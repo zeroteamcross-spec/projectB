@@ -1,0 +1,29 @@
+DirectoryIndex index.html app.html index.php
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Pastikan API tetap masuk ke backend PHP, bukan fallback SPA.
+    RewriteCond %{REQUEST_URI} ^/api(/|$)
+    RewriteRule ^ index.php [QSA,L]
+
+    # Jika upload/storage diproteksi backend, arahkan ke PHP handler.
+    RewriteCond %{REQUEST_URI} ^/storage/uploads/
+    RewriteRule ^ index.php [QSA,L]
+
+    # Sajikan file/folder statis jika memang ada.
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # Fallback SPA agar root domain dan hash route tetap membuka index.html.
+    RewriteRule ^ index.html [L]
+</IfModule>
+
+# Basic security: cegah akses file sensitif.
+<FilesMatch "^(\.env|composer\.(json|lock)|package(-lock)?\.json|README|AGENTS\.md)$">
+    Require all denied
+</FilesMatch>
+
+# Cegah directory listing jika server mengizinkan Options.
+Options -Indexes
