@@ -6,10 +6,8 @@
 # Local runtime files
 /storage/logs/*
 /storage/cache/*
-/storage/uploads/*
 !/storage/logs/.gitkeep
 !/storage/cache/.gitkeep
-#!/storage/uploads/.gitkeep
 /public/uploads/demo/
 
 # Manual test artifacts
