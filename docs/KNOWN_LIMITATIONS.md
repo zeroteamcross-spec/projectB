@@ -299,3 +299,16 @@ Tetapi guard mutation sensitif yang eksplisit baru diterapkan pada affiliate:
 - ubah password affiliate
 
 Seller impersonation saat ini diposisikan untuk inspeksi/support dan belum menambah perluasan mutation policy baru di luar perilaku existing.
+
+---
+
+## 13. Auto schema bootstrap limitations
+
+### 13.1 Scope auto-create tabel masih module-scoped
+Auto schema bootstrap saat ini hanya membuat tabel `notifications` jika belum tersedia. Ini sengaja tidak dibuat global agar request pertama tidak menjalankan scan/patch schema besar.
+
+### 13.2 Tidak membuat database baru
+Database MySQL harus sudah ada dan tetap mengikuti konfigurasi aktif `config/database.php` / `.env`. Bootstrap hanya berjalan setelah koneksi PDO ke database berhasil.
+
+### 13.3 Tidak memperbaiki tabel existing yang tidak lengkap
+Jika tabel `notifications` sudah ada tetapi kolom/index-nya belum lengkap, bootstrap tidak menjalankan `ALTER TABLE`. Sinkronisasi tabel existing tetap harus mengikuti SQL patch manual dengan backup.

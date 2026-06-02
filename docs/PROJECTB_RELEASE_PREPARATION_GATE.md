@@ -236,6 +236,13 @@ Evidence local:
 - disable / unpublish payment callback URL sementara jika callback mulai masuk ke build yang di-rollback.
 - jangan menjalankan rollback SQL manual destruktif tanpa approval.
 
+## 10.1 Auto Schema Bootstrap Gate
+
+- `AUTO_SCHEMA_BOOTSTRAP_ENABLED` mengontrol bootstrap tabel module-scoped.
+- Scope saat ini hanya tabel `notifications`.
+- Bootstrap tidak membuat database baru dan tidak menjalankan `ALTER TABLE` pada tabel existing.
+- Untuk production, rekomendasi utama tetap apply SQL patch dengan backup; auto bootstrap hanya safety net terbatas bila env diaktifkan.
+
 ## 11. UAT Evidence / Data Cleanup
 
 Known UAT evidence:
