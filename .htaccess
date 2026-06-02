@@ -3,7 +3,7 @@ DirectoryIndex index.php index.html app.html
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Sajikan file/folder real di public_html jika memang ada.
+    # Jangan ganggu file/folder yang memang ada di public_html.
     RewriteCond %{REQUEST_FILENAME} -f [OR]
     RewriteCond %{REQUEST_FILENAME} -d
     RewriteRule ^ - [L]

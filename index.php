@@ -1,31 +1,34 @@
 <?php
 /**
- * Bridge public_html/index.php -> /home/u321714661/domains/garasi-mobil.com/public
+ * Bridge for Niagahoster shared hosting:
  *
- * Pakai file ini jika struktur ProjectB TIDAK berada di:
- *   /home/u321714661/domains/garasi-mobil.com/public_html/projectB/public
+ * public_html/index.php  ->  public_html/public/index.html
+ * public_html/index.php  ->  public_html/public/index.php for /api/*
  *
- * Tetapi SPA entry ProjectB berada di:
- *   /home/u321714661/domains/garasi-mobil.com/public/index.html
+ * Expected structure:
  *
- * Letakkan file ini di:
- *   /home/u321714661/domains/garasi-mobil.com/public_html/index.php
+ * public_html/
+ * ├── index.php      <- this file
+ * ├── .htaccess
+ * └── public/
+ *     ├── index.html
+ *     ├── app.html
+ *     ├── index.php
+ *     └── assets/
  */
 
-$publicRoot = '/home/u321714661/domains/garasi-mobil.com/public';
+$publicRoot = __DIR__ . '/public';
 
 if (!is_dir($publicRoot)) {
     http_response_code(500);
     header('Content-Type: text/plain; charset=utf-8');
     echo "ProjectB public folder not found.\n";
     echo "Expected: {$publicRoot}\n";
-    echo "Edit \$publicRoot in public_html/index.php to match your server path.\n";
     exit;
 }
 
 $uriPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 $uriPath = rawurldecode($uriPath);
-
 $relativePath = ltrim($uriPath, '/');
 
 if (str_contains($relativePath, '..')) {
@@ -39,8 +42,6 @@ if (str_contains($relativePath, '..')) {
 |--------------------------------------------------------------------------
 | API/backend requests
 |--------------------------------------------------------------------------
-| Forward /api/... to the real ProjectB backend entry:
-|   /home/u321714661/domains/garasi-mobil.com/public/index.php
 */
 if ($uriPath === '/api' || str_starts_with($uriPath, '/api/')) {
     $_SERVER['SCRIPT_FILENAME'] = $publicRoot . '/index.php';
@@ -54,7 +55,7 @@ if ($uriPath === '/api' || str_starts_with($uriPath, '/api/')) {
 
 /*
 |--------------------------------------------------------------------------
-| Protected storage/uploads route, if ProjectB handles this through PHP.
+| Protected storage/uploads route
 |--------------------------------------------------------------------------
 */
 if ($uriPath === '/storage/uploads' || str_starts_with($uriPath, '/storage/uploads/')) {
@@ -69,11 +70,8 @@ if ($uriPath === '/storage/uploads' || str_starts_with($uriPath, '/storage/uploa
 
 /*
 |--------------------------------------------------------------------------
-| Serve static files from the real public folder.
+| Serve static files from public_html/public.
 |--------------------------------------------------------------------------
-| Examples:
-|   /assets/js/app.js -> /home/.../public/assets/js/app.js
-|   /assets/images/bg-vid.mp4 -> /home/.../public/assets/images/bg-vid.mp4
 */
 $publicRootReal = realpath($publicRoot);
 $staticFile = realpath($publicRoot . '/' . $relativePath);
@@ -85,6 +83,7 @@ if (
     && is_file($staticFile)
 ) {
     $ext = strtolower(pathinfo($staticFile, PATHINFO_EXTENSION));
+
     $mimeMap = [
         'html' => 'text/html; charset=utf-8',
         'css' => 'text/css; charset=utf-8',
@@ -116,13 +115,10 @@ if (
 
 /*
 |--------------------------------------------------------------------------
-| Root and SPA fallback
+| SPA fallback
 |--------------------------------------------------------------------------
-| Browser hash fragments are not sent to the server:
-|   https://garasi-mobil.com/#/seller
-| reaches PHP as "/".
-|
-| Serve real public/index.html.
+| Hash fragments are not sent to the server.
+| https://domain.com/#/seller reaches this script as "/".
 */
 $indexHtml = $publicRoot . '/index.html';
 $appHtml = $publicRoot . '/app.html';
