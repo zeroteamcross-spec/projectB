@@ -22,7 +22,7 @@ return [
     'default' => env('DB_CONNECTION', 'mysql'),
     'connections' => [
         'mysql' => [
-            'host' => env('DB_HOST', 'https://garasi-mobil.com/'),
+            'host' => env('DB_HOST', 'localhost'),
             'port' => env('DB_PORT', '3306'),
             'database' => env('DB_DATABASE', 'u321714661_jualbelimobil'),
             'username' => env('DB_USERNAME', 'u321714661_jualbelimobil'),
