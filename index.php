@@ -1,63 +1,33 @@
 <?php
 /**
- * ProjectB shared-hosting bridge for public_html/index.php
+ * Bridge public_html/index.php -> /home/u321714661/domains/garasi-mobil.com/public
  *
- * Use case:
- * - Keep ProjectB structure unchanged.
- * - Domain document root stays at public_html.
- * - Real ProjectB public entry stays at projectB/public.
+ * Pakai file ini jika struktur ProjectB TIDAK berada di:
+ *   /home/u321714661/domains/garasi-mobil.com/public_html/projectB/public
  *
- * Place this file at:
- *   public_html/index.php
+ * Tetapi SPA entry ProjectB berada di:
+ *   /home/u321714661/domains/garasi-mobil.com/public/index.html
  *
- * Expected structure:
- *   public_html/
- *   ├── index.php              <- this file
- *   ├── .htaccess              <- use provided rewrite file
- *   └── projectB/
- *       ├── app/
- *       ├── bootstrap/
- *       ├── config/
- *       ├── routes/
- *       └── public/
- *           ├── index.html
- *           ├── app.html
- *           ├── index.php
- *           └── assets/
+ * Letakkan file ini di:
+ *   /home/u321714661/domains/garasi-mobil.com/public_html/index.php
  */
 
-/*
-|--------------------------------------------------------------------------
-| Adjust this if your projectB folder has a different name/location.
-|--------------------------------------------------------------------------
-|
-| Example alternatives:
-|   __DIR__ . '/projectB'
-|   dirname(__DIR__) . '/projectB'
-|   '/home/USERNAME/projectB'
-|
-*/
-$projectRoot = __DIR__ . '/projectB';
-$publicRoot = $projectRoot . '/public';
+$publicRoot = '/home/u321714661/domains/garasi-mobil.com/public';
 
 if (!is_dir($publicRoot)) {
     http_response_code(500);
     header('Content-Type: text/plain; charset=utf-8');
     echo "ProjectB public folder not found.\n";
     echo "Expected: {$publicRoot}\n";
-    echo "Edit \$projectRoot in public_html/index.php to match your server path.\n";
+    echo "Edit \$publicRoot in public_html/index.php to match your server path.\n";
     exit;
 }
 
 $uriPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 $uriPath = rawurldecode($uriPath);
 
-/*
-|--------------------------------------------------------------------------
-| Security: normalize path and prevent traversal.
-|--------------------------------------------------------------------------
-*/
 $relativePath = ltrim($uriPath, '/');
+
 if (str_contains($relativePath, '..')) {
     http_response_code(400);
     header('Content-Type: text/plain; charset=utf-8');
@@ -67,13 +37,16 @@ if (str_contains($relativePath, '..')) {
 
 /*
 |--------------------------------------------------------------------------
-| API/backend requests should be handled by ProjectB public/index.php.
+| API/backend requests
 |--------------------------------------------------------------------------
+| Forward /api/... to the real ProjectB backend entry:
+|   /home/u321714661/domains/garasi-mobil.com/public/index.php
 */
 if ($uriPath === '/api' || str_starts_with($uriPath, '/api/')) {
     $_SERVER['SCRIPT_FILENAME'] = $publicRoot . '/index.php';
     $_SERVER['SCRIPT_NAME'] = '/index.php';
     $_SERVER['PHP_SELF'] = '/index.php';
+
     chdir($publicRoot);
     require $publicRoot . '/index.php';
     exit;
@@ -81,13 +54,14 @@ if ($uriPath === '/api' || str_starts_with($uriPath, '/api/')) {
 
 /*
 |--------------------------------------------------------------------------
-| Protected storage/upload route, if ProjectB handles it through PHP.
+| Protected storage/uploads route, if ProjectB handles this through PHP.
 |--------------------------------------------------------------------------
 */
 if ($uriPath === '/storage/uploads' || str_starts_with($uriPath, '/storage/uploads/')) {
     $_SERVER['SCRIPT_FILENAME'] = $publicRoot . '/index.php';
     $_SERVER['SCRIPT_NAME'] = '/index.php';
     $_SERVER['PHP_SELF'] = '/index.php';
+
     chdir($publicRoot);
     require $publicRoot . '/index.php';
     exit;
@@ -95,11 +69,14 @@ if ($uriPath === '/storage/uploads' || str_starts_with($uriPath, '/storage/uploa
 
 /*
 |--------------------------------------------------------------------------
-| Serve static files from projectB/public without moving the folder.
+| Serve static files from the real public folder.
 |--------------------------------------------------------------------------
+| Examples:
+|   /assets/js/app.js -> /home/.../public/assets/js/app.js
+|   /assets/images/bg-vid.mp4 -> /home/.../public/assets/images/bg-vid.mp4
 */
-$staticFile = realpath($publicRoot . '/' . $relativePath);
 $publicRootReal = realpath($publicRoot);
+$staticFile = realpath($publicRoot . '/' . $relativePath);
 
 if (
     $staticFile !== false
@@ -139,15 +116,13 @@ if (
 
 /*
 |--------------------------------------------------------------------------
-| Root and SPA hash routes.
+| Root and SPA fallback
 |--------------------------------------------------------------------------
+| Browser hash fragments are not sent to the server:
+|   https://garasi-mobil.com/#/seller
+| reaches PHP as "/".
 |
-| Browser never sends hash fragments to the server, so:
-|   https://domain.com/#/seller
-| reaches the server as:
-|   /
-|
-| Serve projectB/public/index.html.
+| Serve real public/index.html.
 */
 $indexHtml = $publicRoot . '/index.html';
 $appHtml = $publicRoot . '/app.html';
@@ -166,4 +141,5 @@ if (is_file($appHtml)) {
 
 http_response_code(500);
 header('Content-Type: text/plain; charset=utf-8');
-//echo "ProjectB SPA entry not found. Expected index.html or app.html in: {$publicRoot}\n";
+echo "ProjectB SPA entry not found.\n";
+echo "Expected index.html or app.html in: {$publicRoot}\n";

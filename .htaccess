@@ -3,12 +3,12 @@ DirectoryIndex index.php index.html app.html
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Keep real files/folders in public_html accessible if they exist.
+    # Sajikan file/folder real di public_html jika memang ada.
     RewriteCond %{REQUEST_FILENAME} -f [OR]
     RewriteCond %{REQUEST_FILENAME} -d
     RewriteRule ^ - [L]
 
-    # Send everything else to the bridge index.php.
+    # Semua request lain masuk ke bridge public_html/index.php.
     RewriteRule ^ index.php [QSA,L]
 </IfModule>
 
