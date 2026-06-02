@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>BeliMobil App</title>
+    <script src="/assets/js/theme/tailwindRuntimeConfig.js?v=20260423-design-studio"></script>
+    <script src="/api/theme/runtime-config.js?v=20260423-design-studio"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @keyframes pbModalIn {
+        from { opacity: 0; transform: translateY(10px) scale(0.985); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+      }
+
+      .modal-scrollbar {
+        scrollbar-width: thin;
+        scrollbar-color: color-mix(in srgb, var(--pb-brand-secondary) 42%, transparent) transparent;
+      }
+
+      .modal-scrollbar::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .modal-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      .modal-scrollbar::-webkit-scrollbar-thumb {
+        border: 2px solid transparent;
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--pb-brand-secondary) 42%, transparent);
+        background-clip: content-box;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 font-sans text-gray-950 antialiased">
+    <div id="app"></div>
+    <div id="modal-root" hidden></div>
+    <div id="toast-root" aria-live="polite"></div>
+    <script type="module" src="/assets/js/app.js?v=20260423-design-studio"></script>
+  </body>
+</html>

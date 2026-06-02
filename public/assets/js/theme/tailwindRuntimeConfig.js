@@ -1,0 +1,410 @@
+(function bootstrapThemeRuntime(global) {
+  var DEFAULT_THEME = {
+    brand: {
+      appName: "BeliMobil",
+      shortMark: "BM",
+      tagline: "Jual beli mobil terpercaya",
+      logoIcon: "brandMark",
+      logoMarkAsset: "brand.logoMark",
+    },
+    contact: {
+      whatsapp: "",
+    },
+    colors: {
+      primary: "#ea580c",
+      secondary: "#c2410c",
+      accent: "#f97316",
+      pageBg: "#f8fafc",
+      surface: "#ffffff",
+      surfaceMuted: "#f8fafc",
+      inset: "#f1f5f9",
+      text: "#030712",
+      textStrong: "#1f2937",
+      textMuted: "#6b7280",
+      border: "#e5e7eb",
+      borderStrong: "#cbd5e1",
+      overlay: "rgba(3, 7, 18, 0.55)",
+      success: "#15803d",
+      warning: "#b45309",
+      danger: "#b91c1c",
+      info: "#1d4ed8",
+      publicCanvasStart: "#020617",
+      publicCanvasMid: "#1e293b",
+      publicCanvasEnd: "#475569",
+    },
+    shell: {
+      publicHeaderBg: "rgba(255, 255, 255, 0.92)",
+      appHeaderBg: "rgba(255, 255, 255, 0.95)",
+      sidebarStart: "#b91c1c",
+      sidebarEnd: "#f59e0b",
+      navActiveBg: "rgba(255, 255, 255, 0.16)",
+      navText: "#ffffff",
+    },
+    button: {
+      primaryFrom: "#ea580c",
+      primaryTo: "#f97316",
+      secondaryBg: "#ffffff",
+      secondaryText: "#111827",
+      ghostText: "#c2410c",
+    },
+    surface: {
+      cardBg: "#ffffff",
+      cardBorder: "#e5e7eb",
+      panelBg: "#ffffff",
+      insetBg: "#f8fafc",
+    },
+    form: {
+      searchBg: "#ffffff",
+      inputBg: "#ffffff",
+      controlBorder: "#cbd5e1",
+      focus: "#ea580c",
+      chipBg: "#ffffff",
+      chipText: "#334155",
+      chipActiveFrom: "#ea580c",
+      chipActiveTo: "#f97316",
+    },
+    state: {
+      emptyBg: "#ffffff",
+      errorBg: "#ffffff",
+      errorBorder: "#fecaca",
+      badgeNeutralBg: "#f3f4f6",
+    },
+    layout: {
+      spacingScale: 1,
+      radiusScale: 1,
+      shadowDepth: 1,
+    },
+  };
+
+  var currentTheme = deepMerge(DEFAULT_THEME, global.__PROJECTB_THEME__ || {});
+
+  function deepMerge(base, override) {
+    var source = isObject(base) ? clone(base) : {};
+    var patch = isObject(override) ? override : {};
+
+    Object.keys(patch).forEach(function mergeKey(key) {
+      if (isObject(source[key]) && isObject(patch[key])) {
+        source[key] = deepMerge(source[key], patch[key]);
+        return;
+      }
+
+      source[key] = patch[key];
+    });
+
+    return source;
+  }
+
+  function clone(value) {
+    return JSON.parse(JSON.stringify(value));
+  }
+
+  function isObject(value) {
+    return value && typeof value === "object" && !Array.isArray(value);
+  }
+
+  function normalize(theme) {
+    var merged = deepMerge(DEFAULT_THEME, theme || {});
+    merged.brand.appName = stringOr(merged.brand.appName, DEFAULT_THEME.brand.appName);
+    merged.brand.shortMark = stringOr(merged.brand.shortMark, DEFAULT_THEME.brand.shortMark);
+    merged.brand.tagline = stringOr(merged.brand.tagline, DEFAULT_THEME.brand.tagline);
+    merged.brand.logoIcon = stringOr(merged.brand.logoIcon, DEFAULT_THEME.brand.logoIcon);
+    merged.brand.logoMarkAsset = stringOr(merged.brand.logoMarkAsset, DEFAULT_THEME.brand.logoMarkAsset);
+    merged.contact.whatsapp = stringOr(merged.contact.whatsapp, DEFAULT_THEME.contact.whatsapp);
+
+    normalizeColorGroup(merged.colors, DEFAULT_THEME.colors, [
+      "primary",
+      "secondary",
+      "accent",
+      "pageBg",
+      "surface",
+      "surfaceMuted",
+      "inset",
+      "text",
+      "textStrong",
+      "textMuted",
+      "border",
+      "borderStrong",
+      "success",
+      "warning",
+      "danger",
+      "info",
+      "publicCanvasStart",
+      "publicCanvasMid",
+      "publicCanvasEnd",
+    ]);
+    merged.colors.overlay = paintOr(merged.colors.overlay, DEFAULT_THEME.colors.overlay);
+
+    normalizeColorGroup(merged.shell, DEFAULT_THEME.shell, [
+      "sidebarStart",
+      "sidebarEnd",
+      "navText",
+    ]);
+    merged.shell.publicHeaderBg = paintOr(merged.shell.publicHeaderBg, DEFAULT_THEME.shell.publicHeaderBg);
+    merged.shell.appHeaderBg = paintOr(merged.shell.appHeaderBg, DEFAULT_THEME.shell.appHeaderBg);
+    merged.shell.navActiveBg = paintOr(merged.shell.navActiveBg, DEFAULT_THEME.shell.navActiveBg);
+
+    normalizeColorGroup(merged.button, DEFAULT_THEME.button, [
+      "primaryFrom",
+      "primaryTo",
+      "secondaryBg",
+      "secondaryText",
+      "ghostText",
+    ]);
+    normalizeColorGroup(merged.surface, DEFAULT_THEME.surface, [
+      "cardBg",
+      "cardBorder",
+      "panelBg",
+      "insetBg",
+    ]);
+    normalizeColorGroup(merged.form, DEFAULT_THEME.form, [
+      "searchBg",
+      "inputBg",
+      "controlBorder",
+      "focus",
+      "chipBg",
+      "chipText",
+      "chipActiveFrom",
+      "chipActiveTo",
+    ]);
+    normalizeColorGroup(merged.state, DEFAULT_THEME.state, [
+      "emptyBg",
+      "errorBg",
+      "errorBorder",
+      "badgeNeutralBg",
+    ]);
+    merged.layout.spacingScale = numberOr(merged.layout.spacingScale, 1);
+    merged.layout.radiusScale = numberOr(merged.layout.radiusScale, 1);
+    merged.layout.shadowDepth = numberOr(merged.layout.shadowDepth, 1);
+    return merged;
+  }
+
+  function numberOr(value, fallback) {
+    var next = Number(value);
+    return Number.isFinite(next) ? next : fallback;
+  }
+
+  function stringOr(value, fallback) {
+    var next = String(value || "").trim();
+    return next ? next : fallback;
+  }
+
+  function normalizeColorGroup(group, defaults, keys) {
+    keys.forEach(function normalizeColorKey(key) {
+      group[key] = colorOr(group[key], defaults[key]);
+    });
+  }
+
+  function colorOr(value, fallback) {
+    var next = String(value || "").trim();
+    if (/^#[0-9a-fA-F]{6}$/.test(next)) {
+      return next;
+    }
+    return fallback;
+  }
+
+  function paintOr(value, fallback) {
+    var next = String(value || "").trim();
+    if (!next) {
+      return fallback;
+    }
+    if (/^#[0-9a-fA-F]{6}$/.test(next)) {
+      return next;
+    }
+    if (/^rgba?\([^)]+\)$/i.test(next)) {
+      return next;
+    }
+    if (/^linear-gradient\([^)]+\)$/i.test(next)) {
+      return next;
+    }
+    return fallback;
+  }
+
+  function mix(hex, ratio, base) {
+    var a = toRgb(hex);
+    var b = toRgb(base);
+
+    if (!a || !b) {
+      return hex;
+    }
+
+    return toHex({
+      r: Math.round(a.r * ratio + b.r * (1 - ratio)),
+      g: Math.round(a.g * ratio + b.g * (1 - ratio)),
+      b: Math.round(a.b * ratio + b.b * (1 - ratio)),
+    });
+  }
+
+  function darken(hex, amount) {
+    var rgb = toRgb(hex);
+
+    if (!rgb) {
+      return hex;
+    }
+
+    return toHex({
+      r: Math.max(0, Math.round(rgb.r * (1 - amount))),
+      g: Math.max(0, Math.round(rgb.g * (1 - amount))),
+      b: Math.max(0, Math.round(rgb.b * (1 - amount))),
+    });
+  }
+
+  function toRgb(hex) {
+    var value = String(hex || "").trim().replace("#", "");
+
+    if (!/^[0-9a-fA-F]{6}$/.test(value)) {
+      return null;
+    }
+
+    return {
+      r: parseInt(value.slice(0, 2), 16),
+      g: parseInt(value.slice(2, 4), 16),
+      b: parseInt(value.slice(4, 6), 16),
+    };
+  }
+
+  function toHex(rgb) {
+    return "#" + [rgb.r, rgb.g, rgb.b].map(function mapChannel(channel) {
+      return String(channel.toString(16)).padStart(2, "0");
+    }).join("");
+  }
+
+  function spacing(scale, base) {
+    return Math.max(8, Math.round(base * scale)) + "px";
+  }
+
+  function radius(scale, base) {
+    return Math.max(6, Math.round(base * scale)) + "px";
+  }
+
+  function shadow(theme) {
+    var depth = numberOr(theme.layout.shadowDepth, 1);
+    return {
+      soft: "0 8px 20px rgba(15, 23, 42, " + (0.06 * depth) + ")",
+      card: "0 18px 45px rgba(15, 23, 42, " + (0.14 * depth) + "), 0 8px 18px rgba(15, 23, 42, " + (0.08 * depth) + ")",
+      elevated: "0 24px 55px rgba(15, 23, 42, " + (0.18 * depth) + "), 0 12px 24px rgba(15, 23, 42, " + (0.12 * depth) + ")",
+    };
+  }
+
+  function themeVariables(theme) {
+    var scale = numberOr(theme.layout.radiusScale, 1);
+    var depth = shadow(theme);
+
+    return {
+      "--pb-brand-primary": theme.colors.primary,
+      "--pb-brand-secondary": theme.colors.secondary,
+      "--pb-brand-accent": theme.colors.accent,
+      "--pb-page-bg": theme.colors.pageBg,
+      "--pb-surface": theme.colors.surface,
+      "--pb-surface-muted": theme.colors.surfaceMuted,
+      "--pb-surface-panel": theme.surface.panelBg,
+      "--pb-surface-card": theme.surface.cardBg,
+      "--pb-surface-inset": theme.surface.insetBg,
+      "--pb-text": theme.colors.text,
+      "--pb-text-strong": theme.colors.textStrong,
+      "--pb-text-muted": theme.colors.textMuted,
+      "--pb-border": theme.colors.border,
+      "--pb-border-strong": theme.colors.borderStrong,
+      "--pb-overlay": theme.colors.overlay,
+      "--pb-success": theme.colors.success,
+      "--pb-warning": theme.colors.warning,
+      "--pb-danger": theme.colors.danger,
+      "--pb-info": theme.colors.info,
+      "--pb-public-canvas-start": theme.colors.publicCanvasStart,
+      "--pb-public-canvas-mid": theme.colors.publicCanvasMid,
+      "--pb-public-canvas-end": theme.colors.publicCanvasEnd,
+      "--pb-shell-public-header": theme.shell.publicHeaderBg,
+      "--pb-shell-app-header": theme.shell.appHeaderBg,
+      "--pb-shell-sidebar-start": theme.shell.sidebarStart,
+      "--pb-shell-sidebar-end": theme.shell.sidebarEnd,
+      "--pb-shell-nav-active": theme.shell.navActiveBg,
+      "--pb-shell-nav-text": theme.shell.navText,
+      "--pb-btn-primary-from": theme.button.primaryFrom,
+      "--pb-btn-primary-to": theme.button.primaryTo,
+      "--pb-btn-secondary-bg": theme.button.secondaryBg,
+      "--pb-btn-secondary-text": theme.button.secondaryText,
+      "--pb-btn-ghost-text": theme.button.ghostText,
+      "--pb-form-search-bg": theme.form.searchBg,
+      "--pb-form-input-bg": theme.form.inputBg,
+      "--pb-form-border": theme.form.controlBorder,
+      "--pb-form-focus": theme.form.focus,
+      "--pb-chip-bg": theme.form.chipBg,
+      "--pb-chip-text": theme.form.chipText,
+      "--pb-chip-active-from": theme.form.chipActiveFrom,
+      "--pb-chip-active-to": theme.form.chipActiveTo,
+      "--pb-empty-bg": theme.state.emptyBg,
+      "--pb-error-bg": theme.state.errorBg,
+      "--pb-error-border": theme.state.errorBorder,
+      "--pb-badge-neutral-bg": theme.state.badgeNeutralBg,
+      "--pb-radius-sm": radius(scale, 8),
+      "--pb-radius-md": radius(scale, 12),
+      "--pb-radius-lg": radius(scale, 16),
+      "--pb-radius-xl": radius(scale, 20),
+      "--pb-radius-2xl": radius(scale, 28),
+      "--pb-space-sm": spacing(theme.layout.spacingScale, 8),
+      "--pb-space-md": spacing(theme.layout.spacingScale, 12),
+      "--pb-space-lg": spacing(theme.layout.spacingScale, 16),
+      "--pb-space-xl": spacing(theme.layout.spacingScale, 24),
+      "--pb-page-x": spacing(theme.layout.spacingScale, 16),
+      "--pb-page-y": spacing(theme.layout.spacingScale, 24),
+      "--pb-shadow-soft": depth.soft,
+      "--pb-shadow-card": depth.card,
+      "--pb-shadow-elevated": depth.elevated,
+    };
+  }
+
+  function applyVariables(theme, target) {
+    var host = target || global.document && global.document.documentElement;
+    if (!host || !host.style) {
+      return;
+    }
+
+    var vars = themeVariables(theme);
+    Object.keys(vars).forEach(function setVar(key) {
+      host.style.setProperty(key, vars[key]);
+    });
+  }
+
+  function syncTailwindConfig(theme) {
+    global.tailwind = global.tailwind || {};
+    global.tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: mix(theme.colors.primary, 0.1, "#ffffff"),
+              100: mix(theme.colors.primary, 0.18, "#ffffff"),
+              600: theme.colors.primary,
+              700: theme.colors.secondary,
+              800: darken(theme.colors.secondary, 0.18),
+            },
+          },
+          boxShadow: {
+            card: shadow(theme).card,
+          },
+        },
+      },
+    };
+  }
+
+  function applyTheme(overrides) {
+    currentTheme = normalize(deepMerge(currentTheme, overrides || {}));
+    global.__PROJECTB_THEME__ = currentTheme;
+    applyVariables(currentTheme);
+    syncTailwindConfig(currentTheme);
+    return clone(currentTheme);
+  }
+
+  global.__PROJECTB_THEME_DEFAULTS__ = clone(DEFAULT_THEME);
+  global.__PROJECTB_NORMALIZE_THEME__ = function normalizeThemeInput(input) {
+    return normalize(input);
+  };
+  global.__PROJECTB_THEME_TO_VARS__ = function themeToVars(input) {
+    return themeVariables(normalize(input));
+  };
+  global.__PROJECTB_GET_THEME__ = function getTheme() {
+    return clone(currentTheme);
+  };
+  global.__PROJECTB_APPLY_THEME__ = applyTheme;
+
+  applyTheme(currentTheme);
+}(window));

@@ -1,0 +1,231 @@
+{
+  "date": "2026-06-02T13:09:21.622Z",
+  "baseUrl": "http://127.0.0.1:8035",
+  "targets": {
+    "seller": {
+      "id": 26,
+      "email": "uat_aff_fin_20260601_145953_seller@projectb.local",
+      "role": "seller"
+    },
+    "affiliate_admin": {
+      "id": 28,
+      "email": "uat_aff_fin_20260601_145953_affiliate@projectb.local",
+      "role": "affiliate_admin"
+    }
+  },
+  "adminUi": {
+    "sellerEmail": "uat_aff_fin_20260601_145953_seller@projectb.local",
+    "affiliateEmail": "uat_aff_fin_20260601_145953_affiliate@projectb.local",
+    "sellerButtonVisible": true,
+    "affiliateButtonVisible": true
+  },
+  "seller": {
+    "targetEmail": "uat_aff_fin_20260601_145953_seller@projectb.local",
+    "modalStillOpenAfterBackdrop": true,
+    "redirectUrl": "http://127.0.0.1:8035/app.html#/admin",
+    "authContext": {
+      "user": {
+        "id": 26,
+        "role": "seller",
+        "name": "UAT Affiliate Finance Seller uat_aff_fin_20260601_145953",
+        "phone_number": "6281517264769",
+        "email": "uat_aff_fin_20260601_145953_seller@projectb.local",
+        "address": "UAT Affiliate Finance disposable data",
+        "account_status": "active",
+        "is_approved": true,
+        "created_at": "2026-06-01 14:59:53",
+        "updated_at": "2026-06-01 14:59:53"
+      },
+      "actor": {
+        "id": 1,
+        "role": "admin",
+        "name": "Smoke Admin",
+        "phone_number": "080000000001",
+        "email": "admin@projectb.local",
+        "address": "Smoke Test",
+        "account_status": "active",
+        "is_approved": true,
+        "created_at": "2026-04-15 21:27:12",
+        "updated_at": "2026-06-01 23:54:22"
+      },
+      "impersonation": {
+        "is_impersonating": true,
+        "session_id": 40,
+        "started_at": "2026-06-02 20:09:28",
+        "expires_at": "2026-06-03 00:09:28",
+        "original_admin_id": 1,
+        "original_admin_name": "Smoke Admin",
+        "impersonated_user_id": 26,
+        "impersonated_role": "seller",
+        "actor": {
+          "id": 1,
+          "role": "admin",
+          "name": "Smoke Admin",
+          "phone_number": "080000000001",
+          "email": "admin@projectb.local",
+          "address": "Smoke Test",
+          "account_status": "active",
+          "is_approved": true,
+          "created_at": "2026-04-15 21:27:12",
+          "updated_at": "2026-06-01 23:54:22"
+        },
+        "target": {
+          "id": 26,
+          "role": "seller",
+          "name": "UAT Affiliate Finance Seller uat_aff_fin_20260601_145953",
+          "phone_number": "6281517264769",
+          "email": "uat_aff_fin_20260601_145953_seller@projectb.local",
+          "address": "UAT Affiliate Finance disposable data",
+          "account_status": "active",
+          "is_approved": true,
+          "created_at": "2026-06-01 14:59:53",
+          "updated_at": "2026-06-01 14:59:53"
+        }
+      }
+    },
+    "bannerText": "Anda sedang login sebagai Seller: UAT Affiliate Finance Seller uat_aff_fin_20260601_145953",
+    "postStopContext": {
+      "user": {
+        "id": 1,
+        "role": "admin",
+        "name": "Smoke Admin",
+        "phone_number": "080000000001",
+        "email": "admin@projectb.local",
+        "address": "Smoke Test",
+        "account_status": "active",
+        "is_approved": true,
+        "created_at": "2026-04-15 21:27:12",
+        "updated_at": "2026-06-01 23:54:22"
+      },
+      "actor": {
+        "id": 1,
+        "role": "admin",
+        "name": "Smoke Admin",
+        "phone_number": "080000000001",
+        "email": "admin@projectb.local",
+        "address": "Smoke Test",
+        "account_status": "active",
+        "is_approved": true,
+        "created_at": "2026-04-15 21:27:12",
+        "updated_at": "2026-06-01 23:54:22"
+      },
+      "impersonation": null
+    },
+    "bannerGone": true
+  },
+  "affiliate": {
+    "targetEmail": "uat_aff_fin_20260601_145953_affiliate@projectb.local",
+    "modalStillOpenAfterBackdrop": true,
+    "redirectUrl": "http://127.0.0.1:8035/app.html#/admin",
+    "authContext": {
+      "user": {
+        "id": 28,
+        "role": "affiliate_admin",
+        "name": "UAT Affiliate Finance Affiliate uat_aff_fin_20260601_145953",
+        "phone_number": "6284000150275",
+        "email": "uat_aff_fin_20260601_145953_affiliate@projectb.local",
+        "address": "UAT Affiliate Finance disposable data",
+        "account_status": "active",
+        "is_approved": true,
+        "created_at": "2026-06-01 14:59:53",
+        "updated_at": "2026-06-01 14:59:53"
+      },
+      "actor": {
+        "id": 1,
+        "role": "admin",
+        "name": "Smoke Admin",
+        "phone_number": "080000000001",
+        "email": "admin@projectb.local",
+        "address": "Smoke Test",
+        "account_status": "active",
+        "is_approved": true,
+        "created_at": "2026-04-15 21:27:12",
+        "updated_at": "2026-06-01 23:54:22"
+      },
+      "impersonation": {
+        "is_impersonating": true,
+        "session_id": 41,
+        "started_at": "2026-06-02 20:09:38",
+        "expires_at": "2026-06-03 00:09:38",
+        "original_admin_id": 1,
+        "original_admin_name": "Smoke Admin",
+        "impersonated_user_id": 28,
+        "impersonated_role": "affiliate_admin",
+        "actor": {
+          "id": 1,
+          "role": "admin",
+          "name": "Smoke Admin",
+          "phone_number": "080000000001",
+          "email": "admin@projectb.local",
+          "address": "Smoke Test",
+          "account_status": "active",
+          "is_approved": true,
+          "created_at": "2026-04-15 21:27:12",
+          "updated_at": "2026-06-01 23:54:22"
+        },
+        "target": {
+          "id": 28,
+          "role": "affiliate_admin",
+          "name": "UAT Affiliate Finance Affiliate uat_aff_fin_20260601_145953",
+          "phone_number": "6284000150275",
+          "email": "uat_aff_fin_20260601_145953_affiliate@projectb.local",
+          "address": "UAT Affiliate Finance disposable data",
+          "account_status": "active",
+          "is_approved": true,
+          "created_at": "2026-06-01 14:59:53",
+          "updated_at": "2026-06-01 14:59:53"
+        }
+      }
+    },
+    "bannerText": "Anda sedang login sebagai Affiliate: UAT Affiliate Finance Affiliate uat_aff_fin_20260601_145953",
+    "postStopContext": {
+      "user": {
+        "id": 1,
+        "role": "admin",
+        "name": "Smoke Admin",
+        "phone_number": "080000000001",
+        "email": "admin@projectb.local",
+        "address": "Smoke Test",
+        "account_status": "active",
+        "is_approved": true,
+        "created_at": "2026-04-15 21:27:12",
+        "updated_at": "2026-06-01 23:54:22"
+      },
+      "actor": {
+        "id": 1,
+        "role": "admin",
+        "name": "Smoke Admin",
+        "phone_number": "080000000001",
+        "email": "admin@projectb.local",
+        "address": "Smoke Test",
+        "account_status": "active",
+        "is_approved": true,
+        "created_at": "2026-04-15 21:27:12",
+        "updated_at": "2026-06-01 23:54:22"
+      },
+      "impersonation": null
+    },
+    "bannerGone": true
+  },
+  "regression": {
+    "admin": {
+      "email": "admin@projectb.local",
+      "route": "/admin",
+      "url": "http://127.0.0.1:8035/app.html#/admin",
+      "ok": true
+    },
+    "seller": {
+      "email": "seller@projectb.local",
+      "route": "/seller",
+      "url": "http://127.0.0.1:8035/app.html#/seller",
+      "ok": true
+    },
+    "affiliate_admin": {
+      "email": "affiliate@projectb.local",
+      "route": "/affiliate",
+      "url": "http://127.0.0.1:8035/app.html#/affiliate",
+      "ok": true
+    }
+  },
+  "issues": []
+}

@@ -1,0 +1,218 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Modules\Transactions\Mappers;
+
+class TransactionMapper
+{
+    public static function transaction(array $transaction, array $paymentLogs = [], array $fulfillmentChecklist = []): array
+    {
+        return [
+            'id' => (int) $transaction['id'],
+            'transaction_code' => $transaction['transaction_code'],
+            'buyer_user_id' => (int) $transaction['buyer_user_id'],
+            'seller_user_id' => (int) $transaction['seller_user_id'],
+            'car_id' => (int) $transaction['car_id'],
+            'car_price' => (int) $transaction['car_price'],
+            'payment_type' => $transaction['payment_type'],
+            'dp_amount' => isset($transaction['dp_amount']) ? (int) $transaction['dp_amount'] : null,
+            'remaining_amount' => isset($transaction['remaining_amount']) ? (int) $transaction['remaining_amount'] : null,
+            'transaction_status' => $transaction['transaction_status'],
+            'affiliate_id' => isset($transaction['affiliate_id']) && $transaction['affiliate_id'] !== null ? (int) $transaction['affiliate_id'] : null,
+            'affiliate_referral_code_snapshot' => $transaction['affiliate_referral_code_snapshot'] ?? null,
+            'midtrans_order_id' => $transaction['midtrans_order_id'],
+            'midtrans_token' => $transaction['midtrans_token'],
+            'midtrans_redirect_url' => $transaction['midtrans_redirect_url'],
+            'expires_at' => $transaction['expires_at'],
+            'paid_at' => $transaction['paid_at'],
+            'created_at' => $transaction['created_at'],
+            'updated_at' => $transaction['updated_at'],
+            'buyer' => isset($transaction['buyer_name'])
+                ? [
+                    'id' => (int) $transaction['buyer_user_id'],
+                    'name' => $transaction['buyer_name'],
+                    'email' => $transaction['buyer_email'],
+                ]
+                : null,
+            'seller' => isset($transaction['seller_name'])
+                ? [
+                    'id' => (int) $transaction['seller_user_id'],
+                    'name' => $transaction['seller_name'],
+                    'email' => $transaction['seller_email'],
+                ]
+                : null,
+            'affiliate' => isset($transaction['affiliate_id']) && $transaction['affiliate_id'] !== null
+                ? [
+                    'id' => (int) $transaction['affiliate_id'],
+                    'referral_code' => $transaction['affiliate_referral_code_snapshot'] ?? null,
+                    'name' => $transaction['affiliate_name'] ?? null,
+                    'email' => $transaction['affiliate_email'] ?? null,
+                ]
+                : null,
+            'car' => isset($transaction['brand_name'])
+                ? [
+                    'id' => (int) $transaction['car_id'],
+                    'brand_name' => $transaction['brand_name'],
+                    'model_name' => $transaction['model_name'],
+                    'listing_status' => $transaction['listing_status'],
+                    'cover_image' => $transaction['car_cover_image'] ?? null,
+                    'cover_image_url' => $transaction['car_cover_image'] ?? null,
+                ]
+                : null,
+            'payment_logs' => self::paymentLogs($paymentLogs),
+            'fulfillment_checklist' => self::fulfillmentChecklist($fulfillmentChecklist),
+        ];
+    }
+
+    public static function transactions(array $transactions): array
+    {
+        return array_map(static fn (array $transaction): array => self::transaction($transaction), $transactions);
+    }
+
+    public static function status(array $transaction): array
+    {
+        return [
+            'id' => (int) $transaction['id'],
+            'transaction_code' => $transaction['transaction_code'],
+            'transaction_status' => $transaction['transaction_status'],
+            'affiliate_id' => isset($transaction['affiliate_id']) && $transaction['affiliate_id'] !== null ? (int) $transaction['affiliate_id'] : null,
+            'affiliate_referral_code_snapshot' => $transaction['affiliate_referral_code_snapshot'] ?? null,
+            'payment_type' => $transaction['payment_type'],
+            'car_price' => (int) $transaction['car_price'],
+            'dp_amount' => isset($transaction['dp_amount']) ? (int) $transaction['dp_amount'] : null,
+            'remaining_amount' => isset($transaction['remaining_amount']) ? (int) $transaction['remaining_amount'] : null,
+            'expires_at' => $transaction['expires_at'],
+            'paid_at' => $transaction['paid_at'],
+        ];
+    }
+
+    public static function paymentLog(array $log): array
+    {
+        $payloadRequest = self::decodeJson($log['payload_request_json'] ?? null);
+        $payloadResponse = self::decodeJson($log['payload_response_json'] ?? null);
+        $payloadCallback = self::decodeJson($log['payload_callback_json'] ?? null);
+        $paymentData = self::paymentDataFromPayload($payloadResponse, $payloadCallback);
+
+        return [
+            'id' => (int) $log['id'],
+            'transaction_id' => (int) $log['transaction_id'],
+            'provider_name' => $log['provider_name'],
+            'provider_order_id' => $log['provider_order_id'],
+            'provider_transaction_id' => $log['provider_transaction_id'],
+            'payment_method' => $log['payment_method'],
+            'transaction_status' => $log['transaction_status'],
+            'gross_amount' => isset($log['gross_amount']) ? (int) $log['gross_amount'] : null,
+            'payload_request' => $payloadRequest,
+            'payload_response' => $payloadResponse,
+            'payload_callback' => $payloadCallback,
+            'payment_data' => $paymentData,
+            'qr_code_url' => self::qrCodeUrl($paymentData),
+            'deeplink_url' => self::deeplinkUrl($paymentData),
+            'logged_at' => $log['logged_at'],
+            'created_at' => $log['created_at'],
+        ];
+    }
+
+    public static function paymentLogs(array $logs): array
+    {
+        return array_map(static fn (array $log): array => self::paymentLog($log), $logs);
+    }
+
+    public static function fulfillmentChecklist(array $items): array
+    {
+        return array_map(static fn (array $item): array => [
+            'id' => isset($item['id']) ? (int) $item['id'] : null,
+            'transaction_id' => isset($item['transaction_id']) ? (int) $item['transaction_id'] : null,
+            'key' => $item['checklist_key'] ?? $item['key'] ?? null,
+            'label' => $item['label'] ?? '',
+            'is_required' => (bool) ($item['is_required'] ?? true),
+            'is_completed' => (bool) ($item['is_completed'] ?? false),
+            'completed_at' => $item['completed_at'] ?? null,
+            'completed_by_user_id' => isset($item['completed_by_user_id']) && $item['completed_by_user_id'] !== null
+                ? (int) $item['completed_by_user_id']
+                : null,
+            'notes' => $item['notes'] ?? null,
+            'sort_order' => isset($item['sort_order']) ? (int) $item['sort_order'] : 0,
+            'created_at' => $item['created_at'] ?? null,
+            'updated_at' => $item['updated_at'] ?? null,
+        ], $items);
+    }
+
+    private static function decodeJson(?string $payload): ?array
+    {
+        if (! is_string($payload) || trim($payload) === '') {
+            return null;
+        }
+
+        $decoded = json_decode($payload, true);
+
+        return is_array($decoded) ? $decoded : null;
+    }
+
+    private static function paymentDataFromPayload(?array $payloadResponse, ?array $payloadCallback): array
+    {
+        $source = is_array($payloadResponse) && $payloadResponse !== []
+            ? $payloadResponse
+            : (is_array($payloadCallback) ? $payloadCallback : []);
+
+        $data = [
+            'va_number' => null,
+            'bank' => null,
+            'bill_key' => $source['bill_key'] ?? null,
+            'biller_code' => $source['biller_code'] ?? null,
+            'qr_string' => $source['qr_string'] ?? null,
+            'deeplink_url' => null,
+            'actions' => is_array($source['actions'] ?? null) ? $source['actions'] : [],
+        ];
+
+        if (isset($source['va_numbers'][0]) && is_array($source['va_numbers'][0])) {
+            $data['bank'] = $source['va_numbers'][0]['bank'] ?? null;
+            $data['va_number'] = $source['va_numbers'][0]['va_number'] ?? null;
+        }
+
+        if (isset($source['permata_va_number'])) {
+            $data['bank'] = 'permata';
+            $data['va_number'] = $source['permata_va_number'];
+        }
+
+        foreach ($data['actions'] as $action) {
+            if (! is_array($action)) {
+                continue;
+            }
+
+            if (($action['name'] ?? null) === 'generate-qr-code' && isset($action['url'])) {
+                $data['qr_string'] = $action['url'];
+            }
+
+            if (($action['name'] ?? null) === 'deeplink-redirect' && isset($action['url'])) {
+                $data['deeplink_url'] = $action['url'];
+            }
+        }
+
+        return $data;
+    }
+
+    private static function qrCodeUrl(array $paymentData): ?string
+    {
+        $value = $paymentData['qr_string'] ?? null;
+
+        if (! is_string($value) || trim($value) === '') {
+            return null;
+        }
+
+        $trimmed = trim($value);
+        if (preg_match('/^(https?:\/\/|data:image\/)/i', $trimmed) === 1) {
+            return $trimmed;
+        }
+
+        return null;
+    }
+
+    private static function deeplinkUrl(array $paymentData): ?string
+    {
+        $value = $paymentData['deeplink_url'] ?? null;
+
+        return is_string($value) && trim($value) !== '' ? trim($value) : null;
+    }
+}

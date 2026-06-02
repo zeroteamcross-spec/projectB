@@ -1,0 +1,1043 @@
+{
+  "date": "2026-06-01T13:52:41.992Z",
+  "baseUrl": "http://127.0.0.1:8022",
+  "testData": {
+    "smokeUsers": {
+      "buyer": "buyer@projectb.local",
+      "seller": "seller@projectb.local",
+      "admin": "admin@projectb.local",
+      "affiliate_admin": "uat_aff_fin_20260601_145953_affiliate@projectb.local"
+    },
+    "affiliateFinanceRunId": "uat_aff_fin_20260601_145953",
+    "publicCarId": 19,
+    "affiliateSlug": "smoke-seller",
+    "sellerCarId": 2
+  },
+  "public": {
+    "landing": {
+      "route": "/",
+      "url": "http://127.0.0.1:8022/app.html?gate=1780321962456#/",
+      "title": "BeliMobil",
+      "textSample": "BeliMobil\nJual beli mobil terpercaya\nBUYER BANNER\nProduk Utama\n\nBanner personal untuk highlight terbaru.\n\nLihat Detail\nTerbaru\nPromo\nTermurah\nKM Rendah\nFilter\nUrutkan\nLOKASI\nPilih lokasi\nBandung\nBekasi\nCimahi\nDepok\nMalang\nSidoarjo\nSurabaya\n",
+      "hasNotFound": false,
+      "overflow": false,
+      "visibleModal": false,
+      "visibleBellCount": 0,
+      "maxCardsPerRow": 1
+    },
+    "carDetail": {
+      "route": "/cars/19",
+      "url": "http://127.0.0.1:8022/app.html?gate=1780321968705#/cars/19",
+      "title": "BeliMobil",
+      "textSample": "BeliMobil\nJual beli mobil terpercaya\nKembali ke katalog\n\nToyota Yaris TRD Sportivo\n\nBekasi | Silver\n\n10 foto\nDETAIL MOBIL\nTersedia\nStok 1\nToyota Yaris TRD Sportivo\n\nSilver | Bekasi\n\nTRANSMISI\n\nManual\n\nKILOMETER\n\n54.000 km\n\nKURSI\n\n5 kursi\n\nR",
+      "hasNotFound": false,
+      "overflow": false,
+      "visibleModal": false,
+      "visibleBellCount": 0
+    },
+    "transactionEntry": {
+      "route": "/transactions/new?car_id=19",
+      "url": "http://127.0.0.1:8022/app.html?gate=1780321971463#/transactions/new?car_id=19",
+      "title": "BeliMobil",
+      "textSample": "BeliMobil\nJual beli mobil terpercaya\nKembali ke detail\n\nTRANSACTION ENTRY\n\nBuyer checkout\nMulai transaksi dengan data yang sudah dicek.\n\nForm ini membuat transaksi awal dan sesi pembayaran dari endpoint payment yang sudah tersedia.\n\nData mo",
+      "hasNotFound": false,
+      "overflow": false,
+      "visibleModal": false,
+      "visibleBellCount": 0
+    },
+    "affiliateLanding": {
+      "route": "/af/smoke-seller",
+      "url": "http://127.0.0.1:8022/app.html?gate=1780321974150#/af/smoke-seller",
+      "title": "BeliMobil",
+      "textSample": "BeliMobil\nJual beli mobil terpercaya\nBUYER BANNER\nProduk Utama\n\nBanner personal untuk highlight terbaru.\n\nLihat Detail\n\nCONTEXT AFFILIATE AKTIF\n\nKatalog Smoke Showroom\n\nAnda sedang masuk lewat affiliate Smoke Affiliate Admin. CTA konsultasi",
+      "hasNotFound": false,
+      "overflow": false,
+      "visibleModal": false,
+      "visibleBellCount": 0
+    },
+    "affiliateCarDetail": {
+      "route": "/af/smoke-seller/cars/19",
+      "url": "http://127.0.0.1:8022/app.html?gate=1780321976977#/af/smoke-seller/cars/19",
+      "title": "BeliMobil",
+      "textSample": "BeliMobil\nJual beli mobil terpercaya\nKembali ke katalog\n\nCONTEXT AFFILIATE AKTIF\n\nKatalog Smoke Showroom\n\nAnda sedang masuk lewat affiliate Smoke Affiliate Admin. CTA konsultasi dan transaksi tetap membawa context ini selama sesi aktif.\n\nLe",
+      "hasNotFound": false,
+      "overflow": false,
+      "visibleModal": false,
+      "visibleBellCount": 0
+    },
+    "affiliateTransactionEntry": {
+      "route": "/af/smoke-seller/transactions/new?car_id=19",
+      "url": "http://127.0.0.1:8022/app.html?gate=1780321979656#/af/smoke-seller/transactions/new?car_id=19",
+      "title": "BeliMobil",
+      "textSample": "BeliMobil\nJual beli mobil terpercaya\nKembali ke detail\n\nTRANSACTION ENTRY\n\nBuyer checkout\nMulai transaksi dengan data yang sudah dicek.\n\nForm ini membuat transaksi awal dan sesi pembayaran dari endpoint payment yang sudah tersedia.\n\nData mo",
+      "hasNotFound": false,
+      "overflow": false,
+      "visibleModal": false,
+      "visibleBellCount": 0
+    },
+    "guestNotificationBellCount": 0,
+    "telemetry": {
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ],
+      "pageErrors": [],
+      "requestCount": 35,
+      "mutationCount": 3
+    },
+    "unexpectedMutations": [
+      {
+        "method": "POST",
+        "url": "http://127.0.0.1:8022/api/affiliate/clicks"
+      },
+      {
+        "method": "POST",
+        "url": "http://127.0.0.1:8022/api/affiliate/clicks"
+      },
+      {
+        "method": "POST",
+        "url": "http://127.0.0.1:8022/api/affiliate/clicks"
+      }
+    ]
+  },
+  "buyer": {
+    "/buyer": {
+      "route": "/buyer",
+      "url": "http://127.0.0.1:8022/app.html?gate=1780321986861#/buyer",
+      "title": "BeliMobil",
+      "textSample": "BeliMobil\nJual beli mobil terpercaya",
+      "hasNotFound": false,
+      "overflow": false,
+      "visibleModal": false,
+      "visibleBellCount": 0
+    },
+    "/buyer/cars": {
+      "route": "/buyer/cars",
+      "url": "http://127.0.0.1:8022/app.html?gate=1780321990232#/buyer/cars",
+      "title": "BeliMobil",
+      "textSample": "Katalog Mobil\nBeranda\nTransaksi\nKatalog\nProfil\nPengaturan\nSB\n\nOVERVIEW\n\nKatalog Mobil\n\nData awal memakai snapshot kecil, daftar penuh hidup sebagai working set halaman.\n\nTersedia\nToyota Yaris TRD Sportivo\n\nRp 192.000.000\n\nBekasi | Manual | ",
+      "hasNotFound": false,
+      "overflow": false,
+      "visibleModal": false,
+      "visibleBellCount": 1
+    },
+    "/buyer/transactions": {
+      "route": "/buyer/transactions",
+      "url": "http://127.0.0.1:8022/app.html?gate=1780321993832#/buyer/transactions",
+      "title": "BeliMobil",
+      "textSample": "Buyer\nBeranda\nTransaksi\nKatalog\nProfil\nPengaturan\nSB\n\nBUYER CENTER\n\nTransaksi Saya\n\nPantau proses pembelian dan pembayaran mobil Anda.\n\n10 transaksi\n6 aktif\nCari Mobil\nSemua\n10\nMenunggu Pembayaran\n3\nDiproses\n3\nSelesai\n4\nSemua\nMenunggu Pemba",
+      "hasNotFound": false,
+      "overflow": false,
+      "visibleModal": false,
+      "visibleBellCount": 1
+    },
+    "/profile": {
+      "route": "/profile",
+      "url": "http://127.0.0.1:8022/app.html?gate=1780321996434#/profile",
+      "title": "BeliMobil",
+      "textSample": "Profil Saya\nBeranda\nTransaksi\nProfil\nPengaturan\nSB\nSB\n\nAKUN BUYER\n\nSmoke Buyer\n\nbuyer@projectb.local | 080000000003\n\nBuyer\nAktif\nEdit Profil\nLogout\nInformasi Akun\n\nNAMA\n\nSmoke Buyer\n\nEMAIL\n\nbuyer@projectb.local\n\nNOMOR HP\n\n080000000003\n\nROLE",
+      "hasNotFound": false,
+      "overflow": false,
+      "visibleModal": false,
+      "visibleBellCount": 1
+    },
+    "/notifications": {
+      "route": "/notifications",
+      "url": "http://127.0.0.1:8022/app.html?gate=1780321999213#/notifications",
+      "title": "BeliMobil",
+      "textSample": "Notifikasi\nBeranda\nTransaksi\nProfil\nPengaturan\nSB\n\nSEMUA SUDAH DIBACA\n\nNotifikasi\n\nPantau update transaksi, pembayaran, dan aktivitas akun Anda.\n\nTandai semua dibaca\nSemua\nBelum Dibaca\nSudah Dibaca",
+      "hasNotFound": false,
+      "overflow": false,
+      "visibleModal": false,
+      "visibleBellCount": 1
+    },
+    "shell": {
+      "kind": "buyer",
+      "visibleAsideCount": 0,
+      "visibleFooterCount": 0,
+      "visibleTopNavCount": 1,
+      "hasWhiteOutsideCardTextHint": true,
+      "overflow": false
+    },
+    "notifications": {
+      "available": true,
+      "bellId": "byr_notifications_desktop_ntf_bell_button",
+      "popoverVisible": true,
+      "fetchesOnOpen": 0,
+      "backdropVisible": false,
+      "insideClickStayedOpen": true,
+      "closedByBackdrop": true,
+      "hasViewAll": true,
+      "hasFinanceLinks": false
+    },
+    "profileSync": {
+      "attempted": false,
+      "reason": "name input not visible"
+    },
+    "notificationsFilterStability": {
+      "filterSelector": "#byr_notifications_filter",
+      "beforeExists": true,
+      "stable": true,
+      "overflow": false
+    },
+    "logoutModal": {
+      "attempted": false,
+      "reason": "logout button not visible"
+    },
+    "telemetry": {
+      "consoleErrors": [],
+      "pageErrors": [],
+      "requestCount": 26,
+      "mutationCount": 0
+    }
+  },
+  "seller": {
+    "/seller": {
+      "route": "/seller",
+      "url": "http://127.0.0.1:8022/app.html?gate=1780322019089#/seller",
+      "title": "BeliMobil",
+      "textSample": "BeliMobil\n\nJual beli mobil terpercaya\n\nDashboard Seller\nProfil Saya\nMobil Saya\nAffiliate\nKomisi Affiliate\nTransaksi\nBeliMobil\nROLE: SELLER\nSS\n\nSELLER OPERATING DESK\n\nDashboard Seller\n\nPusat kerja seller untuk menjaga showroom siap, listing ",
+      "hasNotFound": false,
+      "overflow": false,
+      "visibleModal": false,
+      "visibleBellCount": 1
+    },
+    "/seller/cars": {
+      "route": "/seller/cars",
+      "url": "http://127.0.0.1:8022/app.html?gate=1780322021824#/seller/cars",
+      "title": "BeliMobil",
+      "textSample": "BeliMobil\n\nJual beli mobil terpercaya\n\nDashboard Seller\nProfil Saya\nMobil Saya\nAffiliate\nKomisi Affiliate\nTransaksi\nBeliMobil\nROLE: SELLER\nSS\n\nSELLER INVENTORY\n\nMobil Saya\n\nKelola listing mobil, status publikasi, harga, foto, dan inspeksi d",
+      "hasNotFound": false,
+      "overflow": false,
+      "visibleModal": false,
+      "visibleBellCount": 1
+    },
+    "/seller/cars/2/images": {
+      "route": "/seller/cars/2/images",
+      "url": "http://127.0.0.1:8022/app.html?gate=1780322025030#/seller/cars/2/images",
+      "title": "BeliMobil",
+      "textSample": "BeliMobil\n\nJual beli mobil terpercaya\n\nDashboard Seller\nProfil Saya\nMobil Saya\nAffiliate\nKomisi Affiliate\nTransaksi\nBeliMobil\nROLE: SELLER\nSS\n\nOVERVIEW\n\nGambar Mobil\n\nKelola galeri mobil, cover image, dan kesiapan visual listing dari satu t",
+      "hasNotFound": false,
+      "overflow": false,
+      "visibleModal": false,
+      "visibleBellCount": 1
+    },
+    "/seller/cars/2/inspection": {
+      "route": "/seller/cars/2/inspection",
+      "url": "http://127.0.0.1:8022/app.html?gate=1780322027674#/seller/cars/2/inspection",
+      "title": "BeliMobil",
+      "textSample": "BeliMobil\n\nJual beli mobil terpercaya\n\nDashboard Seller\nProfil Saya\nMobil Saya\nAffiliate\nKomisi Affiliate\nTransaksi\nBeliMobil\nROLE: SELLER\nSS\n\nOVERVIEW\n\nInspection Flow\n\nKelola inspection report seller untuk mobil ini.\n\nKembali ke Mobil Say",
+      "hasNotFound": false,
+      "overflow": false,
+      "visibleModal": false,
+      "visibleBellCount": 1
+    },
+    "/seller/inspection": {
+      "route": "/seller/inspection",
+      "url": "http://127.0.0.1:8022/app.html?gate=1780322030379#/seller/inspection",
+      "title": "BeliMobil",
+      "textSample": "BeliMobil\n\nJual beli mobil terpercaya\n\nDashboard Seller\nProfil Saya\nMobil Saya\nAffiliate\nKomisi Affiliate\nTransaksi\nBeliMobil\nROLE: SELLER\nSS\n\nSELLER INSPECTION\n\nInspeksi Kendaraan\n\nPantau readiness inspeksi semua listing, buka checklist da",
+      "hasNotFound": false,
+      "overflow": false,
+      "visibleModal": false,
+      "visibleBellCount": 1
+    },
+    "/seller/affiliates": {
+      "route": "/seller/affiliates",
+      "url": "http://127.0.0.1:8022/app.html?gate=1780322033330#/seller/affiliates",
+      "title": "BeliMobil",
+      "textSample": "BeliMobil\n\nJual beli mobil terpercaya\n\nDashboard Seller\nProfil Saya\nMobil Saya\nAffiliate\nKomisi Affiliate\nTransaksi\nBeliMobil\nROLE: SELLER\nSS\n\nSELLER AFFILIATE DESK\n\nAffiliate\n\nKelola partner affiliate, link referral, dan status performa.\n\n",
+      "hasNotFound": false,
+      "overflow": false,
+      "visibleModal": false,
+      "visibleBellCount": 1
+    },
+    "/seller/affiliate-commissions": {
+      "route": "/seller/affiliate-commissions",
+      "url": "http://127.0.0.1:8022/app.html?gate=1780322035992#/seller/affiliate-commissions",
+      "title": "BeliMobil",
+      "textSample": "BeliMobil\n\nJual beli mobil terpercaya\n\nDashboard Seller\nProfil Saya\nMobil Saya\nAffiliate\nKomisi Affiliate\nTransaksi\nBeliMobil\nROLE: SELLER\nSS\n\nSELLER COMMISSION DESK\n\nKomisi Affiliate\n\nPantau komisi dari referral affiliate, status pembayara",
+      "hasNotFound": false,
+      "overflow": false,
+      "visibleModal": false,
+      "visibleBellCount": 1
+    },
+    "/seller/transactions": {
+      "route": "/seller/transactions",
+      "url": "http://127.0.0.1:8022/app.html?gate=1780322038775#/seller/transactions",
+      "title": "BeliMobil",
+      "textSample": "BeliMobil\n\nJual beli mobil terpercaya\n\nDashboard Seller\nProfil Saya\nMobil Saya\nAffiliate\nKomisi Affiliate\nTransaksi\nBeliMobil\nROLE: SELLER\nSS\n\nSELLER TRANSACTION DESK\n\nTransaksi\n\nPantau transaksi mobil, status pembayaran, dan progres penjua",
+      "hasNotFound": false,
+      "overflow": false,
+      "visibleModal": false,
+      "visibleBellCount": 1
+    },
+    "/notifications": {
+      "route": "/notifications",
+      "url": "http://127.0.0.1:8022/app.html?gate=1780322041788#/notifications",
+      "title": "BeliMobil",
+      "textSample": "BeliMobil\n\nJual beli mobil terpercaya\n\nDashboard Seller\nProfil Saya\nMobil Saya\nAffiliate\nKomisi Affiliate\nTransaksi\nBeliMobil\nROLE: SELLER\nSS\n\n0 BELUM DIBACA\n\nNotifikasi\n\nPantau aktivitas penting dari akun Anda.\n\nTandai semua dibaca\nSemua\nB",
+      "hasNotFound": false,
+      "overflow": false,
+      "visibleModal": false,
+      "visibleBellCount": 1
+    },
+    "/profile": {
+      "route": "/profile",
+      "url": "http://127.0.0.1:8022/app.html?gate=1780322044526#/profile",
+      "title": "BeliMobil",
+      "textSample": "BeliMobil\n\nJual beli mobil terpercaya\n\nDashboard Seller\nProfil Saya\nMobil Saya\nAffiliate\nKomisi Affiliate\nTransaksi\nBeliMobil\nROLE: SELLER\nSS\n\nHome / Profil\n\nProfil Saya\nSS\nSmoke Seller\n\nseller@projectb.local\n\nSeller\nAktif\nROLE\nSeller\nCABAN",
+      "hasNotFound": false,
+      "overflow": false,
+      "visibleModal": false,
+      "visibleBellCount": 1
+    },
+    "cars": {
+      "hasDataTable": true,
+      "createButtonVisible": true,
+      "overflow": false
+    },
+    "affiliatesModal": {
+      "attempted": true,
+      "draftPreservedAfterViewportEvent": true
+    },
+    "notifications": {
+      "available": true,
+      "bellId": "global_ntf_bell_button",
+      "popoverVisible": true,
+      "fetchesOnOpen": 0,
+      "backdropVisible": false,
+      "insideClickStayedOpen": true,
+      "closedByBackdrop": true,
+      "hasViewAll": true,
+      "hasFinanceLinks": false
+    },
+    "telemetry": {
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "pageErrors": [],
+      "requestCount": 69,
+      "mutationCount": 0
+    }
+  },
+  "admin": {
+    "/admin": {
+      "route": "/admin",
+      "url": "http://127.0.0.1:8022/app.html?gate=1780322064510#/admin",
+      "title": "BeliMobil",
+      "textSample": "BeliMobil\nJual beli mobil terpercaya",
+      "hasNotFound": false,
+      "overflow": false,
+      "visibleModal": false,
+      "visibleBellCount": 0
+    },
+    "/admin/users": {
+      "route": "/admin/users",
+      "url": "http://127.0.0.1:8022/app.html?gate=1780322067615#/admin/users",
+      "title": "BeliMobil",
+      "textSample": "BeliMobil\n\nJual beli mobil terpercaya\n\nDashboard Admin\nProfil Saya\nMenu Master\nApproval Queue\nUser Management\nTransactions\nSettlements\nDesign Studio\nBeliMobil\nROLE: ADMIN\nSA\n\nADMIN USER DESK\n\nUser Management\n\nPusat kerja admin untuk melihat",
+      "hasNotFound": false,
+      "overflow": false,
+      "visibleModal": false,
+      "visibleBellCount": 1
+    },
+    "/admin/pending-users": {
+      "route": "/admin/pending-users",
+      "url": "http://127.0.0.1:8022/app.html?gate=1780322072775#/admin/pending-users",
+      "title": "BeliMobil",
+      "textSample": "BeliMobil\nJual beli mobil terpercaya\n\nKATALOG PUBLIK\n\nHalaman tidak ditemukan\n\nKembali ke katalog untuk melihat mobil yang tersedia.\n\nTerbaru\nPromo\nTermurah\nKM Rendah\nFilter\nUrutkan\nLOKASI\nPilih lokasi\n0\nMobil Tersedia\n98%\nKepuasan\n24/7\nSup",
+      "hasNotFound": true,
+      "overflow": false,
+      "visibleModal": false,
+      "visibleBellCount": 0
+    },
+    "/admin/cars": {
+      "route": "/admin/cars",
+      "url": "http://127.0.0.1:8022/app.html?gate=1780322075751#/admin/cars",
+      "title": "BeliMobil",
+      "textSample": "BeliMobil\nJual beli mobil terpercaya\n\nKATALOG PUBLIK\n\nHalaman tidak ditemukan\n\nKembali ke katalog untuk melihat mobil yang tersedia.\n\nTerbaru\nPromo\nTermurah\nKM Rendah\nFilter\nUrutkan\nLOKASI\nPilih lokasi\n0\nMobil Tersedia\n98%\nKepuasan\n24/7\nSup",
+      "hasNotFound": true,
+      "overflow": false,
+      "visibleModal": false,
+      "visibleBellCount": 0
+    },
+    "/admin/transactions": {
+      "route": "/admin/transactions",
+      "url": "http://127.0.0.1:8022/app.html?gate=1780322078307#/admin/transactions",
+      "title": "BeliMobil",
+      "textSample": "BeliMobil\n\nJual beli mobil terpercaya\n\nDashboard Admin\nProfil Saya\nMenu Master\nApproval Queue\nUser Management\nTransactions\nSettlements\nDesign Studio\nBeliMobil\nROLE: ADMIN\nSA\n\nADMIN TRANSACTION DESK\n\nTransaksi Admin\n\nMonitoring transaksi buy",
+      "hasNotFound": false,
+      "overflow": false,
+      "visibleModal": false,
+      "visibleBellCount": 1
+    },
+    "/admin/settlements": {
+      "route": "/admin/settlements",
+      "url": "http://127.0.0.1:8022/app.html?gate=1780322080920#/admin/settlements",
+      "title": "BeliMobil",
+      "textSample": "BeliMobil\n\nJual beli mobil terpercaya\n\nDashboard Admin\nProfil Saya\nMenu Master\nApproval Queue\nUser Management\nTransactions\nSettlements\nDesign Studio\nBeliMobil\nROLE: ADMIN\nSA\n\nADMIN SETTLEMENT DESK\n\nAdmin Settlements\n\nMonitoring batch settle",
+      "hasNotFound": false,
+      "overflow": false,
+      "visibleModal": false,
+      "visibleBellCount": 1
+    },
+    "/admin/affiliate-commissions": {
+      "route": "/admin/affiliate-commissions",
+      "url": "http://127.0.0.1:8022/app.html?gate=1780322083698#/admin/affiliate-commissions",
+      "title": "BeliMobil",
+      "textSample": "BeliMobil\n\nJual beli mobil terpercaya\n\nDashboard Admin\nProfil Saya\nMenu Master\nApproval Queue\nUser Management\nTransactions\nSettlements\nDesign Studio\nBeliMobil\nROLE: ADMIN\nSA\n\nAFFILIATE FINANCE\n\nAffiliate Commissions\n\nKelola ledger komisi, s",
+      "hasNotFound": false,
+      "overflow": false,
+      "visibleModal": false,
+      "visibleBellCount": 1
+    },
+    "/admin/sliders": {
+      "route": "/admin/sliders",
+      "url": "http://127.0.0.1:8022/app.html?gate=1780322086704#/admin/sliders",
+      "title": "BeliMobil",
+      "textSample": "BeliMobil\n\nJual beli mobil terpercaya\n\nDashboard Admin\nProfil Saya\nMenu Master\nMaster Brand\nMaster Sliders\nMaster Sidebar\nMaster Bank\nMaster Inspection\nApproval Queue\nUser Management\nTransactions\nSettlements\nDesign Studio\nBeliMobil\nROLE: AD",
+      "hasNotFound": false,
+      "overflow": false,
+      "visibleModal": false,
+      "visibleBellCount": 1
+    },
+    "/notifications": {
+      "route": "/notifications",
+      "url": "http://127.0.0.1:8022/app.html?gate=1780322089441#/notifications",
+      "title": "BeliMobil",
+      "textSample": "BeliMobil\n\nJual beli mobil terpercaya\n\nDashboard Admin\nProfil Saya\nMenu Master\nApproval Queue\nUser Management\nTransactions\nSettlements\nDesign Studio\nBeliMobil\nROLE: ADMIN\nSA\n\n2 BELUM DIBACA\n\nNotifikasi\n\nPantau aktivitas penting dari akun An",
+      "hasNotFound": false,
+      "overflow": false,
+      "visibleModal": false,
+      "visibleBellCount": 1
+    },
+    "/profile": {
+      "route": "/profile",
+      "url": "http://127.0.0.1:8022/app.html?gate=1780322092102#/profile",
+      "title": "BeliMobil",
+      "textSample": "BeliMobil\n\nJual beli mobil terpercaya\n\nDashboard Admin\nProfil Saya\nMenu Master\nApproval Queue\nUser Management\nTransactions\nSettlements\nDesign Studio\nBeliMobil\nROLE: ADMIN\nSA\n\nHome / Profil\n\nProfil Saya\nSA\nSmoke Admin\n\nadmin@projectb.local\n\n",
+      "hasNotFound": false,
+      "overflow": false,
+      "visibleModal": false,
+      "visibleBellCount": 1
+    },
+    "notifications": {
+      "available": true,
+      "bellId": "global_ntf_bell_button",
+      "popoverVisible": true,
+      "fetchesOnOpen": 1,
+      "backdropVisible": false,
+      "insideClickStayedOpen": true,
+      "closedByBackdrop": true,
+      "hasViewAll": true,
+      "hasFinanceLinks": false
+    },
+    "telemetry": {
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "pageErrors": [],
+      "requestCount": 47,
+      "mutationCount": 0
+    }
+  },
+  "affiliate": {
+    "/affiliate": {
+      "route": "/affiliate",
+      "url": "http://127.0.0.1:8022/app.html?gate=1780322102846#/affiliate",
+      "title": "BeliMobil",
+      "textSample": "BeliMobil\nJual beli mobil terpercaya",
+      "hasNotFound": false,
+      "overflow": false,
+      "visibleModal": false,
+      "visibleBellCount": 0
+    },
+    "/affiliate/ledger": {
+      "route": "/affiliate/ledger",
+      "url": "http://127.0.0.1:8022/app.html?gate=1780322111879#/affiliate/ledger",
+      "title": "BeliMobil",
+      "textSample": "Affiliate Ledger\nDashboard\nKomisi\nSettlement\nProfil\nNotifikasi\nUA\n\nOVERVIEW\n\nAffiliate Ledger\n\nPantau komisi yang berasal dari penjualan, referensi transaksi, dan catatan ledger yang sudah tercatat saat ini.\n\nDashboard affiliate\n\nTotal komi",
+      "hasNotFound": false,
+      "overflow": false,
+      "visibleModal": false,
+      "visibleBellCount": 1
+    },
+    "/affiliate/settlements": {
+      "route": "/affiliate/settlements",
+      "url": "http://127.0.0.1:8022/app.html?gate=1780322115920#/affiliate/settlements",
+      "title": "BeliMobil",
+      "textSample": "Affiliate Settlements\nDashboard\nKomisi\nSettlement\nProfil\nNotifikasi\nUA\n\nOVERVIEW\n\nAffiliate Settlements\n\nPantau komisi yang masih unsettled, ledger yang sudah eligible, dan riwayat batch settlement manual yang sudah dicatat.\n\nDashboard affi",
+      "hasNotFound": false,
+      "overflow": false,
+      "visibleModal": false,
+      "visibleBellCount": 1
+    },
+    "/profile": {
+      "route": "/profile",
+      "url": "http://127.0.0.1:8022/app.html?gate=1780322118520#/profile",
+      "title": "BeliMobil",
+      "textSample": "Profil Affiliate\nDashboard\nKomisi\nSettlement\nProfil\nNotifikasi\nUA\nUA\nUAT Affiliate Finance Affiliate uat_aff_fin_20260601_145953\n\nuat_aff_fin_20260601_145953_affiliate@projectb.local\n\nAffiliate Admin\nAktif\nROLE\nAffiliate Admin\nCABANG\nBelum ",
+      "hasNotFound": false,
+      "overflow": false,
+      "visibleModal": false,
+      "visibleBellCount": 1
+    },
+    "/notifications": {
+      "route": "/notifications",
+      "url": "http://127.0.0.1:8022/app.html?gate=1780322121146#/notifications",
+      "title": "BeliMobil",
+      "textSample": "Notifikasi\nDashboard\nKomisi\nSettlement\nProfil\nNotifikasi\nUA\n\n3 BELUM DIBACA\n\nNotifikasi\n\nPantau aktivitas penting dari akun Anda.\n\nTandai semua dibaca\nSemua\nBelum Dibaca\nSudah Dibaca",
+      "hasNotFound": false,
+      "overflow": false,
+      "visibleModal": false,
+      "visibleBellCount": 1
+    },
+    "shell": {
+      "kind": "affiliate",
+      "visibleAsideCount": 0,
+      "visibleFooterCount": 0,
+      "visibleTopNavCount": 1,
+      "hasWhiteOutsideCardTextHint": true,
+      "overflow": false
+    },
+    "notifications": {
+      "available": true,
+      "bellId": "af_desktop_ntf_bell_button",
+      "popoverVisible": true,
+      "fetchesOnOpen": 0,
+      "backdropVisible": false,
+      "insideClickStayedOpen": true,
+      "closedByBackdrop": true,
+      "hasViewAll": true,
+      "hasFinanceLinks": true
+    },
+    "publicRouteStillPublic": {
+      "accountShellVisible": false,
+      "publicContentVisible": true
+    },
+    "telemetry": {
+      "consoleErrors": [],
+      "pageErrors": [],
+      "requestCount": 30,
+      "mutationCount": 0
+    }
+  },
+  "notifications": {
+    "buyer": {
+      "available": false
+    },
+    "buyer_pageFilterStability": {
+      "filterSelector": "#byr_notifications_filter",
+      "beforeExists": true,
+      "stable": true,
+      "overflow": false
+    },
+    "seller": {
+      "available": false
+    },
+    "seller_pageFilterStability": {
+      "filterSelector": "#ntf_filter_tabs",
+      "beforeExists": false,
+      "stable": false,
+      "overflow": false
+    },
+    "admin": {
+      "available": false
+    },
+    "admin_pageFilterStability": {
+      "filterSelector": "#ntf_filter_tabs",
+      "beforeExists": false,
+      "stable": false,
+      "overflow": false
+    },
+    "affiliate_admin": {
+      "available": false
+    },
+    "affiliate_admin_pageFilterStability": {
+      "filterSelector": "#ntf_filter_tabs",
+      "beforeExists": false,
+      "stable": false,
+      "overflow": false
+    },
+    "guestBellCount": 0
+  },
+  "finance": {
+    "adminAffiliateCommissions": {
+      "expectedText": {
+        "Sudah Dibayar": true,
+        "Belum Dibayar": true
+      },
+      "noDuplicateLedgerHint": true,
+      "overflow": false
+    },
+    "adminSettlements": {
+      "expectedText": {
+        "Sudah Dibayar": true,
+        "Dibatalkan": true
+      },
+      "noDuplicateLedgerHint": true,
+      "overflow": false
+    },
+    "adminSettlementDetail": {
+      "attempted": false,
+      "reason": "detail button not visible"
+    },
+    "affiliateLedger": {
+      "expectedText": {
+        "Sudah Dibayar": true,
+        "Belum Dibayar": true
+      },
+      "noDuplicateLedgerHint": true,
+      "overflow": false
+    },
+    "affiliateSettlements": {
+      "expectedText": {
+        "Sudah Dibayar": true,
+        "Dibatalkan": true
+      },
+      "noDuplicateLedgerHint": true,
+      "overflow": false
+    }
+  },
+  "images": {
+    "sellerImages": {
+      "hasGallery": false,
+      "fileInputAvailable": false,
+      "uploadQueueOpened": false,
+      "modalStayedAfterBackdrop": null,
+      "previewLinksDirectNavigation": 0,
+      "overflow": false
+    }
+  },
+  "inspection": {
+    "sellerInspection": {
+      "hasInspectionText": true,
+      "firstItemContract": null,
+      "overflow": false
+    }
+  },
+  "backgroundVideo": {
+    "publicLanding": {
+      "count": 1,
+      "visibleCount": 1,
+      "nonBlocking": true
+    },
+    "buyer": {
+      "count": 1,
+      "visibleCount": 1,
+      "nonBlocking": true
+    },
+    "affiliate": {
+      "count": 1,
+      "visibleCount": 1,
+      "nonBlocking": true
+    }
+  },
+  "responsive": [
+    {
+      "viewport": "360",
+      "role": "public",
+      "route": "/",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "360",
+      "role": "public",
+      "route": "/cars/19",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "360",
+      "role": "buyer",
+      "route": "/buyer",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "360",
+      "role": "buyer",
+      "route": "/notifications",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "360",
+      "role": "seller",
+      "route": "/seller/cars",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "360",
+      "role": "seller",
+      "route": "/seller/cars/2/images",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "360",
+      "role": "admin",
+      "route": "/admin/affiliate-commissions",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "360",
+      "role": "affiliate_admin",
+      "route": "/affiliate/ledger",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "360",
+      "role": "affiliate_admin",
+      "route": "/affiliate/settlements",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "390",
+      "role": "public",
+      "route": "/",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "390",
+      "role": "public",
+      "route": "/cars/19",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "390",
+      "role": "buyer",
+      "route": "/buyer",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "390",
+      "role": "buyer",
+      "route": "/notifications",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "390",
+      "role": "seller",
+      "route": "/seller/cars",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "390",
+      "role": "seller",
+      "route": "/seller/cars/2/images",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "390",
+      "role": "admin",
+      "route": "/admin/affiliate-commissions",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "390",
+      "role": "affiliate_admin",
+      "route": "/affiliate/ledger",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "390",
+      "role": "affiliate_admin",
+      "route": "/affiliate/settlements",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "768",
+      "role": "public",
+      "route": "/",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "768",
+      "role": "public",
+      "route": "/cars/19",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "768",
+      "role": "buyer",
+      "route": "/buyer",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "768",
+      "role": "buyer",
+      "route": "/notifications",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "768",
+      "role": "seller",
+      "route": "/seller/cars",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "768",
+      "role": "seller",
+      "route": "/seller/cars/2/images",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "768",
+      "role": "admin",
+      "route": "/admin/affiliate-commissions",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "768",
+      "role": "affiliate_admin",
+      "route": "/affiliate/ledger",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "768",
+      "role": "affiliate_admin",
+      "route": "/affiliate/settlements",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "1024",
+      "role": "public",
+      "route": "/",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "1024",
+      "role": "public",
+      "route": "/cars/19",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "1024",
+      "role": "buyer",
+      "route": "/buyer",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "1024",
+      "role": "buyer",
+      "route": "/notifications",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "1024",
+      "role": "seller",
+      "route": "/seller/cars",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "1024",
+      "role": "seller",
+      "route": "/seller/cars/2/images",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "1024",
+      "role": "admin",
+      "route": "/admin/affiliate-commissions",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "1024",
+      "role": "affiliate_admin",
+      "route": "/affiliate/ledger",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "1024",
+      "role": "affiliate_admin",
+      "route": "/affiliate/settlements",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "1280",
+      "role": "public",
+      "route": "/",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "1280",
+      "role": "public",
+      "route": "/cars/19",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "1280",
+      "role": "buyer",
+      "route": "/buyer",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "1280",
+      "role": "buyer",
+      "route": "/notifications",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "1280",
+      "role": "seller",
+      "route": "/seller/cars",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "1280",
+      "role": "seller",
+      "route": "/seller/cars/2/images",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "1280",
+      "role": "admin",
+      "route": "/admin/affiliate-commissions",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "1280",
+      "role": "affiliate_admin",
+      "route": "/affiliate/ledger",
+      "overflow": false,
+      "visibleBellCount": 0
+    },
+    {
+      "viewport": "1280",
+      "role": "affiliate_admin",
+      "route": "/affiliate/settlements",
+      "overflow": false,
+      "visibleBellCount": 0
+    }
+  ],
+  "spaStability": {
+    "locationReloadMatches": [],
+    "routerHandleChangeMatches": []
+  },
+  "staticChecks": {
+    "public/assets/js/modules/seller/pages/carsPage.js": {
+      "directFetch": false,
+      "locationReload": false,
+      "routerHandleChange": false
+    },
+    "public/assets/js/modules/seller/pages/carImagesPage.js": {
+      "directFetch": false,
+      "locationReload": false,
+      "routerHandleChange": false
+    },
+    "public/assets/js/modules/seller/pages/carInspectionPage.js": {
+      "directFetch": false,
+      "locationReload": false,
+      "routerHandleChange": false
+    },
+    "public/assets/js/modules/seller/pages/inspectionPage.js": {
+      "directFetch": false,
+      "locationReload": false,
+      "routerHandleChange": false
+    },
+    "public/assets/js/modules/seller/pages/affiliatesModalPage.js": {
+      "directFetch": false,
+      "locationReload": false,
+      "routerHandleChange": false
+    },
+    "public/assets/js/modules/seller/pages/transactionsPage.js": {
+      "directFetch": false,
+      "locationReload": false,
+      "routerHandleChange": false
+    },
+    "public/assets/js/modules/admin/pages/affiliateCommissionsPage.js": {
+      "directFetch": false,
+      "locationReload": false,
+      "routerHandleChange": false
+    },
+    "public/assets/js/modules/admin/pages/settlementsPage.js": {
+      "directFetch": false,
+      "locationReload": false,
+      "routerHandleChange": false
+    },
+    "public/assets/js/modules/notifications/pages/notificationsPage.js": {
+      "directFetch": false,
+      "locationReload": false,
+      "routerHandleChange": false
+    },
+    "public/assets/js/modules/notifications/components/notificationBell.js": {
+      "directFetch": false,
+      "locationReload": false,
+      "routerHandleChange": false
+    },
+    "public/assets/js/modules/affiliate/pages/ledgerPage.js": {
+      "directFetch": false,
+      "locationReload": false,
+      "routerHandleChange": false
+    },
+    "public/assets/js/modules/affiliate/pages/settlementsPage.js": {
+      "directFetch": false,
+      "locationReload": false,
+      "routerHandleChange": false
+    }
+  },
+  "issues": [
+    {
+      "area": "route-timeout",
+      "message": "/ failed to load: page.goto: Timeout 45000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:8022/app.html?gate=1780322415946#/\", waiting until \"domcontentloaded\"\u001b[22m\n"
+    },
+    {
+      "area": "route",
+      "message": "/admin/pending-users rendered not found."
+    },
+    {
+      "area": "route",
+      "message": "/admin/cars rendered not found."
+    }
+  ]
+}

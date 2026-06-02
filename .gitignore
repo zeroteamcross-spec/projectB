@@ -1,0 +1,43 @@
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+
+# Local runtime files
+/storage/logs/*
+/storage/cache/*
+/storage/uploads/*
+!/storage/logs/.gitkeep
+!/storage/cache/.gitkeep
+#!/storage/uploads/.gitkeep
+/public/uploads/demo/
+
+# Manual test artifacts
+/callback*.json
+/midtrans*.json
+/status-output*.txt
+
+# Archives and generated bundles
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.7z
+
+# Dependencies and tooling caches
+/vendor/
+/node_modules/
+/.phpunit.cache/
+/.php-cs-fixer.cache
+
+# OS and IDE metadata
+.DS_Store
+Thumbs.db
+desktop.ini
+/.idea/
+/.vscode/
+
+# Temporary files
+*.log
+*.tmp
+*.temp

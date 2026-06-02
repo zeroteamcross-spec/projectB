@@ -1,0 +1,25 @@
+<?php
+
+declare(strict_types=1);
+
+use App\Core\Router;
+use App\Modules\Auth\Middleware\AuthenticatedUserMiddleware;
+use App\Modules\Transactions\Controllers\TransactionController;
+
+return static function (Router $router): void {
+    $router->post(
+        '/api/payments/midtrans/callbacks',
+        [TransactionController::class, 'providerCallback']
+    );
+
+    $router->group('/api/transactions', static function (Router $router): void {
+        $router->get('', [TransactionController::class, 'list']);
+        $router->post('', [TransactionController::class, 'create']);
+        $router->get('/{transaction_id}', [TransactionController::class, 'detail']);
+        $router->get('/{transaction_id}/status', [TransactionController::class, 'status']);
+        $router->get('/{transaction_id}/payment-qr', [TransactionController::class, 'downloadPaymentQr']);
+        $router->patch('/{transaction_id}/status', [TransactionController::class, 'updateStatus']);
+        $router->patch('/{transaction_id}/fulfillment-checklist', [TransactionController::class, 'updateFulfillmentChecklist']);
+        $router->post('/{transaction_id}/complete-payment', [TransactionController::class, 'completePayment']);
+    }, [AuthenticatedUserMiddleware::class]);
+};

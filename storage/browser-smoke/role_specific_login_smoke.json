@@ -1,0 +1,92 @@
+{
+  "base": "http://127.0.0.1:8033/app.html",
+  "positive": [
+    {
+      "route": "#/login/buyer",
+      "roleAccountUsed": "buyer",
+      "expectedResult": "#/buyer",
+      "actualResult": "http://127.0.0.1:8033/app.html#/buyer",
+      "autologinRole": "buyer",
+      "result": "PASS"
+    },
+    {
+      "route": "#/login/admin",
+      "roleAccountUsed": "admin",
+      "expectedResult": "#/admin",
+      "actualResult": "http://127.0.0.1:8033/app.html#/admin",
+      "autologinRole": "admin",
+      "result": "PASS"
+    },
+    {
+      "route": "#/login/seller",
+      "roleAccountUsed": "seller",
+      "expectedResult": "#/seller",
+      "actualResult": "http://127.0.0.1:8033/app.html#/seller",
+      "autologinRole": "seller",
+      "result": "PASS"
+    },
+    {
+      "route": "#/login/affiliate",
+      "roleAccountUsed": "affiliate_admin",
+      "expectedResult": "#/affiliate",
+      "actualResult": "http://127.0.0.1:8033/app.html#/affiliate",
+      "autologinRole": "affiliate_admin",
+      "result": "PASS"
+    }
+  ],
+  "negative": [
+    {
+      "route": "#/login/buyer",
+      "roleAccountUsed": "seller",
+      "expectedResult": "ditolak dan tetap tidak login",
+      "actualResult": {
+        "hash": "#/login/buyer",
+        "errorText": "Akun ini bukan akun Buyer. Silakan gunakan halaman login yang sesuai.",
+        "autologinRole": null
+      },
+      "result": "PASS"
+    },
+    {
+      "route": "#/login/admin",
+      "roleAccountUsed": "affiliate_admin",
+      "expectedResult": "ditolak dan tetap tidak login",
+      "actualResult": {
+        "hash": "#/login/admin",
+        "errorText": "Akun ini bukan akun Admin. Silakan gunakan halaman login yang sesuai.",
+        "autologinRole": null
+      },
+      "result": "PASS"
+    },
+    {
+      "route": "#/login/seller",
+      "roleAccountUsed": "buyer",
+      "expectedResult": "ditolak dan tetap tidak login",
+      "actualResult": {
+        "hash": "#/login/seller",
+        "errorText": "Akun ini bukan akun Seller. Silakan gunakan halaman login yang sesuai.",
+        "autologinRole": null
+      },
+      "result": "PASS"
+    },
+    {
+      "route": "#/login/affiliate",
+      "roleAccountUsed": "admin",
+      "expectedResult": "ditolak dan tetap tidak login",
+      "actualResult": {
+        "hash": "#/login/affiliate",
+        "errorText": "Akun ini bukan akun Affiliate. Silakan gunakan halaman login yang sesuai.",
+        "autologinRole": null
+      },
+      "result": "PASS"
+    }
+  ],
+  "existingLogin": {
+    "route": "#/auth?role=buyer",
+    "roleAccountUsed": "buyer",
+    "expectedResult": "#/buyer",
+    "actualResult": "http://127.0.0.1:8033/app.html#/buyer",
+    "autologinRole": "buyer",
+    "result": "PASS"
+  },
+  "result": "PASS"
+}

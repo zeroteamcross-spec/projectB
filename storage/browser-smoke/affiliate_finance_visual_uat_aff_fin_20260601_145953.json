@@ -1,0 +1,258 @@
+{
+  "date": "2026-06-01T08:37:22.346Z",
+  "baseUrl": "http://127.0.0.1:8019",
+  "runId": "uat_aff_fin_20260601_145953",
+  "admin": {
+    "affiliateCommissions": {
+      "route": "#/admin/affiliate-commissions",
+      "requiredText": {
+        "Affiliate Commissions": true,
+        "Affiliate commission ledgers": true,
+        "Sudah Dibayar": true
+      },
+      "requiredSelectors": {
+        "#adfc_ledgers_table_section": true,
+        "#adfc_create_settlement_button": true
+      },
+      "overflow": false,
+      "url": "http://127.0.0.1:8019/app.html?smoke=1780303043432#/admin/affiliate-commissions"
+    },
+    "createSettlementModal": {
+      "available": true,
+      "opened": true,
+      "stayedOpenAfterBackdropClick": true,
+      "draftPreservedAfterViewportEvent": true,
+      "selectionRemountedPageSection": false,
+      "submitted": false
+    },
+    "settlements": {
+      "route": "#/admin/settlements",
+      "requiredText": {
+        "Admin Settlements": true,
+        "Settlement batches": true,
+        "Sudah Dibayar": true,
+        "Dibatalkan": true
+      },
+      "requiredSelectors": {
+        "#adst_settlements_table_section": true
+      },
+      "overflow": false,
+      "url": "http://127.0.0.1:8019/app.html?smoke=1780303051778#/admin/settlements"
+    },
+    "settlementDetail": {
+      "available": true,
+      "opened": true,
+      "hasItems": true,
+      "hasHistory": true,
+      "hasPaymentMetadata": true
+    },
+    "notifications": {
+      "available": true,
+      "popoverVisible": true,
+      "fetchesOnOpen": 0,
+      "hasFinanceText": true,
+      "notificationsRouteOpened": true
+    },
+    "telemetry": {
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "pageErrors": [],
+      "fetches": 25
+    }
+  },
+  "affiliate": {
+    "dashboard": {
+      "route": "#/affiliate",
+      "requiredText": {
+        "Dashboard Affiliate": true,
+        "Buka landing": true
+      },
+      "requiredSelectors": {
+        ".af-account-page": true
+      },
+      "overflow": false,
+      "url": "http://127.0.0.1:8019/app.html?smoke=1780303065960#/affiliate",
+      "noVisibleSidebar": true
+    },
+    "ledger": {
+      "route": "#/affiliate/ledger",
+      "requiredText": {
+        "Affiliate Ledger": true,
+        "Sudah Dibayar": true,
+        "Belum Dibayar": true
+      },
+      "requiredSelectors": {
+        ".af-account-page": true
+      },
+      "overflow": false,
+      "url": "http://127.0.0.1:8019/app.html?smoke=1780303071233#/affiliate/ledger",
+      "noVisibleSidebar": true
+    },
+    "settlements": {
+      "route": "#/affiliate/settlements",
+      "requiredText": {
+        "Affiliate Settlements": true,
+        "Riwayat settlement": true,
+        "Sudah Dibayar": true,
+        "Dibatalkan": true
+      },
+      "requiredSelectors": {
+        ".af-account-page": true
+      },
+      "overflow": false,
+      "url": "http://127.0.0.1:8019/app.html?smoke=1780303074359#/affiliate/settlements",
+      "noVisibleSidebar": true
+    },
+    "notifications": {
+      "available": true,
+      "popoverVisible": true,
+      "fetchesOnOpen": 0,
+      "hasFinanceText": true,
+      "notificationsRouteOpened": true
+    },
+    "profile": {
+      "route": "#/profile",
+      "requiredText": {
+        "Profil Affiliate": true
+      },
+      "requiredSelectors": {
+        ".af-account-page": true
+      },
+      "overflow": false,
+      "url": "http://127.0.0.1:8019/app.html?smoke=1780303078890#/profile"
+    },
+    "telemetry": {
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "pageErrors": [],
+      "fetches": 80
+    }
+  },
+  "responsive": [
+    {
+      "viewport": "mobile-360",
+      "route": "#/admin/affiliate-commissions",
+      "overflow": false,
+      "modalOverflow": false
+    },
+    {
+      "viewport": "mobile-360",
+      "route": "#/admin/settlements",
+      "overflow": false,
+      "modalOverflow": false
+    },
+    {
+      "viewport": "mobile-360",
+      "route": "#/affiliate/ledger",
+      "overflow": false,
+      "modalOverflow": false
+    },
+    {
+      "viewport": "mobile-360",
+      "route": "#/affiliate/settlements",
+      "overflow": false,
+      "modalOverflow": false
+    },
+    {
+      "viewport": "mobile-390",
+      "route": "#/admin/affiliate-commissions",
+      "overflow": false,
+      "modalOverflow": false
+    },
+    {
+      "viewport": "mobile-390",
+      "route": "#/admin/settlements",
+      "overflow": false,
+      "modalOverflow": false
+    },
+    {
+      "viewport": "mobile-390",
+      "route": "#/affiliate/ledger",
+      "overflow": false,
+      "modalOverflow": false
+    },
+    {
+      "viewport": "mobile-390",
+      "route": "#/affiliate/settlements",
+      "overflow": false,
+      "modalOverflow": false
+    },
+    {
+      "viewport": "tablet-768",
+      "route": "#/admin/affiliate-commissions",
+      "overflow": false,
+      "modalOverflow": false
+    },
+    {
+      "viewport": "tablet-768",
+      "route": "#/admin/settlements",
+      "overflow": false,
+      "modalOverflow": false
+    },
+    {
+      "viewport": "tablet-768",
+      "route": "#/affiliate/ledger",
+      "overflow": false,
+      "modalOverflow": false
+    },
+    {
+      "viewport": "tablet-768",
+      "route": "#/affiliate/settlements",
+      "overflow": false,
+      "modalOverflow": false
+    },
+    {
+      "viewport": "desktop-1280",
+      "route": "#/admin/affiliate-commissions",
+      "overflow": false,
+      "modalOverflow": false
+    },
+    {
+      "viewport": "desktop-1280",
+      "route": "#/admin/settlements",
+      "overflow": false,
+      "modalOverflow": false
+    },
+    {
+      "viewport": "desktop-1280",
+      "route": "#/affiliate/ledger",
+      "overflow": false,
+      "modalOverflow": false
+    },
+    {
+      "viewport": "desktop-1280",
+      "route": "#/affiliate/settlements",
+      "overflow": false,
+      "modalOverflow": false
+    }
+  ],
+  "staticChecks": {
+    "public/assets/js/modules/admin/pages/affiliateCommissionsPage.js": {
+      "directFetch": false,
+      "locationReload": false
+    },
+    "public/assets/js/modules/admin/components/adminAffiliateLedgerList.js": {
+      "directFetch": false,
+      "locationReload": false
+    },
+    "public/assets/js/modules/admin/pages/settlementsPage.js": {
+      "directFetch": false,
+      "locationReload": false
+    },
+    "public/assets/js/modules/admin/components/adminSettlementList.js": {
+      "directFetch": false,
+      "locationReload": false
+    },
+    "public/assets/js/modules/affiliate/pages/ledgerPage.js": {
+      "directFetch": false,
+      "locationReload": false
+    },
+    "public/assets/js/modules/affiliate/pages/settlementsPage.js": {
+      "directFetch": false,
+      "locationReload": false
+    }
+  },
+  "issues": []
+}

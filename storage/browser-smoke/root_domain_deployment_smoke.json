@@ -1,0 +1,137 @@
+{
+  "base": "http://127.0.0.1:8036",
+  "root": {
+    "url": "http://127.0.0.1:8036/",
+    "pathname": "/",
+    "hash": "",
+    "appHasContent": true,
+    "title": "BeliMobil"
+  },
+  "hashRoutes": [
+    {
+      "requestedHash": "#/buyer",
+      "url": "http://127.0.0.1:8036/#/auth?role=buyer&from=%2Fbuyer",
+      "pathname": "/",
+      "hash": "#/auth?role=buyer&from=%2Fbuyer",
+      "appHasContent": true,
+      "bodyText": "BeliMobil\nJual beli mobil terpercaya\nKembali ke landing page\nMasuk ke akun\n\nMasuk, lalu kembali ke halaman tujuan.\n\nMasuk\nDaftar\nEmail\nPassword\nIngat saya di pe"
+    },
+    {
+      "requestedHash": "#/seller",
+      "url": "http://127.0.0.1:8036/#/auth?role=seller&from=%2Fseller",
+      "pathname": "/",
+      "hash": "#/auth?role=seller&from=%2Fseller",
+      "appHasContent": true,
+      "bodyText": "BeliMobil\nJual beli mobil terpercaya\nKembali ke landing page\nMasuk ke akun\n\nMasuk, lalu kembali ke halaman tujuan.\n\nMasuk\nDaftar\nEmail\nPassword\nIngat saya di pe"
+    },
+    {
+      "requestedHash": "#/admin",
+      "url": "http://127.0.0.1:8036/#/auth?role=admin&from=%2Fadmin",
+      "pathname": "/",
+      "hash": "#/auth?role=admin&from=%2Fadmin",
+      "appHasContent": true,
+      "bodyText": "BeliMobil\nJual beli mobil terpercaya\nKembali ke landing page\nMasuk ke akun\n\nMasuk, lalu kembali ke halaman tujuan.\n\nMasuk\nDaftar\n\nRole ini memakai akun dari adm"
+    },
+    {
+      "requestedHash": "#/affiliate",
+      "url": "http://127.0.0.1:8036/#/auth?role=affiliate_admin&from=%2Faffiliate",
+      "pathname": "/",
+      "hash": "#/auth?role=affiliate_admin&from=%2Faffiliate",
+      "appHasContent": true,
+      "bodyText": "BeliMobil\nJual beli mobil terpercaya\nKembali ke landing page\nMasuk ke akun\n\nMasuk, lalu kembali ke halaman tujuan.\n\nMasuk\nDaftar\n\nRole ini memakai akun dari adm"
+    },
+    {
+      "requestedHash": "#/notifications",
+      "url": "http://127.0.0.1:8036/#/auth?role=public&from=%2Fnotifications",
+      "pathname": "/",
+      "hash": "#/auth?role=public&from=%2Fnotifications",
+      "appHasContent": true,
+      "bodyText": "BeliMobil\nJual beli mobil terpercaya\nKembali ke landing page\nMasuk ke akun\n\nMasuk, lalu kembali ke halaman tujuan.\n\nMasuk\nDaftar\nEmail\nPassword\nIngat saya di pe"
+    }
+  ],
+  "backwardCompatibility": {
+    "url": "http://127.0.0.1:8036/app.html#/",
+    "pathname": "/app.html",
+    "hash": "#/",
+    "appHasContent": true
+  },
+  "assets": [
+    {
+      "path": "/assets/js/app.js",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "path": "/assets/images/bg-vid.mp4",
+      "status": 200,
+      "ok": true
+    }
+  ],
+  "api": [
+    {
+      "path": "/api/health",
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "isJson": true,
+      "isHtmlFallback": false
+    },
+    {
+      "path": "/api/auth/autologin",
+      "status": 401,
+      "contentType": "application/json; charset=utf-8",
+      "isJson": true,
+      "isHtmlFallback": false
+    },
+    {
+      "path": "/api/auth/me",
+      "status": 404,
+      "contentType": "application/json; charset=utf-8",
+      "isJson": true,
+      "isHtmlFallback": false
+    }
+  ],
+  "regression": {
+    "buyer": {
+      "email": "buyer@projectb.local",
+      "loginStatus": 200,
+      "expectedHash": "#/buyer",
+      "url": "http://127.0.0.1:8036/#/buyer",
+      "pathname": "/",
+      "hash": "#/buyer",
+      "appHasContent": true,
+      "notificationBellCount": 3
+    },
+    "seller": {
+      "email": "seller@projectb.local",
+      "loginStatus": 200,
+      "expectedHash": "#/seller",
+      "url": "http://127.0.0.1:8036/#/seller",
+      "pathname": "/",
+      "hash": "#/seller",
+      "appHasContent": true,
+      "notificationBellCount": 1
+    },
+    "admin": {
+      "email": "admin@projectb.local",
+      "loginStatus": 200,
+      "expectedHash": "#/admin",
+      "url": "http://127.0.0.1:8036/#/admin",
+      "pathname": "/",
+      "hash": "#/admin",
+      "appHasContent": true,
+      "notificationBellCount": 1
+    },
+    "affiliate_admin": {
+      "email": "affiliate@projectb.local",
+      "loginStatus": 200,
+      "expectedHash": "#/affiliate",
+      "url": "http://127.0.0.1:8036/#/affiliate",
+      "pathname": "/",
+      "hash": "#/affiliate",
+      "appHasContent": true,
+      "notificationBellCount": 3
+    }
+  },
+  "issues": [],
+  "result": "PASS"
+}

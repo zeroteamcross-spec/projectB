@@ -1,0 +1,321 @@
+const PAYMENT_STATUS_LABELS = {
+  unpaid: "Belum Dibayar",
+  partial: "Dibayar Sebagian",
+  paid: "Dibayar",
+  failed: "Gagal",
+  refunded: "Refunded",
+  pending_payment: "Belum Dibayar",
+  dp_paid: "DP Dibayar",
+  expired: "Kadaluarsa",
+  cancelled: "Dibatalkan",
+};
+
+const TRANSACTION_STATUS_META = {
+  pending_payment: {
+    label: "Menunggu Pembayaran",
+    shortLabel: "Menunggu",
+    variant: "warning",
+    bucket: "waiting",
+    description: "Buyer belum menyelesaikan pembayaran awal.",
+  },
+  waiting_payment: {
+    label: "Menunggu Pembayaran",
+    shortLabel: "Menunggu",
+    variant: "warning",
+    bucket: "waiting",
+    description: "Buyer belum menyelesaikan pembayaran.",
+  },
+  pending: {
+    label: "Pending",
+    shortLabel: "Pending",
+    variant: "warning",
+    bucket: "waiting",
+    description: "Transaksi masih menunggu pembayaran.",
+  },
+  unpaid: {
+    label: "Belum Dibayar",
+    shortLabel: "Belum Dibayar",
+    variant: "warning",
+    bucket: "waiting",
+    description: "Pembayaran belum diterima.",
+  },
+  dp_pending: {
+    label: "Menunggu DP",
+    shortLabel: "Menunggu DP",
+    variant: "warning",
+    bucket: "waiting",
+    description: "Transaksi menunggu pembayaran DP.",
+  },
+  dp_paid: {
+    label: "DP Dibayar",
+    shortLabel: "DP Dibayar",
+    variant: "info",
+    bucket: "process",
+    description: "DP sudah diterima. Mobil sudah dikunci dan transaksi menunggu pelunasan.",
+  },
+  paid: {
+    label: "Pembayaran Lunas",
+    shortLabel: "Lunas",
+    variant: "success",
+    bucket: "process",
+    description: "Pembayaran sudah 100% dan transaksi perlu diproses seller.",
+  },
+  paid_confirmed: {
+    label: "Pembayaran Dikonfirmasi",
+    shortLabel: "Dikonfirmasi",
+    variant: "success",
+    bucket: "process",
+    description: "Pembayaran sudah dikonfirmasi dan transaksi perlu diproses seller.",
+  },
+  processing: {
+    label: "Diproses Seller",
+    shortLabel: "Diproses",
+    variant: "info",
+    bucket: "process",
+    description: "Seller sedang menyiapkan dokumen dan proses serah terima.",
+  },
+  handover: {
+    label: "Serah Terima",
+    shortLabel: "Serah Terima",
+    variant: "info",
+    bucket: "process",
+    description: "Transaksi masuk fase serah terima kendaraan.",
+  },
+  completed: {
+    label: "Selesai",
+    shortLabel: "Selesai",
+    variant: "success",
+    bucket: "done",
+    description: "Transaksi sudah selesai.",
+  },
+  done: {
+    label: "Selesai",
+    shortLabel: "Selesai",
+    variant: "success",
+    bucket: "done",
+    description: "Transaksi sudah selesai.",
+  },
+  success: {
+    label: "Selesai",
+    shortLabel: "Selesai",
+    variant: "success",
+    bucket: "done",
+    description: "Transaksi sudah selesai.",
+  },
+  expired: {
+    label: "Kadaluarsa",
+    shortLabel: "Kadaluarsa",
+    variant: "danger",
+    bucket: "done",
+    description: "Sesi pembayaran berakhir sebelum pembayaran selesai.",
+  },
+  cancelled: {
+    label: "Dibatalkan",
+    shortLabel: "Dibatalkan",
+    variant: "danger",
+    bucket: "done",
+    description: "Transaksi dibatalkan.",
+  },
+  failed: {
+    label: "Gagal",
+    shortLabel: "Gagal",
+    variant: "danger",
+    bucket: "done",
+    description: "Pembayaran transaksi gagal.",
+  },
+  refunded: {
+    label: "Refunded",
+    shortLabel: "Refunded",
+    variant: "warning",
+    bucket: "done",
+    description: "Pembayaran transaksi sudah direfund.",
+  },
+};
+
+const LISTING_STATUS_META = {
+  draft: { label: "Draft", variant: "default", locked: false },
+  published: { label: "Tersedia", variant: "success", locked: false },
+  reserved: { label: "Terkunci DP", variant: "warning", locked: true },
+  sold: { label: "Terjual", variant: "info", locked: true },
+  archived: { label: "Archived", variant: "danger", locked: true },
+};
+
+export const CANON_LISTING_STATUSES = Object.freeze(["draft", "published", "reserved", "sold", "archived"]);
+export const CANON_TRANSACTION_STATUSES = Object.freeze(["pending_payment", "dp_paid", "paid", "completed", "expired", "cancelled"]);
+export const CANON_SETTLEMENT_STATUSES = Object.freeze(["pending", "settled", "cancelled"]);
+export const CANON_AFFILIATE_LEDGER_STATUSES = Object.freeze(["accrued", "pending", "paid_out", "voided"]);
+
+export function normalizeStatus(status) {
+  return String(status ?? "").trim().toLowerCase();
+}
+
+export function isPaymentPaid(transaction) {
+  const paymentStatus = normalizeStatus(transaction?.payment_status);
+  const transactionStatus = normalizeStatus(transaction?.transaction_status ?? transaction?.status);
+
+  return paymentStatus === "paid" || ["paid", "completed"].includes(transactionStatus);
+}
+
+export function isTransactionFulfillment(transaction) {
+  const status = normalizeStatus(transaction?.transaction_status ?? transaction?.status ?? transaction);
+  return ["paid", "processing", "handover"].includes(status);
+}
+
+export function isTransactionCompleted(transaction) {
+  const status = normalizeStatus(transaction?.transaction_status ?? transaction?.status ?? transaction);
+  return status === "completed";
+}
+
+export function isTransactionCancelled(transaction) {
+  const status = normalizeStatus(transaction?.transaction_status ?? transaction?.status ?? transaction);
+  return ["cancelled", "expired", "failed", "refunded"].includes(status);
+}
+
+export function derivedPaymentStatus(transaction) {
+  const status = normalizeStatus(transaction?.transaction_status ?? transaction?.status ?? transaction);
+
+  if (status === "dp_paid") {
+    return "partial";
+  }
+
+  if (["paid", "completed"].includes(status)) {
+    return "paid";
+  }
+
+  if (["expired", "cancelled", "failed", "refunded"].includes(status)) {
+    return "closed";
+  }
+
+  return "pending";
+}
+
+export function listingStatusForTransaction(transaction, previousTransaction = null) {
+  const status = normalizeStatus(transaction?.transaction_status ?? transaction?.status);
+  const previousStatus = normalizeStatus(previousTransaction?.transaction_status ?? previousTransaction?.status);
+  const currentListing = normalizeStatus(transaction?.car?.listing_status ?? transaction?.listing_status);
+  const previousListing = normalizeStatus(previousTransaction?.car?.listing_status ?? previousTransaction?.listing_status);
+  const listing = currentListing || previousListing || "";
+
+  if (status === "dp_paid") {
+    return "reserved";
+  }
+
+  if (["paid", "completed"].includes(status)) {
+    return "sold";
+  }
+
+  if (["cancelled", "expired"].includes(status)) {
+    if (["dp_paid"].includes(previousStatus) || listing === "reserved") {
+      return "reserved";
+    }
+
+    if (["paid", "completed"].includes(previousStatus) || listing === "sold") {
+      return "sold";
+    }
+
+    return "published";
+  }
+
+  if (status === "refunded") {
+    return "sold";
+  }
+
+  return "";
+}
+
+export function ledgerStatusForSettlementStatus(status) {
+  const normalized = normalizeStatus(status);
+
+  if (normalized === "settled") {
+    return "paid_out";
+  }
+
+  if (normalized === "cancelled") {
+    return "accrued";
+  }
+
+  if (normalized === "pending") {
+    return "pending";
+  }
+
+  return "";
+}
+
+export function getPaymentStatusLabel(status) {
+  const normalized = normalizeStatus(status);
+  return PAYMENT_STATUS_LABELS[normalized] ?? titleizeStatus(status);
+}
+
+export function getTransactionStatusMeta(status) {
+  const normalized = normalizeStatus(status);
+  return TRANSACTION_STATUS_META[normalized] ?? {
+    label: titleizeStatus(status),
+    shortLabel: titleizeStatus(status),
+    variant: "default",
+    bucket: "process",
+    description: "Status transaksi belum dipetakan.",
+  };
+}
+
+export function getTransactionStatusLabel(status) {
+  return getTransactionStatusMeta(status).label;
+}
+
+export function getListingStatusMeta(status) {
+  const normalized = normalizeStatus(status);
+  return LISTING_STATUS_META[normalized] ?? {
+    label: titleizeStatus(status),
+    variant: "default",
+    locked: false,
+  };
+}
+
+export function getListingLockStatus(transaction) {
+  const transactionStatus = normalizeStatus(transaction?.transaction_status ?? transaction?.status);
+  const listingStatus = normalizeStatus(transaction?.car?.listing_status ?? transaction?.listing_status);
+
+  if (transactionStatus === "paid" || listingStatus === "sold") {
+    return {
+      status: "sold",
+      label: "Terjual",
+      variant: "info",
+      locked: true,
+      reason: "Pembayaran sudah lunas.",
+    };
+  }
+
+  if (transactionStatus === "dp_paid" || listingStatus === "reserved") {
+    return {
+      status: "reserved",
+      label: "Terkunci DP",
+      variant: "warning",
+      locked: true,
+      reason: "DP sudah dibayar.",
+    };
+  }
+
+  const meta = getListingStatusMeta(listingStatus || "published");
+  return {
+    status: listingStatus || "published",
+    label: meta.label,
+    variant: meta.variant,
+    locked: Boolean(meta.locked),
+    reason: "",
+  };
+}
+
+export function isCarLocked(carOrTransaction) {
+  const transactionLike = carOrTransaction?.transaction_status || carOrTransaction?.car
+    ? carOrTransaction
+    : { car: carOrTransaction };
+  return getListingLockStatus(transactionLike).locked;
+}
+
+export function titleizeStatus(status) {
+  const value = String(status ?? "-").trim();
+  if (!value) {
+    return "-";
+  }
+
+  return value.replace(/_/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+}

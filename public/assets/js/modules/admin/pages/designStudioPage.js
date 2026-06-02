@@ -1,0 +1,554 @@
+import { createPageLifecycle } from "../../../core/lifecycle.js";
+import { appStore } from "../../../state/store.js";
+import { SectionHeader } from "../../../ui/composites/sectionHeader.js";
+import { Card } from "../../../ui/composites/card.js";
+import { Button } from "../../../ui/primitives/button.js";
+import { EmptyState } from "../../../ui/primitives/emptyState.js";
+import { showToast } from "../../../ui/primitives/toast.js";
+import { currentThemeConfig, applyThemeToDocument } from "../../../theme/themeRuntime.js";
+import { themeStudioResource } from "../../../resources/themeStudioResource.js";
+import { designStudioService } from "../services/designStudioService.js";
+import { DesignStudioPreview } from "../components/designStudioPreview.js";
+import { deepClone } from "../../../utils/deepClone.js";
+
+const RUNTIME_KEY = "adminDesignStudio";
+const STUDIO_SECTIONS = designStudioService.sections();
+const DEFAULT_SECTION = STUDIO_SECTIONS[0]?.id ?? "brand";
+const EMPTY_RUNTIME = {
+  draft: null,
+  dirty: false,
+  saving: false,
+  notice: "",
+  error: "",
+  activeSection: DEFAULT_SECTION,
+  selectedHookId: "",
+};
+
+export function AdminDesignStudioPage({ notFound = false } = {}) {
+  let root = null;
+  let unsubscribe = null;
+  let baselineTheme = currentThemeConfig();
+  let filePicker = null;
+
+  return createPageLifecycle({
+    mount(context) {
+      root = document.createElement("div");
+      filePicker = buildFilePicker(async (raw) => {
+        try {
+          const next = designStudioService.importJson(raw);
+          setDraft(next, true);
+          showToast("Config berhasil diimport ke preview.", { type: "success" });
+        } catch (error) {
+          showToast(error.message || "Import config gagal.", { type: "error" });
+        }
+      });
+
+      initializeDraft();
+      render(root, context, notFound);
+      return root;
+    },
+    hydrate(context) {
+      initializeDraft();
+      render(root, context, notFound);
+    },
+    bindEvents(context) {
+      const handleInput = (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) {
+          return;
+        }
+
+        const path = target.dataset?.fieldPath;
+        if (!path) {
+          return;
+        }
+
+        const value = target.getAttribute("type") === "range"
+          ? Number(target.value)
+          : target.value;
+        setDraft(designStudioService.updateDraft(runtime().draft, path, value), true);
+      };
+
+      const handleClick = async (event) => {
+        const action = event.target instanceof HTMLElement
+          ? event.target.closest("[data-action]")?.dataset?.action
+          : null;
+
+        if (!action) {
+          return;
+        }
+
+        if (action === "reset") {
+          setDraft(designStudioService.defaults(), true);
+          return;
+        }
+
+        if (action === "import") {
+          filePicker?.click();
+          return;
+        }
+
+        if (action === "export") {
+          downloadConfig(runtime().draft ?? designStudioService.defaults());
+          return;
+        }
+
+        if (action === "switch-section") {
+          const sectionId = event.target instanceof HTMLElement
+            ? event.target.closest("[data-section-id]")?.dataset?.sectionId
+            : null;
+          if (sectionId) {
+            patchRuntime({ activeSection: sectionId, selectedHookId: "" }, "admin:design-studio-section");
+          }
+          return;
+        }
+
+        if (action === "select-hook") {
+          const hookId = event.target instanceof HTMLElement
+            ? event.target.closest("[data-hook-id]")?.dataset?.hookId
+            : null;
+          if (hookId) {
+            patchRuntime({ selectedHookId: hookId }, "admin:design-studio-select-hook");
+          }
+          return;
+        }
+
+        if (action === "save") {
+          await saveDraft();
+        }
+      };
+
+      root.addEventListener("input", handleInput);
+      root.addEventListener("change", handleInput);
+      root.addEventListener("click", handleClick);
+      unsubscribe = appStore.subscribe(() => {
+        initializeDraft();
+        render(root, context, notFound);
+      });
+
+      return () => {
+        root.removeEventListener("input", handleInput);
+        root.removeEventListener("change", handleInput);
+        root.removeEventListener("click", handleClick);
+        unsubscribe?.();
+      };
+    },
+    unmount() {},
+    dispose() {
+      if (runtime().dirty) {
+        applyThemeToDocument(baselineTheme);
+      }
+      filePicker?.remove();
+      filePicker = null;
+      unsubscribe = null;
+    },
+  });
+
+  function initializeDraft() {
+    const state = runtime();
+    if (state.draft) {
+      return;
+    }
+
+    const master = appStore.get("working.adminDesignStudio.theme.data", null);
+    const draft = designStudioService.initialDraft(master);
+    baselineTheme = deepClone(draft);
+    patchRuntime({ draft, dirty: false, error: "", notice: "" }, "admin:design-studio-init");
+    applyThemeToDocument(draft);
+  }
+
+  function runtime() {
+    return appStore.get(`runtime.${RUNTIME_KEY}`, EMPTY_RUNTIME) ?? EMPTY_RUNTIME;
+  }
+
+  function patchRuntime(patch, action) {
+    appStore.patchState(`runtime.${RUNTIME_KEY}`, { ...runtime(), ...patch }, action);
+  }
+
+  function setDraft(draft, dirty) {
+    patchRuntime({
+      draft,
+      dirty,
+      notice: dirty ? "Preview aktif. Simpan untuk menjadikannya source of truth." : runtime().notice,
+      error: "",
+    }, "admin:design-studio-draft");
+    applyThemeToDocument(draft);
+  }
+
+  async function saveDraft() {
+    const state = runtime();
+    patchRuntime({ saving: true, error: "", notice: "" }, "admin:design-studio-saving");
+
+    try {
+      const master = await themeStudioResource.save(designStudioService.normalize(state.draft));
+      appStore.patchState("working.adminDesignStudio.theme", {
+        data: master,
+        hydratedAt: Date.now(),
+      }, "admin:design-studio-working-theme");
+      baselineTheme = designStudioService.initialDraft(master);
+      patchRuntime({
+        draft: baselineTheme,
+        dirty: false,
+        saving: false,
+        notice: "Theme global berhasil disimpan.",
+      }, "admin:design-studio-saved");
+      applyThemeToDocument(baselineTheme);
+      showToast("Theme global berhasil disimpan.", { type: "success" });
+    } catch (error) {
+      patchRuntime({
+        saving: false,
+        error: error.message || "Menyimpan theme gagal.",
+      }, "admin:design-studio-save-error");
+      showToast(error.message || "Menyimpan theme gagal.", { type: "error" });
+    }
+  }
+}
+
+function render(root, context, notFound) {
+  if (!root) {
+    return;
+  }
+
+  const state = appStore.get(`runtime.${RUNTIME_KEY}`, EMPTY_RUNTIME) ?? EMPTY_RUNTIME;
+  const draft = state.draft ?? designStudioService.defaults();
+  const activeSectionId = state.activeSection || DEFAULT_SECTION;
+  const activeSection = STUDIO_SECTIONS.find((section) => section.id === activeSectionId) ?? STUDIO_SECTIONS[0];
+  const sectionHooks = designStudioService.hooksForSection(activeSectionId);
+  const selectedHook = designStudioService.hookById(state.selectedHookId);
+
+  if (notFound) {
+    root.replaceChildren(
+      SectionHeader({
+        title: "Design Studio tidak ditemukan",
+        description: "Kembali ke dashboard admin untuk membuka modul konfigurasi desain yang valid.",
+      }),
+      EmptyState({
+        title: "Route tidak ditemukan",
+        description: "Gunakan menu admin untuk membuka Design Studio.",
+      })
+    );
+    return;
+  }
+
+  const actions = document.createElement("div");
+  actions.className = "flex flex-wrap gap-2";
+  actions.append(
+    actionButton("reset", "Reset Default", "secondary"),
+    actionButton("import", "Import JSON", "secondary"),
+    actionButton("export", "Export JSON", "secondary"),
+    actionButton("save", state.saving ? "Menyimpan..." : "Save & Apply", "primary", state.saving)
+  );
+
+  const shell = document.createElement("div");
+  shell.className = "grid gap-6";
+
+  const topBar = Card([], { variant: "raised" });
+  topBar.className = `${topBar.className} grid gap-4 p-5`;
+  topBar.append(
+    SectionHeader({
+      title: "Design Studio",
+      description: "Kelola source of truth visual global tanpa edit file manual. Preview aktif langsung di session ini, simpan untuk menjadikannya runtime resmi.",
+      action: actions,
+    }),
+    helperPanel(state),
+  );
+
+  const content = document.createElement("div");
+  content.className = "grid gap-6 xl:grid-cols-[240px_minmax(0,1fr)_minmax(320px,0.88fr)]";
+
+  const navColumn = document.createElement("aside");
+  navColumn.className = "grid gap-4 xl:sticky xl:top-6 xl:self-start";
+  navColumn.append(sectionNavigator(activeSectionId));
+
+  const formColumn = document.createElement("div");
+  formColumn.className = "grid gap-4";
+  formColumn.append(sectionHero(activeSection), renderSection(activeSection, draft));
+
+  const previewColumn = document.createElement("aside");
+  previewColumn.className = "grid gap-4 xl:sticky xl:top-6 xl:self-start";
+  previewColumn.append(
+    Card([
+      textBlock("text-sm font-semibold text-[var(--pb-text)]", "Live Preview"),
+      textBlock("text-sm text-[var(--pb-text-muted)]", "Snippet public, controls, dan internal memakai token yang sama dengan aplikasi."),
+    ], { variant: "raised" }),
+    hookInspectorCard(activeSection, sectionHooks, selectedHook),
+    DesignStudioPreview({ config: draft, selectedHookId: selectedHook?.id ?? "" })
+  );
+
+  content.append(navColumn, formColumn, previewColumn);
+  shell.append(topBar, content);
+  root.replaceChildren(shell);
+}
+
+function hookInspectorCard(section, hooks, selectedHook) {
+  const card = Card([], { variant: "raised" });
+  card.className = `${card.className} grid gap-4 p-5`;
+
+  const heading = document.createElement("div");
+  heading.className = "grid gap-1";
+  heading.append(
+    textBlock("text-xs font-bold uppercase tracking-normal text-[var(--pb-brand-secondary)]", "Bagian yang terhubung"),
+    textBlock("text-base font-semibold text-[var(--pb-text)]", `${hooks.length} elemen untuk section ${section.title}`),
+    textBlock("text-sm text-[var(--pb-text-muted)]", "Pilih item untuk melihat bagian UI yang dimaksud. Identitas memakai data-ds, jadi tidak bergantung pada class Tailwind."),
+  );
+  card.append(heading);
+
+  if (!hooks.length) {
+    card.append(EmptyState({
+      title: "Belum ada hook untuk section ini",
+      description: "Section ini belum punya area preview yang dipetakan. Registry tetap siap untuk diperluas per modul.",
+    }));
+    return card;
+  }
+
+  const list = document.createElement("div");
+  list.className = "grid gap-2";
+  hooks.forEach((hook) => list.append(hookListItem(hook, selectedHook?.id === hook.id)));
+  card.append(list);
+
+  if (selectedHook) {
+    const detail = document.createElement("div");
+    detail.className = "grid gap-2 rounded-[var(--pb-radius-xl)] border border-[var(--pb-border)] bg-[var(--pb-surface-muted)] p-4";
+    detail.append(
+      textBlock("text-sm font-semibold text-[var(--pb-text)]", selectedHook.label),
+      textBlock("text-sm text-[var(--pb-text-muted)]", selectedHook.description),
+      metaLine("Hook", selectedHook.id),
+      metaLine("Kategori", selectedHook.category),
+      metaLine("Token terkait", selectedHook.tokens.join(", ") || "-"),
+    );
+    card.append(detail);
+  }
+
+  return card;
+}
+
+function hookListItem(hook, active) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.dataset.action = "select-hook";
+  button.dataset.hookId = hook.id;
+  button.className = active
+    ? "grid gap-1 rounded-[var(--pb-radius-xl)] border border-[color-mix(in_srgb,var(--pb-brand-primary)_35%,white)] bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] px-4 py-3 text-left"
+    : "grid gap-1 rounded-[var(--pb-radius-xl)] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] px-4 py-3 text-left";
+  button.append(
+    textBlock("text-sm font-semibold text-[var(--pb-text)]", hook.label),
+    textBlock("text-xs text-[var(--pb-text-muted)]", hook.description),
+    textBlock("text-[11px] font-medium text-[var(--pb-brand-secondary)]", hook.id),
+  );
+  return button;
+}
+
+function metaLine(label, value) {
+  const node = document.createElement("div");
+  node.className = "text-xs text-[var(--pb-text-muted)]";
+  node.textContent = `${label}: ${value}`;
+  return node;
+}
+
+function renderSection(section, draft) {
+  const card = Card([], { variant: "raised" });
+  card.className = `${card.className} grid gap-5 p-5`;
+
+  const grid = document.createElement("div");
+  grid.className = "grid gap-4 md:grid-cols-2";
+  section.fields.forEach((field) => grid.append(renderField(field, draft)));
+
+  card.append(grid);
+  return card;
+}
+
+function renderField(field, draft) {
+  const value = String(designStudioService.fieldValue(draft, field.path, ""));
+  const wrap = document.createElement("label");
+  wrap.className = "grid gap-2 min-w-0";
+
+  const labelRow = document.createElement("div");
+  labelRow.className = "grid gap-1";
+  labelRow.append(
+    textBlock("text-sm font-medium text-[var(--pb-text-strong)]", field.label),
+    textBlock("text-xs text-[var(--pb-text-muted)]", field.type === "range" ? `Nilai saat ini: ${value}` : field.path)
+  );
+
+  wrap.append(labelRow);
+
+  if (field.type === "color") {
+    const row = document.createElement("div");
+    row.className = "flex items-center gap-3";
+
+    const picker = document.createElement("input");
+    picker.type = "color";
+    picker.value = normalizeColorValue(value);
+    picker.dataset.fieldPath = field.path;
+    picker.className = "h-11 w-14 shrink-0 cursor-pointer rounded-[var(--pb-radius-lg)] border border-[var(--pb-form-border)] bg-transparent p-1";
+
+    const text = document.createElement("input");
+    text.type = "text";
+    text.value = value;
+    text.dataset.fieldPath = field.path;
+    text.className = "min-h-11 min-w-0 flex-1 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-sm text-[var(--pb-text)] outline-none";
+
+    row.append(picker, text);
+    wrap.append(row);
+    return wrap;
+  }
+
+  if (field.type === "select") {
+    const select = document.createElement("select");
+    select.dataset.fieldPath = field.path;
+    select.className = "min-h-11 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-sm text-[var(--pb-text)] outline-none";
+    field.options.forEach((option) => {
+      const item = document.createElement("option");
+      item.value = option.value;
+      item.textContent = option.label;
+      item.selected = option.value === value;
+      select.append(item);
+    });
+    wrap.append(select);
+    return wrap;
+  }
+
+  const input = document.createElement("input");
+  input.type = field.type === "range" ? "range" : "text";
+  input.value = value;
+  input.dataset.fieldPath = field.path;
+  input.className = field.type === "range"
+    ? "w-full accent-[var(--pb-brand-primary)]"
+    : "min-h-11 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-sm text-[var(--pb-text)] outline-none";
+
+  if (field.type === "range") {
+    input.min = String(field.min);
+    input.max = String(field.max);
+    input.step = String(field.step);
+  }
+
+  wrap.append(input);
+  return wrap;
+}
+
+function helperPanel(state) {
+  const card = Card([], { variant: "raised" });
+  card.className = `${card.className} grid gap-3 p-4`;
+
+  const top = document.createElement("div");
+  top.className = "flex flex-wrap items-center gap-2";
+  top.append(
+    badge(state.dirty ? "Preview belum disimpan" : "Sinkron dengan source of truth", state.dirty ? "warning" : "success"),
+    badge("Master Data", "default"),
+    badge("Runtime Theme", "info"),
+  );
+
+  card.append(top);
+
+  if (state.notice) {
+    card.append(textBlock("text-sm text-[var(--pb-text-muted)]", state.notice));
+  }
+
+  if (state.error) {
+    const error = document.createElement("div");
+    error.className = "rounded-[var(--pb-radius-xl)] border border-[var(--pb-error-border)] bg-[var(--pb-error-bg)] px-4 py-3 text-sm text-[var(--pb-danger)]";
+    error.textContent = state.error;
+    card.append(error);
+  }
+
+  return card;
+}
+
+function sectionNavigator(activeSectionId) {
+  const card = Card([], { variant: "raised" });
+  card.className = `${card.className} grid gap-3 p-4`;
+
+  card.append(
+    textBlock("text-xs font-bold uppercase tracking-normal text-[var(--pb-brand-secondary)]", "Studio Sections"),
+    textBlock("text-sm text-[var(--pb-text-muted)]", "Pilih area visual yang ingin diatur. Editor utama hanya menampilkan satu section agar tetap rapi."),
+  );
+
+  const list = document.createElement("div");
+  list.className = "grid gap-2";
+  STUDIO_SECTIONS.forEach((section) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.dataset.action = "switch-section";
+    button.dataset.sectionId = section.id;
+    button.className = section.id === activeSectionId
+      ? "grid gap-1 rounded-[var(--pb-radius-xl)] border border-[color-mix(in_srgb,var(--pb-brand-primary)_35%,white)] bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] px-4 py-3 text-left shadow-[var(--pb-shadow-soft)]"
+      : "grid gap-1 rounded-[var(--pb-radius-xl)] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] px-4 py-3 text-left";
+    button.append(
+      textBlock("text-sm font-semibold text-[var(--pb-text)]", section.title),
+      textBlock("text-xs text-[var(--pb-text-muted)]", section.description),
+    );
+    list.append(button);
+  });
+
+  card.append(list);
+  return card;
+}
+
+function sectionHero(section) {
+  const card = Card([], { variant: "raised" });
+  card.className = `${card.className} grid gap-2 p-5`;
+  card.append(
+    textBlock("text-xs font-bold uppercase tracking-normal text-[var(--pb-brand-secondary)]", section.title),
+    textBlock("text-lg font-bold text-[var(--pb-text)]", `Konfigurasi ${section.title}`),
+    textBlock("text-sm text-[var(--pb-text-muted)]", section.description),
+  );
+  return card;
+}
+
+function actionButton(action, label, variant, disabled = false) {
+  const button = Button({ label, variant, disabled });
+  button.dataset.action = action;
+  return button;
+}
+
+function buildFilePicker(onLoad) {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "application/json";
+  input.hidden = true;
+  input.addEventListener("change", async () => {
+    const file = input.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    const raw = await file.text();
+    await onLoad(raw);
+    input.value = "";
+  });
+  document.body.append(input);
+  return input;
+}
+
+function downloadConfig(config) {
+  const blob = new Blob([designStudioService.exportJson(config)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "projectb-theme-config.json";
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+function badge(label, variant) {
+  const node = document.createElement("span");
+  const classes = {
+    default: "bg-[var(--pb-badge-neutral-bg)] text-[var(--pb-text-strong)]",
+    success: "bg-[color-mix(in_srgb,var(--pb-success)_14%,white)] text-[var(--pb-success)]",
+    warning: "bg-[color-mix(in_srgb,var(--pb-warning)_14%,white)] text-[var(--pb-warning)]",
+    info: "bg-[color-mix(in_srgb,var(--pb-info)_14%,white)] text-[var(--pb-info)]",
+  };
+  node.className = `inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${classes[variant] ?? classes.default}`;
+  node.textContent = label;
+  return node;
+}
+
+function textBlock(className, text) {
+  const node = document.createElement("div");
+  node.className = className;
+  node.textContent = text;
+  return node;
+}
+
+function normalizeColorValue(value) {
+  return /^#[0-9a-fA-F]{6}$/.test(String(value)) ? String(value) : "#ffffff";
+}
