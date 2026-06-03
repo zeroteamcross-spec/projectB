@@ -118,7 +118,13 @@ class EnvironmentReadinessChecker
             $blockers[] = 'PHP extension pdo_mysql is required for MySQL.';
         }
 
-        foreach (['host', 'port', 'database', 'username'] as $field) {
+        $socket = isset($database['socket']) ? trim((string) $database['socket']) : '';
+        $checks['database_socket'] = [
+            'value' => $socket,
+            'ok' => true,
+        ];
+
+        foreach (['database', 'username'] as $field) {
             $value = isset($database[$field]) ? (string) $database[$field] : '';
             $checks['database_' . $field] = [
                 'value' => $field === 'username' ? $this->mask($value) : $value,
@@ -127,6 +133,33 @@ class EnvironmentReadinessChecker
 
             if ($value === '') {
                 $blockers[] = 'Database config is missing: ' . $field . '.';
+            }
+        }
+
+        if ($socket === '') {
+            foreach (['host', 'port'] as $field) {
+                $value = isset($database[$field]) ? (string) $database[$field] : '';
+                $checks['database_' . $field] = [
+                    'value' => $value,
+                    'ok' => $value !== '',
+                ];
+
+                if ($value === '') {
+                    $blockers[] = 'Database config is missing: ' . $field . '.';
+                }
+            }
+        } else {
+            $checks['database_host'] = [
+                'value' => isset($database['host']) ? (string) $database['host'] : '',
+                'ok' => true,
+            ];
+            $checks['database_port'] = [
+                'value' => isset($database['port']) ? (string) $database['port'] : '',
+                'ok' => true,
+            ];
+
+            if (! file_exists($socket)) {
+                $warnings[] = 'Database socket path does not exist from this runtime: ' . $socket . '.';
             }
         }
 

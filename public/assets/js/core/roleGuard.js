@@ -1,3 +1,5 @@
+import { defaultLoginPath, googleLoginPathForRole } from "../config/authUxConfig.js";
+
 const PUBLIC_ROLE = "public";
 const DEFAULT_HOME_BY_ROLE = {
   public: "/",
@@ -114,8 +116,8 @@ function homeForRole(role) {
 }
 
 function authLandingPath(requiredRole, fromPath) {
+  const path = requiredRole === PUBLIC_ROLE ? defaultLoginPath("buyer") : googleLoginPathForRole(requiredRole);
   const query = new URLSearchParams();
-  query.set("role", requiredRole);
   query.set("from", fromPath);
-  return `/auth?${query.toString()}`;
+  return `${path}?${query.toString()}`;
 }

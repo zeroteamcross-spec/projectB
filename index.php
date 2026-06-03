@@ -31,7 +31,7 @@ $uriPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 $uriPath = rawurldecode($uriPath);
 $relativePath = ltrim($uriPath, '/');
 
-if (str_contains($relativePath, '..')) {
+if (strpos($relativePath, '..') !== false) {
     http_response_code(400);
     header('Content-Type: text/plain; charset=utf-8');
     echo 'Bad request.';
@@ -43,7 +43,7 @@ if (str_contains($relativePath, '..')) {
 | API/backend requests
 |--------------------------------------------------------------------------
 */
-if ($uriPath === '/api' || str_starts_with($uriPath, '/api/')) {
+if ($uriPath === '/api' || strpos($uriPath, '/api/') === 0) {
     $_SERVER['SCRIPT_FILENAME'] = $publicRoot . '/index.php';
     $_SERVER['SCRIPT_NAME'] = '/index.php';
     $_SERVER['PHP_SELF'] = '/index.php';
@@ -58,7 +58,7 @@ if ($uriPath === '/api' || str_starts_with($uriPath, '/api/')) {
 | Protected storage/uploads route
 |--------------------------------------------------------------------------
 */
-if ($uriPath === '/storage/uploads' || str_starts_with($uriPath, '/storage/uploads/')) {
+if ($uriPath === '/storage/uploads' || strpos($uriPath, '/storage/uploads/') === 0) {
     $_SERVER['SCRIPT_FILENAME'] = $publicRoot . '/index.php';
     $_SERVER['SCRIPT_NAME'] = '/index.php';
     $_SERVER['PHP_SELF'] = '/index.php';
@@ -79,7 +79,7 @@ $staticFile = realpath($publicRoot . '/' . $relativePath);
 if (
     $staticFile !== false
     && $publicRootReal !== false
-    && str_starts_with($staticFile, $publicRootReal . DIRECTORY_SEPARATOR)
+    && strpos($staticFile, $publicRootReal . DIRECTORY_SEPARATOR) === 0
     && is_file($staticFile)
 ) {
     $ext = strtolower(pathinfo($staticFile, PATHINFO_EXTENSION));

@@ -1,0 +1,37 @@
+{
+  "base": "http://127.0.0.1:8034/app.html",
+  "providerStatus": "BLOCKED_PROVIDER_CONFIG",
+  "routes": [
+    {
+      "route": "#/google-login/buyer",
+      "expectedTitle": "Google Login Buyer",
+      "expectedText": "Google Login belum dikonfigurasi",
+      "result": "PASS"
+    },
+    {
+      "route": "#/google-login/admin",
+      "expectedTitle": "Google Login Admin",
+      "expectedText": "Google Login belum dikonfigurasi",
+      "result": "PASS"
+    },
+    {
+      "route": "#/google-login/seller",
+      "expectedTitle": "Google Login Seller",
+      "expectedText": "Google Login belum dikonfigurasi",
+      "result": "PASS"
+    },
+    {
+      "route": "#/google-login/affiliate",
+      "expectedTitle": "Google Login Affiliate",
+      "expectedText": "Affiliate tetap menggunakan login user/password",
+      "result": "PASS"
+    },
+    {
+      "route": "#/google-login/complete",
+      "expectedTitle": "Lengkapi Data Google Login",
+      "expectedText": "Tidak ada data Google yang perlu dilengkapi",
+      "result": "PASS"
+    }
+  ],
+  "result": "PASS"
+}

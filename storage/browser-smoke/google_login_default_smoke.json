@@ -1,0 +1,85 @@
+{
+  "base": "http://127.0.0.1:8035/app.html",
+  "defaultEntry": {
+    "action": "public shell account link",
+    "expectedHash": "#/google-login",
+    "actualHash": "#/google-login",
+    "result": "PASS"
+  },
+  "chooser": {
+    "action": "google chooser role buttons",
+    "actual": {
+      "buyer": "#/google-login/buyer",
+      "admin": "#/google-login/admin",
+      "seller": "#/google-login/seller",
+      "affiliate": "#/google-login/affiliate"
+    },
+    "expected": {
+      "buyer": "#/google-login/buyer",
+      "admin": "#/google-login/admin",
+      "seller": "#/google-login/seller",
+      "affiliate": "#/google-login/affiliate"
+    },
+    "result": "PASS"
+  },
+  "hiddenLegacy": {
+    "action": "public UI hides legacy login links",
+    "leakedHref": [],
+    "leakedVisible": [],
+    "result": "PASS"
+  },
+  "protectedRedirects": [
+    {
+      "route": "#/buyer",
+      "expectedHash": "#/google-login/buyer",
+      "actualHash": "#/google-login/buyer?from=%2Fbuyer",
+      "result": "PASS"
+    },
+    {
+      "route": "#/seller",
+      "expectedHash": "#/google-login/seller",
+      "actualHash": "#/google-login/seller?from=%2Fseller",
+      "result": "PASS"
+    },
+    {
+      "route": "#/admin",
+      "expectedHash": "#/google-login/admin",
+      "actualHash": "#/google-login/admin?from=%2Fadmin",
+      "result": "PASS"
+    },
+    {
+      "route": "#/affiliate",
+      "expectedHash": "#/google-login/affiliate",
+      "actualHash": "#/google-login/affiliate?from=%2Faffiliate",
+      "result": "PASS"
+    }
+  ],
+  "legacyManualAccess": [
+    {
+      "route": "#/auth",
+      "expectedText": "Masuk ke akun",
+      "result": "PASS"
+    },
+    {
+      "route": "#/login/buyer",
+      "expectedText": "Login Buyer",
+      "result": "PASS"
+    },
+    {
+      "route": "#/login/admin",
+      "expectedText": "Login Admin",
+      "result": "PASS"
+    },
+    {
+      "route": "#/login/seller",
+      "expectedText": "Login Seller",
+      "result": "PASS"
+    },
+    {
+      "route": "#/login/affiliate",
+      "expectedText": "Login Affiliate",
+      "result": "PASS"
+    }
+  ],
+  "result": "PASS"
+}

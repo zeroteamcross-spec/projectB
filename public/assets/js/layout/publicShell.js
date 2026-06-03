@@ -5,6 +5,7 @@ import { RouteHydrateAlert } from "../ui/composites/routeHydrateAlert.js";
 import { tw } from "../theme/tailwindClasses.js";
 import { applyDesignHook } from "../theme/designStudioHooks.js";
 import { renderImpersonationBanner as mountImpersonationBanner } from "./impersonationBanner.js";
+import { defaultLoginHash } from "../config/authUxConfig.js";
 
 export class PublicShell {
   constructor({ store } = {}) {
@@ -109,7 +110,7 @@ export class PublicShell {
 
     const isAuthenticated = this.store?.get("auth.isAuthenticated", false) ?? false;
     const role = this.store?.get("auth.role", "public") ?? "public";
-    const target = isAuthenticated ? dashboardHash(role) : "#/auth";
+    const target = isAuthenticated ? dashboardHash(role) : defaultLoginHash();
     this.brandTitleNode && (this.brandTitleNode.textContent = brandConfig.appName);
     this.brandSubtitleNode && (this.brandSubtitleNode.textContent = brandConfig.appTagline || "Showroom mobil pilihan");
     if (this.brandMarkNode) {

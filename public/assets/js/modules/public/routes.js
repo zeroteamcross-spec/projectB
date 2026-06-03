@@ -9,6 +9,7 @@ export const publicReservedRoutePrefixes = Object.freeze([
   "af",
   "auth",
   "cars",
+  "google-login",
   "transactions",
 ]);
 
