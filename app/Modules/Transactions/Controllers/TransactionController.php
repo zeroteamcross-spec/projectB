@@ -113,6 +113,13 @@ class TransactionController extends Controller
 
     public function providerCallback(Request $request): JsonResponse
     {
+        if ($request->input() === []) {
+            return JsonResponse::success(
+                ['acknowledged' => true, 'processed' => false],
+                'Midtrans callback endpoint is ready.'
+            );
+        }
+
         $payload = (new ProviderCallbackRequest($request))->validate();
         $payload = $this->callbackHandler->normalize($payload);
 

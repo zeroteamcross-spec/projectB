@@ -363,7 +363,11 @@ class TransactionService
             ?: $this->transactions->findByCode($providerOrderId);
 
         if (! $transaction) {
-            throw new NotFoundException('Transaksi provider tidak ditemukan.');
+            return [
+                'acknowledged' => true,
+                'processed' => false,
+                'order_id' => $providerOrderId,
+            ];
         }
 
         $grossAmount = isset($payload['gross_amount']) ? (int) $payload['gross_amount'] : null;
