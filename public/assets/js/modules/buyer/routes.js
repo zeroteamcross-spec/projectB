@@ -28,7 +28,13 @@ export const buyerRoutes = [
         },
         {
           key: "sliders",
-          loader: ({ signal }) => slidersResource.publicList({ position: "buyer_home", limit: 5 }, { signal }).catch(() => ({ sliders: [], meta: {} })),
+          loader: ({ signal }) => Promise.all([
+            slidersResource.publicList({ position: "public_home", limit: 5 }, { signal }),
+            slidersResource.publicList({ position: "landing_hero", limit: 5 }, { signal }),
+          ]).then(([publicHome, landingHero]) => ({
+            sliders: [...(publicHome?.sliders ?? []), ...(landingHero?.sliders ?? [])].slice(0, 5),
+            meta: { positions: ["public_home", "landing_hero"] },
+          })).catch(() => ({ sliders: [], meta: {} })),
         },
       ],
     },

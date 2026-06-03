@@ -126,34 +126,35 @@ function actionRow({ activeFilterCount, quickFilter, onQuickFilter, onOpenFilter
 }
 
 function locationSelector({ filters, options, onSearch }) {
-  const wrap = document.createElement("label");
-  wrap.className = "grid gap-2 rounded-[var(--pb-radius-xl)] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] px-4 py-3 shadow-[var(--pb-shadow-soft)]";
-
-  const label = document.createElement("span");
-  label.className = "text-[11px] font-semibold uppercase tracking-normal text-[var(--pb-text-muted)]";
-  label.textContent = "Lokasi";
-
-  const row = document.createElement("div");
-  row.className = "flex min-w-0 items-center gap-2";
-
-  const icon = document.createElement("span");
-  icon.className = "grid h-9 w-9 shrink-0 place-items-center rounded-[var(--pb-radius-xl)] bg-[color-mix(in_srgb,var(--pb-danger)_10%,white)] text-[var(--pb-danger)]";
-  icon.append(createIcon("location", { className: "h-4 w-4" }));
-
-  const select = document.createElement("select");
-  select.name = "location_name";
-  select.className = "min-w-0 flex-1 bg-transparent text-sm font-semibold text-[var(--pb-text-strong)] outline-none";
-  withEmptyOption(options.locations ?? [], "Pilih lokasi").forEach((option) => {
-    const item = document.createElement("option");
-    item.value = option.value;
-    item.textContent = option.label;
-    select.append(item);
-  });
-  select.value = filters.location_name ?? "";
-  select.addEventListener("change", () => onSearch?.({ location_name: select.value }));
-
-  row.append(icon, select, createIcon("sort", { className: "h-4 w-4 shrink-0 rotate-90 text-[var(--pb-text-muted)]" }));
-  wrap.append(label, row);
+  const wrap = "";
+  // const wrap = document.createElement("label");
+  // wrap.className = "grid gap-2 rounded-[var(--pb-radius-xl)] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] px-4 py-3 shadow-[var(--pb-shadow-soft)]";
+  //
+  // const label = document.createElement("span");
+  // label.className = "text-[11px] font-semibold uppercase tracking-normal text-[var(--pb-text-muted)]";
+  // label.textContent = "Lokasi";
+  //
+  // const row = document.createElement("div");
+  // row.className = "flex min-w-0 items-center gap-2";
+  //
+  // const icon = document.createElement("span");
+  // icon.className = "grid h-9 w-9 shrink-0 place-items-center rounded-[var(--pb-radius-xl)] bg-[color-mix(in_srgb,var(--pb-danger)_10%,white)] text-[var(--pb-danger)]";
+  // icon.append(createIcon("location", { className: "h-4 w-4" }));
+  //
+  // const select = document.createElement("select");
+  // select.name = "location_name";
+  // select.className = "min-w-0 flex-1 bg-transparent text-sm font-semibold text-[var(--pb-text-strong)] outline-none";
+  // withEmptyOption(options.locations ?? [], "Pilih lokasi").forEach((option) => {
+  //   const item = document.createElement("option");
+  //   item.value = option.value;
+  //   item.textContent = option.label;
+  //   select.append(item);
+  // });
+  // select.value = filters.location_name ?? "";
+  // select.addEventListener("change", () => onSearch?.({ location_name: select.value }));
+  //
+  // row.append(icon, select, createIcon("sort", { className: "h-4 w-4 shrink-0 rotate-90 text-[var(--pb-text-muted)]" }));
+  // wrap.append(label, row);
   return wrap;
 }
 function withEmptyOption(values, label) {

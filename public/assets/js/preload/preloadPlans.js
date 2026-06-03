@@ -51,10 +51,16 @@ export const preloadPlans = {
         loader: ({ signal }) => carsResource.list({ limit: 10, listing_status: "published" }, { signal }),
       },
       {
-        key: "slidersBuyerHome",
+        key: "slidersLandingPage",
         ttl: 120,
-        version: "buyer-sliders-home-v1",
-        loader: ({ signal }) => slidersResource.publicList({ position: "buyer_home", limit: 5 }, { signal }).catch(() => ({ sliders: [], meta: {} })),
+        version: "landing-page-sliders-v1",
+        loader: ({ signal }) => Promise.all([
+          slidersResource.publicList({ position: "public_home", limit: 5 }, { signal }),
+          slidersResource.publicList({ position: "landing_hero", limit: 5 }, { signal }),
+        ]).then(([publicHome, landingHero]) => ({
+          sliders: [...(publicHome?.sliders ?? []), ...(landingHero?.sliders ?? [])].slice(0, 5),
+          meta: { positions: ["public_home", "landing_hero"] },
+        })).catch(() => ({ sliders: [], meta: {} })),
       },
       {
         key: "transactions",

@@ -39,11 +39,35 @@ export function SliderBanner({
 
   const track = document.createElement("section");
   track.className = "pb-slider-track";
+  const slideNodes = items.map((item) => {
+    const slide = document.createElement("section");
+    slide.className = "pb-slider-item";
+    slide.append(slideTemplate(item, {
+      idPrefix,
+      onNavigate,
+      count: items.length,
+    }));
+    return slide;
+  });
+  track.append(...slideNodes);
+
   const dotsWrap = carouselDots(items.length, 0);
   let activeIndex = 0;
   let timerId = null;
+  let resizeTimerId = null;
+  const handleResize = () => {
+    window.clearTimeout(resizeTimerId);
+    resizeTimerId = window.setTimeout(() => applyTrackPosition(0, false), 80);
+  };
 
-  const renderActiveSlide = (nextIndex, direction = "initial") => {
+  const applyTrackPosition = (dragOffset = 0, animated = true) => {
+    const activeSlide = slideNodes[activeIndex];
+    if (!activeSlide) return;
+    track.style.transition = animated ? "" : "none";
+    track.style.transform = `translate3d(${dragOffset - activeSlide.offsetLeft}px,0,0)`;
+  };
+
+  const renderActiveSlide = (nextIndex, direction = "initial", animated = true) => {
     activeIndex = wrapIndex(nextIndex, items.length);
     const activeSlider = items[activeIndex];
     const activeTemplateKey = templateKeyFor(activeSlider);
@@ -60,15 +84,24 @@ export function SliderBanner({
       directionClass,
       context === "buyer" ? "pb-slider-context-buyer" : "pb-slider-context-public",
     ].filter(Boolean).join(" ");
-    track.replaceChildren(slideTemplate(activeSlider, {
-      idPrefix,
-      onNavigate,
-      count: items.length,
-    }));
+    slideNodes.forEach((slide, index) => {
+      slide.classList.toggle("pb-slider-item-active", index === activeIndex);
+      slide.setAttribute("aria-hidden", index === activeIndex ? "false" : "true");
+    });
+    applyTrackPosition(0, animated);
     syncCarouselDots(dotsWrap, activeIndex);
   };
 
   const next = () => renderActiveSlide(activeIndex + 1, "next");
+  const previous = () => renderActiveSlide(activeIndex - 1, "prev");
+  const goNextFromInteraction = () => {
+    next();
+    scheduleNext();
+  };
+  const goPreviousFromInteraction = () => {
+    previous();
+    scheduleNext();
+  };
   const scheduleNext = () => {
     clearTimer();
     if (items.length <= 1) return;
@@ -91,10 +124,27 @@ export function SliderBanner({
     scheduleNext();
   });
 
-  section.dispose = clearTimer;
-  renderActiveSlide(0, "initial");
-  scheduleNext();
+  bindSliderDrag(section, track, {
+    enabled: items.length > 1,
+    slideCount: items.length,
+    getActiveIndex: () => activeIndex,
+    onDrag: (offset) => applyTrackPosition(offset, false),
+    onSnapBack: () => applyTrackPosition(0, true),
+    onNext: goNextFromInteraction,
+    onPrevious: goPreviousFromInteraction,
+  });
+
+  section.dispose = () => {
+    clearTimer();
+    window.clearTimeout(resizeTimerId);
+    window.removeEventListener("resize", handleResize);
+  };
+  section.addEventListener("pb-slider:pause", clearTimer);
+  section.addEventListener("pb-slider:resume", scheduleNext);
+  window.addEventListener("resize", handleResize);
   section.append(track, dotsWrap);
+  renderActiveSlide(0, "initial", false);
+  scheduleNext();
 
   return section;
 }
@@ -264,6 +314,183 @@ function carouselDots(count, activeIndex = 0) {
   return wrap;
 }
 
+function bindSliderDrag(section, track, {
+  enabled,
+  slideCount,
+  getActiveIndex,
+  onDrag,
+  onSnapBack,
+  onNext,
+  onPrevious,
+}) {
+  if (!enabled) {
+    return;
+  }
+
+  let startX = 0;
+  let startY = 0;
+  let lastX = 0;
+  let tracking = false;
+  let dragging = false;
+  let activeTouchId = null;
+  const minSwipeDistance = 48;
+  const maxVerticalDrift = 64;
+
+  section.classList.add("pb-slider-swipeable");
+
+  const isInteractiveTarget = (target) => target?.closest?.("button,a,input,select,textarea");
+
+  const beginDrag = (clientX, clientY, target) => {
+    if (isInteractiveTarget(target)) {
+      return;
+    }
+    tracking = true;
+    dragging = false;
+    startX = clientX;
+    startY = clientY;
+    lastX = clientX;
+    section.dispatchEvent(new CustomEvent("pb-slider:pause"));
+  };
+
+  const moveDrag = (clientX, clientY) => {
+    if (!tracking) {
+      return false;
+    }
+
+    const deltaX = clientX - startX;
+    const deltaY = clientY - startY;
+    lastX = clientX;
+
+    if (!dragging && Math.abs(deltaY) > maxVerticalDrift && Math.abs(deltaY) > Math.abs(deltaX)) {
+      tracking = false;
+      onSnapBack();
+      section.dispatchEvent(new CustomEvent("pb-slider:resume"));
+      return false;
+    }
+
+    if (Math.abs(deltaX) < 8) {
+      return false;
+    }
+
+    dragging = true;
+    track.classList.add("pb-slider-track-dragging");
+    onDrag(resistanceOffset(deltaX, getActiveIndex(), slideCount));
+    return true;
+  };
+
+  const endDrag = (clientY) => {
+    if (!tracking) {
+      return;
+    }
+    tracking = false;
+    track.classList.remove("pb-slider-track-dragging");
+    const deltaX = lastX - startX;
+    const deltaY = clientY - startY;
+
+    if (Math.abs(deltaX) < minSwipeDistance || Math.abs(deltaY) > maxVerticalDrift) {
+      onSnapBack();
+      section.dispatchEvent(new CustomEvent("pb-slider:resume"));
+      return;
+    }
+
+    if (deltaX < 0) {
+      onNext();
+      return;
+    }
+    onPrevious();
+  };
+
+  const cancelDrag = () => {
+    tracking = false;
+    dragging = false;
+    track.classList.remove("pb-slider-track-dragging");
+    onSnapBack();
+    section.dispatchEvent(new CustomEvent("pb-slider:resume"));
+  };
+
+  section.addEventListener("pointerdown", (event) => {
+    if (event.pointerType === "mouse" && event.button !== 0) {
+      return;
+    }
+    beginDrag(event.clientX, event.clientY, event.target);
+    if (tracking && section.setPointerCapture) {
+      section.setPointerCapture(event.pointerId);
+    }
+  });
+
+  section.addEventListener("pointermove", (event) => {
+    if (moveDrag(event.clientX, event.clientY)) {
+      event.preventDefault();
+    }
+  });
+
+  section.addEventListener("pointerup", (event) => {
+    endDrag(event.clientY);
+    if (section.hasPointerCapture?.(event.pointerId)) {
+      section.releasePointerCapture(event.pointerId);
+    }
+  });
+
+  section.addEventListener("pointercancel", (event) => {
+    cancelDrag();
+    if (section.hasPointerCapture?.(event.pointerId)) {
+      section.releasePointerCapture(event.pointerId);
+    }
+  });
+
+  section.addEventListener("touchstart", (event) => {
+    if (activeTouchId !== null || !event.changedTouches.length) {
+      return;
+    }
+    const touch = event.changedTouches[0];
+    activeTouchId = touch.identifier;
+    beginDrag(touch.clientX, touch.clientY, event.target);
+  }, { passive: true });
+
+  section.addEventListener("touchmove", (event) => {
+    if (activeTouchId === null) {
+      return;
+    }
+    const touch = findTouch(event.changedTouches, activeTouchId);
+    if (!touch) {
+      return;
+    }
+    if (moveDrag(touch.clientX, touch.clientY)) {
+      event.preventDefault();
+    }
+  }, { passive: false });
+
+  section.addEventListener("touchend", (event) => {
+    if (activeTouchId === null) {
+      return;
+    }
+    const touch = findTouch(event.changedTouches, activeTouchId);
+    if (!touch) {
+      return;
+    }
+    activeTouchId = null;
+    endDrag(touch.clientY);
+  }, { passive: true });
+
+  section.addEventListener("touchcancel", () => {
+    activeTouchId = null;
+    cancelDrag();
+  }, { passive: true });
+}
+
+function findTouch(touches, identifier) {
+  return Array.from(touches).find((touch) => touch.identifier === identifier) ?? null;
+}
+
+function resistanceOffset(deltaX, activeIndex, slideCount) {
+  const atFirstSlide = activeIndex <= 0;
+  const atLastSlide = activeIndex >= slideCount - 1;
+  if ((atFirstSlide && deltaX > 0) || (atLastSlide && deltaX < 0)) {
+    return deltaX * 0.32;
+  }
+  return deltaX;
+}
+
 function syncCarouselDots(wrap, activeIndex) {
   wrap.querySelectorAll("[data-slider-index]").forEach((dot) => {
     const active = Number(dot.dataset.sliderIndex) === Number(activeIndex);
@@ -319,7 +546,12 @@ function injectSliderStyles() {
   style.id = "pb-slider-banner-styles";
   style.textContent = `
     .pb-slider-banner{position:relative;overflow:hidden;aspect-ratio:16/5;border-radius:24px;box-shadow:0 22px 58px rgba(15,23,42,.11)}
-    .pb-slider-track{position:absolute;inset:0;overflow:hidden}
+    .pb-slider-swipeable{touch-action:pan-y;cursor:grab}
+    .pb-slider-swipeable:active{cursor:grabbing}
+    .pb-slider-track{position:absolute;inset:0;display:flex;gap:14px;overflow:visible;will-change:transform;transition:transform .46s cubic-bezier(.2,.8,.2,1)}
+    .pb-slider-track-dragging{transition:none}
+    .pb-slider-item{position:relative;flex:0 0 92%;height:100%;overflow:hidden;border-radius:inherit;transform:scale(.985);opacity:.78;transition:opacity .24s ease,transform .24s ease}
+    .pb-slider-item-active{transform:scale(1);opacity:1}
     .pb-slider-inner{position:absolute;inset:0;padding:24px;display:grid;grid-template-columns:minmax(0,58%) minmax(112px,42%);align-items:center;gap:18px;isolation:isolate}
     #pubcat_slider_banner .pb-slider-inner{padding-top:18px;padding-bottom:18px}
     .pb-slider-gradient-inner{background:linear-gradient(135deg,#fb923c 0%,#ef4444 48%,#111827 100%);color:#fff}
@@ -352,8 +584,8 @@ function injectSliderStyles() {
     .pb-slider-anim-zoom .pb-slider-image{animation:pbSliderZoom .62s ease both}
     .pb-slider-anim-rise .pb-slider-copy,.pb-slider-anim-rise .pb-slider-glass-card{animation:pbSliderRise .48s ease both}
     .pb-slider-floating-media{animation:pbSliderFloat 4.8s ease-in-out infinite}
-    .pb-slider-direction-next .pb-slider-inner{animation:pbSliderCarouselNext .58s cubic-bezier(.2,.8,.2,1) both}
-    .pb-slider-direction-prev .pb-slider-inner{animation:pbSliderCarouselPrev .58s cubic-bezier(.2,.8,.2,1) both}
+    .pb-slider-direction-next .pb-slider-item-active .pb-slider-inner{animation:pbSliderCarouselNext .58s cubic-bezier(.2,.8,.2,1) both}
+    .pb-slider-direction-prev .pb-slider-item-active .pb-slider-inner{animation:pbSliderCarouselPrev .58s cubic-bezier(.2,.8,.2,1) both}
     @keyframes pbSliderFade{from{opacity:0}to{opacity:1}}
     @keyframes pbSliderSlide{from{opacity:0;transform:translateX(-18px)}to{opacity:1;transform:translateX(0)}}
     @keyframes pbSliderZoom{from{opacity:.82;transform:scale(.97)}to{opacity:1;transform:scale(1)}}
@@ -361,8 +593,8 @@ function injectSliderStyles() {
     @keyframes pbSliderFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
     @keyframes pbSliderCarouselNext{0%{opacity:0;transform:translateX(24px) scale(.985);filter:blur(4px)}100%{opacity:1;transform:translateX(0) scale(1);filter:blur(0)}}
     @keyframes pbSliderCarouselPrev{0%{opacity:0;transform:translateX(-24px) scale(.985);filter:blur(4px)}100%{opacity:1;transform:translateX(0) scale(1);filter:blur(0)}}
-    @media (max-width:640px){.pb-slider-banner{aspect-ratio:16/7;border-radius:18px}.pb-slider-inner{grid-template-columns:minmax(0,58%) minmax(86px,42%);gap:9px;padding:12px}#pubcat_slider_banner .pb-slider-inner{padding-top:9px;padding-bottom:9px}.pb-slider-full-image-inner{padding:0}.pb-slider-glass-inner{grid-template-columns:minmax(86px,42%) minmax(0,58%)}.pb-slider-copy,.pb-slider-glass-card{gap:6px}.pb-slider-title{font-size:16px;line-height:1.08}.pb-slider-description{font-size:10px;line-height:1.32}.pb-slider-pill{padding:4px 7px;font-size:8px}.pb-slider-glass-card{border-radius:14px;padding:10px}.pb-slider-image-panel{border-radius:14px}.pb-slider-full-image-panel{border-radius:inherit}.pb-slider-cta{min-height:30px!important;padding:5px 9px!important;font-size:10px!important}.pb-slider-dots{bottom:8px}.pb-slider-dot{width:6px;height:6px}.pb-slider-dot-active{width:16px}}
-    @media (min-width:641px) and (max-width:1023px){.pb-slider-banner{aspect-ratio:16/7.2}.pb-slider-inner{padding:20px;gap:14px}#pubcat_slider_banner .pb-slider-inner{padding-top:15px;padding-bottom:15px}.pb-slider-title{font-size:24px}.pb-slider-description{font-size:13px}.pb-slider-glass-card{padding:15px}}
+    @media (max-width:640px){.pb-slider-banner{aspect-ratio:16/6.4;border-radius:18px}.pb-slider-item{flex-basis:88%}.pb-slider-track{gap:10px}.pb-slider-context-buyer{aspect-ratio:auto;min-height:250px}.pb-slider-inner{grid-template-columns:minmax(0,58%) minmax(86px,42%);gap:9px;padding:12px}#pubcat_slider_banner .pb-slider-inner{padding-top:9px;padding-bottom:9px}.pb-slider-context-buyer .pb-slider-inner{grid-template-columns:1fr;grid-template-rows:minmax(78px,42%) minmax(0,1fr);align-content:start;gap:7px;padding:11px 12px 28px}.pb-slider-context-buyer .pb-slider-glass-inner,.pb-slider-context-buyer .pb-slider-minimal-inner{grid-template-columns:1fr;grid-template-rows:minmax(78px,42%) minmax(0,1fr)}.pb-slider-context-buyer .pb-slider-image-panel,.pb-slider-context-buyer .pb-slider-product-media{order:1;min-height:0;aspect-ratio:16/7;width:100%;height:auto}.pb-slider-context-buyer .pb-slider-copy,.pb-slider-context-buyer .pb-slider-glass-card,.pb-slider-context-buyer .pb-slider-product-copy{order:2}.pb-slider-full-image-inner{padding:0}.pb-slider-glass-inner{grid-template-columns:minmax(86px,42%) minmax(0,58%)}.pb-slider-copy,.pb-slider-glass-card{gap:6px}.pb-slider-context-buyer .pb-slider-copy,.pb-slider-context-buyer .pb-slider-glass-card{gap:4px;max-width:100%}.pb-slider-title{font-size:16px;line-height:1.08}.pb-slider-context-buyer .pb-slider-title{font-size:14px;line-height:1.08;-webkit-line-clamp:2}.pb-slider-description{font-size:10px;line-height:1.32}.pb-slider-context-buyer .pb-slider-description{font-size:9px;line-height:1.25;-webkit-line-clamp:1}.pb-slider-pill{padding:4px 7px;font-size:8px}.pb-slider-context-buyer .pb-slider-pill{padding:3px 6px;font-size:7px}.pb-slider-glass-card{border-radius:14px;padding:10px}.pb-slider-context-buyer .pb-slider-glass-card{padding:8px}.pb-slider-image-panel{border-radius:14px}.pb-slider-full-image-panel{border-radius:inherit}.pb-slider-cta{min-height:30px!important;padding:5px 9px!important;font-size:10px!important}.pb-slider-context-buyer .pb-slider-cta{min-height:26px!important;padding:4px 8px!important;font-size:9px!important}.pb-slider-dots{bottom:8px}.pb-slider-dot{width:6px;height:6px}.pb-slider-dot-active{width:16px}}
+    @media (min-width:641px) and (max-width:1023px){.pb-slider-banner{aspect-ratio:16/7.2}.pb-slider-item{flex-basis:90%}.pb-slider-inner{padding:20px;gap:14px}#pubcat_slider_banner .pb-slider-inner{padding-top:15px;padding-bottom:15px}.pb-slider-title{font-size:24px}.pb-slider-description{font-size:13px}.pb-slider-glass-card{padding:15px}}
     @media (prefers-reduced-motion:reduce){.pb-slider-banner *{animation:none!important;transition:none!important}}
   `;
   document.head.append(style);

@@ -448,15 +448,16 @@ function loadMoreSection({ canLoadMore, isLoadingMore, onLoadMore }) {
 }
 
 function statsPanel({ count, meta, affiliate }) {
-  const panel = document.createElement("section");
-  panel.className = "grid grid-cols-2 gap-px overflow-hidden rounded-[22px] border border-white/70 bg-white/96 shadow-card sm:grid-cols-4";
-  applyDesignHook(panel, "catalog.stats.panel");
-  panel.append(
-    compactStat(String(meta?.total ?? count ?? 0), "Mobil Tersedia", "text-[var(--pb-brand-secondary)]"),
-    compactStat(affiliate ? "100%" : "98%", affiliate ? "Context Aktif" : "Kepuasan", "text-[var(--pb-success)]"),
-    compactStat(affiliate ? "24/7" : "24/7", "Support", "text-[var(--pb-info)]"),
-    compactStat(meta?.page ? `${meta.page}` : "Baru", affiliate ? "Page aktif" : "Update", "text-[var(--pb-text-muted)]"),
-  );
+  const panel = "";
+  // const panel = document.createElement("section");
+  // panel.className = "grid grid-cols-2 gap-px overflow-hidden rounded-[22px] border border-white/70 bg-white/96 shadow-card sm:grid-cols-4";
+  // applyDesignHook(panel, "catalog.stats.panel");
+  // panel.append(
+  //   compactStat(String(meta?.total ?? count ?? 0), "Mobil Tersedia", "text-[var(--pb-brand-secondary)]"),
+  //   compactStat(affiliate ? "100%" : "98%", affiliate ? "Context Aktif" : "Kepuasan", "text-[var(--pb-success)]"),
+  //   compactStat(affiliate ? "24/7" : "24/7", "Support", "text-[var(--pb-info)]"),
+  //   compactStat(meta?.page ? `${meta.page}` : "Baru", affiliate ? "Page aktif" : "Update", "text-[var(--pb-text-muted)]"),
+  // );
   return panel;
 }
 

@@ -148,8 +148,8 @@ function render(root, context, actions, uiState, notFound) {
     buyerSearchBar({ cars, uiState, actions }),
     SliderBanner({
       sliders: resolveBuyerSliders(),
-      idPrefix: "byr",
-      context: "buyer",
+      idPrefix: "pubcat",
+      context: "public",
       onNavigate: actions.navigate,
       fallback: () => buyerHero({ cars, notFound, actions }),
     }),
@@ -320,10 +320,14 @@ function buyerHero({ cars, notFound, actions }) {
 
 function resolveBuyerSliders() {
   const working = appStore.get("working.buyerDashboard.sliders.data", null);
-  const snapshot = buyerState.snapshot("slidersBuyerHome", null);
+  const landingPageSnapshot = buyerState.snapshot("slidersLandingPage", null);
+  const publicHomeSnapshot = buyerState.snapshot("slidersPublicHome", null);
+  const landingHeroSnapshot = buyerState.snapshot("slidersLandingHero", null);
   return [
     ...normalizeSliderPayload(working),
-    ...normalizeSliderPayload(snapshot),
+    ...normalizeSliderPayload(landingPageSnapshot),
+    ...normalizeSliderPayload(publicHomeSnapshot),
+    ...normalizeSliderPayload(landingHeroSnapshot),
   ].filter((slider, index, items) => {
     const key = String(slider?.id ?? slider?.code ?? index);
     return items.findIndex((item, itemIndex) => String(item?.id ?? item?.code ?? itemIndex) === key) === index;

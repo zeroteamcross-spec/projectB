@@ -8,7 +8,7 @@ import { getListingLockStatus } from "../../../utils/transactionStatus.js";
 export function PublicCarCard({ car, onOpenDetail = null } = {}) {
   const lock = getListingLockStatus({ car });
   const root = Card([], { designHook: "catalog.card.root" });
-  root.className = "group overflow-hidden rounded-[26px] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] p-0 shadow-[var(--pb-shadow-card)] backdrop-blur";
+  root.className = "group overflow-hidden rounded-[22px] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] p-0 shadow-[var(--pb-shadow-card)] backdrop-blur";
 
   const button = document.createElement("button");
   button.type = "button";
@@ -16,7 +16,7 @@ export function PublicCarCard({ car, onOpenDetail = null } = {}) {
   button.addEventListener("click", () => onOpenDetail?.(car));
 
   const media = document.createElement("div");
-  media.className = "relative aspect-[1.32/1] overflow-hidden bg-[var(--pb-surface-muted)]";
+  media.className = "relative aspect-[1.82/1] overflow-hidden bg-[var(--pb-surface-muted)]";
 
   const image = document.createElement("img");
   image.src = primaryImageUrl(car) || fallbackCarImageUrl();
@@ -29,17 +29,17 @@ export function PublicCarCard({ car, onOpenDetail = null } = {}) {
   media.append(image, mediaOverlay(), badgeStack(car), sliderDots(car));
 
   const body = document.createElement("div");
-  body.className = "grid gap-3 bg-[var(--pb-surface-card)] px-4 pb-4 pt-3";
+  body.className = "grid gap-2 bg-[var(--pb-surface-card)] px-3 pb-3 pt-2.5";
 
   const heading = document.createElement("div");
-  heading.className = "grid gap-1";
+  heading.className = "grid gap-0.5";
 
   const title = document.createElement("h2");
-  title.className = "line-clamp-2 break-words text-lg font-semibold tracking-normal text-[var(--pb-text)]";
+  title.className = "line-clamp-2 break-words text-sm font-semibold leading-5 tracking-normal text-[var(--pb-text)]";
   title.textContent = carTitle(car);
 
   const subtitle = document.createElement("p");
-  subtitle.className = "break-words text-sm leading-5 text-[var(--pb-text-muted)]";
+  subtitle.className = "line-clamp-1 break-words text-xs leading-4 text-[var(--pb-text-muted)]";
   subtitle.textContent = [car.sub_model_name, car.location_name].filter(Boolean).join(" | ") || "Unit showroom";
   heading.append(title, subtitle);
 
@@ -52,27 +52,31 @@ export function PublicCarCard({ car, onOpenDetail = null } = {}) {
   );
 
   const priceBlock = document.createElement("div");
-  priceBlock.className = "grid min-h-[104px] gap-2 rounded-[18px] border border-[color-mix(in_srgb,var(--pb-brand-primary)_24%,white)] bg-[color-mix(in_srgb,var(--pb-brand-primary)_10%,white)] px-4 py-3";
+  priceBlock.className = "grid gap-1.5 rounded-[16px] border border-[color-mix(in_srgb,var(--pb-brand-primary)_24%,white)] bg-[color-mix(in_srgb,var(--pb-brand-primary)_10%,white)] px-3 py-2";
   applyDesignHook(priceBlock, "catalog.card.price");
+
+  const priceRow = document.createElement("div");
+  priceRow.className = "flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5";
+
+  const price = document.createElement("strong");
+  price.className = "break-words text-base font-black leading-none tracking-normal text-[var(--pb-brand-secondary)]";
+  price.textContent = formatCurrency(effectivePrice(car));
+  priceRow.append(price);
 
   if (hasPromo(car)) {
     const original = document.createElement("span");
-    original.className = "text-xs font-semibold text-[var(--pb-text-muted)] line-through";
+    original.className = "text-[11px] font-semibold leading-none text-[var(--pb-text-muted)] line-through";
     original.textContent = formatCurrency(car.price_cash);
-    priceBlock.append(original);
+    priceRow.append(original);
   }
 
-  const price = document.createElement("strong");
-  price.className = "break-words text-[22px] font-black leading-none tracking-normal text-[var(--pb-brand-secondary)]";
-  price.textContent = formatCurrency(effectivePrice(car));
-
   const hint = document.createElement("span");
-  hint.className = "break-words text-xs font-semibold leading-5 text-[var(--pb-text-muted)]";
+  hint.className = "line-clamp-1 break-words text-[11px] font-semibold leading-4 text-[var(--pb-text-muted)]";
   hint.textContent = lock.locked ? "Detail, gallery, dan konsultasi" : "Detail, gallery, inspeksi, dan transaksi";
-  priceBlock.append(price, hint);
+  priceBlock.append(priceRow, hint);
 
   const footer = document.createElement("div");
-  footer.className = "flex flex-wrap gap-2";
+  footer.className = "flex flex-wrap gap-1.5";
   footer.append(
     footerChip("car", car.mileage_km ? `${Number(car.mileage_km).toLocaleString("id-ID")} km` : "KM belum ada"),
     footerChip("seat", car.seat_count ? `${car.seat_count} kursi` : "Kursi belum ada"),
@@ -80,8 +84,8 @@ export function PublicCarCard({ car, onOpenDetail = null } = {}) {
   );
 
   const action = document.createElement("span");
-  action.className = "inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-[var(--pb-radius-xl)] border border-transparent bg-[linear-gradient(135deg,var(--pb-btn-primary-from),var(--pb-btn-primary-to))] px-4 py-2 text-sm font-semibold text-white shadow-[var(--pb-shadow-card)]";
-  action.append(createIcon("eye", { className: "block h-4 w-4 shrink-0 leading-none" }), document.createTextNode(lock.locked ? "Lihat Status" : "Lihat Detail"));
+  action.className = "inline-flex min-h-8 w-full items-center justify-center gap-1.5 rounded-[var(--pb-radius-lg)] border border-transparent bg-[linear-gradient(135deg,var(--pb-btn-primary-from),var(--pb-btn-primary-to))] px-3 py-1.5 text-xs font-semibold text-white shadow-[var(--pb-shadow-card)]";
+  action.append(createIcon("eye", { className: "block h-3.5 w-3.5 shrink-0 leading-none" }), document.createTextNode(lock.locked ? "Lihat Status" : "Lihat Detail"));
 
   body.append(heading, specs, priceBlock, footer, action);
   button.append(media, body);
@@ -91,14 +95,14 @@ export function PublicCarCard({ car, onOpenDetail = null } = {}) {
 
 function mediaOverlay() {
   const overlay = document.createElement("div");
-  overlay.className = "pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-slate-950/58 via-slate-950/16 to-transparent";
+  overlay.className = "pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-slate-950/58 via-slate-950/16 to-transparent";
   return overlay;
 }
 
 function badgeStack(car) {
   const lock = getListingLockStatus({ car });
   const badges = document.createElement("div");
-  badges.className = "absolute left-3 top-3 z-10 grid max-w-[calc(100%-24px)] gap-2";
+  badges.className = "absolute left-2.5 top-2.5 z-10 grid max-w-[calc(100%-20px)] gap-1.5 text-[10px]";
   if (lock.locked) {
     badges.append(Badge({ label: lock.label, variant: lock.variant }));
   }
@@ -113,14 +117,14 @@ function badgeStack(car) {
 
 function sliderDots(car) {
   const row = document.createElement("div");
-  row.className = "absolute inset-x-0 bottom-4 z-10 flex justify-center gap-1.5 px-4";
+  row.className = "absolute inset-x-0 bottom-2.5 z-10 flex justify-center gap-1 px-3";
   const count = Math.max(3, Math.min(Array.isArray(car?.images) ? car.images.length : 0, 4));
 
   Array.from({ length: count }).forEach((_, index) => {
     const dot = document.createElement("span");
     dot.className = index === 0
-      ? "h-2.5 w-5 rounded-full bg-[var(--pb-brand-primary)] shadow"
-      : "h-2.5 w-2.5 rounded-full bg-white/70";
+      ? "h-1.5 w-4 rounded-full bg-[var(--pb-brand-primary)] shadow"
+      : "h-1.5 w-1.5 rounded-full bg-white/70";
     row.append(dot);
   });
 
@@ -153,8 +157,8 @@ function specItem(iconName, label, value) {
 
 function footerChip(iconName, label) {
   const chip = document.createElement("span");
-  chip.className = "inline-flex max-w-full min-w-0 items-center gap-2 rounded-full bg-[var(--pb-surface-muted)] px-3 py-2 text-xs font-semibold text-[var(--pb-text-muted)]";
-  chip.append(createIcon(iconName, { className: "block h-3.5 w-3.5 shrink-0 leading-none" }), document.createTextNode(label));
+  chip.className = "inline-flex max-w-full min-w-0 items-center gap-1.5 rounded-full bg-[var(--pb-surface-muted)] px-2.5 py-1.5 text-[11px] font-semibold leading-none text-[var(--pb-text-muted)]";
+  chip.append(createIcon(iconName, { className: "block h-3 w-3 shrink-0 leading-none" }), document.createTextNode(label));
   return chip;
 }
 

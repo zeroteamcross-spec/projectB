@@ -873,7 +873,7 @@ function invalidateSliderSnapshots() {
   markPreloadSnapshotsStale([
     { role: "public", key: "slidersPublicHome" },
     { role: "public", key: "slidersLandingHero" },
-    { role: "buyer", key: "slidersBuyerHome" },
+    { role: "buyer", key: "slidersLandingPage" },
   ], { source: "admin-sliders:public-buyer-stale" });
 }
 
