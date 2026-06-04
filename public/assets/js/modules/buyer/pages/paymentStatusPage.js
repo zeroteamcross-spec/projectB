@@ -18,14 +18,24 @@ import { BUYER_MOBILE_FOOTER_ITEMS, BuyerMobileFooterNav } from "../components/b
 import { BuyerDesktopTopNav } from "../components/buyerDesktopTopNav.js";
 import { isPaymentPaid } from "../../../utils/transactionStatus.js";
 
+const AUTO_STATUS_POLL_INTERVAL_MS = 12000;
+const PAYMENT_SUCCESS_SEEN_PREFIX = "projectB:payment_success_seen:";
+
 export function PaymentStatusPage() {
   let root = null;
   let unsubscribe = null;
+  let visibilityCleanup = null;
   const flags = {
     isRefreshing: false,
+    isAutoChecking: false,
     isCompleting: false,
     isFinishing: false,
     isDownloadingQr: false,
+  };
+  const poller = {
+    timer: null,
+    transactionId: null,
+    inFlight: false,
   };
 
   return createPageLifecycle({
@@ -33,21 +43,34 @@ export function PaymentStatusPage() {
       root = document.createElement("div");
       root.className = "grid gap-6";
       render(root, context, flags);
+      syncAutoStatusPolling(context, flags, poller);
       return root;
     },
     hydrate(context) {
       render(root, context, flags);
+      syncAutoStatusPolling(context, flags, poller);
     },
     bindEvents(context) {
-      unsubscribe = appStore.subscribe(() => render(root, context, flags));
-      return () => unsubscribe?.();
+      unsubscribe = appStore.subscribe(() => {
+        render(root, context, flags);
+        syncAutoStatusPolling(context, flags, poller);
+      });
+      visibilityCleanup = bindVisibilityResume(context, flags, poller);
+      return () => {
+        unsubscribe?.();
+        visibilityCleanup?.();
+        stopAutoStatusPolling(poller);
+      };
     },
     unmount() {
       unsubscribe?.();
+      visibilityCleanup?.();
+      stopAutoStatusPolling(poller);
       appStore.destroyRuntimeState("buyerPaymentStatus");
     },
     dispose() {
       unsubscribe = null;
+      visibilityCleanup = null;
     },
   });
 }
@@ -66,6 +89,10 @@ function render(root, context, flags) {
     result: null,
     error: "",
   });
+  const successOverlay = appStore.get("runtime.buyerPaymentStatus.successOverlay", {
+    open: false,
+    transactionId: null,
+  });
 
   if (!transaction && !hasHydrated) {
     disposeChildren(root);
@@ -80,6 +107,7 @@ function render(root, context, flags) {
   }
 
   maybeAutoOpenGopay(transaction);
+  markInitialPaidSeen(transaction);
 
   const header = document.createElement("div");
   header.className = "grid gap-4";
@@ -133,7 +161,11 @@ function render(root, context, flags) {
       isRefreshing: flags.isRefreshing,
       isCompleting: flags.isCompleting,
       completionOpen: Boolean(completion.open),
-      onRefresh: () => refreshStatus(context, flags),
+      onRefresh: () => refreshStatus(context, flags, {
+        forceDetail: true,
+        showToastOnSuccess: true,
+        source: "buyer-payment-status:refresh",
+      }),
       onOpenCompletion: () => openCompletionFlow(),
     }), "buyer.payment.actions"));
   }
@@ -153,7 +185,11 @@ function render(root, context, flags) {
 
   layout.append(main, aside);
   disposeChildren(root);
-  root.replaceChildren(buyerTopNavigation(context), header, layout, buyerFooter(context));
+  const children = [buyerTopNavigation(context), header, layout, buyerFooter(context)];
+  if (successOverlay.open && String(successOverlay.transactionId ?? "") === String(transaction.id ?? "")) {
+    children.push(paymentSuccessOverlay(() => closePaymentSuccessOverlay()));
+  }
+  root.replaceChildren(...children);
 }
 
 function buyerTopNavigation(context) {
@@ -358,28 +394,157 @@ function handoverInstructionPanel() {
   return section;
 }
 
-async function refreshStatus(context, flags) {
-  flags.isRefreshing = true;
+async function refreshStatus(context, flags, {
+  forceDetail = true,
+  silent = false,
+  showToastOnSuccess = true,
+  source = "buyer-payment-status:refresh",
+} = {}) {
+  if (flags.isRefreshing || flags.isAutoChecking) {
+    return null;
+  }
+
+  const current = appStore.get("working.buyerPaymentStatus.transaction", null)?.data ?? null;
+  const wasPaid = isPaymentPaid(current);
+
+  if (silent) {
+    flags.isAutoChecking = true;
+  } else {
+    flags.isRefreshing = true;
+  }
   setActionState(flags);
 
   try {
-    await buyerTransactionService.status(context.params.id);
-    const transaction = await buyerTransactionService.detail(context.params.id);
+    const statusTransaction = await buyerTransactionService.status(context.params.id);
+    const statusChanged = statusTransaction?.transaction_status
+      && statusTransaction.transaction_status !== current?.transaction_status;
+    const shouldLoadDetail = forceDetail || statusChanged || isPaymentPaid(statusTransaction) !== wasPaid;
+    const detailTransaction = shouldLoadDetail
+      ? await buyerTransactionService.detail(context.params.id)
+      : null;
+    const transaction = detailTransaction ?? mergeTransactionStatus(current, statusTransaction);
+
+    if (!transaction) {
+      return null;
+    }
+
+    if (!wasPaid && isPaymentPaid(transaction)) {
+      showPaymentSuccessOverlay(transaction);
+    }
+
     appStore.patchState("working.buyerPaymentStatus.transaction", {
       data: transaction,
       hydratedAt: Date.now(),
-    }, "buyer-payment-status:refresh");
+    }, source);
     syncBusinessTransaction(transaction, {
       primaryRole: "buyer",
-      source: "buyer-payment-status:refresh",
+      source,
     });
-    showToast("Status transaksi diperbarui.", { type: "success" });
+
+    if (!silent && showToastOnSuccess) {
+      showToast("Status transaksi diperbarui.", { type: "success" });
+    }
+
+    return transaction;
   } catch (error) {
-    showToast(error.message || "Gagal refresh status.", { type: "error" });
+    if (!silent) {
+      showToast(error.message || "Gagal refresh status.", { type: "error" });
+    }
+
+    return null;
   } finally {
-    flags.isRefreshing = false;
+    if (silent) {
+      flags.isAutoChecking = false;
+    } else {
+      flags.isRefreshing = false;
+    }
     setActionState(flags);
   }
+}
+
+function syncAutoStatusPolling(context, flags, poller) {
+  const transaction = appStore.get("working.buyerPaymentStatus.transaction", null)?.data ?? null;
+
+  if (!shouldAutoPollTransaction(transaction) || document.visibilityState === "hidden") {
+    stopAutoStatusPolling(poller);
+    return;
+  }
+
+  const transactionId = String(transaction.id);
+  if (poller.timer && poller.transactionId === transactionId) {
+    return;
+  }
+
+  stopAutoStatusPolling(poller);
+  poller.transactionId = transactionId;
+  poller.timer = window.setInterval(() => {
+    runAutoStatusCheck(context, flags, poller);
+  }, AUTO_STATUS_POLL_INTERVAL_MS);
+}
+
+async function runAutoStatusCheck(context, flags, poller) {
+  const transaction = appStore.get("working.buyerPaymentStatus.transaction", null)?.data ?? null;
+  if (poller.inFlight || !shouldAutoPollTransaction(transaction) || document.visibilityState === "hidden") {
+    syncAutoStatusPolling(context, flags, poller);
+    return;
+  }
+
+  poller.inFlight = true;
+  try {
+    await refreshStatus(context, flags, {
+      forceDetail: false,
+      silent: true,
+      showToastOnSuccess: false,
+      source: "buyer-payment-status:auto-refresh",
+    });
+  } finally {
+    poller.inFlight = false;
+    syncAutoStatusPolling(context, flags, poller);
+  }
+}
+
+function stopAutoStatusPolling(poller) {
+  if (poller.timer) {
+    window.clearInterval(poller.timer);
+  }
+
+  poller.timer = null;
+  poller.transactionId = null;
+}
+
+function bindVisibilityResume(context, flags, poller) {
+  const onVisibilityChange = () => {
+    if (document.visibilityState === "hidden") {
+      stopAutoStatusPolling(poller);
+      return;
+    }
+
+    syncAutoStatusPolling(context, flags, poller);
+    runAutoStatusCheck(context, flags, poller);
+  };
+
+  document.addEventListener("visibilitychange", onVisibilityChange);
+  return () => document.removeEventListener("visibilitychange", onVisibilityChange);
+}
+
+function shouldAutoPollTransaction(transaction) {
+  if (!transaction?.id) {
+    return false;
+  }
+
+  const status = String(transaction.transaction_status ?? transaction.status ?? "").toLowerCase();
+  return !isPaymentPaid(transaction) && !["expired", "cancelled", "failed", "refunded", "completed"].includes(status);
+}
+
+function mergeTransactionStatus(current, statusTransaction) {
+  if (!current && !statusTransaction) {
+    return null;
+  }
+
+  return {
+    ...(current ?? {}),
+    ...(statusTransaction ?? {}),
+  };
 }
 
 function openCompletionFlow() {
@@ -531,6 +696,97 @@ function textNode(tagName, className, text) {
   node.className = className;
   node.textContent = text ?? "";
   return node;
+}
+
+function paymentSuccessOverlay(onClose = null) {
+  const overlay = document.createElement("section");
+  overlay.className = "fixed inset-0 z-[120] grid place-items-center bg-green-950/80 px-4 backdrop-blur-sm";
+  overlay.setAttribute("role", "status");
+  overlay.setAttribute("aria-live", "polite");
+
+  const card = document.createElement("div");
+  card.className = "grid w-full max-w-md place-items-center gap-5 rounded-[2rem] border border-white/40 bg-white px-6 py-8 text-center shadow-2xl";
+
+  const mark = document.createElement("div");
+  mark.className = "grid h-28 w-28 place-items-center rounded-full bg-green-500 shadow-[0_0_60px_rgba(34,197,94,0.55)] animate-[paymentSuccessPop_700ms_cubic-bezier(.2,1.4,.3,1)_both]";
+  const tick = document.createElement("span");
+  tick.className = "block h-12 w-6 rotate-45 border-b-[10px] border-r-[10px] border-white";
+  tick.setAttribute("aria-hidden", "true");
+  mark.append(tick);
+
+  const copy = document.createElement("div");
+  copy.className = "grid gap-2";
+  const title = document.createElement("h2");
+  title.className = "text-3xl font-black tracking-tight text-green-950";
+  title.textContent = "Pembayaran Berhasil";
+  const body = document.createElement("p");
+  body.className = "text-sm leading-6 text-green-900";
+  body.textContent = "Transaksi Anda sudah dibayar.";
+  copy.append(title, body);
+
+  const close = Button({
+    label: "Lanjut",
+    variant: "primary",
+    onClick: onClose,
+  });
+  close.classList.add("w-full");
+
+  card.append(mark, copy, close, paymentSuccessStyle());
+  overlay.append(card);
+  return overlay;
+}
+
+function paymentSuccessStyle() {
+  const style = document.createElement("style");
+  style.textContent = "@keyframes paymentSuccessPop{0%{opacity:0;transform:scale(.55) rotate(-18deg)}65%{opacity:1;transform:scale(1.08) rotate(3deg)}100%{opacity:1;transform:scale(1) rotate(0)}}";
+  return style;
+}
+
+function showPaymentSuccessOverlay(transaction) {
+  const transactionId = transaction?.id;
+  if (!transactionId || hasPaymentSuccessBeenSeen(transactionId)) {
+    return;
+  }
+
+  markPaymentSuccessSeen(transactionId);
+  appStore.patchState("runtime.buyerPaymentStatus.successOverlay", {
+    open: true,
+    transactionId,
+  }, "buyer-payment-status:success-overlay-open");
+  window.setTimeout(() => closePaymentSuccessOverlay(), 2800);
+}
+
+function closePaymentSuccessOverlay() {
+  appStore.patchState("runtime.buyerPaymentStatus.successOverlay", {
+    open: false,
+    transactionId: null,
+  }, "buyer-payment-status:success-overlay-close");
+}
+
+function markInitialPaidSeen(transaction) {
+  if (isPaymentPaid(transaction) && transaction?.id && !hasPaymentSuccessBeenSeen(transaction.id)) {
+    markPaymentSuccessSeen(transaction.id);
+  }
+}
+
+function hasPaymentSuccessBeenSeen(transactionId) {
+  try {
+    return window.sessionStorage?.getItem(paymentSuccessSeenKey(transactionId)) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function markPaymentSuccessSeen(transactionId) {
+  try {
+    window.sessionStorage?.setItem(paymentSuccessSeenKey(transactionId), "1");
+  } catch {
+    // no-op
+  }
+}
+
+function paymentSuccessSeenKey(transactionId) {
+  return `${PAYMENT_SUCCESS_SEEN_PREFIX}${transactionId}`;
 }
 
 function maybeAutoOpenGopay(transaction) {

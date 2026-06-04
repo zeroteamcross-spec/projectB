@@ -12,7 +12,8 @@ export function PaymentInstructionPanel({
   const details = resolvePaymentArtifacts(transaction);
   const method = details.method;
   const paymentData = details.paymentData;
-  const qrCodeUrl = details.qrCodeUrl;
+  const instructionExpired = isInstructionExpired(details, transaction);
+  const qrCodeUrl = instructionExpired ? null : details.qrCodeUrl;
   const deeplinkUrl = details.deeplinkUrl;
 
   const section = document.createElement("section");
@@ -64,7 +65,11 @@ export function PaymentInstructionPanel({
 
   section.append(header, facts);
 
-  if (method === "gopay" || method === "qris") {
+  if (instructionExpired) {
+    section.append(expiredInstructionPanel());
+  }
+
+  if (!instructionExpired && (method === "gopay" || method === "qris")) {
     section.append(walletPanel({
       method,
       qrCodeUrl,
@@ -77,7 +82,9 @@ export function PaymentInstructionPanel({
 
   const note = document.createElement("p");
   note.className = "rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-800";
-  note.textContent = noteCopy(method, { hasQr: Boolean(qrCodeUrl), hasDeeplink: Boolean(deeplinkUrl), hasVa: Boolean(paymentData.va_number) });
+  note.textContent = instructionExpired
+    ? "Sesi pembayaran sudah melewati batas waktu yang tercatat. Jangan gunakan QR atau instruksi lama sebagai jalur aktif."
+    : noteCopy(method, { hasQr: Boolean(qrCodeUrl), hasDeeplink: Boolean(deeplinkUrl), hasVa: Boolean(paymentData.va_number) });
 
   section.append(steps, note);
   return section;
@@ -121,7 +128,7 @@ function instructionIntro(transaction) {
     return "Transaksi sudah tidak aktif untuk pembayaran.";
   }
 
-  return "Selesaikan pembayaran sesuai metode yang aktif, lalu refresh status.";
+  return "Selesaikan pembayaran sesuai metode yang aktif. Halaman ini akan mengecek status otomatis; tombol refresh tetap tersedia sebagai fallback.";
 }
 
 function walletPanel({ method, qrCodeUrl, deeplinkUrl, isDownloadingQr = false, onDownloadQr = null, onOpenGopay = null } = {}) {
@@ -158,7 +165,7 @@ function walletPanel({ method, qrCodeUrl, deeplinkUrl, isDownloadingQr = false, 
     unavailable.className = "rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700";
     unavailable.textContent = method === "gopay"
       ? "QR GoPay belum tersedia dari provider. Gunakan tombol buka aplikasi jika tersedia."
-      : "QRIS belum tersedia dari provider. Coba refresh status atau buat ulang sesi pembayaran.";
+      : "QRIS belum tersedia dari provider. Coba refresh status, tetapi jangan buat transaksi baru jika sesi ini masih valid.";
     section.append(unavailable);
   }
 
@@ -196,25 +203,47 @@ function walletPanel({ method, qrCodeUrl, deeplinkUrl, isDownloadingQr = false, 
 function noteCopy(method, { hasQr = false, hasDeeplink = false, hasVa = false } = {}) {
   if (method === "gopay") {
     if (hasDeeplink) {
-      return "Gunakan deeplink GoPay sebagai jalur utama. Jika aplikasi tidak terbuka, scan QR GoPay lalu tekan Refresh status setelah pembayaran.";
+      return "Gunakan deeplink GoPay sebagai jalur utama. Jika aplikasi tidak terbuka, scan QR GoPay; halaman ini akan mengecek status otomatis.";
     }
 
     if (hasQr) {
-      return "Provider tidak mengirim deeplink GoPay. Scan QR GoPay yang tersedia lalu tekan Refresh status setelah pembayaran.";
+      return "Provider tidak mengirim deeplink GoPay. Scan QR GoPay yang tersedia; halaman ini akan mengecek status otomatis.";
     }
 
-    return "Instruksi GoPay sudah tampil, tetapi provider belum memberi deeplink atau QR. Coba refresh status atau buat ulang sesi pembayaran.";
+    return "Instruksi GoPay sudah tampil, tetapi provider belum memberi deeplink atau QR. Coba refresh status tanpa membuat transaksi baru.";
   }
 
   if (method === "qris") {
     return hasQr
-      ? "Gunakan tombol Download QR jika Anda perlu menyimpan QRIS. Setelah membayar, tekan Refresh status."
-      : "QRIS belum tersedia untuk diunduh. Coba refresh status atau buat ulang sesi pembayaran.";
+      ? "Gunakan tombol Download QR jika Anda perlu menyimpan QRIS. Halaman ini akan mengecek status otomatis setelah pembayaran."
+      : "QRIS belum tersedia untuk diunduh. Coba refresh status tanpa membuat transaksi baru.";
   }
 
   return hasVa
-    ? "Gunakan nomor VA di atas sesuai instruksi bank. Setelah membayar, tekan Refresh status."
+    ? "Gunakan nomor VA di atas sesuai instruksi bank. Halaman ini akan mengecek status otomatis setelah pembayaran."
     : "Nomor VA ditampilkan jika tersedia dari sesi pembayaran. Jika tidak terlihat, gunakan link pembayaran atau refresh status.";
+}
+
+function expiredInstructionPanel() {
+  const section = document.createElement("section");
+  section.className = "grid gap-2 rounded-[1.25rem] border border-red-200 bg-red-50 px-4 py-4 text-red-800";
+  const title = document.createElement("h3");
+  title.className = "text-base font-black";
+  title.textContent = "Sesi pembayaran kadaluarsa";
+  const body = document.createElement("p");
+  body.className = "text-sm leading-6";
+  body.textContent = "Instruksi lama disimpan sebagai referensi, tetapi tidak ditampilkan sebagai instruksi aktif karena batas waktu pembayaran sudah lewat.";
+  section.append(title, body);
+  return section;
+}
+
+function isInstructionExpired(details, transaction) {
+  const status = String(transaction?.transaction_status ?? "").toLowerCase();
+  if (["paid", "completed", "dp_paid"].includes(status)) {
+    return false;
+  }
+
+  return Boolean(details?.isExpired);
 }
 
 function formatDateTime(value) {

@@ -61,6 +61,7 @@ class TransactionMapper
                 ]
                 : null,
             'payment_logs' => self::paymentLogs($paymentLogs),
+            'payment_instruction' => self::paymentInstruction($paymentLogs, $transaction),
             'fulfillment_checklist' => self::fulfillmentChecklist($fulfillmentChecklist),
         ];
     }
@@ -119,6 +120,44 @@ class TransactionMapper
         return array_map(static fn (array $log): array => self::paymentLog($log), $logs);
     }
 
+    public static function paymentInstruction(array $logs, array $transaction = []): ?array
+    {
+        foreach (self::paymentLogs($logs) as $log) {
+            $paymentData = is_array($log['payment_data'] ?? null) ? $log['payment_data'] : [];
+            $payloadResponse = is_array($log['payload_response'] ?? null) ? $log['payload_response'] : [];
+            $hasActions = is_array($paymentData['actions'] ?? null) && $paymentData['actions'] !== [];
+            $hasInstruction = $hasActions
+                || ! empty($log['qr_code_url'])
+                || ! empty($log['deeplink_url'])
+                || ! empty($paymentData['va_number'])
+                || ! empty($paymentData['bill_key'])
+                || ! empty($paymentData['payment_code'])
+                || ! empty($payloadResponse['redirect_url']);
+
+            if (! $hasInstruction) {
+                continue;
+            }
+
+            return [
+                'provider_name' => $log['provider_name'] ?? null,
+                'provider_order_id' => $log['provider_order_id'] ?? null,
+                'provider_transaction_id' => $log['provider_transaction_id'] ?? null,
+                'payment_method' => $log['payment_method'] ?? null,
+                'transaction_status' => $log['transaction_status'] ?? null,
+                'gross_amount' => $log['gross_amount'] ?? null,
+                'payment_data' => $paymentData,
+                'payload_response' => $payloadResponse,
+                'qr_code_url' => $log['qr_code_url'] ?? null,
+                'deeplink_url' => $log['deeplink_url'] ?? null,
+                'redirect_url' => $payloadResponse['redirect_url'] ?? null,
+                'expires_at' => $transaction['expires_at'] ?? $paymentData['expiry_time'] ?? $payloadResponse['expiry_time'] ?? null,
+                'logged_at' => $log['logged_at'] ?? null,
+            ];
+        }
+
+        return null;
+    }
+
     public static function fulfillmentChecklist(array $items): array
     {
         return array_map(static fn (array $item): array => [
@@ -161,6 +200,8 @@ class TransactionMapper
             'bank' => null,
             'bill_key' => $source['bill_key'] ?? null,
             'biller_code' => $source['biller_code'] ?? null,
+            'payment_code' => $source['payment_code'] ?? null,
+            'expiry_time' => $source['expiry_time'] ?? null,
             'qr_string' => $source['qr_string'] ?? null,
             'deeplink_url' => null,
             'actions' => is_array($source['actions'] ?? null) ? $source['actions'] : [],

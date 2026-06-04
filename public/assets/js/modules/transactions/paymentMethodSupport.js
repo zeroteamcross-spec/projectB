@@ -32,12 +32,13 @@ export function normalizePaymentPayload(value) {
 
 export function resolvePaymentArtifacts(transaction = {}) {
   const session = transaction?.payment_session ?? null;
-  const latestLog = Array.isArray(transaction?.payment_logs) && transaction.payment_logs.length
-    ? transaction.payment_logs[0]
-    : null;
-  const method = session?.payment_method ?? latestLog?.payment_method ?? "bca_va";
-  const paymentData = normalizePaymentPayload(session?.payment_data ?? latestLog?.payment_data ?? {});
-  const payloadResponse = normalizePaymentPayload(session?.payload_response ?? latestLog?.payload_response ?? {});
+  const logs = Array.isArray(transaction?.payment_logs) ? transaction.payment_logs : [];
+  const latestLog = logs.length ? logs[0] : null;
+  const instructionLog = logs.find(hasInstructionArtifact) ?? latestLog;
+  const instruction = transaction?.payment_instruction ?? null;
+  const method = session?.payment_method ?? instruction?.payment_method ?? instructionLog?.payment_method ?? latestLog?.payment_method ?? "bca_va";
+  const paymentData = normalizePaymentPayload(session?.payment_data ?? instruction?.payment_data ?? instructionLog?.payment_data ?? {});
+  const payloadResponse = normalizePaymentPayload(session?.payload_response ?? instruction?.payload_response ?? instructionLog?.payload_response ?? {});
   const actions = Array.isArray(paymentData.actions) && paymentData.actions.length
     ? paymentData.actions
     : Array.isArray(payloadResponse.actions) ? payloadResponse.actions : [];
@@ -46,18 +47,31 @@ export function resolvePaymentArtifacts(transaction = {}) {
     paymentData.qr_code_url,
     urlLikeQr(paymentData.qr_string),
     actionUrl(actions, "generate-qr-code"),
+    instruction?.qr_code_url,
+    instructionLog?.qr_code_url,
     latestLog?.qr_code_url
   );
   const deeplinkUrl = firstNonEmpty(
     paymentData.deeplink_url,
     actionUrl(actions, "deeplink-redirect"),
+    instruction?.deeplink_url,
+    instructionLog?.deeplink_url,
     latestLog?.deeplink_url
+  );
+  const expiresAt = firstNonEmpty(
+    session?.expires_at,
+    instruction?.expires_at,
+    transaction?.expires_at,
+    paymentData.expiry_time,
+    payloadResponse.expiry_time
   );
 
   return {
     method,
     session,
     latestLog,
+    instruction,
+    instructionLog,
     paymentData: {
       ...paymentData,
       actions,
@@ -66,12 +80,13 @@ export function resolvePaymentArtifacts(transaction = {}) {
     actions,
     qrCodeUrl,
     deeplinkUrl,
-    providerOrderId: session?.provider_order_id ?? latestLog?.provider_order_id ?? transaction?.midtrans_order_id ?? "-",
-    providerStatus: session?.transaction_status ?? latestLog?.transaction_status ?? transaction?.transaction_status ?? "-",
+    providerOrderId: session?.provider_order_id ?? instruction?.provider_order_id ?? instructionLog?.provider_order_id ?? latestLog?.provider_order_id ?? transaction?.midtrans_order_id ?? "-",
+    providerStatus: session?.transaction_status ?? latestLog?.transaction_status ?? instruction?.transaction_status ?? instructionLog?.transaction_status ?? transaction?.transaction_status ?? "-",
     transactionStatus: transaction?.transaction_status ?? null,
-    expiresAt: session?.expires_at ?? transaction?.expires_at ?? payloadResponse.expiry_time ?? null,
-    grossAmount: session?.gross_amount ?? latestLog?.gross_amount ?? null,
-    autoOpenKey: session?.provider_order_id ?? latestLog?.provider_order_id ?? transaction?.transaction_code ?? transaction?.id ?? "payment",
+    expiresAt,
+    isExpired: isPastDate(expiresAt),
+    grossAmount: session?.gross_amount ?? instruction?.gross_amount ?? instructionLog?.gross_amount ?? latestLog?.gross_amount ?? null,
+    autoOpenKey: session?.provider_order_id ?? instruction?.provider_order_id ?? instructionLog?.provider_order_id ?? latestLog?.provider_order_id ?? transaction?.transaction_code ?? transaction?.id ?? "payment",
   };
 }
 
@@ -82,7 +97,7 @@ export function instructionSteps(method, { hasQr = false, hasDeeplink = false } 
       hasDeeplink ? "Klik tombol Buka Aplikasi GoPay untuk melanjutkan pembayaran." : "Buka aplikasi GoPay atau Gojek secara manual.",
       hasQr ? "Jika aplikasi tidak terbuka, scan QR GoPay yang tampil di halaman ini." : "Jika deeplink tidak tersedia, gunakan QR yang diberikan oleh provider.",
       "Konfirmasi nominal dan merchant di aplikasi.",
-      "Selesaikan pembayaran lalu kembali ke halaman ini untuk cek status.",
+      "Selesaikan pembayaran lalu kembali ke halaman ini. Status akan dicek otomatis.",
     ];
   }
 
@@ -92,7 +107,7 @@ export function instructionSteps(method, { hasQr = false, hasDeeplink = false } 
       "Pilih menu Scan QR atau Bayar.",
       "Scan QR code yang tampil di halaman ini.",
       "Pastikan nominal dan merchant benar sebelum konfirmasi.",
-      "Selesaikan pembayaran lalu kembali ke halaman ini untuk cek status.",
+      "Selesaikan pembayaran lalu kembali ke halaman ini. Status akan dicek otomatis.",
     ];
   }
 
@@ -102,14 +117,14 @@ export function instructionSteps(method, { hasQr = false, hasDeeplink = false } 
       "Pilih menu transfer ke Virtual Account.",
       "Masukkan nomor VA yang tampil di halaman ini.",
       "Verifikasi nominal dan merchant sebelum konfirmasi.",
-      "Kembali ke halaman ini lalu tekan Refresh status.",
+      "Kembali ke halaman ini. Status akan dicek otomatis.",
     ];
   }
 
   return [
     "Buka link pembayaran jika tersedia.",
     "Ikuti instruksi dari provider pembayaran.",
-    "Kembali ke halaman ini lalu tekan Refresh status.",
+    "Kembali ke halaman ini. Status akan dicek otomatis.",
   ];
 }
 
@@ -172,4 +187,34 @@ function firstNonEmpty(...values) {
 
 function sessionStorageKey(value) {
   return GOPAY_AUTO_OPEN_PREFIX + String(value ?? "payment");
+}
+
+function hasInstructionArtifact(log) {
+  if (!log || typeof log !== "object") {
+    return false;
+  }
+
+  const paymentData = normalizePaymentPayload(log.payment_data ?? {});
+  const payloadResponse = normalizePaymentPayload(log.payload_response ?? {});
+  return Boolean(
+    log.qr_code_url
+    || log.deeplink_url
+    || paymentData.qr_string
+    || paymentData.deeplink_url
+    || paymentData.va_number
+    || paymentData.bill_key
+    || paymentData.payment_code
+    || (Array.isArray(paymentData.actions) && paymentData.actions.length)
+    || (Array.isArray(payloadResponse.actions) && payloadResponse.actions.length)
+    || payloadResponse.redirect_url
+  );
+}
+
+function isPastDate(value) {
+  if (!value) {
+    return false;
+  }
+
+  const time = Date.parse(value);
+  return !Number.isNaN(time) && time < Date.now();
 }

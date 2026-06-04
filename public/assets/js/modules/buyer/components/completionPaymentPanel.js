@@ -177,7 +177,7 @@ function resultBox(transaction) {
 
   const note = document.createElement("p");
   note.className = "text-sm leading-6 text-green-900";
-  note.textContent = "Setelah membayar, kembali ke halaman ini dan tekan Refresh status.";
+  note.textContent = "Setelah membayar, kembali ke halaman ini. Status akan dicek otomatis; Refresh status tetap tersedia sebagai fallback.";
   box.append(note);
 
   return box;
