@@ -245,7 +245,7 @@ function buyerTopNavigation({ activePath, actions }) {
 function buyerSearchBar({ cars, uiState, actions }) {
   const wrap = document.createElement("section");
   wrap.id = "byr_search_section";
-  wrap.className = "relative grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-[1.55rem] border border-[color-mix(in_srgb,var(--pb-brand-primary)_18%,var(--pb-border))] bg-[var(--pb-form-search-bg)] px-4 py-3 shadow-[0_16px_42px_rgba(15,23,42,0.08)] md:rounded-[1.75rem] md:px-5";
+  wrap.className = "relative grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-[1.55rem] border border-[color-mix(in_srgb,var(--pb-brand-primary)_18%,var(--pb-border))] bg-[var(--pb-form-search-bg)] px-2 py-1 shadow-[0_16px_42px_rgba(15,23,42,0.08)] md:rounded-[1.75rem] md:px-5";
   wrap.dataset.ds = "buyer.dashboard.search";
 
   wrap.append(iconBox({ size: "h-9 w-9", className: "text-[var(--pb-text-muted)]", icon: "search", iconSize: "h-5 w-5" }));
@@ -256,7 +256,7 @@ function buyerSearchBar({ cars, uiState, actions }) {
   input.value = uiState.search;
   input.placeholder = "Cari mobil idamanmu...";
   input.autocomplete = "off";
-  input.className = "min-h-11 min-w-0 border-0 bg-transparent text-base font-semibold text-[var(--pb-text)] outline-none placeholder:text-[var(--pb-text-muted)]";
+  input.className = "min-h-8 min-w-0 border-0 bg-transparent text-sm font-semibold text-[var(--pb-text)] outline-none placeholder:text-[var(--pb-text-muted)]";
   input.addEventListener("input", () => actions.setSearch(input.value, cars));
 
   const filter = document.createElement("button");
@@ -399,9 +399,9 @@ function latestTransactionsSection({ transactions, actions }) {
   return DataTable({
     shellId: "byr_latest_transactions_table",
     title: "Transaksi Terakhir",
-    subtitle: rows.length
-      ? `${rows.length} transaksi terbaru dari data lokal`
-      : "Riwayat transaksi buyer akan muncul di sini.",
+    // subtitle: rows.length
+      // ? `${rows.length} transaksi terbaru dari data lokal`
+      // : "Riwayat transaksi buyer akan muncul di sini.",
     icon: iconBox({
       size: "h-10 w-10",
       className: "rounded-full bg-[var(--pb-brand-primary)] text-white shadow-[var(--pb-shadow-soft)]",
@@ -412,7 +412,7 @@ function latestTransactionsSection({ transactions, actions }) {
       { label: "Transaksi", render: (transaction) => transactionIdentity(transaction) },
       { label: "Mobil", render: (transaction) => transactionCar(transaction) },
       { label: "Tanggal", render: (transaction) => textNode("span", "text-sm font-semibold text-[var(--pb-text-strong)]", formatDate(transaction.created_at)) },
-      { label: "Nilai", render: (transaction) => textNode("span", "text-sm font-black text-[var(--pb-brand-secondary)]", formatCurrency(transaction.car_price ?? transaction.dp_amount ?? 0)) },
+      { label: "Nilai", render: (transaction) => textNode("span", "text-sm font-black text-white", formatCurrency(transaction.car_price ?? transaction.dp_amount ?? 0)) },
       { label: "Status", render: (transaction) => transactionStatusBadge(transaction.transaction_status) },
       { label: "Aksi", render: (transaction) => transactionAction(transaction, actions) },
     ],
@@ -469,7 +469,7 @@ function recommendationsToolbar({ count, actions }) {
   copy.className = "grid min-w-0 gap-1";
   copy.append(
     textNode("h2", "break-words text-sm font-bold tracking-normal text-white", "Mobil Pilihan Terbaik"),
-    textNode("p", "text-sm font-medium text-white/70", count ? `${count} rekomendasi tersedia` : "Rekomendasi akan muncul di sini"),
+    // textNode("p", "text-sm font-medium text-white/70", count ? `${count} rekomendasi tersedia` : "Rekomendasi akan muncul di sini"),
   );
 
   const action = "";
@@ -950,7 +950,7 @@ function transactionIdentity(transaction) {
   const wrap = document.createElement("section");
   wrap.className = "grid min-w-0 gap-1";
   wrap.append(
-    textNode("p", "break-words text-sm font-black text-[var(--pb-text)]", transaction.transaction_code || `Transaksi #${transaction.id ?? "-"}`),
+    textNode("p", "break-words text-sm font-black text-white", transaction.transaction_code || `Transaksi #${transaction.id ?? "-"}`),
     textNode("p", "break-words text-xs font-semibold text-[var(--pb-text-muted)]", transaction.payment_type ? paymentTypeLabel(transaction.payment_type) : "Pembelian mobil"),
   );
   return wrap;
@@ -960,7 +960,7 @@ function transactionCar(transaction) {
   const wrap = document.createElement("section");
   wrap.className = "grid min-w-0 gap-1";
   wrap.append(
-    textNode("p", "break-words text-sm font-black text-[var(--pb-text)]", transactionCarLabel(transaction)),
+    textNode("p", "break-words text-sm font-black text-white", transactionCarLabel(transaction)),
     textNode("p", "break-words text-xs font-semibold text-[var(--pb-text-muted)]", transaction.car?.year ? `Tahun ${transaction.car.year}` : `Mobil #${transaction.car_id ?? "-"}`),
   );
   return wrap;
@@ -1028,10 +1028,17 @@ function desktopNavClassName({ active, disabled }) {
 }
 
 function isActiveNav(item, activePath) {
+  const path = String(activePath ?? "");
   if (item.path === "/buyer") {
-    return activePath === "/buyer";
+    return path === "/buyer";
   }
-  return String(activePath ?? "").startsWith(item.path);
+  if (item.path === "/buyer/portfolio") {
+    return path === "/buyer/portfolio" || path.startsWith("/buyer/transactions");
+  }
+  if (item.path === "/") {
+    return path === "/" || path === "/buyer/cars";
+  }
+  return path === item.path || path.startsWith(`${item.path}/`);
 }
 
 function sectionTextButton(label, onClick) {

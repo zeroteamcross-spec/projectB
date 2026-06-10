@@ -31,13 +31,13 @@ export const affiliateLedgerService = {
         key: "commission",
         label: "Total komisi",
         value: formatCurrency(summary.totalCommission),
-        helper: summary.totalCommission > 0 ? "Akumulasi komisi dari ledger penjualan affiliate." : "Belum ada komisi tercatat.",
+        helper: summary.totalCommission > 0 ? "Akumulasi komisi dari ledger penjualan marketing." : "Belum ada komisi tercatat.",
       },
       {
         key: "transactions",
         label: "Transaksi berkomisi",
         value: String(summary.totalTransactions),
-        helper: summary.totalTransactions > 0 ? "Transaksi unik sudah masuk ke ledger affiliate." : "Belum ada transaksi berkomisi.",
+        helper: summary.totalTransactions > 0 ? "Transaksi unik sudah masuk ke ledger marketing." : "Belum ada transaksi berkomisi.",
       },
       {
         key: "pending",

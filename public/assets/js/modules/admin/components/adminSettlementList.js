@@ -53,7 +53,7 @@ export function AdminSettlementList({
     icon,
     columns: [
       { label: "Batch", render: (settlement) => settlementIdentity(settlement) },
-      { label: "Affiliate", render: (settlement) => affiliateBlock(settlement) },
+      { label: "Marketing", render: (settlement) => affiliateBlock(settlement) },
       { label: "Amount", render: (settlement) => amountBlock(settlement) },
       { label: "Status", render: (settlement) => statusBlock(settlement) },
       { label: "Timeline", render: (settlement) => timelineBlock(settlement) },
@@ -63,7 +63,7 @@ export function AdminSettlementList({
     rows: settlements,
     mobileMode: "disclosure",
     emptyTitle: "Settlement batch belum tersedia",
-    emptyDescription: "Batch settlement affiliate akan muncul di sini setelah dicatat oleh admin atau saat filter cocok.",
+    emptyDescription: "Batch settlement marketing akan muncul di sini setelah dicatat oleh admin atau saat filter cocok.",
     mobileCardTitle: (settlement) => `${settlement.affiliateLabel} | Batch #${settlement.id}`,
     mobileCardSubtitle: (settlement) => `${settlement.requestedAmountLabel} | ${formatDate(settlement.requested_at)}`,
     mobileCardBadges: (settlement) => [
@@ -71,7 +71,7 @@ export function AdminSettlementList({
       Badge({ label: `${settlement.ledger_count ?? 0} ledger`, variant: "default" }),
     ],
     mobilePrimaryFields: (settlement) => [
-      { label: "Affiliate", value: settlement.affiliate?.referral_code || settlement.affiliateLabel || "-" },
+      { label: "Marketing", value: settlement.affiliate?.referral_code || settlement.affiliateLabel || "-" },
       { label: "Nominal", value: settlement.requestedAmountLabel },
       { label: "Status", value: settlement.statusMeta?.label || settlement.status || "-" },
     ],

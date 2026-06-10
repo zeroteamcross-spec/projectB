@@ -36,7 +36,7 @@ export const adminSettlementService = {
         key: "batches",
         label: "Total Batch",
         value: String(summary.totalBatches),
-        helper: "Semua batch settlement affiliate yang sudah tercatat.",
+        helper: "Semua batch settlement marketing yang sudah tercatat.",
       },
       {
         key: "pending-batches",
@@ -88,7 +88,7 @@ export const adminSettlementService = {
     return settlements.map((settlement) => ({
       ...settlement,
       requestedAmountLabel: formatCurrency(settlement.requested_amount ?? 0),
-      affiliateLabel: settlement.affiliate?.name || settlement.affiliate?.referral_code || `Affiliate #${settlement.affiliate_id ?? "-"}`,
+      affiliateLabel: settlement.affiliate?.name || settlement.affiliate?.referral_code || `Marketing #${settlement.affiliate_id ?? "-"}`,
       statusMeta: this.statusMeta(settlement.status),
     }));
   },

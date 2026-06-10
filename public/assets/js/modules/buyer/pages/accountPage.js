@@ -554,10 +554,17 @@ function statusLabel(status) {
 }
 
 function isActiveNav(item, activePath) {
+  const path = String(activePath ?? "");
   if (item.path === "/buyer") {
-    return activePath === "/buyer";
+    return path === "/buyer";
   }
-  return String(activePath ?? "").startsWith(item.path);
+  if (item.path === "/buyer/portfolio") {
+    return path === "/buyer/portfolio" || path.startsWith("/buyer/transactions");
+  }
+  if (item.path === "/") {
+    return path === "/" || path === "/buyer/cars";
+  }
+  return path === item.path || path.startsWith(`${item.path}/`);
 }
 
 function normalizeImageUrl(url) {

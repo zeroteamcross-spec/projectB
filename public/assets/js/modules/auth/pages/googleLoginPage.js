@@ -116,9 +116,9 @@ function actionContent(root, context, config, state) {
   }
 
   if (!config.googleEnabled) {
-    fragment.append(messageBox("Affiliate tetap menggunakan login user/password.", "info"));
+    fragment.append(messageBox("Marketing tetap menggunakan login user/password.", "info"));
     if (authUxConfig.showLegacyLoginLinks) {
-      fragment.append(navButton("Buka Login Affiliate", () => context.router.navigate("/login/affiliate")));
+      fragment.append(navButton("Buka Login Marketing", () => context.router.navigate("/login/affiliate")));
     }
     return fragment;
   }

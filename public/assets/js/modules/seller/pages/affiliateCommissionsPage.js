@@ -215,7 +215,7 @@ function render(root, context, actions) {
   if (!rulesHydratedAt && !(snapshotPayload?.global_rule || snapshotPayload?.overrides?.length)) {
     left.append(EmptyState({
       title: "Memuat aturan komisi affiliate",
-      description: "Snapshot dan working set komisi affiliate seller sedang disiapkan.",
+      description: "Snapshot dan working set komisi marketing seller sedang disiapkan.",
     }));
   } else {
     left.append(applyDesignHook(SellerCommissionOverridesList({
@@ -316,7 +316,7 @@ function commissionsHero({ summary, actions }) {
   copy.append(
     icon,
     textBlock("p", "text-xs font-black uppercase tracking-[0.18em] text-orange-700", "Seller commission desk"),
-    textBlock("h1", "max-w-3xl text-3xl font-black leading-tight tracking-normal text-gray-950 sm:text-4xl", "Komisi Affiliate"),
+    textBlock("h1", "max-w-3xl text-3xl font-black leading-tight tracking-normal text-gray-950 sm:text-4xl", "Komisi Marketing"),
     textBlock("p", "max-w-2xl text-sm leading-6 text-gray-600", "Pantau komisi dari referral affiliate, status pembayaran, dan riwayat performa."),
   );
 
@@ -679,7 +679,7 @@ function commissionDetailPanel({ rule, onEdit }) {
   const facts = document.createElement("section");
   facts.className = "grid gap-3 sm:grid-cols-2";
   [
-    ["Affiliate", "Semua affiliate seller"],
+    ["Marketing", "Semua marketing seller"],
     ["Kode referral", "Mengikuti slug affiliate pada transaksi"],
     ["Transaksi / mobil", sellerAffiliateCommissionService.carLabel(rule.car)],
     ["Nilai transaksi", rule.car?.price_cash ? formatCurrency(rule.car.price_cash) : "-"],

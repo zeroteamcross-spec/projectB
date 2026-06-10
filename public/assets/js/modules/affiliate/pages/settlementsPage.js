@@ -57,20 +57,20 @@ function render(root, context) {
   frame.className = "grid min-w-0 w-full gap-6";
   frame.append(
     SectionHeader({
-      title: "Affiliate Settlements",
+      title: "Marketing Settlements",
       description: "Pantau komisi yang masih unsettled, ledger yang sudah eligible, dan riwayat batch settlement manual yang sudah dicatat.",
-      action: Button({ label: "Dashboard affiliate", variant: "secondary", onClick: () => context.router.navigate("/affiliate"), designHook: "shared.button.secondary" }),
+      action: Button({ label: "Dashboard marketing", variant: "secondary", onClick: () => context.router.navigate("/affiliate"), designHook: "shared.button.secondary" }),
     }),
   );
 
   if (!hydratedAt && !payload) {
     frame.append(EmptyState({
-      title: "Memuat settlement affiliate",
+      title: "Memuat settlement marketing",
       description: "Snapshot dan working set payout baseline sedang disiapkan.",
     }));
     root.replaceChildren(AffiliateAccountLayout({
       activePath: context.path,
-      title: "Affiliate Settlements",
+      title: "Marketing Settlements",
       subtitle: "Settlement komisi",
       icon: "transaction",
       actions: affiliateAccountActions(context),
@@ -104,7 +104,7 @@ function render(root, context) {
   frame.append(layout);
   root.replaceChildren(AffiliateAccountLayout({
     activePath: context.path,
-    title: "Affiliate Settlements",
+    title: "Marketing Settlements",
     subtitle: "Settlement komisi",
     icon: "transaction",
     actions: affiliateAccountActions(context),

@@ -325,7 +325,7 @@ function createMobileCard({ rowKey, title, subtitle, badges, fields, actions, id
   const copy = document.createElement("div");
   copy.className = "grid gap-1";
   copy.append(
-    textNode("p", "break-words text-base font-black text-gray-950", title),
+    textNode("p", "break-words text-base font-black text-white", title),
     textNode("p", "break-words text-sm text-gray-500", subtitle),
   );
   top.append(copy);
@@ -390,7 +390,7 @@ function createMobileDisclosureRow({
   const top = document.createElement("div");
   top.className = "grid gap-2";
   top.append(
-    textNode("p", "break-words text-base font-black text-gray-950", title),
+    textNode("p", "break-words text-base font-black text-white", title),
     textNode("p", "break-words text-sm text-gray-500", subtitle),
   );
   if (Array.isArray(badges) && badges.length) {

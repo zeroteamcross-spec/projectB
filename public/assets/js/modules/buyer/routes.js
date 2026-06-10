@@ -6,6 +6,7 @@ import { buyerTransactionDetailPreloadService } from "./services/buyerTransactio
 import { BuyerAccountPage } from "./pages/accountPage.js";
 import { BuyerCarsPage } from "./pages/carsPage.js";
 import { BuyerDashboardPage } from "./pages/dashboardPage.js";
+import { BuyerPortfolioPage } from "./pages/portfolioPage.js";
 import { BuyerTransactionsPage } from "./pages/transactionsPage.js";
 import { PaymentStatusPage } from "./pages/paymentStatusPage.js";
 
@@ -36,6 +37,26 @@ export const buyerRoutes = [
             sliders: [...(publicHome?.sliders ?? []), ...(landingHero?.sliders ?? [])].slice(0, 5),
             meta: { positions: ["public_home", "landing_hero"] },
           })).catch(() => ({ sliders: [], meta: {} })),
+        },
+      ],
+    },
+  },
+  {
+    name: "buyer.portfolio",
+    path: "/buyer/portfolio",
+    shell: "app",
+    role: "buyer",
+    page: BuyerPortfolioPage,
+    workingStateKey: "buyerPortfolio",
+    preload: {
+      working: [
+        {
+          key: "transactions",
+          loader: ({ signal }) => transactionsResource.list({ limit: 20 }, { signal }).catch(() => ({ transactions: [] })),
+        },
+        {
+          key: "profile",
+          loader: ({ signal }) => profileResource.me({ signal }).catch(() => null),
         },
       ],
     },

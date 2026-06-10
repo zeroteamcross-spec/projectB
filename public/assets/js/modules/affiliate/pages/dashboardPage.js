@@ -30,7 +30,7 @@ export function AffiliateDashboardPage({ notFound = false } = {}) {
       const affiliate = currentAffiliate();
       const url = affiliateDashboardService.landingUrl(affiliate);
       if (!url) {
-        showToast("Link landing affiliate belum tersedia.", { type: "info" });
+        showToast("Link landing marketing belum tersedia.", { type: "info" });
         return;
       }
       window.open(url, "_blank", "noopener,noreferrer");
@@ -39,7 +39,7 @@ export function AffiliateDashboardPage({ notFound = false } = {}) {
       const affiliate = currentAffiliate();
       const url = affiliateDashboardService.landingUrl(affiliate);
       if (!url) {
-        showToast("Link landing affiliate belum tersedia.", { type: "info" });
+        showToast("Link landing marketing belum tersedia.", { type: "info" });
         return;
       }
 
@@ -48,7 +48,7 @@ export function AffiliateDashboardPage({ notFound = false } = {}) {
 
       try {
         await navigator.clipboard.writeText(url);
-        showToast("Link landing affiliate berhasil disalin.", { type: "success" });
+        showToast("Link landing marketing berhasil disalin.", { type: "success" });
       } catch (error) {
         showToast("Clipboard tidak tersedia di browser ini.", { type: "error" });
       } finally {
@@ -111,21 +111,21 @@ function render(root, context, notFound, actions) {
   frame.className = "grid min-w-0 w-full gap-6";
   frame.append(
     SectionHeader({
-      title: notFound ? "Halaman affiliate tidak ditemukan" : "Dashboard Affiliate",
-      description: "Pantau identitas affiliate, status landing, dan ringkasan aktivitas yang sudah tersedia saat ini.",
+      title: notFound ? "Halaman marketing tidak ditemukan" : "Dashboard Marketing",
+      description: "Pantau identitas marketing, status landing, dan ringkasan aktivitas yang sudah tersedia saat ini.",
       action: Button({ label: "Buka landing", variant: "secondary", onClick: () => actions.openLanding(), designHook: "shared.button.secondary" }),
     }),
   );
 
   if (!hydratedAt && !affiliate) {
     frame.append(EmptyState({
-      title: "Memuat dashboard affiliate",
-      description: "Profil affiliate dan snapshot aktivitas sedang disiapkan.",
+      title: "Memuat dashboard marketing",
+      description: "Profil marketing dan snapshot aktivitas sedang disiapkan.",
     }));
     root.replaceChildren(AffiliateAccountLayout({
       activePath: context.path,
-      title: "Dashboard Affiliate",
-      subtitle: "Akun affiliate",
+      title: "Dashboard Marketing",
+      subtitle: "Akun marketing",
       icon: "affiliate",
       actions: affiliateAccountActions(context),
       children: [frame],
@@ -135,13 +135,13 @@ function render(root, context, notFound, actions) {
 
   if (!affiliate) {
     frame.append(EmptyState({
-      title: "Affiliate belum siap",
-      description: "Akun ini belum terhubung ke profil affiliate aktif. Seller perlu membuat affiliate terlebih dahulu atau data affiliate belum lengkap.",
+      title: "Marketing belum siap",
+      description: "Akun ini belum terhubung ke profil marketing aktif. Seller perlu membuat marketing terlebih dahulu atau data marketing belum lengkap.",
     }));
     root.replaceChildren(AffiliateAccountLayout({
       activePath: context.path,
-      title: "Dashboard Affiliate",
-      subtitle: "Akun affiliate",
+      title: "Dashboard Marketing",
+      subtitle: "Akun marketing",
       icon: "affiliate",
       actions: affiliateAccountActions(context),
       children: [frame],
@@ -172,8 +172,8 @@ function render(root, context, notFound, actions) {
   frame.append(layout);
   root.replaceChildren(AffiliateAccountLayout({
     activePath: context.path,
-    title: "Dashboard Affiliate",
-    subtitle: "Akun affiliate",
+    title: "Dashboard Marketing",
+    subtitle: "Akun marketing",
     icon: "affiliate",
     actions: affiliateAccountActions(context),
     children: [frame],

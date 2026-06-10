@@ -42,11 +42,13 @@ export function PaymentStatusPage() {
     mount(context) {
       root = document.createElement("div");
       root.className = "grid gap-6";
+      scrollToPageTop();
       render(root, context, flags);
       syncAutoStatusPolling(context, flags, poller);
       return root;
     },
     hydrate(context) {
+      scrollToPageTop();
       render(root, context, flags);
       syncAutoStatusPolling(context, flags, poller);
     },
@@ -72,6 +74,12 @@ export function PaymentStatusPage() {
       unsubscribe = null;
       visibilityCleanup = null;
     },
+  });
+}
+
+function scrollToPageTop() {
+  requestAnimationFrame(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
   });
 }
 

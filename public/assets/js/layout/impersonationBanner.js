@@ -25,7 +25,7 @@ export function renderImpersonationBanner(host, store, { redirectTo = "#/admin" 
   copy.className = "grid min-w-0 gap-1";
 
   const targetRole = String(impersonation.impersonated_role ?? impersonation.target?.role ?? "").trim();
-  const targetRoleLabel = targetRole === "seller" ? "Seller" : "Affiliate";
+  const targetRoleLabel = targetRole === "seller" ? "Seller" : "Marketing";
   const targetName = impersonation.target?.name ?? impersonation.target?.email ?? targetRoleLabel;
   const actorName = impersonation.actor?.name ?? impersonation.actor?.email ?? "Admin";
 

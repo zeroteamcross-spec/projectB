@@ -130,7 +130,7 @@ function instructionIntro(transaction) {
     return "Transaksi sudah tidak aktif untuk pembayaran.";
   }
 
-  return "Selesaikan pembayaran sesuai metode yang aktif. Halaman ini akan mengecek status otomatis; tombol refresh tetap tersedia sebagai fallback.";
+  return "Selesaikan pembayaran sesuai metode yang aktif.";
 }
 
 function walletPanel({ method, qrCodeUrl, deeplinkUrl, isDownloadingQr = false, onDownloadQr = null, onOpenGopay = null } = {}) {

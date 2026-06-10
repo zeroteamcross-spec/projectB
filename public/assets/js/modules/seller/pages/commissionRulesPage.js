@@ -131,7 +131,7 @@ function render(root, context, actions) {
   frame.className = "grid gap-6";
   frame.append(
     SectionHeader({
-      title: "Komisi Affiliate",
+      title: "Komisi Marketing",
       description: "Atur global commission rule dan override per mobil. Override per mobil selalu menang atas global rule.",
       action: Button({ label: "Override baru", onClick: () => actions.createOverride() }),
     }),

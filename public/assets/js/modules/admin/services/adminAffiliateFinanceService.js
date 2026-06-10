@@ -23,7 +23,7 @@ export const adminAffiliateFinanceService = {
       return {
         ...ledger,
         carLabel,
-        affiliateLabel: ledger.affiliate?.name || ledger.referral_code || `Affiliate #${ledger.affiliate_id ?? "-"}`,
+        affiliateLabel: ledger.affiliate?.name || ledger.referral_code || `Marketing #${ledger.affiliate_id ?? "-"}`,
         transactionCodeLabel: ledger.transaction?.transaction_code || (ledger.transaction_id ? `TRX #${ledger.transaction_id}` : "-"),
         amountLabel: formatCurrency(ledger.commission_amount ?? ledger.amount ?? 0),
         baseAmountLabel: formatCurrency(ledger.base_amount ?? 0),

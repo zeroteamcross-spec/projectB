@@ -18,8 +18,8 @@ const SELLER_LINKS = [
   { href: "#/seller/showroom", label: "Showroom Saya", icon: "showroom" },
   { href: "#/seller/cars", label: "Mobil Saya", icon: "car" },
   { href: "#/seller/inspection", label: "Inspeksi", icon: "clipboard" },
-  { href: "#/seller/affiliates", label: "Affiliate", icon: "affiliate" },
-  { href: "#/seller/affiliate-commissions", label: "Komisi Affiliate", icon: "commission" },
+  { href: "#/seller/affiliates", label: "Marketing", icon: "affiliate" },
+  { href: "#/seller/affiliate-commissions", label: "Komisi Marketing", icon: "commission" },
   { href: "#/seller/transactions", label: "Transaksi", icon: "transaction" },
 ];
 
@@ -46,7 +46,7 @@ const ADMIN_LINKS = [
 ];
 
 const AFFILIATE_LINKS = [
-  { href: "#/affiliate", label: "Dashboard Affiliate", icon: "affiliate" },
+  { href: "#/affiliate", label: "Dashboard Marketing", icon: "affiliate" },
   { href: "#/profile", label: "Profil Saya", icon: "user" },
   { href: "#/affiliate/activity", label: "Activity Clicks", icon: "transaction" },
   { href: "#/affiliate/ledger", label: "Ledger Komisi", icon: "commission" },

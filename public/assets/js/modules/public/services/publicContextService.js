@@ -101,7 +101,7 @@ export const publicContextService = {
     if (affiliate?.contactWhatsapp) {
       return {
         phone: affiliate.contactWhatsapp,
-        label: affiliate.profile?.name ? `Affiliate ${affiliate.profile.name}` : "Affiliate",
+        label: affiliate.profile?.name ? `Affiliate ${affiliate.profile.name}` : "Marketing",
       };
     }
 

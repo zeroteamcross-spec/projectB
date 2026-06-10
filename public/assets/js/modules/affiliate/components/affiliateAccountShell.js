@@ -15,7 +15,7 @@ export const AFFILIATE_ACCOUNT_NAV_ITEMS = [
 
 export function AffiliateAccountLayout({
   activePath = "/affiliate",
-  title = "Affiliate",
+  title = "Marketing",
   subtitle = "",
   icon = "affiliate",
   maxWidth = "max-w-[1180px]",
@@ -110,7 +110,7 @@ function affiliateMobileHeader({ title, subtitle, actions }) {
   const copy = document.createElement("section");
   copy.className = "grid min-w-0 gap-0.5";
   copy.append(
-    textNode("p", "truncate text-sm font-bold text-white/75", subtitle || "Akun affiliate"),
+    textNode("p", "truncate text-sm font-bold text-white/75", subtitle || "Akun marketing"),
     textNode("h1", "truncate text-xl font-black leading-tight tracking-normal text-white", title),
   );
 
@@ -129,7 +129,7 @@ function affiliateTopNavigation({ activePath, title, icon, actions }) {
   const nav = document.createElement("nav");
   nav.id = "afacc_desktop_top_nav";
   nav.className = "sticky top-0 z-40 hidden min-w-0 items-center justify-between gap-3 rounded-[1.75rem] border border-[var(--pb-border)] bg-[color-mix(in_srgb,var(--pb-surface-card)_92%,transparent)] p-3 text-[var(--pb-text)] shadow-[var(--pb-shadow-card)] backdrop-blur-xl md:flex";
-  nav.setAttribute("aria-label", "Navigasi affiliate desktop");
+  nav.setAttribute("aria-label", "Navigasi marketing desktop");
 
   const brand = document.createElement("section");
   brand.className = "flex min-w-0 items-center gap-3 px-1";
@@ -188,7 +188,7 @@ function profileButton({ actions, compact = false } = {}) {
   button.className = compact
     ? "inline-flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white/92 text-sm font-black text-[var(--pb-brand-secondary)] shadow-[var(--pb-shadow-card)] ring-1 ring-white/70 transition hover:bg-white focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]"
     : "inline-flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white text-sm font-black text-[var(--pb-brand-secondary)] shadow-[var(--pb-shadow-card)] ring-1 ring-[var(--pb-border)] transition hover:bg-[var(--pb-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]";
-  button.setAttribute("aria-label", "Profil affiliate");
+  button.setAttribute("aria-label", "Profil marketing");
   button.title = "Profil";
   button.addEventListener("click", () => actions?.navigate?.("/profile"));
   button.textContent = initials(user);
@@ -208,7 +208,7 @@ function affiliateMobileFooterNav({ items = AFFILIATE_ACCOUNT_NAV_ITEMS, activeP
   nav.classList.remove("account-mobile-footer--buyer");
   nav.classList.add("account-mobile-footer--affiliate");
   nav.dataset.ds = "affiliate.mobile.footer";
-  nav.setAttribute("aria-label", "Navigasi akun affiliate mobile");
+  nav.setAttribute("aria-label", "Navigasi akun marketing mobile");
   const container = nav.querySelector("#byr_mobile_footer_nav_container");
   if (container) {
     container.id = "afacc_mobile_footer_nav_container";

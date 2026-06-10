@@ -31,7 +31,7 @@ export function AdminMasterSidebarForm({
     options: [
       ["admin", "Admin"],
       ["seller", "Seller"],
-      ["affiliate", "Affiliate"],
+      ["affiliate", "Marketing"],
     ],
   });
   const label = inputField({

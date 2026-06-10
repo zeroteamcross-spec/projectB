@@ -40,19 +40,19 @@ export const affiliateDashboardService = {
         key: "clicks",
         label: "Total klik",
         value: String(summary.clicks),
-        helper: summary.clicks > 0 ? "Klik tercatat dari landing affiliate." : "Belum ada klik tercatat.",
+        helper: summary.clicks > 0 ? "Klik tercatat dari landing marketing." : "Belum ada klik tercatat.",
       },
       {
         key: "transactions",
         label: "Transaksi teratribusi",
         value: String(summary.transactions),
-        helper: summary.transactions > 0 ? "Transaksi sudah masuk agregat affiliate." : "Belum ada transaksi teratribusi.",
+        helper: summary.transactions > 0 ? "Transaksi sudah masuk agregat marketing." : "Belum ada transaksi teratribusi.",
       },
       {
         key: "commission",
         label: "Total komisi",
         value: formatCurrency(summary.commission),
-        helper: summary.commission > 0 ? "Akumulasi komisi dari ledger affiliate." : "Belum ada komisi tercatat.",
+        helper: summary.commission > 0 ? "Akumulasi komisi dari ledger marketing." : "Belum ada komisi tercatat.",
       },
     ];
   },

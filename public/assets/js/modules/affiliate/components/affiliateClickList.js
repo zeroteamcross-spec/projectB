@@ -7,7 +7,7 @@ export function AffiliateClickList({ clicks = [] } = {}) {
   if (!clicks.length) {
     return EmptyState({
       title: "Belum ada click tercatat",
-      description: "Saat landing affiliate mulai diakses, activity click akan muncul di daftar ini.",
+      description: "Saat landing marketing mulai diakses, activity click akan muncul di daftar ini.",
     });
   }
 

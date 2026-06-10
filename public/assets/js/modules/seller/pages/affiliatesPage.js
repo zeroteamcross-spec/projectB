@@ -64,9 +64,9 @@ export function SellerAffiliatesPage() {
             saving: false,
             slugState: {
               is_available: false,
-              message: `Slug ${availability?.referral_code || sellerAffiliateService.normalizeSlug(payload.referral_code)} sudah dipakai affiliate lain.`,
+              message: `Slug ${availability?.referral_code || sellerAffiliateService.normalizeSlug(payload.referral_code)} sudah dipakai marketing lain.`,
             },
-            error: "Slug affiliate sudah dipakai.",
+            error: "Slug marketing sudah dipakai.",
           });
           rerender();
           return;
@@ -85,14 +85,14 @@ export function SellerAffiliatesPage() {
             message: `Slug ${affiliate?.referral_code} siap dipakai di route publik.`,
           },
         });
-        showToast(mode === "edit" ? "Affiliate berhasil diperbarui." : "Affiliate berhasil dibuat.", { type: "success" });
+        showToast(mode === "edit" ? "Marketing berhasil diperbarui." : "Marketing berhasil dibuat.", { type: "success" });
         currentContext?.router?.navigate(buildPath({ affiliateId: affiliate?.id }));
       } catch (error) {
         setRuntime({
           saving: false,
-          error: error?.message ?? "Affiliate gagal disimpan.",
+          error: error?.message ?? "Marketing gagal disimpan.",
         });
-        showToast(error?.message ?? "Affiliate gagal disimpan.", { type: "error" });
+        showToast(error?.message ?? "Marketing gagal disimpan.", { type: "error" });
         rerender();
       }
     },
@@ -104,7 +104,7 @@ export function SellerAffiliatesPage() {
           checkingSlug: false,
           slugState: {
             is_available: false,
-            message: "Gunakan huruf, angka, underscore, atau dash untuk slug affiliate.",
+            message: "Gunakan huruf, angka, underscore, atau dash untuk slug marketing.",
           },
         });
         rerender();
@@ -124,7 +124,7 @@ export function SellerAffiliatesPage() {
             is_available: Boolean(availability?.is_available),
             message: availability?.is_available
               ? `Slug ${availability.referral_code} tersedia.`
-              : `Slug ${availability?.referral_code || normalized} sudah dipakai affiliate lain.`,
+              : `Slug ${availability?.referral_code || normalized} sudah dipakai marketing lain.`,
           },
         });
       } catch (error) {
@@ -132,7 +132,7 @@ export function SellerAffiliatesPage() {
           checkingSlug: false,
           slugState: {
             is_available: false,
-            message: error?.message ?? "Slug affiliate gagal diperiksa.",
+            message: error?.message ?? "Slug marketing gagal diperiksa.",
           },
         });
       }
@@ -149,7 +149,7 @@ export function SellerAffiliatesPage() {
     async copyLanding(affiliate) {
       const url = sellerAffiliateService.landingUrl(affiliate?.referral_code ?? "");
       if (!url) {
-        showToast("Link landing affiliate belum tersedia.", { type: "info" });
+        showToast("Link landing marketing belum tersedia.", { type: "info" });
         return;
       }
 
@@ -158,7 +158,7 @@ export function SellerAffiliatesPage() {
 
       try {
         await navigator.clipboard.writeText(url);
-        showToast("Link landing affiliate berhasil disalin.", { type: "success" });
+        showToast("Link landing marketing berhasil disalin.", { type: "success" });
       } catch (error) {
         showToast("Clipboard tidak tersedia di browser ini.", { type: "error" });
       } finally {
@@ -232,9 +232,9 @@ function render(root, modalHost, context, actions) {
   frame.className = "mx-auto grid w-full max-w-[1180px] gap-6";
   frame.append(
     SectionHeader({
-      title: "Affiliate Seller",
-      description: "Kelola affiliate milik seller, siapkan slug publik, dan arahkan CTA landing ke nomor WhatsApp affiliate yang tepat.",
-      action: Button({ label: "Affiliate baru", onClick: () => actions.createNew(), designHook: "shared.button.primary" }),
+      title: "Marketing Seller",
+      description: "Kelola marketing milik seller, siapkan slug publik, dan arahkan CTA landing ke nomor WhatsApp marketing yang tepat.",
+      action: Button({ label: "Marketing baru", onClick: () => actions.createNew(), designHook: "shared.button.primary" }),
     }),
     applyDesignHook(summaryCards(counts), "seller.affiliates.summary"),
   );
@@ -247,8 +247,8 @@ function render(root, modalHost, context, actions) {
 
   if (!listHydratedAt && !(snapshotPayload?.affiliates?.length)) {
     listWrap.append(EmptyState({
-      title: "Memuat affiliate seller",
-      description: "Snapshot dan working set affiliate seller sedang disiapkan.",
+      title: "Memuat marketing seller",
+      description: "Snapshot dan working set marketing seller sedang disiapkan.",
     }));
   } else {
     listWrap.append(applyDesignHook(SellerAffiliatesList({
@@ -314,8 +314,8 @@ function renderModal({ context, mode, selectedAffiliate, detailHydratedAt, runti
 
   if (mode === "edit" && context.query.affiliate_id && !detailHydratedAt && !selectedAffiliate) {
     panel.append(EmptyState({
-      title: "Memuat detail affiliate",
-      description: "Detail affiliate aktif sedang dihydrate dari working set seller.",
+      title: "Memuat detail marketing",
+      description: "Detail marketing aktif sedang dihydrate dari working set seller.",
     }));
   } else {
     panel.append(applyDesignHook(SellerAffiliateForm({
@@ -352,9 +352,9 @@ function summaryCards(counts) {
   section.className = "grid gap-3 sm:grid-cols-3";
 
   [
-    ["Total affiliate", String(counts.total)],
-    ["Affiliate aktif", String(counts.active)],
-    ["Affiliate nonaktif", String(counts.inactive)],
+    ["Total marketing", String(counts.total)],
+    ["Marketing aktif", String(counts.active)],
+    ["Marketing nonaktif", String(counts.inactive)],
   ].forEach(([label, value]) => {
     const card = Card();
     card.classList.add("grid", "gap-1");
@@ -394,21 +394,21 @@ function syncAffiliateMutation(affiliate) {
 
 function validateAffiliatePayload(payload, mode) {
   if (!String(payload.email ?? "").trim()) {
-    return "Email login affiliate wajib diisi.";
+    return "Email login marketing wajib diisi.";
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(payload.email ?? "").trim())) {
-    return "Email login affiliate tidak valid.";
+    return "Email login marketing tidak valid.";
   }
   const password = String(payload.password ?? "");
   const confirmation = String(payload.password_confirmation ?? "");
   if (mode === "create" && !password) {
-    return "Password affiliate wajib diisi saat membuat akun.";
+    return "Password marketing wajib diisi saat membuat akun.";
   }
   if (password && password.length < 6) {
-    return "Password affiliate minimal 6 karakter.";
+    return "Password marketing minimal 6 karakter.";
   }
   if ((password || confirmation) && password !== confirmation) {
-    return "Konfirmasi password affiliate tidak sama.";
+    return "Konfirmasi password marketing tidak sama.";
   }
   return "";
 }

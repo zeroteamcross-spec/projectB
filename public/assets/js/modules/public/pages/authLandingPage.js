@@ -28,7 +28,7 @@ const ROLE_OPTIONS = [
   },
   {
     role: "affiliate_admin",
-    label: "Affiliate",
+    label: "Marketing",
     icon: "affiliate",
     futureCopy: "Aktivitas dan komisi.",
   },

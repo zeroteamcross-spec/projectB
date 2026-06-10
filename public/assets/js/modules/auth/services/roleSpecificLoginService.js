@@ -36,9 +36,9 @@ const ROLE_CONFIG = Object.freeze({
   affiliate: {
     role: "affiliate_admin",
     slug: "affiliate",
-    label: "Affiliate",
-    title: "Login Affiliate",
-    subtitle: "Masuk sebagai Affiliate",
+    label: "Marketing",
+    title: "Login Marketing",
+    subtitle: "Masuk sebagai Marketing",
     home: "/affiliate",
     icon: "affiliate",
     emailPlaceholder: "affiliate@projectb.local",

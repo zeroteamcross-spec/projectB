@@ -141,8 +141,8 @@ function render(root, context, flags) {
 
   if (invalidAffiliateRoute) {
     frame.append(EmptyState({
-      title: "Affiliate tidak ditemukan",
-      description: "Slug affiliate ini tidak aktif atau tidak tersedia lagi. Kembali ke landing utama untuk melihat katalog publik.",
+      title: "Marketing tidak ditemukan",
+      description: "Slug marketing ini tidak aktif atau tidak tersedia lagi. Kembali ke landing utama untuk melihat katalog publik.",
     }));
   } else {
     frame.append(PublicSearchFilterBar({

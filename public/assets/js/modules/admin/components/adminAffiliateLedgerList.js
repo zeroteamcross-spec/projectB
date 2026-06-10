@@ -33,13 +33,13 @@ export function AdminAffiliateLedgerList({
 
   return DataTable({
     shellId: "adfc_ledgers_table_section",
-    title: "Affiliate commission ledgers",
+    title: "Marketing commission ledgers",
     subtitle: `${totalItems} ledger cocok dengan filter aktif`,
     icon,
     columns: [
       { label: "Pilih", render: (ledger) => selectionCell(ledger, selectedIds, onToggle) },
       { label: "Transaksi", render: identityCell },
-      { label: "Affiliate", render: affiliateCell },
+      { label: "Marketing", render: affiliateCell },
       { label: "Komisi", render: amountCell },
       { label: "Status", render: statusCell },
       { label: "Tanggal", render: (ledger) => textBlock("text-sm font-semibold text-gray-800", formatDate(ledger.created_at)) },
@@ -47,8 +47,8 @@ export function AdminAffiliateLedgerList({
     loading,
     rows: ledgers,
     mobileMode: "disclosure",
-    emptyTitle: "Ledger affiliate belum tersedia",
-    emptyDescription: "Komisi affiliate akan muncul setelah transaksi paid eligible diproses.",
+    emptyTitle: "Ledger marketing belum tersedia",
+    emptyDescription: "Komisi marketing akan muncul setelah transaksi paid eligible diproses.",
     mobileCardTitle: (ledger) => ledger.transactionCodeLabel,
     mobileCardSubtitle: (ledger) => `${ledger.affiliateLabel} | ${ledger.amountLabel}`,
     mobileCardBadges: (ledger) => [Badge({ label: ledger.statusMeta?.label || ledger.ledger_status || "-", variant: ledger.statusMeta?.variant || "default" })],
@@ -99,7 +99,7 @@ function affiliateCell(ledger) {
   wrap.className = "grid min-w-0 gap-1";
   wrap.append(
     textBlock("font-semibold text-gray-900", ledger.affiliateLabel),
-    textBlock("text-sm text-gray-500", `Affiliate #${ledger.affiliate_id ?? "-"}`),
+    textBlock("text-sm text-gray-500", `Marketing #${ledger.affiliate_id ?? "-"}`),
   );
   return wrap;
 }

@@ -56,21 +56,21 @@ function render(root, context) {
   frame.className = "grid min-w-0 w-full gap-6";
   frame.append(
     SectionHeader({
-      title: "Affiliate Ledger",
+      title: "Marketing Ledger",
       description: "Pantau komisi yang berasal dari penjualan, referensi transaksi, dan catatan ledger yang sudah tercatat saat ini.",
-      action: Button({ label: "Dashboard affiliate", variant: "secondary", onClick: () => context.router.navigate("/affiliate"), designHook: "shared.button.secondary" }),
+      action: Button({ label: "Dashboard marketing", variant: "secondary", onClick: () => context.router.navigate("/affiliate"), designHook: "shared.button.secondary" }),
     }),
   );
 
   if (!hydratedAt && !payload) {
     frame.append(EmptyState({
-      title: "Memuat ledger affiliate",
-      description: "Snapshot dan working set ledger affiliate sedang disiapkan.",
+      title: "Memuat ledger marketing",
+      description: "Snapshot dan working set ledger marketing sedang disiapkan.",
     }));
     root.replaceChildren(AffiliateAccountLayout({
       activePath: context.path,
-      title: "Affiliate Ledger",
-      subtitle: "Komisi affiliate",
+      title: "Marketing Ledger",
+      subtitle: "Komisi marketing",
       icon: "wallet",
       actions: affiliateAccountActions(context),
       children: [frame],
@@ -85,8 +85,8 @@ function render(root, context) {
 
   root.replaceChildren(AffiliateAccountLayout({
     activePath: context.path,
-    title: "Affiliate Ledger",
-    subtitle: "Komisi affiliate",
+    title: "Marketing Ledger",
+    subtitle: "Komisi marketing",
     icon: "wallet",
     actions: affiliateAccountActions(context),
     children: [frame],

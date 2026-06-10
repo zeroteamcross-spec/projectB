@@ -112,6 +112,6 @@ export const sellerAffiliateService = {
 
   slugHelper(slug = "") {
     const normalized = this.normalizeSlug(slug);
-    return normalized ? `Route affiliate: #/af/${normalized}` : "Gunakan huruf, angka, underscore, atau dash.";
+    return normalized ? `Route marketing: #/af/${normalized}` : "Gunakan huruf, angka, underscore, atau dash.";
   },
 };

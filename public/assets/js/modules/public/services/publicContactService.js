@@ -11,7 +11,7 @@ export const publicContactService = {
     }
 
     const title = [car?.brand_name, car?.model_name, car?.sub_model_name].filter(Boolean).join(" ") || "mobil ini";
-    const source = target.label === "Affiliate" ? "via affiliate" : "dari katalog";
+    const source = target.label === "Marketing" ? "via affiliate" : "dari katalog";
     const message = encodeURIComponent(`Halo, saya ingin konsultasi untuk ${title} ${source}.`);
     window.open(`https://wa.me/${normalizePhone(target.phone)}?text=${message}`, "_blank", "noopener,noreferrer");
   },

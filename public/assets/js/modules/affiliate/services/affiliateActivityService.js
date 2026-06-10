@@ -32,7 +32,7 @@ export const affiliateActivityService = {
         key: "today",
         label: "Clicks hari ini",
         value: String(summary.todayClicks),
-        helper: summary.todayClicks > 0 ? "Traffic hari ini sudah masuk ke log affiliate." : "Belum ada click baru hari ini.",
+        helper: summary.todayClicks > 0 ? "Traffic hari ini sudah masuk ke log marketing." : "Belum ada click baru hari ini.",
       },
       {
         key: "top",
@@ -78,7 +78,7 @@ function parseLanding(url = "") {
   if (segments[0] === "af" && segments.length === 2) {
     return {
       label: "Landing katalog",
-      sourceLabel: "Landing affiliate",
+      sourceLabel: "Landing marketing",
       targetLabel: "Katalog seller",
       slugLabel: slug || "-",
     };
@@ -87,7 +87,7 @@ function parseLanding(url = "") {
   if (segments[0] === "af" && segments[2] === "cars" && segments[3]) {
     return {
       label: `Detail mobil #${segments[3]}`,
-      sourceLabel: "Detail mobil affiliate",
+      sourceLabel: "Detail mobil marketing",
       targetLabel: `Mobil #${segments[3]}`,
       slugLabel: slug || "-",
     };
@@ -96,7 +96,7 @@ function parseLanding(url = "") {
   if (segments[0] === "af" && segments[2] === "transactions" && segments[3] === "new") {
     return {
       label: "Entry transaksi",
-      sourceLabel: "Transaction entry affiliate",
+      sourceLabel: "Transaction entry marketing",
       targetLabel: "Flow transaksi",
       slugLabel: slug || "-",
     };
@@ -104,7 +104,7 @@ function parseLanding(url = "") {
 
   return {
     label: normalized || url,
-    sourceLabel: "Context affiliate",
+    sourceLabel: "Context marketing",
     targetLabel: "Target belum dipetakan",
     slugLabel: slug || "-",
   };

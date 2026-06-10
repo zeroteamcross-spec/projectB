@@ -64,7 +64,7 @@ function galleryCaption(car, count) {
   floating.className = "absolute inset-x-0 bottom-0 flex flex-wrap items-end justify-between gap-2 p-4";
 
   const titleChip = document.createElement("div");
-  titleChip.className = "min-w-0 max-w-full rounded-2xl border border-white/15 bg-black/20 px-3 py-2 text-white/95 backdrop-blur sm:max-w-[75%]";
+  titleChip.className = "hidden min-w-0 max-w-full rounded-2xl border border-white/15 bg-black/20 px-3 py-2 text-white/95 backdrop-blur sm:max-w-[75%]";
 
   const title = document.createElement("p");
   title.className = "break-words text-sm font-semibold";

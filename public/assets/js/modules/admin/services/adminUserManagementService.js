@@ -71,7 +71,7 @@ export const adminUserManagementService = {
     }
 
     if ((user?.role ?? null) === "affiliate_admin") {
-      return "Affiliate";
+      return "Marketing";
     }
 
     return "User";

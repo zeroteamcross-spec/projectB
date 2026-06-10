@@ -38,7 +38,7 @@ export function AdminApprovalFilterBar({ filters = {}, counts = {}, onSubmit = n
       { value: "", label: "Semua role" },
       { value: "seller", label: "Seller" },
       { value: "buyer", label: "Buyer" },
-      { value: "affiliate_admin", label: "Affiliate Admin" },
+      { value: "affiliate_admin", label: "Marketing Admin" },
       { value: "admin", label: "Admin" },
     ],
   });

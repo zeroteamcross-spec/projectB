@@ -3,11 +3,11 @@ import { createIcon } from "../../../theme/iconRegistry.js";
 const STYLE_ID = "pb-account-mobile-footer-nav-style";
 
 export const BUYER_MOBILE_FOOTER_ITEMS = [
-  { id: "home", label: "Beranda", icon: "home", path: "/buyer" },
-  { id: "transactions", label: "Transaksi", icon: "transaction", path: "/buyer/transactions" },
+  { id: "home", label: "Home", icon: "home", path: "/buyer" },
+  { id: "portfolio", label: "Portofolio", icon: "dashboard", path: "/buyer/portfolio" },
   { id: "catalog", label: "Katalog", icon: "carb", path: "/", featured: true },
-  { id: "account", label: "Profil", icon: "user", path: "/profile" },
-  { id: "settings", label: "Pengaturan", icon: "settings", disabled: true },
+  { id: "notifications", label: "Notif", icon: "bell", path: "/notifications" },
+  { id: "profile", label: "Profil", icon: "user", path: "/profile" },
 ];
 
 export function BuyerMobileFooterNav({ items = BUYER_MOBILE_FOOTER_ITEMS, activePath = "/buyer", onNavigate = null } = {}) {
@@ -95,6 +95,9 @@ function isActiveNav(item, activePath) {
   const path = String(activePath ?? "");
   if (item.path === "/buyer") {
     return path === "/buyer";
+  }
+  if (item.path === "/buyer/portfolio") {
+    return path === "/buyer/portfolio" || path.startsWith("/buyer/transactions");
   }
   if (item.path === "/") {
     return path === "/" || (item.id === "catalog" && path === "/buyer/cars");

@@ -56,20 +56,20 @@ function render(root, context) {
   frame.className = "grid min-w-0 gap-6";
   frame.append(
     SectionHeader({
-      title: "Affiliate Activity",
-      description: "Pantau click terbaru dari landing affiliate, route yang paling sering dibuka, dan ringkasan traffic dasar yang sudah tersedia saat ini.",
-      action: Button({ label: "Dashboard affiliate", variant: "secondary", onClick: () => context.router.navigate("/affiliate"), designHook: "shared.button.secondary" }),
+      title: "Marketing Activity",
+      description: "Pantau click terbaru dari landing marketing, route yang paling sering dibuka, dan ringkasan traffic dasar yang sudah tersedia saat ini.",
+      action: Button({ label: "Dashboard marketing", variant: "secondary", onClick: () => context.router.navigate("/affiliate"), designHook: "shared.button.secondary" }),
     }),
   );
 
   if (!hydratedAt && !payload) {
     frame.append(EmptyState({
-      title: "Memuat activity affiliate",
+      title: "Memuat activity marketing",
       description: "Snapshot dan working set aktivitas click sedang disiapkan.",
     }));
     root.replaceChildren(AffiliateAccountLayout({
       activePath: context.path,
-      title: "Affiliate Activity",
+      title: "Marketing Activity",
       subtitle: "Aktivitas referral",
       icon: "chart",
       actions: affiliateAccountActions(context),
@@ -85,7 +85,7 @@ function render(root, context) {
 
   root.replaceChildren(AffiliateAccountLayout({
     activePath: context.path,
-    title: "Affiliate Activity",
+    title: "Marketing Activity",
     subtitle: "Aktivitas referral",
     icon: "chart",
     actions: affiliateAccountActions(context),

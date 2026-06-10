@@ -120,8 +120,8 @@ function isActiveNav(item, activePath) {
   if (item.path === "/buyer") {
     return path === "/buyer";
   }
-  if (item.path === "/buyer/transactions") {
-    return path === "/buyer/transactions" || path.startsWith("/buyer/transactions/");
+  if (item.path === "/buyer/portfolio") {
+    return path === "/buyer/portfolio" || path === "/buyer/transactions" || path.startsWith("/buyer/transactions/");
   }
   if (item.path === "/") {
     return path === "/" || path === "/buyer/cars";

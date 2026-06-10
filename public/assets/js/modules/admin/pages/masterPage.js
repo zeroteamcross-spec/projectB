@@ -513,7 +513,7 @@ function masterHero({ action, pageType, brands = [], sidebarItems = [], banks = 
     textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", isBank
       ? "Kelola referensi bank, kode bank, dan icon fixed untuk tampilan pembayaran."
       : isSidebar
-      ? "Kelola struktur sidebar role admin, seller, dan affiliate dari satu master JSON."
+      ? "Kelola struktur sidebar role admin, seller, dan marketing dari satu master JSON."
       : "Kelola merek mobil dan model turunannya dari satu master dinamis berbasis JSON."),
   );
 
@@ -625,7 +625,7 @@ function masterSidebarFilterBar({ filters, items, onSubmit }) {
   [
     ["admin", "Admin"],
     ["seller", "Seller"],
-    ["affiliate", "Affiliate"],
+    ["affiliate", "Marketing"],
   ].forEach(([roleValue, label]) => {
     const button = Button({
       label,
@@ -647,7 +647,7 @@ function masterSidebarFilterBar({ filters, items, onSubmit }) {
     ["", "Semua role"],
     ["admin", "Admin"],
     ["seller", "Seller"],
-    ["affiliate", "Affiliate"],
+    ["affiliate", "Marketing"],
   ]);
   const status = selectField("admst_sidebar_status_input", filters.status ?? "", [
     ["", "Semua status"],

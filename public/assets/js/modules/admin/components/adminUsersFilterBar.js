@@ -35,7 +35,7 @@ export function AdminUsersFilterBar({ filters = {}, counts = {}, onSubmit = null
       { value: "", label: "Semua role" },
       { value: "buyer", label: "Buyer" },
       { value: "seller", label: "Seller" },
-      { value: "affiliate_admin", label: "Affiliate Admin" },
+      { value: "affiliate_admin", label: "Marketing Admin" },
       { value: "admin", label: "Admin" },
     ],
   });

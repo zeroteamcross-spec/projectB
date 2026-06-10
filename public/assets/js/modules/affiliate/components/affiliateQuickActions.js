@@ -17,14 +17,14 @@ export function AffiliateQuickActions({
 
   [
     {
-      title: "Buka landing affiliate",
-      description: "Cek halaman publik yang membawa slug affiliate Anda.",
+      title: "Buka landing marketing",
+      description: "Cek halaman publik yang membawa slug marketing Anda.",
       icon: "affiliate",
       action: Button({ label: "Buka landing", variant: "secondary", onClick: () => onOpenLanding?.(affiliate) }),
     },
     {
       title: "Copy link landing",
-      description: "Bagikan link publik affiliate langsung dari dashboard ini.",
+      description: "Bagikan link publik marketing langsung dari dashboard ini.",
       icon: "transaction",
       action: Button({
         label: copying ? "Menyalin..." : "Copy link",
@@ -35,7 +35,7 @@ export function AffiliateQuickActions({
     },
     {
       title: "Buka activity clicks",
-      description: "Lihat click terbaru dan route affiliate yang paling sering dibuka.",
+      description: "Lihat click terbaru dan route marketing yang paling sering dibuka.",
       icon: "dashboard",
       action: Button({ label: "Buka activity", variant: "secondary", onClick: () => onOpenActivity?.() }),
     },

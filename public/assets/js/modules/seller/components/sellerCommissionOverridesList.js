@@ -51,14 +51,14 @@ export function SellerCommissionOverridesList({
 function commissionColumns({ onDetail, onEdit }) {
   return [
     {
-      label: "Affiliate",
+      label: "Marketing",
       key: "affiliate",
       render: () => {
         const wrap = document.createElement("section");
         wrap.className = "grid min-w-0 gap-1";
         wrap.append(
-          textNode("p", "break-words text-sm font-black text-gray-950", "Semua affiliate seller"),
-          textNode("p", "break-words text-xs font-semibold leading-5 text-gray-500", "Aturan berlaku untuk referral affiliate seller ini"),
+          textNode("p", "break-words text-sm font-black text-gray-950", "Semua marketing seller"),
+          textNode("p", "break-words text-xs font-semibold leading-5 text-gray-500", "Aturan berlaku untuk referral marketing seller ini"),
         );
         return wrap;
       },

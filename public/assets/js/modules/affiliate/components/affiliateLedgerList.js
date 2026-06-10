@@ -7,7 +7,7 @@ export function AffiliateLedgerList({ ledgers = [] } = {}) {
   if (!ledgers.length) {
     return EmptyState({
       title: "Belum ada ledger komisi",
-      description: "Komisi affiliate akan muncul di sini saat penjualan mulai dicatat ke ledger.",
+      description: "Komisi marketing akan muncul di sini saat penjualan mulai dicatat ke ledger.",
     });
   }
 

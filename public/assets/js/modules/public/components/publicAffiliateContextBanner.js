@@ -22,7 +22,7 @@ export function PublicAffiliateContextBanner({ affiliate = null, onClear = null 
 
   const eyebrow = document.createElement("p");
   eyebrow.className = "inline-flex w-fit rounded-full bg-orange-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-normal text-orange-700";
-  eyebrow.textContent = "Context affiliate aktif";
+  eyebrow.textContent = "Context marketing aktif";
 
   const title = document.createElement("h2");
   title.className = "break-words text-base font-bold tracking-normal text-gray-950 sm:text-lg";
@@ -30,13 +30,13 @@ export function PublicAffiliateContextBanner({ affiliate = null, onClear = null 
     ? `Katalog ${affiliate.showroom.name}`
     : affiliate.seller?.name
       ? `Katalog seller ${affiliate.seller.name}`
-      : "Katalog affiliate";
+      : "Katalog marketing";
 
   const body = document.createElement("p");
   body.className = `break-words text-sm leading-6 ${tw.text.muted}`;
   body.textContent = affiliate.profile?.name
-    ? `Anda sedang masuk lewat affiliate ${affiliate.profile.name}. CTA konsultasi dan transaksi tetap membawa context ini selama sesi aktif.`
-    : "Anda sedang melihat katalog dengan context affiliate aktif.";
+    ? `Anda sedang masuk lewat marketing ${affiliate.profile.name}. CTA konsultasi dan transaksi tetap membawa context ini selama sesi aktif.`
+    : "Anda sedang melihat katalog dengan context marketing aktif.";
 
   copy.append(eyebrow, title, body);
   top.append(copy);

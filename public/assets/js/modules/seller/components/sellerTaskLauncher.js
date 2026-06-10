@@ -32,7 +32,7 @@ const TASKS = [
   {
     key: "affiliates",
     title: "Kelola affiliate",
-    description: "Slug affiliate, nomor WhatsApp, dan landing seller.",
+    description: "Slug marketing, nomor WhatsApp, dan landing seller.",
     route: "/seller/affiliates",
     icon: "affiliate",
     accent: "from-blue-500 to-cyan-500",

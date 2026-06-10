@@ -134,7 +134,7 @@ function reorderBoard({ items = [], onReorder = null }) {
     const empty = document.createElement("section");
     empty.id = "admst_sidebar_reorder_empty_section";
     empty.className = "rounded-[1.25rem] border border-dashed border-[var(--pb-border)] bg-white/70 px-4 py-5 text-sm font-semibold text-gray-500";
-    empty.textContent = "Pilih role Admin, Seller, atau Affiliate untuk mengatur urutan menu.";
+    empty.textContent = "Pilih role Admin, Seller, atau Marketing untuk mengatur urutan menu.";
     list.append(empty);
     section.append(head, list);
     return section;

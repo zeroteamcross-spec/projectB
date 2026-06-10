@@ -82,9 +82,9 @@ export function AdminAffiliateCommissionsPage() {
             state.selectedIds.clear();
             state.selectedAffiliateId = null;
             closeModal();
-            showToast("Settlement affiliate berhasil dibuat.", { type: "success" });
+            showToast("Settlement marketing berhasil dibuat.", { type: "success" });
           } catch (error) {
-            showToast(error.message || "Gagal membuat settlement affiliate.", { type: "error" });
+            showToast(error.message || "Gagal membuat settlement marketing.", { type: "error" });
           } finally {
             state.isCreating = false;
             rerender();
@@ -176,9 +176,9 @@ function hero(action, summary) {
   const copy = document.createElement("div");
   copy.className = "grid gap-2";
   copy.append(
-    textNode("p", "text-xs font-black uppercase tracking-[0.14em] text-orange-700", "Affiliate finance"),
-    textNode("h1", "text-3xl font-black text-gray-950", "Affiliate Commissions"),
-    textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", "Kelola ledger komisi, status dibayar, dan pembuatan batch pembayaran affiliate."),
+    textNode("p", "text-xs font-black uppercase tracking-[0.14em] text-orange-700", "Marketing finance"),
+    textNode("h1", "text-3xl font-black text-gray-950", "Marketing Commissions"),
+    textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", "Kelola ledger komisi, status dibayar, dan pembuatan batch pembayaran marketing."),
   );
   const stats = document.createElement("div");
   stats.className = "grid gap-2 sm:grid-cols-3 lg:min-w-[480px]";
@@ -202,7 +202,7 @@ function hero(action, summary) {
 function filters(query, actions) {
   const form = document.createElement("form");
   form.className = "grid gap-3 rounded-[var(--pb-radius-2xl)] border border-white/80 bg-white/86 p-4 shadow-[var(--pb-shadow-card)] md:grid-cols-[minmax(0,1fr)_220px_auto]";
-  const keyword = input("Cari affiliate, transaksi, mobil", query.keyword);
+  const keyword = input("Cari marketing, transaksi, mobil", query.keyword);
   const status = document.createElement("select");
   status.className = keyword.className;
   [
@@ -255,7 +255,7 @@ function openSettlementModal({ ledgers, state, onSubmit }) {
 
   openModal(form, {
     key: "admin-affiliate-create-settlement",
-    title: "Buat settlement affiliate",
+    title: "Buat settlement marketing",
     description: "Batch dibuat sebagai pending dan ledger terpilih berubah menjadi menunggu pembayaran.",
     size: "lg",
     closeLabel: "Tutup",

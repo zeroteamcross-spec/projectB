@@ -41,7 +41,7 @@ export function SellerAffiliatesList({
     }),
     rows: affiliates,
     loading,
-    emptyTitle: sourceTotal ? "Affiliate tidak ditemukan" : "Belum ada affiliate",
+    emptyTitle: sourceTotal ? "Marketing tidak ditemukan" : "Belum ada marketing",
     emptyDescription: sourceTotal
       ? "Ubah kata kunci atau status filter untuk melihat affiliate lain."
       : "Tambahkan partner affiliate untuk mulai membagikan link referral showroom Anda.",
@@ -73,7 +73,7 @@ export function SellerAffiliatesList({
     const action = document.createElement("section");
     action.id = "slraf_empty_actions_section";
     action.className = "flex justify-center";
-    const create = Button({ label: "Tambah Affiliate", onClick: onCreate, designHook: "shared.button.primary" });
+    const create = Button({ label: "Tambah Marketing", onClick: onCreate, designHook: "shared.button.primary" });
     create.id = "slraf_empty_create_button";
     create.prepend(createIcon("plus", { className: "h-4 w-4" }));
     action.append(create);
@@ -86,7 +86,7 @@ export function SellerAffiliatesList({
 function affiliateColumns({ copyingAffiliateId, togglingAffiliateId, onDetail, onEdit, onToggleStatus, onOpenLanding, onCopyLanding }) {
   return [
     {
-      label: "Affiliate",
+      label: "Marketing",
       key: "affiliate",
       render: (affiliate) => {
         const wrap = document.createElement("section");

@@ -194,7 +194,7 @@ function settlementsHero({ action, summary = {} }) {
     icon,
     textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-orange-700", "Admin settlement desk"),
     textNode("h1", "max-w-2xl text-3xl font-black leading-tight tracking-normal text-gray-950 sm:text-4xl", "Admin Settlements"),
-    textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", "Monitoring batch settlement affiliate, nilai pending, dan finalisasi manual dari satu layar operasional."),
+    textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", "Monitoring batch settlement marketing, nilai pending, dan finalisasi manual dari satu layar operasional."),
   );
 
   const stats = document.createElement("section");
@@ -270,7 +270,7 @@ function settlementFilterBar(filters, summary, actions) {
   copy.className = "grid min-w-0 gap-1";
   copy.append(
     textNode("p", "text-[11px] font-black uppercase tracking-[0.16em] text-blue-700", "Settlement filter"),
-    textNode("p", "text-sm leading-6 text-gray-600", "Cari batch, affiliate, referral code, atau catatan lalu saring status finalisasi."),
+    textNode("p", "text-sm leading-6 text-gray-600", "Cari batch, marketing, referral code, atau catatan lalu saring status finalisasi."),
   );
   heading.append(icon, copy);
 
@@ -282,7 +282,7 @@ function settlementFilterBar(filters, summary, actions) {
   keyword.id = "adst_keyword_input";
   keyword.name = "keyword";
   keyword.value = filters.keyword ?? "";
-  keyword.placeholder = "Cari affiliate, referral, batch, catatan";
+  keyword.placeholder = "Cari marketing, referral, batch, catatan";
   keyword.className = "max-h-[50px] min-h-10 min-w-0 w-full rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-sm text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
 
   const status = document.createElement("select");
@@ -416,7 +416,7 @@ function renderSettlementDetailModal({ detail, selectedDetailId, fallback, query
   openModal(content, {
     key: `admin-settlement-detail-${selectedDetailId}`,
     title: settlement ? `Detail settlement #${settlement.id}` : "Detail settlement",
-    description: "Items ledger, metadata pembayaran, dan history status batch affiliate.",
+    description: "Items ledger, metadata pembayaran, dan history status batch marketing.",
     size: "xl",
     closeLabel: "Tutup",
     preserveContentOnSameSignature: true,

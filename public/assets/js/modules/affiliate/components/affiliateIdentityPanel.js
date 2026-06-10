@@ -16,11 +16,11 @@ export function AffiliateIdentityPanel({
 
   const eyebrow = document.createElement("p");
   eyebrow.className = tw.text.eyebrow;
-  eyebrow.textContent = "Identitas affiliate";
+  eyebrow.textContent = "Identitas marketing";
 
   const title = document.createElement("h2");
   title.className = "break-words text-xl font-bold text-gray-950";
-  title.textContent = affiliate?.user?.name || affiliate?.name || "Affiliate";
+  title.textContent = affiliate?.user?.name || affiliate?.name || "Marketing";
 
   const subtitle = document.createElement("p");
   subtitle.className = `break-words text-sm ${tw.text.muted}`;
@@ -35,7 +35,7 @@ export function AffiliateIdentityPanel({
   const facts = document.createElement("div");
   facts.className = `grid min-w-0 gap-2 ${tw.surface.insetGrid}`;
   [
-    ["Slug affiliate", affiliate?.referral_code || "-"],
+    ["Slug marketing", affiliate?.referral_code || "-"],
     ["Link landing", landingUrl || "-"],
     ["Seller owner", affiliate?.seller?.name || "-"],
     ["Showroom", affiliate?.showroom?.name || "-"],

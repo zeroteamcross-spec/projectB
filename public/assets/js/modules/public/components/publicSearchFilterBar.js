@@ -45,7 +45,7 @@ export function PublicSearchFilterBar({
   submit.type = "submit";
   submit.className = "grid h-8 w-8 shrink-0 place-items-center rounded-[var(--pb-radius-xl)] bg-[linear-gradient(135deg,var(--pb-btn-primary-from),var(--pb-btn-primary-to))] text-white shadow-[var(--pb-shadow-soft)] transition hover:brightness-95 sm:h-11 sm:w-11";
   submit.setAttribute("aria-label", "Cari mobil");
-  submit.append(createIcon("search", { className: "h-4 w-4" }));
+  submit.append(createIcon("search", { className: "" }));
 
   searchWrap.append(iconWrap, input, submit);
   form.append(searchWrap);
@@ -87,7 +87,7 @@ function actionRow({ activeFilterCount, quickFilter, onQuickFilter, onOpenFilter
     variant: "secondary",
     designHook: "shared.button.secondary",
   });
-  sortButton.classList.add("min-h-12", "w-full", "justify-center", "rounded-[var(--pb-radius-xl)]", "text-xs");
+  sortButton.classList.add("min-h-12", "w-full", "justify-center", "rounded-[var(--pb-radius-xl)]");
   sortButton.prepend(createIcon("sort", { className: "h-4 w-4" }));
 
   const menu = document.createElement("div");

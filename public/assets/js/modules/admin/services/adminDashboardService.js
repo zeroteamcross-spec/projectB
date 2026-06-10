@@ -49,7 +49,7 @@ export const adminDashboardService = {
       },
       {
         title: "Settlements",
-        description: "Pantau batch settlement affiliate dan finalisasi manual yang relevan untuk UAT.",
+        description: "Pantau batch settlement marketing dan finalisasi manual yang relevan untuk UAT.",
         actionLabel: "Lihat settlement",
         onClick: onSettlements,
       },

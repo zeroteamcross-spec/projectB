@@ -110,7 +110,7 @@ function roleLabel(role) {
     buyer: "buyer",
     seller: "seller",
     admin: "admin",
-    affiliate_admin: "affiliate admin",
+    affiliate_admin: "marketing admin",
   };
 
   return labels[role] ?? role;

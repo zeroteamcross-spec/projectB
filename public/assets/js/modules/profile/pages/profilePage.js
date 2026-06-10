@@ -107,7 +107,7 @@ function isAdminImpersonatingAffiliate() {
 function renderAffiliateProfile(root, context, profile, actions) {
   const page = AffiliateAccountLayout({
     activePath: context?.path ?? "/profile",
-    title: "Profil Affiliate",
+    title: "Profil Marketing",
     subtitle: profileName(profile),
     icon: "user",
     actions: {
@@ -282,7 +282,7 @@ function buyerSecurityCard(actions) {
   action.prepend(createIcon("lock", { className: "block h-4 w-4 leading-none" }));
   card.append(copy, action);
   if (blocked) {
-    card.append(textNode("p", "text-sm font-semibold leading-6 text-amber-700 md:col-span-2", "Password akun affiliate tidak dapat diubah saat admin sedang login sebagai affiliate."));
+    card.append(textNode("p", "text-sm font-semibold leading-6 text-amber-700 md:col-span-2", "Password akun marketing tidak dapat diubah saat admin sedang login sebagai marketing."));
   }
   return card;
 }
@@ -525,7 +525,7 @@ function detailPanel(profile, actions) {
   panel.append(actionBar);
 
   if (blocked) {
-    panel.append(textNode("p", "rounded-[1rem] border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold leading-6 text-amber-800", "Anda sedang login sebagai affiliate melalui akun admin. Perubahan profil dan password diblokir untuk menjaga keamanan akun target."));
+    panel.append(textNode("p", "rounded-[1rem] border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold leading-6 text-amber-800", "Anda sedang login sebagai marketing melalui akun admin. Perubahan profil dan password diblokir untuk menjaga keamanan akun target."));
   }
 
   panel.append(
@@ -581,7 +581,7 @@ function relationRows(profile) {
     ["Santri terkait", profile.student?.name || "-"],
     ["Wali santri terkait", profile.guardian?.name || "-"],
     ["Showroom terkait", showroom?.name || "-"],
-    ["Affiliate terkait", affiliate?.referral_code || "-"],
+    ["Marketing terkait", affiliate?.referral_code || "-"],
     ["Referensi lain", profile.reference_note || profile.fid_keterangan || "-"],
   ];
 }
@@ -983,7 +983,7 @@ function roleLabel(role) {
     admin: "Admin",
     seller: "Seller",
     buyer: "Buyer",
-    affiliate_admin: "Affiliate Admin",
+    affiliate_admin: "Marketing Admin",
   };
   return labels[role] ?? statusLabel(role || "-");
 }

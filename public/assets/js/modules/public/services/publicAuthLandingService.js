@@ -117,7 +117,7 @@ export const publicAuthLandingService = {
       buyer: "buyer",
       seller: "seller",
       admin: "admin",
-      affiliate_admin: "affiliate admin",
+      affiliate_admin: "marketing admin",
       public: "publik",
     };
 

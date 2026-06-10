@@ -207,6 +207,11 @@ function transactionsHeader({ summary, actions }) {
     headerPill("clock", `${summary.active} aktif`),
   );
 
+  const back = Button({ label: "Kembali ke Portofolio", variant: "secondary", onClick: () => actions.navigate("/buyer/portfolio"), designHook: "shared.button.secondary" });
+  back.id = "byrtx_header_portfolio_button";
+  back.prepend(createIcon("arrowLeft", { className: "block h-4 w-4 leading-none" }));
+  meta.append(back);
+
   const cta = Button({ label: "Cari Mobil", onClick: actions.openCatalog, designHook: "shared.button.primary" });
   cta.id = "byrtx_header_catalog_button";
   cta.prepend(createIcon("car", { className: "block h-4 w-4 leading-none" }));
@@ -663,10 +668,17 @@ function statusLabel(status) {
 }
 
 function isActiveNav(item, activePath) {
+  const path = String(activePath ?? "");
   if (item.path === "/buyer") {
-    return activePath === "/buyer";
+    return path === "/buyer";
   }
-  return String(activePath ?? "").startsWith(item.path);
+  if (item.path === "/buyer/portfolio") {
+    return path === "/buyer/portfolio" || path.startsWith("/buyer/transactions");
+  }
+  if (item.path === "/") {
+    return path === "/" || path === "/buyer/cars";
+  }
+  return path === item.path || path.startsWith(`${item.path}/`);
 }
 
 function headerPill(icon, label) {

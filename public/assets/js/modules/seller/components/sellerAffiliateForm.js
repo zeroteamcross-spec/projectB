@@ -40,8 +40,8 @@ export function SellerAffiliateForm({
   const headerCopy = document.createElement("div");
   headerCopy.className = "grid gap-2";
   headerCopy.append(
-    textBlock("text-sm font-semibold text-gray-500", mode === "edit" ? "Edit affiliate" : "Affiliate baru"),
-    textBlock("text-xl font-bold text-gray-950", mode === "edit" ? (draft.user?.name || draft.name || "Affiliate") : "Buat affiliate seller"),
+    textBlock("text-sm font-semibold text-gray-500", mode === "edit" ? "Edit marketing" : "Marketing baru"),
+    textBlock("text-xl font-bold text-gray-950", mode === "edit" ? (draft.user?.name || draft.name || "Marketing") : "Buat marketing seller"),
     textBlock(`text-sm ${tw.text.muted}`, mode === "edit"
       ? "Perbarui username/email login, slug, nomor WhatsApp, status, atau isi password baru untuk reset akses login affiliate."
       : "Tambahkan affiliate dengan username/email login, password, slug unik global, dan nomor WhatsApp yang dipakai di landing."),
@@ -97,7 +97,7 @@ export function SellerAffiliateForm({
     }),
     Input({
       name: "referral_code",
-      label: "Slug affiliate",
+      label: "Slug marketing",
       value: draft.referral_code ?? "",
       placeholder: "Contoh: JOKO_SANTOSO",
     }),
@@ -131,7 +131,7 @@ export function SellerAffiliateForm({
 
   const statusField = document.createElement("label");
   statusField.className = tw.form.label;
-  statusField.append(document.createTextNode("Status affiliate"));
+  statusField.append(document.createTextNode("Status marketing"));
   const statusSelect = document.createElement("select");
   statusSelect.name = "status";
   statusSelect.className = tw.form.control;
@@ -176,7 +176,7 @@ export function SellerAffiliateForm({
   actions.className = "flex flex-col gap-2 sm:flex-row sm:flex-wrap";
   actions.append(
     Button({
-      label: saving ? "Menyimpan..." : mode === "edit" ? "Simpan perubahan" : "Buat affiliate",
+      label: saving ? "Menyimpan..." : mode === "edit" ? "Simpan perubahan" : "Buat marketing",
       disabled: saving,
       onClick: () => form.requestSubmit(),
     }),
@@ -184,7 +184,7 @@ export function SellerAffiliateForm({
 
   if (mode === "edit") {
     actions.append(Button({
-      label: "Affiliate baru",
+      label: "Marketing baru",
       variant: "secondary",
       disabled: saving,
       onClick: () => onCreateNew?.(),
@@ -214,7 +214,7 @@ export function SellerAffiliateForm({
 
   if (mode === "create" && !draft.referral_code && !draft.name) {
     card.append(EmptyState({
-      title: "Landing affiliate akan siap setelah disimpan",
+      title: "Landing marketing akan siap setelah disimpan",
       description: "Slug yang lolos validasi akan langsung bisa dipakai di route publik #/af/:slug.",
     }));
   }
