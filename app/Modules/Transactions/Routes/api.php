@@ -5,11 +5,17 @@ declare(strict_types=1);
 use App\Core\Router;
 use App\Modules\Auth\Middleware\AuthenticatedUserMiddleware;
 use App\Modules\Transactions\Controllers\TransactionController;
+use App\Modules\Transactions\Controllers\TransactionCronController;
 
 return static function (Router $router): void {
     $router->post(
         '/api/payments/midtrans/callbacks',
         [TransactionController::class, 'providerCallback']
+    );
+
+    $router->get(
+        '/api/internal/cron/transactions/expire',
+        [TransactionCronController::class, 'expirePending']
     );
 
     $router->group('/api/transactions', static function (Router $router): void {

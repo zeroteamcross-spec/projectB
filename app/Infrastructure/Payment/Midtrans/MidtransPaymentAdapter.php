@@ -78,6 +78,11 @@ class MidtransPaymentAdapter implements PaymentProviderInterface
         );
     }
 
+    public function checkStatus(string $providerOrderId): array
+    {
+        return $this->http->get('/v2/' . rawurlencode($providerOrderId) . '/status');
+    }
+
     private function charge(array $payload, string $paymentMethod, int $amount): array
     {
         try {

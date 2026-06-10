@@ -73,7 +73,7 @@ export const tw = {
     choiceIdle: "rounded-[var(--pb-radius-xl)] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] p-3 text-sm text-[var(--pb-text-strong)]",
   },
   button: {
-    base: "inline-flex min-h-10 max-w-full items-center justify-center gap-2 break-words rounded-[var(--pb-radius-xl)] border px-4 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)] disabled:cursor-not-allowed disabled:opacity-55",
+    base: "inline-flex min-h-3 max-w-full items-center justify-center gap-2 break-words rounded-[var(--pb-radius-xl)] border px-4 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)] disabled:cursor-not-allowed disabled:opacity-55",
     primary: "border-transparent bg-[linear-gradient(135deg,var(--pb-btn-primary-from),var(--pb-btn-primary-to))] text-white shadow-[var(--pb-shadow-card)] hover:brightness-95",
     secondary: "border-[var(--pb-border-strong)] bg-[var(--pb-btn-secondary-bg)] text-[var(--pb-btn-secondary-text)] hover:bg-[color-mix(in_srgb,var(--pb-btn-secondary-bg)_85%,black)]",
     danger: "border-[var(--pb-danger)] bg-[var(--pb-danger)] text-white hover:brightness-95",

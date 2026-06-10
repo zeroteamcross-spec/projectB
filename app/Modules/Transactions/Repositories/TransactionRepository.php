@@ -168,6 +168,97 @@ class TransactionRepository
         $stmt->execute($data);
     }
 
+    public function listStalePending(string $threshold): array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT id, car_id, transaction_code, payment_type, car_price, dp_amount, remaining_amount,
+                    transaction_status, midtrans_order_id, paid_at
+             FROM transactions
+             WHERE transaction_status = :transaction_status
+             AND created_at <= :threshold
+             AND deleted_at IS NULL
+             ORDER BY expires_at ASC, id ASC'
+        );
+        $stmt->execute([
+            'transaction_status' => 'pending_payment',
+            'threshold' => $threshold,
+        ]);
+
+        return $stmt->fetchAll();
+    }
+
+    public function expirePendingByIds(array $ids, string $now): int
+    {
+        if ($ids === []) {
+            return 0;
+        }
+
+        $placeholders = [];
+        $params = [
+            'next_status' => 'expired',
+            'current_status' => 'pending_payment',
+            'updated_at' => $now,
+        ];
+
+        foreach (array_values($ids) as $index => $id) {
+            $key = 'id_' . $index;
+            $placeholders[] = ':' . $key;
+            $params[$key] = (int) $id;
+        }
+
+        $stmt = $this->pdo->prepare(
+            'UPDATE transactions
+             SET transaction_status = :next_status,
+                 updated_at = :updated_at
+             WHERE transaction_status = :current_status
+             AND deleted_at IS NULL
+             AND id IN (' . implode(', ', $placeholders) . ')'
+        );
+        $stmt->execute($params);
+
+        return $stmt->rowCount();
+    }
+
+    public function publishReservedCarsByIds(array $carIds): int
+    {
+        if ($carIds === []) {
+            return 0;
+        }
+
+        $placeholders = [];
+        $params = [
+            'next_status' => 'published',
+            'current_status' => 'reserved',
+            'updated_at' => date('Y-m-d H:i:s'),
+        ];
+
+        foreach (array_values(array_unique($carIds)) as $index => $id) {
+            $key = 'car_id_' . $index;
+            $placeholders[] = ':' . $key;
+            $params[$key] = (int) $id;
+        }
+
+        $stmt = $this->pdo->prepare(
+            'UPDATE cars
+             SET listing_status = :next_status,
+                 updated_at = :updated_at
+             WHERE listing_status = :current_status
+             AND deleted_at IS NULL
+             AND id IN (' . implode(', ', $placeholders) . ')
+             AND NOT EXISTS (
+                SELECT 1
+                FROM transactions AS active_locks
+                WHERE active_locks.car_id = cars.id
+                AND active_locks.transaction_status IN (\'dp_paid\', \'paid\')
+                AND active_locks.deleted_at IS NULL
+                LIMIT 1
+             )'
+        );
+        $stmt->execute($params);
+
+        return $stmt->rowCount();
+    }
+
     public function findActiveLockByCarId(int $carId, int $excludeTransactionId): ?array
     {
         $stmt = $this->pdo->prepare(

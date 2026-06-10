@@ -63,7 +63,7 @@ export function PaymentInstructionPanel({
     steps.append(item);
   });
 
-  section.append(header, facts);
+  section.append(header);
 
   if (instructionExpired) {
     section.append(expiredInstructionPanel());
@@ -79,6 +79,8 @@ export function PaymentInstructionPanel({
       onOpenGopay,
     }));
   }
+
+  section.append(facts);
 
   const note = document.createElement("p");
   note.className = "rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-800";

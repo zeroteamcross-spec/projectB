@@ -20,7 +20,7 @@ export function PublicSearchFilterBar({
   onOpenFilter = null,
 } = {}) {
   const section = document.createElement("section");
-  section.className = "relative z-30 grid gap-1 rounded-[24px] border border-white/70 bg-white/95 p-2.5 text-[13px] shadow-card backdrop-blur sm:p-4 sm:text-sm xl:grid-cols-[minmax(0,1fr)_280px] xl:items-start";
+  section.className = "relative z-30 grid gap-1 rounded-[24px] border border-white/70 bg-white/95 p-2.5 text-[10px] shadow-card backdrop-blur sm:p-4 sm:text-sm xl:grid-cols-[minmax(0,1fr)_280px] sm:items-start";
   applyDesignHook(section, "catalog.search.bar");
 
   const form = document.createElement("form");
@@ -30,8 +30,8 @@ export function PublicSearchFilterBar({
   searchWrap.className = "flex min-w-0 items-center gap-2 rounded-[var(--pb-radius-xl)] border border-[var(--pb-border)] bg-[var(--pb-form-search-bg)] p-2 shadow-[var(--pb-shadow-soft)]";
 
   const iconWrap = document.createElement("span");
-  iconWrap.className = "grid h-9 w-9 shrink-0 place-items-center rounded-[var(--pb-radius-xl)] bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] text-[var(--pb-brand-primary)] sm:h-10 sm:w-10";
-  iconWrap.append(createIcon("search", { className: "h-5 w-5" }));
+  // iconWrap.className = "grid h-9 w-9 shrink-0 place-items-center rounded-[var(--pb-radius-xl)] bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] text-[var(--pb-brand-primary)] sm:h-10 sm:w-10";
+  // iconWrap.append(createIcon("search", { className: "h-5 w-5" }));
 
   const input = document.createElement("input");
   input.name = "keyword";
@@ -43,7 +43,7 @@ export function PublicSearchFilterBar({
 
   const submit = document.createElement("button");
   submit.type = "submit";
-  submit.className = "grid h-10 w-10 shrink-0 place-items-center rounded-[var(--pb-radius-xl)] bg-[linear-gradient(135deg,var(--pb-btn-primary-from),var(--pb-btn-primary-to))] text-white shadow-[var(--pb-shadow-soft)] transition hover:brightness-95 sm:h-11 sm:w-11";
+  submit.className = "grid h-8 w-8 shrink-0 place-items-center rounded-[var(--pb-radius-xl)] bg-[linear-gradient(135deg,var(--pb-btn-primary-from),var(--pb-btn-primary-to))] text-white shadow-[var(--pb-shadow-soft)] transition hover:brightness-95 sm:h-11 sm:w-11";
   submit.setAttribute("aria-label", "Cari mobil");
   submit.append(createIcon("search", { className: "h-4 w-4" }));
 

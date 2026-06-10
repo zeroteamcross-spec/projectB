@@ -111,24 +111,8 @@ function render(root, context, flags) {
   maybeAutoOpenGopay(transaction);
   markInitialPaidSeen(transaction);
 
-  const header = document.createElement("div");
-  header.className = "grid gap-4";
   const back = Button({ label: "Kembali ke transaksi", variant: "secondary", onClick: () => context.router.navigate("/buyer/transactions") });
   back.classList.add("w-fit");
-  const titleWrap = document.createElement("div");
-  titleWrap.className = `grid gap-3 ${tw.surface.raisedCard} p-5 sm:p-6`;
-  applyDesignHook(titleWrap, "buyer.payment.header");
-  const eyebrow = document.createElement("p");
-  eyebrow.className = tw.text.eyebrow;
-  eyebrow.textContent = "Buyer payment";
-  const title = document.createElement("h1");
-  title.className = "break-words text-2xl font-bold tracking-normal text-gray-950";
-  title.textContent = "Status transaksi";
-  const body = document.createElement("p");
-  body.className = "max-w-2xl text-sm leading-6 text-gray-600";
-  body.textContent = "Cek pembayaran, buka instruksi, dan lanjutkan pelunasan.";
-  titleWrap.append(eyebrow, title, body);
-  header.append(back, titleWrap);
 
   const layout = document.createElement("div");
   layout.className = "grid gap-5 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start xl:gap-6";
@@ -137,9 +121,7 @@ function render(root, context, flags) {
   main.className = "grid gap-4";
   if (isPaymentPaid(transaction)) {
     main.append(paymentSuccessPanel(transaction));
-  }
-  main.append(PaymentStatusSummary({ transaction }), carSummary(transaction));
-  if (isPaymentPaid(transaction)) {
+    main.append(PaymentStatusSummary({ transaction }), carSummary(transaction));
     main.append(fulfillmentProgressPanel({
       transaction,
       isFinishing: flags.isFinishing,
@@ -147,17 +129,24 @@ function render(root, context, flags) {
     }));
     main.append(handoverInstructionPanel());
   } else {
-    main.append(applyDesignHook(PaymentInstructionPanel({
-      transaction,
-      isDownloadingQr: flags.isDownloadingQr,
-      onDownloadQr: () => downloadPaymentQr(context, flags, transaction),
-      onOpenGopay: () => openGopayDeeplink(transaction),
-    }), "buyer.payment.instructions"));
+    if (isPendingPayment(transaction)) {
+      main.append(applyDesignHook(PaymentInstructionPanel({
+        transaction,
+        isDownloadingQr: flags.isDownloadingQr,
+        onDownloadQr: () => downloadPaymentQr(context, flags, transaction),
+        onOpenGopay: () => openGopayDeeplink(transaction),
+      }), "buyer.payment.instructions"));
+    }
+    main.append(PaymentStatusSummary({ transaction }));
+    if (isPendingPayment(transaction)) {
+      main.append(pendingPaymentGuidePanel(transaction));
+    }
+    main.append(carSummary(transaction));
   }
 
   const aside = document.createElement("aside");
   aside.className = "grid min-w-0 gap-4 lg:sticky lg:top-6 xl:top-8";
-  if (!isPaymentPaid(transaction)) {
+  if (!isPaymentPaid(transaction) && !isPendingPayment(transaction)) {
     aside.append(applyDesignHook(PaymentActionPanel({
       transaction,
       isRefreshing: flags.isRefreshing,
@@ -185,9 +174,14 @@ function render(root, context, flags) {
     }), "buyer.payment.completion"));
   }
 
-  layout.append(main, aside);
+  if (aside.childElementCount) {
+    layout.append(main, aside);
+  } else {
+    layout.className = "grid gap-5 xl:gap-6";
+    layout.append(main);
+  }
   disposeChildren(root);
-  const children = [buyerTopNavigation(context), header, layout, buyerFooter(context)];
+  const children = [buyerTopNavigation(context), back, layout, buyerFooter(context)];
   if (successOverlay.open && String(successOverlay.transactionId ?? "") === String(transaction.id ?? "")) {
     children.push(paymentSuccessOverlay(() => closePaymentSuccessOverlay()));
   }
@@ -396,6 +390,50 @@ function handoverInstructionPanel() {
   return section;
 }
 
+function pendingPaymentGuidePanel(transaction) {
+  const section = document.createElement("section");
+  section.className = `grid gap-4 ${tw.surface.accentPanel} p-5`;
+  applyDesignHook(section, "buyer.payment.pendingGuide");
+
+  const copy = document.createElement("div");
+  copy.className = "grid gap-2";
+  const eyebrow = document.createElement("p");
+  eyebrow.className = tw.text.eyebrow;
+  eyebrow.textContent = "Menunggu pembayaran";
+  const title = document.createElement("h2");
+  title.className = "text-xl font-bold tracking-normal text-gray-950";
+  title.textContent = "Lanjutkan dari instruksi pembayaran di bawah";
+  const body = document.createElement("p");
+  body.className = "text-sm leading-6 text-gray-700";
+  body.textContent = "Status transaksi belum berubah karena pembayaran belum terkonfirmasi. Setelah membayar, halaman ini akan mengecek otomatis dan menampilkan notifikasi saat status berubah.";
+  copy.append(eyebrow, title, body);
+
+  const steps = document.createElement("div");
+  steps.className = "grid gap-2 sm:grid-cols-3";
+  [
+    ["1", "Ikuti instruksi", "Gunakan VA, QRIS, atau GoPay yang aktif."],
+    ["2", "Selesaikan pembayaran", paymentDueCopy(transaction)],
+    ["3", "Tunggu konfirmasi", "Halaman akan refresh otomatis; gunakan refresh manual hanya jika perlu."],
+  ].forEach(([number, label, description]) => {
+    const item = document.createElement("section");
+    item.className = "grid gap-2 rounded-2xl border border-white/70 bg-white/90 p-4 shadow-sm";
+    const mark = document.createElement("span");
+    mark.className = "grid h-8 w-8 place-items-center rounded-full bg-orange-500 text-sm font-black text-white";
+    mark.textContent = number;
+    const itemTitle = document.createElement("h3");
+    itemTitle.className = "text-sm font-black text-gray-950";
+    itemTitle.textContent = label;
+    const itemBody = document.createElement("p");
+    itemBody.className = "text-sm leading-6 text-gray-600";
+    itemBody.textContent = description;
+    item.append(mark, itemTitle, itemBody);
+    steps.append(item);
+  });
+
+  section.append(copy, steps);
+  return section;
+}
+
 async function refreshStatus(context, flags, {
   forceDetail = true,
   silent = false,
@@ -444,7 +482,9 @@ async function refreshStatus(context, flags, {
     });
 
     if (!silent && showToastOnSuccess) {
-      showToast("Status transaksi diperbarui.", { type: "success" });
+      const feedback = statusFeedback(transaction);
+      showToast(feedback.message, { type: feedback.type });
+      scrollPaymentSummaryIntoView();
     }
 
     return transaction;
@@ -624,7 +664,8 @@ async function createCompletionPayment(context, flags, values = {}) {
       result: transaction,
       error: "",
     });
-    showToast("Sesi pelunasan berhasil dibuat.", { type: "success" });
+    showToast("Sesi pelunasan berhasil dibuat. Instruksi pembayaran terbaru sudah ditampilkan.", { type: "success" });
+    scrollPaymentSummaryIntoView();
   } catch (error) {
     patchCompletionRuntime({ error: error.message || "Gagal membuat sesi pelunasan." });
     showToast(error.message || "Gagal membuat sesi pelunasan.", { type: "error" });
@@ -662,6 +703,7 @@ async function finishTransaction(context, flags) {
       source: "buyer-payment-status:finish",
     });
     showToast("Transaksi selesai.", { type: "success" });
+    scrollPaymentSummaryIntoView();
   } catch (error) {
     showToast(error.message || "Gagal menyelesaikan transaksi.", { type: "error" });
   } finally {
@@ -675,6 +717,45 @@ function isFulfillmentChecklistComplete(transaction) {
   return checklist.length > 0 && checklist
     .filter((item) => item.is_required !== false)
     .every((item) => Boolean(item.is_completed));
+}
+
+function isPendingPayment(transaction) {
+  return String(transaction?.transaction_status ?? "").toLowerCase() === "pending_payment";
+}
+
+function paymentDueCopy(transaction) {
+  return transaction?.expires_at
+    ? `Selesaikan sebelum batas waktu: ${transaction.expires_at}.`
+    : "Selesaikan pembayaran sebelum sesi provider berakhir.";
+}
+
+function statusFeedback(transaction) {
+  if (isPaymentPaid(transaction)) {
+    return {
+      message: "Pembayaran sudah terkonfirmasi. Detail transaksi diperbarui.",
+      type: "success",
+    };
+  }
+
+  if (isPendingPayment(transaction)) {
+    return {
+      message: "Pembayaran masih menunggu konfirmasi. Ikuti instruksi pembayaran aktif di halaman ini.",
+      type: "info",
+    };
+  }
+
+  const status = String(transaction?.transaction_status ?? "").toLowerCase();
+  if (status === "expired" || status === "cancelled") {
+    return {
+      message: "Transaksi sudah tidak aktif untuk pembayaran.",
+      type: "error",
+    };
+  }
+
+  return {
+    message: "Status transaksi diperbarui.",
+    type: "success",
+  };
 }
 
 function setActionState(flags) {
@@ -698,6 +779,12 @@ function textNode(tagName, className, text) {
   node.className = className;
   node.textContent = text ?? "";
   return node;
+}
+
+function scrollPaymentSummaryIntoView() {
+  window.setTimeout(() => {
+    document.querySelector("#buyer_payment_detail_summary")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, 80);
 }
 
 function paymentSuccessOverlay(onClose = null) {

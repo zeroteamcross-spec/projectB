@@ -405,6 +405,82 @@ class TransactionService
         ];
     }
 
+    public function expirePendingTransactions(): array
+    {
+        $now = date('Y-m-d H:i:s');
+        $threshold = date('Y-m-d H:i:s', strtotime('-24 hours'));
+        $expiredTransactionIds = [];
+
+        foreach ($this->transactions->listStalePending($threshold) as $transaction) {
+            $providerOrderId = trim((string) ($transaction['midtrans_order_id'] ?? ''));
+
+            if ($providerOrderId !== '') {
+                $providerStatus = $this->paymentProvider->checkStatus($providerOrderId);
+                $grossAmount = isset($providerStatus['gross_amount']) ? (int) $providerStatus['gross_amount'] : null;
+
+                try {
+                    $this->pdo->beginTransaction();
+                    $this->paymentLogs->record((int) $transaction['id'], [
+                        'provider_name' => 'midtrans',
+                        'provider_order_id' => $providerOrderId,
+                        'provider_transaction_id' => $providerStatus['transaction_id'] ?? null,
+                        'payment_method' => $providerStatus['payment_type'] ?? null,
+                        'transaction_status' => $providerStatus['transaction_status'] ?? null,
+                        'gross_amount' => $grossAmount,
+                        'payload_callback' => $providerStatus,
+                    ]);
+
+                    $providerNextStatus = $this->paymentLogs->providerStatusToCanon(
+                        $transaction,
+                        $providerStatus['transaction_status'] ?? null,
+                        $grossAmount
+                    );
+                    $nextStatus = in_array($providerNextStatus, ['dp_paid', 'paid', 'completed'], true)
+                        ? $providerNextStatus
+                        : 'expired';
+
+                    $this->applyStatus($transaction, $nextStatus);
+
+                    if ($nextStatus === 'expired') {
+                        $expiredTransactionIds[] = (int) $transaction['id'];
+                        $this->transactions->publishReservedCarsByIds([(int) $transaction['car_id']]);
+                    }
+
+                    $this->pdo->commit();
+                } catch (Throwable $exception) {
+                    if ($this->pdo->inTransaction()) {
+                        $this->pdo->rollBack();
+                    }
+
+                    throw $exception;
+                }
+                continue;
+            }
+
+            try {
+                $this->pdo->beginTransaction();
+                $expiredCount = $this->transactions->expirePendingByIds([(int) $transaction['id']], $now);
+                $this->transactions->publishReservedCarsByIds([(int) $transaction['car_id']]);
+                $this->pdo->commit();
+            } catch (Throwable $exception) {
+                if ($this->pdo->inTransaction()) {
+                    $this->pdo->rollBack();
+                }
+
+                throw $exception;
+            }
+
+            if ($expiredCount > 0) {
+                $expiredTransactionIds[] = (int) $transaction['id'];
+            }
+        }
+
+        return [
+            'expired_count' => count($expiredTransactionIds),
+            'expired_transaction_ids' => $expiredTransactionIds,
+        ];
+    }
+
     private function applyStatus(array $transaction, string $status): void
     {
         if ($status === 'dp_paid' && ($transaction['payment_type'] ?? null) !== 'dp') {

@@ -33,6 +33,22 @@ class MidtransHttpClient
         return $this->postWithStream($url, $body, $headers);
     }
 
+    public function get(string $path): array
+    {
+        $this->config->ensureUsable();
+        $url = $this->config->coreApiBaseUrl() . '/' . ltrim($path, '/');
+        $headers = [
+            'Accept: application/json',
+            'Authorization: Basic ' . base64_encode($this->config->serverKey() . ':'),
+        ];
+
+        if (function_exists('curl_init')) {
+            return $this->getWithCurl($url, $headers);
+        }
+
+        return $this->getWithStream($url, $headers);
+    }
+
     private function postWithCurl(string $url, string $body, array $headers): array
     {
         $curl = curl_init($url);
@@ -64,6 +80,54 @@ class MidtransHttpClient
                 'method' => 'POST',
                 'header' => implode("\r\n", $headers),
                 'content' => $body,
+                'timeout' => 30,
+                'ignore_errors' => true,
+            ],
+        ]);
+
+        $responseBody = file_get_contents($url, false, $context);
+        $statusCode = 0;
+
+        if (isset($http_response_header[0]) && preg_match('/\s(\d{3})\s/', $http_response_header[0], $matches)) {
+            $statusCode = (int) $matches[1];
+        }
+
+        if ($responseBody === false) {
+            throw new HttpException('Midtrans request failed.', 502);
+        }
+
+        return $this->decodeResponse((string) $responseBody, $statusCode);
+    }
+
+    private function getWithCurl(string $url, array $headers): array
+    {
+        $curl = curl_init($url);
+
+        curl_setopt_array($curl, [
+            CURLOPT_HTTPGET => true,
+            CURLOPT_HTTPHEADER => $headers,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT => 30,
+        ]);
+
+        $responseBody = curl_exec($curl);
+        $statusCode = (int) curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        $error = curl_error($curl);
+        curl_close($curl);
+
+        if ($responseBody === false) {
+            throw new HttpException('Midtrans request failed: ' . $error, 502);
+        }
+
+        return $this->decodeResponse((string) $responseBody, $statusCode);
+    }
+
+    private function getWithStream(string $url, array $headers): array
+    {
+        $context = stream_context_create([
+            'http' => [
+                'method' => 'GET',
+                'header' => implode("\r\n", $headers),
                 'timeout' => 30,
                 'ignore_errors' => true,
             ],
