@@ -65,8 +65,10 @@ function render(root, context, getBackgroundVideoLayer) {
     return;
   }
 
+  const routeCarId = String(context.params?.id ?? "");
   const detailNode = appStore.get("working.publicCarDetail.detail", null);
-  const detail = detailNode?.data ?? null;
+  const rawDetail = detailNode?.data ?? null;
+  const detail = String(rawDetail?.car?.id ?? "") === routeCarId ? rawDetail : null;
   const hasHydrated = Boolean(detailNode?.hydratedAt);
   const affiliate = publicContextService.activeAffiliate();
   const summary = publicCatalogState.selectedCarSummary(context.params.id);

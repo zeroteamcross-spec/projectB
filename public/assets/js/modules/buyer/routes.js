@@ -2,6 +2,7 @@ import { carsResource } from "../../resources/carsResource.js";
 import { profileResource } from "../../resources/profileResource.js";
 import { transactionsResource } from "../../resources/transactionsResource.js";
 import { slidersResource } from "../../resources/slidersResource.js";
+import { buyerTransactionDetailPreloadService } from "./services/buyerTransactionDetailPreloadService.js";
 import { BuyerAccountPage } from "./pages/accountPage.js";
 import { BuyerCarsPage } from "./pages/carsPage.js";
 import { BuyerDashboardPage } from "./pages/dashboardPage.js";
@@ -98,7 +99,7 @@ export const buyerRoutes = [
       working: [
         {
           key: "transaction",
-          loader: ({ params, signal }) => transactionsResource.detail(params.id, { signal }).catch(() => null),
+          loader: ({ params, signal }) => buyerTransactionDetailPreloadService.detailOrFetch(params.id, { signal }).catch(() => null),
         },
       ],
     },

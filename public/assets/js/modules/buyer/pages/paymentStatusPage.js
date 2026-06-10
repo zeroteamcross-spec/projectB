@@ -80,8 +80,10 @@ function render(root, context, flags) {
     return;
   }
 
+  const routeTransactionId = String(context.params?.id ?? "");
   const node = appStore.get("working.buyerPaymentStatus.transaction", null);
-  const transaction = node?.data ?? null;
+  const rawTransaction = node?.data ?? null;
+  const transaction = String(rawTransaction?.id ?? "") === routeTransactionId ? rawTransaction : null;
   const hasHydrated = Boolean(node?.hydratedAt);
   const completion = appStore.get("runtime.buyerPaymentStatus.completion", {
     open: false,
@@ -120,7 +122,7 @@ function render(root, context, flags) {
   eyebrow.className = tw.text.eyebrow;
   eyebrow.textContent = "Buyer payment";
   const title = document.createElement("h1");
-  title.className = "break-words text-3xl font-bold tracking-normal text-gray-950";
+  title.className = "break-words text-2xl font-bold tracking-normal text-gray-950";
   title.textContent = "Status transaksi";
   const body = document.createElement("p");
   body.className = "max-w-2xl text-sm leading-6 text-gray-600";

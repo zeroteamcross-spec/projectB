@@ -23,6 +23,7 @@ import { bindModal } from "../ui/primitives/modal.js";
 import { bindToastContainer } from "../ui/primitives/toast.js";
 import { showToast } from "../ui/primitives/toast.js";
 import { createRoleGuard } from "./roleGuard.js";
+import { bindDesignStudioPreviewRuntime } from "../theme/designStudioPreviewRuntime.js";
 
 export function createProjectBApp(options = {}) {
   return new ProjectBApp(options);
@@ -84,6 +85,7 @@ export class ProjectBApp {
       });
     }));
     this.cleanup.push(notificationService.bindRealtimeLifecycle(appStore));
+    bindDesignStudioPreviewRuntime();
     this.registerFeatures([publicManifest, authManifest, profileManifest, buyerManifest, sellerManifest, adminManifest, affiliateManifest, notificationsManifest]);
     publicContextService.restore();
 

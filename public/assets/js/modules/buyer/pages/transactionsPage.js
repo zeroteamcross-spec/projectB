@@ -9,6 +9,7 @@ import { formatDate } from "../../../utils/formatDate.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 import { NotificationBell } from "../../notifications/components/notificationBell.js";
 import { buyerState } from "../state/buyerState.js";
+import { buyerTransactionDetailPreloadService } from "../services/buyerTransactionDetailPreloadService.js";
 import { BUYER_MOBILE_FOOTER_ITEMS, BuyerMobileFooterNav } from "../components/buyerMobileFooterNav.js";
 import { getTransactionStatusMeta, titleizeStatus } from "../../../utils/transactionStatus.js";
 
@@ -113,6 +114,7 @@ function render(root, context, actions, uiState) {
 
   disposeChildren(root);
   root.replaceChildren(page);
+  buyerTransactionDetailPreloadService.enqueueTransactions(transactions);
 }
 
 function disposeChildren(root) {

@@ -202,8 +202,9 @@ function emptyState(context, title, description) {
 }
 
 function heroCopy() {
-  const section = document.createElement("section");
-  section.className = `${tw.surface.raisedCard} grid gap-3 p-5 sm:p-6`;
+  const section = "";
+  // const section = document.createElement("section");
+  // section.className = `${tw.surface.raisedCard} hidden grid gap-3 p-5 sm:p-6`;
   applyDesignHook(section, "buyer.transaction.hero");
   const badgeRow = document.createElement("div");
   badgeRow.className = "flex flex-wrap items-center gap-2";
@@ -214,13 +215,13 @@ function heroCopy() {
   pill.className = tw.interactive.pillIdle;
   pill.textContent = "Buyer checkout";
   const title = document.createElement("h1");
-  title.className = "text-3xl font-bold tracking-normal text-gray-950";
+  title.className = "text-2xl font-bold tracking-normal text-gray-950";
   title.textContent = "Mulai transaksi dengan data yang sudah dicek.";
   const body = document.createElement("p");
   body.className = "text-sm leading-6 text-gray-600";
   body.textContent = "Form ini membuat transaksi awal dan sesi pembayaran dari endpoint payment yang sudah tersedia.";
   badgeRow.append(eyebrow, pill);
-  section.append(badgeRow, title, body, heroTrustRow());
+  // section.append(badgeRow, title, body, heroTrustRow());
   return section;
 }
 

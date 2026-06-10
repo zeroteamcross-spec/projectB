@@ -14,6 +14,7 @@ import { createIcon } from "../../../theme/iconRegistry.js";
 import { applyDesignHook } from "../../../theme/designStudioHooks.js";
 import { NotificationBell } from "../../notifications/components/notificationBell.js";
 import { PublicCarCard } from "../../public/components/publicCarCard.js";
+import { publicContextService } from "../../public/services/publicContextService.js";
 import { buyerState } from "../state/buyerState.js";
 import { BUYER_MOBILE_FOOTER_ITEMS, BuyerMobileFooterNav } from "../components/buyerMobileFooterNav.js";
 
@@ -72,7 +73,9 @@ export function BuyerDashboardPage({ notFound = false } = {}) {
     },
     openCar(car) {
       buyerState.setSelectedCar(car.id);
-      openBuyerCarModal(car);
+      if (car?.id) {
+        currentContext?.router?.navigate(publicContextService.carDetailPath(car.id));
+      }
     },
     toggleFavorite(carId, button) {
       const key = String(carId ?? "");
@@ -451,7 +454,7 @@ function recommendationsSection({ cars, actions }) {
   const grid = document.createElement("section");
   grid.id = "byr_recommendations_grid";
   grid.className = "grid min-w-0 gap-4 sm:grid-cols-2 lg:grid-cols-3";
-  cars.slice(0, 8).forEach((car) => {
+  cars.slice(0, 3).forEach((car) => {
     grid.append(PublicCarCard({ car, onOpenDetail: actions.openCar }));
   });
   section.append(grid);
@@ -465,12 +468,13 @@ function recommendationsToolbar({ count, actions }) {
   const copy = document.createElement("section");
   copy.className = "grid min-w-0 gap-1";
   copy.append(
-    textNode("h2", "break-words text-lg font-bold tracking-normal text-white", "Mobil Pilihan Terbaik"),
+    textNode("h2", "break-words text-sm font-bold tracking-normal text-white", "Mobil Pilihan Terbaik"),
     textNode("p", "text-sm font-medium text-white/70", count ? `${count} rekomendasi tersedia` : "Rekomendasi akan muncul di sini"),
   );
 
-  const action = sectionTextButton("Semua", actions.openCatalog);
-  action.classList.add("mt-3", "text-white", "hover:bg-white/10", "md:mt-0");
+  const action = "";
+  // const action = sectionTextButton("Semua", actions.openCatalog);
+  // action.classList.add("mt-3", "text-white", "hover:bg-white/10", "md:mt-0");
 
   bar.append(copy, action);
   return bar;
@@ -909,10 +913,10 @@ function greetingBlock(user) {
   wrap.className = "grid min-w-0 gap-0.5";
 
   const greeting = document.createElement("h1");
-  greeting.className = "truncate text-2xl font-black leading-tight tracking-normal text-white";
-  greeting.textContent = `Hello, ${name}`;
+  greeting.className = "truncate text-xl font-black leading-tight tracking-normal text-white";
+  greeting.textContent = ` ${name}`;
 
-  wrap.append(greeting, textNode("p", "truncate text-sm font-semibold text-white/75", "Welcome back!"));
+  wrap.append(greeting, textNode("p", "truncate text-[5] font-semibold text-white/75", "Selamat datang kembali!"));
   return wrap;
 }
 

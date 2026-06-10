@@ -111,7 +111,7 @@ function affiliateMobileHeader({ title, subtitle, actions }) {
   copy.className = "grid min-w-0 gap-0.5";
   copy.append(
     textNode("p", "truncate text-sm font-bold text-white/75", subtitle || "Akun affiliate"),
-    textNode("h1", "truncate text-2xl font-black leading-tight tracking-normal text-white", title),
+    textNode("h1", "truncate text-xl font-black leading-tight tracking-normal text-white", title),
   );
 
   const actionGroup = document.createElement("section");
@@ -207,6 +207,7 @@ function affiliateMobileFooterNav({ items = AFFILIATE_ACCOUNT_NAV_ITEMS, activeP
   nav.id = "afacc_mobile_footer_nav";
   nav.classList.remove("account-mobile-footer--buyer");
   nav.classList.add("account-mobile-footer--affiliate");
+  nav.dataset.ds = "affiliate.mobile.footer";
   nav.setAttribute("aria-label", "Navigasi akun affiliate mobile");
   const container = nav.querySelector("#byr_mobile_footer_nav_container");
   if (container) {

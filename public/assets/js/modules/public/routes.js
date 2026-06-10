@@ -3,6 +3,7 @@ import { PublicCarDetailPage } from "./pages/carDetailPage.js";
 import { AuthLandingPage } from "./pages/authLandingPage.js";
 import { TransactionEntryPage } from "./pages/transactionEntryPage.js";
 import { publicCatalogService } from "./services/publicCatalogService.js";
+import { publicCarDetailPreloadService } from "./services/publicCarDetailPreloadService.js";
 import { slidersResource } from "../../resources/slidersResource.js";
 
 export const publicReservedRoutePrefixes = Object.freeze([
@@ -39,7 +40,7 @@ export const publicRoutes = [
       working: [
         {
           key: "detail",
-          loader: ({ params, signal }) => publicCatalogService.detail(params.id, { signal, affiliateSlug: params.slug }).catch(() => null),
+          loader: ({ params, signal }) => publicCarDetailPreloadService.detailOrFetch(params.id, { signal, affiliateSlug: params.slug }).catch(() => null),
         },
       ],
     },
@@ -55,7 +56,7 @@ export const publicRoutes = [
         {
           key: "detail",
           loader: ({ params, query, signal }) => query.car_id
-            ? publicCatalogService.detail(query.car_id, { signal, affiliateSlug: params.slug }).catch(() => null)
+            ? publicCarDetailPreloadService.detailOrFetch(query.car_id, { signal, affiliateSlug: params.slug }).catch(() => null)
             : Promise.resolve(null),
         },
       ],
@@ -86,7 +87,7 @@ export const publicRoutes = [
       working: [
         {
           key: "detail",
-          loader: ({ params, signal }) => publicCatalogService.detail(params.id, { signal, affiliateSlug: params.slug }).catch(() => null),
+          loader: ({ params, signal }) => publicCarDetailPreloadService.detailOrFetch(params.id, { signal, affiliateSlug: params.slug }).catch(() => null),
         },
       ],
     },
@@ -102,7 +103,7 @@ export const publicRoutes = [
         {
           key: "detail",
           loader: ({ params, query, signal }) => query.car_id
-            ? publicCatalogService.detail(query.car_id, { signal, affiliateSlug: params.slug }).catch(() => null)
+            ? publicCarDetailPreloadService.detailOrFetch(query.car_id, { signal, affiliateSlug: params.slug }).catch(() => null)
             : Promise.resolve(null),
         },
       ],
@@ -168,7 +169,7 @@ export const publicRoutes = [
       working: [
         {
           key: "detail",
-          loader: ({ params, signal }) => publicCatalogService.detail(params.id, { signal }).catch(() => null),
+          loader: ({ params, signal }) => publicCarDetailPreloadService.detailOrFetch(params.id, { signal }).catch(() => null),
         },
       ],
     },
@@ -184,7 +185,7 @@ export const publicRoutes = [
         {
           key: "detail",
           loader: ({ query, signal }) => query.car_id
-            ? publicCatalogService.detail(query.car_id, { signal }).catch(() => null)
+            ? publicCarDetailPreloadService.detailOrFetch(query.car_id, { signal }).catch(() => null)
             : Promise.resolve(null),
         },
       ],

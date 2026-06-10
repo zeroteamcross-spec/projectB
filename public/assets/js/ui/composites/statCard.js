@@ -13,7 +13,7 @@ export function StatCard({ label, value, note = "" }) {
   title.textContent = label;
 
   const number = document.createElement("strong");
-  number.className = "block text-3xl font-bold tracking-normal text-gray-950";
+  number.className = "block text-2xl font-bold tracking-normal text-gray-950";
   number.textContent = value;
 
   card.append(glow, title, number);

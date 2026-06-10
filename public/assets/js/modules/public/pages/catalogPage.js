@@ -7,6 +7,7 @@ import { createBackgroundVideoLayer } from "../../../ui/composites/backgroundVid
 import { SliderBanner } from "../../../ui/composites/sliderBanner.js";
 import { showToast } from "../../../ui/primitives/toast.js";
 import { publicCatalogService } from "../services/publicCatalogService.js";
+import { publicCarDetailPreloadService } from "../services/publicCarDetailPreloadService.js";
 import { publicAffiliateTrackingService } from "../services/publicAffiliateTrackingService.js";
 import { publicContextService } from "../services/publicContextService.js";
 import { publicCatalogState } from "../state/publicCatalogState.js";
@@ -188,6 +189,7 @@ function render(root, context, flags) {
   );
   disposeSliderBanners(root);
   root.replaceChildren(shell);
+  publicCarDetailPreloadService.enqueueCars(allCars, { affiliateSlug });
 }
 
 function heroSection(notFound) {
@@ -203,7 +205,7 @@ function heroSection(notFound) {
     eyebrow.textContent = "Katalog publik";
 
     const title = document.createElement("h1");
-    title.className = "max-w-2xl text-3xl font-bold tracking-normal text-gray-950 sm:text-4xl";
+    title.className = "max-w-2xl text-2xl font-bold tracking-normal text-gray-950 xsm:text-1xl";
     title.textContent = "Halaman tidak ditemukan";
 
     const body = document.createElement("p");
@@ -442,7 +444,7 @@ function loadMoreSection({ canLoadMore, isLoadingMore, onLoadMore }) {
     onClick: onLoadMore,
     designHook: "catalog.load_more.button",
   });
-  button.classList.add("w-full", "sm:w-auto", "px-6", "py-3");
+  button.classList.add("w-full", "xsm:w-auto", "px-6", "py-3");
   wrap.append(button, trustMarks());
   return wrap;
 }

@@ -10,6 +10,7 @@ import { themeStudioResource } from "../../../resources/themeStudioResource.js";
 import { designStudioService } from "../services/designStudioService.js";
 import { DesignStudioPreview } from "../components/designStudioPreview.js";
 import { deepClone } from "../../../utils/deepClone.js";
+import { DESIGN_STUDIO_PREVIEW_ROUTES, DESIGN_STUDIO_VIEWPORTS, registryEntries, registryItem } from "../designStudioRegistry.js";
 
 const RUNTIME_KEY = "adminDesignStudio";
 const STUDIO_SECTIONS = designStudioService.sections();
@@ -22,6 +23,12 @@ const EMPTY_RUNTIME = {
   error: "",
   activeSection: DEFAULT_SECTION,
   selectedHookId: "",
+  dsSearch: "",
+  selectedDataDs: "catalog.search.bar",
+  previewRouteId: "landing",
+  previewViewportId: "mobile",
+  temporaryStyles: {},
+  foundDataDs: [],
 };
 
 export function AdminDesignStudioPage({ notFound = false } = {}) {
@@ -29,6 +36,7 @@ export function AdminDesignStudioPage({ notFound = false } = {}) {
   let unsubscribe = null;
   let baselineTheme = currentThemeConfig();
   let filePicker = null;
+  let skipNextRender = false;
 
   return createPageLifecycle({
     mount(context) {
@@ -59,6 +67,34 @@ export function AdminDesignStudioPage({ notFound = false } = {}) {
         }
 
         const path = target.dataset?.fieldPath;
+        const runtimeField = target.dataset?.runtimeField;
+        const styleProp = target.dataset?.styleProp;
+
+        if (runtimeField) {
+          if (runtimeField === "dsSearch") {
+            patchRuntime({ [runtimeField]: target.value }, "admin:design-studio-runtime-input", { render: false });
+            updateDataDsRegistryList(root, target.value);
+          } else {
+            patchRuntime({ [runtimeField]: target.value }, "admin:design-studio-runtime-input");
+          }
+          return;
+        }
+
+        if (styleProp) {
+          const state = runtime();
+          const key = state.selectedDataDs;
+          patchRuntime({
+            temporaryStyles: {
+              ...(state.temporaryStyles ?? {}),
+              [key]: {
+                ...(state.temporaryStyles?.[key] ?? {}),
+                [styleProp]: target.value,
+              },
+            },
+          }, "admin:design-studio-style-input", { render: false });
+          return;
+        }
+
         if (!path) {
           return;
         }
@@ -66,7 +102,7 @@ export function AdminDesignStudioPage({ notFound = false } = {}) {
         const value = target.getAttribute("type") === "range"
           ? Number(target.value)
           : target.value;
-        setDraft(designStudioService.updateDraft(runtime().draft, path, value), true);
+        setDraft(designStudioService.updateDraft(runtime().draft, path, value), true, { render: false });
       };
 
       const handleClick = async (event) => {
@@ -115,13 +151,64 @@ export function AdminDesignStudioPage({ notFound = false } = {}) {
 
         if (action === "save") {
           await saveDraft();
+          return;
+        }
+
+        if (action === "select-data-ds") {
+          const key = event.target instanceof HTMLElement
+            ? event.target.closest("[data-data-ds-key]")?.dataset?.dataDsKey
+            : null;
+          if (key) {
+            patchRuntime({ selectedDataDs: key }, "admin:design-studio-select-data-ds");
+            postPreviewMessage("DESIGN_STUDIO_HIGHLIGHT", { target: key });
+          }
+          return;
+        }
+
+        if (action === "refresh-preview") {
+          refreshPreviewFrame();
+          return;
+        }
+
+        if (action === "apply-temporary") {
+          const state = runtime();
+          postPreviewMessage("DESIGN_STUDIO_APPLY_OVERRIDE", {
+            target: state.selectedDataDs,
+            styles: state.temporaryStyles?.[state.selectedDataDs] ?? {},
+          });
+          return;
+        }
+
+        if (action === "reset-temporary") {
+          patchRuntime({ temporaryStyles: {} }, "admin:design-studio-reset-temporary");
+          postPreviewMessage("DESIGN_STUDIO_RESET_OVERRIDE", {});
+          return;
+        }
+
+        if (action === "export-data-ds-draft") {
+          downloadDataDsDraft(runtime().temporaryStyles ?? {});
+        }
+      };
+
+      const handleMessage = (event) => {
+        if (event.origin !== window.location.origin || event.data?.type !== "DESIGN_STUDIO_DATA_DS_LIST") {
+          return;
+        }
+        const nextItems = normalizeFoundDataDs(event.data.payload?.items ?? []);
+        if (!sameFoundDataDs(runtime().foundDataDs ?? [], nextItems)) {
+          patchRuntime({ foundDataDs: nextItems }, "admin:design-studio-scan-result");
         }
       };
 
       root.addEventListener("input", handleInput);
       root.addEventListener("change", handleInput);
       root.addEventListener("click", handleClick);
+      window.addEventListener("message", handleMessage);
       unsubscribe = appStore.subscribe(() => {
+        if (skipNextRender) {
+          skipNextRender = false;
+          return;
+        }
         initializeDraft();
         render(root, context, notFound);
       });
@@ -130,6 +217,7 @@ export function AdminDesignStudioPage({ notFound = false } = {}) {
         root.removeEventListener("input", handleInput);
         root.removeEventListener("change", handleInput);
         root.removeEventListener("click", handleClick);
+        window.removeEventListener("message", handleMessage);
         unsubscribe?.();
       };
     },
@@ -161,17 +249,20 @@ export function AdminDesignStudioPage({ notFound = false } = {}) {
     return appStore.get(`runtime.${RUNTIME_KEY}`, EMPTY_RUNTIME) ?? EMPTY_RUNTIME;
   }
 
-  function patchRuntime(patch, action) {
+  function patchRuntime(patch, action, options = {}) {
+    if (options.render === false) {
+      skipNextRender = true;
+    }
     appStore.patchState(`runtime.${RUNTIME_KEY}`, { ...runtime(), ...patch }, action);
   }
 
-  function setDraft(draft, dirty) {
+  function setDraft(draft, dirty, options = {}) {
     patchRuntime({
       draft,
       dirty,
       notice: dirty ? "Preview aktif. Simpan untuk menjadikannya source of truth." : runtime().notice,
       error: "",
-    }, "admin:design-studio-draft");
+    }, "admin:design-studio-draft", options);
     applyThemeToDocument(draft);
   }
 
@@ -254,7 +345,7 @@ function render(root, context, notFound) {
   );
 
   const content = document.createElement("div");
-  content.className = "grid gap-6 xl:grid-cols-[240px_minmax(0,1fr)_minmax(320px,0.88fr)]";
+  content.className = "grid gap-6 xl:grid-cols-[240px_minmax(0,1fr)_minmax(380px,1fr)]";
 
   const navColumn = document.createElement("aside");
   navColumn.className = "grid gap-4 xl:sticky xl:top-6 xl:self-start";
@@ -271,6 +362,7 @@ function render(root, context, notFound) {
       textBlock("text-sm font-semibold text-[var(--pb-text)]", "Live Preview"),
       textBlock("text-sm text-[var(--pb-text-muted)]", "Snippet public, controls, dan internal memakai token yang sama dengan aplikasi."),
     ], { variant: "raised" }),
+    dataDsStudioPanel(state),
     hookInspectorCard(activeSection, sectionHooks, selectedHook),
     DesignStudioPreview({ config: draft, selectedHookId: selectedHook?.id ?? "" })
   );
@@ -498,6 +590,249 @@ function actionButton(action, label, variant, disabled = false) {
   const button = Button({ label, variant, disabled });
   button.dataset.action = action;
   return button;
+}
+
+function dataDsStudioPanel(state) {
+  const card = Card([], { variant: "raised" });
+  card.className = `${card.className} grid gap-4 p-5`;
+
+  const selected = registryItem(state.selectedDataDs) ? { key: state.selectedDataDs, ...registryItem(state.selectedDataDs) } : registryEntries()[0];
+  const route = DESIGN_STUDIO_PREVIEW_ROUTES.find((item) => item.id === state.previewRouteId) ?? DESIGN_STUDIO_PREVIEW_ROUTES[0];
+  const viewport = DESIGN_STUDIO_VIEWPORTS[state.previewViewportId] ?? DESIGN_STUDIO_VIEWPORTS.mobile;
+
+  card.append(
+    textBlock("text-xs font-bold uppercase tracking-normal text-[var(--pb-brand-secondary)]", "data-ds Registry"),
+    dataDsToolbar(state),
+    dataDsRegistryList(state, selected?.key),
+    dataDsPreviewControls(state, route, viewport),
+    dataDsFrame(route, viewport),
+    dataDsEditor(selected, state),
+    unregisteredDataDs(state)
+  );
+  return card;
+}
+
+function dataDsToolbar(state) {
+  const wrap = document.createElement("div");
+  wrap.className = "grid gap-2";
+  const input = document.createElement("input");
+  input.type = "search";
+  input.placeholder = "Cari elemen design...";
+  input.value = state.dsSearch ?? "";
+  input.dataset.runtimeField = "dsSearch";
+  input.className = "min-h-11 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-sm text-[var(--pb-text)] outline-none";
+  wrap.append(input);
+  return wrap;
+}
+
+function dataDsRegistryList(state, selectedKey) {
+  const query = String(state.dsSearch || "").toLowerCase().trim();
+  const entries = registryEntries().filter((item) => {
+    const haystack = [item.key, item.label, item.group, item.description, ...(item.previewRoutes ?? [])].join(" ").toLowerCase();
+    return !query || haystack.includes(query);
+  });
+  const list = document.createElement("div");
+  list.dataset.dsRegistryList = "true";
+  list.className = "grid max-h-72 gap-2 overflow-auto rounded-[var(--pb-radius-xl)] border border-[var(--pb-border)] p-2";
+  entries.forEach((item) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.dataset.action = "select-data-ds";
+    button.dataset.dataDsKey = item.key;
+    button.className = item.key === selectedKey
+      ? "grid gap-1 rounded-[var(--pb-radius-lg)] border border-[color-mix(in_srgb,var(--pb-brand-primary)_35%,white)] bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] px-3 py-2 text-left"
+      : "grid gap-1 rounded-[var(--pb-radius-lg)] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] px-3 py-2 text-left";
+    button.append(
+      textBlock("text-sm font-semibold text-[var(--pb-text)]", item.label),
+      textBlock("text-[11px] text-[var(--pb-brand-secondary)]", item.key),
+      textBlock("text-xs text-[var(--pb-text-muted)]", `${item.group} - ${item.editable ? "editable" : "read only"} - ${item.riskLevel}`),
+    );
+    list.append(button);
+  });
+  if (!entries.length) {
+    list.append(EmptyState({ title: "Registry tidak ditemukan", description: "Tidak ada data-ds registered yang cocok dengan pencarian." }));
+  }
+  return list;
+}
+
+function updateDataDsRegistryList(root, query) {
+  const list = root?.querySelector?.("[data-ds-registry-list='true']");
+  if (!list) {
+    return;
+  }
+  const state = {
+    ...appStore.get(`runtime.${RUNTIME_KEY}`, EMPTY_RUNTIME),
+    dsSearch: query,
+  };
+  list.replaceWith(dataDsRegistryList(state, state.selectedDataDs));
+}
+
+function dataDsPreviewControls(state, route, viewport) {
+  const wrap = document.createElement("div");
+  wrap.className = "grid gap-3";
+
+  const row = document.createElement("div");
+  row.className = "grid gap-2 md:grid-cols-2";
+  row.append(
+    selectControl("previewRouteId", DESIGN_STUDIO_PREVIEW_ROUTES.map((item) => ({ value: item.id, label: `${item.label} (${item.roleContext})` })), route.id),
+    selectControl("previewViewportId", Object.values(DESIGN_STUDIO_VIEWPORTS).map((item) => ({ value: item.id, label: `${item.label} ${item.width}x${item.height}` })), viewport.id),
+  );
+
+  const actions = document.createElement("div");
+  actions.className = "flex flex-wrap gap-2";
+  actions.append(
+    actionButton("refresh-preview", "Refresh Preview", "secondary"),
+    actionButton("apply-temporary", "Apply Temporary", "primary"),
+    actionButton("reset-temporary", "Reset Preview", "secondary"),
+    actionButton("export-data-ds-draft", "Export JSON Draft", "secondary"),
+  );
+  wrap.append(row, textBlock("text-xs text-[var(--pb-text-muted)]", `Preview memakai session saat ini. Protected route akan mengikuti role guard existing: ${route.roleContext}.`), actions);
+  return wrap;
+}
+
+function dataDsFrame(route, viewport) {
+  const shell = document.createElement("div");
+  shell.className = "overflow-auto rounded-[var(--pb-radius-xl)] border border-[var(--pb-border)] bg-[var(--pb-surface-muted)] p-3";
+  const frame = document.createElement("iframe");
+  frame.id = "design_studio_route_preview";
+  frame.src = route.route;
+  frame.width = String(viewport.width);
+  frame.height = String(viewport.height);
+  frame.className = "block border-0 bg-white shadow-[var(--pb-shadow-card)]";
+  frame.style.width = `${viewport.width}px`;
+  frame.style.height = `${viewport.height}px`;
+  frame.addEventListener("load", () => {
+    postPreviewMessage("DESIGN_STUDIO_SCAN_DATA_DS", {});
+    postPreviewMessage("DESIGN_STUDIO_HIGHLIGHT", { target: appStore.get(`runtime.${RUNTIME_KEY}`, EMPTY_RUNTIME)?.selectedDataDs });
+  });
+  shell.append(frame);
+  return shell;
+}
+
+function dataDsEditor(selected, state) {
+  const box = document.createElement("div");
+  box.className = "grid gap-3 rounded-[var(--pb-radius-xl)] border border-[var(--pb-border)] bg-[var(--pb-surface-muted)] p-4";
+  if (!selected) {
+    box.append(textBlock("text-sm text-[var(--pb-text-muted)]", "Pilih registry item untuk mulai edit temporary."));
+    return box;
+  }
+  box.append(
+    textBlock("text-sm font-semibold text-[var(--pb-text)]", selected.label),
+    metaLine("data-ds", selected.key),
+    metaLine("Allowed styles", selected.allowedStyles.join(", ")),
+  );
+  selected.allowedStyles.forEach((prop) => {
+    const input = document.createElement("input");
+    input.type = prop.toLowerCase().includes("color") || prop === "background" || prop === "textColor" ? "text" : "text";
+    input.placeholder = propValuePlaceholder(prop);
+    input.value = state.temporaryStyles?.[selected.key]?.[prop] ?? "";
+    input.dataset.styleProp = prop;
+    input.className = "min-h-10 rounded-[var(--pb-radius-lg)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-sm text-[var(--pb-text)] outline-none";
+    const label = document.createElement("label");
+    label.className = "grid gap-1 text-xs font-semibold text-[var(--pb-text-muted)]";
+    label.textContent = prop;
+    label.append(input);
+    box.append(label);
+  });
+  return box;
+}
+
+function unregisteredDataDs(state) {
+  const registered = new Set(registryEntries().map((item) => item.key));
+  const found = (state.foundDataDs ?? []).filter((item) => !registered.has(item.key));
+  const box = document.createElement("div");
+  box.className = "grid gap-2";
+  box.append(textBlock("text-sm font-semibold text-[var(--pb-text)]", "Unregistered data-ds"));
+  if (!found.length) {
+    box.append(textBlock("text-xs text-[var(--pb-text-muted)]", "Belum ada unregistered data-ds dari preview saat ini."));
+    return box;
+  }
+  found.forEach((item) => box.append(textBlock("text-xs text-[var(--pb-text-muted)]", `${item.key} (${item.tagName}) - Add to registry required before editing.`)));
+  return box;
+}
+
+function selectControl(field, options, value) {
+  const select = document.createElement("select");
+  select.dataset.runtimeField = field;
+  select.className = "min-h-11 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-sm text-[var(--pb-text)] outline-none";
+  options.forEach((option) => {
+    const item = document.createElement("option");
+    item.value = option.value;
+    item.textContent = option.label;
+    item.selected = option.value === value;
+    select.append(item);
+  });
+  return select;
+}
+
+function propValuePlaceholder(prop) {
+  const placeholders = {
+    fontSize: "13px",
+    paddingX: "14px",
+    paddingY: "10px",
+    borderRadius: "16px",
+    borderTopRadius: "24px 24px 0 0",
+    background: "#ffffff",
+    textColor: "#334155",
+    placeholderColor: "#64748b",
+    gap: "8px",
+    padding: "12px",
+    boxShadow: "0 8px 20px rgba(15,23,42,.12)",
+    height: "88px",
+    iconSize: "22px",
+  };
+  return placeholders[prop] ?? "value";
+}
+
+function postPreviewMessage(type, payload) {
+  const frame = document.getElementById("design_studio_route_preview");
+  frame?.contentWindow?.postMessage({ type, payload }, window.location.origin);
+}
+
+function refreshPreviewFrame() {
+  const frame = document.getElementById("design_studio_route_preview");
+  if (frame) {
+    frame.src = frame.src;
+  }
+}
+
+function normalizeFoundDataDs(items) {
+  return [...items]
+    .map((item) => ({
+      key: String(item?.key ?? ""),
+      tagName: String(item?.tagName ?? ""),
+      visible: Boolean(item?.visible),
+      registered: Boolean(item?.registered),
+      editable: Boolean(item?.editable),
+    }))
+    .filter((item) => item.key)
+    .sort((a, b) => `${a.key}:${a.tagName}`.localeCompare(`${b.key}:${b.tagName}`));
+}
+
+function sameFoundDataDs(current, next) {
+  const a = normalizeFoundDataDs(current);
+  const b = normalizeFoundDataDs(next);
+  if (a.length !== b.length) {
+    return false;
+  }
+  return a.every((item, index) => {
+    const other = b[index];
+    return item.key === other.key
+      && item.tagName === other.tagName
+      && item.visible === other.visible
+      && item.registered === other.registered
+      && item.editable === other.editable;
+  });
+}
+
+function downloadDataDsDraft(styles) {
+  const blob = new Blob([JSON.stringify({ status: "temporary_only", overrides: styles }, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "projectb-data-ds-design-draft.json";
+  link.click();
+  URL.revokeObjectURL(url);
 }
 
 function buildFilePicker(onLoad) {

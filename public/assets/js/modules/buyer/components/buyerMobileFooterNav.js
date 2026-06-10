@@ -16,6 +16,7 @@ export function BuyerMobileFooterNav({ items = BUYER_MOBILE_FOOTER_ITEMS, active
   const nav = document.createElement("nav");
   nav.id = "byr_mobile_footer_nav";
   nav.className = "account-mobile-footer account-mobile-footer--buyer";
+  nav.dataset.ds = "buyer.mobile.footer";
   nav.setAttribute("aria-label", "Navigasi buyer mobile");
 
   const shell = document.createElement("section");
@@ -81,7 +82,7 @@ function footerLink({ item, activePath, onNavigate }) {
   link.append(iconWrap);
 
   const label = document.createElement("span");
-  label.className = item.featured ? "account-mobile-footer__action-label" : "account-mobile-footer__label";
+  label.className = item.featured ? "account-mobile-footer__action-label mt-2 text-[#ff6600]" : "account-mobile-footer__label";
   label.textContent = item.label;
   link.append(label);
 
@@ -114,18 +115,18 @@ function ensureFooterStyles() {
       left: 0;
       right: 0;
       bottom: 0;
+      width: 100%;
       z-index: 58;
       display: block;
-      padding: 0 1rem calc(0.75rem + env(safe-area-inset-bottom, 0px));
+      padding: 0 0 env(safe-area-inset-bottom, 0px);
       pointer-events: none;
     }
 
     .account-mobile-footer__shell {
       position: relative;
       width: 100%;
-      max-width: 420px;
       height: 6.7rem;
-      margin: 0 auto;
+      margin: 0;
       pointer-events: auto;
     }
 
@@ -136,6 +137,9 @@ function ensureFooterStyles() {
       bottom: 0;
       height: 5.55rem;
       border: 1px solid color-mix(in srgb, var(--pb-border) 72%, transparent);
+      border-right: 0;
+      border-left: 0;
+      border-bottom: 0;
       border-radius: 1.65rem 1.65rem 0 0;
       background:
         radial-gradient(circle at 50% -24px, transparent 0 3.25rem, rgba(255, 255, 255, 0.94) 3.28rem),
@@ -155,7 +159,7 @@ function ensureFooterStyles() {
       grid-template-columns: repeat(5, minmax(0, 1fr));
       align-items: center;
       height: 5.55rem;
-      padding: 0 0.7rem;
+      padding: 0 max(0.7rem, env(safe-area-inset-left, 0px)) 0 max(0.7rem, env(safe-area-inset-right, 0px));
     }
 
     .account-mobile-footer__item {
@@ -178,7 +182,6 @@ function ensureFooterStyles() {
     .account-mobile-footer__item .account-mobile-footer__label,
     .account-mobile-footer__item .account-mobile-footer__svg,
     .account-mobile-footer__action .account-mobile-footer__action-label {
-      color: inherit;
       opacity: 1;
       visibility: visible;
     }
@@ -247,7 +250,7 @@ function ensureFooterStyles() {
       align-items: center;
       justify-content: center;
       justify-items: center;
-      align-content: start;
+      // align-content: start;
       gap: 0.24rem;
       border: 0;
       border-radius: 1.3rem;

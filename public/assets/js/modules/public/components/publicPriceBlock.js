@@ -10,7 +10,7 @@ export function PublicPriceBlock({ car } = {}) {
   label.textContent = hasPromo(car) ? "Harga promo" : "Harga cash";
 
   const primary = document.createElement("strong");
-  primary.className = "break-words text-3xl font-bold tracking-normal text-gray-950";
+  primary.className = "break-words text-2xl font-bold tracking-normal text-gray-950";
   primary.textContent = formatCurrency(effectivePrice(car));
 
   const assist = document.createElement("p");

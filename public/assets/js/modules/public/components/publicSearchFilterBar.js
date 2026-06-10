@@ -20,14 +20,14 @@ export function PublicSearchFilterBar({
   onOpenFilter = null,
 } = {}) {
   const section = document.createElement("section");
-  section.className = "grid gap-3 rounded-[24px] border border-white/70 bg-white/95 p-2.5 shadow-card backdrop-blur sm:p-4 xl:grid-cols-[minmax(0,1fr)_280px] xl:items-start";
+  section.className = "relative z-30 grid gap-1 rounded-[24px] border border-white/70 bg-white/95 p-2.5 text-[13px] shadow-card backdrop-blur sm:p-4 sm:text-sm xl:grid-cols-[minmax(0,1fr)_280px] xl:items-start";
   applyDesignHook(section, "catalog.search.bar");
 
   const form = document.createElement("form");
   form.className = "grid gap-3 xl:col-span-2";
 
   const searchWrap = document.createElement("div");
-  searchWrap.className = "flex min-w-0 items-center gap-2 rounded-[var(--pb-radius-2xl)] border border-[var(--pb-border)] bg-[var(--pb-form-search-bg)] p-2 shadow-[var(--pb-shadow-soft)]";
+  searchWrap.className = "flex min-w-0 items-center gap-2 rounded-[var(--pb-radius-xl)] border border-[var(--pb-border)] bg-[var(--pb-form-search-bg)] p-2 shadow-[var(--pb-shadow-soft)]";
 
   const iconWrap = document.createElement("span");
   iconWrap.className = "grid h-9 w-9 shrink-0 place-items-center rounded-[var(--pb-radius-xl)] bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] text-[var(--pb-brand-primary)] sm:h-10 sm:w-10";
@@ -38,7 +38,7 @@ export function PublicSearchFilterBar({
   input.type = "search";
   input.value = filters.keyword ?? "";
   input.placeholder = "Cari mobil impian Anda...";
-  input.className = "min-w-0 flex-1 bg-transparent pr-1 text-sm text-[var(--pb-text-strong)] outline-none placeholder:text-[var(--pb-text-muted)]";
+  input.className = "min-w-0 flex-1 bg-transparent pr-1 text-[13px] text-[var(--pb-text-strong)] outline-none placeholder:text-[13px] placeholder:text-[var(--pb-text-muted)] sm:text-sm sm:placeholder:text-sm";
   applyDesignHook(input, "catalog.search.input");
 
   const submit = document.createElement("button");
@@ -56,7 +56,7 @@ export function PublicSearchFilterBar({
 
   section.append(form);
   const filterStack = document.createElement("div");
-  filterStack.className = "grid min-w-0 gap-3 xl:grid-cols-[minmax(0,1fr)_280px] xl:items-start";
+  filterStack.className = "grid min-w-0 gap-1 xl:grid-cols-[minmax(0,1fr)_280px] xl:items-start";
   filterStack.append(PublicQuickFilterRow({ active: quickFilter, onChange: onQuickFilter }), actionRow({ activeFilterCount, quickFilter, onQuickFilter, onOpenFilter }));
   section.append(filterStack);
   section.append(locationSelector({ filters, options, onSearch }));
@@ -66,8 +66,9 @@ export function PublicSearchFilterBar({
 
 function actionRow({ activeFilterCount, quickFilter, onQuickFilter, onOpenFilter }) {
   const row = document.createElement("div");
-  row.className = "grid grid-cols-2 gap-3 xl:min-w-[280px]";
+  row.className = "relative z-40 grid grid-cols-2 gap-3 overflow-visible text-xs xl:min-w-[280px]";
   applyDesignHook(row, "catalog.filter.toolbar");
+  row.style.fontSize = "12px";
 
   const filterButton = Button({
     label: activeFilterCount > 0 ? `Filter (${activeFilterCount})` : "Filter",
@@ -75,29 +76,29 @@ function actionRow({ activeFilterCount, quickFilter, onQuickFilter, onOpenFilter
     onClick: () => onOpenFilter?.(),
     designHook: "shared.button.secondary",
   });
-  filterButton.classList.add("min-h-12", "w-full", "justify-center", "rounded-[var(--pb-radius-xl)]");
+  filterButton.classList.add("min-h-12", "w-full", "justify-center", "rounded-[var(--pb-radius-xl)]", "text-xs");
   filterButton.prepend(createIcon("filter", { className: "h-4 w-4" }));
 
   const sortWrap = document.createElement("div");
-  sortWrap.className = "relative min-w-0";
+  sortWrap.className = "relative z-50 min-w-0 overflow-visible";
 
   const sortButton = Button({
     label: "Urutkan",
     variant: "secondary",
     designHook: "shared.button.secondary",
   });
-  sortButton.classList.add("min-h-12", "w-full", "justify-center", "rounded-[var(--pb-radius-xl)]");
+  sortButton.classList.add("min-h-12", "w-full", "justify-center", "rounded-[var(--pb-radius-xl)]", "text-xs");
   sortButton.prepend(createIcon("sort", { className: "h-4 w-4" }));
 
   const menu = document.createElement("div");
-  menu.className = "absolute right-0 top-[calc(100%+0.5rem)] z-20 hidden w-full min-w-0 rounded-[var(--pb-radius-2xl)] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] p-2 shadow-[var(--pb-shadow-card)] sm:min-w-[180px] sm:w-auto";
+  menu.className = "absolute right-0 top-[calc(100%+0.35rem)] z-[65] hidden w-full min-w-0 rounded-[var(--pb-radius-2xl)] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] p-2 shadow-[var(--pb-shadow-elevated)] sm:min-w-[180px] sm:w-auto";
 
   SORT_OPTIONS.forEach((option) => {
     const item = document.createElement("button");
     item.type = "button";
     item.className = option.value === quickFilter
-      ? "flex w-full items-center justify-between rounded-[var(--pb-radius-xl)] bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] px-3 py-2 text-left text-sm font-semibold text-[var(--pb-brand-secondary)]"
-      : "flex w-full items-center justify-between rounded-[var(--pb-radius-xl)] px-3 py-2 text-left text-sm font-medium text-[var(--pb-text-muted)] hover:bg-[var(--pb-surface-muted)]";
+      ? "flex w-full items-center justify-between rounded-[var(--pb-radius-xl)] bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] px-3 py-2 text-left text-xs font-semibold text-[var(--pb-brand-secondary)]"
+      : "flex w-full items-center justify-between rounded-[var(--pb-radius-xl)] px-3 py-2 text-left text-xs font-medium text-[var(--pb-text-muted)] hover:bg-[var(--pb-surface-muted)]";
     item.textContent = option.label;
     item.addEventListener("click", () => {
       menu.classList.add("hidden");

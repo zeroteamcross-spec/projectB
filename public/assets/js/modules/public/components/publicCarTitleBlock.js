@@ -22,7 +22,7 @@ export function PublicCarTitleBlock({ car } = {}) {
   eyebrow.textContent = "Detail mobil";
 
   const title = document.createElement("h1");
-  title.className = "text-3xl font-bold tracking-normal text-gray-950 sm:text-4xl";
+  title.className = "text-2xl font-bold tracking-normal text-gray-950 xsm:text-1xl";
   title.textContent = [car?.brand_name, car?.model_name, car?.sub_model_name].filter(Boolean).join(" ") || `Mobil #${car?.id ?? "-"}`;
 
   const meta = document.createElement("p");
