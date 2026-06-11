@@ -24,6 +24,7 @@ import { bindToastContainer } from "../ui/primitives/toast.js";
 import { showToast } from "../ui/primitives/toast.js";
 import { createRoleGuard } from "./roleGuard.js";
 import { bindDesignStudioPreviewRuntime } from "../theme/designStudioPreviewRuntime.js";
+import { bindDesignStudioStyleLoader } from "../theme/designStudioStyleLoader.js";
 
 export function createProjectBApp(options = {}) {
   return new ProjectBApp(options);
@@ -86,10 +87,12 @@ export class ProjectBApp {
     }));
     this.cleanup.push(notificationService.bindRealtimeLifecycle(appStore));
     bindDesignStudioPreviewRuntime();
+    bindDesignStudioStyleLoader(this.bus);
     this.registerFeatures([publicManifest, authManifest, profileManifest, buyerManifest, sellerManifest, adminManifest, affiliateManifest, notificationsManifest]);
     publicContextService.restore();
 
     await this.loadAuthContext();
+    await this.bootstrapDesignStudioV2();
     await notificationService.ensureSnapshot({ force: true, store: appStore });
     await this.preloadManager.boot(authStore.role());
 
@@ -114,10 +117,61 @@ export class ProjectBApp {
         actor: response.data?.actor ?? null,
         impersonation: response.data?.impersonation ?? null,
       });
+      if (response.data?.designStudioV2) {
+        appStore.patchState("runtime.designStudioV2", {
+          enabled: Boolean(response.data.designStudioV2.enabled),
+          designMode: Boolean(response.data.designStudioV2.designMode),
+        }, "auth:design-studio-flags");
+      }
       return user;
     } catch (error) {
       authStore.setContext({ user: null, actor: null, impersonation: null });
       return null;
+    }
+  }
+
+  async bootstrapDesignStudioV2() {
+    const featureFlagAdapter = {
+      isEnabled: () => Boolean(appStore.get("runtime.designStudioV2.enabled", false)),
+    };
+    const designModeAdapter = {
+      isEnabled: () => Boolean(appStore.get("runtime.designStudioV2.designMode", false)),
+    };
+    const currentUserAdapter = {
+      getUser: () => authStore.user(),
+      getRole: () => authStore.role(),
+    };
+
+    const enabled = featureFlagAdapter.isEnabled();
+    const designMode = designModeAdapter.isEnabled();
+    const currentUser = currentUserAdapter.getUser() || { role: currentUserAdapter.getRole() };
+
+    if (!enabled || !designMode || currentUser?.role !== "super_admin") {
+      return false;
+    }
+
+    try {
+      const designStudio = await import("../modules/designStudioV2/designStudioBootstrap.js");
+
+      const initialized = Boolean(designStudio.initialize?.({
+        enabled,
+        designMode,
+        currentUser,
+        appStore,
+        authStore,
+        router: this.router,
+        bus: this.bus,
+        documentRef: document,
+      }));
+
+      if (initialized && typeof designStudio.destroy === "function") {
+        this.cleanup.push(() => designStudio.destroy());
+      }
+
+      return initialized;
+    } catch (error) {
+      console.error("Design Studio V2 bootstrap failed.", error);
+      return false;
     }
   }
 

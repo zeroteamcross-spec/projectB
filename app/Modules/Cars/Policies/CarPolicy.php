@@ -18,14 +18,14 @@ class CarPolicy
 
     public static function requireAdmin(array $user): void
     {
-        if (($user['role'] ?? null) !== 'admin') {
+        if (! in_array($user['role'] ?? null, ['admin', 'super_admin'], true)) {
             throw new ForbiddenException('Hanya admin yang dapat mengelola mobil admin.');
         }
     }
 
     public static function requireSellerOrAdmin(array $user): void
     {
-        if (! in_array($user['role'] ?? null, ['seller', 'admin'], true)) {
+        if (! in_array($user['role'] ?? null, ['seller', 'admin', 'super_admin'], true)) {
             throw new ForbiddenException('Hanya seller atau admin yang dapat mengelola mobil.');
         }
     }
@@ -40,7 +40,7 @@ class CarPolicy
             return false;
         }
 
-        return ($user['role'] ?? null) === 'admin' || (int) $car['seller_user_id'] === (int) $user['id'];
+        return in_array($user['role'] ?? null, ['admin', 'super_admin'], true) || (int) $car['seller_user_id'] === (int) $user['id'];
     }
 
     public static function ensureCanManage(?array $car, array $user): void
@@ -49,7 +49,7 @@ class CarPolicy
             throw new NotFoundException('Mobil tidak ditemukan.');
         }
 
-        if (($user['role'] ?? null) === 'admin') {
+        if (in_array($user['role'] ?? null, ['admin', 'super_admin'], true)) {
             return;
         }
 

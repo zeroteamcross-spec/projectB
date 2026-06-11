@@ -31,14 +31,14 @@ class AuthPolicy
 
     public static function requireAdmin(?array $user): array
     {
-        return self::requireRole($user, ['admin']);
+        return self::requireRole($user, ['admin', 'super_admin']);
     }
 
     public static function ensureCanViewUser(?array $actor, int $targetUserId): array
     {
         $actor = self::requireUser($actor);
 
-        if ((int) ($actor['id'] ?? 0) === $targetUserId || ($actor['role'] ?? null) === 'admin') {
+        if ((int) ($actor['id'] ?? 0) === $targetUserId || in_array($actor['role'] ?? null, ['admin', 'super_admin'], true)) {
             return $actor;
         }
 
@@ -49,7 +49,7 @@ class AuthPolicy
     {
         $actor = self::requireUser($actor);
 
-        if ((int) ($actor['id'] ?? 0) === $targetUserId || ($actor['role'] ?? null) === 'admin') {
+        if ((int) ($actor['id'] ?? 0) === $targetUserId || in_array($actor['role'] ?? null, ['admin', 'super_admin'], true)) {
             return $actor;
         }
 

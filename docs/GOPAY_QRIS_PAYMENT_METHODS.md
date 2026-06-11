@@ -233,3 +233,16 @@ GoPay/QRIS tidak menambah aturan status khusus baru.
   - `APP_URL` is still localhost
   - no explicitly approved disposable buyer/seller/car/transaction set was provided for provider mutation
 - Result: `BLOCKED`
+
+## 14. Payment page persistence update - 2026-06-04
+
+Payment status page sekarang reload-safe untuk instruction sebelum expired:
+
+- backend detail mengembalikan `payment_instruction` dari payment log terbaru yang punya artifact instruksi.
+- frontend tidak lagi bergantung hanya pada `payment_logs[0]`.
+- QRIS QR dan Download QR tetap muncul dari payment instruction/log existing selama QR valid dan belum expired.
+- GoPay deeplink/QR fallback dan VA instruction dipulihkan dari detail/log existing.
+- auto status check berjalan setiap 12 detik lewat endpoint status existing, lalu mengambil detail saat status berubah.
+- paid success overlay tampil sekali saat status berubah dari belum paid ke `paid`/`completed`.
+
+Tidak ada perubahan status canon, callback provider, atau schema.

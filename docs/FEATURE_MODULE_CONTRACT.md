@@ -240,3 +240,15 @@ Spesifikasi ini dianggap berhasil bila:
 - Settlement response wajib membawa `ledger_ids` atau `items` agar shared mutation sync dapat memetakan lifecycle ledger.
 
 
+
+## 17. Payment Status Page Runtime Contract
+
+Payment status page adalah page lifecycle dengan timer aktif, sehingga wajib mengikuti kontrak berikut:
+
+- API call status/detail/download tetap lewat service/resource layer, bukan direct fetch di page/component.
+- Polling status default 12 detik dan tidak boleh overlap.
+- Timer wajib dibersihkan saat unmount dan dihentikan saat tab hidden.
+- Page tidak boleh membuat transaksi baru hanya untuk menampilkan ulang instruction.
+- Instruction harus dipulihkan dari backend detail, `payment_instruction`, atau payment log existing.
+- Paid overlay hanya boleh muncul sekali per transaksi memakai key `projectB:payment_success_seen:{transaction_id}`.
+- Refresh manual boleh ada sebagai fallback, tetapi bukan satu-satunya mekanisme status sync.

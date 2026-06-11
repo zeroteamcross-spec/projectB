@@ -2,6 +2,7 @@ import { AdminDashboardPage } from "./pages/dashboardPage.js";
 import { AdminApprovalsPage } from "./pages/approvalsPage.js";
 import { AdminCarsPage } from "./pages/carsPage.js";
 import { AdminDesignStudioPage } from "./pages/designStudioPage.js";
+import { AdminDesignStudioV2Page } from "./pages/designStudioV2Page.js";
 import { AdminUsersPage } from "./pages/usersPage.js";
 import { AdminSettlementsPage } from "./pages/settlementsPage.js";
 import { AdminAffiliateCommissionsPage } from "./pages/affiliateCommissionsPage.js";
@@ -283,6 +284,13 @@ export const adminRoutes = [
         },
       ],
     },
+  },
+  {
+    name: "admin.design-studio-v2",
+    path: "/admin/design-studio-v2",
+    shell: "app",
+    role: "admin",
+    page: AdminDesignStudioV2Page,
   },
   {
     name: "admin.transactions",

@@ -26,6 +26,13 @@ $users = [
         'email' => 'frontend-admin@projectb.local',
         'address' => 'Frontend demo control',
     ],
+    'super_admin' => [
+        'role' => 'super_admin',
+        'name' => 'Frontend Demo Super Admin',
+        'phone_number' => '081100000009',
+        'email' => 'frontend-superadmin@projectb.local',
+        'address' => 'Frontend demo super control',
+    ],
     'buyer' => [
         'role' => 'buyer',
         'name' => 'Frontend Demo Buyer',
@@ -195,6 +202,7 @@ echo json_encode([
         'credentials' => [
             'password' => $password,
             'admin' => $users['admin']['email'],
+            'super_admin' => $users['super_admin']['email'],
             'buyer' => $users['buyer']['email'],
             'sellers' => [
                 $users['seller_jakarta']['email'],

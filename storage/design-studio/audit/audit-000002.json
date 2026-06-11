@@ -1,0 +1,17 @@
+{
+    "type": "publish",
+    "version": 2,
+    "route": "/",
+    "userId": 32,
+    "username": null,
+    "publishedAt": "2026-06-11 23:10:57",
+    "publishNote": "xxxxx",
+    "elementsChanged": 1,
+    "propertiesChanged": 3,
+    "responsiveChanges": {
+        "mobile": 3,
+        "tablet": 0,
+        "desktop": 0
+    },
+    "auditId": 2
+}

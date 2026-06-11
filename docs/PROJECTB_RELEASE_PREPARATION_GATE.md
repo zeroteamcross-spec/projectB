@@ -161,6 +161,19 @@ Post-check:
   - unique `uniq_affiliate_commission_ledgers_accrual_source` ada
 Rollback note: tidak ada rollback script aman; gunakan restore backup jika patch ini bermasalah.
 
+6. `20260602_google_oauth_identities.sql`
+Purpose: menambahkan tabel OAuth identity untuk Google role-specific login tanpa mengubah tabel `users`.
+Dependency:
+  - tabel `users` sudah ada.
+Pre-check:
+  - backup DB
+  - cek belum ada tabel `user_oauth_identities`
+Post-check:
+  - tabel `user_oauth_identities` ada
+  - unique (`provider`, `provider_user_id`) ada
+  - unique (`user_id`, `provider`) ada
+Rollback note: restore DB backup jika patch gagal; jangan drop manual di production tanpa approval.
+
 ## 7. Environment Checklist
 
 Semua nilai production/staging berikut masih `TO_CONFIRM` kecuali default local yang hanya menjadi referensi bentuk konfigurasi.
@@ -171,6 +184,11 @@ Semua nilai production/staging berikut masih `TO_CONFIRM` kecuali default local 
 | `APP_DEBUG` | `<TO_CONFIRM>` |
 | `APP_TIMEZONE` | `Asia/Jakarta` unless target requires otherwise |
 | `APP_URL` | `<TO_CONFIRM>` |
+| `GOOGLE_AUTH_ENABLED` | `false` until Google credential target is confirmed |
+| `GOOGLE_CLIENT_ID` | `<TO_CONFIRM>` |
+| `GOOGLE_CLIENT_SECRET` | `<TO_CONFIRM>` |
+| `GOOGLE_REDIRECT_URI` | `<TO_CONFIRM>` |
+| `GOOGLE_ALLOWED_DOMAINS` | optional `<TO_CONFIRM>` |
 | `DB_CONNECTION` | `mysql` |
 | `DB_HOST` | `<TO_CONFIRM>` |
 | `DB_PORT` | `<TO_CONFIRM>` |
@@ -213,6 +231,24 @@ Notes:
 - local env current callback masih `http://localhost:8000/api/payments/midtrans/callbacks`.
 - real provider UAT tidak dijalankan pada gate ini.
 - release aplikasi dapat lanjut sebagai Conditional GO jika provider gate ini diterima sebagai keterbatasan environment, bukan defect runtime aplikasi.
+
+## 8.1 Google Provider Readiness
+
+Status: BLOCKED for real UAT / production-ready provider verification.
+
+Checklist:
+- Google OAuth client tersedia: `[ ]`
+- `GOOGLE_CLIENT_ID` target valid: `[ ]`
+- `GOOGLE_CLIENT_SECRET` target valid: `[ ]`
+- `GOOGLE_REDIRECT_URI` cocok dengan Google Cloud authorized redirect URI: `[ ]`
+- `GOOGLE_AUTH_ENABLED=true` hanya setelah credential valid: `[ ]`
+- SQL patch `20260602_google_oauth_identities.sql` sudah applied: `[ ]`
+- Browser smoke route disabled/configured sudah dijalankan: `[ ]`
+
+Notes:
+- default aman adalah disabled.
+- affiliate Google login disabled by policy; affiliate tetap user/password.
+- provider real UAT tidak dijalankan pada gate ini.
 
 ## 9. Backup Plan
 

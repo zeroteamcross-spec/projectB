@@ -35,7 +35,7 @@ class ImpersonationPolicy
 
         $actor = $auth->actor();
 
-        if (($actor['role'] ?? null) === 'admin') {
+        if (in_array($actor['role'] ?? null, ['admin', 'super_admin'], true)) {
             throw new ForbiddenException($message);
         }
     }

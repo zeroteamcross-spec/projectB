@@ -216,7 +216,11 @@ export class AppShell {
   }
 
   hasSidebarShell(role, path) {
-    const normalizedRole = role === "affiliate_admin" ? "affiliate" : role;
+    const normalizedRole = role === "affiliate_admin"
+      ? "affiliate"
+      : role === "super_admin"
+        ? "admin"
+        : role;
     const isBuyerShell = role === "buyer" && this.isBuyerExperiencePath(path);
     const isAffiliateAccountShell = role === "affiliate_admin" && this.isAffiliateAccountExperiencePath(path);
     return !isBuyerShell && !isAffiliateAccountShell && ["admin", "seller", "affiliate"].includes(normalizedRole);

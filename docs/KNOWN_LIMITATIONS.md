@@ -105,6 +105,8 @@ Saat ini seller dapat membuat akun affiliate aktif dengan email/password, dan af
 - aktivasi formal affiliate
 - lifecycle onboarding affiliate yang lengkap
 
+Google Login Affiliate sengaja tidak diaktifkan. Route `#/google-login/affiliate` hanya menjelaskan policy dan mengarahkan affiliate ke login user/password existing karena affiliate canon wajib terhubung ke seller dan referral code.
+
 ### 5.2 Activity/click bukan sumber kebenaran komisi
 Click/activity sudah tersedia, tetapi hanya berfungsi sebagai telemetry pendukung. Komisi tidak didasarkan pada click, melainkan pada penjualan canon.
 
@@ -163,6 +165,21 @@ Provider/runtime payment path di codebase sudah ada, tetapi real provider UAT da
 - rollback/reset plan yang disetujui
 
 Artinya, aplikasi bisa lulus regression gate tanpa otomatis berarti provider real UAT sudah siap dijalankan.
+
+### 6.6 Google provider real UAT masih blocked environment
+Google role-specific login sudah tersedia secara code-level, tetapi provider UAT/production readiness tetap bergantung pada:
+- `GOOGLE_CLIENT_ID`
+- `GOOGLE_CLIENT_SECRET`
+- `GOOGLE_REDIRECT_URI`
+- domain callback yang cocok dengan konfigurasi Google Cloud
+- SQL patch `20260602_google_oauth_identities.sql`
+
+Default env tetap `GOOGLE_AUTH_ENABLED=false`, jadi status provider adalah blocked sampai credential target valid dipasang.
+
+### 6.7 Google login menjadi default UI, tetapi provider masih bisa disabled
+Public UI sekarang mengarah ke Google Login sebagai default. Jika provider belum dikonfigurasi, user melihat pesan aman bahwa Google Login belum dikonfigurasi.
+
+Login email/password existing tetap tersedia lewat URL manual untuk emergency, tetapi link legacy disembunyikan dari UI publik/default.
 
 ---
 
@@ -312,3 +329,22 @@ Database MySQL harus sudah ada dan tetap mengikuti konfigurasi aktif `config/dat
 
 ### 13.3 Tidak memperbaiki tabel existing yang tidak lengkap
 Jika tabel `notifications` sudah ada tetapi kolom/index-nya belum lengkap, bootstrap tidak menjalankan `ALTER TABLE`. Sinkronisasi tabel existing tetap harus mengikuti SQL patch manual dengan backup.
+
+## 14. Payment page persistence limitations
+
+Payment page sekarang menyimpan ulang instruksi dari backend detail/log dan tidak memaksa transaksi baru untuk QRIS/GoPay/VA reload. Batasan yang masih berlaku:
+
+- Polling status memakai endpoint status existing dan tidak menambah provider status query baru.
+- Jika provider response/log tidak pernah membawa QR/deeplink/VA/payment code, UI tidak bisa mengarang instruksi baru.
+- Browser smoke real provider tetap membutuhkan credential, callback HTTPS publik, dan transaksi disposable yang disetujui.
+- Expiry mengikuti `transactions.expires_at` atau `expiry_time` provider bila tersedia.
+
+## 15. Design Studio data-ds preview limitations
+
+Design Studio sekarang memiliki registry awal, search `data-ds`, iframe route preview, viewport selector, highlight, dan temporary style override. Batasan yang masih berlaku:
+
+- Persistent save per-elemen `data-ds` belum dibuat karena storage belum diputuskan.
+- Protected route preview memakai session login saat ini dan tidak membuat mock auth.
+- Admin dapat membuka route frontend buyer/seller/affiliate untuk Design Studio preview, tetapi endpoint/API tetap mengikuti permission backend dan bisa menampilkan data kosong atau error terkontrol jika session admin tidak punya data role target.
+- Registry editable awal sengaja dibatasi ke `catalog.search.bar`, `catalog.filter.toolbar`, `buyer.mobile.footer`, dan `affiliate.mobile.footer`.
+- Unregistered `data-ds` hanya ditampilkan sebagai temuan scan dan tidak dapat diedit bebas.

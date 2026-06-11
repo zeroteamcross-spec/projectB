@@ -1,0 +1,16 @@
+{
+    "schemaVersion": 1,
+    "route": "/",
+    "updatedBy": 32,
+    "updatedAt": "2026-06-11 23:10:43",
+    "elements": {
+        "shared.button.secondary": {
+            "mobile": {
+                "gap": 5,
+                "height": 30
+            },
+            "tablet": [],
+            "desktop": []
+        }
+    }
+}

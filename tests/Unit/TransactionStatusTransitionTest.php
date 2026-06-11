@@ -296,6 +296,11 @@ class FakeTransactionPaymentProvider implements PaymentProviderInterface
     {
         return [];
     }
+
+    public function checkStatus(string $providerOrderId): array
+    {
+        return [];
+    }
 }
 
 class FailingTransactionPaymentProvider implements PaymentProviderInterface
@@ -308,6 +313,11 @@ class FailingTransactionPaymentProvider implements PaymentProviderInterface
     public function createCompletionPayment(array $transaction, array $customer, string $paymentMethod): array
     {
         throw $this->failure($paymentMethod);
+    }
+
+    public function checkStatus(string $providerOrderId): array
+    {
+        throw $this->failure('');
     }
 
     private function failure(string $paymentMethod): PaymentProviderException

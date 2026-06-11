@@ -31,6 +31,7 @@ return static function (Router $router): void {
         base_path('app/Modules/Admin/Routes/api.php'),
         base_path('app/Modules/MasterData/Routes/api.php'),
         base_path('app/Modules/ApiVersion/Routes/api.php'),
+        base_path('app/Modules/DesignStudio/Routes/api.php'),
     ] as $moduleRoutes) {
         if (is_file($moduleRoutes)) {
             $registerModuleRoutes = require $moduleRoutes;

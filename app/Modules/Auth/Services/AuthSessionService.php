@@ -38,11 +38,12 @@ class AuthSessionService
         $actor = $actorAuth['user'];
 
         if (($actor['role'] ?? null) !== 'admin' || ! is_string($impersonationToken) || $impersonationToken === '') {
-            return [
+            $context = [
                 'user' => $actor,
                 'actor' => $actor,
                 'impersonation' => null,
             ];
+            return $this->attachDesignStudioV2Config($context, $actor);
         }
 
         try {
@@ -71,14 +72,26 @@ class AuthSessionService
 
             $this->impersonations->markLastUsed((int) $session['id']);
 
-            return $this->buildImpersonationContext($actor, $session, $target);
+            $context = $this->buildImpersonationContext($actor, $session, $target);
+            return $this->attachDesignStudioV2Config($context, $actor);
         } catch (UnauthorizedException | ForbiddenException $exception) {
-            return [
+            $context = [
                 'user' => $actor,
                 'actor' => $actor,
                 'impersonation' => null,
             ];
+            return $this->attachDesignStudioV2Config($context, $actor);
         }
+    }
+
+    private function attachDesignStudioV2Config(array $context, array $actor): array
+    {
+        $isSuperAdmin = ($actor['role'] ?? null) === 'super_admin';
+        $context['designStudioV2'] = [
+            'enabled' => $isSuperAdmin,
+            'designMode' => $isSuperAdmin,
+        ];
+        return $context;
     }
 
     public function buildImpersonationContext(array $actor, array $session, array $target): array

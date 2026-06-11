@@ -1,0 +1,17 @@
+{
+    "schemaVersion": 1,
+    "version": 1,
+    "route": "/",
+    "publishedBy": 32,
+    "publishedAt": "2026-06-11 22:59:57",
+    "publishNote": "xxxxx",
+    "elements": {
+        "shared.button.secondary": {
+            "mobile": {
+                "fontSize": 11
+            },
+            "tablet": [],
+            "desktop": []
+        }
+    }
+}

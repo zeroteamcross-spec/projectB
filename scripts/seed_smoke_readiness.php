@@ -73,6 +73,19 @@ try {
         'updated_at' => $now,
     ]);
 
+    $superadminId = upsertSmokeUser($pdo, [
+        'role' => 'super_admin',
+        'name' => 'Smoke Super Admin',
+        'phone_number' => '080000000009',
+        'email' => 'superadmin@projectb.local',
+        'password_hash' => $passwordHash,
+        'address' => 'Smoke Test Super Admin',
+        'account_status' => 'active',
+        'is_approved' => 1,
+        'created_at' => $now,
+        'updated_at' => $now,
+    ]);
+
     $showroomId = upsertSmokeShowroom($pdo, $sellerId, [
         'name' => 'Smoke Showroom',
         'address' => 'Jl. Smoke Test No. 1',
@@ -142,12 +155,14 @@ echo json_encode([
         'credentials' => [
             'password' => $password,
             'admin' => 'admin@projectb.local',
+            'super_admin' => 'superadmin@projectb.local',
             'seller' => 'seller@projectb.local',
             'buyer' => 'buyer@projectb.local',
             'affiliate_admin' => 'affiliate@projectb.local',
         ],
         'ids' => [
             'admin_user_id' => $adminId,
+            'super_admin_user_id' => $superadminId,
             'seller_user_id' => $sellerId,
             'buyer_user_id' => $buyerId,
             'affiliate_admin_user_id' => $affiliateAdminId,

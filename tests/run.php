@@ -25,6 +25,7 @@ $tests = [
     Tests\Unit\ProjectStabilizationTest::class,
     Tests\Unit\EnvironmentReadinessTest::class,
     Tests\Unit\MidtransCallbackEndpointTest::class,
+    Tests\Unit\DesignStudioV2DraftTest::class,
 ];
 
 $passed = 0;

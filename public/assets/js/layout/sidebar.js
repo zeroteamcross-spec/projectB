@@ -4,6 +4,7 @@ import { tw } from "../theme/tailwindClasses.js";
 import { applyDesignHook } from "../theme/designStudioHooks.js";
 import { adminMasterService } from "../modules/admin/services/adminMasterService.js";
 import { uiStore } from "../state/uiStore.js";
+import { designStudioV2MenuItem, isDesignStudioV2Allowed } from "../modules/designStudioV2/accessGuard.js";
 
 const BUYER_LINKS = [
   { href: "#/buyer", label: "Buyer Home", icon: "dashboard" },
@@ -202,7 +203,7 @@ function renderLinks(nav, store, options = {}) {
         : BUYER_LINKS;
   const links = getSidebarLinksForRole(role, store, fallbackLinks);
 
-  nav.replaceChildren(...links.map((link) => renderSidebarNode(link, path, options)));
+  nav.replaceChildren(...withDesignStudioV2Menu(links, role, store).map((link) => renderSidebarNode(link, path, options)));
 }
 
 function resolveSidebarRole(store) {
@@ -229,7 +230,7 @@ function isActive(currentPath, href) {
 }
 
 function getSidebarLinksForRole(role, store, fallbackLinks) {
-  const normalizedRole = role === "affiliate_admin" ? "affiliate" : role;
+  const normalizedRole = normalizeSidebarRole(role);
   if (!["admin", "seller", "affiliate"].includes(normalizedRole)) {
     return fallbackLinks;
   }
@@ -248,6 +249,30 @@ function getSidebarLinksForRole(role, store, fallbackLinks) {
   }
 
   return ensureProfileMenu(buildSidebarTree(items));
+}
+
+function normalizeSidebarRole(role) {
+  if (role === "affiliate_admin") {
+    return "affiliate";
+  }
+
+  if (role === "super_admin") {
+    return "admin";
+  }
+
+  return role;
+}
+
+function withDesignStudioV2Menu(links, role, store) {
+  if (normalizeSidebarRole(role) !== "admin" || !isDesignStudioV2Allowed({ store })) {
+    return links;
+  }
+
+  if (links.some((link) => String(link.href ?? "") === "#/admin/design-studio-v2")) {
+    return links;
+  }
+
+  return [...links, designStudioV2MenuItem()];
 }
 
 function ensureProfileMenu(links) {

@@ -84,6 +84,7 @@ Daftar tabel inti untuk `projectB`:
 21. `notifications`
 22. `sliders`
 23. `affiliate_settlement_histories`
+24. `user_oauth_identities`
 
 Catatan:
 - beberapa tabel adalah hasil normalisasi dari struktur lama
@@ -796,6 +797,36 @@ Index:
 Catatan:
 - history dibuat saat create settlement, settle, dan cancel.
 - settlement `cancelled` mengembalikan ledger ke `accrued`, bukan `voided`.
+
+---
+
+## 4.24 `user_oauth_identities`
+
+Tujuan:
+Menyimpan identity OAuth eksternal tanpa menambah kolom provider ke tabel `users`.
+
+Field:
+- `id` bigint unsigned, PK, auto increment
+- `user_id` bigint unsigned, FK -> `users.id`
+- `provider` varchar(50) not null
+- `provider_user_id` varchar(191) not null
+- `provider_email` varchar(100) not null
+- `provider_name` varchar(200) null
+- `avatar_url` text null
+- `created_at` datetime not null
+- `updated_at` datetime null
+- `deleted_at` datetime null
+
+Index:
+- unique on (`provider`, `provider_user_id`)
+- unique on (`user_id`, `provider`)
+- index on `user_id`
+- index on (`provider`, `provider_email`)
+
+Catatan:
+- provider awal: `google`.
+- satu akun Google hanya boleh terhubung ke satu user/role.
+- role tetap berasal dari `users.role`, bukan dari provider atau input frontend.
 
 ---
 

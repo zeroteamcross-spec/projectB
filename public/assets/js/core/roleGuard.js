@@ -2,11 +2,13 @@ import { defaultLoginPath, googleLoginPathForRole } from "../config/authUxConfig
 
 const PUBLIC_ROLE = "public";
 const SUPER_VIEWER_ROLE = "admin";
+const SUPER_ADMIN_ROLE = "super_admin";
 const DEFAULT_HOME_BY_ROLE = {
   public: "/",
   buyer: "/buyer",
   seller: "/seller",
   admin: "/admin",
+  super_admin: "/admin",
   affiliate_admin: "/affiliate",
 };
 
@@ -62,7 +64,11 @@ export function createRoleGuard({ auth } = {}) {
 }
 
 function canViewRole(currentRole, requiredRole) {
-  return currentRole === SUPER_VIEWER_ROLE && requiredRole !== PUBLIC_ROLE;
+  if (currentRole === SUPER_VIEWER_ROLE && requiredRole !== PUBLIC_ROLE) {
+    return true;
+  }
+
+  return currentRole === SUPER_ADMIN_ROLE && requiredRole === SUPER_VIEWER_ROLE;
 }
 
 function allow(route) {
@@ -110,6 +116,7 @@ function roleLabel(role) {
     buyer: "buyer",
     seller: "seller",
     admin: "admin",
+    super_admin: "super admin",
     affiliate_admin: "marketing admin",
   };
 

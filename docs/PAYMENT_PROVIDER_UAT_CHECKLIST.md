@@ -113,3 +113,26 @@ Checklist ini dipakai untuk UAT real payment webhook/provider setelah Global Not
   - callback still localhost/http, not public HTTPS
   - disposable provider mutation set not approved
 - Result: `BLOCKED`
+
+## Scenario F - Payment Page Persistence and Auto Status
+
+1. Buat transaksi QRIS disposable yang masih `pending_payment`.
+2. Pastikan QR tampil dan tombol `Download QR` aktif.
+3. Reload `#/buyer/transactions/{id}`.
+4. Pastikan QR dan Download QR tetap tampil dari transaction detail/payment log, tanpa membuat transaksi baru.
+5. Klik Download QR dan pastikan file `qris-payment-...png` terunduh lewat endpoint backend.
+6. Buat transaksi GoPay disposable dan reload halaman status.
+7. Pastikan deeplink/QR fallback tetap tampil dan auto-open mobile tidak berulang.
+8. Buat transaksi VA disposable dan reload halaman status.
+9. Pastikan VA/bill instruction tetap tampil.
+10. Biarkan payment page terbuka dan verifikasi polling status berjalan tiap 12 detik tanpa request overlap.
+11. Simulasikan callback/status menjadi `paid` untuk full payment.
+12. Pastikan overlay `Pembayaran Berhasil` muncul sekali, polling berhenti, dan reload tidak menampilkan overlay berulang.
+
+Evidence tambahan:
+
+- screenshot QRIS sebelum dan sesudah reload.
+- screenshot tombol Download QR.
+- bukti filename download.
+- network log polling `GET /api/transactions/{transaction_id}/status`.
+- screenshot overlay paid success.

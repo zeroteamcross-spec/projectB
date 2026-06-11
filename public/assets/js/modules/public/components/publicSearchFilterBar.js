@@ -27,7 +27,7 @@ export function PublicSearchFilterBar({
   form.className = "grid gap-3 xl:col-span-2";
 
   const searchWrap = document.createElement("div");
-  searchWrap.className = "flex min-w-0 items-center gap-2 rounded-[var(--pb-radius-xl)] border border-[var(--pb-border)] bg-[var(--pb-form-search-bg)] p-2 shadow-[var(--pb-shadow-soft)]";
+  searchWrap.className = "flex min-w-0 items-center gap-1 rounded-[var(--pb-radius-lg)] border border-[var(--pb-border)] bg-[var(--pb-form-search-bg)] p-1 shadow-[var(--pb-shadow-soft)]";
 
   const iconWrap = document.createElement("span");
   // iconWrap.className = "grid h-9 w-9 shrink-0 place-items-center rounded-[var(--pb-radius-xl)] bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] text-[var(--pb-brand-primary)] sm:h-10 sm:w-10";
@@ -43,7 +43,7 @@ export function PublicSearchFilterBar({
 
   const submit = document.createElement("button");
   submit.type = "submit";
-  submit.className = "grid h-8 w-8 shrink-0 place-items-center rounded-[var(--pb-radius-xl)] bg-[linear-gradient(135deg,var(--pb-btn-primary-from),var(--pb-btn-primary-to))] text-white shadow-[var(--pb-shadow-soft)] transition hover:brightness-95 sm:h-11 sm:w-11";
+  submit.className = "grid h-7 w-7 shrink-0 place-items-center rounded-[var(--pb-radius-lg)] bg-[linear-gradient(135deg,var(--pb-btn-primary-from),var(--pb-btn-primary-to))] text-white shadow-[var(--pb-shadow-soft)] transition hover:brightness-95 sm:h-8 sm:w-8";
   submit.setAttribute("aria-label", "Cari mobil");
   submit.append(createIcon("search", { className: "" }));
 
