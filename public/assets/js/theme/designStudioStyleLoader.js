@@ -113,4 +113,11 @@ export function bindDesignStudioStyleLoader(bus) {
         const route = context.path || context.route?.path || context.name || null;
         applyStylesForRoute(route);
     });
+
+    bus.on('design-studio:published', (context) => {
+        const route = context?.route || null;
+        if (route) {
+            applyStylesForRoute(route);
+        }
+    });
 }

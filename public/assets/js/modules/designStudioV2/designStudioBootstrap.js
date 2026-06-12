@@ -189,6 +189,14 @@ async function handlePublishFlow(documentRef) {
         confirmBtn.disabled = true;
         confirmBtn.textContent = 'Publishing...';
 
+        try {
+            if (draftManager) {
+                await draftManager.save();
+            }
+        } catch (err) {
+            console.error('Failed to save draft before publish:', err);
+        }
+
         const result = await publishManager.publish({
             route: activeRoute,
             publishNote: note,
@@ -196,6 +204,9 @@ async function handlePublishFlow(documentRef) {
 
         if (result) {
             alert('Desain berhasil diterbitkan!');
+            if (typeof dependencies?.bus?.emit === 'function') {
+                dependencies.bus.emit('design-studio:published', { route: activeRoute });
+            }
             documentRef.body.removeChild(modal);
         } else {
             alert('Gagal menerbitkan desain.');
@@ -436,12 +447,17 @@ async function handleHistoryFlow(documentRef) {
 
                         // Refresh styling visually in real-time
                         previewEngine?.clear?.();
+                        const width = window.innerWidth;
+                        const activeBp = width >= 1024 ? 'desktop' : (width >= 768 ? 'tablet' : 'mobile');
                         Object.entries(result.elements || {}).forEach(([elName, elDraft]) => {
-                            const effectiveStyles = getEffectiveStyles(elDraft, 'mobile');
+                            const effectiveStyles = getEffectiveStyles(elDraft, activeBp);
                             previewEngine?.apply(elName, effectiveStyles);
                         });
                     }
                     alert(`Rollback berhasil! Layout telah dikembalikan ke Versi ${version.version}.`);
+                    if (typeof dependencies?.bus?.emit === 'function') {
+                        dependencies.bus.emit('design-studio:published', { route: activeRoute });
+                    }
                     documentRef.body.removeChild(modal);
                 } else {
                     alert('Gagal melakukan rollback.');
@@ -657,8 +673,10 @@ export async function mountRoute(route = null) {
             await draftManager.load();
             const draftData = draftManager.getDraft();
             if (draftData && draftData.elements) {
+                const width = window.innerWidth;
+                const activeBp = width >= 1024 ? 'desktop' : (width >= 768 ? 'tablet' : 'mobile');
                 Object.entries(draftData.elements).forEach(([elName, elDraft]) => {
-                    const effectiveStyles = getEffectiveStyles(elDraft, 'mobile');
+                    const effectiveStyles = getEffectiveStyles(elDraft, activeBp);
                     previewEngine?.apply(elName, effectiveStyles);
                 });
             }

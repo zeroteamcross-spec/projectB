@@ -33,6 +33,11 @@ class DraftRepository extends JsonRepository
         $default = RouteStyleDocument::empty($route);
 
         if (! is_file($path)) {
+            $publishedRepo = new PublishRepository($this->storagePath);
+            $published = $publishedRepo->getPublished($route);
+            if ($published !== null && isset($published['elements'])) {
+                $default['elements'] = $published['elements'];
+            }
             $this->save($route, $default);
             return $default;
         }

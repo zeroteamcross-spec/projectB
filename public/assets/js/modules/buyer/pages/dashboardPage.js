@@ -256,7 +256,7 @@ function buyerSearchBar({ cars, uiState, actions }) {
   input.value = uiState.search;
   input.placeholder = "Cari mobil idamanmu...";
   input.autocomplete = "off";
-  input.className = "min-h-8 min-w-0 border-0 bg-transparent text-sm font-semibold text-[var(--pb-text)] outline-none placeholder:text-[var(--pb-text-muted)]";
+  input.className = "min-h-8 min-w-0 border-0 bg-transparent text-[10] font-semibold text-[var(--pb-text)] outline-none placeholder:text-[var(--pb-text-muted)]";
   input.addEventListener("input", () => actions.setSearch(input.value, cars));
 
   const filter = document.createElement("button");
