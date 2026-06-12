@@ -10,7 +10,7 @@ class InspectionPolicy
 {
     public static function ensureCanManage(array $user, array $car): void
     {
-        if (($user['role'] ?? null) === 'admin') {
+        if (in_array(($user['role'] ?? null), ['admin', 'super_admin'], true)) {
             return;
         }
 

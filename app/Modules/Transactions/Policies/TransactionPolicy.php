@@ -10,7 +10,7 @@ class TransactionPolicy
 {
     public static function scopeFilters(array $user, array $filters): array
     {
-        if (($user['role'] ?? null) === 'admin') {
+        if (in_array(($user['role'] ?? null), ['admin', 'super_admin'], true)) {
             return $filters;
         }
 
@@ -29,7 +29,7 @@ class TransactionPolicy
 
     public static function ensureCanCreate(array $user, int $buyerUserId): void
     {
-        if (($user['role'] ?? null) === 'admin') {
+        if (in_array(($user['role'] ?? null), ['admin', 'super_admin'], true)) {
             return;
         }
 
@@ -42,7 +42,7 @@ class TransactionPolicy
 
     public static function ensureCanView(array $user, array $transaction): void
     {
-        if (($user['role'] ?? null) === 'admin') {
+        if (in_array(($user['role'] ?? null), ['admin', 'super_admin'], true)) {
             return;
         }
 
@@ -72,7 +72,7 @@ class TransactionPolicy
 
     public static function ensureCanManageStatus(array $user, array $transaction): void
     {
-        if (($user['role'] ?? null) === 'admin') {
+        if (in_array(($user['role'] ?? null), ['admin', 'super_admin'], true)) {
             return;
         }
 
@@ -89,7 +89,7 @@ class TransactionPolicy
             return;
         }
 
-        if (($user['role'] ?? null) === 'admin') {
+        if (in_array(($user['role'] ?? null), ['admin', 'super_admin'], true)) {
             return;
         }
 
@@ -98,7 +98,7 @@ class TransactionPolicy
 
     public static function ensureCanCompletePayment(array $user, array $transaction): void
     {
-        if (($user['role'] ?? null) === 'admin') {
+        if (in_array(($user['role'] ?? null), ['admin', 'super_admin'], true)) {
             return;
         }
 

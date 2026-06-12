@@ -64,11 +64,15 @@ export function createRoleGuard({ auth } = {}) {
 }
 
 function canViewRole(currentRole, requiredRole) {
+  if (currentRole === SUPER_ADMIN_ROLE) {
+    return true;
+  }
+
   if (currentRole === SUPER_VIEWER_ROLE && requiredRole !== PUBLIC_ROLE) {
     return true;
   }
 
-  return currentRole === SUPER_ADMIN_ROLE && requiredRole === SUPER_VIEWER_ROLE;
+  return false;
 }
 
 function allow(route) {

@@ -50,7 +50,7 @@ class CarService
 
     public function detail(int $id, ?array $user = null): array
     {
-        $car = $this->cars->findById($id, ($user['role'] ?? null) === 'admin');
+        $car = $this->cars->findById($id, in_array(($user['role'] ?? null), ['admin', 'super_admin'], true));
 
         if (! $car || (! CarPolicy::canView($car, $user))) {
             throw new NotFoundException('Mobil tidak ditemukan.');
@@ -84,7 +84,7 @@ class CarService
         $carId = $this->cars->create($payload);
         $created = $this->cars->findById($carId, true) ?? array_merge($payload, ['id' => $carId]);
 
-        if ($this->notificationService !== null && ($user['role'] ?? null) === 'admin' && ($created['listing_status'] ?? null) === 'published') {
+        if ($this->notificationService !== null && in_array(($user['role'] ?? null), ['admin', 'super_admin'], true) && ($created['listing_status'] ?? null) === 'published') {
             $this->notificationService->createListingApprovedNotification($created);
         }
 
@@ -112,7 +112,7 @@ class CarService
             $payload['published_at'] = $car['published_at'];
         }
 
-        if (($user['role'] ?? null) === 'admin' && array_key_exists('seller_user_id', $data)) {
+        if (in_array(($user['role'] ?? null), ['admin', 'super_admin'], true) && array_key_exists('seller_user_id', $data)) {
             $payload['seller_user_id'] = (int) $data['seller_user_id'];
         } else {
             $payload['seller_user_id'] = (int) $car['seller_user_id'];
@@ -202,7 +202,7 @@ class CarService
 
     private function notifyListingStatusChange(array $before, array $after, array $actor): void
     {
-        if ($this->notificationService === null || ($actor['role'] ?? null) !== 'admin') {
+        if ($this->notificationService === null || !in_array(($actor['role'] ?? null), ['admin', 'super_admin'], true)) {
             return;
         }
 

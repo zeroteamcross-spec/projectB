@@ -72,6 +72,6 @@ class AffiliatePolicy
 
     private static function isAdminScope(array $user): bool
     {
-        return ($user['role'] ?? null) === 'admin';
+        return in_array(($user['role'] ?? null), ['admin', 'super_admin'], true);
     }
 }
