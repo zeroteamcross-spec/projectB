@@ -201,7 +201,27 @@ function renderLinks(nav, store, options = {}) {
       : role === "affiliate_admin"
         ? AFFILIATE_LINKS
         : BUYER_LINKS;
-  const links = getSidebarLinksForRole(role, store, fallbackLinks);
+  let links = getSidebarLinksForRole(role, store, fallbackLinks);
+
+  const userRealRole = store?.get("auth.user.role", "") || store?.get("auth.role", "");
+  if (userRealRole === "super_admin") {
+    if (!links.some((l) => l.label === "Role Switcher (Super)")) {
+      links = [
+        ...links,
+        {
+          href: "#",
+          label: "Role Switcher (Super)",
+          icon: "user",
+          children: [
+            { href: "#/admin", label: "Admin View", icon: "dashboard" },
+            { href: "#/buyer", label: "Buyer View", icon: "user" },
+            { href: "#/seller", label: "Seller View", icon: "car" },
+            { href: "#/affiliate", label: "Affiliate View", icon: "affiliate" },
+          ],
+        },
+      ];
+    }
+  }
 
   nav.replaceChildren(...withDesignStudioV2Menu(links, role, store).map((link) => renderSidebarNode(link, path, options)));
 }

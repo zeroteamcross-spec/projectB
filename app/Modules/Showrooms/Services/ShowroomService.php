@@ -75,7 +75,7 @@ class ShowroomService
 
     private function ensureSeller(array $user): void
     {
-        if (($user['role'] ?? null) !== 'seller') {
+        if (! in_array(($user['role'] ?? null), ['seller', 'super_admin'], true)) {
             throw new ForbiddenException('Hanya seller yang dapat mengelola showroom.');
         }
     }

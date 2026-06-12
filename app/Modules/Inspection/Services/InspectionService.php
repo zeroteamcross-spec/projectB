@@ -103,7 +103,7 @@ class InspectionService
 
     public function sellerOverview(array $user, array $filters = []): array
     {
-        if (($user['role'] ?? null) !== 'seller') {
+        if (! in_array(($user['role'] ?? null), ['seller', 'super_admin'], true)) {
             throw new ForbiddenException('Akses overview inspeksi seller tidak diizinkan.');
         }
 
