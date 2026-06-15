@@ -1,6 +1,6 @@
 import { groupPropertyMetadata } from './propertyMetadataRegistry.js';
 
-export function createEditorPanel({ documentRef = null, resizeManager = null, showHighRisk = false, onChange = null, onPublish = null, onViewHistory = null, onSaveDraft = null } = {}) {
+export function createEditorPanel({ documentRef = null, resizeManager = null, showHighRisk = false, onChange = null, onPublish = null, onViewHistory = null, onSaveDraft = null, onResetElement = null } = {}) {
     let panel = null;
     let collapsed = false;
     let currentSelectedElement = null;
@@ -131,14 +131,53 @@ export function createEditorPanel({ documentRef = null, resizeManager = null, sh
             padding: '12px 20px',
             background: '#f3f4f6',
             borderBottom: '1px solid #e5e7eb',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: '10px',
+        });
+
+        const selectedText = documentRef.createElement('span');
+        selectedText.textContent = `Selected: ${currentSelectedElement}`;
+        Object.assign(selectedText.style, {
             fontSize: '12px',
             fontWeight: '500',
             color: '#374151',
             textOverflow: 'ellipsis',
             overflow: 'hidden',
             whiteSpace: 'nowrap',
+            flex: '1',
         });
-        elementInfo.textContent = `Selected: ${currentSelectedElement}`;
+        elementInfo.appendChild(selectedText);
+
+        const resetBtn = documentRef.createElement('button');
+        resetBtn.textContent = 'Reset Element';
+        Object.assign(resetBtn.style, {
+            border: 'none',
+            background: 'transparent',
+            color: '#dc2626',
+            fontSize: '11px',
+            fontWeight: '600',
+            cursor: 'pointer',
+            padding: '2px 6px',
+            borderRadius: '4px',
+            transition: 'background 0.2s',
+        });
+        resetBtn.addEventListener('mouseenter', () => {
+            resetBtn.style.background = '#fee2e2';
+        });
+        resetBtn.addEventListener('mouseleave', () => {
+            resetBtn.style.background = 'transparent';
+        });
+        resetBtn.addEventListener('click', () => {
+            if (confirm(`Apakah Anda yakin ingin mereset elemen "${currentSelectedElement}" ke stelan default?`)) {
+                if (typeof onResetElement === 'function') {
+                    onResetElement(currentSelectedElement);
+                }
+            }
+        });
+        elementInfo.appendChild(resetBtn);
+
         panel.appendChild(elementInfo);
 
         // Breakpoint Switcher Tabs

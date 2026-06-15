@@ -47,11 +47,22 @@ export class PreviewStyleEngine {
                     return;
                 }
 
+                const kebabProp = property.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
+                const finalProp = property === 'shadow' ? 'box-shadow' : kebabProp;
+
                 if (!Object.prototype.hasOwnProperty.call(previous, property)) {
-                    previous[property] = node.style[property] || '';
+                    previous[property] = {
+                        value: node.style.getPropertyValue(finalProp),
+                        priority: node.style.getPropertyPriority(finalProp)
+                    };
                 }
 
-                node.style[property] = formatValue(metadata, value);
+                const formatted = formatValue(metadata, value);
+                if (formatted !== '') {
+                    node.style.setProperty(finalProp, formatted, 'important');
+                } else {
+                    node.style.removeProperty(finalProp);
+                }
             });
 
             this.applied.set(node, previous);
@@ -62,8 +73,14 @@ export class PreviewStyleEngine {
 
     clear() {
         this.applied.forEach((styles, node) => {
-            Object.entries(styles).forEach(([property, value]) => {
-                node.style[property] = value;
+            Object.entries(styles).forEach(([property, original]) => {
+                const kebabProp = property.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
+                const finalProp = property === 'shadow' ? 'box-shadow' : kebabProp;
+                if (original && original.value !== undefined) {
+                    node.style.setProperty(finalProp, original.value, original.priority || '');
+                } else {
+                    node.style.removeProperty(finalProp);
+                }
             });
         });
         this.applied.clear();

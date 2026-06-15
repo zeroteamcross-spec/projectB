@@ -567,6 +567,29 @@ export function initialize(options = {}) {
                         alert('Gagal menyimpan draf.');
                     }
                 }
+            },
+            onResetElement: (elementName) => {
+                if (draftManager) {
+                    draftManager.clearElement(elementName);
+                    
+                    // Clear overrides visually from PreviewStyleEngine
+                    previewEngine?.clear();
+                    
+                    // Re-apply preview styles for all other elements in the draft
+                    const draftData = draftManager.getDraft();
+                    if (draftData && draftData.elements) {
+                        const width = window.innerWidth;
+                        const activeBp = width >= 1024 ? 'desktop' : (width >= 768 ? 'tablet' : 'mobile');
+                        Object.entries(draftData.elements).forEach(([elName, elDraft]) => {
+                            const effectiveStyles = getEffectiveStyles(elDraft, activeBp);
+                            previewEngine?.apply(elName, effectiveStyles);
+                        });
+                    }
+                    
+                    // Deselect and reselect to trigger input updates to default empty state
+                    selectionManager?.select(null);
+                    selectionManager?.select(elementName);
+                }
             }
         });
 
