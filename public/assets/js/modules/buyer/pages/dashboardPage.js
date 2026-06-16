@@ -152,8 +152,8 @@ function render(root, context, actions, uiState, notFound) {
     buyerSearchBar({ cars, uiState, actions }),
     SliderBanner({
       sliders: resolveBuyerSliders(),
-      idPrefix: "pubcat",
-      context: "public",
+      idPrefix: "byr",
+      context: "buyer",
       onNavigate: actions.navigate,
       fallback: () => buyerHero({ cars, notFound, actions }),
     }),
