@@ -545,9 +545,11 @@ async function loadMore(root, context, flags) {
 }
 
 function activeFilterCount(filters) {
-  return Object.entries(filters)
-    .filter(([key, value]) => key !== "keyword" && value !== "" && value !== null && value !== undefined)
-    .length;
+  return Object.entries(filters).reduce((count, [key, value]) => {
+    if (key === "keyword" || key === "brand_name") return count;
+    if (key === "brand_names" && Array.isArray(value)) return count + value.filter(Boolean).length;
+    return value !== "" && value !== null && value !== undefined ? count + 1 : count;
+  }, 0);
 }
 
 function buildFilterOptions(cars) {
@@ -595,7 +597,7 @@ function applyQuickFilter(cars, quickFilter) {
 
 function applyLocalFilters(cars, filters = {}) {
   const keyword = String(filters.keyword ?? "").trim().toLowerCase();
-  const brand = String(filters.brand_name ?? "").trim().toLowerCase();
+  const brands = selectedBrands(filters).map((brand) => brand.toLowerCase());
   const transmission = String(filters.transmission ?? "").trim().toLowerCase();
   const location = String(filters.location_name ?? "").trim().toLowerCase();
   const minPrice = Number(filters.min_price_cash ?? 0);
@@ -612,13 +614,21 @@ function applyLocalFilters(cars, filters = {}) {
     const price = effectivePrice(car);
 
     if (keyword && !searchable.includes(keyword)) return false;
-    if (brand && String(car.brand_name ?? "").toLowerCase() !== brand) return false;
+    if (brands.length > 0 && !brands.includes(String(car.brand_name ?? "").toLowerCase())) return false;
     if (transmission && String(car.transmission ?? "").toLowerCase() !== transmission) return false;
     if (location && String(car.location_name ?? "").toLowerCase() !== location) return false;
     if (minPrice > 0 && price < minPrice) return false;
     if (maxPrice > 0 && price > maxPrice) return false;
     return true;
   });
+}
+
+function selectedBrands(filters) {
+  if (Array.isArray(filters?.brand_names)) {
+    return [...new Set(filters.brand_names.map(String).filter(Boolean))];
+  }
+  const legacyBrand = String(filters?.brand_name ?? "");
+  return legacyBrand ? [legacyBrand] : [];
 }
 
 function marketableCars(cars = []) {

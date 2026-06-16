@@ -27,7 +27,7 @@ export function PublicSearchFilterBar({
   form.className = "grid gap-3 xl:col-span-2";
 
   const searchWrap = document.createElement("div");
-  searchWrap.className = "flex min-w-0 items-center gap-1 rounded-[var(--pb-radius-lg)] border border-[var(--pb-border)] bg-[var(--pb-form-search-bg)] p-1 shadow-[var(--pb-shadow-soft)]";
+  searchWrap.className = "flex min-w-0 items-center gap-1 overflow-visible rounded-[var(--pb-radius-lg)] border border-[var(--pb-border)] bg-[var(--pb-form-search-bg)] p-1 shadow-[var(--pb-shadow-soft)]";
 
   const iconWrap = document.createElement("span");
   // iconWrap.className = "grid h-9 w-9 shrink-0 place-items-center rounded-[var(--pb-radius-xl)] bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] text-[var(--pb-brand-primary)] sm:h-10 sm:w-10";
@@ -47,7 +47,7 @@ export function PublicSearchFilterBar({
   submit.setAttribute("aria-label", "Cari mobil");
   submit.append(createIcon("search", { className: "" }));
 
-  searchWrap.append(iconWrap, input, submit);
+  searchWrap.append(iconWrap, input, submit, actionRow({ activeFilterCount, quickFilter, onQuickFilter, onOpenFilter }));
   form.append(searchWrap);
   form.addEventListener("submit", (event) => {
     event.preventDefault();
@@ -56,8 +56,8 @@ export function PublicSearchFilterBar({
 
   section.append(form);
   const filterStack = document.createElement("div");
-  filterStack.className = "grid min-w-0 gap-1 xl:grid-cols-[minmax(0,1fr)_280px] xl:items-start";
-  filterStack.append(PublicQuickFilterRow({ active: quickFilter, onChange: onQuickFilter }), actionRow({ activeFilterCount, quickFilter, onQuickFilter, onOpenFilter }));
+  filterStack.className = "grid min-w-0 gap-1";
+  filterStack.append(PublicQuickFilterRow({ active: quickFilter, onChange: onQuickFilter }));
   section.append(filterStack);
   section.append(locationSelector({ filters, options, onSearch }));
 
@@ -66,32 +66,34 @@ export function PublicSearchFilterBar({
 
 function actionRow({ activeFilterCount, quickFilter, onQuickFilter, onOpenFilter }) {
   const row = document.createElement("div");
-  row.className = "relative z-40 grid grid-cols-2 gap-3 overflow-visible text-xs xl:min-w-[280px]";
+  row.className = "relative z-40 flex shrink-0 items-center gap-1 overflow-visible text-xs";
   applyDesignHook(row, "catalog.filter.toolbar");
   row.style.fontSize = "12px";
 
   const filterButton = Button({
-    label: activeFilterCount > 0 ? `Filter (${activeFilterCount})` : "Filter",
+    label: "",
     variant: "secondary",
     onClick: () => onOpenFilter?.(),
     designHook: "shared.button.secondary",
   });
-  filterButton.classList.add("min-h-12", "w-full", "justify-center", "rounded-[var(--pb-radius-xl)]", "text-xs");
+  filterButton.setAttribute("aria-label", activeFilterCount > 0 ? `Filter, ${activeFilterCount} aktif` : "Filter");
+  filterButton.classList.add("h-7", "w-7", "min-h-0", "justify-center", "rounded-[var(--pb-radius-lg)]", "p-0", "text-xs", "sm:h-8", "sm:w-8");
   filterButton.prepend(createIcon("filter", { className: "h-4 w-4" }));
 
   const sortWrap = document.createElement("div");
-  sortWrap.className = "relative z-50 min-w-0 overflow-visible";
+  sortWrap.className = "relative z-50 shrink-0 overflow-visible";
 
   const sortButton = Button({
-    label: "Urutkan",
+    label: "",
     variant: "secondary",
     designHook: "shared.button.secondary",
   });
-  sortButton.classList.add("min-h-12", "w-full", "justify-center", "rounded-[var(--pb-radius-xl)]");
+  sortButton.setAttribute("aria-label", "Urutkan");
+  sortButton.classList.add("h-7", "w-7", "min-h-0", "justify-center", "rounded-[var(--pb-radius-lg)]", "p-0", "sm:h-8", "sm:w-8");
   sortButton.prepend(createIcon("sort", { className: "h-4 w-4" }));
 
   const menu = document.createElement("div");
-  menu.className = "absolute right-0 top-[calc(100%+0.35rem)] z-[65] hidden w-full min-w-0 rounded-[var(--pb-radius-2xl)] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] p-2 shadow-[var(--pb-shadow-elevated)] sm:min-w-[180px] sm:w-auto";
+  menu.className = "absolute right-0 top-[calc(100%+0.35rem)] z-[65] hidden w-[180px] rounded-[var(--pb-radius-2xl)] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] p-2 shadow-[var(--pb-shadow-elevated)]";
 
   SORT_OPTIONS.forEach((option) => {
     const item = document.createElement("button");

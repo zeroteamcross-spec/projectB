@@ -46,6 +46,7 @@ export function BuyerDashboardPage({ notFound = false } = {}) {
     search: "",
     category: "all",
     brand: "",
+    brands: [],
     transmission: "",
     favorites: new Set(),
   };
@@ -262,10 +263,14 @@ function buyerSearchBar({ cars, uiState, actions }) {
   const filter = document.createElement("button");
   filter.id = "byr_filter_button";
   filter.type = "button";
-  filter.className = "inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[var(--pb-brand-secondary)] transition hover:bg-[color-mix(in_srgb,var(--pb-brand-primary)_10%,transparent)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]";
-  filter.setAttribute("aria-label", "Filter mobil");
+  filter.className = "relative inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[var(--pb-brand-secondary)] transition hover:bg-[color-mix(in_srgb,var(--pb-brand-primary)_10%,transparent)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  const activeCount = activeBuyerFilterCount(uiState);
+  filter.setAttribute("aria-label", activeCount > 0 ? `Filter mobil, ${activeCount} aktif` : "Filter mobil");
   filter.addEventListener("click", () => actions.openFilter(cars));
   filter.append(createIcon("filter", { className: "block h-5 w-5 leading-none" }));
+  if (activeCount > 0) {
+    filter.append(textNode("span", "absolute right-1 top-1 grid h-4 min-w-4 place-items-center rounded-full bg-[var(--pb-brand-primary)] px-1 text-[10px] font-black leading-none text-white", String(activeCount)));
+  }
 
   wrap.append(input, filter);
   return wrap;
@@ -621,7 +626,7 @@ function navLink(item, activePath, actions, mode) {
 function openBuyerFilterModal({ cars, uiState, onApply }) {
   const draft = {
     category: uiState.category,
-    brand: uiState.brand,
+    brands: selectedBrands(uiState),
     transmission: uiState.transmission,
   };
   const content = document.createElement("section");
@@ -643,10 +648,14 @@ function openBuyerFilterModal({ cars, uiState, onApply }) {
       label: item.label,
       value: item.value,
       icon: "car",
-      active: draft.brand === item.value,
+      active: item.value === "" ? draft.brands.length === 0 : draft.brands.includes(item.value),
       onClick: (button, siblings) => {
-        draft.brand = item.value;
-        syncOptionButtons(button, siblings);
+        if (item.value === "") {
+          draft.brands = [];
+        } else {
+          draft.brands = toggleValue(draft.brands, item.value);
+        }
+        syncMultiOptionButtons(siblings, draft.brands);
       },
     }))),
     filterGroup("Transmisi", localOptions(cars, "transmission", "Semua Transmisi").map((item) => ({
@@ -670,6 +679,7 @@ function openBuyerFilterModal({ cars, uiState, onApply }) {
     onClick: () => {
       uiState.category = "all";
       uiState.brand = "";
+      uiState.brands = [];
       uiState.transmission = "";
       closeModal({ notify: false });
       onApply?.();
@@ -682,7 +692,8 @@ function openBuyerFilterModal({ cars, uiState, onApply }) {
     label: "Selesai",
     onClick: () => {
       uiState.category = draft.category;
-      uiState.brand = draft.brand;
+      uiState.brand = "";
+      uiState.brands = [...draft.brands];
       uiState.transmission = draft.transmission;
       closeModal({ notify: false });
       onApply?.();
@@ -787,6 +798,7 @@ function filterGroup(title, options) {
     button.type = "button";
     button.className = optionButtonClassName(option.active);
     button.dataset.active = option.active ? "true" : "false";
+    button.dataset.value = option.value ?? "";
     button.append(
       iconBox({ size: "h-8 w-8", className: "rounded-full text-[var(--pb-brand-secondary)]", icon: option.icon, iconSize: "h-4 w-4" }),
       textNode("span", "min-w-0 truncate text-left", option.label),
@@ -802,7 +814,7 @@ function filterGroup(title, options) {
 function filterCars(cars, uiState) {
   const search = String(uiState.search ?? "").trim().toLowerCase();
   const category = String(uiState.category || "all");
-  const brand = String(uiState.brand || "");
+  const brands = selectedBrands(uiState);
   const transmission = String(uiState.transmission || "");
 
   return cars.filter((car) => {
@@ -818,7 +830,7 @@ function filterCars(cars, uiState) {
     if (search && !haystack.includes(search)) {
       return false;
     }
-    if (brand && String(car.brand_name ?? "") !== brand) {
+    if (brands.length > 0 && !brands.includes(String(car.brand_name ?? ""))) {
       return false;
     }
     if (transmission && String(car.transmission ?? "") !== transmission) {
@@ -826,6 +838,35 @@ function filterCars(cars, uiState) {
     }
     return matchesCategory(car, category);
   });
+}
+
+function activeBuyerFilterCount(uiState) {
+  let count = selectedBrands(uiState).length;
+  if (String(uiState?.category ?? "all") !== "all") {
+    count += 1;
+  }
+  if (String(uiState?.transmission ?? "")) {
+    count += 1;
+  }
+  return count;
+}
+
+function selectedBrands(uiState) {
+  if (Array.isArray(uiState?.brands)) {
+    return [...new Set(uiState.brands.map(String).filter(Boolean))];
+  }
+  const legacyBrand = String(uiState?.brand ?? "");
+  return legacyBrand ? [legacyBrand] : [];
+}
+
+function toggleValue(values, value) {
+  const current = new Set((Array.isArray(values) ? values : []).map(String).filter(Boolean));
+  if (current.has(value)) {
+    current.delete(value);
+  } else {
+    current.add(value);
+  }
+  return [...current];
 }
 
 function matchesCategory(car, category) {
@@ -1094,6 +1135,16 @@ function optionButtonClassName(active) {
 function syncOptionButtons(activeButton, siblings) {
   siblings.forEach((button) => {
     const active = button === activeButton;
+    button.dataset.active = active ? "true" : "false";
+    button.className = optionButtonClassName(active);
+  });
+}
+
+function syncMultiOptionButtons(siblings, activeValues) {
+  const activeSet = new Set(activeValues.map(String));
+  siblings.forEach((button) => {
+    const value = String(button.dataset.value ?? "");
+    const active = value === "" ? activeSet.size === 0 : activeSet.has(value);
     button.dataset.active = active ? "true" : "false";
     button.className = optionButtonClassName(active);
   });

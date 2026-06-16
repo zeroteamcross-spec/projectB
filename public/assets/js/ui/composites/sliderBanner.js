@@ -26,10 +26,12 @@ export function SliderBanner({
   injectSliderStyles();
   const slider = items[0];
   const templateKey = templateKeyFor(slider);
+  const usesSidePeek = context === "public" && items.length > 1;
   const section = document.createElement("section");
   section.id = `${idPrefix}_slider_banner`;
   section.className = [
     "pb-slider-banner",
+    usesSidePeek ? "pb-slider-side-peek" : "",
     `pb-slider-${templateKey}`,
     `pb-slider-anim-${animationKeyFor(slider)}`,
     context === "buyer" ? "pb-slider-context-buyer" : "pb-slider-context-public",
@@ -39,9 +41,13 @@ export function SliderBanner({
 
   const track = document.createElement("section");
   track.className = "pb-slider-track";
-  const slideNodes = items.map((item) => {
+  const renderedItems = usesSidePeek
+    ? [items[items.length - 1], ...items, items[0]]
+    : items;
+  const slideNodes = renderedItems.map((item, renderedIndex) => {
     const slide = document.createElement("section");
     slide.className = "pb-slider-item";
+    slide.dataset.sliderItemIndex = String(usesSidePeek ? wrapIndex(renderedIndex - 1, items.length) : renderedIndex);
     slide.append(slideTemplate(item, {
       idPrefix,
       onNavigate,
@@ -53,6 +59,7 @@ export function SliderBanner({
 
   const dotsWrap = carouselDots(items.length, 0);
   let activeIndex = 0;
+  let renderedIndex = usesSidePeek ? 1 : 0;
   let timerId = null;
   let resizeTimerId = null;
   const handleResize = () => {
@@ -61,14 +68,18 @@ export function SliderBanner({
   };
 
   const applyTrackPosition = (dragOffset = 0, animated = true) => {
-    const activeSlide = slideNodes[activeIndex];
+    const activeSlide = slideNodes[renderedIndex];
     if (!activeSlide) return;
+    const sidePeekOffset = usesSidePeek
+      ? (section.clientWidth - activeSlide.offsetWidth) / 2
+      : 0;
     track.style.transition = animated ? "" : "none";
-    track.style.transform = `translate3d(${dragOffset - activeSlide.offsetLeft}px,0,0)`;
+    track.style.transform = `translate3d(${dragOffset + sidePeekOffset - activeSlide.offsetLeft}px,0,0)`;
   };
 
-  const renderActiveSlide = (nextIndex, direction = "initial", animated = true) => {
+  const renderActiveSlide = (nextIndex, direction = "initial", animated = true, targetRenderedIndex = null) => {
     activeIndex = wrapIndex(nextIndex, items.length);
+    renderedIndex = targetRenderedIndex ?? (usesSidePeek ? activeIndex + 1 : activeIndex);
     const activeSlider = items[activeIndex];
     const activeTemplateKey = templateKeyFor(activeSlider);
     const directionClass = direction === "prev"
@@ -79,21 +90,44 @@ export function SliderBanner({
     section.dataset.template = activeTemplateKey;
     section.className = [
       "pb-slider-banner",
+      usesSidePeek ? "pb-slider-side-peek" : "",
       `pb-slider-${activeTemplateKey}`,
       `pb-slider-anim-${animationKeyFor(activeSlider)}`,
       directionClass,
       context === "buyer" ? "pb-slider-context-buyer" : "pb-slider-context-public",
     ].filter(Boolean).join(" ");
     slideNodes.forEach((slide, index) => {
-      slide.classList.toggle("pb-slider-item-active", index === activeIndex);
-      slide.setAttribute("aria-hidden", index === activeIndex ? "false" : "true");
+      const isActive = index === renderedIndex;
+      const isBeforeActive = usesSidePeek && index === renderedIndex - 1;
+      const isAfterActive = usesSidePeek && index === renderedIndex + 1;
+      slide.classList.toggle("pb-slider-item-active", isActive);
+      slide.classList.toggle("pb-slider-item-before-active", isBeforeActive);
+      slide.classList.toggle("pb-slider-item-after-active", isAfterActive);
+      slide.setAttribute("aria-hidden", isActive ? "false" : "true");
     });
     applyTrackPosition(0, animated);
     syncCarouselDots(dotsWrap, activeIndex);
   };
 
-  const next = () => renderActiveSlide(activeIndex + 1, "next");
-  const previous = () => renderActiveSlide(activeIndex - 1, "prev");
+  const snapInfiniteEdge = () => {
+    if (!usesSidePeek) return;
+    if (renderedIndex === 0) {
+      renderActiveSlide(items.length - 1, "initial", false, items.length);
+      return;
+    }
+    if (renderedIndex === items.length + 1) {
+      renderActiveSlide(0, "initial", false, 1);
+    }
+  };
+
+  const next = () => {
+    const nextRenderedIndex = usesSidePeek ? renderedIndex + 1 : activeIndex + 1;
+    renderActiveSlide(activeIndex + 1, "next", true, nextRenderedIndex);
+  };
+  const previous = () => {
+    const nextRenderedIndex = usesSidePeek ? renderedIndex - 1 : activeIndex - 1;
+    renderActiveSlide(activeIndex - 1, "prev", true, nextRenderedIndex);
+  };
   const goNextFromInteraction = () => {
     next();
     scheduleNext();
@@ -120,7 +154,7 @@ export function SliderBanner({
     const button = event.target?.closest?.("[data-slider-index]");
     if (!button) return;
     const nextIndex = Number(button.dataset.sliderIndex);
-    renderActiveSlide(nextIndex, nextIndex < activeIndex ? "prev" : "next");
+    renderActiveSlide(nextIndex, nextIndex < activeIndex ? "prev" : "next", true, usesSidePeek ? nextIndex + 1 : nextIndex);
     scheduleNext();
   });
 
@@ -142,6 +176,10 @@ export function SliderBanner({
   section.addEventListener("pb-slider:pause", clearTimer);
   section.addEventListener("pb-slider:resume", scheduleNext);
   window.addEventListener("resize", handleResize);
+  track.addEventListener("transitionend", (event) => {
+    if (event.target !== track || event.propertyName !== "transform") return;
+    snapInfiniteEdge();
+  });
   section.append(track, dotsWrap);
   renderActiveSlide(0, "initial", false);
   scheduleNext();
@@ -546,12 +584,15 @@ function injectSliderStyles() {
   style.id = "pb-slider-banner-styles";
   style.textContent = `
     .pb-slider-banner{position:relative;overflow:hidden;aspect-ratio:16/5;border-radius:24px;box-shadow:0 22px 58px rgba(15,23,42,.11)}
+    .pb-slider-side-peek{border-radius:0;box-shadow:none}
     .pb-slider-swipeable{touch-action:pan-y;cursor:grab}
     .pb-slider-swipeable:active{cursor:grabbing}
-    .pb-slider-track{position:absolute;inset:0;display:flex;gap:14px;overflow:visible;will-change:transform;transition:transform .46s cubic-bezier(.2,.8,.2,1)}
+    .pb-slider-track{position:absolute;inset:0;display:flex;gap:16px;overflow:visible;will-change:transform;transition:transform .46s cubic-bezier(.2,.8,.2,1)}
     .pb-slider-track-dragging{transition:none}
-    .pb-slider-item{position:relative;flex:0 0 92%;height:100%;overflow:hidden;border-radius:inherit;transform:scale(.985);opacity:.78;transition:opacity .24s ease,transform .24s ease}
-    .pb-slider-item-active{transform:scale(1);opacity:1}
+    .pb-slider-item{position:relative;flex:0 0 78%;height:100%;overflow:hidden;border-radius:14px;transform:scale(1);opacity:1;transition:opacity .24s ease,transform .24s ease}
+    .pb-slider-item-before-active{border-radius:0 14px 14px 0}
+    .pb-slider-item-after-active{border-radius:14px 0 0 14px}
+    .pb-slider-item-active{border-radius:14px;box-shadow:0 22px 58px rgba(15,23,42,.11);transform:scale(1);opacity:1}
     .pb-slider-inner{position:absolute;inset:0;padding:24px;display:grid;grid-template-columns:minmax(0,58%) minmax(112px,42%);align-items:center;gap:18px;isolation:isolate}
     #pubcat_slider_banner .pb-slider-inner{padding-top:18px;padding-bottom:18px}
     .pb-slider-gradient-inner{background:linear-gradient(135deg,#fb923c 0%,#ef4444 48%,#111827 100%);color:#fff}
@@ -593,8 +634,8 @@ function injectSliderStyles() {
     @keyframes pbSliderFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
     @keyframes pbSliderCarouselNext{0%{opacity:0;transform:translateX(24px) scale(.985);filter:blur(4px)}100%{opacity:1;transform:translateX(0) scale(1);filter:blur(0)}}
     @keyframes pbSliderCarouselPrev{0%{opacity:0;transform:translateX(-24px) scale(.985);filter:blur(4px)}100%{opacity:1;transform:translateX(0) scale(1);filter:blur(0)}}
-    @media (max-width:640px){.pb-slider-banner{aspect-ratio:16/6.4;border-radius:18px}.pb-slider-item{flex-basis:88%}.pb-slider-track{gap:10px}.pb-slider-context-buyer{aspect-ratio:auto;min-height:250px}.pb-slider-inner{grid-template-columns:minmax(0,58%) minmax(86px,42%);gap:9px;padding:12px}#pubcat_slider_banner .pb-slider-inner{padding-top:9px;padding-bottom:9px}.pb-slider-context-buyer .pb-slider-inner{grid-template-columns:1fr;grid-template-rows:minmax(78px,42%) minmax(0,1fr);align-content:start;gap:7px;padding:11px 12px 28px}.pb-slider-context-buyer .pb-slider-glass-inner,.pb-slider-context-buyer .pb-slider-minimal-inner{grid-template-columns:1fr;grid-template-rows:minmax(78px,42%) minmax(0,1fr)}.pb-slider-context-buyer .pb-slider-image-panel,.pb-slider-context-buyer .pb-slider-product-media{order:1;min-height:0;aspect-ratio:16/7;width:100%;height:auto}.pb-slider-context-buyer .pb-slider-copy,.pb-slider-context-buyer .pb-slider-glass-card,.pb-slider-context-buyer .pb-slider-product-copy{order:2}.pb-slider-full-image-inner{padding:0}.pb-slider-glass-inner{grid-template-columns:minmax(86px,42%) minmax(0,58%)}.pb-slider-copy,.pb-slider-glass-card{gap:6px}.pb-slider-context-buyer .pb-slider-copy,.pb-slider-context-buyer .pb-slider-glass-card{gap:4px;max-width:100%}.pb-slider-title{font-size:16px;line-height:1.08}.pb-slider-context-buyer .pb-slider-title{font-size:14px;line-height:1.08;-webkit-line-clamp:2}.pb-slider-description{font-size:10px;line-height:1.32}.pb-slider-context-buyer .pb-slider-description{font-size:9px;line-height:1.25;-webkit-line-clamp:1}.pb-slider-pill{padding:4px 7px;font-size:8px}.pb-slider-context-buyer .pb-slider-pill{padding:3px 6px;font-size:7px}.pb-slider-glass-card{border-radius:14px;padding:10px}.pb-slider-context-buyer .pb-slider-glass-card{padding:8px}.pb-slider-image-panel{border-radius:14px}.pb-slider-full-image-panel{border-radius:inherit}.pb-slider-cta{min-height:30px!important;padding:5px 9px!important;font-size:10px!important}.pb-slider-context-buyer .pb-slider-cta{min-height:26px!important;padding:4px 8px!important;font-size:9px!important}.pb-slider-dots{bottom:8px}.pb-slider-dot{width:6px;height:6px}.pb-slider-dot-active{width:16px}}
-    @media (min-width:641px) and (max-width:1023px){.pb-slider-banner{aspect-ratio:16/7.2}.pb-slider-item{flex-basis:90%}.pb-slider-inner{padding:20px;gap:14px}#pubcat_slider_banner .pb-slider-inner{padding-top:15px;padding-bottom:15px}.pb-slider-title{font-size:24px}.pb-slider-description{font-size:13px}.pb-slider-glass-card{padding:15px}}
+    @media (max-width:640px){.pb-slider-banner{aspect-ratio:16/6.4;border-radius:16px}.pb-slider-side-peek{border-radius:0}.pb-slider-item{flex-basis:78%;border-radius:12px}.pb-slider-item-before-active{border-radius:0 12px 12px 0}.pb-slider-item-after-active{border-radius:12px 0 0 12px}.pb-slider-item-active{border-radius:12px}.pb-slider-track{gap:10px}.pb-slider-context-buyer{aspect-ratio:auto;min-height:250px}.pb-slider-inner{grid-template-columns:minmax(0,58%) minmax(86px,42%);gap:9px;padding:12px}#pubcat_slider_banner .pb-slider-inner{padding-top:9px;padding-bottom:9px}.pb-slider-context-buyer .pb-slider-inner{grid-template-columns:1fr;grid-template-rows:minmax(78px,42%) minmax(0,1fr);align-content:start;gap:7px;padding:11px 12px 28px}.pb-slider-context-buyer .pb-slider-glass-inner,.pb-slider-context-buyer .pb-slider-minimal-inner{grid-template-columns:1fr;grid-template-rows:minmax(78px,42%) minmax(0,1fr)}.pb-slider-context-buyer .pb-slider-image-panel,.pb-slider-context-buyer .pb-slider-product-media{order:1;min-height:0;aspect-ratio:16/7;width:100%;height:auto}.pb-slider-context-buyer .pb-slider-copy,.pb-slider-context-buyer .pb-slider-glass-card,.pb-slider-context-buyer .pb-slider-product-copy{order:2}.pb-slider-full-image-inner{padding:0}.pb-slider-glass-inner{grid-template-columns:minmax(86px,42%) minmax(0,58%)}.pb-slider-copy,.pb-slider-glass-card{gap:6px}.pb-slider-context-buyer .pb-slider-copy,.pb-slider-context-buyer .pb-slider-glass-card{gap:4px;max-width:100%}.pb-slider-title{font-size:16px;line-height:1.08}.pb-slider-context-buyer .pb-slider-title{font-size:14px;line-height:1.08;-webkit-line-clamp:2}.pb-slider-description{font-size:10px;line-height:1.32}.pb-slider-context-buyer .pb-slider-description{font-size:9px;line-height:1.25;-webkit-line-clamp:1}.pb-slider-pill{padding:4px 7px;font-size:8px}.pb-slider-context-buyer .pb-slider-pill{padding:3px 6px;font-size:7px}.pb-slider-glass-card{border-radius:14px;padding:10px}.pb-slider-context-buyer .pb-slider-glass-card{padding:8px}.pb-slider-image-panel{border-radius:14px}.pb-slider-full-image-panel{border-radius:inherit}.pb-slider-cta{min-height:30px!important;padding:5px 9px!important;font-size:10px!important}.pb-slider-context-buyer .pb-slider-cta{min-height:26px!important;padding:4px 8px!important;font-size:9px!important}.pb-slider-dots{bottom:8px}.pb-slider-dot{width:6px;height:6px}.pb-slider-dot-active{width:16px}}
+    @media (min-width:641px) and (max-width:1023px){.pb-slider-banner{aspect-ratio:16/7.2}.pb-slider-item{flex-basis:78%;border-radius:14px}.pb-slider-item-before-active{border-radius:0 14px 14px 0}.pb-slider-item-after-active{border-radius:14px 0 0 14px}.pb-slider-item-active{border-radius:14px}.pb-slider-track{gap:14px}.pb-slider-inner{padding:20px;gap:14px}#pubcat_slider_banner .pb-slider-inner{padding-top:15px;padding-bottom:15px}.pb-slider-title{font-size:24px}.pb-slider-description{font-size:13px}.pb-slider-glass-card{padding:15px}}
     @media (prefers-reduced-motion:reduce){.pb-slider-banner *{animation:none!important;transition:none!important}}
   `;
   document.head.append(style);

@@ -13,7 +13,7 @@ export const publicCatalogService = {
     }
 
     const cleanFilters = Object.fromEntries(
-      Object.entries(filters).filter(([, value]) => value !== "" && value !== null && value !== undefined)
+      Object.entries(filters).filter(([key, value]) => key !== "brand_names" && value !== "" && value !== null && value !== undefined)
     );
 
     return carsResource.list(publicContextService.applyCatalogFilters({

@@ -82,7 +82,7 @@ function footerLink({ item, activePath, onNavigate }) {
   link.append(iconWrap);
 
   const label = document.createElement("span");
-  label.className = item.featured ? "account-mobile-footer__action-label mt-2 text-[#ff6600]" : "account-mobile-footer__label";
+  label.className = item.featured ? "account-mobile-footer__action-label text-[#ff6600] mt-4" : "account-mobile-footer__label";
   label.textContent = item.label;
   link.append(label);
 
@@ -192,7 +192,6 @@ function ensureFooterStyles() {
     .account-mobile-footer__item:hover,
     .account-mobile-footer__item--active {
       color: var(--pb-brand-primary);
-      background: color-mix(in srgb, var(--pb-brand-primary) 18%, transparent);
     }
 
     .account-mobile-footer__item--disabled {

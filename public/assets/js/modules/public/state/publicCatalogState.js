@@ -32,6 +32,7 @@ export const publicCatalogState = {
     appStore.patchState(`${BASE}.filters`, {
       keyword: "",
       brand_name: "",
+      brand_names: [],
       transmission: "",
       location_name: "",
       min_price_cash: "",
