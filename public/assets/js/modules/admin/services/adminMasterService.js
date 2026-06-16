@@ -50,12 +50,13 @@ const DEFAULT_SIDEBAR_SEED = [
   sidebarSeed("admin.users", "admin", "User Management", "#/admin/users", "transaction", 30),
   sidebarSeed("admin.transactions", "admin", "Transactions", "#/admin/transactions", "transaction", 40),
   sidebarSeed("admin.settlements", "admin", "Settlements", "#/admin/settlements", "commission", 50),
-  sidebarSeed("admin.master", "admin", "Master", "", "sort", 60, "", true),
+  sidebarSeed("admin.sliders", "admin", "Slider", "#/admin/sliders", "image", 60),
+  sidebarSeed("admin.master", "admin", "Master", "", "sort", 70, "", true),
   sidebarSeed("admin.master_brand", "admin", "Master Brand", "#/admin/master-brand", "car", 10, "admin.master"),
   sidebarSeed("admin.master_sidebar", "admin", "Master Sidebar", "#/admin/master-sidebar", "sitemap", 20, "admin.master"),
   sidebarSeed("admin.master_bank", "admin", "Master Bank", "#/admin/master-bank", "bank", 30, "admin.master"),
   sidebarSeed("admin.master_inspection", "admin", "Master Inspection", "#/admin/master-inspection", "clipboard", 40, "admin.master"),
-  sidebarSeed("admin.design_studio", "admin", "Design Studio", "#/admin/design-studio", "sparkles", 70),
+  sidebarSeed("admin.design_studio", "admin", "Design Studio", "#/admin/design-studio", "sparkles", 80),
   sidebarSeed("seller.dashboard", "seller", "Dashboard Seller", "#/seller", "dashboard", 10),
   sidebarSeed("seller.showroom", "seller", "Showroom Saya", "#/seller/showroom", "showroom", 20),
   sidebarSeed("seller.cars", "seller", "Mobil Saya", "#/seller/cars", "car", 30),
@@ -590,43 +591,62 @@ function repairSidebarItems(items = []) {
 function ensureAdminMasterSidebarChildren(items = []) {
   const byKey = new Map(items.map((item) => [item.key, item]));
   const master = byKey.get("admin.master");
+  const next = [...items];
+
+  if (!byKey.has("admin.sliders")) {
+    const sliderOrder = master && Number.isFinite(Number(master.order)) ? Number(master.order) - 1 : 60;
+    next.push(sidebarSeed("admin.sliders", "admin", "Slider", "#/admin/sliders", "image", sliderOrder));
+  }
+
   if (!master || master.role !== "admin") {
-    return items;
+    return next;
   }
 
   const now = master.updated_at ?? null;
-  const next = items.map((item) => item.key === "admin.master"
+  const normalized = next.map((item) => item.key === "admin.master"
     ? {
       ...item,
       route: "",
       icon: item.icon || "sort",
-      order: Number.isFinite(Number(item.order)) ? Number(item.order) : 60,
+      order: Number.isFinite(Number(item.order)) ? Number(item.order) : 70,
       parent_key: "",
       is_parent: true,
     }
     : item);
 
   if (!byKey.has("admin.master_brand")) {
-    next.push(sidebarSeed("admin.master_brand", "admin", "Master Brand", "#/admin/master-brand", "car", 10, "admin.master"));
-    next[next.length - 1].updated_at = now;
+    normalized.push(sidebarSeed("admin.master_brand", "admin", "Master Brand", "#/admin/master-brand", "car", 10, "admin.master"));
+    normalized[normalized.length - 1].updated_at = now;
   }
 
   if (!byKey.has("admin.master_sidebar")) {
-    next.push(sidebarSeed("admin.master_sidebar", "admin", "Master Sidebar", "#/admin/master-sidebar", "sitemap", 20, "admin.master"));
-    next[next.length - 1].updated_at = now;
+    normalized.push(sidebarSeed("admin.master_sidebar", "admin", "Master Sidebar", "#/admin/master-sidebar", "sitemap", 20, "admin.master"));
+    normalized[normalized.length - 1].updated_at = now;
   }
 
   if (!byKey.has("admin.master_bank")) {
-    next.push(sidebarSeed("admin.master_bank", "admin", "Master Bank", "#/admin/master-bank", "bank", 30, "admin.master"));
-    next[next.length - 1].updated_at = now;
+    normalized.push(sidebarSeed("admin.master_bank", "admin", "Master Bank", "#/admin/master-bank", "bank", 30, "admin.master"));
+    normalized[normalized.length - 1].updated_at = now;
   }
 
   if (!byKey.has("admin.master_inspection")) {
-    next.push(sidebarSeed("admin.master_inspection", "admin", "Master Inspection", "#/admin/master-inspection", "clipboard", 40, "admin.master"));
-    next[next.length - 1].updated_at = now;
+    normalized.push(sidebarSeed("admin.master_inspection", "admin", "Master Inspection", "#/admin/master-inspection", "clipboard", 40, "admin.master"));
+    normalized[normalized.length - 1].updated_at = now;
   }
 
-  return next.map((item) => {
+  return normalized.map((item) => {
+    if (item.key === "admin.sliders") {
+      return {
+        ...item,
+        label: item.label || "Slider",
+        route: "#/admin/sliders",
+        icon: item.icon || "image",
+        parent_key: "",
+        role: "admin",
+        is_parent: false,
+        order: Number.isFinite(Number(item.order)) ? Number(item.order) : 60,
+      };
+    }
     if (item.key === "admin.master_brand") {
       return {
         ...item,

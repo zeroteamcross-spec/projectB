@@ -432,14 +432,39 @@ function transactionActions(transaction, actions) {
   detail.prepend(createIcon("eye", { className: "block h-4 w-4 leading-none" }));
   wrap.append(detail);
 
-  if (bucket === "waiting") {
-    const pay = Button({ label: "Lanjutkan Pembayaran", onClick: () => actions.openTransaction(transaction), designHook: "shared.button.primary" });
+  if (bucket === "waiting" || isPaymentExpired(transaction)) {
+    const expired = isPaymentExpired(transaction);
+    const pay = Button({
+      label: expired ? "Pembayaran Kadaluarsa" : "Lanjutkan Pembayaran",
+      variant: expired ? "secondary" : "primary",
+      disabled: expired,
+      onClick: expired ? null : () => actions.openTransaction(transaction),
+      designHook: expired ? "shared.button.secondary" : "shared.button.primary",
+    });
     pay.id = `byrtx_transaction_${transaction.id ?? "unknown"}_pay_button`;
-    pay.prepend(createIcon("creditCard", { className: "block h-4 w-4 leading-none" }));
+    pay.prepend(createIcon(expired ? "clock" : "creditCard", { className: "block h-4 w-4 leading-none" }));
+    if (expired) {
+      pay.setAttribute("aria-disabled", "true");
+      pay.title = "Pembayaran sudah kadaluarsa";
+      pay.classList.add("cursor-not-allowed", "opacity-65");
+    }
     wrap.append(pay);
   }
 
   return wrap;
+}
+
+function isPaymentExpired(transaction) {
+  const status = String(transaction?.transaction_status ?? "").toLowerCase();
+  return status === "expired" || isExpiredDate(transaction?.expires_at);
+}
+
+function isExpiredDate(value) {
+  if (!value) {
+    return false;
+  }
+  const time = Date.parse(value);
+  return Number.isFinite(time) && time < Date.now();
 }
 
 function desktopNavLink(item, activePath, actions) {

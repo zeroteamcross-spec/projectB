@@ -35,6 +35,7 @@ trait CarPayloadRules
             'has_service_book' => 'nullable|boolean',
             'key_count' => 'nullable|integer|min_value:0',
             'description' => 'nullable|string',
+            'youtube_url' => 'nullable|string|max:300',
             'price_cash' => 'nullable|integer|min_value:0',
             'price_discount' => 'nullable|integer|min_value:0',
             'price_credit' => 'nullable|integer|min_value:0',

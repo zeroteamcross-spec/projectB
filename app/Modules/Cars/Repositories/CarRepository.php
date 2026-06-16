@@ -13,7 +13,7 @@ class CarRepository
         secondary_color, color_variation, document_type, registration_date, transmission,
         engine_number, chassis_number, location_name, engine_capacity_cc, mileage_km,
         seat_count, previous_owner_count, has_service_book, key_count, description,
-        price_cash, price_discount, price_credit, inspection_summary_status, published_at,
+        youtube_url, price_cash, price_discount, price_credit, inspection_summary_status, published_at,
         created_at, updated_at,
         (
             SELECT cover_image.file_path

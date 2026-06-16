@@ -355,22 +355,12 @@ function renderSidebarNode(link, path, options = {}) {
     arrow.append(createIcon("chevron-down", { className: "block h-3.5 w-3.5 leading-none" }));
     parent.append(arrow);
     const childWrap = document.createElement("div");
-    childWrap.className = childActive
-      ? (compactExpanded ? "grid gap-1 pl-5" : "hidden gap-1 pl-5 xl:grid")
-      : "hidden gap-1 pl-5";
-    if (options.mode === "drawer") {
-      childWrap.className = childActive ? "grid gap-1 pl-5" : "hidden gap-1 pl-5";
-    }
+    syncSidebarGroup(childWrap, arrow, parent, childActive, options);
     link.children.forEach((child) => childWrap.append(renderSidebarAnchor(child, path, true, false, false, options)));
-    parent.setAttribute("aria-expanded", childActive ? "true" : "false");
     parent.addEventListener("click", (event) => {
       event.preventDefault();
-      const hidden = childWrap.classList.contains("hidden");
-      childWrap.className = hidden
-        ? (options.mode === "drawer" || isCompactExpanded(options.store, options.mode) ? "grid gap-1 pl-5" : "hidden gap-1 pl-5 xl:grid")
-        : "hidden gap-1 pl-5";
-      arrow.classList.toggle("rotate-180", hidden);
-      parent.setAttribute("aria-expanded", hidden ? "true" : "false");
+      const expanded = parent.getAttribute("aria-expanded") === "true";
+      syncSidebarGroup(childWrap, arrow, parent, !expanded, options);
     });
     group.append(parent);
     group.append(childWrap);
@@ -378,6 +368,13 @@ function renderSidebarNode(link, path, options = {}) {
   }
 
   return renderSidebarAnchor(link, path, false, false, false, options);
+}
+
+function syncSidebarGroup(childWrap, arrow, parent, expanded = false, options = {}) {
+  const baseClass = "gap-1 pl-5";
+  childWrap.className = expanded ? `grid ${baseClass}` : `hidden ${baseClass}`;
+  arrow.classList.toggle("rotate-180", expanded);
+  parent.setAttribute("aria-expanded", expanded ? "true" : "false");
 }
 
 function renderSidebarAnchor(link, path, child = false, parent = false, activeOverride = false, options = {}) {

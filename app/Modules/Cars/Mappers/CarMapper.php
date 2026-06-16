@@ -34,6 +34,7 @@ class CarMapper
             'has_service_book' => (bool) $car['has_service_book'],
             'key_count' => (int) $car['key_count'],
             'description' => $car['description'],
+            'youtube_url' => $car['youtube_url'] ?? null,
             'price_cash' => self::nullableInt($car['price_cash']),
             'price_discount' => self::nullableInt($car['price_discount']),
             'price_credit' => self::nullableInt($car['price_credit']),

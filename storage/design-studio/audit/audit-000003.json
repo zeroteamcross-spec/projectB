@@ -1,0 +1,17 @@
+{
+    "type": "publish",
+    "version": 1,
+    "route": "test-route-publish",
+    "userId": 99,
+    "username": null,
+    "publishedAt": "2026-06-16 11:36:54",
+    "publishNote": "Initial Publish Note",
+    "elementsChanged": 0,
+    "propertiesChanged": 0,
+    "responsiveChanges": {
+        "mobile": 0,
+        "tablet": 0,
+        "desktop": 0
+    },
+    "auditId": 3
+}

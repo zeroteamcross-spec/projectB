@@ -89,6 +89,61 @@ function ensureAffiliateAccountStyles() {
     .af-account-page .account-mobile-footer__action {
       color: #fff;
     }
+    .af-account-page .account-mobile-footer--affiliate .account-mobile-footer__action-label {
+      color: #000;
+    }
+    .af-account-page .account-mobile-footer--affiliate .account-mobile-footer__shell {
+      height: 5.65rem;
+    }
+    .af-account-page .account-mobile-footer--affiliate .account-mobile-footer__bar {
+      height: 4.65rem;
+      border-radius: 1.35rem 1.35rem 0 0;
+      background:
+        radial-gradient(circle at 50% -18px, transparent 0 2.7rem, rgba(255, 255, 255, 0.94) 2.73rem),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.94));
+      box-shadow: 0 -14px 32px rgba(15, 23, 42, 0.14);
+      backdrop-filter: blur(14px) saturate(1.1);
+      -webkit-backdrop-filter: blur(14px) saturate(1.1);
+    }
+    .af-account-page .account-mobile-footer--affiliate .account-mobile-footer__items {
+      height: 4.65rem;
+      padding: 0 max(0.55rem, env(safe-area-inset-left, 0px)) 0 max(0.55rem, env(safe-area-inset-right, 0px));
+    }
+    .af-account-page .account-mobile-footer--affiliate .account-mobile-footer__item {
+      min-height: 3.55rem;
+      gap: 0.2rem;
+      border-radius: 0.9rem;
+    }
+    .af-account-page .account-mobile-footer--affiliate .account-mobile-footer__icon {
+      width: 1.55rem;
+      height: 1.55rem;
+      font-size: 1rem;
+    }
+    .af-account-page .account-mobile-footer--affiliate .account-mobile-footer__label,
+    .af-account-page .account-mobile-footer--affiliate .account-mobile-footer__action-label {
+      font-size: 0.58rem;
+      font-weight: 760;
+      line-height: 1;
+    }
+    .af-account-page .account-mobile-footer--affiliate .account-mobile-footer__center {
+      transform: translate(-50%, -0.03rem);
+    }
+    .af-account-page .account-mobile-footer--affiliate .account-mobile-footer__action {
+      width: 3.45rem;
+      min-height: 4.35rem;
+      gap: 0.18rem;
+      border-radius: 1rem;
+    }
+    .af-account-page .account-mobile-footer--affiliate .account-mobile-footer__action-icon {
+      width: 2.75rem;
+      height: 2.75rem;
+      font-size: 1.42rem;
+      box-shadow: 0 14px 26px rgba(249, 115, 22, 0.3);
+      outline: 6px solid rgba(255, 255, 255, 0.95);
+    }
+    .af-account-page .account-mobile-footer--affiliate .account-mobile-footer__action-label {
+      width: 3.45rem;
+    }
   `;
   document.head.append(style);
 }

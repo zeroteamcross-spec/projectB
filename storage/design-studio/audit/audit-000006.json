@@ -1,0 +1,17 @@
+{
+    "type": "publish",
+    "version": 2,
+    "route": "test-route-rollback",
+    "userId": 99,
+    "username": null,
+    "publishedAt": "2026-06-16 11:36:55",
+    "publishNote": "Publish version 2",
+    "elementsChanged": 1,
+    "propertiesChanged": 1,
+    "responsiveChanges": {
+        "mobile": 0,
+        "tablet": 0,
+        "desktop": 1
+    },
+    "auditId": 6
+}

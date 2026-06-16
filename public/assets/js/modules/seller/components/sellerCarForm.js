@@ -135,6 +135,7 @@ export function SellerCarForm({
     NumericInput({ id: "slrc_stock_input", name: "stock", label: "Stok", value: values.stock ?? 1, placeholder: "1" }),
     Select({ id: "slrc_listing_status_input", name: "listing_status", label: "Status listing", value: values.listing_status ?? "draft", options: STATUS_OPTIONS }),
     Select({ id: "slrc_inspection_summary_status_input", name: "inspection_summary_status", label: "Status inspeksi", value: values.inspection_summary_status ?? "not_checked", options: INSPECTION_STATUS_OPTIONS }),
+    Input({ id: "slrc_youtube_url_input", name: "youtube_url", label: "URL YouTube", value: values.youtube_url ?? "", type: "url", placeholder: "https://www.youtube.com/watch?v=..." }),
     descriptionField
   );
   step3.append(commercial.section);
@@ -512,6 +513,7 @@ function normalizeCarPayload(formData) {
     price_credit: numberValue(formData, "price_credit"),
     listing_status: textValue(formData, "listing_status") || "draft",
     inspection_summary_status: textValue(formData, "inspection_summary_status") || "not_checked",
+    youtube_url: nullableText(formData, "youtube_url"),
     description: nullableText(formData, "description"),
   };
 }
