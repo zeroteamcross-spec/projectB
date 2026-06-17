@@ -116,6 +116,7 @@ export class AppShell {
     const isAccountShell = isBuyerShell || isAffiliateAccountShell;
     const hasSidebarShell = this.hasSidebarShell(role, path);
     const compactExpanded = hasSidebarShell && Boolean(this.store?.get("ui.sidebarCompactExpanded", false));
+    const isSuperAdminTool = this.isSuperAdminToolPath(path);
 
     this.root.className = isAccountShell
       ? "relative isolate min-h-screen grid min-w-0 grid-cols-1 bg-[var(--pb-page-bg)]"
@@ -137,7 +138,10 @@ export class AppShell {
     this.sidebarNode.setAttribute("aria-hidden", hasSidebarShell ? "false" : "true");
     this.content.className = isAccountShell
       ? "pb-bgv-buyer-content relative mx-auto grid min-w-0 w-full max-w-[1180px] gap-[var(--pb-space-xl)] overflow-x-clip px-3 py-4 pb-28 sm:px-5 md:px-6 md:py-6 md:pb-8 xl:px-8"
+      : isSuperAdminTool
+        ? "relative mx-auto grid min-w-0 w-full max-w-[1240px] gap-[var(--pb-space-xl)] overflow-x-clip px-[var(--pb-page-x)] pb-[var(--pb-page-y)] xl:max-w-[1320px] xl:px-8 2xl:max-w-[1400px]"
       : this.defaultContentClassName;
+    this.content.style.paddingTop = isAccountShell ? "" : isSuperAdminTool ? "0.75rem" : "";
     if (this.headerNode) {
       this.headerNode.hidden = isAccountShell;
       this.headerNode.style.display = isAccountShell ? "none" : "";
@@ -145,7 +149,11 @@ export class AppShell {
     }
     this.alertHost.className = isAccountShell
       ? "px-3 pt-3 sm:px-5 md:px-6"
-      : this.defaultAlertHostClassName;
+      : isSuperAdminTool && !this.store?.get("app.routeHydrateError", null)
+        ? "hidden"
+        : isSuperAdminTool
+          ? "px-4 pt-2 md:px-6"
+          : this.defaultAlertHostClassName;
 
     if (!hasSidebarShell && this.store?.get("ui.sidebarOpen", false)) {
       uiStore.closeSidebar();
@@ -234,5 +242,11 @@ export class AppShell {
   isAffiliateAccountExperiencePath(path) {
     const value = String(path ?? "");
     return value === "/profile" || value === "/notifications" || value.startsWith("/affiliate");
+  }
+
+  isSuperAdminToolPath(path) {
+    return path === "/super-admin"
+      || path === "/admin/release-versions"
+      || path === "/admin/migrations";
   }
 }

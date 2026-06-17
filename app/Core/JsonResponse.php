@@ -18,7 +18,12 @@ class JsonResponse extends Response
         parent::__construct(
             $body,
             $statusCode,
-            array_merge(['Content-Type' => 'application/json; charset=utf-8'], $headers)
+            array_merge([
+                'Content-Type' => 'application/json; charset=utf-8',
+                'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+                'Pragma' => 'no-cache',
+                'Expires' => '0',
+            ], $headers)
         );
     }
 

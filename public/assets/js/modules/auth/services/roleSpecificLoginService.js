@@ -15,6 +15,7 @@ const ROLE_CONFIG = Object.freeze({
   },
   admin: {
     role: "admin",
+    acceptedRoles: ["admin", "super_admin"],
     slug: "admin",
     label: "Admin",
     title: "Login Admin",
@@ -70,14 +71,14 @@ export const roleSpecificLoginService = {
 
     await authService.login(credentials);
 
-    if (authStore.role() !== config.role) {
+    if (!acceptedRoles(config).includes(authStore.role())) {
       await this.cleanupMismatchSession();
       throw this.roleMismatchError(config);
     }
 
     return {
       user: authStore.user(),
-      target: config.home,
+      target: homeForAuthenticatedRole(authStore.role(), config),
     };
   },
 
@@ -101,3 +102,17 @@ export const roleSpecificLoginService = {
     return Object.values(ROLE_CONFIG);
   },
 };
+
+function acceptedRoles(config) {
+  return Array.isArray(config.acceptedRoles) && config.acceptedRoles.length
+    ? config.acceptedRoles
+    : [config.role];
+}
+
+function homeForAuthenticatedRole(role, config) {
+  if (role === "super_admin") {
+    return "/super-admin";
+  }
+
+  return config.home;
+}

@@ -8,7 +8,7 @@ const DEFAULT_HOME_BY_ROLE = {
   buyer: "/buyer",
   seller: "/seller",
   admin: "/admin",
-  super_admin: "/admin",
+  super_admin: "/super-admin",
   affiliate_admin: "/affiliate",
 };
 

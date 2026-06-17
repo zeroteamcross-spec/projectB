@@ -32,6 +32,7 @@ const ICONS = {
   money: "fa-solid fa-money-bill-wave",
   wallet: "fa-solid fa-wallet",
   bank: "fa-solid fa-building-columns",
+  database: "fa-solid fa-database",
   creditCard: "fa-solid fa-credit-card",
   file: "fa-solid fa-file-lines",
   folder: "fa-solid fa-folder",

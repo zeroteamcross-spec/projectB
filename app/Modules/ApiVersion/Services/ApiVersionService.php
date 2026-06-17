@@ -27,6 +27,30 @@ class ApiVersionService
         return $this->map($version);
     }
 
+    public function list(array $resourceNames = []): array
+    {
+        $normalized = [];
+
+        foreach ($resourceNames as $resourceName) {
+            if (! is_string($resourceName)) {
+                continue;
+            }
+
+            $resourceName = $this->normalizeResourceName($resourceName);
+
+            if ($resourceName !== '') {
+                $normalized[] = $resourceName;
+            }
+        }
+
+        $normalized = array_values(array_unique($normalized));
+
+        return array_map(
+            fn (array $version): array => $this->map($version),
+            $this->versions->findMany($normalized)
+        );
+    }
+
     public function bump(string $resourceName, ?string $displayName = null): array
     {
         return $this->map($this->versions->bump($this->normalizeResourceName($resourceName), $displayName));

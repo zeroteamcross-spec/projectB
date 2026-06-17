@@ -46,6 +46,23 @@ const ADMIN_LINKS = [
   { href: "#/admin/design-studio", label: "Design Studio", icon: "sparkles" },
 ];
 
+const SUPER_ADMIN_LINKS = [
+  { href: "#/super-admin", label: "Superadmin Dashboard", icon: "dashboard" },
+  { href: "#/admin/release-versions", label: "Release Version Manager", icon: "download" },
+  { href: "#/admin/migrations", label: "Migration Manager", icon: "database" },
+  {
+    href: "#",
+    label: "Role Switcher (Super)",
+    icon: "user",
+    children: [
+      { href: "#/admin", label: "Admin View", icon: "dashboard" },
+      { href: "#/buyer", label: "Buyer View", icon: "user" },
+      { href: "#/seller", label: "Seller View", icon: "car" },
+      { href: "#/affiliate", label: "Affiliate View", icon: "affiliate" },
+    ],
+  },
+];
+
 const AFFILIATE_LINKS = [
   { href: "#/affiliate", label: "Dashboard Marketing", icon: "affiliate" },
   { href: "#/profile", label: "Profil Saya", icon: "user" },
@@ -205,25 +222,11 @@ function renderLinks(nav, store, options = {}) {
 
   const userRealRole = store?.get("auth.user.role", "") || store?.get("auth.role", "");
   if (userRealRole === "super_admin") {
-    if (!links.some((l) => l.label === "Role Switcher (Super)")) {
-      links = [
-        ...links,
-        {
-          href: "#",
-          label: "Role Switcher (Super)",
-          icon: "user",
-          children: [
-            { href: "#/admin", label: "Admin View", icon: "dashboard" },
-            { href: "#/buyer", label: "Buyer View", icon: "user" },
-            { href: "#/seller", label: "Seller View", icon: "car" },
-            { href: "#/affiliate", label: "Affiliate View", icon: "affiliate" },
-          ],
-        },
-      ];
-    }
+    links = SUPER_ADMIN_LINKS;
   }
 
-  nav.replaceChildren(...withDesignStudioV2Menu(links, role, store).map((link) => renderSidebarNode(link, path, options)));
+  const visibleLinks = userRealRole === "super_admin" ? links : withDesignStudioV2Menu(links, role, store);
+  nav.replaceChildren(...visibleLinks.map((link) => renderSidebarNode(link, path, options)));
 }
 
 function resolveSidebarRole(store) {

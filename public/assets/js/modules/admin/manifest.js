@@ -17,6 +17,6 @@ export const adminManifest = {
   },
   preload: {
     snapshot: ["admin.pendingUsers", "admin.users", "admin.transactions", "admin.cars", "admin.settlements", "admin.affiliateLedgers", "admin.sliders", "admin.masterBrand", "admin.masterSidebar", "admin.masterBank", "admin.masterInspection"],
-    working: ["adminDashboard", "adminApprovals", "adminUsers", "adminTransactions", "adminSettlements", "adminAffiliateCommissions", "adminSliders", "adminMaster", "adminMasterInspection", "adminDesignStudio"],
+    working: ["superAdminDashboard", "adminDashboard", "adminApprovals", "adminUsers", "adminTransactions", "adminSettlements", "adminAffiliateCommissions", "adminSliders", "adminMaster", "adminMasterInspection", "adminDesignStudio", "adminMigrations", "adminReleaseVersions"],
   },
 };

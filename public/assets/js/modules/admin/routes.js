@@ -10,6 +10,9 @@ import { AdminTransactionsPage } from "./pages/transactionsPage.js";
 import { AdminSlidersPage } from "./pages/slidersPage.js";
 import { AdminMasterBankPage, AdminMasterBrandPage, AdminMasterSidebarPage } from "./pages/masterPage.js";
 import { AdminMasterInspectionPage } from "./pages/masterInspectionPage.js";
+import { AdminMigrationManagerPage } from "./pages/migrationManagerPage.js";
+import { AdminReleaseVersionManagerPage } from "./pages/releaseVersionManagerPage.js";
+import { SuperAdminDashboardPage } from "./pages/superAdminDashboardPage.js";
 import { adminSessionService } from "./services/adminSessionService.js";
 import { transactionsResource } from "../../resources/transactionsResource.js";
 import { carsResource } from "../../resources/carsResource.js";
@@ -19,6 +22,14 @@ import { inspectionsResource } from "../../resources/inspectionsResource.js";
 import { slidersResource } from "../../resources/slidersResource.js";
 
 export const adminRoutes = [
+  {
+    name: "super-admin.dashboard",
+    path: "/super-admin",
+    shell: "app",
+    role: "admin",
+    page: SuperAdminDashboardPage,
+    workingStateKey: "superAdminDashboard",
+  },
   {
     name: "admin.dashboard",
     path: "/admin",
@@ -291,6 +302,44 @@ export const adminRoutes = [
     shell: "app",
     role: "admin",
     page: AdminDesignStudioV2Page,
+  },
+  {
+    name: "admin.migrations",
+    path: "/admin/migrations",
+    shell: "app",
+    role: "admin",
+    page: AdminMigrationManagerPage,
+    workingStateKey: "adminMigrations",
+    preload: {
+      working: [
+        {
+          key: "migrations",
+          loader: ({ signal }) => import("./services/adminMigrationService.js")
+            .then(({ adminMigrationService }) => adminMigrationService.status({ signal }))
+            .then((migrations) => ({ migrations }))
+            .catch(() => ({ migrations: [] })),
+        },
+      ],
+    },
+  },
+  {
+    name: "admin.release-versions",
+    path: "/admin/release-versions",
+    shell: "app",
+    role: "admin",
+    page: AdminReleaseVersionManagerPage,
+    workingStateKey: "adminReleaseVersions",
+    preload: {
+      working: [
+        {
+          key: "versions",
+          loader: ({ signal }) => import("./services/adminReleaseVersionService.js")
+            .then(({ adminReleaseVersionService }) => adminReleaseVersionService.versions(["app", "cars", "transactions", "notifications", "sliders", "master_data", "design_studio"], { signal }))
+            .then((versions) => ({ versions }))
+            .catch(() => ({ versions: [] })),
+        },
+      ],
+    },
   },
   {
     name: "admin.transactions",

@@ -107,7 +107,7 @@ if (
 
     header('Content-Type: ' . ($mimeMap[$ext] ?? 'application/octet-stream'));
     header('Content-Length: ' . filesize($staticFile));
-    header('Cache-Control: public, max-age=604800');
+    sendStaticCacheHeaders($ext, basename($staticFile));
 
     readfile($staticFile);
     exit;
@@ -125,12 +125,14 @@ $appHtml = $publicRoot . '/app.html';
 
 if (is_file($indexHtml)) {
     header('Content-Type: text/html; charset=utf-8');
+    sendNoStoreHeaders();
     readfile($indexHtml);
     exit;
 }
 
 if (is_file($appHtml)) {
     header('Content-Type: text/html; charset=utf-8');
+    sendNoStoreHeaders();
     readfile($appHtml);
     exit;
 }
@@ -139,3 +141,25 @@ http_response_code(500);
 header('Content-Type: text/plain; charset=utf-8');
 echo "ProjectB SPA entry not found.\n";
 echo "Expected index.html or app.html in: {$publicRoot}\n";
+
+function sendStaticCacheHeaders(string $extension, string $filename): void
+{
+    if ($extension === 'html' || $filename === 'release-manifest.json') {
+        sendNoStoreHeaders();
+        return;
+    }
+
+    if (in_array($extension, ['js', 'mjs', 'css', 'json', 'map'], true)) {
+        header('Cache-Control: no-cache, must-revalidate');
+        return;
+    }
+
+    header('Cache-Control: public, max-age=604800');
+}
+
+function sendNoStoreHeaders(): void
+{
+    header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+    header('Pragma: no-cache');
+    header('Expires: 0');
+}

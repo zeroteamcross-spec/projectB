@@ -7,6 +7,14 @@ export const appStore = new StateEngine({
     currentRoute: null,
     routeHydrateError: null,
     resourceVersions: {},
+    release: {
+      manifest: null,
+      latestVersion: null,
+      appliedVersion: null,
+      updateAvailable: false,
+      checkedAt: null,
+      error: null,
+    },
   },
   auth: {
     user: null,

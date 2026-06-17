@@ -30,6 +30,38 @@ class ApiVersionRepository
         return $version ?: null;
     }
 
+    public function findMany(array $resourceNames = []): array
+    {
+        if ($resourceNames === []) {
+            $stmt = $this->pdo->query(
+                'SELECT id, resource_name, display_name, version_number, created_at, updated_at
+                 FROM api_versions
+                 ORDER BY resource_name ASC'
+            );
+
+            return $stmt->fetchAll() ?: [];
+        }
+
+        $placeholders = [];
+        $params = [];
+
+        foreach (array_values($resourceNames) as $index => $resourceName) {
+            $key = ':resource_' . $index;
+            $placeholders[] = $key;
+            $params[$key] = $resourceName;
+        }
+
+        $stmt = $this->pdo->prepare(
+            'SELECT id, resource_name, display_name, version_number, created_at, updated_at
+             FROM api_versions
+             WHERE resource_name IN (' . implode(', ', $placeholders) . ')
+             ORDER BY resource_name ASC'
+        );
+        $stmt->execute($params);
+
+        return $stmt->fetchAll() ?: [];
+    }
+
     public function create(string $resourceName, ?string $displayName = null): int
     {
         $stmt = $this->pdo->prepare(

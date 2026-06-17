@@ -1,5 +1,27 @@
 DirectoryIndex index.html app.html
 
+<IfModule mod_headers.c>
+<FilesMatch "\.(html)$">
+Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+Header set Pragma "no-cache"
+Header set Expires "0"
+</FilesMatch>
+
+<FilesMatch "^(release-manifest\.json)$">
+Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+Header set Pragma "no-cache"
+Header set Expires "0"
+</FilesMatch>
+
+<FilesMatch "\.(js|mjs|css)$">
+Header set Cache-Control "no-cache, must-revalidate"
+</FilesMatch>
+
+<FilesMatch "\.(png|jpg|jpeg|gif|svg|webp|ico|mp4|webm|woff|woff2|ttf)$">
+Header set Cache-Control "public, max-age=604800"
+</FilesMatch>
+</IfModule>
+
 <IfModule mod_rewrite.c>
 RewriteEngine On
 

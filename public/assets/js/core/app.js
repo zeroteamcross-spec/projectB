@@ -1,6 +1,7 @@
 import { apiClient } from "./apiClient.js";
 import { EventBus } from "./eventBus.js";
 import { Router } from "./router.js";
+import { ReleaseManager } from "./releaseManager.js";
 import { VersionManager } from "./versionManager.js";
 import { appStore } from "../state/store.js";
 import { authStore } from "../state/authStore.js";
@@ -37,6 +38,7 @@ export class ProjectBApp {
     this.modalRoot = modalRoot;
     this.bus = new EventBus();
     this.cache = new CacheManager({ namespace: "projectB:spa:v1" });
+    this.releaseManager = new ReleaseManager();
     this.versionManager = new VersionManager({ client: apiClient, store: appStore, bus: this.bus });
     this.preloadManager = new PreloadManager({
       store: appStore,
@@ -91,6 +93,7 @@ export class ProjectBApp {
     this.registerFeatures([publicManifest, authManifest, profileManifest, buyerManifest, sellerManifest, adminManifest, affiliateManifest, notificationsManifest]);
     publicContextService.restore();
 
+    await this.checkReleaseVersion();
     await this.loadAuthContext();
     await this.bootstrapDesignStudioV2();
     await notificationService.ensureSnapshot({ force: true, store: appStore });
@@ -99,6 +102,33 @@ export class ProjectBApp {
     this.cleanup.push(this.router.start());
     appStore.patchState("app", { bootstrapped: true, startedAt: Date.now() }, "app:bootstrapped");
     this.bus.emit("app:bootstrapped", appStore.getState().app);
+  }
+
+  async checkReleaseVersion() {
+    try {
+      const release = await this.releaseManager.check();
+      appStore.patchState("app.release", {
+        manifest: release.manifest,
+        latestVersion: release.latestVersion,
+        appliedVersion: release.appliedVersion,
+        updateAvailable: release.updateAvailable,
+        checkedAt: Date.now(),
+        error: null,
+      }, "release:checked");
+
+      if (release.updateAvailable) {
+        this.bus.emit("release:update-available", release);
+      }
+
+      return release;
+    } catch (error) {
+      appStore.patchState("app.release", {
+        ...appStore.get("app.release", {}),
+        checkedAt: Date.now(),
+        error: error?.message || "Release manifest gagal dimuat.",
+      }, "release:check-error");
+      return null;
+    }
   }
 
   registerFeatures(manifests) {
