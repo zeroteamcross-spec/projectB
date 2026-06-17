@@ -24,7 +24,7 @@ export function GoogleLoginPage({ roleSlug } = {}) {
     backgroundVideoLayer ??= createBackgroundVideoLayer({
       id: "google_login_buyer_background_video_layer",
       fallbackClassName: BUYER_FALLBACK_BG,
-      overlayClassName: "bg-white/80 backdrop-blur-[2px]",
+      overlayClassName: "bg-white/40",
     });
     return backgroundVideoLayer;
   };
@@ -99,7 +99,7 @@ function render(root, context, config, state, getBackgroundVideoLayer = null) {
 function renderBuyer(root, context, config, state, getBackgroundVideoLayer) {
   const frame = document.createElement("section");
   frame.id = "google_login_buyer_panel";
-  frame.className = "relative z-10 mx-auto grid min-h-screen w-full max-w-[520px] overflow-hidden px-6 py-8 text-center sm:px-10 lg:max-w-[560px]";
+  frame.className = "relative z-10 mx-auto grid min-h-screen w-full max-w-[520px] overflow-hidden px-6 py-8 text-center sm:px-10 lg:mx-0 lg:ml-auto lg:mr-[7vw] lg:max-w-[560px]";
 
   const topWave = document.createElement("span");
   topWave.className = "pointer-events-none absolute -left-20 top-28 h-44 w-[calc(100%+10rem)] rounded-[50%] bg-white/70 blur-sm";
