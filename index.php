@@ -18,6 +18,7 @@
  */
 
 $publicRoot = __DIR__ . '/public';
+$appSplashMaxWaitMs = 1600;
 
 if (!is_dir($publicRoot)) {
     http_response_code(500);
@@ -126,14 +127,14 @@ $appHtml = $publicRoot . '/app.html';
 if (is_file($indexHtml)) {
     header('Content-Type: text/html; charset=utf-8');
     sendNoStoreHeaders();
-    readfile($indexHtml);
+    renderSpaEntry($indexHtml, $appSplashMaxWaitMs);
     exit;
 }
 
 if (is_file($appHtml)) {
     header('Content-Type: text/html; charset=utf-8');
     sendNoStoreHeaders();
-    readfile($appHtml);
+    renderSpaEntry($appHtml, $appSplashMaxWaitMs);
     exit;
 }
 
@@ -162,4 +163,17 @@ function sendNoStoreHeaders(): void
     header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
     header('Pragma: no-cache');
     header('Expires: 0');
+}
+
+function renderSpaEntry(string $path, int $appSplashMaxWaitMs): void
+{
+    $html = file_get_contents($path);
+
+    if ($html === false) {
+        http_response_code(500);
+        echo "ProjectB SPA entry cannot be read.\n";
+        return;
+    }
+
+    echo str_replace('__APP_SPLASH_MAX_WAIT_MS__', (string) $appSplashMaxWaitMs, $html);
 }

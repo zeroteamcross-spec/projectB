@@ -19,10 +19,7 @@ const disposeInitialRouteListener = app.bus.on("route:mounted", () => {
 });
 
 app.bootstrap()
-  .then(() => Promise.race([
-    initialRouteMounted,
-    new Promise((resolve) => window.setTimeout(resolve, 1600)),
-  ]))
+  .then(() => initialRouteMounted)
   .catch((error) => {
     console.error("ProjectB app bootstrap failed.", error);
   })

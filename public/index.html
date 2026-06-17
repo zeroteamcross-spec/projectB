@@ -89,6 +89,7 @@
       (function () {
         var startedAt = Date.now();
         var minimumMs = 500;
+        var maximumMs = Number("__APP_SPLASH_MAX_WAIT_MS__") || 1600;
         var hidden = false;
 
         window.AppSplash = {
@@ -113,6 +114,10 @@
             }, Math.max(0, minimumMs - (Date.now() - startedAt)));
           },
         };
+
+        window.setTimeout(function () {
+          window.AppSplash.hide();
+        }, Math.max(minimumMs, maximumMs));
       })();
     </script>
   </head>
