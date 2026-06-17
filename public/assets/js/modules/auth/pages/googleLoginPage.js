@@ -132,7 +132,7 @@ function actionContent(root, context, config, state) {
   }
 
   const button = Button({
-    label: state.submitting ? "Membuka Google..." : `Login dengan Google sebagai ${config.label}`,
+    label: state.submitting ? "Membuka Google..." : "Login",
     variant: "primary",
     disabled: state.submitting,
     onClick: () => beginGoogleLogin(root, context, config, state),

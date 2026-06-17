@@ -18,6 +18,25 @@ export function createRoleGuard({ auth } = {}) {
       return allow(route);
     }
 
+    if (location.path === "/google-login") {
+      const currentRole = auth?.role?.() ?? PUBLIC_ROLE;
+
+      if (currentRole === SUPER_ADMIN_ROLE) {
+        return allow(route);
+      }
+
+      return {
+        type: "redirect",
+        path: googleLoginPathForCurrentHost(),
+        meta: {
+          currentRole,
+          blockedRouteName: route.name,
+          blockedPath: location.path,
+          reason: "google-login-chooser-restricted",
+        },
+      };
+    }
+
     if (route.authRequired) {
       const currentRole = auth?.role?.() ?? PUBLIC_ROLE;
       const isAuthenticated = auth?.isAuthenticated?.() ?? false;
@@ -136,4 +155,22 @@ function authLandingPath(requiredRole, fromPath) {
   const query = new URLSearchParams();
   query.set("from", fromPath);
   return `${path}?${query.toString()}`;
+}
+
+function googleLoginPathForCurrentHost() {
+  const host = String(window.location.hostname || "").toLowerCase();
+
+  if (host === "admin.garasi-mobil.com") {
+    return "/google-login/admin";
+  }
+
+  if (host === "showroom.garasi-mobil.com") {
+    return "/google-login/seller";
+  }
+
+  if (host === "marketing.garasi-mobil.com") {
+    return "/login/affiliate";
+  }
+
+  return "/google-login/buyer";
 }

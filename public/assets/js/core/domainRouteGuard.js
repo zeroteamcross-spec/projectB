@@ -47,7 +47,7 @@ export function enforceDomainRoute({ locationRef = window.location } = {}) {
 }
 
 function enforceAdminLoginRoute({ locationRef, path }) {
-  if (path === "/google-login" || path.startsWith("/google-login/")) {
+  if (path.startsWith("/google-login/")) {
     if (path !== "/google-login/admin") {
       locationRef.replace(`${locationRef.protocol}//${ROLE_HOSTS.admin}${locationRef.pathname}${locationRef.search}#/google-login/admin`);
       return true;

@@ -63,7 +63,7 @@ function roleCard(context, config) {
   body.textContent = config.googleEnabled ? config.subtitle : "Marketing tetap menggunakan login user/password.";
 
   const button = Button({
-    label: config.googleEnabled ? `Google Login ${config.label}` : "Buka Policy Marketing",
+    label: config.googleEnabled ? "Login" : "Buka Policy Marketing",
     variant: config.googleEnabled ? "primary" : "secondary",
     onClick: () => context.router.navigate(`/google-login/${config.slug}`),
   });
