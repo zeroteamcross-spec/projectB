@@ -14,6 +14,24 @@ return [
         'client_secret' => env('GOOGLE_CLIENT_SECRET', ''),
         'redirect_uri' => env('GOOGLE_REDIRECT_URI', ''),
         'allowed_domains' => $allowedDomains,
+        'hosts' => [
+            'admin.garasi-mobil.com' => [
+                'role' => 'admin',
+                'google_enabled' => true,
+            ],
+            'garasi-mobil.com' => [
+                'role' => 'buyer',
+                'google_enabled' => true,
+            ],
+            'showroom.garasi-mobil.com' => [
+                'role' => 'seller',
+                'google_enabled' => true,
+            ],
+            'marketing.garasi-mobil.com' => [
+                'role' => 'affiliate_admin',
+                'google_enabled' => false,
+            ],
+        ],
         'state_cookie' => [
             'name' => 'google_oauth_state',
             'ttl_minutes' => 15,

@@ -52,7 +52,22 @@ class GoogleAuthService
         ];
     }
 
-    public function redirect(string $role): array
+    public function redirectForHost(string $host): array
+    {
+        $context = $this->contextForHost($host);
+
+        if (! (bool) ($context['google_enabled'] ?? false)) {
+            throw new ForbiddenException('Google Login tidak tersedia untuk domain ini.');
+        }
+
+        return $this->redirect(
+            (string) $context['role'],
+            $this->redirectUriForHost((string) $context['host']),
+            (string) $context['host']
+        );
+    }
+
+    public function redirect(string $role, ?string $redirectUri = null, ?string $host = null): array
     {
         $role = $this->normalizeRole($role);
 
@@ -65,6 +80,8 @@ class GoogleAuthService
         $state = $this->signedToken([
             'type' => 'google_oauth_state',
             'role' => $role,
+            'host' => $host,
+            'redirect_uri' => $redirectUri ?? $this->redirectUri(),
             'nonce' => bin2hex(random_bytes(16)),
             'iat' => time(),
             'exp' => time() + ((int) config('google.auth.state_cookie.ttl_minutes', 15) * 60),
@@ -72,7 +89,7 @@ class GoogleAuthService
 
         $query = http_build_query([
             'client_id' => $this->clientId(),
-            'redirect_uri' => $this->redirectUri(),
+            'redirect_uri' => $redirectUri ?? $this->redirectUri(),
             'response_type' => 'code',
             'scope' => 'openid email profile',
             'state' => $state,
@@ -86,12 +103,13 @@ class GoogleAuthService
         ];
     }
 
-    public function callback(string $code, string $state, ?string $cookieState): array
+    public function callback(string $code, string $state, ?string $cookieState, string $host = ''): array
     {
         $this->ensureEnabled();
         $statePayload = $this->validateState($state, $cookieState);
+        $this->ensureStateHostMatches($statePayload, $host);
         $role = (string) $statePayload['role'];
-        $profile = $this->fetchProfile($code);
+        $profile = $this->fetchProfile($code, (string) ($statePayload['redirect_uri'] ?? $this->redirectUri()));
         $resolved = $this->resolveUser($role, $profile);
         $user = $resolved['user'];
 
@@ -328,13 +346,13 @@ class GoogleAuthService
         return $this->repository->findUserById($userId) ?: [];
     }
 
-    private function fetchProfile(string $code): array
+    private function fetchProfile(string $code, string $redirectUri): array
     {
         $token = $this->postForm('https://oauth2.googleapis.com/token', [
             'code' => $code,
             'client_id' => $this->clientId(),
             'client_secret' => $this->clientSecret(),
-            'redirect_uri' => $this->redirectUri(),
+            'redirect_uri' => $redirectUri,
             'grant_type' => 'authorization_code',
         ]);
 
@@ -439,6 +457,26 @@ class GoogleAuthService
         return $payload;
     }
 
+    private function ensureStateHostMatches(array $statePayload, string $host): void
+    {
+        $expectedHost = $this->normalizeHost((string) ($statePayload['host'] ?? ''));
+        $actualHost = $this->normalizeHost($host);
+
+        if ($expectedHost === '' || $actualHost === '' || ! hash_equals($expectedHost, $actualHost)) {
+            throw new UnauthorizedException('Domain Google Login tidak valid.');
+        }
+
+        $context = $this->contextForHost($actualHost);
+
+        if (! (bool) ($context['google_enabled'] ?? false)) {
+            throw new ForbiddenException('Google Login tidak tersedia untuk domain ini.');
+        }
+
+        if ((string) $statePayload['role'] !== (string) $context['role']) {
+            throw new ForbiddenException('Role Google Login tidak sesuai domain.');
+        }
+    }
+
     private function validateSignedToken(?string $token, string $type): array
     {
         if (! is_string($token) || strpos($token, '.') === false) {
@@ -540,7 +578,6 @@ class GoogleAuthService
         foreach ([
             'GOOGLE_CLIENT_ID' => $this->clientId(),
             'GOOGLE_CLIENT_SECRET' => $this->clientSecret(),
-            'GOOGLE_REDIRECT_URI' => $this->redirectUri(),
         ] as $key => $value) {
             if (trim((string) $value) === '') {
                 $missing[] = $key;
@@ -718,6 +755,44 @@ class GoogleAuthService
         ];
 
         return $labels[$role] ?? $role;
+    }
+
+    private function contextForHost(string $host): array
+    {
+        $normalizedHost = $this->normalizeHost($host);
+        $hosts = (array) config('google.auth.hosts', []);
+        $context = $hosts[$normalizedHost] ?? null;
+
+        if (! is_array($context)) {
+            throw new ForbiddenException('Domain login tidak diizinkan.');
+        }
+
+        $context['host'] = $normalizedHost;
+        $context['role'] = $this->normalizeRole((string) ($context['role'] ?? ''));
+
+        return $context;
+    }
+
+    private function redirectUriForHost(string $host): string
+    {
+        $scheme = (bool) config('google.auth.state_cookie.secure', false) ? 'https' : 'http';
+
+        if (strpos($host, 'garasi-mobil.com') !== false) {
+            $scheme = 'https';
+        }
+
+        return $scheme . '://' . $host . '/api/auth/google/callback';
+    }
+
+    private function normalizeHost(string $host): string
+    {
+        $host = strtolower(trim($host));
+
+        if ($host === '') {
+            return '';
+        }
+
+        return explode(':', $host, 2)[0];
     }
 
     private function clientId(): string

@@ -34,8 +34,7 @@ class GoogleAuthController extends Controller
 
     public function redirect(Request $request): JsonResponse
     {
-        $role = (string) $request->query('role', '');
-        $result = $this->service->redirect($role);
+        $result = $this->service->redirectForHost((string) $request->server('HTTP_HOST', ''));
 
         return JsonResponse::success([
             'auth_url' => $result['auth_url'],
@@ -62,7 +61,8 @@ class GoogleAuthController extends Controller
             $result = $this->service->callback(
                 (string) $request->query('code', ''),
                 (string) $request->query('state', ''),
-                is_string($stateCookie) ? $stateCookie : null
+                is_string($stateCookie) ? $stateCookie : null,
+                (string) $request->server('HTTP_HOST', '')
             );
             $response = $this->redirectToFrontend($result['redirect_path']);
 
