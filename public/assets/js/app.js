@@ -15,14 +15,17 @@ const initialRouteMounted = new Promise((resolve) => {
 });
 const disposeInitialRouteListener = app.bus.on("route:mounted", () => {
   disposeInitialRouteListener();
-  window.requestAnimationFrame(() => {
-    window.requestAnimationFrame(resolveInitialRoute);
-  });
+  window.setTimeout(resolveInitialRoute, 32);
 });
 
-try {
-  await app.bootstrap();
-  await initialRouteMounted;
-} finally {
-  window.AppSplash?.hide();
-}
+app.bootstrap()
+  .then(() => Promise.race([
+    initialRouteMounted,
+    new Promise((resolve) => window.setTimeout(resolve, 1600)),
+  ]))
+  .catch((error) => {
+    console.error("ProjectB app bootstrap failed.", error);
+  })
+  .finally(() => {
+    window.AppSplash?.hide();
+  });
