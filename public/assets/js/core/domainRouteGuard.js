@@ -23,7 +23,19 @@ export function enforceDomainRoute({ locationRef = window.location } = {}) {
     return false;
   }
 
-  const targetRole = roleForHashPath(hashPath(locationRef.hash));
+  const path = hashPath(locationRef.hash);
+  const defaultPath = defaultPathForHost(currentHost);
+
+  if (path === "/" && defaultPath !== null) {
+    locationRef.replace(`${locationRef.protocol}//${currentHost}${locationRef.pathname}${locationRef.search}#${defaultPath}`);
+    return true;
+  }
+
+  if (currentHost === ROLE_HOSTS.admin) {
+    return enforceAdminLoginRoute({ locationRef, path });
+  }
+
+  const targetRole = roleForHashPath(path);
   const targetHost = targetRole ? ROLE_HOSTS[targetRole] : null;
 
   if (!targetHost || targetHost === currentHost) {
@@ -32,6 +44,40 @@ export function enforceDomainRoute({ locationRef = window.location } = {}) {
 
   locationRef.replace(`${locationRef.protocol}//${targetHost}${locationRef.pathname}${locationRef.search}${locationRef.hash}`);
   return true;
+}
+
+function enforceAdminLoginRoute({ locationRef, path }) {
+  if (path === "/google-login" || path.startsWith("/google-login/")) {
+    if (path !== "/google-login/admin") {
+      locationRef.replace(`${locationRef.protocol}//${ROLE_HOSTS.admin}${locationRef.pathname}${locationRef.search}#/google-login/admin`);
+      return true;
+    }
+
+    return false;
+  }
+
+  if (path.startsWith("/login/") && path !== "/login/admin") {
+    locationRef.replace(`${locationRef.protocol}//${ROLE_HOSTS.admin}${locationRef.pathname}${locationRef.search}#/login/admin`);
+    return true;
+  }
+
+  return false;
+}
+
+function defaultPathForHost(host) {
+  if (host === ROLE_HOSTS.admin) {
+    return "/admin";
+  }
+
+  if (host === ROLE_HOSTS.seller) {
+    return "/seller";
+  }
+
+  if (host === ROLE_HOSTS.affiliate) {
+    return "/login/affiliate";
+  }
+
+  return null;
 }
 
 function roleForHashPath(path) {
