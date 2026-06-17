@@ -13,7 +13,6 @@ import { formatDate } from "../../../utils/formatDate.js";
 import { NotificationBell } from "../../notifications/components/notificationBell.js";
 import { BUYER_MOBILE_FOOTER_ITEMS, BuyerMobileFooterNav } from "../../buyer/components/buyerMobileFooterNav.js";
 import { AffiliateAccountLayout, affiliateAccountActions } from "../../affiliate/components/affiliateAccountShell.js";
-import { roleSpecificLoginService } from "../../auth/services/roleSpecificLoginService.js";
 
 const PROFILE_MODAL_KEY = "profile-edit-modal";
 const PASSWORD_MODAL_KEY = "profile-password-modal";
@@ -744,7 +743,7 @@ function openChangePasswordModal() {
 
 function openLogoutConfirmModal() {
   let processing = false;
-  const loginPath = roleSpecificLoginService.loginPathForRole(authStore.role());
+  const loginHash = logoutLoginHash(authStore.role());
 
   const renderModal = () => {
     const content = document.createElement("section");
@@ -781,7 +780,7 @@ function openLogoutConfirmModal() {
           await authService.logout();
           closeModal({ notify: false });
           showToast("Logout berhasil.", { type: "success" });
-          window.location.hash = `#${loginPath}`;
+          window.location.hash = loginHash;
         } catch (error) {
           processing = false;
           renderModal();
@@ -810,6 +809,22 @@ function openLogoutConfirmModal() {
   };
 
   renderModal();
+}
+
+function logoutLoginHash(role) {
+  if (role === "admin" || role === "super_admin") {
+    return "#/google-login/admin";
+  }
+
+  if (role === "seller") {
+    return "#/google-login/seller";
+  }
+
+  if (role === "affiliate_admin") {
+    return "#/login/affiliate";
+  }
+
+  return "#/google-login/buyer";
 }
 
 function formInput(label, id, type, value, onChange, error, disabled) {
