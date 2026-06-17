@@ -27,18 +27,18 @@ class RepositoryQueryTest extends TestCase
              sub_model_name, primary_color, secondary_color, color_variation, document_type,
              registration_date, transmission, engine_number, chassis_number, location_name,
              engine_capacity_cc, mileage_km, seat_count, previous_owner_count, has_service_book,
-             key_count, description, price_cash, price_discount, price_credit,
+             key_count, description, youtube_url, price_cash, price_discount, price_credit,
              inspection_summary_status, published_at, created_at, updated_at, deleted_at)
             VALUES
             (1, 7, NULL, 'published', 1, 'Toyota', 'Avanza', NULL, NULL, NULL, NULL, NULL,
              NULL, 'automatic', NULL, NULL, 'Jakarta', NULL, NULL, NULL, NULL, 0, 1, NULL,
-             150000000, NULL, NULL, 'not_checked', NULL, '2026-01-01 00:00:00', NULL, NULL),
+             NULL, 150000000, NULL, NULL, 'not_checked', NULL, '2026-01-01 00:00:00', NULL, NULL),
             (2, 7, NULL, 'draft', 1, 'Toyota', 'Yaris', NULL, NULL, NULL, NULL, NULL,
              NULL, 'manual', NULL, NULL, 'Bandung', NULL, NULL, NULL, NULL, 0, 1, NULL,
-             120000000, NULL, NULL, 'not_checked', NULL, '2026-01-01 00:00:00', NULL, NULL),
+             NULL, 120000000, NULL, NULL, 'not_checked', NULL, '2026-01-01 00:00:00', NULL, NULL),
             (3, 8, NULL, 'published', 1, 'Honda', 'Brio', NULL, NULL, NULL, NULL, NULL,
              NULL, 'manual', NULL, NULL, 'Jakarta', NULL, NULL, NULL, NULL, 0, 1, NULL,
-             100000000, NULL, NULL, 'not_checked', NULL, '2026-01-01 00:00:00', NULL, '2026-01-02 00:00:00')");
+             NULL, 100000000, NULL, NULL, 'not_checked', NULL, '2026-01-01 00:00:00', NULL, '2026-01-02 00:00:00')");
 
         $repository = new CarRepository($pdo);
         $rows = $repository->list(['listing_status' => 'published', 'keyword' => 'avan'], 10, 0);
@@ -120,7 +120,7 @@ class RepositoryQueryTest extends TestCase
             engine_number TEXT NULL, chassis_number TEXT NULL, location_name TEXT NULL,
             engine_capacity_cc INTEGER NULL, mileage_km INTEGER NULL, seat_count INTEGER NULL,
             previous_owner_count INTEGER NULL, has_service_book INTEGER, key_count INTEGER,
-            description TEXT NULL, price_cash INTEGER NULL, price_discount INTEGER NULL,
+            description TEXT NULL, youtube_url TEXT NULL, price_cash INTEGER NULL, price_discount INTEGER NULL,
             price_credit INTEGER NULL, inspection_summary_status TEXT, published_at TEXT NULL,
             created_at TEXT, updated_at TEXT NULL, deleted_at TEXT NULL
         )');
