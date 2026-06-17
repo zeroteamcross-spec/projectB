@@ -1,19 +1,32 @@
 import { createPageLifecycle } from "../../../core/lifecycle.js";
 import { Button } from "../../../ui/primitives/button.js";
+import { createBackgroundVideoLayer } from "../../../ui/composites/backgroundVideo.js";
 import { showToast } from "../../../ui/primitives/toast.js";
 import { authUxConfig, defaultLoginPath } from "../../../config/authUxConfig.js";
 import { googleLoginService } from "../services/googleLoginService.js";
 
 const PAGE_BG = "bg-[radial-gradient(circle_at_10%_0%,color-mix(in_srgb,var(--pb-brand-primary)_18%,transparent),transparent_34%),radial-gradient(circle_at_90%_8%,color-mix(in_srgb,var(--pb-brand-accent)_16%,transparent),transparent_30%),linear-gradient(135deg,#f7fbf9,#fff7ed_52%,#eef7f3)]";
+const BUYER_FALLBACK_BG = "bg-[radial-gradient(circle_at_20%_4%,rgba(207,211,255,0.42),transparent_30%),radial-gradient(circle_at_92%_88%,rgba(210,216,255,0.72),transparent_34%),linear-gradient(180deg,#fbfbff_0%,#ffffff_42%,#f2f4ff_100%)]";
 
 export function GoogleLoginPage({ roleSlug } = {}) {
   let root = null;
+  let backgroundVideoLayer = null;
   const config = googleLoginService.configForSlug(roleSlug);
   const state = {
     loading: true,
     submitting: false,
     status: null,
     error: "",
+  };
+  const isBuyer = config?.slug === "buyer";
+
+  const getBackgroundVideoLayer = () => {
+    backgroundVideoLayer ??= createBackgroundVideoLayer({
+      id: "google_login_buyer_background_video_layer",
+      fallbackClassName: BUYER_FALLBACK_BG,
+      overlayClassName: "bg-white/80 backdrop-blur-[2px]",
+    });
+    return backgroundVideoLayer;
   };
 
   return createPageLifecycle({
@@ -25,8 +38,10 @@ export function GoogleLoginPage({ roleSlug } = {}) {
     },
     mount(context) {
       root = document.createElement("main");
-      root.className = `min-h-screen ${PAGE_BG} px-4 py-8 sm:px-6 lg:px-10`;
-      render(root, context, config, state);
+      root.className = isBuyer
+        ? "relative isolate min-h-screen overflow-hidden bg-transparent"
+        : `min-h-screen ${PAGE_BG} px-4 py-8 sm:px-6 lg:px-10`;
+      render(root, context, config, state, isBuyer ? getBackgroundVideoLayer : null);
       return root;
     },
     async hydrate(context) {
@@ -41,14 +56,23 @@ export function GoogleLoginPage({ roleSlug } = {}) {
         state.error = error.message || "Status Google Login gagal diambil.";
       } finally {
         state.loading = false;
-        render(root, context, config, state);
+        render(root, context, config, state, isBuyer ? getBackgroundVideoLayer : null);
       }
+    },
+    dispose() {
+      backgroundVideoLayer?.dispose?.();
+      backgroundVideoLayer = null;
     },
   });
 }
 
-function render(root, context, config, state) {
+function render(root, context, config, state, getBackgroundVideoLayer = null) {
   if (!root || !config) {
+    return;
+  }
+
+  if (config.slug === "buyer") {
+    renderBuyer(root, context, config, state, getBackgroundVideoLayer);
     return;
   }
 
@@ -70,6 +94,162 @@ function render(root, context, config, state) {
   panel.append(hero, action);
   wrap.append(panel);
   root.replaceChildren(wrap);
+}
+
+function renderBuyer(root, context, config, state, getBackgroundVideoLayer) {
+  const frame = document.createElement("section");
+  frame.id = "google_login_buyer_panel";
+  frame.className = "relative z-10 mx-auto grid min-h-screen w-full max-w-[520px] overflow-hidden px-6 py-8 text-center sm:px-10 lg:max-w-[560px]";
+
+  const topWave = document.createElement("span");
+  topWave.className = "pointer-events-none absolute -left-20 top-28 h-44 w-[calc(100%+10rem)] rounded-[50%] bg-white/70 blur-sm";
+
+  const bottomWave = document.createElement("span");
+  bottomWave.className = "pointer-events-none absolute -bottom-24 left-1/2 h-72 w-[150%] -translate-x-1/2 rounded-[50%] bg-[#dfe3ff]/70 blur-[1px]";
+
+  const bottomWaveDeep = document.createElement("span");
+  bottomWaveDeep.className = "pointer-events-none absolute -bottom-36 left-0 h-52 w-[120%] rounded-[50%] bg-[#cdd3ff]/60";
+
+  const content = document.createElement("div");
+  content.className = "relative z-10 grid min-h-[calc(100vh-4rem)] content-center justify-items-center gap-7";
+  content.append(appIcon(), buyerHeader(), buyerActionContent(root, context, config, state));
+
+  frame.append(topWave, bottomWave, bottomWaveDeep, plantDecor("left"), plantDecor("right"), content, homeIndicator());
+  const backgroundLayer = getBackgroundVideoLayer?.();
+  root.replaceChildren(...[backgroundLayer, frame].filter(Boolean));
+}
+
+function appIcon() {
+  const wrap = document.createElement("div");
+  wrap.className = "grid h-24 w-24 place-items-center rounded-[1.75rem] border border-white/80 bg-white/72 shadow-[0_22px_52px_rgba(84,92,170,0.16)] backdrop-blur-xl";
+
+  const mark = document.createElement("span");
+  mark.className = "relative block h-12 w-12";
+
+  const left = document.createElement("span");
+  left.className = "absolute bottom-1 left-2 h-8 w-7 rounded-bl-full rounded-tr-full bg-[#6657ff] shadow-[0_12px_24px_rgba(102,87,255,0.26)]";
+
+  const right = document.createElement("span");
+  right.className = "absolute bottom-1 right-2 h-9 w-7 rounded-br-full rounded-tl-full bg-[#9aa1ff]/95 shadow-[0_12px_24px_rgba(154,161,255,0.24)]";
+
+  const dot = document.createElement("span");
+  dot.className = "absolute left-1/2 top-0 h-4 w-4 -translate-x-1/2 rounded-full bg-[#b8bdff]";
+
+  mark.append(left, right, dot);
+  wrap.append(mark);
+  return wrap;
+}
+
+function buyerHeader() {
+  const headerEl = document.createElement("header");
+  headerEl.className = "grid max-w-[360px] gap-3";
+
+  const title = document.createElement("h1");
+  title.id = "google_login_buyer_title";
+  title.className = "text-[2.75rem] font-black leading-[1.04] tracking-normal text-[#11142d] sm:text-5xl";
+  title.textContent = "Selamat datang!";
+
+  const subtitle = document.createElement("p");
+  subtitle.className = "text-xl font-medium leading-8 tracking-normal text-[#a8abc2] sm:text-2xl sm:leading-9";
+  subtitle.textContent = "Masuk untuk melanjutkan dan nikmati pengalaman terbaik.";
+
+  headerEl.append(title, subtitle);
+  return headerEl;
+}
+
+function buyerActionContent(root, context, config, state) {
+  const fragment = document.createDocumentFragment();
+  const actionWrap = document.createElement("div");
+  actionWrap.className = "grid w-full max-w-[410px] gap-6";
+
+  if (state.loading) {
+    const loading = document.createElement("p");
+    loading.className = "rounded-[1.5rem] border border-white/75 bg-white/70 px-5 py-4 text-sm font-semibold text-[#717693] shadow-[0_18px_48px_rgba(84,92,170,0.10)] backdrop-blur";
+    loading.textContent = "Memeriksa konfigurasi Google Login...";
+    actionWrap.append(loading);
+    fragment.append(actionWrap);
+    return fragment;
+  }
+
+  if (state.error) {
+    actionWrap.append(messageBox(state.error, "error"));
+  }
+
+  if (!state.status?.enabled) {
+    actionWrap.append(messageBox("Google Login belum dikonfigurasi.", "info"));
+    fragment.append(actionWrap);
+    return fragment;
+  }
+
+  const button = document.createElement("button");
+  button.id = "google_login_buyer_button";
+  button.type = "button";
+  button.disabled = state.submitting;
+  button.className = "inline-flex min-h-16 w-full items-center justify-center gap-5 rounded-[1.35rem] border border-[#d8dbe8] bg-white/70 px-5 text-lg font-black tracking-normal text-[#171a35] shadow-[0_22px_52px_rgba(84,92,170,0.10)] backdrop-blur transition duration-200 hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-4 focus:ring-[#dfe3ff] disabled:cursor-wait disabled:opacity-70";
+  button.append(googleGlyph(), document.createTextNode(state.submitting ? "Membuka Google..." : "Login dengan Google"));
+  button.addEventListener("click", () => beginGoogleLogin(root, context, config, state));
+
+  actionWrap.append(button, divider());
+  fragment.append(actionWrap);
+  return fragment;
+}
+
+function googleGlyph() {
+  const glyph = document.createElement("span");
+  glyph.className = "grid h-10 w-10 shrink-0 place-items-center text-[2rem] font-black leading-none";
+  glyph.textContent = "G";
+  glyph.style.background = "conic-gradient(from -45deg,#4285f4 0 25%,#34a853 0 50%,#fbbc05 0 75%,#ea4335 0 100%)";
+  glyph.style.setProperty("-webkit-background-clip", "text");
+  glyph.style.setProperty("background-clip", "text");
+  glyph.style.color = "transparent";
+  return glyph;
+}
+
+function divider() {
+  const wrap = document.createElement("div");
+  wrap.className = "grid grid-cols-[1fr_auto_1fr] items-center gap-5 text-lg font-medium text-[#b2b5cc]";
+
+  const left = document.createElement("span");
+  left.className = "h-px bg-[#dfe2ee]";
+  const text = document.createElement("span");
+  text.textContent = "atau";
+  const right = document.createElement("span");
+  right.className = "h-px bg-[#dfe2ee]";
+
+  wrap.append(left, text, right);
+  return wrap;
+}
+
+function plantDecor(side) {
+  const root = document.createElement("span");
+  root.className = side === "left"
+    ? "pointer-events-none absolute bottom-14 left-0 z-10 h-48 w-28 opacity-55"
+    : "pointer-events-none absolute bottom-10 right-0 z-10 h-40 w-24 opacity-55";
+
+  const stem = document.createElement("span");
+  stem.className = side === "left"
+    ? "absolute bottom-0 left-5 h-44 w-px -rotate-[24deg] bg-[#aab0f6]"
+    : "absolute bottom-0 right-5 h-36 w-px rotate-[24deg] bg-[#aab0f6]";
+  root.append(stem);
+
+  for (let index = 0; index < 5; index += 1) {
+    const leaf = document.createElement("span");
+    const isLeftSide = (index + (side === "left" ? 0 : 1)) % 2 === 0;
+    leaf.className = "absolute h-10 w-5 rounded-[100%_0_100%_0] bg-[#b8bdff]";
+    leaf.style.bottom = `${index * 28 + 6}px`;
+    leaf.style[side === "left" ? "left" : "right"] = `${isLeftSide ? 10 : 46}px`;
+    leaf.style.transform = `rotate(${isLeftSide ? -42 : 42}deg)`;
+    root.append(leaf);
+  }
+
+  return root;
+}
+
+function homeIndicator() {
+  const bar = document.createElement("span");
+  bar.className = "absolute bottom-4 left-1/2 z-20 h-1.5 w-36 -translate-x-1/2 rounded-full bg-black/80 sm:hidden";
+  bar.setAttribute("aria-hidden", "true");
+  return bar;
 }
 
 function header(config) {
@@ -153,7 +333,7 @@ function actionContent(root, context, config, state) {
 
 async function beginGoogleLogin(root, context, config, state) {
   state.submitting = true;
-  render(root, context, config, state);
+  render(root, context, config, state, config.slug === "buyer" ? () => document.getElementById("google_login_buyer_background_video_layer") : null);
 
   try {
     const authUrl = await googleLoginService.begin(config);
@@ -162,7 +342,7 @@ async function beginGoogleLogin(root, context, config, state) {
     state.error = error.message || "Google Login gagal dimulai.";
     state.submitting = false;
     showToast(state.error, { type: "error", key: `google-login-${config.slug}-error`, dedupeMs: 3000 });
-    render(root, context, config, state);
+    render(root, context, config, state, config.slug === "buyer" ? () => document.getElementById("google_login_buyer_background_video_layer") : null);
   }
 }
 
