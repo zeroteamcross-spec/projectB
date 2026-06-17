@@ -9,4 +9,20 @@ const app = createProjectBApp({
   modalRoot: "#modal-root",
 });
 
-app.bootstrap();
+let resolveInitialRoute;
+const initialRouteMounted = new Promise((resolve) => {
+  resolveInitialRoute = resolve;
+});
+const disposeInitialRouteListener = app.bus.on("route:mounted", () => {
+  disposeInitialRouteListener();
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(resolveInitialRoute);
+  });
+});
+
+try {
+  await app.bootstrap();
+  await initialRouteMounted;
+} finally {
+  window.AppSplash?.hide();
+}

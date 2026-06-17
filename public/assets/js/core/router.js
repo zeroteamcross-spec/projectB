@@ -88,7 +88,8 @@ export class Router {
     this.bus?.emit("route:change", context);
 
     if (!route) {
-      this.mountPage(this.notFound(context), context);
+      await this.mountPage(this.notFound(context), context);
+      this.bus?.emit("route:mounted", context);
       return;
     }
 
@@ -97,6 +98,7 @@ export class Router {
     }
 
     await this.mountPage(route.page(context), context);
+    this.bus?.emit("route:mounted", context);
 
     this.preloadManager?.hydrateRoute(route, context)
       .then(() => {
