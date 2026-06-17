@@ -99,7 +99,7 @@ function render(root, context, config, state, getBackgroundVideoLayer = null) {
 function renderBuyer(root, context, config, state, getBackgroundVideoLayer) {
   const frame = document.createElement("section");
   frame.id = "google_login_buyer_panel";
-  frame.className = "relative z-10 mx-auto grid min-h-screen w-full max-w-[520px] overflow-hidden px-6 py-8 text-center sm:px-10 lg:mx-0 lg:ml-auto lg:mr-[7vw] lg:max-w-[560px]";
+  frame.className = "relative z-10 mx-auto grid min-h-screen w-full max-w-[430px] overflow-hidden px-5 py-6 text-center sm:px-7 lg:mx-0 lg:ml-auto lg:mr-[8vw] lg:max-w-[450px]";
 
   const topWave = document.createElement("span");
   topWave.className = "pointer-events-none absolute -left-20 top-28 h-44 w-[calc(100%+10rem)] rounded-[50%] bg-white/70 blur-sm";
@@ -111,7 +111,7 @@ function renderBuyer(root, context, config, state, getBackgroundVideoLayer) {
   bottomWaveDeep.className = "pointer-events-none absolute -bottom-36 left-0 h-52 w-[120%] rounded-[50%] bg-[#cdd3ff]/60";
 
   const content = document.createElement("div");
-  content.className = "relative z-10 grid min-h-[calc(100vh-4rem)] content-center justify-items-center gap-7";
+  content.className = "relative z-10 grid min-h-[calc(100vh-3rem)] content-center justify-items-center gap-5 rounded-[1.75rem] border border-white/45 bg-[linear-gradient(135deg,rgba(255,255,255,0.72),rgba(214,220,235,0.42)_42%,rgba(244,247,252,0.62)_100%)] px-5 py-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.82),0_24px_70px_rgba(18,24,45,0.18)] backdrop-blur-xl sm:px-7 sm:py-9";
   content.append(appIcon(), buyerHeader(), buyerActionContent(root, context, config, state));
 
   frame.append(topWave, bottomWave, bottomWaveDeep, plantDecor("left"), plantDecor("right"), content, homeIndicator());
@@ -121,19 +121,19 @@ function renderBuyer(root, context, config, state, getBackgroundVideoLayer) {
 
 function appIcon() {
   const wrap = document.createElement("div");
-  wrap.className = "grid h-24 w-24 place-items-center rounded-[1.75rem] border border-white/80 bg-white/72 shadow-[0_22px_52px_rgba(84,92,170,0.16)] backdrop-blur-xl";
+  wrap.className = "grid h-20 w-20 place-items-center rounded-[1.35rem] border border-white/70 bg-[linear-gradient(145deg,rgba(255,255,255,0.84),rgba(203,210,230,0.54))] shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_18px_42px_rgba(84,92,170,0.16)] backdrop-blur-xl";
 
   const mark = document.createElement("span");
-  mark.className = "relative block h-12 w-12";
+  mark.className = "relative block h-10 w-10";
 
   const left = document.createElement("span");
-  left.className = "absolute bottom-1 left-2 h-8 w-7 rounded-bl-full rounded-tr-full bg-[#6657ff] shadow-[0_12px_24px_rgba(102,87,255,0.26)]";
+  left.className = "absolute bottom-1 left-1.5 h-7 w-6 rounded-bl-full rounded-tr-full bg-[#6657ff] shadow-[0_12px_24px_rgba(102,87,255,0.26)]";
 
   const right = document.createElement("span");
-  right.className = "absolute bottom-1 right-2 h-9 w-7 rounded-br-full rounded-tl-full bg-[#9aa1ff]/95 shadow-[0_12px_24px_rgba(154,161,255,0.24)]";
+  right.className = "absolute bottom-1 right-1.5 h-8 w-6 rounded-br-full rounded-tl-full bg-[#9aa1ff]/95 shadow-[0_12px_24px_rgba(154,161,255,0.24)]";
 
   const dot = document.createElement("span");
-  dot.className = "absolute left-1/2 top-0 h-4 w-4 -translate-x-1/2 rounded-full bg-[#b8bdff]";
+  dot.className = "absolute left-1/2 top-0 h-3.5 w-3.5 -translate-x-1/2 rounded-full bg-[#b8bdff]";
 
   mark.append(left, right, dot);
   wrap.append(mark);
@@ -142,15 +142,15 @@ function appIcon() {
 
 function buyerHeader() {
   const headerEl = document.createElement("header");
-  headerEl.className = "grid max-w-[360px] gap-3";
+  headerEl.className = "grid max-w-[320px] gap-2.5";
 
   const title = document.createElement("h1");
   title.id = "google_login_buyer_title";
-  title.className = "text-[2.75rem] font-black leading-[1.04] tracking-normal text-[#11142d] sm:text-5xl";
+  title.className = "text-[2.2rem] font-black leading-[1.04] tracking-normal text-[#11142d] sm:text-[2.55rem]";
   title.textContent = "Selamat datang!";
 
   const subtitle = document.createElement("p");
-  subtitle.className = "text-xl font-medium leading-8 tracking-normal text-[#a8abc2] sm:text-2xl sm:leading-9";
+  subtitle.className = "text-base font-medium leading-7 tracking-normal text-[#858aa2] sm:text-lg sm:leading-8";
   subtitle.textContent = "Masuk untuk melanjutkan dan nikmati pengalaman terbaik.";
 
   headerEl.append(title, subtitle);
@@ -160,7 +160,7 @@ function buyerHeader() {
 function buyerActionContent(root, context, config, state) {
   const fragment = document.createDocumentFragment();
   const actionWrap = document.createElement("div");
-  actionWrap.className = "grid w-full max-w-[410px] gap-6";
+  actionWrap.className = "grid w-full max-w-[340px] gap-5";
 
   if (state.loading) {
     const loading = document.createElement("p");
@@ -185,7 +185,7 @@ function buyerActionContent(root, context, config, state) {
   button.id = "google_login_buyer_button";
   button.type = "button";
   button.disabled = state.submitting;
-  button.className = "inline-flex min-h-16 w-full items-center justify-center gap-5 rounded-[1.35rem] border border-[#d8dbe8] bg-white/70 px-5 text-lg font-black tracking-normal text-[#171a35] shadow-[0_22px_52px_rgba(84,92,170,0.10)] backdrop-blur transition duration-200 hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-4 focus:ring-[#dfe3ff] disabled:cursor-wait disabled:opacity-70";
+  button.className = "inline-flex min-h-14 w-full items-center justify-center gap-4 rounded-[1.15rem] border border-white/60 bg-[linear-gradient(135deg,rgba(255,255,255,0.84),rgba(216,222,236,0.58))] px-4 text-base font-black tracking-normal text-[#171a35] shadow-[inset_0_1px_0_rgba(255,255,255,0.88),0_16px_36px_rgba(84,92,170,0.13)] backdrop-blur transition duration-200 hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-4 focus:ring-[#dfe3ff] disabled:cursor-wait disabled:opacity-70";
   button.append(googleGlyph(), document.createTextNode(state.submitting ? "Membuka Google..." : "Login dengan Google"));
   button.addEventListener("click", () => beginGoogleLogin(root, context, config, state));
 
