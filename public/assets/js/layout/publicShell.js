@@ -81,9 +81,8 @@ export class PublicShell {
 
     const login = document.createElement("a");
     this.actionLink = login;
-    login.className = "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--pb-radius-xl)] border border-[var(--pb-border)] bg-[var(--pb-btn-secondary-bg)] text-[var(--pb-btn-secondary-text)] leading-none shadow-[var(--pb-shadow-soft)] transition hover:brightness-95";
+    login.className = "inline-flex h-10 shrink-0 items-center justify-center rounded-[var(--pb-radius-xl)] border border-[var(--pb-border)] bg-[var(--pb-btn-secondary-bg)] px-3 text-sm font-semibold text-[var(--pb-btn-secondary-text)] leading-none shadow-[var(--pb-shadow-soft)] transition hover:brightness-95";
     login.setAttribute("aria-label", "Akun");
-    login.append(createIcon("user", { className: "block h-4 w-4 leading-none" }));
     this.syncActionLink();
 
     actions.append(login);
@@ -110,7 +109,7 @@ export class PublicShell {
 
     const isAuthenticated = this.store?.get("auth.isAuthenticated", false) ?? false;
     const role = this.store?.get("auth.role", "public") ?? "public";
-    const target = isAuthenticated ? dashboardHash(role) : defaultLoginHash();
+    const target = isAuthenticated ? dashboardHash(role) : loginHashForCurrentHost();
     this.brandTitleNode && (this.brandTitleNode.textContent = brandConfig.appName);
     this.brandSubtitleNode && (this.brandSubtitleNode.textContent = brandConfig.appTagline || "Showroom mobil pilihan");
     if (this.brandMarkNode) {
@@ -128,6 +127,14 @@ export class PublicShell {
     }
     this.actionLink.href = target;
     this.actionLink.title = isAuthenticated ? "Dashboard akun" : "Masuk";
+    this.actionLink.classList.toggle("w-10", isAuthenticated);
+    this.actionLink.classList.toggle("px-0", isAuthenticated);
+    this.actionLink.classList.toggle("px-3", !isAuthenticated);
+    this.actionLink.replaceChildren(
+      isAuthenticated
+        ? createIcon("user", { className: "block h-4 w-4 leading-none" })
+        : document.createTextNode("Login")
+    );
     this.renderImpersonationBanner();
   }
 
@@ -158,6 +165,28 @@ function dashboardHash(role) {
   }
 
   return "#/";
+}
+
+function loginHashForCurrentHost() {
+  const host = String(window.location.hostname || "").toLowerCase();
+
+  if (host === "admin.garasi-mobil.com") {
+    return "#/google-login/admin";
+  }
+
+  if (host === "showroom.garasi-mobil.com") {
+    return "#/google-login/seller";
+  }
+
+  if (host === "marketing.garasi-mobil.com") {
+    return "#/login/affiliate";
+  }
+
+  if (host === "garasi-mobil.com") {
+    return "#/google-login/buyer";
+  }
+
+  return defaultLoginHash();
 }
 
 PublicShell.prototype.renderImpersonationBanner = function renderImpersonationBanner() {
