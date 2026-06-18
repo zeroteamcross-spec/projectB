@@ -104,11 +104,19 @@ function syncModalFooter(panel, modal) {
   const footer = existing ?? document.createElement("div");
   footer.dataset.modalPart = "footer";
   footer.className = "flex flex-wrap justify-end gap-2 border-t border-[var(--pb-border)] bg-white/70 px-5 py-4 sm:px-6";
-  footer.replaceChildren(Button({
-    label: modal.closeLabel ?? "Tutup",
-    variant: "secondary",
-    onClick: closeModal,
-  }));
+  const runtime = modalRuntime.get(modal.key);
+  const customFooter = runtime?.footer ?? null;
+  if (customFooter instanceof Node) {
+    footer.replaceChildren(customFooter);
+  } else if (typeof customFooter === "function") {
+    footer.replaceChildren(customFooter());
+  } else {
+    footer.replaceChildren(Button({
+      label: modal.closeLabel ?? "Tutup",
+      variant: "secondary",
+      onClick: closeModal,
+    }));
+  }
 
   if (!existing) {
     panel.append(footer);
@@ -157,6 +165,7 @@ export function openModal(content, options = {}) {
     if (options.preserveContentOnSameSignature && previousRuntime?.contentSignature === nextSignature) {
       modalRuntime.set(current.key, {
         ...previousRuntime,
+        footer: options.footerNode ?? previousRuntime?.footer ?? null,
         onClose: options.onClose ?? previousRuntime?.onClose ?? null,
         contentSignature: nextSignature,
       });
@@ -165,6 +174,7 @@ export function openModal(content, options = {}) {
 
     modalRuntime.set(current.key, {
       content,
+      footer: options.footerNode ?? null,
       onClose: options.onClose ?? null,
       contentSignature: nextSignature,
     });
@@ -178,6 +188,7 @@ export function openModal(content, options = {}) {
   const key = options.key ?? `modal-${Date.now()}-${Math.random().toString(16).slice(2)}`;
   modalRuntime.set(key, {
     content,
+    footer: options.footerNode ?? null,
     onClose: options.onClose ?? null,
     contentSignature: options.contentSignature ?? "",
   });

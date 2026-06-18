@@ -129,6 +129,7 @@ function openCarFormModal({ runtime, brandOptions }) {
     error: runtime.error,
     brandOptions,
     step: runtime.formStep ?? 1,
+    showNavigation: false,
     onStepChange: (formStep) => setRuntime({ formStep }),
     onCancel: () => setRuntime({ mode: "list", selectedCar: null, form: null, error: "", formStep: 1 }),
     onChange: (form) => setFormState(form),
@@ -140,9 +141,12 @@ function openCarFormModal({ runtime, brandOptions }) {
     title: isEdit ? "Edit mobil" : "Tambah mobil",
     description: "Pilih brand dan model dari Master Brand, lalu lengkapi detail listing.",
     size: "xl",
-    footer: null,
+    footer: "custom",
+    footerNode: createCarFormFooter(runtime),
     panelId: "slrc_car_form_modal_section",
-    panelClassName: "md:min-w-[900px]",
+    rootClassName: "p-0 sm:p-4",
+    panelClassName: "h-screen max-h-screen rounded-none sm:h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-2rem)] sm:!max-w-[900px] sm:rounded-[1.5rem] md:min-w-[900px]",
+    bodyClassName: "modal-scrollbar min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-6",
     headerId: "slrc_car_form_modal_header_section",
     bodyId: "slrc_car_form_modal_body_section",
     closeButtonId: "slrc_car_form_modal_close_button",
@@ -150,6 +154,68 @@ function openCarFormModal({ runtime, brandOptions }) {
     preserveContentOnSameSignature: true,
     contentSignature: carFormModalSignature(runtime),
   });
+}
+
+function createCarFormFooter(runtime) {
+  const currentStep = Number(runtime.formStep ?? 1);
+  const saving = Boolean(runtime.saving);
+  const footer = document.createElement("section");
+  footer.id = "slrc_car_form_modal_footer_actions_section";
+  footer.className = "flex w-full flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-between";
+
+  const cancel = Button({
+    label: "Batal",
+    variant: "secondary",
+    disabled: saving,
+    onClick: () => dispatchCarFormEvent("seller-car-form:cancel"),
+  });
+  cancel.id = "slrc_cancel_car_button";
+
+  const actions = document.createElement("section");
+  actions.id = "slrc_car_form_modal_footer_step_actions_section";
+  actions.className = "flex flex-col-reverse gap-2 sm:flex-row sm:justify-end";
+
+  const back = Button({
+    label: "Kembali",
+    variant: "secondary",
+    disabled: saving || currentStep === 1,
+    onClick: () => dispatchCarFormEvent("seller-car-form:previous"),
+  });
+  back.id = "slrc_car_form_back_button";
+  back.prepend(createIcon("arrowLeft", { className: "h-4 w-4" }));
+  setFooterButtonVisibility(back, currentStep !== 1);
+
+  const next = Button({
+    label: "Lanjut",
+    disabled: saving,
+    onClick: () => dispatchCarFormEvent("seller-car-form:next"),
+  });
+  next.id = "slrc_car_form_next_button";
+  next.append(createIcon("arrowRight", { className: "h-4 w-4" }));
+  setFooterButtonVisibility(next, currentStep !== 3);
+
+  const submit = Button({
+    label: saving ? "Menyimpan..." : "Simpan mobil",
+    disabled: saving,
+    onClick: () => dispatchCarFormEvent("seller-car-form:submit"),
+  });
+  submit.id = "slrc_car_form_submit_button";
+  submit.prepend(createIcon("circleCheck", { className: "h-4 w-4" }));
+  setFooterButtonVisibility(submit, currentStep === 3);
+
+  actions.append(back, next, submit);
+  footer.append(cancel, actions);
+  return footer;
+}
+
+function dispatchCarFormEvent(name) {
+  document.querySelector("#slrc_car_form_section")?.dispatchEvent(new Event(name));
+}
+
+function setFooterButtonVisibility(button, visible) {
+  button.hidden = !visible;
+  button.style.display = visible ? "" : "none";
+  button.setAttribute("aria-hidden", visible ? "false" : "true");
 }
 
 function closeCarFormModal() {

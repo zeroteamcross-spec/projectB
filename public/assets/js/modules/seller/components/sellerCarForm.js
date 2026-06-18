@@ -70,6 +70,7 @@ export function SellerCarForm({
   error = "",
   brandOptions = [],
   step = 1,
+  showNavigation = true,
   onStepChange = null,
   onSubmit = null,
   onCancel = null,
@@ -83,7 +84,7 @@ export function SellerCarForm({
   const documentToggle = createDocumentTypeToggle(values.document_type ?? "new");
   const form = document.createElement("form");
   form.id = "slrc_car_form_section";
-  form.className = "grid min-w-0 gap-5 rounded-[2rem] border border-white/80 bg-white/88 p-4 shadow-[0_22px_70px_rgba(15,23,42,0.09)] backdrop-blur-xl transition duration-150 sm:p-5";
+  form.className = "grid min-w-0 gap-5";
   form.dataset.ds = "seller.cars.form";
 
   const header = formHeader(car);
@@ -147,15 +148,18 @@ export function SellerCarForm({
   );
   step3.append(commercial.section);
 
-  const navigation = createNavigation({
+  const navigation = showNavigation ? createNavigation({
     currentStep,
     saving,
     onCancel,
     onPrevious: () => moveStep(form, currentStep - 1, onStepChange, onChange, validationNode),
     onNext: () => moveStep(form, currentStep + 1, onStepChange, onChange, validationNode),
-  });
+  }) : null;
 
-  form.append(header, stepper, errorNode, validationNode, step1, step2, step3, navigation);
+  form.append(header, stepper, errorNode, validationNode, step1, step2, step3);
+  if (navigation) {
+    form.append(navigation);
+  }
 
   brandField.select.addEventListener("change", () => {
     const selectedBrand = findBrandByValue(brands, brandField.select.value);
@@ -163,6 +167,10 @@ export function SellerCarForm({
   });
   form.addEventListener("input", () => onChange?.(normalizeCarPayload(new FormData(form))));
   form.addEventListener("change", () => onChange?.(normalizeCarPayload(new FormData(form))));
+  form.addEventListener("seller-car-form:previous", () => moveStep(form, currentStep - 1, onStepChange, onChange, validationNode));
+  form.addEventListener("seller-car-form:next", () => moveStep(form, currentStep + 1, onStepChange, onChange, validationNode));
+  form.addEventListener("seller-car-form:cancel", () => onCancel?.());
+  form.addEventListener("seller-car-form:submit", () => form.requestSubmit());
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     const invalidStep = firstInvalidStep(form);
@@ -185,6 +193,7 @@ function formHeader(car) {
   const copyWrap = document.createElement("section");
   copyWrap.id = "slrc_car_form_header_copy_section";
   copyWrap.className = "flex min-w-0 items-start gap-3";
+  setElementVisibility(copyWrap, false);
   const icon = document.createElement("span");
   icon.className = "grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#f97316,#14b8a6)] text-white shadow-[0_14px_34px_rgba(249,115,22,0.18)]";
   icon.append(createIcon("car", { className: "h-5 w-5" }));
@@ -197,7 +206,7 @@ function formHeader(car) {
   title.textContent = car?.id ? "Edit mobil" : "Tambah mobil";
   const helper = document.createElement("p");
   helper.className = `text-sm leading-6 ${tw.text.muted}`;
-  helper.textContent = "Flow bertahap: data dasar, spesifikasi, lalu harga dan publikasi.";
+  helper.textContent = "";
   copy.append(title, helper);
   copyWrap.append(icon, copy);
 
@@ -212,7 +221,7 @@ function formHeader(car) {
 function createStepper(currentStep) {
   const section = document.createElement("section");
   section.id = "slrc_car_form_stepper_section";
-  section.className = "grid gap-3";
+  section.className = "sticky top-0 z-20 grid gap-3 rounded-2xl border border-white/80 bg-white/95 p-3 shadow-[0_16px_40px_rgba(15,23,42,0.12)] backdrop-blur-xl";
 
   const top = document.createElement("section");
   top.id = "slrc_car_form_stepper_summary_section";
