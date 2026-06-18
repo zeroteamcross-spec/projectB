@@ -11,7 +11,7 @@ export function AdminWebConfigPage() {
   let root = null;
   let context = null;
   let unsubscribe = null;
-  const state = { saving: false, uploading: false, error: "", draft: null };
+  const state = { saving: false, uploading: false, error: "", notice: "", draft: null };
   const rerender = () => render(root, context, state, actions);
 
   const actions = {
@@ -20,6 +20,7 @@ export function AdminWebConfigPage() {
       state.draft = currentDraft ?? state.draft;
       state.uploading = true;
       state.error = "";
+      state.notice = "";
       rerender();
       try {
         const asset = await webConfigResource.uploadIcon(file);
@@ -48,15 +49,19 @@ export function AdminWebConfigPage() {
       }
       state.saving = true;
       state.error = "";
+      state.notice = "";
       rerender();
       try {
         const result = await webConfigResource.update(payload);
         state.draft = null;
+        state.error = "";
+        state.notice = result.message || "Konfigurasi WEB berhasil disimpan.";
+        safeToast(state.notice, { type: "success" });
         patchConfig(result.config, result.theme);
-        showToast(result.message, { type: "success" });
       } catch (error) {
         state.error = error.message || "Gagal menyimpan Konfigurasi WEB.";
-        showToast(state.error, { type: "error" });
+        state.notice = "";
+        safeToast(state.error, { type: "error" });
       } finally {
         state.saving = false;
         rerender();
@@ -68,6 +73,7 @@ export function AdminWebConfigPage() {
     bootstrap(nextContext) {
       context = nextContext;
       state.error = "";
+      state.notice = "";
     },
     mount(nextContext) {
       context = nextContext;
@@ -99,6 +105,7 @@ function render(root, context, state, actions) {
   const page = document.createElement("section");
   page.className = "grid min-w-0 gap-6";
   page.append(hero(), formSection(draft, state, actions));
+  if (state.notice) page.append(successPanel(state.notice));
   if (state.error) page.append(errorPanel(state.error));
   root.replaceChildren(page);
 }
@@ -178,10 +185,66 @@ function actionRow(state) {
 }
 
 function patchConfig(config, theme) {
-  if (config) appStore.patchState("working.adminWebConfig.config", { data: config, hydratedAt: Date.now() }, "admin-web-config:save");
-  if (theme && typeof globalThis.__PROJECTB_APPLY_THEME__ === "function") {
-    globalThis.__PROJECTB_APPLY_THEME__(theme);
+  try {
+    if (config) {
+      appStore.patchState("working.adminWebConfig.config", { data: config, hydratedAt: Date.now() }, "admin-web-config:save");
+      syncDocumentIdentity(config);
+    }
+  } catch (error) {
+    console.error("Web config local sync failed.", error);
   }
+}
+
+function syncDocumentIdentity(config) {
+  const appName = String(config?.app_name ?? "").trim();
+  const tagline = String(config?.tagline ?? "").trim();
+  const iconUrl = normalizeAssetUrl(config?.icon_url ?? "");
+
+  if (appName) {
+    document.title = appName;
+    upsertMeta("name", "application-name", appName);
+    upsertMeta("name", "apple-mobile-web-app-title", appName);
+    upsertMeta("property", "og:title", appName);
+    upsertMeta("name", "twitter:title", appName);
+  }
+
+  if (tagline) {
+    upsertMeta("name", "description", tagline);
+    upsertMeta("property", "og:description", tagline);
+    upsertMeta("name", "twitter:description", tagline);
+  }
+
+  if (iconUrl) {
+    upsertLink("icon", iconUrl);
+    upsertLink("shortcut icon", iconUrl);
+    upsertLink("apple-touch-icon", iconUrl);
+  }
+}
+
+function upsertMeta(attribute, key, content) {
+  const selector = `meta[${attribute}="${cssAttrEscape(key)}"]`;
+  let node = document.head.querySelector(selector);
+  if (!node) {
+    node = document.createElement("meta");
+    node.setAttribute(attribute, key);
+    document.head.append(node);
+  }
+  node.setAttribute("content", content);
+}
+
+function upsertLink(rel, href) {
+  const selector = `link[rel="${cssAttrEscape(rel)}"]`;
+  let node = document.head.querySelector(selector);
+  if (!node) {
+    node = document.createElement("link");
+    node.rel = rel;
+    document.head.append(node);
+  }
+  node.href = href;
+}
+
+function cssAttrEscape(value) {
+  return String(value).replace(/\\/g, "\\\\").replace(/"/g, '\\"');
 }
 
 function validatePayload(payload) {
@@ -282,6 +345,21 @@ function errorPanel(message) {
   section.className = "rounded-[1rem] border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700";
   section.textContent = message;
   return section;
+}
+
+function successPanel(message) {
+  const section = document.createElement("section");
+  section.className = "rounded-[1rem] border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700";
+  section.textContent = message;
+  return section;
+}
+
+function safeToast(message, options = {}) {
+  try {
+    showToast(message, options);
+  } catch (error) {
+    console.error("Toast failed.", error);
+  }
 }
 
 function normalizeAssetUrl(url) {
