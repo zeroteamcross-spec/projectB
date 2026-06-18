@@ -49,6 +49,7 @@ const ADMIN_LINKS = [
 
 const SUPER_ADMIN_LINKS = [
   { href: "#/super-admin", label: "Superadmin Dashboard", icon: "dashboard" },
+  { href: "#/admin/web-config", label: "Konfigurasi WEB", icon: "settings" },
   { href: "#/admin/release-versions", label: "Release Version Manager", icon: "download" },
   { href: "#/admin/migrations", label: "Migration Manager", icon: "database" },
   {
