@@ -25,7 +25,7 @@ class MasterAssetController extends Controller
 
     public function uploadBankIcon(Request $request): JsonResponse
     {
-        AuthPolicy::requireRole($request->user(), ['admin']);
+        AuthPolicy::requireAdmin($request->user());
         $payload = (new UploadBankIconRequest($request))->validate();
 
         return JsonResponse::success([
@@ -35,7 +35,7 @@ class MasterAssetController extends Controller
 
     public function uploadAppIcon(Request $request): JsonResponse
     {
-        AuthPolicy::requireRole($request->user(), ['admin']);
+        AuthPolicy::requireAdmin($request->user());
         $payload = (new UploadAppIconRequest($request))->validate();
 
         return JsonResponse::success([

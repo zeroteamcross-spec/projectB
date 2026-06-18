@@ -391,7 +391,93 @@
     global.__PROJECTB_THEME__ = currentTheme;
     applyVariables(currentTheme);
     syncTailwindConfig(currentTheme);
+    syncDocumentMetadata(currentTheme);
     return clone(currentTheme);
+  }
+
+  function syncDocumentMetadata(theme) {
+    var doc = global.document;
+    if (!doc || !doc.head) {
+      return;
+    }
+
+    var appName = stringOr(theme.brand && theme.brand.appName, DEFAULT_THEME.brand.appName);
+    var tagline = stringOr(theme.brand && theme.brand.tagline, DEFAULT_THEME.brand.tagline);
+    var iconUrl = resolveDocumentAssetUrl(
+      theme.brand && (theme.brand.iconUrl || theme.brand.logoMarkAsset)
+    );
+
+    doc.title = appName;
+    upsertMeta("name", "application-name", appName);
+    upsertMeta("name", "apple-mobile-web-app-title", appName);
+    upsertMeta("name", "description", tagline);
+    upsertMeta("property", "og:site_name", appName);
+    upsertMeta("property", "og:title", appName);
+    upsertMeta("property", "og:description", tagline);
+    upsertMeta("name", "twitter:title", appName);
+    upsertMeta("name", "twitter:description", tagline);
+
+    if (iconUrl) {
+      upsertLink("icon", iconUrl);
+      upsertLink("shortcut icon", iconUrl);
+      upsertLink("apple-touch-icon", iconUrl);
+      upsertMeta("property", "og:image", iconUrl);
+      upsertMeta("name", "twitter:image", iconUrl);
+    }
+  }
+
+  function resolveDocumentAssetUrl(value) {
+    var next = String(value || "").trim();
+    if (!next || next.indexOf("brand.") === 0) {
+      return "";
+    }
+
+    if (/^(https?:|data:|blob:)/i.test(next)) {
+      return next;
+    }
+
+    if (next.charAt(0) === "/") {
+      return next;
+    }
+
+    return "";
+  }
+
+  function upsertMeta(attribute, key, content) {
+    var doc = global.document;
+    var selector = 'meta[' + attribute + '="' + cssEscape(key) + '"]';
+    var node = doc.head.querySelector(selector);
+    if (!node) {
+      node = doc.createElement("meta");
+      node.setAttribute(attribute, key);
+      doc.head.appendChild(node);
+    }
+    node.setAttribute("content", String(content || ""));
+  }
+
+  function upsertLink(rel, href) {
+    var doc = global.document;
+    var selector = 'link[rel="' + cssEscape(rel) + '"]';
+    var node = doc.head.querySelector(selector);
+    if (!node) {
+      node = doc.createElement("link");
+      node.setAttribute("rel", rel);
+      doc.head.appendChild(node);
+    }
+    node.setAttribute("href", href);
+    if (/\\.svg(?:[?#].*)?$/i.test(href)) {
+      node.setAttribute("type", "image/svg+xml");
+    } else if (/\\.png(?:[?#].*)?$/i.test(href)) {
+      node.setAttribute("type", "image/png");
+    } else if (/\\.webp(?:[?#].*)?$/i.test(href)) {
+      node.setAttribute("type", "image/webp");
+    } else {
+      node.removeAttribute("type");
+    }
+  }
+
+  function cssEscape(value) {
+    return String(value).replace(/\\/g, "\\\\").replace(/"/g, '\\"');
   }
 
   global.__PROJECTB_THEME_DEFAULTS__ = clone(DEFAULT_THEME);
