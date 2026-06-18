@@ -121,7 +121,7 @@ function renderBuyer(root, context, config, state, getBackgroundVideoLayer) {
 
 function appIcon() {
   const wrap = document.createElement("div");
-  wrap.className = "grid h-16 w-16 place-items-center rounded-[1.15rem] border border-white/70 bg-[linear-gradient(145deg,rgba(255,255,255,0.84),rgba(203,210,230,0.54))] shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_16px_34px_rgba(84,92,170,0.16)] backdrop-blur-xl";
+  wrap.className = " hidden grid h-16 w-16 place-items-center rounded-[1.15rem] border border-white/70 bg-[linear-gradient(145deg,rgba(255,255,255,0.84),rgba(203,210,230,0.54))] shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_16px_34px_rgba(84,92,170,0.16)] backdrop-blur-xl";
 
   const mark = document.createElement("span");
   mark.className = "relative block h-8 w-8";
@@ -150,7 +150,7 @@ function buyerHeader() {
   title.textContent = "Selamat datang!";
 
   const subtitle = document.createElement("p");
-  subtitle.className = "text-sm font-medium leading-6 tracking-normal text-[#858aa2] sm:text-base sm:leading-7";
+  subtitle.className = "text-sm font-medium leading-6 tracking-normal text-black sm:text-base sm:leading-7";
   subtitle.textContent = "Masuk untuk melanjutkan dan nikmati pengalaman terbaik.";
 
   headerEl.append(title, subtitle);
