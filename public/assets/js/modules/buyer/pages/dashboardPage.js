@@ -689,7 +689,7 @@ function openBuyerFilterModal({ cars, uiState, onApply }) {
   reset.id = "byr_filter_reset_button";
 
   const apply = Button({
-    label: "Selesai",
+    label: "Terapkan",
     onClick: () => {
       uiState.category = draft.category;
       uiState.brand = "";

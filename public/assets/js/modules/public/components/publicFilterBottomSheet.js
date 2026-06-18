@@ -77,7 +77,7 @@ export function PublicFilterBottomSheet({
   resetButton.classList.add("w-full", "min-h-11", "px-4", "py-2", "text-sm");
 
   const applyButton = Button({
-    label: "Selesai",
+    label: "Terapkan",
     onClick: () => {
       closeModal({ notify: false });
       const values = collectFilterValues(content);

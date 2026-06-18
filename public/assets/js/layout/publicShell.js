@@ -6,6 +6,7 @@ import { tw } from "../theme/tailwindClasses.js";
 import { applyDesignHook } from "../theme/designStudioHooks.js";
 import { renderImpersonationBanner as mountImpersonationBanner } from "./impersonationBanner.js";
 import { defaultLoginHash } from "../config/authUxConfig.js";
+import { BuyerMobileFooterNav } from "../modules/buyer/components/buyerMobileFooterNav.js";
 
 export class PublicShell {
   constructor({ store } = {}) {
@@ -28,8 +29,10 @@ export class PublicShell {
       applyDesignHook(this.root, "shell.public.root");
       this.headerNode = this.header();
       this.outlet.className = tw.layout.publicMain;
-      this.root.append(this.headerNode, this.alertHost, this.outlet);
+      this.mobileFooterContainer = document.createElement("div");
+      this.root.append(this.headerNode, this.alertHost, this.outlet, this.mobileFooterContainer);
       this.unsubscribe = this.store?.subscribe?.(() => this.syncActionLink()) ?? null;
+      window.addEventListener("hashchange", () => this.syncActionLink());
     }
 
     this.syncActionLink();
@@ -139,6 +142,29 @@ export class PublicShell {
         : document.createTextNode("Login")
     );
     this.renderImpersonationBanner();
+
+    // Toggle public header and sync mobile footer if logged in as buyer on landing page
+    const isLandingPage = !window.location.hash || window.location.hash === "#/" || window.location.hash === "#/public";
+    const isMobileLoggedIn = isAuthenticated && role === "buyer" && isLandingPage;
+
+    if (this.headerNode) {
+      this.headerNode.classList.toggle("hidden", isMobileLoggedIn);
+      this.headerNode.classList.toggle("sm:block", isMobileLoggedIn);
+    }
+
+    if (this.mobileFooterContainer) {
+      this.mobileFooterContainer.replaceChildren();
+      if (isMobileLoggedIn) {
+        const activePath = window.location.hash.replace(/^#/, "") || "/";
+        const footer = BuyerMobileFooterNav({
+          activePath,
+          onNavigate: (path) => {
+            window.location.hash = `#${path}`;
+          }
+        });
+        this.mobileFooterContainer.append(footer);
+      }
+    }
   }
 
   dispose() {
