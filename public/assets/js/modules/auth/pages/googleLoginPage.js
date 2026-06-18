@@ -102,10 +102,10 @@ function renderBuyer(root, context, config, state, getBackgroundVideoLayer) {
   frame.className = "relative z-10 mx-auto grid min-h-screen w-full max-w-[430px] overflow-hidden px-5 py-6 text-center sm:px-7 lg:mx-0 lg:ml-auto lg:mr-[8vw] lg:max-w-[450px]";
 
   const topWave = document.createElement("span");
-  topWave.className = "pointer-events-none absolute -left-20 top-28 h-44 w-[calc(100%+10rem)] rounded-[50%] bg-white/70 blur-sm";
+  topWave.className = "hidden pointer-events-none absolute -left-20 top-28 h-44 w-[calc(100%+10rem)] rounded-[50%] bg-white/70 blur-sm";
 
   const bottomWave = document.createElement("span");
-  bottomWave.className = "pointer-events-none absolute -bottom-24 left-1/2 h-72 w-[150%] -translate-x-1/2 rounded-[50%] bg-[#dfe3ff]/70 blur-[1px]";
+  bottomWave.className = "hidden pointer-events-none absolute -bottom-24 left-1/2 h-72 w-[150%] -translate-x-1/2 rounded-[50%] bg-[#dfe3ff]/70 blur-[1px]";
 
   const bottomWaveDeep = document.createElement("span");
   bottomWaveDeep.className = "pointer-events-none absolute -bottom-36 left-0 h-52 w-[120%] rounded-[50%] bg-[#cdd3ff]/60";
