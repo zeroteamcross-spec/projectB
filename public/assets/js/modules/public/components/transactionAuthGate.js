@@ -65,7 +65,6 @@ function loginForm({ isSubmitting, onLogin }) {
   form.append(
     field({ name: "email", label: "Email", type: "email", placeholder: "buyer@projectb.local" }),
     field({ name: "password", label: "Password", type: "password", placeholder: "Password buyer" }),
-    rememberField(),
     submitButton(isSubmitting ? "Memproses..." : "Masuk dan lanjut", isSubmitting)
   );
   form.addEventListener("submit", (event) => {
@@ -74,7 +73,6 @@ function loginForm({ isSubmitting, onLogin }) {
     onLogin?.({
       email: data.email,
       password: data.password,
-      remember: data.remember === "on",
     });
   });
   return form;
@@ -121,17 +119,6 @@ function field({ name, label, type = "text", placeholder = "" }) {
   input.className = tw.form.control;
   wrap.append(input);
   return wrap;
-}
-
-function rememberField() {
-  const label = document.createElement("label");
-  label.className = tw.form.checkLabel;
-  const input = document.createElement("input");
-  input.type = "checkbox";
-  input.name = "remember";
-  input.className = tw.form.checkControl;
-  label.append(input, document.createTextNode("Ingat saya di perangkat ini"));
-  return label;
 }
 
 function submitButton(label, disabled = false) {

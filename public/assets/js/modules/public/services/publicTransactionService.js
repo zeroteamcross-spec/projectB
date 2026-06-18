@@ -15,7 +15,6 @@ export const publicTransactionService = {
     return authService.login({
       email: payload.email,
       password: payload.password,
-      remember: true,
     });
   },
 

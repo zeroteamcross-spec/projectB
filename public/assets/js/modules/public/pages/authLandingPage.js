@@ -351,7 +351,6 @@ function loginForm({ selectedRole, isSubmitting, error, onSubmit }) {
   form.append(
     field({ id: `hr_auth_login_${selectedRole}_email_input`, name: "email", label: "Email", type: "email", placeholder: emailPlaceholder(selectedRole) }),
     field({ id: `hr_auth_login_${selectedRole}_password_input`, name: "password", label: "Password", type: "password", placeholder: "Password akun" }),
-    rememberField(),
   );
 
   if (error) {
@@ -377,7 +376,6 @@ function loginForm({ selectedRole, isSubmitting, error, onSubmit }) {
     onSubmit?.({
       email: data.email,
       password: data.password,
-      remember: data.remember === "on",
     });
   });
 
@@ -543,21 +541,6 @@ function textareaField({ id, name, label, placeholder = "", required = true }) {
 
   wrap.append(input);
   return wrap;
-}
-
-function rememberField() {
-  const label = document.createElement("label");
-  label.className = "inline-flex items-center gap-2 text-sm font-medium text-gray-600";
-
-  const input = document.createElement("input");
-  input.id = "hr_auth_login_remember_input";
-  input.type = "checkbox";
-  input.name = "remember";
-  input.checked = true;
-  input.className = "h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-200";
-
-  label.append(input, document.createTextNode("Ingat saya di perangkat ini"));
-  return label;
 }
 
 function infoRow(label, value) {

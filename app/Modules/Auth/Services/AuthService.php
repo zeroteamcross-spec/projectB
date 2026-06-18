@@ -94,7 +94,7 @@ class AuthService
             'remember_token' => null,
         ];
 
-        $result['remember_token'] = $this->issueRememberToken((int) $user['id'], (bool) ($data['remember'] ?? false));
+        $result['remember_token'] = $this->issueRememberToken((int) $user['id']);
 
         return $result;
     }
@@ -119,6 +119,7 @@ class AuthService
         $this->ensureCanAuthenticate($user);
         $this->tokens->markLastUsed((int) $token['id']);
 
+        // Token rotation can be added here later by returning a replacement token with the user payload.
         return [
             'user' => $this->serializeUser($user),
         ];
@@ -157,7 +158,7 @@ class AuthService
         ];
 
         if ($this->canAuthenticate($user)) {
-            $result['remember_token'] = $this->issueRememberToken((int) $user['id'], (bool) ($data['remember'] ?? false));
+            $result['remember_token'] = $this->issueRememberToken((int) $user['id']);
         }
 
         return $result;
@@ -183,17 +184,11 @@ class AuthService
         ];
     }
 
-    private function issueRememberToken(int $userId, bool $remember): array
+    private function issueRememberToken(int $userId): array
     {
         $selector = bin2hex(random_bytes(6));
         $validator = bin2hex(random_bytes(32));
-        $expiresAt = $remember
-            ? (new DateTimeImmutable())
-                ->add(new DateInterval('P' . (int) config('auth.remember_cookie.ttl_days', 30) . 'D'))
-                ->format('Y-m-d H:i:s')
-            : (new DateTimeImmutable())
-                ->add(new DateInterval('PT' . (int) config('auth.remember_cookie.session_ttl_hours', 12) . 'H'))
-                ->format('Y-m-d H:i:s');
+        $expiresAt = $this->rememberTokenExpiresAt();
 
         $this->tokens->create($userId, $selector, password_hash($validator, PASSWORD_DEFAULT), $expiresAt);
 
@@ -201,6 +196,13 @@ class AuthService
             'value' => $selector . ':' . $validator,
             'expires_at' => $expiresAt,
         ];
+    }
+
+    private function rememberTokenExpiresAt(): string
+    {
+        return (new DateTimeImmutable())
+            ->add(new DateInterval('P' . (int) config('auth.remember_cookie.ttl_days', 365) . 'D'))
+            ->format('Y-m-d H:i:s');
     }
 
     private function parseRememberToken(?string $rawToken): array

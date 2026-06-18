@@ -46,7 +46,6 @@ export const publicAuthLandingService = {
     await this.loginForRole(selectedRole, {
       email: payload.email,
       password: payload.password,
-      remember: true,
     });
 
     return { authenticated: true };

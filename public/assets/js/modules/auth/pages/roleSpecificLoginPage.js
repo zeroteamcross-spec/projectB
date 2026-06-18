@@ -125,7 +125,6 @@ function loginForm({ config, isSubmitting, error, onSubmit }) {
   form.append(
     field({ id: `role_login_${config.slug}_email_input`, name: "email", label: "Email", type: "email", placeholder: config.emailPlaceholder }),
     field({ id: `role_login_${config.slug}_password_input`, name: "password", label: "Password", type: "password", placeholder: "Password akun" }),
-    rememberField(config.slug),
   );
 
   if (error) {
@@ -152,7 +151,6 @@ function loginForm({ config, isSubmitting, error, onSubmit }) {
     onSubmit?.({
       email: data.email,
       password: data.password,
-      remember: data.remember === "on",
     });
   });
 
@@ -208,21 +206,6 @@ function field({ id, name, label, type = "text", placeholder = "" }) {
 
   wrap.append(input);
   return wrap;
-}
-
-function rememberField(slug) {
-  const label = document.createElement("label");
-  label.className = "inline-flex items-center gap-2 text-sm font-medium text-gray-600";
-
-  const input = document.createElement("input");
-  input.id = `role_login_${slug}_remember_input`;
-  input.type = "checkbox";
-  input.name = "remember";
-  input.checked = true;
-  input.className = "h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-200";
-
-  label.append(input, document.createTextNode("Ingat saya di perangkat ini"));
-  return label;
 }
 
 async function submitRoleLogin(payload, context, config, state, root, getBackgroundVideoLayer) {

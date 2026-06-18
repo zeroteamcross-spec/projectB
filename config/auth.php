@@ -5,7 +5,7 @@ declare(strict_types=1);
 return [
     'remember_cookie' => [
         'name' => 'remember_me',
-        'ttl_days' => 30,
+        'ttl_days' => 365,
         'session_ttl_hours' => 12,
         'secure' => env('AUTH_REMEMBER_SECURE', false),
         'same_site' => env('AUTH_REMEMBER_SAME_SITE', 'Strict'),

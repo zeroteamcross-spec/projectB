@@ -606,9 +606,7 @@ class GoogleAuthService
     {
         $selector = bin2hex(random_bytes(6));
         $validator = bin2hex(random_bytes(32));
-        $expiresAt = (new DateTimeImmutable())
-            ->add(new DateInterval('PT' . (int) config('auth.remember_cookie.session_ttl_hours', 12) . 'H'))
-            ->format('Y-m-d H:i:s');
+        $expiresAt = $this->rememberTokenExpiresAt();
 
         $this->tokens->create($userId, $selector, password_hash($validator, PASSWORD_DEFAULT), $expiresAt);
 
@@ -616,6 +614,13 @@ class GoogleAuthService
             'value' => $selector . ':' . $validator,
             'expires_at' => $expiresAt,
         ];
+    }
+
+    private function rememberTokenExpiresAt(): string
+    {
+        return (new DateTimeImmutable())
+            ->add(new DateInterval('P' . (int) config('auth.remember_cookie.ttl_days', 365) . 'D'))
+            ->format('Y-m-d H:i:s');
     }
 
     private function canAuthenticate(array $user): bool
