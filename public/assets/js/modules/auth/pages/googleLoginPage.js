@@ -223,8 +223,8 @@ function divider() {
 function plantDecor(side) {
   const root = document.createElement("span");
   root.className = side === "left"
-    ? "pointer-events-none absolute bottom-14 left-0 z-10 h-48 w-28 opacity-55"
-    : "pointer-events-none absolute bottom-10 right-0 z-10 h-40 w-24 opacity-55";
+    ? "hidden pointer-events-none absolute bottom-14 left-0 z-10 h-48 w-28 opacity-55"
+    : "hidden pointer-events-none absolute bottom-10 right-0 z-10 h-40 w-24 opacity-55";
 
   const stem = document.createElement("span");
   stem.className = side === "left"
