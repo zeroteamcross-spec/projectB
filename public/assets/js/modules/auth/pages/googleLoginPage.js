@@ -24,7 +24,7 @@ export function GoogleLoginPage({ roleSlug } = {}) {
     backgroundVideoLayer ??= createBackgroundVideoLayer({
       id: "google_login_buyer_background_video_layer",
       fallbackClassName: BUYER_FALLBACK_BG,
-      overlayClassName: "bg-white/40",
+      overlayClassName: "bg-white/90",
     });
     return backgroundVideoLayer;
   };
