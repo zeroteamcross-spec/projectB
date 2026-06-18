@@ -8,12 +8,12 @@ return [
         'ttl_days' => 365,
         'session_ttl_hours' => 12,
         'secure' => env('AUTH_REMEMBER_SECURE', false),
-        'same_site' => env('AUTH_REMEMBER_SAME_SITE', 'Strict'),
+        'same_site' => env('AUTH_REMEMBER_SAME_SITE', 'Lax'),
     ],
     'impersonation_cookie' => [
         'name' => 'admin_impersonation',
         'ttl_hours' => 4,
         'secure' => env('AUTH_REMEMBER_SECURE', false),
-        'same_site' => env('AUTH_REMEMBER_SAME_SITE', 'Strict'),
+        'same_site' => env('AUTH_REMEMBER_SAME_SITE', 'Lax'),
     ],
 ];

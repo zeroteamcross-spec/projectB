@@ -93,7 +93,7 @@ function render(root, context, flags) {
   const contextReady = !isAffiliateRoute || (affiliate?.slug ?? "") === affiliateSlug;
   const useBackgroundVideo = isLandingRoute(context);
 
-  if (isAffiliateRoute && !invalidAffiliateRoute && !contextReady && !workingHydratedAt) {
+  if (isAffiliateRoute && !invalidAffiliateRoute && (!contextReady || !workingHydratedAt)) {
     disposeSliderBanners(root);
     root.replaceChildren(loadingFrame(
       filters,

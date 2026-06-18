@@ -52,17 +52,22 @@ class AuthController extends Controller
 
     public function autologin(Request $request): JsonResponse
     {
-        $rawToken = $this->rememberTokenFromRequest($request);
+        try {
+            $rawToken = $this->rememberTokenFromRequest($request);
 
-        if (! $rawToken) {
-            throw new UnauthorizedException('Remember token tidak ditemukan.');
+            if (! $rawToken) {
+                throw new UnauthorizedException('Remember token tidak ditemukan.');
+            }
+
+            $impersonationCookieName = (string) config('auth.impersonation_cookie.name', 'admin_impersonation');
+            $impersonationToken = $request->cookie($impersonationCookieName);
+            $result = $this->sessionService->authenticate($rawToken, is_string($impersonationToken) ? $impersonationToken : null);
+
+            return JsonResponse::success($result, 'Autologin berhasil.');
+        } catch (UnauthorizedException $exception) {
+            return JsonResponse::error($exception->getMessage(), [], 401)
+                ->withHeader('Set-Cookie', $this->expiredRememberCookieHeader());
         }
-
-        $impersonationCookieName = (string) config('auth.impersonation_cookie.name', 'admin_impersonation');
-        $impersonationToken = $request->cookie($impersonationCookieName);
-        $result = $this->sessionService->authenticate($rawToken, is_string($impersonationToken) ? $impersonationToken : null);
-
-        return JsonResponse::success($result, 'Autologin berhasil.');
     }
 
     public function logout(Request $request): JsonResponse
