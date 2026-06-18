@@ -335,7 +335,7 @@ function catalogToolbar(count, meta, affiliate = null) {
   copy.className = "grid gap-1 min-w-0";
 
   const title = document.createElement("h2");
-  title.className = "break-words text-[10px] font-bold tracking-normal text-white";
+  title.className = "break-words text-sm font-bold tracking-normal text-white";
   title.textContent = affiliate?.showroom?.name
     ? `Mobil Pilihan ${affiliate.showroom.name}`
     : "Mobil Pilihan Terbaik";
