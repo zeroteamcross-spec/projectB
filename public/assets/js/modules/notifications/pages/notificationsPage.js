@@ -91,7 +91,7 @@ export function NotificationsPage() {
       contextRef = context;
       root = document.createElement("section");
       root.id = "ntf_page";
-      root.className = "mx-auto grid min-w-0 w-full max-w-[940px] gap-5 text-[var(--pb-text)]";
+      root.className = "mx-auto grid min-w-0 w-full max-w-[1180px] gap-5 text-[var(--pb-text)]";
       render(root, contextRef, state, actions);
       return root;
     },
@@ -200,7 +200,7 @@ function updateAffiliateNotifications(root, context, state, actions, viewState) 
       title: "Notifikasi",
       subtitle: "Pusat notifikasi",
       icon: "bell",
-      maxWidth: "max-w-[980px]",
+      maxWidth: "max-w-[1180px]",
       actions: {
         ...affiliateAccountActions(context),
         navigate: actions.navigate,
@@ -243,7 +243,7 @@ function updateBuyerNotifications(root, context, state, actions, viewState) {
   const shell = ensureNotificationsShell(root, "buyer", () => {
     const page = document.createElement("section");
     page.id = "byr_notifications_page";
-    page.className = "mx-auto grid min-w-0 w-full max-w-[430px] gap-5 pb-28 text-[var(--pb-text)] md:max-w-[980px] md:gap-6 md:pb-8";
+    page.className = "mx-auto grid min-w-0 w-full max-w-[430px] gap-5 pb-28 text-[var(--pb-text)] md:max-w-[1180px] md:gap-6 md:pb-8";
     page.dataset.ds = "buyer.notifications.page";
 
     const headerHost = hostSection("byr_notifications_header_host");
