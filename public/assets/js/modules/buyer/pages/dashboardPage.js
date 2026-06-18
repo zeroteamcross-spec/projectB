@@ -17,6 +17,7 @@ import { PublicCarCard } from "../../public/components/publicCarCard.js";
 import { publicContextService } from "../../public/services/publicContextService.js";
 import { buyerState } from "../state/buyerState.js";
 import { BUYER_MOBILE_FOOTER_ITEMS, BuyerMobileFooterNav } from "../components/buyerMobileFooterNav.js";
+import { PublicSearchFilterBar } from "../../public/components/publicSearchFilterBar.js";
 
 const CAR_MODAL_KEY = "byr-car-detail-modal";
 const FILTER_MODAL_KEY = "byr-local-filter-modal";
@@ -49,6 +50,7 @@ export function BuyerDashboardPage({ notFound = false } = {}) {
     brands: [],
     transmission: "",
     favorites: new Set(),
+    quickFilter: "newest",
   };
 
   const actions = {
@@ -63,6 +65,10 @@ export function BuyerDashboardPage({ notFound = false } = {}) {
     },
     setSearch(value, cars) {
       uiState.search = value;
+      refreshRecommendations(root, cars, actions, uiState);
+    },
+    setQuickFilter(value, cars) {
+      uiState.quickFilter = value;
       refreshRecommendations(root, cars, actions, uiState);
     },
     setCategory(value) {
@@ -244,36 +250,21 @@ function buyerTopNavigation({ activePath, actions }) {
 }
 
 function buyerSearchBar({ cars, uiState, actions }) {
-  const wrap = document.createElement("section");
-  wrap.id = "byr_search_section";
-  wrap.className = "relative grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-[1.55rem] border border-[color-mix(in_srgb,var(--pb-brand-primary)_18%,var(--pb-border))] bg-[var(--pb-form-search-bg)] px-2 py-1 shadow-[0_16px_42px_rgba(15,23,42,0.08)] md:rounded-[1.75rem] md:px-5";
-  wrap.dataset.ds = "buyer.dashboard.search";
-
-  wrap.append(iconBox({ size: "h-9 w-9", className: "text-[var(--pb-text-muted)]", icon: "search", iconSize: "h-5 w-5" }));
-
-  const input = document.createElement("input");
-  input.id = "byr_search_input";
-  input.type = "search";
-  input.value = uiState.search;
-  input.placeholder = "Cari mobil idamanmu...";
-  input.autocomplete = "off";
-  input.className = "min-h-8 min-w-0 border-0 bg-transparent text-[10] font-semibold text-[var(--pb-text)] outline-none placeholder:text-[var(--pb-text-muted)]";
-  input.addEventListener("input", () => actions.setSearch(input.value, cars));
-
-  const filter = document.createElement("button");
-  filter.id = "byr_filter_button";
-  filter.type = "button";
-  filter.className = "relative inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[var(--pb-brand-secondary)] transition hover:bg-[color-mix(in_srgb,var(--pb-brand-primary)_10%,transparent)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]";
-  const activeCount = activeBuyerFilterCount(uiState);
-  filter.setAttribute("aria-label", activeCount > 0 ? `Filter mobil, ${activeCount} aktif` : "Filter mobil");
-  filter.addEventListener("click", () => actions.openFilter(cars));
-  filter.append(createIcon("filter", { className: "block h-5 w-5 leading-none" }));
-  if (activeCount > 0) {
-    filter.append(textNode("span", "absolute right-1 top-1 grid h-4 min-w-4 place-items-center rounded-full bg-[var(--pb-brand-primary)] px-1 text-[10px] font-black leading-none text-white", String(activeCount)));
-  }
-
-  wrap.append(input, filter);
-  return wrap;
+  return PublicSearchFilterBar({
+    filters: { keyword: uiState.search },
+    quickFilter: uiState.quickFilter || "newest",
+    activeFilterCount: activeBuyerFilterCount(uiState),
+    options: {},
+    onSearch: (nextFilters) => {
+      actions.setSearch(nextFilters.keyword ?? "", cars);
+    },
+    onQuickFilter: (value) => {
+      actions.setQuickFilter(value, cars);
+    },
+    onOpenFilter: () => {
+      actions.openFilter(cars);
+    },
+  });
 }
 
 function buyerHero({ cars, notFound, actions }) {
@@ -817,7 +808,7 @@ function filterCars(cars, uiState) {
   const brands = selectedBrands(uiState);
   const transmission = String(uiState.transmission || "");
 
-  return cars.filter((car) => {
+  const filtered = cars.filter((car) => {
     const haystack = [
       carTitle(car),
       car.sub_model_name,
@@ -838,6 +829,36 @@ function filterCars(cars, uiState) {
     }
     return matchesCategory(car, category);
   });
+
+  return applyQuickFilter(filtered, uiState.quickFilter || "newest");
+}
+
+function applyQuickFilter(cars, quickFilter) {
+  const nextCars = [...cars];
+
+  if (quickFilter === "promo") {
+    return nextCars.filter((car) => Number(car.price_discount ?? 0) > 0 && Number(car.price_discount) < Number(car.price_cash ?? 0));
+  }
+
+  if (quickFilter === "price-low") {
+    return nextCars.sort((a, b) => effectivePrice(a) - effectivePrice(b));
+  }
+
+  if (quickFilter === "mileage-low") {
+    return nextCars.sort((a, b) => Number(a.mileage_km ?? 999999999) - Number(b.mileage_km ?? 999999999));
+  }
+
+  return nextCars.sort((a, b) => {
+    const left = Date.parse(a.published_at ?? a.created_at ?? "") || Number(a.id ?? 0);
+    const right = Date.parse(b.published_at ?? b.created_at ?? "") || Number(b.id ?? 0);
+    return right - left;
+  });
+}
+
+function effectivePrice(car) {
+  const price = Number(car.price_cash ?? 0);
+  const discount = Number(car.price_discount ?? 0);
+  return discount > 0 && discount < price ? discount : price;
 }
 
 function activeBuyerFilterCount(uiState) {

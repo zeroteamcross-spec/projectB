@@ -105,6 +105,7 @@ class UserService
             'is_approved' => (bool) $user['is_approved'],
             'created_at' => $user['created_at'],
             'updated_at' => $user['updated_at'],
+            'has_google_identity' => (bool) ($user['has_google_identity'] ?? false),
             'showroom' => isset($user['showroom']) && is_array($user['showroom'])
                 ? $this->serializeShowroom($user['showroom'])
                 : null,

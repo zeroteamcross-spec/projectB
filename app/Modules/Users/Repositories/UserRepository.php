@@ -27,6 +27,14 @@ class UserRepository
         $stmt->execute(['id' => $id]);
         $user = $stmt->fetch();
 
+        if ($user) {
+            $stmtOauth = $this->pdo->prepare(
+                'SELECT 1 FROM user_oauth_identities WHERE user_id = :user_id AND provider = "google" AND deleted_at IS NULL LIMIT 1'
+            );
+            $stmtOauth->execute(['user_id' => $id]);
+            $user['has_google_identity'] = (bool) $stmtOauth->fetchColumn();
+        }
+
         return $user ?: null;
     }
 

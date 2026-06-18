@@ -129,19 +129,29 @@ function renderBuyerProfile(root, context, profile, actions) {
   page.className = "mx-auto grid min-w-0 w-full max-w-[430px] gap-5 pb-28 text-[var(--pb-text)] md:max-w-[1180px] md:gap-6 md:pb-8";
   page.dataset.ds = "buyer.profile.page";
 
+  const isGoogle = Boolean(profile.has_google_identity);
+
   page.append(
     buyerTopNavigation({ activePath, profile, actions }),
     buyerMobileHeader({ profile, actions }),
     buyerHeroCard(profile, actions),
-    buyerAccountCard(profile),
-    buyerSecurityCard(actions),
-    buyerShortcutCard(actions),
+    buyerAccountCard(profile)
+  );
+
+  if (!isGoogle) {
+    page.append(
+      buyerSecurityCard(actions),
+      buyerShortcutCard(actions)
+    );
+  }
+
+  page.append(
     buyerLogoutCard(actions),
     BuyerMobileFooterNav({
       activePath,
       items: BUYER_MOBILE_FOOTER_ITEMS,
       onNavigate: (path) => actions.navigate(path),
-    }),
+    })
   );
 
   disposeChildren(root);

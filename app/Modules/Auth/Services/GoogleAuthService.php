@@ -636,6 +636,7 @@ class GoogleAuthService
             'is_approved' => (bool) ($user['is_approved'] ?? false),
             'created_at' => $user['created_at'] ?? null,
             'updated_at' => $user['updated_at'] ?? null,
+            'has_google_identity' => true,
         ];
     }
 
