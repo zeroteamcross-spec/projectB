@@ -50,6 +50,7 @@ class WebConfigService
             'data' => $theme,
             'bump_version' => true,
         ]);
+        $this->syncStaticHtmlMetadata($theme);
 
         return [
             'config' => $this->configFromTheme($theme),
@@ -122,5 +123,123 @@ class WebConfigService
         return preg_match('/^https?:\/\//i', $url) === 1
             || (preg_match('/^\/(?!\/)[A-Za-z0-9._~!$&\'()*+,;=:@\/%-]*$/', $url) === 1 && stripos($url, 'javascript:') === false)
             || preg_match('/^[a-zA-Z0-9_.-]+$/', $url) === 1;
+    }
+
+    private function syncStaticHtmlMetadata(array $theme): void
+    {
+        foreach ([base_path('public/index.html'), base_path('public/app.html')] as $path) {
+            if (! is_file($path) || ! is_writable($path)) {
+                continue;
+            }
+
+            $html = file_get_contents($path);
+            if (! is_string($html) || $html === '') {
+                continue;
+            }
+
+            file_put_contents($path, $this->injectHtmlMetadata($html, $theme));
+        }
+    }
+
+    private function injectHtmlMetadata(string $html, array $theme): string
+    {
+        $config = $this->configFromTheme($theme);
+        $appName = (string) $config['app_name'];
+        $tagline = (string) $config['tagline'];
+        $iconUrl = $this->shareableIconUrl((string) ($config['icon_url'] ?? ''));
+        $absoluteIconUrl = $iconUrl !== '' ? $this->absoluteUrl($iconUrl) : '';
+
+        $html = preg_replace('/<title>.*?<\/title>/is', '<title>' . $this->escapeHtml($appName) . '</title>', $html, 1) ?? $html;
+
+        foreach ([
+            ['name', 'application-name', $appName],
+            ['name', 'apple-mobile-web-app-title', $appName],
+            ['name', 'description', $tagline],
+            ['property', 'og:site_name', $appName],
+            ['property', 'og:title', $appName],
+            ['property', 'og:description', $tagline],
+            ['name', 'twitter:title', $appName],
+            ['name', 'twitter:description', $tagline],
+        ] as [$attribute, $key, $content]) {
+            $html = $this->upsertHtmlMeta($html, $attribute, $key, $content);
+        }
+
+        if ($iconUrl !== '') {
+            $html = $this->upsertHtmlLink($html, 'icon', $iconUrl);
+            $html = $this->upsertHtmlLink($html, 'shortcut icon', $iconUrl);
+            $html = $this->upsertHtmlLink($html, 'apple-touch-icon', $iconUrl);
+        }
+
+        if ($absoluteIconUrl !== '') {
+            $html = $this->upsertHtmlMeta($html, 'property', 'og:image', $absoluteIconUrl);
+            $html = $this->upsertHtmlMeta($html, 'name', 'twitter:image', $absoluteIconUrl);
+        }
+
+        return $html;
+    }
+
+    private function upsertHtmlMeta(string $html, string $attribute, string $key, string $content): string
+    {
+        $tag = '<meta ' . $attribute . '="' . $this->escapeHtml($key) . '" content="' . $this->escapeHtml($content) . '">';
+        $pattern = '/<meta\s+' . preg_quote($attribute, '/') . '=["\']' . preg_quote($key, '/') . '["\'][^>]*>/i';
+
+        return preg_match($pattern, $html) === 1
+            ? (preg_replace($pattern, $tag, $html, 1) ?? $html)
+            : (preg_replace('/<\/head>/i', '    ' . $tag . "\n  </head>", $html, 1) ?? $html);
+    }
+
+    private function upsertHtmlLink(string $html, string $rel, string $href): string
+    {
+        $type = $this->iconMimeType($href);
+        $tag = '<link rel="' . $this->escapeHtml($rel) . '" href="' . $this->escapeHtml($href) . '"' . ($type !== '' ? ' type="' . $this->escapeHtml($type) . '"' : '') . '>';
+        $pattern = '/<link\s+rel=["\']' . preg_quote($rel, '/') . '["\'][^>]*>/i';
+
+        return preg_match($pattern, $html) === 1
+            ? (preg_replace($pattern, $tag, $html, 1) ?? $html)
+            : (preg_replace('/<\/head>/i', '    ' . $tag . "\n  </head>", $html, 1) ?? $html);
+    }
+
+    private function shareableIconUrl(string $url): string
+    {
+        $url = trim($url);
+        if ($url === '' || strpos($url, 'brand.') === 0 || ! $this->isAllowedAssetUrl($url)) {
+            return '';
+        }
+
+        return $url;
+    }
+
+    private function absoluteUrl(string $url): string
+    {
+        if (preg_match('/^https?:\/\//i', $url) === 1) {
+            return $url;
+        }
+
+        $baseUrl = rtrim((string) env('APP_URL', ''), '/');
+        if ($baseUrl === '') {
+            return $url;
+        }
+
+        return $baseUrl . '/' . ltrim($url, '/');
+    }
+
+    private function iconMimeType(string $href): string
+    {
+        if (preg_match('/\.svg(?:[?#].*)?$/i', $href) === 1) {
+            return 'image/svg+xml';
+        }
+        if (preg_match('/\.png(?:[?#].*)?$/i', $href) === 1) {
+            return 'image/png';
+        }
+        if (preg_match('/\.webp(?:[?#].*)?$/i', $href) === 1) {
+            return 'image/webp';
+        }
+
+        return '';
+    }
+
+    private function escapeHtml(string $value): string
+    {
+        return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     }
 }
