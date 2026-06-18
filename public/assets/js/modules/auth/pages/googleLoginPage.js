@@ -150,7 +150,7 @@ function buyerHeader() {
   title.textContent = "Selamat datang!";
 
   const subtitle = document.createElement("p");
-  subtitle.className = "text-base font-medium leading-7 tracking-normal text-[#858aa2] sm:text-lg sm:leading-8";
+  subtitle.className = "text-base font-medium font-black leading-7 tracking-normal text-[#858aa2] sm:text-lg sm:leading-8";
   subtitle.textContent = "Masuk untuk melanjutkan dan nikmati pengalaman terbaik.";
 
   headerEl.append(title, subtitle);
@@ -211,8 +211,8 @@ function divider() {
 
   const left = document.createElement("span");
   left.className = "h-px bg-[#dfe2ee]";
-  const text = document.createElement("span");
-  text.textContent = "atau";
+  // const text = document.createElement("span");
+  // text.textContent = "atau";
   const right = document.createElement("span");
   right.className = "h-px bg-[#dfe2ee]";
 
