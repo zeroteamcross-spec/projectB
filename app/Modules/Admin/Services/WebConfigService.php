@@ -85,7 +85,7 @@ class WebConfigService
             $errors['whatsapp_number'] = 'Nomor Whatsapp Aplikasi tidak valid.';
         }
         if ($iconUrl !== null && ! $this->isAllowedAssetUrl($iconUrl)) {
-            $errors['icon_url'] = 'Icon URL harus berupa http(s) atau path relatif aman.';
+            $errors['icon_url'] = 'Icon URL harus berupa http(s), path upload, atau asset key aman.';
         }
 
         if ($errors !== []) {
@@ -120,6 +120,7 @@ class WebConfigService
     private function isAllowedAssetUrl(string $url): bool
     {
         return preg_match('/^https?:\/\//i', $url) === 1
-            || (preg_match('/^\/(?!\/)[A-Za-z0-9._~!$&\'()*+,;=:@\/%-]*$/', $url) === 1 && stripos($url, 'javascript:') === false);
+            || (preg_match('/^\/(?!\/)[A-Za-z0-9._~!$&\'()*+,;=:@\/%-]*$/', $url) === 1 && stripos($url, 'javascript:') === false)
+            || preg_match('/^[a-zA-Z0-9_.-]+$/', $url) === 1;
     }
 }

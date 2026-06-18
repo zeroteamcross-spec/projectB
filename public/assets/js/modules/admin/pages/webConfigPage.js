@@ -4,18 +4,20 @@ import { Button } from "../../../ui/primitives/button.js";
 import { showToast } from "../../../ui/primitives/toast.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 import { brandConfig } from "../../../theme/brandConfig.js";
+import { getAsset } from "../../../theme/assetRegistry.js";
 import { webConfigResource } from "../../../resources/webConfigResource.js";
 
 export function AdminWebConfigPage() {
   let root = null;
   let context = null;
   let unsubscribe = null;
-  const state = { saving: false, uploading: false, error: "" };
+  const state = { saving: false, uploading: false, error: "", draft: null };
   const rerender = () => render(root, context, state, actions);
 
   const actions = {
-    async uploadIcon(file, iconUrlInput, preview) {
+    async uploadIcon(file, iconUrlInput, preview, currentDraft = null) {
       if (!file) return;
+      state.draft = currentDraft ?? state.draft;
       state.uploading = true;
       state.error = "";
       rerender();
@@ -23,6 +25,7 @@ export function AdminWebConfigPage() {
         const asset = await webConfigResource.uploadIcon(file);
         const path = asset?.path ?? asset?.url ?? "";
         if (!path) throw new Error("Upload icon tidak mengembalikan path.");
+        state.draft = { ...(state.draft ?? {}), icon_url: path };
         iconUrlInput.value = path;
         renderIconPreview(preview, path);
         showToast("Icon aplikasi berhasil diupload.", { type: "success" });
@@ -35,6 +38,7 @@ export function AdminWebConfigPage() {
       }
     },
     async save(payload) {
+      state.draft = payload;
       const message = validatePayload(payload);
       if (message) {
         state.error = message;
@@ -47,6 +51,7 @@ export function AdminWebConfigPage() {
       rerender();
       try {
         const result = await webConfigResource.update(payload);
+        state.draft = null;
         patchConfig(result.config, result.theme);
         showToast(result.message, { type: "success" });
       } catch (error) {
@@ -89,10 +94,11 @@ function render(root, context, state, actions) {
   const config = appStore.get("working.adminWebConfig.config.data", null)
     ?? appStore.get("snapshot.admin.webConfig.data", null)
     ?? {};
+  const draft = { ...config, ...(state.draft ?? {}) };
 
   const page = document.createElement("section");
   page.className = "grid min-w-0 gap-6";
-  page.append(hero(), formSection(config, state, actions));
+  page.append(hero(), formSection(draft, state, actions));
   if (state.error) page.append(errorPanel(state.error));
   root.replaceChildren(page);
 }
@@ -123,16 +129,19 @@ function formSection(config, state, actions) {
   const tagline = input("awc_tagline", "tagline", config.tagline ?? brandConfig.appTagline, "Tagline");
   const whatsapp = input("awc_whatsapp", "whatsapp_number", config.whatsapp_number ?? brandConfig.contact.whatsapp, "6281234567890");
   const preview = document.createElement("section");
-  preview.className = "grid h-24 w-24 place-items-center overflow-hidden rounded-[1rem] border border-[var(--pb-border)] bg-gray-50";
+  preview.className = "grid h-28 w-28 place-items-center overflow-hidden rounded-[1.25rem] border border-white/80 bg-white shadow-[var(--pb-shadow-soft)]";
   renderIconPreview(preview, iconUrl.value);
   const file = document.createElement("input");
   file.type = "file";
   file.accept = "image/jpeg,image/png,image/webp,image/svg+xml,.jpg,.jpeg,.png,.webp,.svg";
-  file.className = controlClassName();
+  file.className = "sr-only";
   file.addEventListener("change", () => actions.uploadIcon(file.files?.[0] ?? null, iconUrl, preview));
-  const iconRow = document.createElement("section");
-  iconRow.className = "grid gap-4 md:grid-cols-[96px_minmax(0,1fr)] md:items-end";
-  iconRow.append(preview, labelWrap(state.uploading ? "Mengupload icon..." : "Upload Icon Web / Aplikasi", file));
+  const iconRow = uploadDropzone({
+    input: file,
+    preview,
+    uploading: state.uploading,
+    onFile: (nextFile) => actions.uploadIcon(nextFile, iconUrl, preview, collectPayload()),
+  });
   form.append(
     iconRow,
     labelWrap("Icon URL", iconUrl),
@@ -143,13 +152,18 @@ function formSection(config, state, actions) {
   );
   form.addEventListener("submit", (event) => {
     event.preventDefault();
-    actions.save({
+    actions.save(collectPayload());
+  });
+
+  function collectPayload() {
+    return {
       icon_url: iconUrl.value.trim(),
       app_name: appName.value.trim(),
       tagline: tagline.value.trim(),
       whatsapp_number: whatsapp.value.trim(),
-    });
-  });
+    };
+  }
+
   return form;
 }
 
@@ -185,10 +199,53 @@ function renderIconPreview(preview, url) {
     image.src = normalizeAssetUrl(url);
     image.alt = "Icon aplikasi";
     image.className = "h-full w-full object-contain p-2";
+    image.addEventListener("error", () => {
+      preview.replaceChildren(createIcon("brandMark", { className: "h-9 w-9 text-gray-400" }));
+    }, { once: true });
     preview.append(image);
     return;
   }
   preview.append(createIcon("brandMark", { className: "h-8 w-8 text-gray-400" }));
+}
+
+function uploadDropzone({ input, preview, uploading, onFile }) {
+  const section = document.createElement("section");
+  section.className = "grid gap-4 rounded-[1.5rem] border border-dashed border-orange-200 bg-[linear-gradient(135deg,rgba(255,247,237,0.85),rgba(255,255,255,0.96),rgba(240,253,250,0.82))] p-4 shadow-sm md:grid-cols-[112px_minmax(0,1fr)] md:items-center";
+
+  const body = document.createElement("section");
+  body.className = "grid min-w-0 gap-3";
+  const title = textNode("p", "text-base font-black text-gray-950", uploading ? "Mengupload icon..." : "Upload Icon Web / Aplikasi");
+  const desc = textNode("p", "text-sm leading-6 text-gray-600", "Tarik file ke area ini atau pilih file SVG, PNG, JPG, atau WebP. Maksimal 2 MB, minimal 64x64 px untuk raster.");
+  const actions = document.createElement("section");
+  actions.className = "flex flex-wrap items-center gap-2";
+  const choose = document.createElement("button");
+  choose.type = "button";
+  choose.className = "inline-flex min-h-11 items-center justify-center gap-2 rounded-[1rem] bg-[var(--pb-brand-primary)] px-4 py-2 text-sm font-bold text-white shadow-[var(--pb-shadow-soft)] transition hover:brightness-105 focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)] disabled:cursor-not-allowed disabled:opacity-60";
+  choose.disabled = Boolean(uploading);
+  choose.append(createIcon("upload", { className: "block h-4 w-4 leading-none" }), document.createTextNode(uploading ? "Memproses..." : "Pilih File"));
+  choose.addEventListener("click", () => input.click());
+  const hint = textNode("span", "text-xs font-bold uppercase tracking-[0.12em] text-orange-700", "SVG supported");
+  actions.append(choose, hint, input);
+  body.append(title, desc, actions);
+  section.append(preview, body);
+
+  const setDrag = (active) => {
+    section.classList.toggle("border-orange-400", active);
+    section.classList.toggle("bg-orange-50", active);
+  };
+  section.addEventListener("dragover", (event) => {
+    event.preventDefault();
+    setDrag(true);
+  });
+  section.addEventListener("dragleave", () => setDrag(false));
+  section.addEventListener("drop", (event) => {
+    event.preventDefault();
+    setDrag(false);
+    const file = event.dataTransfer?.files?.[0] ?? null;
+    if (file) onFile?.(file);
+  });
+
+  return section;
 }
 
 function input(id, name, value, placeholder) {
@@ -231,7 +288,7 @@ function normalizeAssetUrl(url) {
   const value = String(url ?? "").trim();
   if (!value) return "";
   if (/^(https?:|data:|blob:)/.test(value) || value.startsWith("/")) return value;
-  return `/${value}`;
+  return getAsset(value, "");
 }
 
 function textNode(tagName, className, text) {
