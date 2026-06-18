@@ -1,8 +1,8 @@
 import { AdminDashboardPage } from "./pages/dashboardPage.js";
 import { AdminApprovalsPage } from "./pages/approvalsPage.js";
 import { AdminCarsPage } from "./pages/carsPage.js";
-import { AdminDesignStudioPage } from "./pages/designStudioPage.js";
 import { AdminDesignStudioV2Page } from "./pages/designStudioV2Page.js";
+import { AdminWebConfigPage } from "./pages/webConfigPage.js";
 import { AdminUsersPage } from "./pages/usersPage.js";
 import { AdminSettlementsPage } from "./pages/settlementsPage.js";
 import { AdminAffiliateCommissionsPage } from "./pages/affiliateCommissionsPage.js";
@@ -16,10 +16,10 @@ import { SuperAdminDashboardPage } from "./pages/superAdminDashboardPage.js";
 import { adminSessionService } from "./services/adminSessionService.js";
 import { transactionsResource } from "../../resources/transactionsResource.js";
 import { carsResource } from "../../resources/carsResource.js";
-import { themeStudioResource } from "../../resources/themeStudioResource.js";
 import { adminMasterService } from "./services/adminMasterService.js";
 import { inspectionsResource } from "../../resources/inspectionsResource.js";
 import { slidersResource } from "../../resources/slidersResource.js";
+import { webConfigResource } from "../../resources/webConfigResource.js";
 
 export const adminRoutes = [
   {
@@ -281,17 +281,17 @@ export const adminRoutes = [
     },
   },
   {
-    name: "admin.design-studio",
-    path: "/admin/design-studio",
+    name: "admin.web-config",
+    path: "/admin/web-config",
     shell: "app",
     role: "admin",
-    page: AdminDesignStudioPage,
-    workingStateKey: "adminDesignStudio",
+    page: AdminWebConfigPage,
+    workingStateKey: "adminWebConfig",
     preload: {
       working: [
         {
-          key: "theme",
-          loader: ({ signal }) => themeStudioResource.get({ signal }).catch(() => null),
+          key: "config",
+          loader: ({ signal }) => webConfigResource.get({ signal }).catch(() => null),
         },
       ],
     },

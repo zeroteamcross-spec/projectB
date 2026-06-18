@@ -1,4 +1,5 @@
 import { brandConfig } from "../theme/brandConfig.js";
+import { getAsset } from "../theme/assetRegistry.js";
 import { createIcon } from "../theme/iconRegistry.js";
 import { tw } from "../theme/tailwindClasses.js";
 import { applyDesignHook } from "../theme/designStudioHooks.js";
@@ -43,7 +44,7 @@ const ADMIN_LINKS = [
         { href: "#/admin/master-inspection", label: "Master Inspection", icon: "clipboard" },
       ],
     },
-  { href: "#/admin/design-studio", label: "Design Studio", icon: "sparkles" },
+  { href: "#/admin/web-config", label: "Konfigurasi WEB", icon: "settings" },
 ];
 
 const SUPER_ADMIN_LINKS = [
@@ -99,7 +100,7 @@ export function sidebar(store = null, options = {}) {
   compactMark.className = mode === "drawer"
     ? "hidden"
     : compactMarkClassName(compactExpanded);
-  compactMark.append(createIcon(brandConfig.logoIcon, { className: "block h-5 w-5 leading-none" }));
+  renderBrandMark(compactMark);
 
   brandCopy.append(compactMark, brandName, tagline);
   brand.append(brandCopy);
@@ -133,6 +134,7 @@ export function sidebar(store = null, options = {}) {
     syncCompactToggle(compactToggle, expanded);
     brandName.textContent = brandConfig.appName;
     tagline.textContent = brandConfig.appTagline;
+    renderBrandMark(compactMark);
   };
 
   const unsubscribe = store?.subscribe?.(() => {
@@ -143,6 +145,21 @@ export function sidebar(store = null, options = {}) {
   aside.append(...[brand, compactToggle, nav].filter(Boolean));
   aside.dispose = () => unsubscribe?.();
   return aside;
+}
+
+function renderBrandMark(mark) {
+  mark.replaceChildren();
+  const logoMark = getAsset(brandConfig.logoMarkAsset);
+  if (logoMark) {
+    const image = document.createElement("img");
+    image.src = logoMark;
+    image.alt = brandConfig.appName;
+    image.className = "block h-7 w-7 object-contain";
+    mark.append(image);
+    return;
+  }
+
+  mark.append(createIcon(brandConfig.logoIcon, { className: "block h-5 w-5 leading-none" }));
 }
 
 function isCompactExpanded(store, mode = "desktop") {

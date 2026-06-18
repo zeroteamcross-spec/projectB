@@ -21,6 +21,7 @@ return static function (Router $router): void {
 
     $router->group('/api/master-data', static function (Router $router): void {
         $router->post('/assets/bank-icons', [MasterAssetController::class, 'uploadBankIcon']);
+        $router->post('/assets/app-icons', [MasterAssetController::class, 'uploadAppIcon']);
         $router->put('/{master_key}', [MasterDataController::class, 'upsert']);
         $router->patch('/{master_key}', [MasterDataController::class, 'upsert']);
     }, [AuthenticatedUserMiddleware::class]);

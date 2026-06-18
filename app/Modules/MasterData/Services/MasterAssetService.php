@@ -70,24 +70,77 @@ class MasterAssetService
         ];
     }
 
+    public function storeAppIcon(array $file, string $mimeType): array
+    {
+        if ($mimeType === 'image/svg+xml') {
+            return $this->storeSvgIcon($file, 'apps', 'app-icon');
+        }
+
+        if (! function_exists('imagecreatetruecolor')) {
+            throw new RuntimeException('Image processing extension is not available.');
+        }
+
+        $source = $this->createSourceImage((string) $file['tmp_name'], $mimeType);
+        $sourceWidth = imagesx($source);
+        $sourceHeight = imagesy($source);
+        $cropSize = min($sourceWidth, $sourceHeight);
+        $sourceX = (int) floor(($sourceWidth - $cropSize) / 2);
+        $sourceY = (int) floor(($sourceHeight - $cropSize) / 2);
+
+        $target = imagecreatetruecolor(self::BANK_ICON_SIZE, self::BANK_ICON_SIZE);
+        imagealphablending($target, false);
+        imagesavealpha($target, true);
+        $transparent = imagecolorallocatealpha($target, 0, 0, 0, 127);
+        imagefill($target, 0, 0, $transparent);
+        imagecopyresampled($target, $source, 0, 0, $sourceX, $sourceY, self::BANK_ICON_SIZE, self::BANK_ICON_SIZE, $cropSize, $cropSize);
+
+        $directory = base_path('public/uploads/master/apps');
+        if (! is_dir($directory) && ! mkdir($directory, 0775, true) && ! is_dir($directory)) {
+            throw new RuntimeException('Unable to create app icon directory.');
+        }
+
+        $fileName = 'app-icon-' . bin2hex(random_bytes(10)) . '.png';
+        $path = $directory . DIRECTORY_SEPARATOR . $fileName;
+        if (! imagepng($target, $path, 8)) {
+            throw new RuntimeException('Unable to store app icon.');
+        }
+
+        imagedestroy($source);
+        imagedestroy($target);
+
+        return [
+            'path' => '/uploads/master/apps/' . $fileName,
+            'file_name' => $fileName,
+            'mime_type' => 'image/png',
+            'width' => self::BANK_ICON_SIZE,
+            'height' => self::BANK_ICON_SIZE,
+            'size' => is_file($path) ? filesize($path) : null,
+        ];
+    }
+
     private function storeSvgBankIcon(array $file): array
     {
-        $directory = base_path('public/uploads/master/banks');
+        return $this->storeSvgIcon($file, 'banks', 'bank-icon');
+    }
+
+    private function storeSvgIcon(array $file, string $directoryName, string $prefix): array
+    {
+        $directory = base_path('public/uploads/master/' . $directoryName);
         if (! is_dir($directory) && ! mkdir($directory, 0775, true) && ! is_dir($directory)) {
-            throw new RuntimeException('Unable to create bank icon directory.');
+            throw new RuntimeException('Unable to create icon directory.');
         }
 
         $svg = file_get_contents((string) ($file['tmp_name'] ?? '')) ?: '';
         $svg = $this->normalizeSvgIcon($svg);
-        $fileName = 'bank-icon-' . bin2hex(random_bytes(10)) . '.svg';
+        $fileName = $prefix . '-' . bin2hex(random_bytes(10)) . '.svg';
         $path = $directory . DIRECTORY_SEPARATOR . $fileName;
 
         if (file_put_contents($path, $svg) === false) {
-            throw new RuntimeException('Unable to store bank SVG icon.');
+            throw new RuntimeException('Unable to store SVG icon.');
         }
 
         return [
-            'path' => '/uploads/master/banks/' . $fileName,
+            'path' => '/uploads/master/' . $directoryName . '/' . $fileName,
             'file_name' => $fileName,
             'mime_type' => 'image/svg+xml',
             'width' => self::BANK_ICON_SIZE,

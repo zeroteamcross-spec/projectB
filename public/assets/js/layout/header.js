@@ -1,4 +1,5 @@
 import { brandConfig } from "../theme/brandConfig.js";
+import { getAsset } from "../theme/assetRegistry.js";
 import { createIcon } from "../theme/iconRegistry.js";
 import { showToast } from "../ui/primitives/toast.js";
 import { tw } from "../theme/tailwindClasses.js";
@@ -19,7 +20,7 @@ export function header(store) {
 
   const mark = document.createElement("div");
   mark.className = tw.layout.shellMark;
-  mark.append(createIcon(brandConfig.logoIcon, { className: "h-5 w-5" }));
+  renderBrandMark(mark);
 
   const title = document.createElement("strong");
   title.className = `${tw.layout.appHeaderTitle} min-w-0 break-words`;
@@ -43,7 +44,7 @@ export function header(store) {
   const sync = (state) => {
     const isAuthenticated = Boolean(state.auth?.isAuthenticated);
     role.textContent = `Role: ${state.auth?.role ?? state.app.activeRole ?? "public"}`;
-    mark.replaceChildren(createIcon(brandConfig.logoIcon, { className: "h-5 w-5" }));
+    renderBrandMark(mark);
     title.textContent = brandConfig.shellTitle;
     renderBanner(bannerHost, state);
     syncProfileButton(profileAction, state.auth?.user ?? null);
@@ -65,6 +66,21 @@ export function header(store) {
     unsubscribe?.();
   };
   return node;
+}
+
+function renderBrandMark(mark) {
+  mark.replaceChildren();
+  const logoMark = getAsset(brandConfig.logoMarkAsset);
+  if (logoMark) {
+    const image = document.createElement("img");
+    image.src = logoMark;
+    image.alt = brandConfig.appName;
+    image.className = "h-6 w-6 object-contain";
+    mark.append(image);
+    return;
+  }
+
+  mark.append(createIcon(brandConfig.logoIcon, { className: "h-5 w-5" }));
 }
 
 function currentRole(store) {

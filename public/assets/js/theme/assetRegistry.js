@@ -13,7 +13,12 @@ export const assetRegistry = {
 };
 
 export function getAsset(path, fallback = "") {
-  return String(path)
+  const value = String(path ?? "").trim();
+  if (/^(https?:|data:|blob:)/.test(value) || value.startsWith("/")) {
+    return value;
+  }
+
+  return value
     .split(".")
     .reduce((carry, key) => (carry && key in carry ? carry[key] : fallback), assetRegistry);
 }

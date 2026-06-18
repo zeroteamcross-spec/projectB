@@ -9,6 +9,7 @@ use App\Core\JsonResponse;
 use App\Core\Request;
 use App\Modules\Auth\Policies\AuthPolicy;
 use App\Modules\MasterData\Requests\UploadBankIconRequest;
+use App\Modules\MasterData\Requests\UploadAppIconRequest;
 use App\Modules\MasterData\Services\MasterAssetService;
 
 class MasterAssetController extends Controller
@@ -30,5 +31,15 @@ class MasterAssetController extends Controller
         return JsonResponse::success([
             'asset' => $this->assets->storeBankIcon($payload['icon'], $payload['mime_type']),
         ], 'Icon bank berhasil diupload.', [], 201);
+    }
+
+    public function uploadAppIcon(Request $request): JsonResponse
+    {
+        AuthPolicy::requireRole($request->user(), ['admin']);
+        $payload = (new UploadAppIconRequest($request))->validate();
+
+        return JsonResponse::success([
+            'asset' => $this->assets->storeAppIcon($payload['icon'], $payload['mime_type']),
+        ], 'Icon aplikasi berhasil diupload.', [], 201);
     }
 }
