@@ -108,10 +108,10 @@ function renderBuyer(root, context, config, state, getBackgroundVideoLayer) {
   bottomWave.className = "hidden pointer-events-none absolute -bottom-24 left-1/2 h-72 w-[150%] -translate-x-1/2 rounded-[50%] bg-[#dfe3ff]/70 blur-[1px]";
 
   const bottomWaveDeep = document.createElement("span");
-  bottomWaveDeep.className = "pointer-events-none absolute -bottom-36 left-0 h-52 w-[120%] rounded-[50%] bg-[#cdd3ff]/60";
+  bottomWaveDeep.className = "hidden pointer-events-none absolute -bottom-36 left-0 h-52 w-[120%] rounded-[50%] bg-[#cdd3ff]/60";
 
   const content = document.createElement("div");
-  content.className = "relative z-10 grid min-h-[calc(100vh-3rem)] content-center justify-items-center gap-5 rounded-[1.75rem] border border-white/45 bg-[linear-gradient(135deg,rgba(255,255,255,0.72),rgba(214,220,235,0.42)_42%,rgba(244,247,252,0.62)_100%)] px-5 py-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.82),0_24px_70px_rgba(18,24,45,0.18)] backdrop-blur-xl sm:px-7 sm:py-9";
+  content.className = "relative z-10 grid min-h-[calc(90vh-3rem)] content-center justify-items-center gap-5 rounded-[1.75rem] border border-white/45 bg-[linear-gradient(135deg,rgba(255,255,255,0.72),rgba(214,220,235,0.42)_42%,rgba(244,247,252,0.62)_100%)] px-5 py-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.82),0_24px_70px_rgba(18,24,45,0.18)] backdrop-blur-xl sm:px-7 sm:py-9";
   content.append(appIcon(), buyerHeader(), buyerActionContent(root, context, config, state));
 
   frame.append(topWave, bottomWave, bottomWaveDeep, plantDecor("left"), plantDecor("right"), content, homeIndicator());
