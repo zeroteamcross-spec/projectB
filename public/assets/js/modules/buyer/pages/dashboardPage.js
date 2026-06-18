@@ -462,8 +462,8 @@ function recommendationsToolbar({ count, actions }) {
   bar.className = "mt-1 rounded-[24px] border border-white/16 bg-white/10 px-4 py-3 backdrop-blur md:flex md:items-center md:justify-between xl:px-5";
 
   const copy = document.createElement("section");
-  // copy.className = "grid min-w-0 gap-1";
-  copy.className = "";
+  copy.className = "grid min-w-0 gap-1";
+  // copy.className = "";
   copy.append(
     textNode("h2", "break-words text-sm font-bold tracking-normal text-white", "Mobil Pilihan Terbaik"),
     // textNode("p", "text-sm font-medium text-white/70", count ? `${count} rekomendasi tersedia` : "Rekomendasi akan muncul di sini"),
