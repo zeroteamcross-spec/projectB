@@ -52,8 +52,7 @@ export function createRoleGuard({ auth } = {}) {
     }
 
     if (route.authRequired) {
-      const currentRole = auth?.role?.() ?? PUBLIC_ROLE;
-      const isAuthenticated = auth?.isAuthenticated?.() ?? false;
+
 
       if (!isAuthenticated || currentRole === PUBLIC_ROLE) {
         return unauthenticatedRedirect({
@@ -72,8 +71,7 @@ export function createRoleGuard({ auth } = {}) {
       return allow(route);
     }
 
-    const currentRole = auth?.role?.() ?? PUBLIC_ROLE;
-    const isAuthenticated = auth?.isAuthenticated?.() ?? false;
+
 
     if (!isAuthenticated || currentRole === PUBLIC_ROLE) {
       return unauthenticatedRedirect({
