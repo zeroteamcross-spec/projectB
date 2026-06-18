@@ -127,12 +127,15 @@ export class PublicShell {
     }
     this.actionLink.href = target;
     this.actionLink.title = isAuthenticated ? "Dashboard akun" : "Masuk";
-    this.actionLink.classList.toggle("w-10", isAuthenticated);
-    this.actionLink.classList.toggle("px-0", isAuthenticated);
-    this.actionLink.classList.toggle("px-3", !isAuthenticated);
+    const isTargetBuyer = isAuthenticated && target === "#/buyer";
+    this.actionLink.classList.toggle("w-10", isAuthenticated && !isTargetBuyer);
+    this.actionLink.classList.toggle("px-0", isAuthenticated && !isTargetBuyer);
+    this.actionLink.classList.toggle("px-3", !isAuthenticated || isTargetBuyer);
     this.actionLink.replaceChildren(
       isAuthenticated
-        ? createIcon("user", { className: "block h-4 w-4 leading-none" })
+        ? (isTargetBuyer
+            ? document.createTextNode("Back To Home")
+            : createIcon("user", { className: "block h-4 w-4 leading-none" }))
         : document.createTextNode("Login")
     );
     this.renderImpersonationBanner();
