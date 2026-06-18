@@ -30,7 +30,7 @@ class WebConfigController extends Controller
 
     public function update(Request $request): JsonResponse
     {
-        $result = $this->service->update($this->user($request), $request->all());
+        $result = $this->service->update($this->user($request), $request->input());
 
         return JsonResponse::success([
             'config' => $result['config'],

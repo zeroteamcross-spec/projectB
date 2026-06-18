@@ -153,6 +153,7 @@ class MasterAssetService
     {
         $content = trim($svg);
         $content = preg_replace('/<\?xml[^>]*\?>/i', '', $content) ?? $content;
+        $content = preg_replace('/<!doctype[^>]*>/i', '', $content) ?? $content;
         $content = preg_replace('/<!--.*?-->/s', '', $content) ?? $content;
         $content = preg_replace('/\swidth\s*=\s*([\'"])[^\'"]*\1/i', '', $content) ?? $content;
         $content = preg_replace('/\sheight\s*=\s*([\'"])[^\'"]*\1/i', '', $content) ?? $content;

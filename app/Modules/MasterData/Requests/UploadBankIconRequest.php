@@ -42,7 +42,7 @@ class UploadBankIconRequest
 
             $extension = strtolower(pathinfo((string) ($file['name'] ?? ''), PATHINFO_EXTENSION));
             $mimeType = mime_content_type((string) ($file['tmp_name'] ?? '')) ?: '';
-            $svg = $extension === 'svg' ? (file_get_contents((string) ($file['tmp_name'] ?? '')) ?: '') : '';
+            $svg = file_get_contents((string) ($file['tmp_name'] ?? '')) ?: '';
             $isSvg = $extension === 'svg'
                 || $mimeType === 'image/svg+xml'
                 || ($svg !== '' && stripos($svg, '<svg') !== false);
@@ -94,7 +94,7 @@ class UploadBankIconRequest
             '/<\s*iframe\b/i',
             '/<\s*object\b/i',
             '/<\s*embed\b/i',
-            '/<!doctype/i',
+            '/<!entity/i',
         ];
 
         foreach ($blockedPatterns as $pattern) {
