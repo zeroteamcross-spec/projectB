@@ -53,49 +53,61 @@ export function GalleryLightbox({
 
   // Toolbar Controls (Play, Zoom In, Zoom Out, Zoom Reset, Fullscreen, Close)
   const toolbar = document.createElement("div");
-  toolbar.className = "flex items-center gap-2";
+  toolbar.className = "flex items-center gap-1.5 sm:gap-2 shrink-0";
 
   // Play/Pause Slideshow Button
   const playBtn = document.createElement("button");
   playBtn.type = "button";
-  playBtn.className = "flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white hover:bg-white/15 transition focus:outline-none";
+  playBtn.className = "flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white hover:bg-white/15 hover:text-white transition focus:outline-none";
   playBtn.title = "Mulai Slideshow";
-  playBtn.append(createIcon("play", { className: "h-4 w-4" }));
+  const playIcon = document.createElement("i");
+  playIcon.className = "fa-solid fa-play h-4 w-4 flex items-center justify-center";
+  playBtn.append(playIcon);
 
   // Zoom Out Button
   const zoomOutBtn = document.createElement("button");
   zoomOutBtn.type = "button";
-  zoomOutBtn.className = "flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white hover:bg-white/15 transition focus:outline-none";
+  zoomOutBtn.className = "flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white hover:bg-white/15 hover:text-white transition focus:outline-none";
   zoomOutBtn.title = "Perkecil";
-  zoomOutBtn.append(createIcon("minus", { className: "h-4 w-4" }));
+  const zoomOutIcon = document.createElement("i");
+  zoomOutIcon.className = "fa-solid fa-magnifying-glass-minus h-4 w-4 flex items-center justify-center";
+  zoomOutBtn.append(zoomOutIcon);
 
   // Zoom In Button
   const zoomInBtn = document.createElement("button");
   zoomInBtn.type = "button";
-  zoomInBtn.className = "flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white hover:bg-white/15 transition focus:outline-none";
+  zoomInBtn.className = "flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white hover:bg-white/15 hover:text-white transition focus:outline-none";
   zoomInBtn.title = "Perbesar";
-  zoomInBtn.append(createIcon("plus", { className: "h-4 w-4" }));
+  const zoomInIcon = document.createElement("i");
+  zoomInIcon.className = "fa-solid fa-magnifying-glass-plus h-4 w-4 flex items-center justify-center";
+  zoomInBtn.append(zoomInIcon);
 
   // Zoom Reset Button
   const zoomResetBtn = document.createElement("button");
   zoomResetBtn.type = "button";
-  zoomResetBtn.className = "flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white hover:bg-white/15 transition focus:outline-none hidden";
+  zoomResetBtn.className = "flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white hover:bg-white/15 hover:text-white transition focus:outline-none hidden";
   zoomResetBtn.title = "Reset Zoom";
-  zoomResetBtn.append(createIcon("rotate", { className: "h-4 w-4" }));
+  const zoomResetIcon = document.createElement("i");
+  zoomResetIcon.className = "fa-solid fa-arrow-rotate-left h-4 w-4 flex items-center justify-center";
+  zoomResetBtn.append(zoomResetIcon);
 
   // Fullscreen Toggle Button
   const fullscreenBtn = document.createElement("button");
   fullscreenBtn.type = "button";
-  fullscreenBtn.className = "flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white hover:bg-white/15 transition focus:outline-none";
+  fullscreenBtn.className = "flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white hover:bg-white/15 hover:text-white transition focus:outline-none";
   fullscreenBtn.title = "Fullscreen";
-  fullscreenBtn.append(createIcon("expand", { className: "h-4 w-4" }));
+  const fullscreenIcon = document.createElement("i");
+  fullscreenIcon.className = "fa-solid fa-expand h-4 w-4 flex items-center justify-center";
+  fullscreenBtn.append(fullscreenIcon);
 
   // Close Button
   const close = Button({ label: "", variant: "secondary", onClick: () => handleClose() });
   close.id = "pb_gallery_lightbox_close_button";
-  close.className = "inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/10 text-white shadow-lg transition hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/45";
+  close.className = "inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/10 text-white shadow-lg transition hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/45 ml-1";
   close.setAttribute("aria-label", "Tutup preview galeri");
-  close.replaceChildren(createIcon("circleXmark", { className: "h-5 w-5" }));
+  const closeIcon = document.createElement("i");
+  closeIcon.className = "fa-solid fa-xmark text-base";
+  close.replaceChildren(closeIcon);
 
   toolbar.append(playBtn, zoomOutBtn, zoomInBtn, zoomResetBtn, fullscreenBtn, close);
   header.append(copy, toolbar);
@@ -343,7 +355,7 @@ export function GalleryLightbox({
     if (!document.fullscreenElement) {
       section.requestFullscreen?.()
         .then(() => {
-          fullscreenBtn.replaceChildren(createIcon("compress", { className: "h-4 w-4" }));
+          fullscreenBtn.replaceChildren(createCustomIcon("fa-solid fa-compress h-4 w-4 flex items-center justify-center"));
         })
         .catch((err) => {
           console.error("Gagal fullscreen:", err);
@@ -351,7 +363,7 @@ export function GalleryLightbox({
     } else {
       document.exitFullscreen?.()
         .then(() => {
-          fullscreenBtn.replaceChildren(createIcon("expand", { className: "h-4 w-4" }));
+          fullscreenBtn.replaceChildren(createCustomIcon("fa-solid fa-expand h-4 w-4 flex items-center justify-center"));
         });
     }
   }
@@ -364,16 +376,16 @@ export function GalleryLightbox({
   // Sync fullscreen change state (e.g. if exited via Esc key)
   document.addEventListener("fullscreenchange", () => {
     if (!document.fullscreenElement) {
-      fullscreenBtn.replaceChildren(createIcon("expand", { className: "h-4 w-4" }));
+      fullscreenBtn.replaceChildren(createCustomIcon("fa-solid fa-expand h-4 w-4 flex items-center justify-center"));
     } else {
-      fullscreenBtn.replaceChildren(createIcon("compress", { className: "h-4 w-4" }));
+      fullscreenBtn.replaceChildren(createCustomIcon("fa-solid fa-compress h-4 w-4 flex items-center justify-center"));
     }
   });
 
   // --- SLIDESHOW (AUTOPLAY) ---
   function startSlideshow() {
     isPlaying = true;
-    playBtn.replaceChildren(createIcon("pause", { className: "h-4 w-4 text-[var(--pb-brand-accent)]" }));
+    playBtn.replaceChildren(createCustomIcon("fa-solid fa-pause h-4 w-4 flex items-center justify-center text-[var(--pb-brand-accent)]"));
     playBtn.title = "Pause Slideshow";
     slideshowTimer = window.setInterval(() => {
       navigate(1);
@@ -382,7 +394,7 @@ export function GalleryLightbox({
 
   function pauseSlideshow() {
     isPlaying = false;
-    playBtn.replaceChildren(createIcon("play", { className: "h-4 w-4" }));
+    playBtn.replaceChildren(createCustomIcon("fa-solid fa-play h-4 w-4 flex items-center justify-center"));
     playBtn.title = "Mulai Slideshow";
     if (slideshowTimer) {
       window.clearInterval(slideshowTimer);
@@ -460,6 +472,12 @@ function textNode(tagName, className, text) {
   node.className = className;
   node.textContent = text ?? "";
   return node;
+}
+
+function createCustomIcon(classNames) {
+  const i = document.createElement("i");
+  i.className = classNames;
+  return i;
 }
 
 function safeId(value) {
