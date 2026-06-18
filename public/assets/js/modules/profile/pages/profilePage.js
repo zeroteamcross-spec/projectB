@@ -140,7 +140,6 @@ function renderBuyerProfile(root, context, profile, actions) {
 
   if (!isGoogle) {
     page.append(
-      buyerSecurityCard(actions),
       buyerShortcutCard(actions)
     );
   }
@@ -201,7 +200,7 @@ function buyerTopNavigation({ activePath, profile, actions }) {
 
   const links = document.createElement("section");
   links.className = "flex min-w-0 items-center justify-end gap-2";
-  BUYER_MOBILE_FOOTER_ITEMS.filter((item) => !item.featured).forEach((item) => {
+  BUYER_MOBILE_FOOTER_ITEMS.forEach((item) => {
     links.append(buyerDesktopNavLink(item, activePath, actions));
   });
 
@@ -529,7 +528,11 @@ function detailPanel(profile, actions) {
   });
   password.id = "profile_change_password_button";
   password.prepend(createIcon("lock", { className: "block h-4 w-4 leading-none" }));
-  actionBar.append(edit, password);
+  if (profile.role !== "seller") {
+    actionBar.append(edit, password);
+  } else {
+    actionBar.append(edit);
+  }
 
   panel.append(actionBar);
 

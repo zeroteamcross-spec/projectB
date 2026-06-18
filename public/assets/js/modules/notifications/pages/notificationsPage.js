@@ -402,7 +402,7 @@ function buyerTopNavigation({ activePath, user, actions }) {
 
   const links = document.createElement("section");
   links.className = "flex min-w-0 items-center justify-end gap-2";
-  BUYER_MOBILE_FOOTER_ITEMS.filter((item) => !item.featured).forEach((item) => {
+  BUYER_MOBILE_FOOTER_ITEMS.forEach((item) => {
     links.append(buyerDesktopNavLink(item, activePath, actions));
   });
 
