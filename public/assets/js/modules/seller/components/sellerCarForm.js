@@ -11,7 +11,7 @@ const TOTAL_STEPS = 3;
 const STEP_META = [
   { step: 1, title: "Data Dasar", icon: "car", helper: "Identitas kendaraan dan warna utama." },
   { step: 2, title: "Spesifikasi Teknis", icon: "settings", helper: "Dokumen, mesin, kilometer, dan lokasi." },
-  { step: 3, title: "Harga & Publikasi", icon: "transaction", helper: "Harga, stok, deskripsi, dan status listing." },
+  { step: 3, title: "Harga dan Deskripsi", icon: "transaction", helper: "Harga, stok, deskripsi, dan status listing." },
 ];
 
 const REQUIRED_FIELDS = {
@@ -286,7 +286,7 @@ function createNavigation({ currentStep, saving, onCancel, onPrevious, onNext })
   next.hidden = currentStep === TOTAL_STEPS;
   next.append(createIcon("arrowRight", { className: "h-4 w-4" }));
 
-  const submit = Button({ label: saving ? "Menyimpan..." : "Buat mobil", disabled: saving });
+  const submit = Button({ label: saving ? "Menyimpan..." : "Simpan mobil", disabled: saving });
   submit.id = "slrc_car_form_submit_button";
   submit.type = "submit";
   submit.hidden = currentStep !== TOTAL_STEPS;
@@ -331,9 +331,24 @@ function validateStep(form, step) {
   const focusTarget = field?.dataset?.numericVisibleId
     ? form.querySelector(`[id="${field.dataset.numericVisibleId}"]`)
     : field;
-  const label = focusTarget?.closest("label")?.querySelector("span")?.textContent ?? missing;
+  const label = fieldLabel(focusTarget, missing);
   focusTarget?.focus?.();
   return { valid: false, message: `Lengkapi ${label} sebelum lanjut.` };
+}
+
+function fieldLabel(field, fallback) {
+  const label = field?.closest("label");
+  const spanText = label?.querySelector("span")?.textContent?.trim();
+  if (spanText) {
+    return spanText;
+  }
+
+  const text = Array.from(label?.childNodes ?? [])
+    .filter((node) => node.nodeType === Node.TEXT_NODE)
+    .map((node) => node.textContent?.trim())
+    .find(Boolean);
+
+  return text || fallback;
 }
 
 function showValidation(node, message) {
