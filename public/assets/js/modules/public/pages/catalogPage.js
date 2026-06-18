@@ -77,7 +77,7 @@ function render(root, context, flags) {
   }
 
   const affiliate = publicContextService.activeAffiliate();
-  const affiliateSlug = String(context.params?.slug ?? "").trim().toUpperCase();
+  const affiliateSlug = String(context.params?.slug ?? "").trim().toLowerCase();
   const isAffiliateRoute = Boolean(affiliateSlug);
   const invalidAffiliateRoute = isAffiliateRoute && publicContextService.invalidSlug() === affiliateSlug;
   const catalogState = publicCatalogState.get();

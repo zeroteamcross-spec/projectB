@@ -61,7 +61,7 @@ const SUPER_ADMIN_LINKS = [
       { href: "#/admin", label: "Admin View", icon: "dashboard" },
       { href: "#/buyer", label: "Buyer View", icon: "user" },
       { href: "#/seller", label: "Seller View", icon: "car" },
-      { href: "#/affiliate", label: "Affiliate View", icon: "affiliate" },
+      { href: "#/affiliate", label: "Marketing View", icon: "affiliate" },
     ],
   },
 ];

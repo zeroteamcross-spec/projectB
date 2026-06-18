@@ -101,6 +101,19 @@ function roleForHashPath(path) {
     return loginRoleForPath(path);
   }
 
+  if (
+    path.startsWith("/af/") ||
+    path.startsWith("/a/") ||
+    path.startsWith("/cars/") ||
+    path.startsWith("/transactions/") ||
+    path.startsWith("/auth/") ||
+    path === "/auth" ||
+    path === "/public" ||
+    path.startsWith("/public/")
+  ) {
+    return "buyer";
+  }
+
   return null;
 }
 

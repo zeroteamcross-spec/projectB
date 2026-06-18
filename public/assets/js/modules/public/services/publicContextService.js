@@ -45,7 +45,7 @@ export const publicContextService = {
   },
 
   async activateAffiliateBySlug(slug, options = {}) {
-    const normalizedSlug = String(slug ?? "").trim().toUpperCase();
+    const normalizedSlug = String(slug ?? "").trim().toLowerCase();
     if (!normalizedSlug) {
       this.clear();
       return null;
