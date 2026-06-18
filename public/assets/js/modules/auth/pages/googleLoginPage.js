@@ -20,11 +20,11 @@ export function GoogleLoginPage({ roleSlug } = {}) {
     status: null,
     error: "",
   };
-  const isBuyer = config?.slug === "buyer";
+  const usesGlassLoginDesign = Boolean(config);
 
   const getBackgroundVideoLayer = () => {
     backgroundVideoLayer ??= createBackgroundVideoLayer({
-      id: "google_login_buyer_background_video_layer",
+      id: `google_login_${config.slug}_background_video_layer`,
       fallbackClassName: BUYER_FALLBACK_BG,
       overlayClassName: "bg-white/5",
     });
@@ -39,7 +39,7 @@ export function GoogleLoginPage({ roleSlug } = {}) {
       state.error = "";
     },
     mount(context) {
-      if (isBuyer) {
+      if (usesGlassLoginDesign) {
         previousBodyOverflow = document.body.style.overflow;
         previousHtmlOverflow = document.documentElement.style.overflow;
         document.body.style.overflow = "hidden";
@@ -47,10 +47,10 @@ export function GoogleLoginPage({ roleSlug } = {}) {
       }
 
       root = document.createElement("main");
-      root.className = isBuyer
+      root.className = usesGlassLoginDesign
         ? "relative isolate min-h-screen overflow-hidden bg-transparent"
         : `min-h-screen ${PAGE_BG} px-4 py-8 sm:px-6 lg:px-10`;
-      render(root, context, config, state, isBuyer ? getBackgroundVideoLayer : null);
+      render(root, context, config, state, usesGlassLoginDesign ? getBackgroundVideoLayer : null);
       return root;
     },
     async hydrate(context) {
@@ -65,11 +65,11 @@ export function GoogleLoginPage({ roleSlug } = {}) {
         state.error = error.message || "Status Google Login gagal diambil.";
       } finally {
         state.loading = false;
-        render(root, context, config, state, isBuyer ? getBackgroundVideoLayer : null);
+        render(root, context, config, state, usesGlassLoginDesign ? getBackgroundVideoLayer : null);
       }
     },
     dispose() {
-      if (isBuyer) {
+      if (usesGlassLoginDesign) {
         document.body.style.overflow = previousBodyOverflow;
         document.documentElement.style.overflow = previousHtmlOverflow;
       }
@@ -84,8 +84,8 @@ function render(root, context, config, state, getBackgroundVideoLayer = null) {
     return;
   }
 
-  if (config.slug === "buyer") {
-    renderBuyer(root, context, config, state, getBackgroundVideoLayer);
+  if (getBackgroundVideoLayer) {
+    renderGlassLogin(root, context, config, state, getBackgroundVideoLayer);
     return;
   }
 
@@ -109,9 +109,9 @@ function render(root, context, config, state, getBackgroundVideoLayer = null) {
   root.replaceChildren(wrap);
 }
 
-function renderBuyer(root, context, config, state, getBackgroundVideoLayer) {
+function renderGlassLogin(root, context, config, state, getBackgroundVideoLayer) {
   const frame = document.createElement("section");
-  frame.id = "google_login_buyer_panel";
+  frame.id = `google_login_${config.slug}_panel`;
   frame.className = "relative z-10 mx-auto grid min-h-screen w-full max-w-[400px] content-center overflow-hidden px-5 py-5 text-center sm:px-6 lg:mx-0 lg:ml-auto lg:mr-[8vw] lg:max-w-[420px]";
 
   const topWave = document.createElement("span");
@@ -125,7 +125,7 @@ function renderBuyer(root, context, config, state, getBackgroundVideoLayer) {
 
   const content = document.createElement("div");
   content.className = "relative z-10 grid justify-items-center gap-4 rounded-[1.5rem] border border-white/45 bg-[linear-gradient(135deg,rgba(255,255,255,0.72),rgba(214,220,235,0.42)_42%,rgba(244,247,252,0.62)_100%)] px-5 py-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.82),0_22px_60px_rgba(18,24,45,0.18)] backdrop-blur-xl sm:px-6 sm:py-7";
-  content.append(appIcon(), buyerHeader(), buyerActionContent(root, context, config, state));
+  content.append(appIcon(), glassLoginHeader(config), glassLoginActionContent(root, context, config, state));
 
   frame.append(topWave, bottomWave, bottomWaveDeep, plantDecor("left"), plantDecor("right"), content, homeIndicator());
   const backgroundLayer = getBackgroundVideoLayer?.();
@@ -153,12 +153,12 @@ function appIcon() {
   return wrap;
 }
 
-function buyerHeader() {
+function glassLoginHeader(config) {
   const headerEl = document.createElement("header");
   headerEl.className = "grid max-w-[320px] gap-2.5";
 
   const title = document.createElement("h1");
-  title.id = "google_login_buyer_title";
+  title.id = `google_login_${config.slug}_title`;
   title.className = "text-[1.95rem] font-black leading-[1.04] tracking-normal text-[#11142d] sm:text-[2.2rem]";
   title.textContent = "Selamat datang!";
 
@@ -170,7 +170,7 @@ function buyerHeader() {
   return headerEl;
 }
 
-function buyerActionContent(root, context, config, state) {
+function glassLoginActionContent(root, context, config, state) {
   const fragment = document.createDocumentFragment();
   const actionWrap = document.createElement("div");
   actionWrap.className = "grid w-full max-w-[310px] gap-4";
@@ -188,6 +188,12 @@ function buyerActionContent(root, context, config, state) {
     actionWrap.append(messageBox(state.error, "error"));
   }
 
+  if (!config.googleEnabled) {
+    actionWrap.append(messageBox(config.warning || "Google Login tidak tersedia untuk role ini.", "info"));
+    fragment.append(actionWrap);
+    return fragment;
+  }
+
   if (!state.status?.enabled) {
     actionWrap.append(messageBox("Google Login belum dikonfigurasi.", "info"));
     fragment.append(actionWrap);
@@ -195,7 +201,7 @@ function buyerActionContent(root, context, config, state) {
   }
 
   const button = document.createElement("button");
-  button.id = "google_login_buyer_button";
+  button.id = `google_login_${config.slug}_button`;
   button.type = "button";
   button.disabled = state.submitting;
   button.className = "inline-flex min-h-12 w-full items-center justify-center gap-3.5 rounded-[1rem] border border-white/60 bg-[linear-gradient(135deg,rgba(255,255,255,0.84),rgba(216,222,236,0.58))] px-4 text-sm font-black tracking-normal text-[#171a35] shadow-[inset_0_1px_0_rgba(255,255,255,0.88),0_14px_30px_rgba(84,92,170,0.13)] backdrop-blur transition duration-200 hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-4 focus:ring-[#dfe3ff] disabled:cursor-wait disabled:opacity-70";
@@ -346,7 +352,7 @@ function actionContent(root, context, config, state) {
 
 async function beginGoogleLogin(root, context, config, state) {
   state.submitting = true;
-  render(root, context, config, state, config.slug === "buyer" ? () => document.getElementById("google_login_buyer_background_video_layer") : null);
+  render(root, context, config, state, () => document.getElementById(`google_login_${config.slug}_background_video_layer`));
 
   try {
     const authUrl = await googleLoginService.begin(config);
@@ -355,7 +361,7 @@ async function beginGoogleLogin(root, context, config, state) {
     state.error = error.message || "Google Login gagal dimulai.";
     state.submitting = false;
     showToast(state.error, { type: "error", key: `google-login-${config.slug}-error`, dedupeMs: 3000 });
-    render(root, context, config, state, config.slug === "buyer" ? () => document.getElementById("google_login_buyer_background_video_layer") : null);
+    render(root, context, config, state, () => document.getElementById(`google_login_${config.slug}_background_video_layer`));
   }
 }
 
