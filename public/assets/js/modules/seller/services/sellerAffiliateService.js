@@ -107,7 +107,10 @@ export const sellerAffiliateService = {
       return "";
     }
 
-    return `${window.location.origin}${window.location.pathname}#${path}`;
+    const hostname = window.location.hostname.replace(/^(showroom|marketing|admin)\./i, "");
+    const origin = `${window.location.protocol}//${hostname}${window.location.port ? ":" + window.location.port : ""}`;
+
+    return `${origin}${window.location.pathname}#${path}`;
   },
 
   slugHelper(slug = "") {

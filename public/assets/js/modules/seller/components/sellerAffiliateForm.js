@@ -83,14 +83,14 @@ export function SellerAffiliateForm({
   form.append(
     Input({
       name: "name",
-      label: "Nama affiliate",
+      label: "Nama Marketing",
       value: draft.user?.name ?? draft.name ?? "",
       placeholder: "Contoh: Joko Santoso",
     }),
     Input({
       id: "slraf_affiliate_email_input",
       name: "email",
-      label: "Username / email login affiliate",
+      label: "Username / email login Marketing",
       type: "email",
       value: draft.user?.email ?? draft.email ?? "",
       placeholder: "affiliate@example.com",
@@ -103,7 +103,7 @@ export function SellerAffiliateForm({
     }),
     Input({
       name: "phone_number",
-      label: "Nomor WhatsApp affiliate",
+      label: "Nomor WhatsApp",
       value: draft.phone_number ?? draft.user?.phone_number ?? "",
       placeholder: "Contoh: 081234567890",
     }),
