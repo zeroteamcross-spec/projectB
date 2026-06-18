@@ -209,14 +209,10 @@ async function publishReport(carId, report) {
     if (!saved?.id) {
       throw new Error("Simpan draft inspection terlebih dahulu.");
     }
-    const updated = await inspectionsResource.updateReport(saved.id, {
-      report_status: "published",
-      summary_notes: runtimeState().summaryDraft ?? saved.summary_notes ?? null,
+    await publishSavedReport(carId, saved, {
+      notice: "Inspection report berhasil dipublish.",
+      toast: "Inspection report berhasil dipublish.",
     });
-    setReport(updated);
-    syncCarInspectionSummary("completed");
-    setRuntime({ publishing: false, dirty: false, notice: "Inspection report berhasil dipublish." });
-    showToast("Inspection report berhasil dipublish.", { type: "success" });
   } catch (error) {
     const message = error?.message ?? "Inspection report gagal dipublish.";
     setRuntime({ publishing: false, error: message });
@@ -225,19 +221,53 @@ async function publishReport(carId, report) {
 }
 
 async function saveInspectionDraft(carId, report, templates) {
-  setRuntime({ savingDraft: true, error: "", notice: "" });
+  let draftSaved = false;
+  setRuntime({ savingDraft: true, publishing: true, error: "", notice: "" });
 
   try {
     const updated = await persistInspectionDraft(carId, report, templates);
+    draftSaved = true;
     setReport(updated, { syncDrafts: false });
     syncCarInspectionSummary("partial");
-    setRuntime({ savingDraft: false, dirty: false, notice: "Draft inspection berhasil disimpan." });
-    showToast("Draft inspection berhasil disimpan.", { type: "success" });
+    await publishSavedReport(carId, updated, {
+      notice: "Inspection berhasil disimpan dan dipublish.",
+      toast: "Inspection berhasil disimpan dan dipublish.",
+    });
   } catch (error) {
-    const message = error?.message ?? "Draft inspection gagal disimpan.";
-    setRuntime({ savingDraft: false, error: message });
+    const message = error?.message ?? "Inspection gagal disimpan atau dipublish.";
+    setRuntime({ savingDraft: false, publishing: false, dirty: draftSaved ? false : runtimeState().dirty, error: message });
     showToast(message, { type: "error" });
   }
+}
+
+async function publishSavedReport(carId, report, { notice, toast } = {}) {
+  const runtime = runtimeState();
+  const templates = sellerState.working("sellerCarInspection", "templates", []) ?? [];
+  const items = buildInspectionItems(templates, report, runtime.itemDrafts);
+  const progress = inspectionProgress(items);
+
+  if (progress.completed < progress.total) {
+    throw new Error("Draft tersimpan. Lengkapi semua item sebelum publish.");
+  }
+
+  if (!report?.id) {
+    throw new Error("Simpan draft inspection terlebih dahulu.");
+  }
+
+  const updated = await inspectionsResource.updateReport(report.id, {
+    report_status: "published",
+    summary_notes: runtime.summaryDraft ?? report.summary_notes ?? null,
+  });
+  setReport(updated);
+  syncCarInspectionSummary("completed");
+  setRuntime({
+    savingDraft: false,
+    publishing: false,
+    dirty: false,
+    notice: notice ?? "Inspection report berhasil dipublish.",
+  });
+  showToast(toast ?? "Inspection report berhasil dipublish.", { type: "success" });
+  return updated;
 }
 
 async function persistInspectionDraft(carId, report, templates) {
