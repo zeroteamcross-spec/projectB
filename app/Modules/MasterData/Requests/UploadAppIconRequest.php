@@ -43,9 +43,12 @@ class UploadAppIconRequest
 
             $extension = strtolower(pathinfo((string) ($file['name'] ?? ''), PATHINFO_EXTENSION));
             $mimeType = mime_content_type((string) ($file['tmp_name'] ?? '')) ?: '';
-            $isSvg = $extension === 'svg' || $mimeType === 'image/svg+xml';
+            $svg = $extension === 'svg' ? (file_get_contents((string) ($file['tmp_name'] ?? '')) ?: '') : '';
+            $isSvg = $extension === 'svg'
+                || $mimeType === 'image/svg+xml'
+                || ($svg !== '' && stripos($svg, '<svg') !== false);
             if ($isSvg) {
-                $svg = file_get_contents((string) ($file['tmp_name'] ?? '')) ?: '';
+                $svg = $svg !== '' ? $svg : (file_get_contents((string) ($file['tmp_name'] ?? '')) ?: '');
                 if (! $this->isSafeSvg($svg)) {
                     $errors['icon'] = 'SVG icon aplikasi tidak valid atau mengandung konten tidak aman.';
                 }

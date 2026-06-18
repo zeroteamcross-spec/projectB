@@ -289,7 +289,7 @@ function getSidebarLinksForRole(role, store, fallbackLinks) {
     return fallbackLinks;
   }
 
-  return ensureProfileMenu(buildSidebarTree(items));
+  return ensureAdminWebConfigMenu(ensureProfileMenu(buildSidebarTree(items)), role);
 }
 
 function normalizeSidebarRole(role) {
@@ -317,14 +317,27 @@ function withDesignStudioV2Menu(links, role, store) {
 }
 
 function ensureProfileMenu(links) {
-  if (links.some((link) => String(link.href ?? "") === "#/profile")) {
+  return ensureMenuLink(links, { href: "#/profile", label: "Profil Saya", icon: "user" }, 1);
+}
+
+function ensureAdminWebConfigMenu(links, role) {
+  if (normalizeSidebarRole(role) !== "admin") {
     return links;
   }
 
+  return ensureMenuLink(links, { href: "#/admin/web-config", label: "Konfigurasi WEB", icon: "settings" }, 2);
+}
+
+function ensureMenuLink(links, menu, index = 1) {
+  if (links.some((link) => String(link.href ?? "") === menu.href)) {
+    return links;
+  }
+
+  const insertAt = Math.min(Math.max(0, index), links.length);
   return [
-    ...links.slice(0, 1),
-    { href: "#/profile", label: "Profil Saya", icon: "user" },
-    ...links.slice(1),
+    ...links.slice(0, insertAt),
+    menu,
+    ...links.slice(insertAt),
   ];
 }
 
