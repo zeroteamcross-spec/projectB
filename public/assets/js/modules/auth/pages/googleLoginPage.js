@@ -11,6 +11,8 @@ const BUYER_FALLBACK_BG = "bg-[radial-gradient(circle_at_20%_4%,rgba(207,211,255
 export function GoogleLoginPage({ roleSlug } = {}) {
   let root = null;
   let backgroundVideoLayer = null;
+  let previousBodyOverflow = "";
+  let previousHtmlOverflow = "";
   const config = googleLoginService.configForSlug(roleSlug);
   const state = {
     loading: true,
@@ -37,6 +39,13 @@ export function GoogleLoginPage({ roleSlug } = {}) {
       state.error = "";
     },
     mount(context) {
+      if (isBuyer) {
+        previousBodyOverflow = document.body.style.overflow;
+        previousHtmlOverflow = document.documentElement.style.overflow;
+        document.body.style.overflow = "hidden";
+        document.documentElement.style.overflow = "hidden";
+      }
+
       root = document.createElement("main");
       root.className = isBuyer
         ? "relative isolate min-h-screen overflow-hidden bg-transparent"
@@ -60,6 +69,10 @@ export function GoogleLoginPage({ roleSlug } = {}) {
       }
     },
     dispose() {
+      if (isBuyer) {
+        document.body.style.overflow = previousBodyOverflow;
+        document.documentElement.style.overflow = previousHtmlOverflow;
+      }
       backgroundVideoLayer?.dispose?.();
       backgroundVideoLayer = null;
     },
