@@ -36,7 +36,7 @@ export function BuyerPortfolioPage() {
       currentContext?.router?.navigate("/buyer/transactions");
     },
     openCatalog() {
-      currentContext?.router?.navigate("/buyer/cars");
+      currentContext?.router?.navigate("/");
     },
     showDevelopmentToast() {
       showToast("Fitur masih dalam Pengembangan", { type: "info" });
