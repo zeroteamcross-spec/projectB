@@ -641,7 +641,7 @@ function ensureAdminMasterSidebarChildren(items = []) {
         label: item.label || "Slider",
         route: "#/admin/sliders",
         icon: item.icon || "image",
-        parent_key: "",
+        parent_key: item.parent_key ?? "",
         role: "admin",
         is_parent: false,
         order: Number.isFinite(Number(item.order)) ? Number(item.order) : 60,
