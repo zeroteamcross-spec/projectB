@@ -212,7 +212,7 @@ function divider() {
   const left = document.createElement("span");
   left.className = "h-px bg-[#dfe2ee]";
   const text = document.createElement("span");
-  text.textContent = "atau";
+  text.textContent = "";
   const right = document.createElement("span");
   right.className = "h-px bg-[#dfe2ee]";
 
