@@ -138,7 +138,8 @@ function renderBuyerProfile(root, context, profile, actions) {
     buyerAccountCard(profile)
   );
 
-  if (!isGoogle) {
+  const hideShortcutCard = ["buyer", "seller", "admin"].includes(profile.role);
+  if (!isGoogle && !hideShortcutCard) {
     page.append(
       buyerShortcutCard(actions)
     );
