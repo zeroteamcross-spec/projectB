@@ -332,7 +332,7 @@ function catalogToolbar(count, meta, affiliate = null) {
   applyDesignHook(bar, "catalog.filter.toolbar");
 
   const copy = document.createElement("div");
-  copy.className = "grid gap-1 min-w-0";
+  copy.className = "grid min-w-0 gap-1";
 
   const title = document.createElement("h2");
   title.className = "break-words text-sm font-bold tracking-normal text-white";
