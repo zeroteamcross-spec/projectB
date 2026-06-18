@@ -110,10 +110,11 @@ function statusButtons(item, { busyItemId, onStatusChange }) {
 
   STATUS_OPTIONS.forEach((option) => {
     const active = item.result_status === option.value;
+    const isBusy = busyItemId !== null && busyItemId !== undefined && String(busyItemId) === String(item.id);
     const button = document.createElement("button");
     button.id = `slrinsp_condition_${safeId(item.template_id)}_${option.value}_button`;
     button.type = "button";
-    button.disabled = busyItemId === item.id;
+    button.disabled = isBusy;
     button.className = [
       "inline-flex min-h-7 items-center justify-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-black transition",
       active ? option.active : "border-gray-200 bg-gray-50 text-gray-600 hover:border-gray-300 hover:bg-white hover:text-gray-800",
