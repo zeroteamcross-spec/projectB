@@ -15,6 +15,7 @@ import { applyDesignHook } from "../../../theme/designStudioHooks.js";
 import { NotificationBell } from "../../notifications/components/notificationBell.js";
 import { PublicCarCard } from "../../public/components/publicCarCard.js";
 import { publicContextService } from "../../public/services/publicContextService.js";
+import { adminMasterService } from "../../admin/services/adminMasterService.js";
 import { buyerState } from "../state/buyerState.js";
 import { BUYER_MOBILE_FOOTER_ITEMS, BuyerMobileFooterNav } from "../components/buyerMobileFooterNav.js";
 import { PublicSearchFilterBar } from "../../public/components/publicSearchFilterBar.js";
@@ -49,6 +50,7 @@ export function BuyerDashboardPage({ notFound = false } = {}) {
     brand: "",
     brands: [],
     transmission: "",
+    location_name: "",
     favorites: new Set(),
     quickFilter: "newest",
   };
@@ -76,7 +78,12 @@ export function BuyerDashboardPage({ notFound = false } = {}) {
       render(root, currentContext, actions, uiState, notFound);
     },
     openFilter(cars) {
-      openBuyerFilterModal({ cars, uiState, onApply: () => render(root, currentContext, actions, uiState, notFound) });
+      openBuyerFilterModal({
+        cars,
+        uiState,
+        locationOptions: resolveLocationOptions(),
+        onApply: () => render(root, currentContext, actions, uiState, notFound),
+      });
     },
     openCar(car) {
       buyerState.setSelectedCar(car.id);
@@ -251,12 +258,15 @@ function buyerTopNavigation({ activePath, actions }) {
 
 function buyerSearchBar({ cars, uiState, actions }) {
   return PublicSearchFilterBar({
-    filters: { keyword: uiState.search },
+    filters: { keyword: uiState.search, location_name: uiState.location_name },
     quickFilter: uiState.quickFilter || "newest",
     activeFilterCount: activeBuyerFilterCount(uiState),
-    options: {},
+    options: { locations: resolveLocationOptions() },
     onSearch: (nextFilters) => {
-      actions.setSearch(nextFilters.keyword ?? "", cars);
+      if (Object.prototype.hasOwnProperty.call(nextFilters, "location_name")) {
+        uiState.location_name = nextFilters.location_name ?? "";
+      }
+      actions.setSearch(nextFilters.keyword ?? uiState.search ?? "", cars);
     },
     onQuickFilter: (value) => {
       actions.setQuickFilter(value, cars);
@@ -615,11 +625,12 @@ function navLink(item, activePath, actions, mode) {
   return link;
 }
 
-function openBuyerFilterModal({ cars, uiState, onApply }) {
+function openBuyerFilterModal({ cars, uiState, locationOptions = [], onApply }) {
   const draft = {
     category: uiState.category,
     brands: selectedBrands(uiState),
     transmission: uiState.transmission,
+    location_name: uiState.location_name,
   };
   const content = document.createElement("section");
   content.id = "byr_filter_modal_content";
@@ -660,6 +671,16 @@ function openBuyerFilterModal({ cars, uiState, onApply }) {
         syncOptionButtons(button, siblings);
       },
     }))),
+    filterGroup("Lokasi", optionList(locationOptions, "Semua Lokasi").map((item) => ({
+      label: item.label,
+      value: item.value,
+      icon: "location",
+      active: draft.location_name === item.value,
+      onClick: (button, siblings) => {
+        draft.location_name = item.value;
+        syncOptionButtons(button, siblings);
+      },
+    }))),
   );
 
   const actions = document.createElement("section");
@@ -673,6 +694,7 @@ function openBuyerFilterModal({ cars, uiState, onApply }) {
       uiState.brand = "";
       uiState.brands = [];
       uiState.transmission = "";
+      uiState.location_name = "";
       closeModal({ notify: false });
       onApply?.();
     },
@@ -687,6 +709,7 @@ function openBuyerFilterModal({ cars, uiState, onApply }) {
       uiState.brand = "";
       uiState.brands = [...draft.brands];
       uiState.transmission = draft.transmission;
+      uiState.location_name = draft.location_name;
       closeModal({ notify: false });
       onApply?.();
     },
@@ -808,6 +831,7 @@ function filterCars(cars, uiState) {
   const category = String(uiState.category || "all");
   const brands = selectedBrands(uiState);
   const transmission = String(uiState.transmission || "");
+  const location = String(uiState.location_name || "");
 
   const filtered = cars.filter((car) => {
     const haystack = [
@@ -826,6 +850,9 @@ function filterCars(cars, uiState) {
       return false;
     }
     if (transmission && String(car.transmission ?? "") !== transmission) {
+      return false;
+    }
+    if (location && String(car.location_name ?? "").toLowerCase() !== location.toLowerCase()) {
       return false;
     }
     return matchesCategory(car, category);
@@ -868,6 +895,9 @@ function activeBuyerFilterCount(uiState) {
     count += 1;
   }
   if (String(uiState?.transmission ?? "")) {
+    count += 1;
+  }
+  if (String(uiState?.location_name ?? "")) {
     count += 1;
   }
   return count;
@@ -986,6 +1016,23 @@ function greetingBlock(user) {
 function localOptions(cars, key, allLabel) {
   const values = [...new Set(cars.map((car) => car?.[key]).filter(Boolean).map(String))].sort((a, b) => a.localeCompare(b));
   return [{ label: allLabel, value: "" }, ...values.slice(0, 8).map((value) => ({ label: value, value }))];
+}
+
+function optionList(values, allLabel) {
+  return [{ label: allLabel, value: "" }, ...values.filter(Boolean).map((value) => ({ label: value, value }))];
+}
+
+function resolveLocationOptions() {
+  const master = adminMasterService.normalizeLocationMaster(
+    appStore.get("working.buyerDashboard.masterLocation.data", null)
+      ?? buyerState.snapshot("masterLocation", null)
+  );
+
+  return (master?.data?.cities ?? [])
+    .filter((city) => city.status === "active")
+    .map((city) => city.name)
+    .filter(Boolean)
+    .sort((a, b) => a.localeCompare(b));
 }
 
 function normalizeCars(cars) {

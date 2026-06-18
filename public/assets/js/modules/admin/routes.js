@@ -8,7 +8,7 @@ import { AdminSettlementsPage } from "./pages/settlementsPage.js";
 import { AdminAffiliateCommissionsPage } from "./pages/affiliateCommissionsPage.js";
 import { AdminTransactionsPage } from "./pages/transactionsPage.js";
 import { AdminSlidersPage } from "./pages/slidersPage.js";
-import { AdminMasterBankPage, AdminMasterBrandPage, AdminMasterSidebarPage } from "./pages/masterPage.js";
+import { AdminMasterBankPage, AdminMasterBrandPage, AdminMasterLocationPage, AdminMasterSidebarPage } from "./pages/masterPage.js";
 import { AdminMasterInspectionPage } from "./pages/masterInspectionPage.js";
 import { AdminMigrationManagerPage } from "./pages/migrationManagerPage.js";
 import { AdminReleaseVersionManagerPage } from "./pages/releaseVersionManagerPage.js";
@@ -260,6 +260,22 @@ export const adminRoutes = [
         {
           key: "bank",
           loader: ({ signal }) => adminMasterService.getBankMaster({ signal }).catch(() => adminMasterService.normalizeBankMaster(null)),
+        },
+      ],
+    },
+  },
+  {
+    name: "admin.master-location",
+    path: "/admin/master-location",
+    shell: "app",
+    role: "admin",
+    page: AdminMasterLocationPage,
+    workingStateKey: "adminMaster",
+    preload: {
+      working: [
+        {
+          key: "location",
+          loader: ({ signal }) => adminMasterService.getLocationMaster({ signal }).catch(() => adminMasterService.normalizeLocationMaster(null)),
         },
       ],
     },

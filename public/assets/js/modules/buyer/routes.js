@@ -2,6 +2,7 @@ import { carsResource } from "../../resources/carsResource.js";
 import { profileResource } from "../../resources/profileResource.js";
 import { transactionsResource } from "../../resources/transactionsResource.js";
 import { slidersResource } from "../../resources/slidersResource.js";
+import { adminMasterService } from "../admin/services/adminMasterService.js";
 import { buyerTransactionDetailPreloadService } from "./services/buyerTransactionDetailPreloadService.js";
 import { BuyerAccountPage } from "./pages/accountPage.js";
 import { BuyerCarsPage } from "./pages/carsPage.js";
@@ -27,6 +28,10 @@ export const buyerRoutes = [
         {
           key: "transactions",
           loader: ({ signal }) => transactionsResource.list({ limit: 10 }, { signal }).catch(() => ({ transactions: [] })),
+        },
+        {
+          key: "masterLocation",
+          loader: ({ signal }) => adminMasterService.getLocationMaster({ signal }).catch(() => adminMasterService.normalizeLocationMaster(null)),
         },
         {
           key: "sliders",

@@ -34,6 +34,12 @@ export const preloadPlans = {
         version: "public-sliders-landing-v1",
         loader: ({ signal }) => slidersResource.publicList({ position: "landing_hero", limit: 5 }, { signal }).catch(() => ({ sliders: [], meta: {} })),
       },
+      {
+        key: "masterLocation",
+        ttl: 120,
+        version: "public-master-location-v1",
+        loader: ({ signal }) => adminMasterService.getLocationMaster({ signal }).catch(() => adminMasterService.normalizeLocationMaster(null)),
+      },
     ],
   },
   buyer: {
@@ -73,6 +79,12 @@ export const preloadPlans = {
         ttl: 300,
         version: "buyer-inspection-summary-v1",
         fallback: [],
+      },
+      {
+        key: "masterLocation",
+        ttl: 120,
+        version: "buyer-master-location-v1",
+        loader: ({ signal }) => adminMasterService.getLocationMaster({ signal }).catch(() => adminMasterService.normalizeLocationMaster(null)),
       },
     ],
   },
@@ -194,6 +206,12 @@ export const preloadPlans = {
         ttl: 120,
         version: "admin-master-bank-v1",
         loader: ({ signal }) => adminMasterService.getBankMaster({ signal }).catch(() => adminMasterService.normalizeBankMaster(null)),
+      },
+      {
+        key: "masterLocation",
+        ttl: 120,
+        version: "admin-master-location-v1",
+        loader: ({ signal }) => adminMasterService.getLocationMaster({ signal }).catch(() => adminMasterService.normalizeLocationMaster(null)),
       },
       {
         key: "masterInspection",

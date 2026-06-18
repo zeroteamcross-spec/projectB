@@ -1,4 +1,4 @@
-DirectoryIndex index.html app.html
+DirectoryIndex index.php index.html app.html
 
 <IfModule mod_headers.c>
 <FilesMatch "\.(html)$">
@@ -38,6 +38,6 @@ RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
 
-# Hash routing is client-side; unknown non-API paths fall back to the SPA shell.
-RewriteRule ^ index.html [L]
+# Hash routing is client-side; unknown non-API paths use PHP so share metadata can be injected.
+RewriteRule ^ index.php [QSA,L]
 </IfModule>

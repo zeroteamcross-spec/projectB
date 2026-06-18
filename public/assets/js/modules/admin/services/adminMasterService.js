@@ -4,6 +4,7 @@ import { iconRegistry } from "../../../theme/iconRegistry.js";
 export const MASTER_BRANDS_KEY = "cars.brands";
 export const MASTER_SIDEBAR_KEY = "app.sidebar";
 export const MASTER_BANKS_KEY = "payments.banks";
+export const MASTER_LOCATIONS_KEY = "locations.cities";
 
 const DEFAULT_BRAND_SEED = [
   brandSeed("brand_toyota", "Toyota", "toyota", "MPV, SUV, dan city car populer untuk pasar keluarga Indonesia.", [
@@ -56,6 +57,7 @@ const DEFAULT_SIDEBAR_SEED = [
   sidebarSeed("admin.master_sidebar", "admin", "Master Sidebar", "#/admin/master-sidebar", "sitemap", 20, "admin.master"),
   sidebarSeed("admin.master_bank", "admin", "Master Bank", "#/admin/master-bank", "bank", 30, "admin.master"),
   sidebarSeed("admin.master_inspection", "admin", "Master Inspection", "#/admin/master-inspection", "clipboard", 40, "admin.master"),
+  sidebarSeed("admin.master_location", "admin", "Master Lokasi", "#/admin/master-location", "location", 50, "admin.master"),
   sidebarSeed("admin.design_studio", "admin", "Design Studio", "#/admin/design-studio", "sparkles", 80),
   sidebarSeed("seller.dashboard", "seller", "Dashboard Seller", "#/seller", "dashboard", 10),
   sidebarSeed("seller.showroom", "seller", "Showroom Saya", "#/seller/showroom", "showroom", 20),
@@ -78,6 +80,29 @@ const DEFAULT_BANK_SEED = [
   bankSeed("bank_permata", "Permata Bank", "permata-bank", "013"),
   bankSeed("bank_danamon", "Danamon", "danamon", "011"),
   bankSeed("bank_bsi", "Bank Syariah Indonesia", "bsi", "451"),
+];
+
+const DEFAULT_LOCATION_SEED = [
+  citySeed("city_jakarta", "Jakarta", "jakarta", "DKI Jakarta", "dki-jakarta"),
+  citySeed("city_bandung", "Bandung", "bandung", "Jawa Barat", "jawa-barat"),
+  citySeed("city_surabaya", "Surabaya", "surabaya", "Jawa Timur", "jawa-timur"),
+  citySeed("city_semarang", "Semarang", "semarang", "Jawa Tengah", "jawa-tengah"),
+  citySeed("city_yogyakarta", "Yogyakarta", "yogyakarta", "DI Yogyakarta", "di-yogyakarta"),
+  citySeed("city_medan", "Medan", "medan", "Sumatera Utara", "sumatera-utara"),
+  citySeed("city_palembang", "Palembang", "palembang", "Sumatera Selatan", "sumatera-selatan"),
+  citySeed("city_pekanbaru", "Pekanbaru", "pekanbaru", "Riau", "riau"),
+  citySeed("city_padang", "Padang", "padang", "Sumatera Barat", "sumatera-barat"),
+  citySeed("city_makassar", "Makassar", "makassar", "Sulawesi Selatan", "sulawesi-selatan"),
+  citySeed("city_denpasar", "Denpasar", "denpasar", "Bali", "bali"),
+  citySeed("city_balipapan", "Balikpapan", "balikpapan", "Kalimantan Timur", "kalimantan-timur"),
+  citySeed("city_samarinda", "Samarinda", "samarinda", "Kalimantan Timur", "kalimantan-timur"),
+  citySeed("city_banjarmasin", "Banjarmasin", "banjarmasin", "Kalimantan Selatan", "kalimantan-selatan"),
+  citySeed("city_manado", "Manado", "manado", "Sulawesi Utara", "sulawesi-utara"),
+  citySeed("city_batam", "Batam", "batam", "Kepulauan Riau", "kepulauan-riau"),
+  citySeed("city_tangerang", "Tangerang", "tangerang", "Banten", "banten"),
+  citySeed("city_bekasi", "Bekasi", "bekasi", "Jawa Barat", "jawa-barat"),
+  citySeed("city_bogor", "Bogor", "bogor", "Jawa Barat", "jawa-barat"),
+  citySeed("city_depok", "Depok", "depok", "Jawa Barat", "jawa-barat"),
 ];
 
 export const adminMasterService = {
@@ -137,12 +162,32 @@ export const adminMasterService = {
     return normalizeBankMaster(master);
   },
 
+  async getLocationMaster(options = {}) {
+    const master = await masterDataResource.get(MASTER_LOCATIONS_KEY, options);
+    return normalizeLocationMaster(master);
+  },
+
+  async saveLocationMaster(cities = [], options = {}) {
+    const master = await masterDataResource.save(MASTER_LOCATIONS_KEY, {
+      schema: "admin.master.location.v1",
+      type: "location",
+      cities: normalizeCities(cities),
+    }, {
+      displayName: "Master Lokasi",
+      bumpVersion: true,
+      ...options,
+    });
+    return normalizeLocationMaster(master);
+  },
+
   normalizeMaster,
   normalizeSidebarMaster,
   normalizeBankMaster,
+  normalizeLocationMaster,
   normalizeBrands,
   normalizeSidebarItems,
   normalizeBanks,
+  normalizeCities,
   validateSidebarItems,
   assertValidSidebarItems,
   getSidebarChildren,
@@ -150,6 +195,7 @@ export const adminMasterService = {
   createEmptyModel,
   createEmptySidebarItem,
   createEmptyBank,
+  createEmptyCity,
 
   filterBrands(brands = [], filters = {}) {
     const keyword = String(filters.keyword ?? "").trim().toLowerCase();
@@ -237,6 +283,28 @@ export const adminMasterService = {
       ].filter(Boolean).join(" ").toLowerCase().includes(keyword);
     });
   },
+
+  filterCities(cities = [], filters = {}) {
+    const keyword = String(filters.keyword ?? "").trim().toLowerCase();
+    const status = String(filters.status ?? "").trim().toLowerCase();
+
+    return cities.filter((city) => {
+      if (status && city.status !== status) {
+        return false;
+      }
+
+      if (!keyword) {
+        return true;
+      }
+
+      return [
+        city.name,
+        city.slug,
+        city.province_name,
+        city.province_slug,
+      ].filter(Boolean).join(" ").toLowerCase().includes(keyword);
+    });
+  },
 };
 
 function normalizeMaster(master = null) {
@@ -293,6 +361,24 @@ function normalizeBankMaster(master = null) {
   };
 }
 
+function normalizeLocationMaster(master = null) {
+  const hasPersistedCities = Array.isArray(master?.data?.cities);
+  const data = master?.data ?? {};
+  return {
+    id: master?.id ?? null,
+    master_key: master?.master_key ?? MASTER_LOCATIONS_KEY,
+    data: {
+      schema: data.schema ?? "admin.master.location.v1",
+      type: data.type ?? "location",
+      cities: normalizeCities(hasPersistedCities ? data.cities : DEFAULT_LOCATION_SEED),
+    },
+    version: master?.version ?? null,
+    created_at: master?.created_at ?? null,
+    updated_at: master?.updated_at ?? null,
+    seeded: !hasPersistedCities,
+  };
+}
+
 function normalizeBrands(brands = []) {
   return brands.map((brand, index) => ({
     id: String(brand.id || `brand_${Date.now()}_${index}`),
@@ -334,6 +420,29 @@ function normalizeBanks(banks = []) {
       return null;
     }
     seen.add(key);
+    return normalized;
+  }).filter(Boolean);
+}
+
+function normalizeCities(cities = []) {
+  const seen = new Set();
+  return cities.map((city, index) => {
+    const name = String(city.name ?? city.city_name ?? "").trim();
+    const slug = slugify(city.slug || name || `city-${index + 1}`);
+    const provinceName = String(city.province_name ?? "").trim();
+    const normalized = {
+      id: String(city.id || `city_${Date.now()}_${index}`),
+      name,
+      slug,
+      status: ["active", "inactive"].includes(city.status) ? city.status : "active",
+      province_name: provinceName,
+      province_slug: slugify(city.province_slug || provinceName),
+      updated_at: city.updated_at ?? null,
+    };
+    if (!normalized.name || seen.has(normalized.slug)) {
+      return null;
+    }
+    seen.add(normalized.slug);
     return normalized;
   }).filter(Boolean);
 }
@@ -412,6 +521,17 @@ function createEmptyBank() {
   };
 }
 
+function createEmptyCity() {
+  return {
+    id: `city_${Date.now()}`,
+    name: "",
+    slug: "",
+    status: "active",
+    province_name: "",
+    province_slug: "",
+  };
+}
+
 function slugify(value) {
   return String(value ?? "")
     .trim()
@@ -465,6 +585,18 @@ function bankSeed(id, bankName, slug, bankCode) {
     icon_asset: {},
     status: "active",
     updated_at: "2026-05-05T00:00:00.000Z",
+  };
+}
+
+function citySeed(id, name, slug, provinceName = "", provinceSlug = "") {
+  return {
+    id,
+    name,
+    slug,
+    status: "active",
+    province_name: provinceName,
+    province_slug: provinceSlug,
+    updated_at: "2026-06-18T00:00:00.000Z",
   };
 }
 
@@ -634,6 +766,11 @@ function ensureAdminMasterSidebarChildren(items = []) {
     normalized[normalized.length - 1].updated_at = now;
   }
 
+  if (!byKey.has("admin.master_location")) {
+    normalized.push(sidebarSeed("admin.master_location", "admin", "Master Lokasi", "#/admin/master-location", "location", 50, "admin.master"));
+    normalized[normalized.length - 1].updated_at = now;
+  }
+
   return normalized.map((item) => {
     if (item.key === "admin.sliders") {
       return {
@@ -686,6 +823,17 @@ function ensureAdminMasterSidebarChildren(items = []) {
         label: item.label || "Master Inspection",
         route: "#/admin/master-inspection",
         icon: item.icon || "clipboard",
+        parent_key: "admin.master",
+        role: "admin",
+        is_parent: false,
+      };
+    }
+    if (item.key === "admin.master_location") {
+      return {
+        ...item,
+        label: item.label || "Master Lokasi",
+        route: "#/admin/master-location",
+        icon: item.icon || "location",
         parent_key: "admin.master",
         role: "admin",
         is_parent: false,

@@ -42,6 +42,7 @@ const ADMIN_LINKS = [
         { href: "#/admin/master-sidebar", label: "Master Sidebar", icon: "sitemap" },
         { href: "#/admin/master-bank", label: "Master Bank", icon: "bank" },
         { href: "#/admin/master-inspection", label: "Master Inspection", icon: "clipboard" },
+        { href: "#/admin/master-location", label: "Master Lokasi", icon: "location" },
       ],
     },
   { href: "#/admin/web-config", label: "Konfigurasi WEB", icon: "settings" },

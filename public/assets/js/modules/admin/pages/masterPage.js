@@ -10,12 +10,14 @@ import { AdminMasterBrandList } from "../components/adminMasterBrandList.js";
 import { AdminMasterBrandForm } from "../components/adminMasterBrandForm.js";
 import { AdminMasterBankList } from "../components/adminMasterBankList.js";
 import { AdminMasterBankForm } from "../components/adminMasterBankForm.js";
+import { AdminMasterLocationList } from "../components/adminMasterLocationList.js";
+import { AdminMasterLocationForm } from "../components/adminMasterLocationForm.js";
 import { AdminMasterSidebarList } from "../components/adminMasterSidebarList.js";
 import { AdminMasterSidebarForm } from "../components/adminMasterSidebarForm.js";
 import { adminMasterService } from "../services/adminMasterService.js";
 import { masterDataResource } from "../../../resources/masterDataResource.js";
 
-const MASTER_PAGES = ["brand", "sidebar", "bank"];
+const MASTER_PAGES = ["brand", "sidebar", "bank", "location"];
 
 export function AdminMasterBrandPage() {
   return createAdminMasterPage("brand");
@@ -27,6 +29,10 @@ export function AdminMasterSidebarPage() {
 
 export function AdminMasterBankPage() {
   return createAdminMasterPage("bank");
+}
+
+export function AdminMasterLocationPage() {
+  return createAdminMasterPage("location");
 }
 
 export function AdminMasterPage() {
@@ -301,6 +307,61 @@ function createAdminMasterPage(pageType = "brand") {
         status: bank.status === "active" ? "inactive" : "active",
       }, banks);
     },
+    openCreateCity(cities) {
+      openLocationModal({ mode: "create", city: null, cities, actions, state });
+    },
+    openEditCity(city, cities) {
+      openLocationModal({ mode: "edit", city, cities, actions, state });
+    },
+    async saveCity(nextCity, cities) {
+      state.saving = true;
+      state.error = "";
+      rerender();
+      try {
+        const nextCities = upsertCity(cities, nextCity);
+        const master = await adminMasterService.saveLocationMaster(nextCities);
+        patchLocationMaster(master);
+        closeModal({ notify: false });
+        showToast("Master lokasi berhasil disimpan.", { type: "success" });
+      } catch (error) {
+        state.error = error.message || "Gagal menyimpan master lokasi.";
+        showToast(state.error, { type: "error" });
+      } finally {
+        state.saving = false;
+        rerender();
+      }
+    },
+    async deleteCity(city, cities) {
+      const confirmed = await confirmDialog({
+        title: "Hapus kota",
+        message: "Yakin mau hapus kota ini?",
+        confirmLabel: "Hapus",
+        key: `admstloc-delete-city-${city.id}`,
+      });
+      if (!confirmed) {
+        return;
+      }
+      state.saving = true;
+      rerender();
+      try {
+        const master = await adminMasterService.saveLocationMaster(cities.filter((item) => item.id !== city.id));
+        patchLocationMaster(master);
+        closeModal({ notify: false });
+        showToast("Master lokasi berhasil dihapus.", { type: "success" });
+      } catch (error) {
+        state.error = error.message || "Gagal menghapus master lokasi.";
+        showToast(state.error, { type: "error" });
+      } finally {
+        state.saving = false;
+        rerender();
+      }
+    },
+    async toggleCityStatus(city, cities) {
+      await actions.saveCity({
+        ...city,
+        status: city.status === "active" ? "inactive" : "active",
+      }, cities);
+    },
   };
 
   return createPageLifecycle({
@@ -355,6 +416,7 @@ function render(root, context, state, actions, activePage = "brand") {
   const sidebarItems = sidebarMaster.data.items ?? [];
   const isSidebar = activePage === "sidebar";
   const isBank = activePage === "bank";
+  const isLocation = activePage === "location";
 
   const snapshotBankMaster = appStore.get("snapshot.admin.masterBank.data", null);
   const workingBankMaster = appStore.get("working.adminMaster.bank.data", null);
@@ -363,26 +425,35 @@ function render(root, context, state, actions, activePage = "brand") {
   const hasBankSource = Boolean(snapshotBankMaster || workingBankMaster);
   const banks = bankMaster.data.banks ?? [];
 
+  const snapshotLocationMaster = appStore.get("snapshot.admin.masterLocation.data", null);
+  const workingLocationMaster = appStore.get("working.adminMaster.location.data", null);
+  const locationMaster = adminMasterService.normalizeLocationMaster(workingLocationMaster ?? snapshotLocationMaster);
+  const locationHydratedAt = appStore.get("working.adminMaster.location.hydratedAt", 0) ?? 0;
+  const hasLocationSource = Boolean(snapshotLocationMaster || workingLocationMaster);
+  const cities = locationMaster.data.cities ?? [];
+
   const layout = document.createElement("section");
-  layout.id = isBank ? "admstbk_page_section" : isSidebar ? "admst_sidebar_page_section" : "admst_brand_page_section";
+  layout.id = isLocation ? "admstloc_page_section" : isBank ? "admstbk_page_section" : isSidebar ? "admst_sidebar_page_section" : "admst_brand_page_section";
   layout.className = "grid min-w-0 gap-6";
-  layout.dataset.ds = isBank ? "admin.master.bank.page" : isSidebar ? "admin.master.sidebar.page" : "admin.master.brand.page";
+  layout.dataset.ds = isLocation ? "admin.master.location.page" : isBank ? "admin.master.bank.page" : isSidebar ? "admin.master.sidebar.page" : "admin.master.brand.page";
 
   const createButton = Button({
-    label: isBank ? "Tambah Bank" : isSidebar ? "Tambah Menu" : "Tambah Brand",
+    label: isLocation ? "Tambah Kota" : isBank ? "Tambah Bank" : isSidebar ? "Tambah Menu" : "Tambah Brand",
     variant: "primary",
-    onClick: () => isBank
+    onClick: () => isLocation
+      ? actions.openCreateCity(cities)
+      : isBank
       ? actions.openCreateBank(banks)
       : isSidebar
       ? actions.openCreateSidebar(sidebarItems)
       : actions.openCreateBrand(brands),
     designHook: "shared.button.primary",
   });
-  createButton.id = isBank ? "admstbk_create_bank_button" : isSidebar ? "admst_create_sidebar_button" : "admst_create_brand_button";
+  createButton.id = isLocation ? "admstloc_create_city_button" : isBank ? "admstbk_create_bank_button" : isSidebar ? "admst_create_sidebar_button" : "admst_create_brand_button";
   createButton.prepend(createIcon("sparkles", { className: "h-4 w-4" }));
 
   layout.append(
-    masterHero({ action: createButton, pageType: activePage, brands, sidebarItems, banks, master: isBank ? bankMaster : isSidebar ? sidebarMaster : brandMaster }),
+    masterHero({ action: createButton, pageType: activePage, brands, sidebarItems, banks, cities, master: isLocation ? locationMaster : isBank ? bankMaster : isSidebar ? sidebarMaster : brandMaster }),
   );
 
   if (state.error) {
@@ -393,7 +464,14 @@ function render(root, context, state, actions, activePage = "brand") {
     layout.append(error);
   }
 
-  if (isBank) {
+  if (isLocation) {
+    layout.append(...renderLocationPage({
+      state,
+      actions,
+      cities,
+      loading: !locationHydratedAt && !hasLocationSource,
+    }));
+  } else if (isBank) {
     layout.append(...renderBankPage({
       state,
       actions,
@@ -438,6 +516,28 @@ function renderBankPage({ state, actions, banks, loading }) {
       onPageChange: actions.changePage,
       onPerPageChange: actions.changePerPage,
     }), "admin.master.bank.table"),
+  ];
+}
+
+function renderLocationPage({ state, actions, cities, loading }) {
+  const filters = { ...state.query };
+  const filteredCities = adminMasterService.filterCities(cities, filters);
+  const pagination = paginate(filteredCities, filters);
+
+  return [
+    masterLocationFilterBar({ filters, cities, onSubmit: actions.applyFilters }),
+    applyDesignHook(AdminMasterLocationList({
+      loading,
+      cities: pagination.items,
+      page: pagination.page,
+      perPage: pagination.pageSize,
+      totalItems: filteredCities.length,
+      onEdit: (city) => actions.openEditCity(city, cities),
+      onToggleStatus: (city) => actions.toggleCityStatus(city, cities),
+      onDelete: (city) => actions.deleteCity(city, cities),
+      onPageChange: actions.changePage,
+      onPerPageChange: actions.changePerPage,
+    }), "admin.master.location.table"),
   ];
 }
 
@@ -491,11 +591,12 @@ function renderSidebarTab({ state, actions, items, loading }) {
   ];
 }
 
-function masterHero({ action, pageType, brands = [], sidebarItems = [], banks = [], master = {} }) {
+function masterHero({ action, pageType, brands = [], sidebarItems = [], banks = [], cities = [], master = {} }) {
   const isSidebar = pageType === "sidebar";
   const isBank = pageType === "bank";
+  const isLocation = pageType === "location";
   const section = document.createElement("section");
-  section.id = isBank ? "admstbk_hero_section" : "admst_hero_section";
+  section.id = isLocation ? "admstloc_hero_section" : isBank ? "admstbk_hero_section" : "admst_hero_section";
   section.className = "relative overflow-hidden rounded-[2rem] border border-orange-100/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.95),rgba(255,247,237,0.86),rgba(239,246,255,0.72))] p-5 shadow-[0_24px_80px_rgba(15,23,42,0.10)] backdrop-blur-xl transition-shadow duration-150 sm:p-6 lg:p-7";
   section.dataset.ds = "admin.master.hero";
 
@@ -505,12 +606,14 @@ function masterHero({ action, pageType, brands = [], sidebarItems = [], banks = 
   copy.className = "grid min-w-0 gap-3";
   const icon = document.createElement("div");
   icon.className = "grid h-12 w-12 place-items-center rounded-2xl bg-[linear-gradient(135deg,#f97316,#14b8a6)] text-white shadow-[0_16px_40px_rgba(249,115,22,0.22)]";
-  icon.append(createIcon(isBank ? "bank" : isSidebar ? "sort" : "car", { className: "h-5 w-5" }));
+  icon.append(createIcon(isLocation ? "location" : isBank ? "bank" : isSidebar ? "sort" : "car", { className: "h-5 w-5" }));
   copy.append(
     icon,
-    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-orange-700", isBank ? "Admin master bank" : isSidebar ? "Admin master sidebar" : "Admin master brand"),
-    textNode("h1", "text-3xl font-black leading-tight tracking-normal text-gray-950 sm:text-4xl", isBank ? "Master Bank" : isSidebar ? "Master Sidebar" : "Master Brand"),
-    textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", isBank
+    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-orange-700", isLocation ? "Admin master lokasi" : isBank ? "Admin master bank" : isSidebar ? "Admin master sidebar" : "Admin master brand"),
+    textNode("h1", "text-3xl font-black leading-tight tracking-normal text-gray-950 sm:text-4xl", isLocation ? "Master Lokasi" : isBank ? "Master Bank" : isSidebar ? "Master Sidebar" : "Master Brand"),
+    textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", isLocation
+      ? "Kelola referensi nama kota untuk lokasi listing mobil, dengan field provinsi opsional untuk pengembangan berikutnya."
+      : isBank
       ? "Kelola referensi bank, kode bank, dan icon fixed untuk tampilan pembayaran."
       : isSidebar
       ? "Kelola struktur sidebar role admin, seller, dan marketing dari satu master JSON."
@@ -518,9 +621,16 @@ function masterHero({ action, pageType, brands = [], sidebarItems = [], banks = 
   );
 
   const stats = document.createElement("section");
-  stats.id = isBank ? "admstbk_hero_stats_section" : "admst_hero_stats_section";
+  stats.id = isLocation ? "admstloc_hero_stats_section" : isBank ? "admstbk_hero_stats_section" : "admst_hero_stats_section";
   stats.className = "grid gap-2 sm:grid-cols-3 lg:min-w-[380px]";
-  const statItems = isBank
+  const provinceCount = new Set(cities.map((city) => city.province_slug || city.province_name).filter(Boolean)).size;
+  const statItems = isLocation
+    ? [
+      ["Kota", cities.length],
+      ["Aktif", cities.filter((city) => city.status === "active").length],
+      ["Provinsi", provinceCount],
+    ]
+    : isBank
     ? [
       ["Bank", banks.length],
       ["Aktif", banks.filter((bank) => bank.status === "active").length],
@@ -539,7 +649,7 @@ function masterHero({ action, pageType, brands = [], sidebarItems = [], banks = 
     ];
   statItems.forEach(([label, value]) => {
     const card = document.createElement("section");
-    card.id = `${isBank ? "admstbk" : "admst"}_hero_stat_${String(label).toLowerCase()}_section`;
+    card.id = `${isLocation ? "admstloc" : isBank ? "admstbk" : "admst"}_hero_stat_${String(label).toLowerCase()}_section`;
     card.className = "rounded-[1.25rem] border border-white/80 bg-white/78 p-3 shadow-sm";
     card.append(
       textNode("p", "text-[11px] font-black uppercase tracking-[0.14em] text-gray-500", label),
@@ -549,7 +659,7 @@ function masterHero({ action, pageType, brands = [], sidebarItems = [], banks = 
   });
 
   const side = document.createElement("section");
-  side.id = isBank ? "admstbk_hero_actions_section" : "admst_hero_actions_section";
+  side.id = isLocation ? "admstloc_hero_actions_section" : isBank ? "admstbk_hero_actions_section" : "admst_hero_actions_section";
   side.className = "grid gap-3";
   side.append(stats, action, textNode("p", "text-xs font-semibold text-gray-500", `master_key: ${master.master_key ?? "-"}`));
   grid.append(copy, side);
@@ -583,6 +693,37 @@ function masterBankFilterBar({ filters, banks, onSubmit }) {
     `${banks.length} bank`,
     `${banks.filter((bank) => bank.status === "active").length} aktif`,
     `${banks.filter((bank) => bank.icon_path).length} icon`,
+  ]));
+  return section;
+}
+
+function masterLocationFilterBar({ filters, cities, onSubmit }) {
+  const section = baseFilterSection("admstloc_filter_section", "admin.master.location.filters");
+  const form = document.createElement("form");
+  form.id = "admstloc_filter_form_section";
+  form.className = "grid gap-3 lg:grid-cols-[minmax(0,1fr)_220px_auto]";
+
+  const keyword = inputField("admstloc_keyword_input", filters.keyword ?? "", "Cari kota, slug, atau provinsi");
+  const status = selectField("admstloc_status_input", filters.status ?? "", [
+    ["", "Semua status"],
+    ["active", "Aktif"],
+    ["inactive", "Nonaktif"],
+  ]);
+  const actions = filterActions({
+    idPrefix: "admstloc",
+    onReset: () => onSubmit?.({ keyword: "", status: "" }),
+  });
+  form.append(labelWrap("Keyword", keyword), labelWrap("Status", status), actions.wrap);
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    onSubmit?.({ keyword: keyword.value.trim(), status: status.value });
+  });
+
+  const provinceCount = new Set(cities.map((city) => city.province_slug || city.province_name).filter(Boolean)).size;
+  section.append(form, filterChips("admstloc_filter_chips_section", [
+    `${cities.length} kota`,
+    `${cities.filter((city) => city.status === "active").length} aktif`,
+    `${provinceCount} provinsi`,
   ]));
   return section;
 }
@@ -739,6 +880,27 @@ function openBankModal({ mode, bank, banks, actions, state }) {
   });
 }
 
+function openLocationModal({ mode, city, cities, actions, state }) {
+  openModal(applyDesignHook(AdminMasterLocationForm({
+    city,
+    mode,
+    saving: state.saving,
+    onSubmit: (nextCity) => actions.saveCity(nextCity, cities),
+    onDelete: (targetCity) => actions.deleteCity(targetCity, cities),
+    onCancel: () => closeModal(),
+  }), "admin.master.location.form"), {
+    key: `admstloc-city-${mode}-${city?.id ?? "new"}`,
+    title: mode === "edit" ? "Edit Kota" : "Tambah Kota",
+    description: "Data kota disimpan dalam payload JSON master locations.cities.",
+    size: "xl",
+    footer: null,
+    panelId: "admstloc_city_modal_section",
+    headerId: "admstloc_city_modal_header_section",
+    bodyId: "admstloc_city_modal_body_section",
+    closeButtonId: "admstloc_city_modal_close_button",
+  });
+}
+
 function upsertBrand(brands, nextBrand) {
   const exists = brands.some((brand) => brand.id === nextBrand.id);
   const normalized = {
@@ -793,6 +955,20 @@ function upsertBank(banks, nextBank) {
   return exists
     ? banks.map((bank) => bank.id === nextBank.id ? normalized : bank)
     : [...banks, normalized];
+}
+
+function upsertCity(cities, nextCity) {
+  const exists = cities.some((city) => city.id === nextCity.id);
+  const normalized = {
+    ...nextCity,
+    slug: slugify(nextCity.slug || nextCity.name),
+    province_slug: slugify(nextCity.province_slug || nextCity.province_name || ""),
+    updated_at: new Date().toISOString(),
+  };
+
+  return exists
+    ? cities.map((city) => city.id === nextCity.id ? normalized : city)
+    : [...cities, normalized];
 }
 
 function removeSidebarItem(items, targetItem) {
@@ -853,6 +1029,17 @@ function patchBankMaster(master) {
   }, "admin-master:bank-snapshot-synced");
 }
 
+function patchLocationMaster(master) {
+  appStore.patchState("working.adminMaster.location", {
+    data: master,
+    hydratedAt: Date.now(),
+  }, "admin-master:location-saved");
+  appStore.patchState("snapshot.admin.masterLocation", {
+    data: master,
+    hydratedAt: Date.now(),
+  }, "admin-master:location-snapshot-synced");
+}
+
 function buildMasterPath(pageType = "brand", { keyword = "", status = "", role = "", page = "", pageSize = "" } = {}) {
   const params = new URLSearchParams();
   if (keyword) params.set("keyword", keyword);
@@ -861,7 +1048,7 @@ function buildMasterPath(pageType = "brand", { keyword = "", status = "", role =
   if (page && Number(page) > 1) params.set("page", String(page));
   if (pageSize && Number(pageSize) > 0) params.set("page_size", String(pageSize));
   const query = params.toString();
-  const basePath = pageType === "bank" ? "/admin/master-bank" : pageType === "sidebar" ? "/admin/master-sidebar" : "/admin/master-brand";
+  const basePath = pageType === "location" ? "/admin/master-location" : pageType === "bank" ? "/admin/master-bank" : pageType === "sidebar" ? "/admin/master-sidebar" : "/admin/master-brand";
   return query ? `${basePath}?${query}` : basePath;
 }
 

@@ -16,7 +16,7 @@ export const adminManifest = {
     notFound: () => AdminDashboardPage({ notFound: true }),
   },
   preload: {
-    snapshot: ["admin.pendingUsers", "admin.users", "admin.transactions", "admin.cars", "admin.settlements", "admin.affiliateLedgers", "admin.sliders", "admin.masterBrand", "admin.masterSidebar", "admin.masterBank", "admin.masterInspection"],
+    snapshot: ["admin.pendingUsers", "admin.users", "admin.transactions", "admin.cars", "admin.settlements", "admin.affiliateLedgers", "admin.sliders", "admin.masterBrand", "admin.masterSidebar", "admin.masterBank", "admin.masterLocation", "admin.masterInspection"],
     working: ["superAdminDashboard", "adminDashboard", "adminApprovals", "adminUsers", "adminTransactions", "adminSettlements", "adminAffiliateCommissions", "adminSliders", "adminMaster", "adminMasterInspection", "adminDesignStudio", "adminMigrations", "adminReleaseVersions"],
   },
 };

@@ -33,7 +33,7 @@ export const publicManifest = {
     notFound: () => PublicCatalogPage({ notFound: true }),
   },
   preload: {
-    snapshot: ["public.catalog", "public.slidersPublicHome", "public.slidersLandingHero"],
+    snapshot: ["public.catalog", "public.slidersPublicHome", "public.slidersLandingHero", "public.masterLocation"],
     working: ["publicCatalog"],
   },
 };

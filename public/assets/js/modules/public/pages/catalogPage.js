@@ -17,6 +17,7 @@ import { PublicAffiliateContextBanner } from "../components/publicAffiliateConte
 import { PublicCarCard } from "../components/publicCarCard.js";
 import { PublicFilterBottomSheet } from "../components/publicFilterBottomSheet.js";
 import { PublicSearchFilterBar } from "../components/publicSearchFilterBar.js";
+import { adminMasterService } from "../../admin/services/adminMasterService.js";
 import { tw } from "../../../theme/tailwindClasses.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 import { applyDesignHook } from "../../../theme/designStudioHooks.js";
@@ -87,7 +88,7 @@ function render(root, context, flags) {
   const filters = catalogState.filters ?? {};
   const sourceCars = marketableCars(working?.cars ?? snapshot?.cars ?? []);
   const allCars = applyQuickFilter(applyLocalFilters(sourceCars, filters), catalogState.quickFilter);
-  const filterOptions = buildFilterOptions(sourceCars);
+  const filterOptions = buildFilterOptions(sourceCars, resolveLocationMaster());
   const canLoadMore = canLoadMoreCatalog(meta, allCars.length, catalogState.page, catalogState.limit);
   const contextReady = !isAffiliateRoute || (affiliate?.slug ?? "") === affiliateSlug;
   const useBackgroundVideo = isLandingRoute(context);
@@ -566,17 +567,32 @@ function activeFilterCount(filters) {
   }, 0);
 }
 
-function buildFilterOptions(cars) {
+function buildFilterOptions(cars, locationMaster = null) {
   cars = marketableCars(cars);
   return {
     brands: unique(cars.map((car) => car.brand_name)),
     transmissions: unique(cars.map((car) => car.transmission)),
-    locations: unique(cars.map((car) => car.location_name)),
+    locations: masterLocationOptions(locationMaster),
   };
 }
 
 function unique(values) {
   return [...new Set(values.filter(Boolean))].sort();
+}
+
+function resolveLocationMaster() {
+  return adminMasterService.normalizeLocationMaster(
+    appStore.get("working.publicCatalog.masterLocation.data", null)
+      ?? appStore.get("snapshot.public.masterLocation.data", null)
+  );
+}
+
+function masterLocationOptions(master) {
+  return (master?.data?.cities ?? [])
+    .filter((city) => city.status === "active")
+    .map((city) => city.name)
+    .filter(Boolean)
+    .sort((a, b) => a.localeCompare(b));
 }
 
 function canLoadMoreCatalog(meta, shownCount, page, limit) {

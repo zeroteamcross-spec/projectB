@@ -5,6 +5,7 @@ import { TransactionEntryPage } from "./pages/transactionEntryPage.js";
 import { publicCatalogService } from "./services/publicCatalogService.js";
 import { publicCarDetailPreloadService } from "./services/publicCarDetailPreloadService.js";
 import { slidersResource } from "../../resources/slidersResource.js";
+import { adminMasterService } from "../admin/services/adminMasterService.js";
 
 export const publicReservedRoutePrefixes = Object.freeze([
   "af",
@@ -26,6 +27,10 @@ export const publicRoutes = [
         {
           key: "catalog",
           loader: ({ params, signal }) => publicCatalogService.list({ page: 1, limit: 12, affiliateSlug: params.slug }, { signal }),
+        },
+        {
+          key: "masterLocation",
+          loader: ({ signal }) => adminMasterService.getLocationMaster({ signal }).catch(() => adminMasterService.normalizeLocationMaster(null)),
         },
       ],
     },
@@ -73,6 +78,10 @@ export const publicRoutes = [
         {
           key: "catalog",
           loader: ({ params, signal }) => publicCatalogService.list({ page: 1, limit: 12, affiliateSlug: params.slug }, { signal }),
+        },
+        {
+          key: "masterLocation",
+          loader: ({ signal }) => adminMasterService.getLocationMaster({ signal }).catch(() => adminMasterService.normalizeLocationMaster(null)),
         },
       ],
     },
@@ -122,6 +131,10 @@ export const publicRoutes = [
           loader: ({ signal }) => publicCatalogService.list({ page: 1, limit: 12 }, { signal }),
         },
         {
+          key: "masterLocation",
+          loader: ({ signal }) => adminMasterService.getLocationMaster({ signal }).catch(() => adminMasterService.normalizeLocationMaster(null)),
+        },
+        {
           key: "sliders",
           loader: ({ signal }) => Promise.all([
             slidersResource.publicList({ position: "public_home", limit: 5 }, { signal }),
@@ -145,6 +158,10 @@ export const publicRoutes = [
         {
           key: "catalog",
           loader: ({ signal }) => publicCatalogService.list({ page: 1, limit: 12 }, { signal }),
+        },
+        {
+          key: "masterLocation",
+          loader: ({ signal }) => adminMasterService.getLocationMaster({ signal }).catch(() => adminMasterService.normalizeLocationMaster(null)),
         },
         {
           key: "sliders",

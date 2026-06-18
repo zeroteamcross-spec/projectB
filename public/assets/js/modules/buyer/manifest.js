@@ -14,7 +14,7 @@ export const buyerManifest = {
     notFound: () => BuyerDashboardPage({ notFound: true }),
   },
   preload: {
-    snapshot: ["buyer.profile", "buyer.catalog", "buyer.transactions", "buyer.inspectionSummary", "buyer.slidersLandingPage"],
+    snapshot: ["buyer.profile", "buyer.catalog", "buyer.transactions", "buyer.inspectionSummary", "buyer.slidersLandingPage", "buyer.masterLocation"],
     working: ["buyerDashboard", "buyerAccount", "buyerCars", "buyerTransactions"],
   },
 };
