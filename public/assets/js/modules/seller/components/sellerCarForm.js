@@ -56,6 +56,13 @@ const INSPECTION_STATUS_OPTIONS = [
   { value: "completed", label: "Inspeksi selesai" },
 ];
 
+function setElementVisibility(element, visible) {
+  if (!element) return;
+  element.hidden = !visible;
+  element.style.display = visible ? "" : "none";
+  element.setAttribute("aria-hidden", visible ? "false" : "true");
+}
+
 export function SellerCarForm({
   car = null,
   draft = null,
@@ -257,7 +264,7 @@ function createStepPanel(step, currentStep) {
   section.id = `slrc_car_form_step_${step}_section`;
   section.dataset.carStepPanel = String(step);
   section.className = "grid min-w-0 gap-4 transition duration-150";
-  section.hidden = step !== currentStep;
+  setElementVisibility(section, step === currentStep);
   return section;
 }
 
@@ -277,19 +284,19 @@ function createNavigation({ currentStep, saving, onCancel, onPrevious, onNext })
   const back = Button({ label: "Kembali", variant: "secondary", disabled: saving || currentStep === 1, onClick: onPrevious });
   back.id = "slrc_car_form_back_button";
   back.type = "button";
-  back.hidden = currentStep === 1;
+  setElementVisibility(back, currentStep !== 1);
   back.prepend(createIcon("arrowLeft", { className: "h-4 w-4" }));
 
   const next = Button({ label: "Lanjut", disabled: saving, onClick: onNext });
   next.id = "slrc_car_form_next_button";
   next.type = "button";
-  next.hidden = currentStep === TOTAL_STEPS;
+  setElementVisibility(next, currentStep !== TOTAL_STEPS);
   next.append(createIcon("arrowRight", { className: "h-4 w-4" }));
 
   const submit = Button({ label: saving ? "Menyimpan..." : "Simpan mobil", disabled: saving });
   submit.id = "slrc_car_form_submit_button";
   submit.type = "submit";
-  submit.hidden = currentStep !== TOTAL_STEPS;
+  setElementVisibility(submit, currentStep === TOTAL_STEPS);
   submit.prepend(createIcon("circleCheck", { className: "h-4 w-4" }));
 
   actions.append(back, next, submit);
