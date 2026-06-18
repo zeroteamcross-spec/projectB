@@ -18,9 +18,23 @@ export function createRoleGuard({ auth } = {}) {
       return allow(route);
     }
 
-    if (location.path === "/google-login") {
-      const currentRole = auth?.role?.() ?? PUBLIC_ROLE;
+    const isAuthenticated = auth?.isAuthenticated?.() ?? false;
+    const user = auth?.user?.() ?? {};
+    const currentRole = auth?.role?.() ?? PUBLIC_ROLE;
 
+    if (isAuthenticated && !user.is_approved && currentRole === "seller") {
+      if (location.path !== "/google-login/complete") {
+        return {
+          type: "redirect",
+          path: "/google-login/complete?status=pending_approval&role=seller",
+          meta: {
+            reason: "unapproved-seller-redirect",
+          },
+        };
+      }
+    }
+
+    if (location.path === "/google-login") {
       if (currentRole === SUPER_ADMIN_ROLE) {
         return allow(route);
       }

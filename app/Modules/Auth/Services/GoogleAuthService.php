@@ -175,17 +175,19 @@ class GoogleAuthService
         $user = $this->repository->findUserById((int) $user['id']);
         $canAuthenticate = $user && $this->canAuthenticate($user);
 
+        $isApproved = (int) ($user['is_approved'] ?? 0) === 1;
+
         return [
             'user' => $canAuthenticate ? $this->serializeUser($user) : null,
             'remember_token' => $canAuthenticate ? $this->issueRememberToken((int) $user['id']) : null,
             'profile_completion_required' => false,
             'login_available' => $canAuthenticate,
             'next' => [
-                'status' => $canAuthenticate ? 'ready' : 'pending_approval',
-                'target' => $canAuthenticate ? $this->homeForRole((string) $user['role']) : '/login/seller',
-                'message' => $canAuthenticate
+                'status' => $isApproved ? 'ready' : 'pending_approval',
+                'target' => $isApproved ? $this->homeForRole((string) $user['role']) : '/google-login/complete?status=pending_approval&role=' . $this->slugForRole((string) $user['role']),
+                'message' => $isApproved
                     ? 'Profil seller Google lengkap.'
-                    : 'Profil seller tersimpan. Akun seller menunggu approval admin sebelum bisa login.',
+                    : 'Profil seller lengkap, sedang menunggu approval admin.',
             ],
         ];
     }
@@ -625,7 +627,7 @@ class GoogleAuthService
 
     private function canAuthenticate(array $user): bool
     {
-        return ($user['account_status'] ?? null) === 'active' && (int) ($user['is_approved'] ?? 0) === 1;
+        return ($user['account_status'] ?? null) === 'active';
     }
 
     private function serializeUser(array $user): array

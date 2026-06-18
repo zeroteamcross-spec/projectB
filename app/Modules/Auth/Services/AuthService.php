@@ -236,7 +236,7 @@ class AuthService
 
     private function canAuthenticate(array $user): bool
     {
-        return ($user['account_status'] ?? null) === 'active' && (int) ($user['is_approved'] ?? 0) === 1;
+        return ($user['account_status'] ?? null) === 'active';
     }
 
     public function serializeUser(?array $user): array
