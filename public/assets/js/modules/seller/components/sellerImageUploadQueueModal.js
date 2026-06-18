@@ -10,6 +10,7 @@ export function SellerImageUploadQueueModal({
   onEdit = null,
   onRemove = null,
   onToggleCover = null,
+  showActions = true,
 } = {}) {
   const section = document.createElement("section");
   section.id = "slri_queue_modal_section";
@@ -76,18 +77,32 @@ export function SellerImageUploadQueueModal({
     list.append(empty);
   }
 
+  section.append(titleRow, summaryGrid, total, list);
+  if (showActions) {
+    section.append(SellerImageUploadQueueFooter({
+      queue,
+      uploading,
+      onStart,
+      onRetryFailed,
+      onClose,
+    }));
+  }
+  return section;
+}
+
+export function SellerImageUploadQueueFooter({
+  queue = [],
+  uploading = false,
+  onStart = null,
+  onRetryFailed = null,
+  onClose = null,
+} = {}) {
+  const summary = queueSummary(queue);
   const actions = document.createElement("section");
   actions.id = "slri_queue_actions_section";
-  actions.className = "flex flex-wrap justify-end gap-2 border-t border-[var(--pb-border)] pt-4";
+  actions.className = "flex w-full flex-col-reverse gap-2 sm:flex-row sm:flex-wrap sm:justify-end";
   const hasQueued = queue.some((item) => canUpload(item));
   const hasFailed = queue.some((item) => item.status === "failed");
-  const start = Button({
-    label: uploading ? "Mengupload..." : "Mulai Upload",
-    disabled: uploading || !hasQueued,
-    onClick: () => onStart?.(),
-  });
-  start.id = "slri_queue_start_upload_button";
-  start.prepend(createIcon(uploading ? "clock" : "upload", { className: "h-4 w-4" }));
   const retry = Button({
     label: "Upload Ulang yang gagal",
     variant: "secondary",
@@ -96,6 +111,13 @@ export function SellerImageUploadQueueModal({
   });
   retry.id = "slri_queue_retry_failed_button";
   retry.prepend(createIcon("history", { className: "h-4 w-4" }));
+  const start = Button({
+    label: uploading ? "Mengupload..." : "Mulai Upload",
+    disabled: uploading || !hasQueued,
+    onClick: () => onStart?.(),
+  });
+  start.id = "slri_queue_start_upload_button";
+  start.prepend(createIcon(uploading ? "clock" : "upload", { className: "h-4 w-4" }));
   const done = Button({
     label: summary.inProgress ? "Tunggu proses selesai" : "Tutup",
     variant: "secondary",
@@ -109,9 +131,7 @@ export function SellerImageUploadQueueModal({
   done.id = "slri_queue_done_button";
   done.prepend(createIcon("circleCheck", { className: "h-4 w-4" }));
   actions.append(retry, start, done);
-
-  section.append(titleRow, summaryGrid, total, list, actions);
-  return section;
+  return actions;
 }
 
 function queueItem(item, { uploading, onEdit, onRemove, onToggleCover }) {

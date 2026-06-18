@@ -14,7 +14,7 @@ import { createIcon } from "../../../theme/iconRegistry.js";
 import { sellerState } from "../state/sellerState.js";
 import { SellerImageGalleryPreviewModal } from "../components/sellerImageGalleryPreviewModal.js";
 import { SellerImageUploadPanel } from "../components/sellerImageUploadPanel.js";
-import { SellerImageUploadQueueModal } from "../components/sellerImageUploadQueueModal.js";
+import { SellerImageUploadQueueFooter, SellerImageUploadQueueModal } from "../components/sellerImageUploadQueueModal.js";
 import { SellerImagesList } from "../components/sellerImagesList.js";
 
 const RUNTIME_KEY = "sellerCarImages";
@@ -355,10 +355,18 @@ function syncQueueModal({ carId, queueApi, runtime }) {
       item.isCover = isCover;
       queueApi.touchQueue();
     },
+    showActions: false,
   }), {
     key: QUEUE_MODAL_KEY,
     size: "xl",
-    footer: null,
+    footer: "custom",
+    footerNode: SellerImageUploadQueueFooter({
+      queue: queueApi.getQueue(),
+      uploading: runtime.uploading,
+      onStart: () => uploadQueueItems(carId, queueApi.getQueue(), queueApi.touchQueue),
+      onRetryFailed: () => uploadQueueItems(carId, queueApi.getQueue(), queueApi.touchQueue),
+      onClose: queueApi.closeQueueModal,
+    }),
     panelId: "slri_queue_modal_panel_section",
     bodyId: "slri_queue_modal_body_section",
     panelClassName: "max-h-[92vh]",
