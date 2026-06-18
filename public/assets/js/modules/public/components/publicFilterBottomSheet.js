@@ -27,6 +27,7 @@ export function PublicFilterBottomSheet({
   content.className = "grid min-w-0 gap-5";
   const draft = {
     brands: selectedBrands(filters),
+    locations: selectedLocations(filters),
   };
 
   content.append(
@@ -55,9 +56,16 @@ export function PublicFilterBottomSheet({
       label: item.label,
       value: item.value,
       icon: "location",
-      active: String(filters.location_name ?? "") === item.value,
-      onClick: (button, siblings) => syncSingleOptionButtons(button, siblings),
-    })), "location_name"),
+      active: item.value === "" ? draft.locations.length === 0 : draft.locations.includes(item.value),
+      onClick: (button, siblings) => {
+        if (item.value === "") {
+          draft.locations = [];
+        } else {
+          draft.locations = toggleValue(draft.locations, item.value);
+        }
+        syncMultiOptionButtons(siblings, draft.locations);
+      },
+    }))),
     numericFields(filters),
   );
 
@@ -85,6 +93,8 @@ export function PublicFilterBottomSheet({
         ...values,
         brand_name: "",
         brand_names: [...draft.brands],
+        location_name: "",
+        location_names: [...draft.locations],
       });
     },
     designHook: "shared.button.primary",
@@ -223,6 +233,14 @@ function selectedBrands(filters) {
   }
   const legacyBrand = String(filters?.brand_name ?? "");
   return legacyBrand ? [legacyBrand] : [];
+}
+
+function selectedLocations(filters) {
+  if (Array.isArray(filters?.location_names)) {
+    return [...new Set(filters.location_names.map(String).filter(Boolean))];
+  }
+  const legacyLocation = String(filters?.location_name ?? "");
+  return legacyLocation ? [legacyLocation] : [];
 }
 
 function toggleValue(values, value) {

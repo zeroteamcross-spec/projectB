@@ -51,6 +51,7 @@ export function BuyerDashboardPage({ notFound = false } = {}) {
     brands: [],
     transmission: "",
     location_name: "",
+    locations: [],
     favorites: new Set(),
     quickFilter: "newest",
   };
@@ -258,13 +259,14 @@ function buyerTopNavigation({ activePath, actions }) {
 
 function buyerSearchBar({ cars, uiState, actions }) {
   return PublicSearchFilterBar({
-    filters: { keyword: uiState.search, location_name: uiState.location_name },
+    filters: { keyword: uiState.search, location_name: uiState.location_name, location_names: selectedLocations(uiState) },
     quickFilter: uiState.quickFilter || "newest",
     activeFilterCount: activeBuyerFilterCount(uiState),
     options: { locations: resolveLocationOptions() },
     onSearch: (nextFilters) => {
       if (Object.prototype.hasOwnProperty.call(nextFilters, "location_name")) {
         uiState.location_name = nextFilters.location_name ?? "";
+        uiState.locations = nextFilters.location_name ? [nextFilters.location_name] : [];
       }
       actions.setSearch(nextFilters.keyword ?? uiState.search ?? "", cars);
     },
@@ -630,7 +632,7 @@ function openBuyerFilterModal({ cars, uiState, locationOptions = [], onApply }) 
     category: uiState.category,
     brands: selectedBrands(uiState),
     transmission: uiState.transmission,
-    location_name: uiState.location_name,
+    locations: selectedLocations(uiState),
   };
   const content = document.createElement("section");
   content.id = "byr_filter_modal_content";
@@ -675,10 +677,14 @@ function openBuyerFilterModal({ cars, uiState, locationOptions = [], onApply }) 
       label: item.label,
       value: item.value,
       icon: "location",
-      active: draft.location_name === item.value,
+      active: item.value === "" ? draft.locations.length === 0 : draft.locations.includes(item.value),
       onClick: (button, siblings) => {
-        draft.location_name = item.value;
-        syncOptionButtons(button, siblings);
+        if (item.value === "") {
+          draft.locations = [];
+        } else {
+          draft.locations = toggleValue(draft.locations, item.value);
+        }
+        syncMultiOptionButtons(siblings, draft.locations);
       },
     }))),
   );
@@ -695,6 +701,7 @@ function openBuyerFilterModal({ cars, uiState, locationOptions = [], onApply }) 
       uiState.brands = [];
       uiState.transmission = "";
       uiState.location_name = "";
+      uiState.locations = [];
       closeModal({ notify: false });
       onApply?.();
     },
@@ -709,7 +716,8 @@ function openBuyerFilterModal({ cars, uiState, locationOptions = [], onApply }) 
       uiState.brand = "";
       uiState.brands = [...draft.brands];
       uiState.transmission = draft.transmission;
-      uiState.location_name = draft.location_name;
+      uiState.location_name = "";
+      uiState.locations = [...draft.locations];
       closeModal({ notify: false });
       onApply?.();
     },
@@ -831,7 +839,7 @@ function filterCars(cars, uiState) {
   const category = String(uiState.category || "all");
   const brands = selectedBrands(uiState);
   const transmission = String(uiState.transmission || "");
-  const location = String(uiState.location_name || "");
+  const locations = selectedLocations(uiState).map((location) => location.toLowerCase());
 
   const filtered = cars.filter((car) => {
     const haystack = [
@@ -852,7 +860,7 @@ function filterCars(cars, uiState) {
     if (transmission && String(car.transmission ?? "") !== transmission) {
       return false;
     }
-    if (location && String(car.location_name ?? "").toLowerCase() !== location.toLowerCase()) {
+    if (locations.length > 0 && !locations.includes(String(car.location_name ?? "").toLowerCase())) {
       return false;
     }
     return matchesCategory(car, category);
@@ -897,9 +905,7 @@ function activeBuyerFilterCount(uiState) {
   if (String(uiState?.transmission ?? "")) {
     count += 1;
   }
-  if (String(uiState?.location_name ?? "")) {
-    count += 1;
-  }
+  count += selectedLocations(uiState).length;
   return count;
 }
 
@@ -909,6 +915,14 @@ function selectedBrands(uiState) {
   }
   const legacyBrand = String(uiState?.brand ?? "");
   return legacyBrand ? [legacyBrand] : [];
+}
+
+function selectedLocations(uiState) {
+  if (Array.isArray(uiState?.locations)) {
+    return [...new Set(uiState.locations.map(String).filter(Boolean))];
+  }
+  const legacyLocation = String(uiState?.location_name ?? "");
+  return legacyLocation ? [legacyLocation] : [];
 }
 
 function toggleValue(values, value) {

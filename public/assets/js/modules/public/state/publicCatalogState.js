@@ -35,6 +35,7 @@ export const publicCatalogState = {
       brand_names: [],
       transmission: "",
       location_name: "",
+      location_names: [],
       min_price_cash: "",
       max_price_cash: "",
     }, "public:filters-reset");
