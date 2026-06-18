@@ -76,6 +76,7 @@ export function SellerInspectionReportPanel({
 
   const actions = document.createElement("div");
   actions.className = "mt-4 grid gap-2 sm:flex sm:flex-wrap sm:justify-end";
+  actions.id = "inspeksi_publish_report";
   const saveDraftButton = Button({ label: savingDraft ? "Menyimpan..." : "Simpan Inspeksi", variant: "secondary", disabled: savingDraft || publishing, onClick: onSaveDraft });
   saveDraftButton.id = "slrinsp_save_draft_button";
   const saveSummaryButton = Button({ label: savingSummary ? "Menyimpan..." : "Simpan catatan", variant: "secondary", disabled: savingSummary || publishing, onClick: onSummarySave });
