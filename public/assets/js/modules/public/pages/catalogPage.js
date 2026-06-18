@@ -3,6 +3,8 @@ import { appStore } from "../../../state/store.js";
 import { Button } from "../../../ui/primitives/button.js";
 import { EmptyState } from "../../../ui/primitives/emptyState.js";
 import { Skeleton } from "../../../ui/primitives/skeleton.js";
+import { authStore } from "../../../state/authStore.js";
+import { NotificationBell } from "../../notifications/components/notificationBell.js";
 import { createBackgroundVideoLayer } from "../../../ui/composites/backgroundVideo.js";
 import { SliderBanner } from "../../../ui/composites/sliderBanner.js";
 import { showToast } from "../../../ui/primitives/toast.js";
@@ -111,6 +113,17 @@ function render(root, context, flags) {
 
   const frame = document.createElement("div");
   frame.className = "relative z-10 mx-auto grid w-full max-w-[1200px] gap-5 px-3 py-4 sm:gap-6 sm:px-6 sm:py-6 2xl:max-w-[1240px]";
+
+  const isAuthenticated = authStore.isAuthenticated();
+  const role = authStore.role();
+  if (isAuthenticated && (role === "buyer" || role === "seller")) {
+    frame.append(buyerProfileHeader({
+      user: authStore.user(),
+      actions: {
+        navigate: (path) => context.router?.navigate(path),
+      },
+    }));
+  }
 
   frame.append(SliderBanner({
     sliders: resolvePublicSliders(),
@@ -651,4 +664,108 @@ function isLandingRoute(context) {
     || path === "/"
     || path === "/public"
     || /^\/af\/[^/]+$/.test(path);
+}
+
+function buyerProfileHeader({ user, actions }) {
+  const header = document.createElement("header");
+  header.id = "byr_profile_header";
+  header.className = "relative flex min-w-0 items-start justify-between gap-3 px-1 py-1 md:hidden";
+  header.dataset.ds = "buyer.dashboard.profile_header";
+
+  const identity = document.createElement("section");
+  identity.className = "flex min-w-0 flex-1 items-start gap-3";
+
+  const menu = document.createElement("button");
+  menu.id = "byr_mobile_menu_button";
+  menu.type = "button";
+  menu.hidden = true;
+  menu.className = "hidden";
+  menu.setAttribute("aria-hidden", "true");
+  menu.setAttribute("aria-label", "Open menu");
+  menu.append(createIcon("bars", { className: "block h-5 w-5 leading-none" }));
+
+  identity.append(menu, greetingBlock(user));
+
+  const actionGroup = document.createElement("section");
+  actionGroup.className = "relative z-20 inline-flex shrink-0 items-center justify-end gap-2";
+  actionGroup.append(NotificationBell({
+    idPrefix: "byr_mobile",
+    compact: true,
+    onNavigate: actions.navigate,
+    withBackdrop: true,
+  }), buyerProfileAction({ user, actions, compact: true }));
+
+  header.append(identity, actionGroup);
+  return header;
+}
+
+function greetingBlock(user) {
+  const name = buyerName(user) || "User";
+  const wrap = document.createElement("section");
+  wrap.className = "grid min-w-0 gap-0.5";
+
+  const greeting = document.createElement("h1");
+  greeting.className = "truncate text-xl font-black leading-tight tracking-normal text-white";
+  greeting.textContent = ` ${name}`;
+
+  wrap.append(greeting, textNode("p", "truncate text-[5] font-semibold text-white/75", "Selamat datang kembali!"));
+  return wrap;
+}
+
+function buyerName(user = {}) {
+  return user.name ?? user.full_name ?? user.username ?? user.email?.split("@")[0] ?? "User";
+}
+
+function userInitials(user = {}) {
+  return buyerName(user)
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((word) => word[0]?.toUpperCase())
+    .join("") || "U";
+}
+
+function buyerProfileAction({ user, actions, compact = false } = {}) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = compact
+    ? "inline-flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] text-sm font-black text-[var(--pb-brand-secondary)] shadow-[var(--pb-shadow-card)] ring-1 ring-[var(--pb-border)] transition hover:bg-[var(--pb-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]"
+    : "inline-flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] text-sm font-black text-[var(--pb-brand-secondary)] shadow-[var(--pb-shadow-card)] ring-1 ring-[var(--pb-border)] transition hover:bg-[var(--pb-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  button.setAttribute("aria-label", "Buka profil buyer");
+  button.title = "Profil";
+  button.addEventListener("click", () => actions?.navigate?.("/profile"));
+  const src = user?.avatar_url ?? user?.photo_url ?? user?.profile_photo_url ?? "";
+  if (src) {
+    const image = document.createElement("img");
+    image.src = normalizeImageUrl(src);
+    image.alt = "Avatar buyer";
+    image.loading = "lazy";
+    image.className = "block h-full w-full object-cover";
+    image.addEventListener("error", () => {
+      button.textContent = userInitials(user);
+    }, { once: true });
+    button.append(image);
+    return button;
+  }
+
+  button.textContent = userInitials(user);
+  return button;
+}
+
+function normalizeImageUrl(url) {
+  const value = String(url ?? "").trim();
+  if (!value) {
+    return "";
+  }
+  if (/^(https?:|data:|blob:)/.test(value) || value.startsWith("/")) {
+    return value;
+  }
+  return `/storage/${value.replace(/^\/+/, "")}`;
+}
+
+function textNode(tagName, className, text) {
+  const node = document.createElement(tagName);
+  node.className = className;
+  node.textContent = text ?? "";
+  return node;
 }
