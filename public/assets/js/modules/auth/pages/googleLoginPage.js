@@ -99,7 +99,7 @@ function render(root, context, config, state, getBackgroundVideoLayer = null) {
 function renderBuyer(root, context, config, state, getBackgroundVideoLayer) {
   const frame = document.createElement("section");
   frame.id = "google_login_buyer_panel";
-  frame.className = "relative z-10 mx-auto grid min-h-screen w-full max-w-[430px] overflow-hidden px-5 py-6 text-center sm:px-7 lg:mx-0 lg:ml-auto lg:mr-[8vw] lg:max-w-[450px]";
+  frame.className = "relative z-10 mx-auto grid min-h-screen w-full max-w-[400px] content-center overflow-hidden px-5 py-5 text-center sm:px-6 lg:mx-0 lg:ml-auto lg:mr-[8vw] lg:max-w-[420px]";
 
   const topWave = document.createElement("span");
   topWave.className = "hidden pointer-events-none absolute -left-20 top-28 h-44 w-[calc(100%+10rem)] rounded-[50%] bg-white/70 blur-sm";
@@ -111,7 +111,7 @@ function renderBuyer(root, context, config, state, getBackgroundVideoLayer) {
   bottomWaveDeep.className = "hidden pointer-events-none absolute -bottom-36 left-0 h-52 w-[120%] rounded-[50%] bg-[#cdd3ff]/60";
 
   const content = document.createElement("div");
-  content.className = "relative z-10 grid min-h-[calc(90vh-3rem)] content-center justify-items-center gap-5 rounded-[1.75rem] border border-white/45 bg-[linear-gradient(135deg,rgba(255,255,255,0.72),rgba(214,220,235,0.42)_42%,rgba(244,247,252,0.62)_100%)] px-5 py-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.82),0_24px_70px_rgba(18,24,45,0.18)] backdrop-blur-xl sm:px-7 sm:py-9";
+  content.className = "relative z-10 grid justify-items-center gap-4 rounded-[1.5rem] border border-white/45 bg-[linear-gradient(135deg,rgba(255,255,255,0.72),rgba(214,220,235,0.42)_42%,rgba(244,247,252,0.62)_100%)] px-5 py-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.82),0_22px_60px_rgba(18,24,45,0.18)] backdrop-blur-xl sm:px-6 sm:py-7";
   content.append(appIcon(), buyerHeader(), buyerActionContent(root, context, config, state));
 
   frame.append(topWave, bottomWave, bottomWaveDeep, plantDecor("left"), plantDecor("right"), content, homeIndicator());
@@ -121,19 +121,19 @@ function renderBuyer(root, context, config, state, getBackgroundVideoLayer) {
 
 function appIcon() {
   const wrap = document.createElement("div");
-  wrap.className = "grid h-20 w-20 place-items-center rounded-[1.35rem] border border-white/70 bg-[linear-gradient(145deg,rgba(255,255,255,0.84),rgba(203,210,230,0.54))] shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_18px_42px_rgba(84,92,170,0.16)] backdrop-blur-xl";
+  wrap.className = "grid h-16 w-16 place-items-center rounded-[1.15rem] border border-white/70 bg-[linear-gradient(145deg,rgba(255,255,255,0.84),rgba(203,210,230,0.54))] shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_16px_34px_rgba(84,92,170,0.16)] backdrop-blur-xl";
 
   const mark = document.createElement("span");
-  mark.className = "relative block h-10 w-10";
+  mark.className = "relative block h-8 w-8";
 
   const left = document.createElement("span");
-  left.className = "absolute bottom-1 left-1.5 h-7 w-6 rounded-bl-full rounded-tr-full bg-[#6657ff] shadow-[0_12px_24px_rgba(102,87,255,0.26)]";
+  left.className = "absolute bottom-0.5 left-1 h-6 w-5 rounded-bl-full rounded-tr-full bg-[#6657ff] shadow-[0_12px_24px_rgba(102,87,255,0.26)]";
 
   const right = document.createElement("span");
-  right.className = "absolute bottom-1 right-1.5 h-8 w-6 rounded-br-full rounded-tl-full bg-[#9aa1ff]/95 shadow-[0_12px_24px_rgba(154,161,255,0.24)]";
+  right.className = "absolute bottom-0.5 right-1 h-6 w-5 rounded-br-full rounded-tl-full bg-[#9aa1ff]/95 shadow-[0_12px_24px_rgba(154,161,255,0.24)]";
 
   const dot = document.createElement("span");
-  dot.className = "absolute left-1/2 top-0 h-3.5 w-3.5 -translate-x-1/2 rounded-full bg-[#b8bdff]";
+  dot.className = "absolute left-1/2 top-0 h-3 w-3 -translate-x-1/2 rounded-full bg-[#b8bdff]";
 
   mark.append(left, right, dot);
   wrap.append(mark);
@@ -146,11 +146,11 @@ function buyerHeader() {
 
   const title = document.createElement("h1");
   title.id = "google_login_buyer_title";
-  title.className = "text-[2.2rem] font-black leading-[1.04] tracking-normal text-[#11142d] sm:text-[2.55rem]";
+  title.className = "text-[1.95rem] font-black leading-[1.04] tracking-normal text-[#11142d] sm:text-[2.2rem]";
   title.textContent = "Selamat datang!";
 
   const subtitle = document.createElement("p");
-  subtitle.className = "text-base font-medium font-black leading-7 tracking-normal text-[#858aa2] sm:text-lg sm:leading-8";
+  subtitle.className = "text-sm font-medium leading-6 tracking-normal text-[#858aa2] sm:text-base sm:leading-7";
   subtitle.textContent = "Masuk untuk melanjutkan dan nikmati pengalaman terbaik.";
 
   headerEl.append(title, subtitle);
@@ -160,7 +160,7 @@ function buyerHeader() {
 function buyerActionContent(root, context, config, state) {
   const fragment = document.createDocumentFragment();
   const actionWrap = document.createElement("div");
-  actionWrap.className = "grid w-full max-w-[340px] gap-5";
+  actionWrap.className = "grid w-full max-w-[310px] gap-4";
 
   if (state.loading) {
     const loading = document.createElement("p");
@@ -185,7 +185,7 @@ function buyerActionContent(root, context, config, state) {
   button.id = "google_login_buyer_button";
   button.type = "button";
   button.disabled = state.submitting;
-  button.className = "inline-flex min-h-14 w-full items-center justify-center gap-4 rounded-[1.15rem] border border-white/60 bg-[linear-gradient(135deg,rgba(255,255,255,0.84),rgba(216,222,236,0.58))] px-4 text-base font-black tracking-normal text-[#171a35] shadow-[inset_0_1px_0_rgba(255,255,255,0.88),0_16px_36px_rgba(84,92,170,0.13)] backdrop-blur transition duration-200 hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-4 focus:ring-[#dfe3ff] disabled:cursor-wait disabled:opacity-70";
+  button.className = "inline-flex min-h-12 w-full items-center justify-center gap-3.5 rounded-[1rem] border border-white/60 bg-[linear-gradient(135deg,rgba(255,255,255,0.84),rgba(216,222,236,0.58))] px-4 text-sm font-black tracking-normal text-[#171a35] shadow-[inset_0_1px_0_rgba(255,255,255,0.88),0_14px_30px_rgba(84,92,170,0.13)] backdrop-blur transition duration-200 hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-4 focus:ring-[#dfe3ff] disabled:cursor-wait disabled:opacity-70";
   button.append(googleGlyph(), document.createTextNode(state.submitting ? "Membuka Google..." : "Login dengan Google"));
   button.addEventListener("click", () => beginGoogleLogin(root, context, config, state));
 
@@ -196,7 +196,7 @@ function buyerActionContent(root, context, config, state) {
 
 function googleGlyph() {
   const glyph = document.createElement("span");
-  glyph.className = "grid h-10 w-10 shrink-0 place-items-center text-[2rem] font-black leading-none";
+  glyph.className = "grid h-8 w-8 shrink-0 place-items-center text-[1.7rem] font-black leading-none";
   glyph.textContent = "G";
   glyph.style.background = "conic-gradient(from -45deg,#4285f4 0 25%,#34a853 0 50%,#fbbc05 0 75%,#ea4335 0 100%)";
   glyph.style.setProperty("-webkit-background-clip", "text");
@@ -207,12 +207,12 @@ function googleGlyph() {
 
 function divider() {
   const wrap = document.createElement("div");
-  wrap.className = "grid grid-cols-[1fr_auto_1fr] items-center gap-5 text-lg font-medium text-[#b2b5cc]";
+  wrap.className = "grid grid-cols-[1fr_auto_1fr] items-center gap-4 text-sm font-medium text-[#b2b5cc]";
 
   const left = document.createElement("span");
   left.className = "h-px bg-[#dfe2ee]";
-  // const text = document.createElement("span");
-  // text.textContent = "atau";
+  const text = document.createElement("span");
+  text.textContent = "atau";
   const right = document.createElement("span");
   right.className = "h-px bg-[#dfe2ee]";
 
