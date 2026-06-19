@@ -134,27 +134,18 @@ function render(root, context, flags) {
     }));
   }
 
-  if (isAffiliateRoute) {
-    frame.append(heroSection({
+  frame.append(SliderBanner({
+    sliders: resolvePublicSliders(),
+    idPrefix: "pubcat",
+    context: "public",
+    onNavigate: (path) => context.router?.navigate(path),
+    fallback: () => heroSection({
       notFound: Boolean(flags.notFound || invalidAffiliateRoute),
       count: allCars.length,
       meta,
       affiliate,
-    }));
-  } else {
-    frame.append(SliderBanner({
-      sliders: resolvePublicSliders(),
-      idPrefix: "pubcat",
-      context: "public",
-      onNavigate: (path) => context.router?.navigate(path),
-      fallback: () => heroSection({
-        notFound: Boolean(flags.notFound || invalidAffiliateRoute),
-        count: allCars.length,
-        meta,
-        affiliate,
-      }),
-    }));
-  }
+    }),
+  }));
 
   if (affiliate) {
     const banner = PublicAffiliateContextBanner({

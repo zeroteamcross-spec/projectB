@@ -32,6 +32,10 @@ export const publicRoutes = [
           key: "masterLocation",
           loader: ({ signal }) => adminMasterService.getLocationMaster({ signal }).catch(() => adminMasterService.normalizeLocationMaster(null)),
         },
+        {
+          key: "sliders",
+          loader: ({ signal }) => loadPublicLandingSliders(signal),
+        },
       ],
     },
   },
@@ -82,6 +86,10 @@ export const publicRoutes = [
         {
           key: "masterLocation",
           loader: ({ signal }) => adminMasterService.getLocationMaster({ signal }).catch(() => adminMasterService.normalizeLocationMaster(null)),
+        },
+        {
+          key: "sliders",
+          loader: ({ signal }) => loadPublicLandingSliders(signal),
         },
       ],
     },
@@ -136,13 +144,7 @@ export const publicRoutes = [
         },
         {
           key: "sliders",
-          loader: ({ signal }) => Promise.all([
-            slidersResource.publicList({ position: "public_home", limit: 5 }, { signal }),
-            slidersResource.publicList({ position: "landing_hero", limit: 5 }, { signal }),
-          ]).then(([publicHome, landingHero]) => ({
-            sliders: [...(publicHome?.sliders ?? []), ...(landingHero?.sliders ?? [])].slice(0, 5),
-            meta: { positions: ["public_home", "landing_hero"] },
-          })).catch(() => ({ sliders: [], meta: {} })),
+          loader: ({ signal }) => loadPublicLandingSliders(signal),
         },
       ],
     },
@@ -165,13 +167,7 @@ export const publicRoutes = [
         },
         {
           key: "sliders",
-          loader: ({ signal }) => Promise.all([
-            slidersResource.publicList({ position: "public_home", limit: 5 }, { signal }),
-            slidersResource.publicList({ position: "landing_hero", limit: 5 }, { signal }),
-          ]).then(([publicHome, landingHero]) => ({
-            sliders: [...(publicHome?.sliders ?? []), ...(landingHero?.sliders ?? [])].slice(0, 5),
-            meta: { positions: ["public_home", "landing_hero"] },
-          })).catch(() => ({ sliders: [], meta: {} })),
+          loader: ({ signal }) => loadPublicLandingSliders(signal),
         },
       ],
     },
@@ -216,3 +212,13 @@ export const publicRoutes = [
     workingStateKey: null,
   },
 ];
+
+function loadPublicLandingSliders(signal) {
+  return Promise.all([
+    slidersResource.publicList({ position: "public_home", limit: 5 }, { signal }),
+    slidersResource.publicList({ position: "landing_hero", limit: 5 }, { signal }),
+  ]).then(([publicHome, landingHero]) => ({
+    sliders: [...(publicHome?.sliders ?? []), ...(landingHero?.sliders ?? [])].slice(0, 5),
+    meta: { positions: ["public_home", "landing_hero"] },
+  })).catch(() => ({ sliders: [], meta: {} }));
+}
