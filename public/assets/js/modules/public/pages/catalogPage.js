@@ -42,6 +42,13 @@ export function PublicCatalogPage({ notFound = false } = {}) {
   };
 
   return createPageLifecycle({
+    async bootstrap(context) {
+      const affiliateSlug = String(context.params?.slug ?? "").trim().toLowerCase();
+
+      if (affiliateSlug) {
+        await publicContextService.activateAffiliateBySlug(affiliateSlug).catch(() => null);
+      }
+    },
     mount(context) {
       root = document.createElement("div");
       root.className = "min-h-screen";
