@@ -108,6 +108,7 @@ function render(root, context, flags) {
       filterOptions,
       useBackgroundVideo ? flags.getBackgroundVideoLayer?.() : null,
       useBackgroundVideo,
+      affiliate,
     ));
     return;
   }
@@ -133,18 +134,27 @@ function render(root, context, flags) {
     }));
   }
 
-  frame.append(SliderBanner({
-    sliders: resolvePublicSliders(),
-    idPrefix: "pubcat",
-    context: "public",
-    onNavigate: (path) => context.router?.navigate(path),
-    fallback: () => heroSection({
+  if (isAffiliateRoute) {
+    frame.append(heroSection({
       notFound: Boolean(flags.notFound || invalidAffiliateRoute),
       count: allCars.length,
       meta,
       affiliate,
-    }),
-  }));
+    }));
+  } else {
+    frame.append(SliderBanner({
+      sliders: resolvePublicSliders(),
+      idPrefix: "pubcat",
+      context: "public",
+      onNavigate: (path) => context.router?.navigate(path),
+      fallback: () => heroSection({
+        notFound: Boolean(flags.notFound || invalidAffiliateRoute),
+        count: allCars.length,
+        meta,
+        affiliate,
+      }),
+    }));
+  }
 
   if (affiliate) {
     const banner = PublicAffiliateContextBanner({
@@ -406,7 +416,7 @@ function carGrid({ cars, router, isRefreshing }) {
   return grid;
 }
 
-function loadingFrame(filters = {}, quickFilter = "newest", options = {}, backgroundVideoLayer = null, useBackgroundVideo = false) {
+function loadingFrame(filters = {}, quickFilter = "newest", options = {}, backgroundVideoLayer = null, useBackgroundVideo = false, affiliate = null) {
   const shell = document.createElement("div");
   shell.className = useBackgroundVideo
     ? "relative isolate min-h-screen overflow-x-clip bg-transparent"
@@ -416,14 +426,14 @@ function loadingFrame(filters = {}, quickFilter = "newest", options = {}, backgr
   const frame = document.createElement("div");
   frame.className = "relative z-10 mx-auto grid w-full max-w-[1200px] gap-5 px-4 py-4 sm:px-6 sm:py-6 2xl:max-w-[1240px]";
   frame.append(
-    heroSection(false),
+    heroSection({ affiliate }),
     PublicSearchFilterBar({
       filters,
       quickFilter,
       options,
       activeFilterCount: activeFilterCount(filters),
     }),
-    statsPanel({ count: 0, meta: {}, affiliate: null }),
+    statsPanel({ count: 0, meta: {}, affiliate }),
     Skeleton({ lines: 8 }),
   );
   shell.append(frame);
