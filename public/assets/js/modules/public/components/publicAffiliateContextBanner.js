@@ -8,7 +8,7 @@ export function PublicAffiliateContextBanner({ affiliate = null, onClear = null 
   }
 
   const section = document.createElement("section");
-  section.className = "relative grid gap-3 overflow-hidden rounded-[24px] border border-orange-200/70 bg-white/96 p-4 shadow-card";
+  section.className = "hidden relative grid gap-3 overflow-hidden rounded-[24px] border border-orange-200/70 bg-white/96 p-4 shadow-card";
   applyDesignHook(section, "public.affiliate.banner");
 
   const glow = document.createElement("div");
