@@ -25,24 +25,24 @@ export function TransactionAuthGate({
   body.textContent = "Transaksi membutuhkan akun aktif agar pesanan dan pembayaran tercatat aman.";
   header.append(eyebrow, title, body);
 
-  // const tabs = document.createElement("div");
-  // tabs.className = `grid grid-cols-2 gap-2 ${tw.surface.inset} p-1`;
-  // tabs.append(
-  //   tabButton("login", "Masuk", mode, onModeChange),
-  //   tabButton("register", "Daftar Pembeli", mode, onModeChange)
-  // );
+  const tabs = document.createElement("div");
+  tabs.className = `grid grid-cols-2 gap-2 ${tw.surface.inset} p-1`;
+  tabs.append(
+    tabButton("login", "Masuk", mode, onModeChange),
+    tabButton("register", "Daftar Pembeli", mode, onModeChange)
+  );
 
-  // const form = mode === "register"
-  //   ? registerForm({ isSubmitting, onRegister })
-  //   : loginForm({ isSubmitting, onLogin });
-  //
-  // section.append(header, tabs);
+  const form = mode === "register"
+    ? registerForm({ isSubmitting, onRegister })
+    : loginForm({ isSubmitting, onLogin });
+
+  section.append(header);
 
   if (error) {
     const message = document.createElement("p");
     message.className = tw.alert.error;
     message.textContent = error;
-    section.append(message);
+    // section.append(message);
   }
 
   section.append(helperStrip(), form);
