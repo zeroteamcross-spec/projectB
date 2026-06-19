@@ -1,6 +1,6 @@
 export function PublicSellerSummary({ car } = {}) {
   const section = document.createElement("section");
-  section.className = "grid gap-4 rounded-[28px] border border-white/75 bg-white/95 p-5 shadow-card backdrop-blur";
+  section.className = "hidden grid gap-4 rounded-[28px] border border-white/75 bg-white/95 p-5 shadow-card backdrop-blur";
 
   const eyebrow = document.createElement("span");
   eyebrow.className = "text-[11px] font-semibold uppercase tracking-normal text-orange-600";
