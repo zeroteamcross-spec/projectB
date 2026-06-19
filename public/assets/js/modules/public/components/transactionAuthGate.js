@@ -22,21 +22,21 @@ export function TransactionAuthGate({
   title.textContent = "Masuk";
   const body = document.createElement("p");
   body.className = "text-sm leading-6 text-gray-600";
-  body.textContent = "Transaksi membutuhkan akun buyer aktif agar pesanan dan pembayaran tercatat aman.";
+  body.textContent = "Transaksi membutuhkan akun aktif agar pesanan dan pembayaran tercatat aman.";
   header.append(eyebrow, title, body);
 
-  const tabs = document.createElement("div");
-  tabs.className = `grid grid-cols-2 gap-2 ${tw.surface.inset} p-1`;
-  tabs.append(
-    tabButton("login", "Masuk", mode, onModeChange),
-    tabButton("register", "Daftar Pembeli", mode, onModeChange)
-  );
+  // const tabs = document.createElement("div");
+  // tabs.className = `grid grid-cols-2 gap-2 ${tw.surface.inset} p-1`;
+  // tabs.append(
+  //   tabButton("login", "Masuk", mode, onModeChange),
+  //   tabButton("register", "Daftar Pembeli", mode, onModeChange)
+  // );
 
-  const form = mode === "register"
-    ? registerForm({ isSubmitting, onRegister })
-    : loginForm({ isSubmitting, onLogin });
-
-  section.append(header, tabs);
+  // const form = mode === "register"
+  //   ? registerForm({ isSubmitting, onRegister })
+  //   : loginForm({ isSubmitting, onLogin });
+  //
+  // section.append(header, tabs);
 
   if (error) {
     const message = document.createElement("p");
@@ -88,7 +88,7 @@ function loginForm({ isSubmitting, onLogin }) {
 
   const note = document.createElement("p");
   note.className = "text-xs leading-5 text-gray-500 text-center mt-2";
-  note.textContent = "Transaksi membutuhkan login buyer aktif. Masuk menggunakan akun Google Anda.";
+  note.textContent = "";
 
   form.append(button, note);
   return form;
@@ -148,8 +148,8 @@ function helperStrip() {
   const strip = document.createElement("div");
   strip.className = "grid gap-2 border-t border-white/60 pt-4 text-sm text-gray-600";
   [
-    "Gunakan akun buyer agar transaksi dan payment status tercatat di dashboard buyer.",
-    "Daftar buyer dari sini tetap menjaga funnel berjalan tanpa pindah halaman.",
+    "",
+    "",
   ].forEach((copy) => {
     const item = document.createElement("p");
     item.className = "rounded-2xl bg-orange-50/70 px-3 py-2";
