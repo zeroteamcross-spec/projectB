@@ -139,6 +139,7 @@ function render(root, context, flags) {
     idPrefix: "pubcat",
     context: "public",
     onNavigate: (path) => context.router?.navigate(path),
+    resolveCtaUrl: (url) => isAffiliateRoute ? affiliateSliderCtaUrl(url, affiliateSlug) : url,
     fallback: () => heroSection({
       notFound: Boolean(flags.notFound || invalidAffiliateRoute),
       count: allCars.length,
@@ -339,6 +340,66 @@ function resolvePublicSliders() {
   }
 
   return publicSliderCache;
+}
+
+function affiliateSliderCtaUrl(url, affiliateSlug) {
+  const catalogUrl = `#/af/${encodeURIComponent(affiliateSlug)}`;
+  const value = String(url || "").trim();
+
+  if (!value) {
+    return catalogUrl;
+  }
+
+  const hashPath = sliderHashPath(value);
+
+  if (!hashPath || hashPath === "/" || hashPath === "/public") {
+    return catalogUrl;
+  }
+
+  if (hashPath.startsWith("/cars/")) {
+    return `#/af/${encodeURIComponent(affiliateSlug)}${hashPath}`;
+  }
+
+  if (hashPath.startsWith("/transactions/")) {
+    return `#/af/${encodeURIComponent(affiliateSlug)}${hashPath}`;
+  }
+
+  if (hashPath.startsWith("/af/") || hashPath.startsWith("/a/")) {
+    return `#${hashPath}`;
+  }
+
+  return catalogUrl;
+}
+
+function sliderHashPath(url) {
+  const value = String(url || "").trim();
+
+  if (value.startsWith("#/")) {
+    return value.slice(1);
+  }
+
+  if (value.startsWith("/#/")) {
+    return value.slice(2);
+  }
+
+  if (value.startsWith("/")) {
+    return value.replace(/\/$/, "") || "/";
+  }
+
+  try {
+    const parsed = new URL(value, window.location.origin);
+    if (parsed.hash.startsWith("#/")) {
+      return parsed.hash.slice(1);
+    }
+
+    if (parsed.origin === window.location.origin || parsed.hostname.endsWith("garasi-mobil.com")) {
+      return parsed.pathname.replace(/\/$/, "") || "/";
+    }
+  } catch (error) {
+    // Treat unsupported CTA values as a request to stay on the affiliate catalog.
+  }
+
+  return "";
 }
 
 function normalizeSliderPayload(payload) {

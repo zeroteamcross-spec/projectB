@@ -16,6 +16,7 @@ export function SliderBanner({
   idPrefix = "sld",
   context = "public",
   onNavigate = null,
+  resolveCtaUrl = null,
 } = {}) {
   const items = normalizeSliders(sliders);
 
@@ -51,6 +52,7 @@ export function SliderBanner({
     slide.append(slideTemplate(item, {
       idPrefix,
       onNavigate,
+      resolveCtaUrl,
       count: items.length,
     }));
     return slide;
@@ -209,7 +211,7 @@ export function sliderAnimationOptions() {
   ];
 }
 
-function elegantGradientTemplate(slider, { idPrefix, onNavigate, count }) {
+function elegantGradientTemplate(slider, { idPrefix, onNavigate, resolveCtaUrl, count }) {
   const wrap = document.createElement("section");
   wrap.className = "pb-slider-inner pb-slider-gradient-inner";
 
@@ -219,7 +221,7 @@ function elegantGradientTemplate(slider, { idPrefix, onNavigate, count }) {
     pill("Promo utama", "sparkles"),
     textNode("h1", "pb-slider-title", slider.title || "Promo pilihan"),
     textNode("p", "pb-slider-description", slider.description || slider.body_text || "Konten promo terbaru tersedia untuk katalog pilihan."),
-    ctaButton(slider, { idPrefix, onNavigate }),
+    ctaButton(slider, { idPrefix, onNavigate, resolveCtaUrl }),
   );
 
   const media = imagePanel(slider, "pb-slider-image-panel");
@@ -227,7 +229,7 @@ function elegantGradientTemplate(slider, { idPrefix, onNavigate, count }) {
   return wrap;
 }
 
-function glassmorphismTemplate(slider, { idPrefix, onNavigate, count }) {
+function glassmorphismTemplate(slider, { idPrefix, onNavigate, resolveCtaUrl, count }) {
   const wrap = document.createElement("section");
   wrap.className = "pb-slider-inner pb-slider-glass-inner";
 
@@ -238,19 +240,19 @@ function glassmorphismTemplate(slider, { idPrefix, onNavigate, count }) {
     pill("Buyer banner", "crown"),
     textNode("h1", "pb-slider-title", slider.title || "Rekomendasi premium"),
     textNode("p", "pb-slider-description", slider.description || slider.body_text || "Banner personal untuk highlight terbaru."),
-    ctaButton(slider, { idPrefix, onNavigate }),
+    ctaButton(slider, { idPrefix, onNavigate, resolveCtaUrl }),
   );
 
   wrap.append(media, card);
   return wrap;
 }
 
-function minimalProductTemplate(slider, { idPrefix, onNavigate, count }) {
+function minimalProductTemplate(slider, { idPrefix, onNavigate, resolveCtaUrl, count }) {
   const wrap = document.createElement("section");
   wrap.className = "pb-slider-inner pb-slider-minimal-inner";
   wrap.append(
     imagePanel(slider, "pb-slider-image-panel pb-slider-product-media"),
-    productCopy(slider, { idPrefix, onNavigate }),
+    productCopy(slider, { idPrefix, onNavigate, resolveCtaUrl }),
   );
   return wrap;
 }
@@ -276,14 +278,14 @@ function fullImageTemplate(slider) {
   return wrap;
 }
 
-function productCopy(slider, { idPrefix, onNavigate }) {
+function productCopy(slider, { idPrefix, onNavigate, resolveCtaUrl }) {
   const copy = document.createElement("section");
   copy.className = "pb-slider-copy pb-slider-product-copy";
   copy.append(
     pill("Featured collection", "tag"),
     textNode("h1", "pb-slider-title", slider.title || "Pilihan unggulan"),
     textNode("p", "pb-slider-description", slider.description || slider.body_text || "Highlight produk terbaru dengan tampilan bersih."),
-    ctaButton(slider, { idPrefix, onNavigate }),
+    ctaButton(slider, { idPrefix, onNavigate, resolveCtaUrl }),
   );
   return copy;
 }
@@ -307,9 +309,11 @@ function imagePanel(slider, className) {
   return media;
 }
 
-function ctaButton(slider, { idPrefix, onNavigate }) {
+function ctaButton(slider, { idPrefix, onNavigate, resolveCtaUrl }) {
   const text = slider.cta_text || "Lihat Detail";
-  const url = String(slider.cta_url || "").trim();
+  const url = typeof resolveCtaUrl === "function"
+    ? String(resolveCtaUrl(slider.cta_url || "", slider) || "").trim()
+    : String(slider.cta_url || "").trim();
   const button = Button({
     label: text,
     variant: "primary",
