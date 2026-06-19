@@ -12,7 +12,7 @@ export function PublicAffiliateContextBanner({ affiliate = null, onClear = null 
   applyDesignHook(section, "public.affiliate.banner");
 
   const glow = document.createElement("div");
-  glow.className = "absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(251,146,60,0.18),transparent_35%),linear-gradient(135deg,rgba(255,247,237,0.92),rgba(255,255,255,0.98))]";
+  glow.className = "hidden absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(251,146,60,0.18),transparent_35%),linear-gradient(135deg,rgba(255,247,237,0.92),rgba(255,255,255,0.98))]";
 
   const top = document.createElement("div");
   top.className = "relative flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between";
