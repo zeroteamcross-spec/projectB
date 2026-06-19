@@ -5,23 +5,36 @@ import { publicContextService } from "./publicContextService.js";
 
 export const publicCatalogService = {
   async list({ page = 1, limit = 12, filters = {}, affiliateSlug = "" } = {}, options = {}) {
+    let affiliateSellerUserId = null;
+
     if (affiliateSlug) {
       const context = await publicContextService.activateAffiliateBySlug(affiliateSlug, options);
       if (!context) {
         return { cars: [], meta: {} };
       }
+
+      affiliateSellerUserId = context.sellerUserId;
     }
 
     const cleanFilters = Object.fromEntries(
       Object.entries(filters).filter(([key, value]) => key !== "brand_names" && value !== "" && value !== null && value !== undefined)
     );
 
-    return carsResource.list(publicContextService.applyCatalogFilters({
+    const scopedFilters = {
       page,
       limit,
       ...cleanFilters,
       listing_status: "published",
-    }), options);
+    };
+
+    if (affiliateSellerUserId) {
+      scopedFilters.seller_user_id = affiliateSellerUserId;
+    }
+
+    return carsResource.list(
+      affiliateSellerUserId ? scopedFilters : publicContextService.applyCatalogFilters(scopedFilters),
+      options
+    );
   },
 
   async detail(carId, options = {}) {

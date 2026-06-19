@@ -555,12 +555,14 @@ async function loadMore(root, context, flags) {
   render(root, context, flags);
 
   try {
+    const affiliateSlug = String(context.params?.slug ?? "").trim().toLowerCase();
     const nextPage = publicCatalogState.page() + 1;
     const current = publicCatalogState.workingCatalog({ cars: [], meta: {} });
     const next = await publicCatalogService.list({
       page: nextPage,
       limit: publicCatalogState.limit(),
       filters: publicCatalogState.filters(),
+      affiliateSlug,
     });
 
     publicCatalogState.incrementPage();
@@ -702,10 +704,8 @@ function isLandingRoute(context) {
   const path = String(context?.path ?? "");
   return name === "public.catalog"
     || name === "public.catalog-alias"
-    || name === "public.affiliate.catalog"
     || path === "/"
-    || path === "/public"
-    || /^\/af\/[^/]+$/.test(path);
+    || path === "/public";
 }
 
 function buyerProfileHeader({ user, actions }) {
