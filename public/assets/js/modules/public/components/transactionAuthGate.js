@@ -16,10 +16,10 @@ export function TransactionAuthGate({
   header.className = "grid gap-2";
   const eyebrow = document.createElement("p");
   eyebrow.className = tw.text.eyebrow;
-  eyebrow.textContent = "Buyer access";
+  eyebrow.textContent = "Akun akses";
   const title = document.createElement("h2");
   title.className = "text-xl font-bold tracking-normal text-gray-950";
-  title.textContent = "Masuk sebagai buyer";
+  title.textContent = "Masuk";
   const body = document.createElement("p");
   body.className = "text-sm leading-6 text-gray-600";
   body.textContent = "Transaksi membutuhkan akun buyer aktif agar pesanan dan pembayaran tercatat aman.";
@@ -29,7 +29,7 @@ export function TransactionAuthGate({
   tabs.className = `grid grid-cols-2 gap-2 ${tw.surface.inset} p-1`;
   tabs.append(
     tabButton("login", "Masuk", mode, onModeChange),
-    tabButton("register", "Daftar buyer", mode, onModeChange)
+    tabButton("register", "Daftar Pembeli", mode, onModeChange)
   );
 
   const form = mode === "register"
@@ -62,19 +62,35 @@ function tabButton(value, label, activeMode, onModeChange) {
 
 function loginForm({ isSubmitting, onLogin }) {
   const form = baseForm();
-  form.append(
-    field({ name: "email", label: "Email", type: "email", placeholder: "buyer@projectb.local" }),
-    field({ name: "password", label: "Password", type: "password", placeholder: "Password buyer" }),
-    submitButton(isSubmitting ? "Memproses..." : "Masuk dan lanjut", isSubmitting)
-  );
-  form.addEventListener("submit", (event) => {
+
+  const button = document.createElement("button");
+  button.id = "google_login_buyer_button";
+  button.type = "button";
+  button.disabled = isSubmitting;
+  button.className = "inline-flex min-h-12 w-full items-center justify-center gap-3 rounded-[1rem] border border-white/60 bg-[linear-gradient(135deg,rgba(255,255,255,0.84),rgba(216,222,236,0.58))] px-4 text-sm font-black tracking-normal text-[#171a35] shadow-[inset_0_1px_0_rgba(255,255,255,0.88),0_14px_30px_rgba(84,92,170,0.13)] backdrop-blur transition duration-200 hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-4 focus:ring-[#dfe3ff] disabled:cursor-wait disabled:opacity-70";
+
+  const icon = document.createElement("span");
+  icon.className = "grid h-5 w-5 shrink-0 place-items-center text-lg font-black leading-none";
+  icon.textContent = "G";
+  icon.style.background = "conic-gradient(from -45deg,#4285f4 0 25%,#34a853 0 50%,#fbbc05 0 75%,#ea4335 0 100%)";
+  icon.style.setProperty("-webkit-background-clip", "text");
+  icon.style.setProperty("background-clip", "text");
+  icon.style.color = "transparent";
+
+  const text = document.createTextNode(isSubmitting ? "Membuka Google..." : "Login dengan Google");
+
+  button.append(icon, text);
+
+  button.addEventListener("click", (event) => {
     event.preventDefault();
-    const data = Object.fromEntries(new FormData(form));
-    onLogin?.({
-      email: data.email,
-      password: data.password,
-    });
+    onLogin?.();
   });
+
+  const note = document.createElement("p");
+  note.className = "text-xs leading-5 text-gray-500 text-center mt-2";
+  note.textContent = "Transaksi membutuhkan login buyer aktif. Masuk menggunakan akun Google Anda.";
+
+  form.append(button, note);
   return form;
 }
 

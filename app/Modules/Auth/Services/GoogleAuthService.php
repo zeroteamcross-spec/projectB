@@ -52,7 +52,7 @@ class GoogleAuthService
         ];
     }
 
-    public function redirectForHost(string $host): array
+    public function redirectForHost(string $host, ?string $next = null): array
     {
         $context = $this->contextForHost($host);
 
@@ -63,11 +63,12 @@ class GoogleAuthService
         return $this->redirect(
             (string) $context['role'],
             $this->redirectUriForHost((string) $context['host']),
-            (string) $context['host']
+            (string) $context['host'],
+            $next
         );
     }
 
-    public function redirect(string $role, ?string $redirectUri = null, ?string $host = null): array
+    public function redirect(string $role, ?string $redirectUri = null, ?string $host = null, ?string $next = null): array
     {
         $role = $this->normalizeRole($role);
 
@@ -77,7 +78,7 @@ class GoogleAuthService
 
         $this->ensureEnabled();
 
-        $state = $this->signedToken([
+        $statePayload = [
             'type' => 'google_oauth_state',
             'role' => $role,
             'host' => $host,
@@ -85,7 +86,13 @@ class GoogleAuthService
             'nonce' => bin2hex(random_bytes(16)),
             'iat' => time(),
             'exp' => time() + ((int) config('google.auth.state_cookie.ttl_minutes', 15) * 60),
-        ]);
+        ];
+
+        if ($next !== null && $next !== '') {
+            $statePayload['next'] = $next;
+        }
+
+        $state = $this->signedToken($statePayload);
 
         $query = http_build_query([
             'client_id' => $this->clientId(),
@@ -130,7 +137,9 @@ class GoogleAuthService
         }
 
         return [
-            'redirect_path' => $this->homeForRole($role),
+            'redirect_path' => (isset($statePayload['next']) && is_string($statePayload['next']) && $statePayload['next'] !== '')
+                ? $statePayload['next']
+                : $this->homeForRole($role),
             'completion_cookie' => null,
             'remember_token' => $this->issueRememberToken((int) $user['id']),
         ];

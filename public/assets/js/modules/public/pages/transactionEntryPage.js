@@ -17,6 +17,7 @@ import { markGopayAutoOpened, resolvePaymentArtifacts, shouldAutoOpenGopay } fro
 import { publicAffiliateTrackingService } from "../services/publicAffiliateTrackingService.js";
 import { publicContextService } from "../services/publicContextService.js";
 import { publicTransactionService } from "../services/publicTransactionService.js";
+import { googleLoginService } from "../../auth/services/googleLoginService.js";
 import { transactionEntryState } from "../state/transactionEntryState.js";
 import { tw } from "../../../theme/tailwindClasses.js";
 import { applyDesignHook } from "../../../theme/designStudioHooks.js";
@@ -140,7 +141,7 @@ function render(root, context, getBackgroundVideoLayer) {
       isSubmitting: Boolean(entry.isSubmitting),
       error: entry.error ?? "",
       onModeChange: (mode) => transactionEntryState.setMode(mode),
-      onLogin: (payload) => loginBuyer(payload),
+      onLogin: () => redirectToGoogleLogin(),
       onRegister: (payload) => registerBuyer(payload),
     }), "buyer.transaction.form"));
   } else if (!isBuyer) {
@@ -285,20 +286,13 @@ function heroTrustRow() {
   return row;
 }
 
-async function loginBuyer(payload) {
+async function redirectToGoogleLogin() {
   await runAction(async () => {
-    await publicTransactionService.loginBuyer(payload);
-    if (authStore.role() !== "buyer") {
-      transactionEntryState.setError("Akun yang masuk bukan buyer.");
-      return;
-    }
-    transactionEntryState.setError("");
-    showToast("Login buyer berhasil.", {
-      type: "success",
-      key: "auth-login-success",
-      dedupeMs: 3000,
-    });
-  }, { errorToastKey: "auth-login-error" });
+    const config = googleLoginService.configForSlug("buyer");
+    const nextPath = window.location.hash.substring(1) || "/";
+    const authUrl = await googleLoginService.begin(config, nextPath);
+    window.location.assign(authUrl);
+  });
 }
 
 async function registerBuyer(payload) {

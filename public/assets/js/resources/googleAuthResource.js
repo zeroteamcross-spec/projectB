@@ -6,8 +6,13 @@ export const googleAuthResource = {
     return response.data ?? {};
   },
 
-  async redirect(role, options = {}) {
-    const response = await apiClient.get(`/auth/google/redirect?role=${encodeURIComponent(role)}`, options);
+  async redirect(role, next = "", options = {}) {
+    const query = new URLSearchParams();
+    query.set("role", role);
+    if (next) {
+      query.set("next", next);
+    }
+    const response = await apiClient.get(`/auth/google/redirect?${query.toString()}`, options);
     return response.data ?? {};
   },
 

@@ -34,7 +34,11 @@ class GoogleAuthController extends Controller
 
     public function redirect(Request $request): JsonResponse
     {
-        $result = $this->service->redirectForHost((string) $request->server('HTTP_HOST', ''));
+        $next = $request->query('next');
+        $result = $this->service->redirectForHost(
+            (string) $request->server('HTTP_HOST', ''),
+            is_string($next) ? $next : null
+        );
 
         return JsonResponse::success([
             'auth_url' => $result['auth_url'],

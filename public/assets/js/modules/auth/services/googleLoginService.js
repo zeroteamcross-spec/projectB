@@ -66,7 +66,7 @@ export const googleLoginService = {
     return googleAuthResource.status();
   },
 
-  async begin(config) {
+  async begin(config, next = "") {
     if (!config?.role || !config.googleEnabled) {
       throw new Error(config?.warning || "Google Login tidak tersedia untuk role ini.");
     }
@@ -83,7 +83,7 @@ export const googleLoginService = {
       throw new Error(roleStatus.message || "Google Login tidak tersedia untuk role ini.");
     }
 
-    const result = await googleAuthResource.redirect(config.role);
+    const result = await googleAuthResource.redirect(config.role, next);
 
     if (!result.auth_url) {
       throw new Error("URL Google Login tidak tersedia.");
