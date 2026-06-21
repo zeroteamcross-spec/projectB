@@ -21,6 +21,10 @@ export const buyerTransactionService = {
     return transactionsResource.completePayment(transactionId, payload, options);
   },
 
+  cancel(transactionId, payload = {}, options = {}) {
+    return transactionsResource.cancel(transactionId, payload, options);
+  },
+
   downloadPaymentQr(transactionId, options = {}) {
     return transactionsResource.downloadPaymentQr(transactionId, options);
   },

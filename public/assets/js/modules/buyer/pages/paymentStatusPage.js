@@ -30,6 +30,7 @@ export function PaymentStatusPage() {
     isAutoChecking: false,
     isCompleting: false,
     isFinishing: false,
+    isCancelling: false,
     isDownloadingQr: false,
   };
   const poller = {
@@ -148,6 +149,13 @@ function render(root, context, flags) {
     main.append(PaymentStatusSummary({ transaction }));
     if (isPendingPayment(transaction)) {
       main.append(pendingPaymentGuidePanel(transaction));
+    }
+    if (canBuyerCancel(transaction)) {
+      main.append(cancelTransactionPanel({
+        transaction,
+        isCancelling: flags.isCancelling,
+        onCancel: () => cancelTransaction(context, flags),
+      }));
     }
     main.append(carSummary(transaction));
   }
@@ -442,6 +450,34 @@ function pendingPaymentGuidePanel(transaction) {
   return section;
 }
 
+function cancelTransactionPanel({ transaction, isCancelling = false, onCancel = null } = {}) {
+  const status = String(transaction?.transaction_status ?? "").toLowerCase();
+  const isDpPaid = status === "dp_paid";
+  const section = document.createElement("section");
+  section.className = `grid gap-3 ${tw.surface.raisedCard} p-5`;
+
+  const title = document.createElement("h2");
+  title.className = "text-lg font-bold tracking-normal text-gray-950";
+  title.textContent = "Batalkan transaksi";
+  const body = document.createElement("p");
+  body.className = "text-sm leading-6 text-gray-600";
+  body.textContent = isDpPaid
+    ? "Buyer bisa membatalkan sebelum pelunasan. Refund DP akan dipotong 10%, dan nomor rekening wajib diisi."
+    : "Buyer bisa membatalkan selama pembayaran belum lunas.";
+
+  const action = Button({
+    label: isCancelling ? "Membatalkan..." : "Batalkan Transaksi",
+    variant: "secondary",
+    disabled: isCancelling,
+    onClick: onCancel,
+    designHook: "shared.button.secondary",
+  });
+  action.classList.add("w-full", "sm:w-fit");
+
+  section.append(title, body, action);
+  return section;
+}
+
 async function refreshStatus(context, flags, {
   forceDetail = true,
   silent = false,
@@ -720,6 +756,80 @@ async function finishTransaction(context, flags) {
   }
 }
 
+async function cancelTransaction(context, flags) {
+  const transaction = appStore.get("working.buyerPaymentStatus.transaction", null)?.data ?? null;
+  if (!transaction?.id || flags.isCancelling || !canBuyerCancel(transaction)) {
+    return;
+  }
+
+  const payload = collectBuyerCancelPayload(transaction);
+  if (payload === null) {
+    return;
+  }
+
+  flags.isCancelling = true;
+  setActionState(flags);
+
+  try {
+    const updated = await buyerTransactionService.cancel(context.params.id, payload);
+    const nextTransaction = updated ?? { ...transaction, transaction_status: "cancelled" };
+    appStore.patchState("working.buyerPaymentStatus.transaction", {
+      data: nextTransaction,
+      hydratedAt: Date.now(),
+    }, "buyer-payment-status:cancel");
+    syncBusinessTransaction(nextTransaction, {
+      primaryRole: "buyer",
+      source: "buyer-payment-status:cancel",
+    });
+    showToast("Transaksi berhasil dibatalkan.", { type: "success" });
+  } catch (error) {
+    showToast(error.message || "Gagal membatalkan transaksi.", { type: "error" });
+  } finally {
+    flags.isCancelling = false;
+    setActionState(flags);
+  }
+}
+
+function collectBuyerCancelPayload(transaction) {
+  const status = String(transaction?.transaction_status ?? "").toLowerCase();
+  const isDpPaid = status === "dp_paid";
+  const message = isDpPaid
+    ? "Batalkan transaksi ini? Refund DP akan dipotong 10%."
+    : "Batalkan transaksi ini?";
+
+  if (!window.confirm(message)) {
+    return null;
+  }
+
+  const payload = {
+    cancel_reason: window.prompt("Alasan pembatalan", "") ?? "",
+  };
+
+  if (!isDpPaid) {
+    return payload;
+  }
+
+  const refundBankName = window.prompt("Nama bank untuk refund DP", "");
+  if (refundBankName === null) {
+    return null;
+  }
+  const refundAccountNumber = window.prompt("Nomor rekening untuk refund DP", "");
+  if (refundAccountNumber === null) {
+    return null;
+  }
+  const refundAccountName = window.prompt("Nama pemilik rekening", "");
+  if (refundAccountName === null) {
+    return null;
+  }
+
+  return {
+    ...payload,
+    refund_bank_name: refundBankName.trim(),
+    refund_account_number: refundAccountNumber.trim(),
+    refund_account_name: refundAccountName.trim(),
+  };
+}
+
 function isFulfillmentChecklistComplete(transaction) {
   const checklist = transaction?.fulfillment_checklist ?? [];
   return checklist.length > 0 && checklist
@@ -729,6 +839,10 @@ function isFulfillmentChecklistComplete(transaction) {
 
 function isPendingPayment(transaction) {
   return String(transaction?.transaction_status ?? "").toLowerCase() === "pending_payment";
+}
+
+function canBuyerCancel(transaction) {
+  return ["pending_payment", "dp_paid"].includes(String(transaction?.transaction_status ?? "").toLowerCase());
 }
 
 function paymentDueCopy(transaction) {

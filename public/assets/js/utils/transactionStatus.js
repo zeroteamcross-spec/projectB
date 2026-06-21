@@ -204,7 +204,15 @@ export function listingStatusForTransaction(transaction, previousTransaction = n
     return "sold";
   }
 
-  if (["cancelled", "expired"].includes(status)) {
+  if (status === "cancelled") {
+    if (["paid", "completed"].includes(previousStatus) || listing === "sold") {
+      return "sold";
+    }
+
+    return "published";
+  }
+
+  if (status === "expired") {
     if (["dp_paid"].includes(previousStatus) || listing === "reserved") {
       return "reserved";
     }

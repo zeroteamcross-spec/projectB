@@ -25,6 +25,11 @@ class TransactionStatusTransitionTest extends TestCase
         $this->providerFailureIsLoggedForCompletionPayment();
         $this->sellerCannotMarkTransactionCompleted();
         $this->buyerCanCompletePaidTransactionAfterChecklistIsDone();
+        $this->buyerCanCancelDpPaidTransactionWithRefundAccount();
+        $this->buyerCannotCancelDpPaidTransactionWithoutRefundAccount();
+        $this->sellerCanCancelDpPaidTransactionAndPublishListing();
+        $this->paidTransactionCannotBeCancelled();
+        $this->genericStatusUpdateCannotCancelTransaction();
     }
 
     private function paidStatusClearsRemainingAmountAndSetsPaidAt(): void
@@ -118,6 +123,82 @@ class TransactionStatusTransitionTest extends TestCase
         $row = $pdo->query('SELECT transaction_status FROM transactions WHERE id = 1')->fetch();
         $this->assertSame('completed', $row['transaction_status']);
         $this->assertSame('completed', $result['transaction_status']);
+    }
+
+    private function buyerCanCancelDpPaidTransactionWithRefundAccount(): void
+    {
+        [$pdo, $service] = $this->serviceWithSeedData('dp', 'dp_paid', 50000000, 100000000);
+        $pdo->exec("UPDATE cars SET listing_status = 'reserved' WHERE id = 10");
+
+        $result = $service->cancel(['id' => 1, 'role' => 'buyer'], 1, [
+            'refund_bank_name' => 'BCA',
+            'refund_account_number' => '1234567890',
+            'refund_account_name' => 'Buyer',
+            'cancel_reason' => 'Berubah pikiran',
+        ]);
+
+        $transaction = $pdo->query('SELECT transaction_status FROM transactions WHERE id = 1')->fetch();
+        $car = $pdo->query('SELECT listing_status FROM cars WHERE id = 10')->fetch();
+        $log = $pdo->query('SELECT provider_name, transaction_status, gross_amount, payload_request_json FROM transaction_payment_logs WHERE transaction_id = 1')->fetch();
+        $payload = json_decode((string) $log['payload_request_json'], true);
+
+        $this->assertSame('cancelled', $transaction['transaction_status']);
+        $this->assertSame('published', $car['listing_status']);
+        $this->assertSame('cancelled', $result['transaction_status']);
+        $this->assertSame('internal', $log['provider_name']);
+        $this->assertSame('refund_requested', $log['transaction_status']);
+        $this->assertSame(45000000, (int) $log['gross_amount']);
+        $this->assertSame(10, (int) $payload['refund_deduction_percent']);
+    }
+
+    private function buyerCannotCancelDpPaidTransactionWithoutRefundAccount(): void
+    {
+        [, $service] = $this->serviceWithSeedData('dp', 'dp_paid', 50000000, 100000000);
+
+        $this->expectException(ValidationException::class, static function () use ($service): void {
+            $service->cancel(['id' => 1, 'role' => 'buyer'], 1, [
+                'refund_bank_name' => 'BCA',
+            ]);
+        }, 'refund_account_number');
+    }
+
+    private function sellerCanCancelDpPaidTransactionAndPublishListing(): void
+    {
+        [$pdo, $service] = $this->serviceWithSeedData('dp', 'dp_paid', 50000000, 100000000);
+        $pdo->exec("UPDATE cars SET listing_status = 'reserved' WHERE id = 10");
+
+        $result = $service->cancel(['id' => 2, 'role' => 'seller'], 1, [
+            'cancel_reason' => 'Unit tidak tersedia',
+        ]);
+
+        $transaction = $pdo->query('SELECT transaction_status FROM transactions WHERE id = 1')->fetch();
+        $car = $pdo->query('SELECT listing_status FROM cars WHERE id = 10')->fetch();
+
+        $this->assertSame('cancelled', $transaction['transaction_status']);
+        $this->assertSame('published', $car['listing_status']);
+        $this->assertSame('cancelled', $result['transaction_status']);
+    }
+
+    private function paidTransactionCannotBeCancelled(): void
+    {
+        [, $service] = $this->serviceWithSeedData('full', 'paid', null, 0);
+
+        $this->expectException(ValidationException::class, static function () use ($service): void {
+            $service->cancel(['id' => 1, 'role' => 'buyer'], 1, [
+                'cancel_reason' => 'Berubah pikiran',
+            ]);
+        }, 'transaction_status');
+    }
+
+    private function genericStatusUpdateCannotCancelTransaction(): void
+    {
+        [, $service] = $this->serviceWithSeedData('dp', 'dp_paid', 50000000, 100000000);
+
+        $this->expectException(ValidationException::class, static function () use ($service): void {
+            $service->updateStatus(['id' => 2, 'role' => 'seller'], 1, [
+                'transaction_status' => 'cancelled',
+            ]);
+        }, 'transaction_status');
     }
 
     private function markChecklistComplete(\PDO $pdo): void

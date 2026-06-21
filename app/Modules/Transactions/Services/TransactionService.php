@@ -237,6 +237,13 @@ class TransactionService
     public function updateStatus(array $user, int $transactionId, array $data): array
     {
         $transaction = $this->requireTransaction($transactionId);
+
+        if (($data['transaction_status'] ?? null) === 'cancelled') {
+            throw new ValidationException([
+                'transaction_status' => 'Gunakan endpoint pembatalan transaksi.',
+            ]);
+        }
+
         TransactionPolicy::ensureCanUpdateStatus($user, $transaction, $data['transaction_status']);
         $this->applyStatus($transaction, $data['transaction_status']);
 
@@ -354,6 +361,41 @@ class TransactionService
         ];
 
         return $result;
+    }
+
+    public function cancel(array $user, int $transactionId, array $data): array
+    {
+        $transaction = $this->requireTransaction($transactionId);
+        TransactionPolicy::ensureCanCancel($user, $transaction);
+        $this->ensureCanCancelStatus($user, $transaction, $data);
+
+        $refund = $this->refundPayload($user, $transaction, $data);
+
+        try {
+            $this->pdo->beginTransaction();
+
+            $this->applyStatus($transaction, 'cancelled');
+
+            if (! $this->transactions->publishCarForCancelledTransaction((int) $transaction['car_id'])) {
+                throw new ValidationException([
+                    'car_id' => 'Listing mobil tidak bisa dikembalikan ke published.',
+                ]);
+            }
+
+            if ($refund !== null) {
+                $this->paymentLogs->record($transactionId, $refund);
+            }
+
+            $this->pdo->commit();
+        } catch (Throwable $exception) {
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+
+            throw $exception;
+        }
+
+        return $this->detail($user, $transactionId);
     }
 
     public function handleProviderCallback(array $payload): array
@@ -554,6 +596,69 @@ class TransactionService
 
             throw $exception;
         }
+    }
+
+    private function ensureCanCancelStatus(array $user, array $transaction, array $data): void
+    {
+        $status = (string) ($transaction['transaction_status'] ?? '');
+
+        if (! in_array($status, ['pending_payment', 'dp_paid'], true)) {
+            throw new ValidationException([
+                'transaction_status' => 'Transaksi hanya bisa dibatalkan sebelum pembayaran lunas.',
+            ]);
+        }
+
+        if (($user['role'] ?? null) === 'buyer' && $status === 'dp_paid') {
+            foreach ([
+                'refund_bank_name' => 'Nama bank refund wajib diisi.',
+                'refund_account_number' => 'Nomor rekening refund wajib diisi.',
+                'refund_account_name' => 'Nama pemilik rekening refund wajib diisi.',
+            ] as $field => $message) {
+                if (trim((string) ($data[$field] ?? '')) === '') {
+                    throw new ValidationException([$field => $message]);
+                }
+            }
+        }
+    }
+
+    private function refundPayload(array $user, array $transaction, array $data): ?array
+    {
+        if (($transaction['transaction_status'] ?? null) !== 'dp_paid') {
+            return null;
+        }
+
+        $dpAmount = (int) ($transaction['dp_amount'] ?? 0);
+        if ($dpAmount <= 0) {
+            return null;
+        }
+
+        $feeAmount = (int) floor($dpAmount * 0.1);
+        $refundAmount = max(0, $dpAmount - $feeAmount);
+
+        return [
+            'provider_name' => 'internal',
+            'provider_order_id' => $transaction['transaction_code'] ?? null,
+            'provider_transaction_id' => null,
+            'payment_method' => 'bank_transfer',
+            'transaction_status' => 'refund_requested',
+            'gross_amount' => $refundAmount,
+            'payload_request' => [
+                'requested_by_user_id' => (int) ($user['id'] ?? 0),
+                'requested_by_role' => $user['role'] ?? null,
+                'refund_bank_name' => trim((string) ($data['refund_bank_name'] ?? '')),
+                'refund_account_number' => trim((string) ($data['refund_account_number'] ?? '')),
+                'refund_account_name' => trim((string) ($data['refund_account_name'] ?? '')),
+                'cancel_reason' => trim((string) ($data['cancel_reason'] ?? '')),
+                'dp_amount' => $dpAmount,
+                'refund_deduction_percent' => 10,
+                'refund_deduction_amount' => $feeAmount,
+                'refund_amount' => $refundAmount,
+                'note' => 'Refund DP dipotong 10%.',
+            ],
+            'payload_response' => [
+                'message' => 'Refund DP menunggu proses internal. Nominal refund dipotong 10%.',
+            ],
+        ];
     }
 
     private function lockListingForPaymentStatus(array $transaction, string $status): void

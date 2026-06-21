@@ -18,6 +18,10 @@ export const sellerTransactionService = {
     return transactionsResource.updateFulfillmentChecklist(transactionId, payload, options);
   },
 
+  cancel(transactionId, payload = {}, options = {}) {
+    return transactionsResource.cancel(transactionId, payload, options);
+  },
+
   summarize(transactions = []) {
     return {
       total: transactions.length,

@@ -1,14 +1,17 @@
 import { createPageLifecycle } from "../../../core/lifecycle.js";
 import { appStore } from "../../../state/store.js";
 import { mergeActiveUserIdentity } from "../../../state/sync/authUserSync.js";
+import { syncBusinessTransaction } from "../../../state/sync/businessStatusSync.js";
 import { Badge } from "../../../ui/primitives/badge.js";
 import { Button } from "../../../ui/primitives/button.js";
 import { EmptyState } from "../../../ui/primitives/emptyState.js";
+import { showToast } from "../../../ui/primitives/toast.js";
 import { formatCurrency } from "../../../utils/formatCurrency.js";
 import { formatDate } from "../../../utils/formatDate.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 import { NotificationBell } from "../../notifications/components/notificationBell.js";
 import { buyerState } from "../state/buyerState.js";
+import { buyerTransactionService } from "../services/buyerTransactionService.js";
 import { buyerTransactionDetailPreloadService } from "../services/buyerTransactionDetailPreloadService.js";
 import { BUYER_MOBILE_FOOTER_ITEMS, BuyerMobileFooterNav } from "../components/buyerMobileFooterNav.js";
 import { getTransactionStatusMeta, titleizeStatus } from "../../../utils/transactionStatus.js";
@@ -42,6 +45,9 @@ export function BuyerTransactionsPage() {
         return;
       }
       currentContext?.router?.navigate("/buyer/transactions");
+    },
+    async cancelTransaction(transaction) {
+      await cancelBuyerTransaction(transaction);
     },
     setSearch(value) {
       uiState.search = value;
@@ -451,7 +457,87 @@ function transactionActions(transaction, actions) {
     wrap.append(pay);
   }
 
+  if (canBuyerCancel(transaction)) {
+    const cancel = Button({
+      label: "Batalkan",
+      variant: "secondary",
+      onClick: () => actions.cancelTransaction(transaction),
+      designHook: "shared.button.secondary",
+    });
+    cancel.id = `byrtx_transaction_${transaction.id ?? "unknown"}_cancel_button`;
+    cancel.prepend(createIcon("circleXmark", { className: "block h-4 w-4 leading-none" }));
+    wrap.append(cancel);
+  }
+
   return wrap;
+}
+
+async function cancelBuyerTransaction(transaction) {
+  if (!transaction?.id || !canBuyerCancel(transaction)) {
+    return;
+  }
+
+  const payload = collectBuyerCancelPayload(transaction);
+  if (payload === null) {
+    return;
+  }
+
+  try {
+    const updated = await buyerTransactionService.cancel(transaction.id, payload);
+    if (updated) {
+      syncBusinessTransaction(updated, {
+        primaryRole: "buyer",
+        source: "buyer-transactions:cancel",
+      });
+    }
+    showToast("Transaksi berhasil dibatalkan.", { type: "success" });
+  } catch (error) {
+    showToast(error.message || "Gagal membatalkan transaksi.", { type: "error" });
+  }
+}
+
+function collectBuyerCancelPayload(transaction) {
+  const status = String(transaction?.transaction_status ?? "").toLowerCase();
+  const isDpPaid = status === "dp_paid";
+  const message = isDpPaid
+    ? "Batalkan transaksi ini? Refund DP akan dipotong 10%."
+    : "Batalkan transaksi ini?";
+
+  if (!window.confirm(message)) {
+    return null;
+  }
+
+  const payload = {
+    cancel_reason: window.prompt("Alasan pembatalan", "") ?? "",
+  };
+
+  if (!isDpPaid) {
+    return payload;
+  }
+
+  const refundBankName = window.prompt("Nama bank untuk refund DP", "");
+  if (refundBankName === null) {
+    return null;
+  }
+  const refundAccountNumber = window.prompt("Nomor rekening untuk refund DP", "");
+  if (refundAccountNumber === null) {
+    return null;
+  }
+  const refundAccountName = window.prompt("Nama pemilik rekening", "");
+  if (refundAccountName === null) {
+    return null;
+  }
+
+  return {
+    ...payload,
+    refund_bank_name: refundBankName.trim(),
+    refund_account_number: refundAccountNumber.trim(),
+    refund_account_name: refundAccountName.trim(),
+  };
+}
+
+function canBuyerCancel(transaction) {
+  return ["pending_payment", "dp_paid"].includes(String(transaction?.transaction_status ?? "").toLowerCase());
 }
 
 function isPaymentExpired(transaction) {

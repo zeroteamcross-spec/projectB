@@ -14,6 +14,8 @@ export function SellerTransactionDetailPanel({
   onChecklistNote = null,
   onChecklistDate = null,
   onChecklistSave = null,
+  isCancelling = false,
+  onCancel = null,
 } = {}) {
   if (!transaction) {
     return EmptyState({
@@ -27,7 +29,7 @@ export function SellerTransactionDetailPanel({
   const layout = document.createElement("div");
   layout.className = "grid min-w-0 gap-4";
   layout.append(
-    statusCard(transaction, statusMeta),
+    statusCard(transaction, statusMeta, { isCancelling, onCancel }),
     fulfillmentChecklistCard({
       transaction,
       checklistDraft,
@@ -194,7 +196,7 @@ function stripHandoverDate(notes = "") {
     .trim();
 }
 
-function statusCard(transaction, statusMeta) {
+function statusCard(transaction, statusMeta, { isCancelling = false, onCancel = null } = {}) {
   const header = document.createElement("div");
   header.className = "flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between";
 
@@ -208,8 +210,28 @@ function statusCard(transaction, statusMeta) {
   body.textContent = statusMeta.description;
   copy.append(title, body);
 
-  header.append(copy, SellerTransactionStatusBadge({ status: transaction.transaction_status }));
+  const actions = document.createElement("div");
+  actions.className = "flex flex-wrap items-center gap-2 sm:justify-end";
+  actions.append(SellerTransactionStatusBadge({ status: transaction.transaction_status }));
+
+  if (canSellerCancel(transaction)) {
+    const cancel = Button({
+      label: isCancelling ? "Membatalkan..." : "Batalkan",
+      variant: "secondary",
+      disabled: isCancelling,
+      onClick: onCancel,
+      designHook: "shared.button.secondary",
+    });
+    cancel.classList.add("w-full", "sm:w-fit");
+    actions.append(cancel);
+  }
+
+  header.append(copy, actions);
   return Card(header);
+}
+
+function canSellerCancel(transaction) {
+  return ["pending_payment", "dp_paid"].includes(String(transaction?.transaction_status ?? "").toLowerCase());
 }
 
 function financialCard(financials) {

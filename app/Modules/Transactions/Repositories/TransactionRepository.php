@@ -259,6 +259,39 @@ class TransactionRepository
         return $stmt->rowCount();
     }
 
+    public function publishCarForCancelledTransaction(int $carId): bool
+    {
+        $stmt = $this->pdo->prepare(
+            'UPDATE cars
+             SET listing_status = :next_status,
+                 updated_at = :updated_at
+             WHERE id = :id
+             AND deleted_at IS NULL
+             AND listing_status IN (\'reserved\', \'published\')'
+        );
+        $stmt->execute([
+            'next_status' => 'published',
+            'updated_at' => date('Y-m-d H:i:s'),
+            'id' => $carId,
+        ]);
+
+        if ($stmt->rowCount() > 0) {
+            return true;
+        }
+
+        $check = $this->pdo->prepare(
+            'SELECT listing_status
+             FROM cars
+             WHERE id = :id
+             AND deleted_at IS NULL
+             LIMIT 1'
+        );
+        $check->execute(['id' => $carId]);
+        $car = $check->fetch();
+
+        return ($car['listing_status'] ?? null) === 'published';
+    }
+
     public function findActiveLockByCarId(int $carId, int $excludeTransactionId): ?array
     {
         $stmt = $this->pdo->prepare(

@@ -8,6 +8,7 @@ use App\Core\Controller;
 use App\Core\JsonResponse;
 use App\Core\Request;
 use App\Core\Response;
+use App\Modules\Transactions\Requests\CancelTransactionRequest;
 use App\Modules\Transactions\Requests\CompleteTransactionRequest;
 use App\Modules\Transactions\Requests\CreateTransactionRequest;
 use App\Modules\Transactions\Requests\ProviderCallbackRequest;
@@ -109,6 +110,16 @@ class TransactionController extends Controller
         return JsonResponse::success([
             'transaction' => $this->service->completePayment($user, (int) $request->routeParam('transaction_id'), $payload),
         ], 'Pelunasan transaksi berhasil diproses.');
+    }
+
+    public function cancel(Request $request): JsonResponse
+    {
+        $user = $this->user($request);
+        $payload = (new CancelTransactionRequest($request))->validate();
+
+        return JsonResponse::success([
+            'transaction' => $this->service->cancel($user, (int) $request->routeParam('transaction_id'), $payload),
+        ], 'Transaksi berhasil dibatalkan.');
     }
 
     public function providerCallback(Request $request): JsonResponse

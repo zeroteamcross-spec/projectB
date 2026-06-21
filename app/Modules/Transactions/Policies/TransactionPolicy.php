@@ -108,4 +108,21 @@ class TransactionPolicy
 
         throw new ForbiddenException('Akses pelunasan transaksi tidak diizinkan.');
     }
+
+    public static function ensureCanCancel(array $user, array $transaction): void
+    {
+        if (in_array(($user['role'] ?? null), ['admin', 'super_admin'], true)) {
+            return;
+        }
+
+        if (($user['role'] ?? null) === 'buyer' && (int) $user['id'] === (int) $transaction['buyer_user_id']) {
+            return;
+        }
+
+        if (($user['role'] ?? null) === 'seller' && (int) $user['id'] === (int) $transaction['seller_user_id']) {
+            return;
+        }
+
+        throw new ForbiddenException('Akses pembatalan transaksi tidak diizinkan.');
+    }
 }

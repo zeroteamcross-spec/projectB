@@ -58,6 +58,14 @@ class PaymentLogService
             return 'paid';
         }
 
+        if (($transaction['transaction_status'] ?? null) === 'cancelled') {
+            return 'cancelled';
+        }
+
+        if (($transaction['transaction_status'] ?? null) === 'expired') {
+            return 'expired';
+        }
+
         if (in_array($providerStatus, ['settlement', 'capture', 'paid'], true)) {
             return $this->settledStatus($transaction, $grossAmount);
         }
