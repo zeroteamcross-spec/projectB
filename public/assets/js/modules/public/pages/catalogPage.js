@@ -181,12 +181,7 @@ function render(root, context, flags) {
       context: "public",
       onNavigate: (path) => context.router?.navigate(path),
       resolveCtaUrl: (url) => isAffiliateRoute ? affiliateSliderCtaUrl(url, affiliateSlug) : url,
-      fallback: () => heroSection({
-        notFound: Boolean(flags.notFound || invalidAffiliateRoute),
-        count: allCars.length,
-        meta,
-        affiliate,
-      }),
+      fallback: () => sliderSkeletonPlaceholder(),
     }));
     frame.append(statsPanel({ count: allCars.length, meta, affiliate }));
     frame.append(
@@ -499,13 +494,56 @@ function loadingFrame(filters = {}, quickFilter = "newest", options = {}, backgr
       sliders: resolvePublicSliders(),
       idPrefix: "pubcat",
       context: "public",
-      fallback: () => heroSection({ affiliate }),
+      fallback: () => sliderSkeletonPlaceholder(),
     }),
     statsPanel({ count: 0, meta: {}, affiliate }),
     Skeleton({ lines: 8 }),
   );
   shell.append(frame);
   return shell;
+}
+
+function sliderSkeletonPlaceholder() {
+  const section = document.createElement("section");
+  section.id = "pubcat_slider_skeleton";
+  section.className = "relative overflow-hidden rounded-[24px] border border-white/45 bg-white/20 shadow-[0_22px_58px_rgba(15,23,42,.10)] backdrop-blur";
+  section.style.aspectRatio = "16 / 5";
+  section.setAttribute("aria-hidden", "true");
+
+  const shimmer = document.createElement("span");
+  shimmer.className = "absolute inset-0 -translate-x-full bg-[linear-gradient(90deg,transparent,rgba(255,255,255,.58),transparent)] animate-[pbPublicSliderShimmer_1.2s_infinite]";
+
+  const content = document.createElement("span");
+  content.className = "absolute inset-4 grid grid-cols-[minmax(0,1fr)_34%] items-center gap-4";
+
+  const copy = document.createElement("span");
+  copy.className = "grid gap-3";
+  ["h-4 w-24", "h-8 w-3/4", "h-4 w-1/2"].forEach((size) => {
+    const line = document.createElement("span");
+    line.className = `${size} rounded-full bg-white/55`;
+    copy.append(line);
+  });
+
+  const media = document.createElement("span");
+  media.className = "h-full min-h-0 rounded-[18px] bg-white/45";
+
+  content.append(copy, media);
+  section.append(shimmer, content);
+  injectPublicSliderSkeletonStyle();
+  return section;
+}
+
+let publicSliderSkeletonStyleInjected = false;
+
+function injectPublicSliderSkeletonStyle() {
+  if (publicSliderSkeletonStyleInjected || typeof document === "undefined") {
+    return;
+  }
+  publicSliderSkeletonStyleInjected = true;
+  const style = document.createElement("style");
+  style.id = "pubcat-slider-skeleton-style";
+  style.textContent = "@keyframes pbPublicSliderShimmer{100%{transform:translateX(100%)}}";
+  document.head.append(style);
 }
 
 function restoreCatalogScrollOnce(hasRestored, markRestored) {
