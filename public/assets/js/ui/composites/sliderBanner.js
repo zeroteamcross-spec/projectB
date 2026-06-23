@@ -9,7 +9,6 @@ const TEMPLATE_LABELS = {
 };
 
 let styleInjected = false;
-let sliderBannerDebugCount = 0;
 
 export function SliderBanner({
   sliders = [],
@@ -30,19 +29,12 @@ export function SliderBanner({
   const templateKey = templateKeyFor(slider);
   const usesSidePeek = ["public", "buyer"].includes(context) && items.length > 1;
   const sliderId = `${idPrefix}_slider_banner`;
-  const debugId = ++sliderBannerDebugCount;
-  debugSliderBanner("create", {
-    debugId,
-    sliderId,
-    context,
-    items: items.length,
-    usesSidePeek,
-  });
   const section = document.createElement("section");
   section.id = sliderId;
   section.className = [
     "pb-slider-banner",
     usesSidePeek ? "pb-slider-side-peek" : "",
+    usesSidePeek ? "pb-slider-layout-pending" : "",
     `pb-slider-${templateKey}`,
     `pb-slider-anim-${animationKeyFor(slider)}`,
     context === "buyer" ? "pb-slider-context-buyer" : "pb-slider-context-public",
@@ -75,33 +67,18 @@ export function SliderBanner({
   let timerId = null;
   let resizeTimerId = null;
   const handleResize = () => {
-    debugSliderBanner("resize", { debugId, sliderId });
     window.clearTimeout(resizeTimerId);
     resizeTimerId = window.setTimeout(() => applyTrackPosition(0, false), 80);
   };
 
   const applyTrackPosition = (dragOffset = 0, animated = true) => {
     const activeSlide = slideNodes[renderedIndex];
-    if (!activeSlide) {
-      debugSliderBanner("apply-track-missing-active-slide", { debugId, sliderId, renderedIndex });
-      return;
-    }
+    if (!activeSlide) return;
     const sidePeekOffset = usesSidePeek
       ? (section.clientWidth - activeSlide.offsetWidth) / 2
       : 0;
     track.style.transition = animated ? "" : "none";
     track.style.transform = `translate3d(${dragOffset + sidePeekOffset - activeSlide.offsetLeft}px,0,0)`;
-    debugSliderBanner("apply-track", {
-      debugId,
-      sliderId,
-      activeIndex,
-      renderedIndex,
-      animated,
-      clientWidth: section.clientWidth,
-      activeWidth: activeSlide.offsetWidth,
-      activeLeft: activeSlide.offsetLeft,
-      transform: track.style.transform,
-    });
   };
 
   const renderActiveSlide = (nextIndex, direction = "initial", animated = true, targetRenderedIndex = null) => {
@@ -109,17 +86,6 @@ export function SliderBanner({
     renderedIndex = targetRenderedIndex ?? (usesSidePeek ? activeIndex + 1 : activeIndex);
     const activeSlider = items[activeIndex];
     const activeTemplateKey = templateKeyFor(activeSlider);
-    debugSliderBanner("render-active", {
-      debugId,
-      sliderId,
-      nextIndex,
-      activeIndex,
-      renderedIndex,
-      direction,
-      animated,
-      targetRenderedIndex,
-      template: activeTemplateKey,
-    });
     const directionClass = direction === "prev"
       ? "pb-slider-direction-prev"
       : direction === "next"
@@ -129,6 +95,7 @@ export function SliderBanner({
     section.className = [
       "pb-slider-banner",
       usesSidePeek ? "pb-slider-side-peek" : "",
+      usesSidePeek && section.classList.contains("pb-slider-layout-pending") ? "pb-slider-layout-pending" : "",
       `pb-slider-${activeTemplateKey}`,
       `pb-slider-anim-${animationKeyFor(activeSlider)}`,
       directionClass,
@@ -177,16 +144,13 @@ export function SliderBanner({
   const scheduleNext = () => {
     clearTimer();
     if (items.length <= 1) return;
-    debugSliderBanner("schedule-next", { debugId, sliderId, activeIndex, renderedIndex });
     timerId = window.setTimeout(() => {
-      debugSliderBanner("timer-next", { debugId, sliderId, activeIndex, renderedIndex });
       next();
       scheduleNext();
     }, 5200);
   };
   const clearTimer = () => {
     if (!timerId) return;
-    debugSliderBanner("clear-timer", { debugId, sliderId });
     window.clearTimeout(timerId);
     timerId = null;
   };
@@ -210,7 +174,6 @@ export function SliderBanner({
   });
 
   section.dispose = () => {
-    debugSliderBanner("dispose", { debugId, sliderId, activeIndex, renderedIndex });
     clearTimer();
     window.clearTimeout(resizeTimerId);
     window.removeEventListener("resize", handleResize);
@@ -220,7 +183,6 @@ export function SliderBanner({
   window.addEventListener("resize", handleResize);
   track.addEventListener("transitionend", (event) => {
     if (event.target !== track || event.propertyName !== "transform") return;
-    debugSliderBanner("transitionend", { debugId, sliderId, activeIndex, renderedIndex });
     snapInfiniteEdge();
   });
   section.append(track, dotsWrap);
@@ -229,22 +191,13 @@ export function SliderBanner({
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         applyTrackPosition(0, false);
+        section.classList.remove("pb-slider-layout-pending");
       });
     });
   }
   scheduleNext();
 
   return section;
-}
-
-function debugSliderBanner(event, detail = {}) {
-  if (typeof console === "undefined") {
-    return;
-  }
-  console.debug("[slider-banner-debug]", event, {
-    t: Math.round(performance.now()),
-    ...detail,
-  });
 }
 
 export function sliderTemplateOptions() {
@@ -647,6 +600,7 @@ function injectSliderStyles() {
   style.textContent = `
     .pb-slider-banner{position:relative;overflow:hidden;aspect-ratio:16/5;border-radius:24px;box-shadow:0 22px 58px rgba(15,23,42,.11)}
     .pb-slider-side-peek{border-radius:0;box-shadow:none}
+    .pb-slider-layout-pending{visibility:hidden}
     .pb-slider-swipeable{touch-action:pan-y;cursor:grab}
     .pb-slider-swipeable:active{cursor:grabbing}
     .pb-slider-track{position:absolute;inset:0;display:flex;gap:16px;overflow:visible;will-change:transform;transition:transform .46s cubic-bezier(.2,.8,.2,1)}

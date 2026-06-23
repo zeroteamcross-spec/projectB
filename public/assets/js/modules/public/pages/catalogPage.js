@@ -25,8 +25,6 @@ import { applyDesignHook } from "../../../theme/designStudioHooks.js";
 
 const PUBLIC_CATALOG_FALLBACK = "bg-[radial-gradient(circle_at_top_left,color-mix(in_srgb,var(--pb-brand-accent)_22%,transparent),transparent_22%),radial-gradient(circle_at_top_right,rgba(255,255,255,0.08),transparent_12%),linear-gradient(180deg,var(--pb-public-canvas-start)_0%,var(--pb-public-canvas-mid)_45%,var(--pb-public-canvas-end)_100%)]";
 let publicSliderCache = [];
-let publicCatalogRenderDebugCount = 0;
-let publicCatalogLastAction = "initial";
 
 export function PublicCatalogPage({ notFound = false } = {}) {
   let root = null;
@@ -67,9 +65,7 @@ export function PublicCatalogPage({ notFound = false } = {}) {
     },
     bindEvents(context) {
       unsubscribe = appStore.subscribe((state, action) => {
-        publicCatalogLastAction = String(action ?? "");
         if (!shouldRenderCatalogForAction(action)) {
-          debugPublicCatalog("skip-render", { action });
           return;
         }
         render(root, context, { notFound, isLoadingMore, isRefreshing, getBackgroundVideoLayer });
@@ -136,21 +132,8 @@ function render(root, context, flags) {
   const contextReady = !isAffiliateRoute || (affiliate?.slug ?? "") === affiliateSlug;
   const useBackgroundVideo = isLandingRoute(context);
   const slidersBeforeRender = resolvePublicSliders();
-  const existingSlider = root.querySelector?.("#pubcat_slider_banner");
-  debugPublicCatalog("render-start", {
-    count: ++publicCatalogRenderDebugCount,
-    action: publicCatalogLastAction,
-    path: context?.path,
-    cars: allCars.length,
-    sliders: slidersBeforeRender.length,
-    existingSlider: Boolean(existingSlider),
-  });
 
   if (isAffiliateRoute && !invalidAffiliateRoute && (!contextReady || !workingHydratedAt)) {
-    debugPublicCatalog("replace-loading-frame", {
-      action: publicCatalogLastAction,
-      existingSlider: Boolean(root.querySelector?.("#pubcat_slider_banner")),
-    });
     disposeSliderBanners(root);
     root.replaceChildren(loadingFrame(
       filters,
@@ -224,14 +207,16 @@ function render(root, context, flags) {
       onQuickFilter: (value) => publicCatalogState.setQuickFilter(value),
       onOpenFilter: () => publicCatalogState.setFilterOpen(true),
     }));
-    frame.append(SliderBanner({
-      sliders: slidersBeforeRender,
-      idPrefix: "pubcat",
-      context: "public",
-      onNavigate: (path) => context.router?.navigate(path),
-      resolveCtaUrl: (url) => isAffiliateRoute ? affiliateSliderCtaUrl(url, affiliateSlug) : url,
-      fallback: () => sliderSkeletonPlaceholder(),
-    }));
+    frame.append(slidersBeforeRender.length
+      ? SliderBanner({
+          sliders: slidersBeforeRender,
+          idPrefix: "pubcat",
+          context: "public",
+          onNavigate: (path) => context.router?.navigate(path),
+          resolveCtaUrl: (url) => isAffiliateRoute ? affiliateSliderCtaUrl(url, affiliateSlug) : url,
+          fallback: () => sliderSkeletonPlaceholder(),
+        })
+      : sliderSkeletonPlaceholder());
     frame.append(statsPanel({ count: allCars.length, meta, affiliate }));
     frame.append(
       catalogToolbar(allCars.length, meta, affiliate),
@@ -265,24 +250,9 @@ function render(root, context, flags) {
       onClose: () => publicCatalogState.setFilterOpen(false),
     })
   );
-  debugPublicCatalog("replace-shell", {
-    action: publicCatalogLastAction,
-    existingSlider: Boolean(root.querySelector?.("#pubcat_slider_banner")),
-    nextSliders: slidersBeforeRender.length,
-  });
   disposeSliderBanners(root);
   root.replaceChildren(shell);
   publicCarDetailPreloadService.enqueueCars(allCars, { affiliateSlug });
-}
-
-function debugPublicCatalog(event, detail = {}) {
-  if (typeof console === "undefined") {
-    return;
-  }
-  console.debug("[public-catalog-debug]", event, {
-    t: Math.round(performance.now()),
-    ...detail,
-  });
 }
 
 function heroSection(notFound) {
@@ -544,6 +514,7 @@ function loadingFrame(filters = {}, quickFilter = "newest", options = {}, backgr
     ? "relative isolate min-h-screen overflow-x-clip bg-transparent"
     : `relative isolate min-h-screen overflow-x-clip ${PUBLIC_CATALOG_FALLBACK}`;
   appendBackground(shell, backgroundVideoLayer, cosmicTexture());
+  const sliders = resolvePublicSliders();
 
   const frame = document.createElement("div");
   frame.className = "relative z-10 mx-auto grid w-full max-w-[1200px] gap-5 px-4 py-4 sm:px-6 sm:py-6 2xl:max-w-[1240px]";
@@ -554,12 +525,14 @@ function loadingFrame(filters = {}, quickFilter = "newest", options = {}, backgr
       options,
       activeFilterCount: activeFilterCount(filters),
     }),
-    SliderBanner({
-      sliders: resolvePublicSliders(),
-      idPrefix: "pubcat",
-      context: "public",
-      fallback: () => sliderSkeletonPlaceholder(),
-    }),
+    sliders.length
+      ? SliderBanner({
+          sliders,
+          idPrefix: "pubcat",
+          context: "public",
+          fallback: () => sliderSkeletonPlaceholder(),
+        })
+      : sliderSkeletonPlaceholder(),
     statsPanel({ count: 0, meta: {}, affiliate }),
     Skeleton({ lines: 8 }),
   );
@@ -696,11 +669,6 @@ function appendBackground(shell, ...layers) {
 
 function disposeSliderBanners(root) {
   const banners = Array.from(root?.querySelectorAll?.(".pb-slider-banner") ?? []);
-  debugPublicCatalog("dispose-slider-banners", {
-    action: publicCatalogLastAction,
-    count: banners.length,
-    ids: banners.map((node) => node.id),
-  });
   banners.forEach((node) => node.dispose?.());
 }
 
