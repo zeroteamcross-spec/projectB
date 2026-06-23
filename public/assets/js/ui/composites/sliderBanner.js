@@ -9,6 +9,7 @@ const TEMPLATE_LABELS = {
 };
 
 let styleInjected = false;
+const preparedSidePeekSliderIds = new Set();
 
 export function SliderBanner({
   sliders = [],
@@ -28,12 +29,14 @@ export function SliderBanner({
   const slider = items[0];
   const templateKey = templateKeyFor(slider);
   const usesSidePeek = ["public", "buyer"].includes(context) && items.length > 1;
+  const sliderId = `${idPrefix}_slider_banner`;
+  const needsInitialPreparation = usesSidePeek && !preparedSidePeekSliderIds.has(sliderId);
   const section = document.createElement("section");
-  section.id = `${idPrefix}_slider_banner`;
+  section.id = sliderId;
   section.className = [
     "pb-slider-banner",
     usesSidePeek ? "pb-slider-side-peek" : "",
-    usesSidePeek ? "pb-slider-preparing" : "",
+    needsInitialPreparation ? "pb-slider-preparing" : "",
     `pb-slider-${templateKey}`,
     `pb-slider-anim-${animationKeyFor(slider)}`,
     context === "buyer" ? "pb-slider-context-buyer" : "pb-slider-context-public",
@@ -43,7 +46,7 @@ export function SliderBanner({
 
   const track = document.createElement("section");
   track.className = "pb-slider-track";
-  const preparingSkeleton = usesSidePeek ? sidePeekSkeleton() : null;
+  const preparingSkeleton = needsInitialPreparation ? sidePeekSkeleton() : null;
   const renderedItems = usesSidePeek
     ? [items[items.length - 1], ...items, items[0]]
     : items;
@@ -95,7 +98,7 @@ export function SliderBanner({
     section.className = [
       "pb-slider-banner",
       usesSidePeek ? "pb-slider-side-peek" : "",
-      usesSidePeek && section.classList.contains("pb-slider-preparing") ? "pb-slider-preparing" : "",
+      needsInitialPreparation && section.classList.contains("pb-slider-preparing") ? "pb-slider-preparing" : "",
       `pb-slider-${activeTemplateKey}`,
       `pb-slider-anim-${animationKeyFor(activeSlider)}`,
       directionClass,
@@ -194,8 +197,11 @@ export function SliderBanner({
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         applyTrackPosition(0, false);
-        section.classList.remove("pb-slider-preparing");
-        preparingSkeleton?.remove();
+        if (needsInitialPreparation) {
+          preparedSidePeekSliderIds.add(sliderId);
+          section.classList.remove("pb-slider-preparing");
+          preparingSkeleton?.remove();
+        }
       });
     });
   }
