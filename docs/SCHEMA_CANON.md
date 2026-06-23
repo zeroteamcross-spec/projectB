@@ -85,10 +85,12 @@ Daftar tabel inti untuk `projectB`:
 22. `sliders`
 23. `affiliate_settlement_histories`
 24. `user_oauth_identities`
+25. `schema_migrations`
 
 Catatan:
 - beberapa tabel adalah hasil normalisasi dari struktur lama
 - beberapa tabel ditambahkan untuk memperjelas domain dan mengurangi ambiguitas
+- `schema_migrations` adalah tabel operasional untuk Migration Manager
 
 ---
 
@@ -198,6 +200,7 @@ Field:
 - `has_service_book` tinyint(1) not null default 0
 - `key_count` int not null default 1
 - `description` text null
+- `youtube_url` varchar(300) null
 - `price_cash` bigint null
 - `price_discount` bigint null
 - `price_credit` bigint null

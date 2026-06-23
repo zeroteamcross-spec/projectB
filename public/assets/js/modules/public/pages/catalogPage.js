@@ -64,7 +64,12 @@ export function PublicCatalogPage({ notFound = false } = {}) {
       render(root, context, { notFound, isLoadingMore, isRefreshing, getBackgroundVideoLayer });
     },
     bindEvents(context) {
-      unsubscribe = appStore.subscribe(() => render(root, context, { notFound, isLoadingMore, isRefreshing, getBackgroundVideoLayer }));
+      unsubscribe = appStore.subscribe((state, action) => {
+        if (!shouldRenderCatalogForAction(action)) {
+          return;
+        }
+        render(root, context, { notFound, isLoadingMore, isRefreshing, getBackgroundVideoLayer });
+      });
       return () => unsubscribe?.();
     },
     unmount() {
@@ -77,6 +82,32 @@ export function PublicCatalogPage({ notFound = false } = {}) {
       unsubscribe = null;
     },
   });
+}
+
+function shouldRenderCatalogForAction(action) {
+  const value = String(action ?? "");
+  if (!value) {
+    return true;
+  }
+
+  if (value.startsWith("ui:")) {
+    return false;
+  }
+
+  if (value === "public:selected-car" || value === "public:scroll-save" || value === "public:scroll-consume") {
+    return false;
+  }
+
+  return [
+    "auth.",
+    "auth:",
+    "public:",
+    "public-context:",
+    "working:set",
+    "snapshot:set",
+    "route:",
+    "app.route",
+  ].some((prefix) => value.startsWith(prefix) || value.includes(prefix));
 }
 
 function render(root, context, flags) {
