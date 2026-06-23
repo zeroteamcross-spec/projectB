@@ -148,8 +148,8 @@ export class PublicShell {
     const isMobileLoggedIn = isAuthenticated && role === "buyer" && isLandingPage;
 
     if (this.headerNode) {
-      this.headerNode.classList.toggle("hidden", isMobileLoggedIn);
-      this.headerNode.classList.toggle("sm:block", isMobileLoggedIn);
+      this.headerNode.classList.toggle("hidden", isAuthenticated);
+      this.headerNode.classList.toggle("sm:block", false);
     }
 
     if (this.mobileFooterContainer) {
