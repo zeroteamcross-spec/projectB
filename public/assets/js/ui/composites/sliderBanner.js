@@ -9,6 +9,7 @@ const TEMPLATE_LABELS = {
 };
 
 let styleInjected = false;
+let sliderBannerDebugCount = 0;
 
 export function SliderBanner({
   sliders = [],
@@ -29,6 +30,14 @@ export function SliderBanner({
   const templateKey = templateKeyFor(slider);
   const usesSidePeek = ["public", "buyer"].includes(context) && items.length > 1;
   const sliderId = `${idPrefix}_slider_banner`;
+  const debugId = ++sliderBannerDebugCount;
+  debugSliderBanner("create", {
+    debugId,
+    sliderId,
+    context,
+    items: items.length,
+    usesSidePeek,
+  });
   const section = document.createElement("section");
   section.id = sliderId;
   section.className = [
@@ -66,18 +75,33 @@ export function SliderBanner({
   let timerId = null;
   let resizeTimerId = null;
   const handleResize = () => {
+    debugSliderBanner("resize", { debugId, sliderId });
     window.clearTimeout(resizeTimerId);
     resizeTimerId = window.setTimeout(() => applyTrackPosition(0, false), 80);
   };
 
   const applyTrackPosition = (dragOffset = 0, animated = true) => {
     const activeSlide = slideNodes[renderedIndex];
-    if (!activeSlide) return;
+    if (!activeSlide) {
+      debugSliderBanner("apply-track-missing-active-slide", { debugId, sliderId, renderedIndex });
+      return;
+    }
     const sidePeekOffset = usesSidePeek
       ? (section.clientWidth - activeSlide.offsetWidth) / 2
       : 0;
     track.style.transition = animated ? "" : "none";
     track.style.transform = `translate3d(${dragOffset + sidePeekOffset - activeSlide.offsetLeft}px,0,0)`;
+    debugSliderBanner("apply-track", {
+      debugId,
+      sliderId,
+      activeIndex,
+      renderedIndex,
+      animated,
+      clientWidth: section.clientWidth,
+      activeWidth: activeSlide.offsetWidth,
+      activeLeft: activeSlide.offsetLeft,
+      transform: track.style.transform,
+    });
   };
 
   const renderActiveSlide = (nextIndex, direction = "initial", animated = true, targetRenderedIndex = null) => {
@@ -85,6 +109,17 @@ export function SliderBanner({
     renderedIndex = targetRenderedIndex ?? (usesSidePeek ? activeIndex + 1 : activeIndex);
     const activeSlider = items[activeIndex];
     const activeTemplateKey = templateKeyFor(activeSlider);
+    debugSliderBanner("render-active", {
+      debugId,
+      sliderId,
+      nextIndex,
+      activeIndex,
+      renderedIndex,
+      direction,
+      animated,
+      targetRenderedIndex,
+      template: activeTemplateKey,
+    });
     const directionClass = direction === "prev"
       ? "pb-slider-direction-prev"
       : direction === "next"
@@ -142,13 +177,16 @@ export function SliderBanner({
   const scheduleNext = () => {
     clearTimer();
     if (items.length <= 1) return;
+    debugSliderBanner("schedule-next", { debugId, sliderId, activeIndex, renderedIndex });
     timerId = window.setTimeout(() => {
+      debugSliderBanner("timer-next", { debugId, sliderId, activeIndex, renderedIndex });
       next();
       scheduleNext();
     }, 5200);
   };
   const clearTimer = () => {
     if (!timerId) return;
+    debugSliderBanner("clear-timer", { debugId, sliderId });
     window.clearTimeout(timerId);
     timerId = null;
   };
@@ -172,6 +210,7 @@ export function SliderBanner({
   });
 
   section.dispose = () => {
+    debugSliderBanner("dispose", { debugId, sliderId, activeIndex, renderedIndex });
     clearTimer();
     window.clearTimeout(resizeTimerId);
     window.removeEventListener("resize", handleResize);
@@ -181,6 +220,7 @@ export function SliderBanner({
   window.addEventListener("resize", handleResize);
   track.addEventListener("transitionend", (event) => {
     if (event.target !== track || event.propertyName !== "transform") return;
+    debugSliderBanner("transitionend", { debugId, sliderId, activeIndex, renderedIndex });
     snapInfiniteEdge();
   });
   section.append(track, dotsWrap);
@@ -195,6 +235,16 @@ export function SliderBanner({
   scheduleNext();
 
   return section;
+}
+
+function debugSliderBanner(event, detail = {}) {
+  if (typeof console === "undefined") {
+    return;
+  }
+  console.debug("[slider-banner-debug]", event, {
+    t: Math.round(performance.now()),
+    ...detail,
+  });
 }
 
 export function sliderTemplateOptions() {
