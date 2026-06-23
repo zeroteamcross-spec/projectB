@@ -18,6 +18,7 @@ import { PublicCarCard } from "../components/publicCarCard.js";
 import { PublicFilterBottomSheet } from "../components/publicFilterBottomSheet.js";
 import { PublicSearchFilterBar } from "../components/publicSearchFilterBar.js";
 import { adminMasterService } from "../../admin/services/adminMasterService.js";
+import { BuyerDesktopTopNav } from "../../buyer/components/buyerDesktopTopNav.js";
 import { tw } from "../../../theme/tailwindClasses.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 import { applyDesignHook } from "../../../theme/designStudioHooks.js";
@@ -125,6 +126,17 @@ function render(root, context, flags) {
 
   const isAuthenticated = authStore.isAuthenticated();
   const role = authStore.role();
+  const showDesktopTopNav = isAuthenticated && (role === "buyer" || role === "seller");
+  if (showDesktopTopNav) {
+    frame.append(BuyerDesktopTopNav({
+      activePath: context?.path ?? "/",
+      brandLabel: role === "seller" ? "Marketing" : "Premium Buyer",
+      brandIcon: role === "seller" ? "showroom" : "car",
+      user: authStore.user(),
+      onNavigate: (path) => context.router?.navigate(path),
+    }));
+  }
+
   if (isAuthenticated && (role === "buyer" || role === "seller")) {
     frame.append(buyerProfileHeader({
       user: authStore.user(),
@@ -133,20 +145,6 @@ function render(root, context, flags) {
       },
     }));
   }
-
-  frame.append(SliderBanner({
-    sliders: resolvePublicSliders(),
-    idPrefix: "pubcat",
-    context: "public",
-    onNavigate: (path) => context.router?.navigate(path),
-    resolveCtaUrl: (url) => isAffiliateRoute ? affiliateSliderCtaUrl(url, affiliateSlug) : url,
-    fallback: () => heroSection({
-      notFound: Boolean(flags.notFound || invalidAffiliateRoute),
-      count: allCars.length,
-      meta,
-      affiliate,
-    }),
-  }));
 
   if (affiliate) {
     const banner = PublicAffiliateContextBanner({
@@ -176,6 +174,19 @@ function render(root, context, flags) {
       onSearch: (nextFilters) => publicCatalogState.setFilters(nextFilters),
       onQuickFilter: (value) => publicCatalogState.setQuickFilter(value),
       onOpenFilter: () => publicCatalogState.setFilterOpen(true),
+    }));
+    frame.append(SliderBanner({
+      sliders: resolvePublicSliders(),
+      idPrefix: "pubcat",
+      context: "public",
+      onNavigate: (path) => context.router?.navigate(path),
+      resolveCtaUrl: (url) => isAffiliateRoute ? affiliateSliderCtaUrl(url, affiliateSlug) : url,
+      fallback: () => heroSection({
+        notFound: Boolean(flags.notFound || invalidAffiliateRoute),
+        count: allCars.length,
+        meta,
+        affiliate,
+      }),
     }));
     frame.append(statsPanel({ count: allCars.length, meta, affiliate }));
     frame.append(
@@ -478,12 +489,17 @@ function loadingFrame(filters = {}, quickFilter = "newest", options = {}, backgr
   const frame = document.createElement("div");
   frame.className = "relative z-10 mx-auto grid w-full max-w-[1200px] gap-5 px-4 py-4 sm:px-6 sm:py-6 2xl:max-w-[1240px]";
   frame.append(
-    heroSection({ affiliate }),
     PublicSearchFilterBar({
       filters,
       quickFilter,
       options,
       activeFilterCount: activeFilterCount(filters),
+    }),
+    SliderBanner({
+      sliders: resolvePublicSliders(),
+      idPrefix: "pubcat",
+      context: "public",
+      fallback: () => heroSection({ affiliate }),
     }),
     statsPanel({ count: 0, meta: {}, affiliate }),
     Skeleton({ lines: 8 }),
