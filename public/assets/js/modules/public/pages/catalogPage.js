@@ -153,11 +153,14 @@ function render(root, context, flags) {
   applyDesignHook(shell, "catalog.page");
   appendBackground(shell, useBackgroundVideo ? flags.getBackgroundVideoLayer?.() : null, cosmicTexture());
 
-  const frame = document.createElement("div");
-  frame.className = "relative z-10 mx-auto grid w-full max-w-[1200px] gap-5 px-3 py-4 sm:gap-6 sm:px-6 sm:py-6 2xl:max-w-[1240px]";
-
   const isAuthenticated = authStore.isAuthenticated();
   const role = authStore.role();
+  const hasBuyerMobileFooter = isAuthenticated && role === "buyer" && isLandingRoute(context);
+
+  const frame = document.createElement("div");
+  frame.className = hasBuyerMobileFooter
+    ? "relative z-10 mx-auto grid w-full max-w-[1200px] gap-5 px-3 pb-28 pt-4 sm:gap-6 sm:px-6 sm:pb-32 sm:pt-6 md:pb-6 2xl:max-w-[1240px]"
+    : "relative z-10 mx-auto grid w-full max-w-[1200px] gap-5 px-3 py-4 sm:gap-6 sm:px-6 sm:py-6 2xl:max-w-[1240px]";
   const showDesktopTopNav = isAuthenticated && (role === "buyer" || role === "seller");
   if (showDesktopTopNav) {
     frame.append(BuyerDesktopTopNav({
