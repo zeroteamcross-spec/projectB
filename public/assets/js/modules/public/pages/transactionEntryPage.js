@@ -39,6 +39,14 @@ export function TransactionEntryPage() {
   };
 
   return createPageLifecycle({
+    async bootstrap(context) {
+      publicContextService.syncRouteContext(context);
+      const affiliateSlug = publicContextService.routeAffiliateSlug(context);
+
+      if (affiliateSlug) {
+        await publicContextService.activateAffiliateBySlug(affiliateSlug).catch(() => null);
+      }
+    },
     mount(context) {
       transactionEntryState.ensureForm();
       root = document.createElement("div");

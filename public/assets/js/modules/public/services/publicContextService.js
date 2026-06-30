@@ -2,30 +2,10 @@ import { brandConfig } from "../../../theme/brandConfig.js";
 import { affiliatesResource } from "../../../resources/affiliatesResource.js";
 import { publicContextState } from "../state/publicContextState.js";
 
-const STORAGE_KEY = "projectB:public-context";
-
 export const publicContextService = {
   restore() {
-    const raw = safeSessionStorage().getItem(STORAGE_KEY);
-
-    if (!raw) {
-      publicContextState.setDefault();
-      return null;
-    }
-
-    try {
-      const parsed = JSON.parse(raw);
-      if (!parsed || parsed.mode !== "affiliate" || !parsed.affiliate?.slug) {
-        this.clear();
-        return null;
-      }
-
-      publicContextState.setAffiliate(parsed.affiliate);
-      return parsed.affiliate;
-    } catch (error) {
-      this.clear();
-      return null;
-    }
+    publicContextState.setDefault();
+    return null;
   },
 
   current() {
@@ -68,18 +48,36 @@ export const publicContextService = {
     };
 
     publicContextState.setAffiliate(affiliate);
-    persist({ mode: "affiliate", affiliate });
     return affiliate;
   },
 
   clear() {
     publicContextState.setDefault();
-    safeSessionStorage().removeItem(STORAGE_KEY);
   },
 
   clearInvalidSlug(slug) {
     publicContextState.setInvalidSlug(slug);
-    safeSessionStorage().removeItem(STORAGE_KEY);
+  },
+
+  syncRouteContext(context = {}) {
+    if (this.routeAffiliateSlug(context)) {
+      return;
+    }
+
+    this.clear();
+  },
+
+  routeAffiliateSlug(context = {}) {
+    const slug = String(context.params?.slug ?? "").trim().toLowerCase();
+    if (!slug) {
+      return "";
+    }
+
+    const path = String(context.path ?? "");
+    const name = String(context.name ?? context.route?.name ?? "");
+    const isAffiliatePath = path.startsWith(`/af/${slug}`) || path.startsWith(`/a/${slug}`);
+    const isAffiliateRoute = name.includes("affiliate");
+    return isAffiliatePath || isAffiliateRoute ? slug : "";
   },
 
   applyCatalogFilters(filters = {}) {
@@ -142,19 +140,3 @@ export const publicContextService = {
     return `/transactions/new?car_id=${encodeURIComponent(carId)}`;
   },
 };
-
-function persist(payload) {
-  safeSessionStorage().setItem(STORAGE_KEY, JSON.stringify(payload));
-}
-
-function safeSessionStorage() {
-  try {
-    return window.sessionStorage;
-  } catch (error) {
-    return {
-      getItem() { return null; },
-      setItem() {},
-      removeItem() {},
-    };
-  }
-}

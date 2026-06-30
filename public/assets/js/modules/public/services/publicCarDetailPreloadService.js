@@ -75,6 +75,10 @@ async function loadNext() {
   isLoading = true;
 
   try {
+    if (item.affiliateSlug && !isCurrentAffiliateRoute(item.affiliateSlug)) {
+      return;
+    }
+
     const detail = await fetchDetailOnce(item.id, item.id, {
       affiliateSlug: item.affiliateSlug,
     });
@@ -142,4 +146,16 @@ function patchWorkingIfActive(id, detail) {
 function normalizeId(value) {
   const id = String(value ?? "").trim();
   return id || "";
+}
+
+function isCurrentAffiliateRoute(slug) {
+  const route = appStore.get("app.currentRoute", null);
+  const path = String(route?.path ?? "");
+  const normalizedSlug = String(slug ?? "").trim().toLowerCase();
+
+  if (!normalizedSlug) {
+    return true;
+  }
+
+  return path.startsWith(`/af/${normalizedSlug}`) || path.startsWith(`/a/${normalizedSlug}`);
 }

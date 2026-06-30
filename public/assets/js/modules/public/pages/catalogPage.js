@@ -44,7 +44,8 @@ export function PublicCatalogPage({ notFound = false } = {}) {
 
   return createPageLifecycle({
     async bootstrap(context) {
-      const affiliateSlug = String(context.params?.slug ?? "").trim().toLowerCase();
+      publicContextService.syncRouteContext(context);
+      const affiliateSlug = publicContextService.routeAffiliateSlug(context);
 
       if (affiliateSlug) {
         await publicContextService.activateAffiliateBySlug(affiliateSlug).catch(() => null);

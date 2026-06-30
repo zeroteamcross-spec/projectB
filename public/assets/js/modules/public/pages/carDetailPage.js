@@ -36,6 +36,14 @@ export function PublicCarDetailPage() {
   };
 
   return createPageLifecycle({
+    async bootstrap(context) {
+      publicContextService.syncRouteContext(context);
+      const affiliateSlug = publicContextService.routeAffiliateSlug(context);
+
+      if (affiliateSlug) {
+        await publicContextService.activateAffiliateBySlug(affiliateSlug).catch(() => null);
+      }
+    },
     mount(context) {
       root = document.createElement("div");
       root.className = "min-h-screen pb-24 sm:pb-0";
