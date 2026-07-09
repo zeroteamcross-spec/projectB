@@ -55,7 +55,7 @@ const SUPER_ADMIN_LINKS = [
   { href: "#/admin/migrations", label: "Migration Manager", icon: "database" },
   {
     href: "#",
-    label: "Role Switcher (Super)",
+    label: "Level User Switcher (Super)",
     icon: "user",
     children: [
       { href: "#/admin", label: "Admin View", icon: "dashboard" },

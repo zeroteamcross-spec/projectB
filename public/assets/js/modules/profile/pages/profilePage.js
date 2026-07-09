@@ -552,7 +552,7 @@ function detailPanel(profile, actions) {
     ]),
     detailSection("Informasi Role & Scope", "sitemap", [
       ["Level login", profile.id_level || profile.login_level || profile.role || "-"],
-      ["Role efektif", roleLabel(profile.role)],
+      ["Level User efektif", roleLabel(profile.role)],
       ["Cabang user", branchLabel(profile)],
       ["Scope data user", "Own"],
     ]),
@@ -569,7 +569,7 @@ function detailPanel(profile, actions) {
 
 function detailSection(title, icon, rows) {
   const section = document.createElement("section");
-  section.className = "grid min-w-0 gap-4 rounded-[1.5rem] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] p-5 shadow-[var(--pb-shadow-card)]";
+  section.className = "hidden grid min-w-0 gap-4 rounded-[1.5rem] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] p-5 shadow-[var(--pb-shadow-card)]";
 
   const header = document.createElement("header");
   header.className = "flex min-w-0 items-center gap-3";

@@ -40,7 +40,7 @@ function renderRoleGuardPage(config, context) {
   panel.className = cx(tw.surface.raisedCard, "grid gap-4 p-5 md:p-6");
 
   const state = EmptyState({
-    title: config.stateTitle ?? "Role tidak sesuai",
+    title: config.stateTitle ?? "Level User tidak sesuai",
     description: config.stateDescription ?? "",
   });
 

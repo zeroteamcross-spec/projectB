@@ -30,7 +30,7 @@ export function header(store) {
 
   const role = document.createElement("span");
   role.className = `${tw.layout.rolePill} hidden md:inline-flex`;
-  role.textContent = `Role: ${currentRole(store)}`;
+  role.textContent = `Level User: ${currentRole(store)}`;
 
   const actions = document.createElement("div");
   actions.className = "flex shrink-0 items-center justify-end gap-2";
@@ -43,7 +43,7 @@ export function header(store) {
 
   const sync = (state) => {
     const isAuthenticated = Boolean(state.auth?.isAuthenticated);
-    role.textContent = `Role: ${state.auth?.role ?? state.app.activeRole ?? "public"}`;
+    role.textContent = `Level User: ${state.auth?.role ?? state.app.activeRole ?? "public"}`;
     renderBrandMark(mark);
     title.textContent = brandConfig.shellTitle;
     renderBanner(bannerHost, state);
