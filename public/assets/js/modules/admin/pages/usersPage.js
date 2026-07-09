@@ -308,9 +308,9 @@ function usersHero({ action }) {
 
   copy.append(
     icon,
-    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-orange-700", "Admin user desk"),
+    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-orange-700", ""),
     textNode("h1", "max-w-2xl text-3xl font-black leading-tight tracking-normal text-gray-950 sm:text-4xl", "User Management"),
-    textNode("p", "max-w-xl text-sm leading-6 text-gray-600", "Pusat kerja admin untuk melihat user, menyaring role dan approval state, approve seller, dan memulai impersonation dari konteks yang benar."),
+    textNode("p", "max-w-xl text-sm leading-6 text-gray-600", ""),
   );
 
   layout.append(copy, action);

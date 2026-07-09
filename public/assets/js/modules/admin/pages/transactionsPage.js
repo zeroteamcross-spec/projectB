@@ -218,9 +218,9 @@ function transactionsHero({ action, counts = {} }) {
 
   copy.append(
     icon,
-    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-orange-700", "Admin transaction desk"),
+    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-orange-700", ""),
     textNode("h1", "max-w-2xl text-3xl font-black leading-tight tracking-normal text-gray-950 sm:text-4xl", "Transaksi Admin"),
-    textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", "Monitoring transaksi buyer dan seller dengan status pembayaran, nominal, dan detail operasional dalam satu layar kerja."),
+    textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", ""),
   );
 
   const stats = document.createElement("section");

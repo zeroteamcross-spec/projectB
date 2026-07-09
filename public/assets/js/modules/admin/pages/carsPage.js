@@ -255,9 +255,9 @@ function carsHero({ cars, filteredCars, isForm }) {
   icon.append(createIcon("car", { className: "h-5 w-5" }));
   copy.append(
     icon,
-    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-orange-700", "Admin inventory"),
+    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-orange-700", ""),
     textNode("h1", "max-w-3xl text-3xl font-black leading-tight tracking-normal text-gray-950 sm:text-4xl", isForm ? "Form listing mobil" : "Katalog Mobil"),
-    textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", "Kelola listing mobil seluruh seller/showroom, status publikasi, harga, foto, dan inspeksi dari satu halaman operasional.")
+    textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", "")
   );
 
   const stats = document.createElement("section");

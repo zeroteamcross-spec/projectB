@@ -192,9 +192,9 @@ function settlementsHero({ action, summary = {} }) {
 
   copy.append(
     icon,
-    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-orange-700", "Admin settlement desk"),
+    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-orange-700", ""),
     textNode("h1", "max-w-2xl text-3xl font-black leading-tight tracking-normal text-gray-950 sm:text-4xl", "Admin Settlements"),
-    textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", "Monitoring batch settlement marketing, nilai pending, dan finalisasi manual dari satu layar operasional."),
+    textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", ""),
   );
 
   const stats = document.createElement("section");

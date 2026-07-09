@@ -117,9 +117,9 @@ function hero() {
   copy.className = "grid min-w-0 gap-2";
   copy.append(
     iconBox("settings"),
-    textNode("p", "text-xs font-black uppercase tracking-[0.16em] text-orange-700", "Admin"),
+    textNode("p", "text-xs font-black uppercase tracking-[0.16em] text-orange-700", ""),
     textNode("h1", "text-3xl font-black leading-tight text-gray-950", "Konfigurasi WEB"),
-    textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", "Atur identitas aplikasi yang tampil pada shell, sidebar, dan kontak utama."),
+    textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", ""),
   );
   const preview = document.createElement("section");
   preview.className = "grid min-w-[220px] gap-2 rounded-[1rem] border border-[var(--pb-border)] bg-white/82 p-4 shadow-sm";

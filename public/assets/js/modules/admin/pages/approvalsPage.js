@@ -312,9 +312,9 @@ function approvalsHero({ action }) {
 
   copy.append(
     icon,
-    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-orange-700", "Admin approval desk"),
+    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-orange-700", ""),
     textNode("h1", "max-w-2xl text-3xl font-black leading-tight tracking-normal text-gray-950 sm:text-4xl", "Approval Queue"),
-    textNode("p", "max-w-xl text-sm leading-6 text-gray-600", "Queue operasional admin untuk review pending approvals dan screening seller dengan tabel yang cepat discan."),
+    textNode("p", "max-w-xl text-sm leading-6 text-gray-600", ""),
   );
 
   layout.append(copy, action);

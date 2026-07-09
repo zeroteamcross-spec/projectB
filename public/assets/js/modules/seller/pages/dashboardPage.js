@@ -78,9 +78,9 @@ function sellerHero({ router, summary = {}, notFound = false }) {
 
   copy.append(
     icon,
-    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-orange-700", "Seller operating desk"),
+    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-orange-700", ""),
     textNode("h1", "max-w-2xl text-3xl font-black leading-tight tracking-normal text-gray-950 sm:text-4xl", notFound ? "Halaman seller tidak ditemukan" : "Dashboard Seller"),
-    textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", "Pusat kerja seller untuk menjaga showroom siap, listing rapi, inspeksi lengkap, dan transaksi cepat ditindaklanjuti."),
+    textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", ""),
   );
 
   const stats = document.createElement("section");

@@ -80,7 +80,7 @@ function render(root, context, notFound, animation = {}) {
   const content = [
     adminHero({
       title: notFound ? "Halaman admin tidak ditemukan" : "Dashboard Admin",
-      description: "Ringkasan operasional untuk user, approval, transaksi, dan settlement.",
+      description: "",
       action: approvalButton,
     }),
   ];
@@ -145,7 +145,7 @@ function adminHero({ title, description, action }) {
 
   const eyebrow = document.createElement("p");
   eyebrow.className = "text-xs font-black uppercase tracking-[0.18em] text-orange-700";
-  eyebrow.textContent = "Admin command center";
+  eyebrow.textContent = "";
 
   const heading = document.createElement("h1");
   heading.className = "max-w-2xl text-3xl font-black leading-tight tracking-[-0.04em] text-gray-950 sm:text-4xl";

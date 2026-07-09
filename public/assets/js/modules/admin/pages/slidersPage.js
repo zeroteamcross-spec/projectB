@@ -263,7 +263,7 @@ function hero({ action, sliders }) {
     icon,
     textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-orange-700", "Admin slider"),
     textNode("h1", "text-3xl font-black leading-tight tracking-normal text-gray-950 sm:text-4xl", "Manajemen Slider"),
-    textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", "Kelola banner public dan buyer dengan template predefined, upload gambar aman, jadwal tampil, CTA, dan urutan."),
+    textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", ""),
   );
 
   const stats = document.createElement("section");

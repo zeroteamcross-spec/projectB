@@ -609,15 +609,15 @@ function masterHero({ action, pageType, brands = [], sidebarItems = [], banks = 
   icon.append(createIcon(isLocation ? "location" : isBank ? "bank" : isSidebar ? "sort" : "car", { className: "h-5 w-5" }));
   copy.append(
     icon,
-    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-orange-700", isLocation ? "Admin master lokasi" : isBank ? "Admin master bank" : isSidebar ? "Admin master sidebar" : "Admin master brand"),
+    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-orange-700", isLocation ? "" : isBank ? "" : isSidebar ? "" : ""),
     textNode("h1", "text-3xl font-black leading-tight tracking-normal text-gray-950 sm:text-4xl", isLocation ? "Master Lokasi" : isBank ? "Master Bank" : isSidebar ? "Master Sidebar" : "Master Brand"),
     textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", isLocation
-      ? "Kelola referensi nama kota untuk lokasi listing mobil, dengan field provinsi opsional untuk pengembangan berikutnya."
+      ? ""
       : isBank
-      ? "Kelola referensi bank, kode bank, dan icon fixed untuk tampilan pembayaran."
+      ? ""
       : isSidebar
-      ? "Kelola struktur sidebar role admin, seller, dan marketing dari satu master JSON."
-      : "Kelola merek mobil dan model turunannya dari satu master dinamis berbasis JSON."),
+      ? ""
+      : ""),
   );
 
   const stats = document.createElement("section");

@@ -261,7 +261,7 @@ function carsHero({ cars, filteredCars, isForm }) {
     icon,
     textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-orange-700", "Seller inventory"),
     textNode("h1", "max-w-3xl text-3xl font-black leading-tight tracking-normal text-gray-950 sm:text-4xl", isForm ? "Form listing mobil" : "Katalog"),
-    textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", "Kelola listing mobil, status publikasi, harga, foto, dan inspeksi dari satu halaman operasional.")
+    textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", "")
   );
 
   const stats = document.createElement("section");
