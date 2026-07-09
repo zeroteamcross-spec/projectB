@@ -177,7 +177,8 @@ function render(root, router, params, queueApi) {
   notice.textContent = runtime.notice;
   notice.hidden = !runtime.notice;
 
-  const backButton = Button({ label: "Kembali ke Katalog", variant: "secondary", onClick: () => router?.navigate("/seller/cars") });
+  const backPath = isAdminCarsPath() ? "/admin/cars" : "/seller/cars";
+  const backButton = Button({ label: "Kembali ke Katalog", variant: "secondary", onClick: () => router?.navigate(backPath) });
   backButton.id = "slri_back_to_cars_button";
   backButton.prepend(createIcon("arrowLeft", { className: "h-4 w-4" }));
 
@@ -868,4 +869,8 @@ function labelWrap(label, control) {
   wrap.textContent = label;
   wrap.append(control);
   return wrap;
+}
+
+function isAdminCarsPath() {
+  return String(window.location.hash ?? "").startsWith("#/admin/cars/");
 }

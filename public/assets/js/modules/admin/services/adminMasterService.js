@@ -49,10 +49,11 @@ const DEFAULT_SIDEBAR_SEED = [
   sidebarSeed("admin.dashboard", "admin", "Dashboard Admin", "#/admin", "dashboard", 10),
   sidebarSeed("admin.approvals", "admin", "Approval Queue", "#/admin/approvals", "transaction", 20),
   sidebarSeed("admin.users", "admin", "User Management", "#/admin/users", "transaction", 30),
-  sidebarSeed("admin.transactions", "admin", "Transactions", "#/admin/transactions", "transaction", 40),
-  sidebarSeed("admin.settlements", "admin", "Settlements", "#/admin/settlements", "commission", 50),
-  sidebarSeed("admin.sliders", "admin", "Slider", "#/admin/sliders", "image", 60),
-  sidebarSeed("admin.master", "admin", "Master", "", "sort", 70, "", true),
+  sidebarSeed("admin.cars", "admin", "Katalog Mobil", "#/admin/cars", "car", 40),
+  sidebarSeed("admin.transactions", "admin", "Transactions", "#/admin/transactions", "transaction", 50),
+  sidebarSeed("admin.settlements", "admin", "Settlements", "#/admin/settlements", "commission", 60),
+  sidebarSeed("admin.sliders", "admin", "Slider", "#/admin/sliders", "image", 70),
+  sidebarSeed("admin.master", "admin", "Master", "", "sort", 80, "", true),
   sidebarSeed("admin.master_brand", "admin", "Master Brand", "#/admin/master-brand", "car", 10, "admin.master"),
   sidebarSeed("admin.master_sidebar", "admin", "Master Sidebar", "#/admin/master-sidebar", "sitemap", 20, "admin.master"),
   sidebarSeed("admin.master_bank", "admin", "Master Bank", "#/admin/master-bank", "bank", 30, "admin.master"),
@@ -730,6 +731,10 @@ function ensureAdminMasterSidebarChildren(items = []) {
     next.push(sidebarSeed("admin.sliders", "admin", "Slider", "#/admin/sliders", "image", sliderOrder));
   }
 
+  if (!byKey.has("admin.cars")) {
+    next.push(sidebarSeed("admin.cars", "admin", "Katalog Mobil", "#/admin/cars", "car", 40));
+  }
+
   if (!master || master.role !== "admin") {
     return next;
   }
@@ -782,6 +787,18 @@ function ensureAdminMasterSidebarChildren(items = []) {
         role: "admin",
         is_parent: false,
         order: Number.isFinite(Number(item.order)) ? Number(item.order) : 60,
+      };
+    }
+    if (item.key === "admin.cars") {
+      return {
+        ...item,
+        label: item.label || "Katalog Mobil",
+        route: "#/admin/cars",
+        icon: item.icon || "car",
+        parent_key: item.parent_key ?? "",
+        role: "admin",
+        is_parent: false,
+        order: Number.isFinite(Number(item.order)) ? Number(item.order) : 40,
       };
     }
     if (item.key === "admin.master_brand") {

@@ -30,6 +30,7 @@ const ADMIN_LINKS = [
   { href: "#/profile", label: "Profil Saya", icon: "user" },
   { href: "#/admin/approvals", label: "Approval Queue", icon: "transaction" },
   { href: "#/admin/users", label: "User Management", icon: "transaction" },
+  { href: "#/admin/cars", label: "Katalog Mobil", icon: "car" },
   { href: "#/admin/transactions", label: "Transactions", icon: "transaction" },
   { href: "#/admin/settlements", label: "Settlements", icon: "commission" },
   { href: "#/admin/sliders", label: "Slider", icon: "image" },

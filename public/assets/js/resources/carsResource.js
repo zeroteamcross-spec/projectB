@@ -36,6 +36,11 @@ export const carsResource = {
     };
   },
 
+  async adminDetail(id, options = {}) {
+    const response = await apiClient.get(`/admin/cars/${encodeURIComponent(id)}`, options);
+    return response.data?.car ?? null;
+  },
+
   async sellerCreate(payload = {}, options = {}) {
     const response = await apiClient.post("/seller/cars", payload, options);
     return response.data?.car ?? null;
@@ -48,6 +53,21 @@ export const carsResource = {
 
   async sellerArchive(id, options = {}) {
     const response = await apiClient.delete(`/seller/cars/${encodeURIComponent(id)}`, options);
+    return response.data?.car ?? null;
+  },
+
+  async adminCreate(payload = {}, options = {}) {
+    const response = await apiClient.post("/admin/cars", payload, options);
+    return response.data?.car ?? null;
+  },
+
+  async adminUpdate(id, payload = {}, options = {}) {
+    const response = await apiClient.patch(`/admin/cars/${encodeURIComponent(id)}`, payload, options);
+    return response.data?.car ?? null;
+  },
+
+  async adminArchive(id, options = {}) {
+    const response = await apiClient.delete(`/admin/cars/${encodeURIComponent(id)}`, options);
     return response.data?.car ?? null;
   },
 };

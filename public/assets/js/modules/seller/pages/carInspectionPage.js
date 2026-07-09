@@ -70,7 +70,8 @@ function render(root, router, params) {
 
   const notice = message("green", runtime.notice);
   const error = message("red", runtime.error);
-  const backButton = Button({ label: "Kembali ke Katalog", variant: "secondary", onClick: () => router?.navigate("/seller/cars") });
+  const backPath = isAdminCarsPath() ? "/admin/cars" : "/seller/cars";
+  const backButton = Button({ label: "Kembali ke Katalog", variant: "secondary", onClick: () => router?.navigate(backPath) });
   backButton.id = "slrinsp_back_to_cars_button";
   const header = SectionHeader({
     title,
@@ -533,4 +534,8 @@ function hasDirtyItemDrafts() {
 
 function sqlDateTimeNow() {
   return new Date().toISOString().slice(0, 19).replace("T", " ");
+}
+
+function isAdminCarsPath() {
+  return String(window.location.hash ?? "").startsWith("#/admin/cars/");
 }

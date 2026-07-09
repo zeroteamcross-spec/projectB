@@ -1,6 +1,8 @@
 import { AdminDashboardPage } from "./pages/dashboardPage.js";
 import { AdminApprovalsPage } from "./pages/approvalsPage.js";
 import { AdminCarsPage } from "./pages/carsPage.js";
+import { SellerCarImagesPage } from "../seller/pages/carImagesPage.js";
+import { SellerCarInspectionPage } from "../seller/pages/carInspectionPage.js";
 import { AdminDesignStudioV2Page } from "./pages/designStudioV2Page.js";
 import { AdminWebConfigPage } from "./pages/webConfigPage.js";
 import { AdminUsersPage } from "./pages/usersPage.js";
@@ -16,6 +18,7 @@ import { SuperAdminDashboardPage } from "./pages/superAdminDashboardPage.js";
 import { adminSessionService } from "./services/adminSessionService.js";
 import { transactionsResource } from "../../resources/transactionsResource.js";
 import { carsResource } from "../../resources/carsResource.js";
+import { imagesResource } from "../../resources/imagesResource.js";
 import { adminMasterService } from "./services/adminMasterService.js";
 import { inspectionsResource } from "../../resources/inspectionsResource.js";
 import { slidersResource } from "../../resources/slidersResource.js";
@@ -115,8 +118,60 @@ export const adminRoutes = [
           key: "cars",
           loader: ({ query, signal }) => carsResource.adminList({
             listing_status: query.listing_status ?? query.status ?? "",
-            limit: 100,
+            limit: 10,
           }, { signal }).catch(() => ({ cars: [], meta: {} })),
+        },
+        {
+          key: "masterBrand",
+          loader: ({ signal }) => adminMasterService.getBrandMaster({ signal }).catch(() => adminMasterService.normalizeMaster(null)),
+        },
+        {
+          key: "users",
+          loader: ({ signal }) => adminSessionService.listUsers({ limit: 100 }, { signal }).catch(() => ({ users: [], meta: {} })),
+        },
+      ],
+    },
+  },
+  {
+    name: "admin.car-images",
+    path: "/admin/cars/:id/images",
+    shell: "app",
+    role: "admin",
+    page: SellerCarImagesPage,
+    workingStateKey: "sellerCarImages",
+    preload: {
+      working: [
+        {
+          key: "car",
+          loader: ({ params, signal }) => carsResource.adminDetail(params.id, { signal }).catch(() => null),
+        },
+        {
+          key: "images",
+          loader: ({ params, signal }) => imagesResource.listByCar(params.id, { signal }).catch(() => []),
+        },
+      ],
+    },
+  },
+  {
+    name: "admin.car-inspection",
+    path: "/admin/cars/:id/inspection",
+    shell: "app",
+    role: "admin",
+    page: SellerCarInspectionPage,
+    workingStateKey: "sellerCarInspection",
+    preload: {
+      working: [
+        {
+          key: "car",
+          loader: ({ params, signal }) => carsResource.adminDetail(params.id, { signal }).catch(() => null),
+        },
+        {
+          key: "templates",
+          loader: ({ signal }) => inspectionsResource.templates({ signal }).catch(() => []),
+        },
+        {
+          key: "report",
+          loader: ({ params, signal }) => inspectionsResource.byCar(params.id, { signal }).catch(() => null),
         },
       ],
     },
