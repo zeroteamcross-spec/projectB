@@ -18,13 +18,13 @@ export function NotificationFilterTabs({ active = "all", onChange = null } = {})
 
     if (isActive) {
       button.className =
-        "inline-flex min-h-10 items-center justify-center gap-1.5 rounded-full border border-transparent bg-[linear-gradient(135deg,var(--pb-btn-primary-from),var(--pb-btn-primary-to))] px-4 py-2 text-sm font-black text-white shadow-[var(--pb-shadow-card)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+        "inline-flex min-h-10 items-center justify-center gap-1.5 rounded-full border border-transparent bg-[linear-gradient(135deg,var(--pb-btn-primary-from),var(--pb-btn-primary-to))] px-4 py-2 text-xs text-white shadow-[var(--pb-shadow-card)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]";
     } else {
       button.className =
-        "inline-flex min-h-10 min-w-10 items-center justify-center rounded-full border border-[var(--pb-border)] bg-[var(--pb-surface-card)] px-2 py-2 text-sm font-black text-[var(--pb-text-strong)] shadow-[var(--pb-shadow-soft)] transition hover:bg-[var(--pb-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+        "inline-flex min-h-10 min-w-10 items-center justify-center rounded-full border border-[var(--pb-border)] bg-[var(--pb-surface-card)] px-2 py-2 text-xs text-[var(--pb-text-strong)] shadow-[var(--pb-shadow-soft)] transition hover:bg-[var(--pb-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]";
     }
 
-    button.append(createIcon(filter.icon, { className: "block h-4 w-4 leading-none" }));
+    button.append(createIcon(filter.icon, { className: "block h-3.5 w-3.5 leading-none" }));
 
     if (isActive) {
       button.append(" ", filter.label);
