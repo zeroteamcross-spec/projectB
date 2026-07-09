@@ -21,6 +21,7 @@ return static function (Router $router): void {
     $router->group('/api/admin/cars', static function (Router $router): void {
         $router->get('', [CarController::class, 'adminIndex']);
         $router->get('/{id}', [CarController::class, 'show']);
+        $router->post('', [CarController::class, 'create']);
         $router->patch('/{id}', [CarController::class, 'update']);
         $router->delete('/{id}', [CarController::class, 'archive']);
     }, [AuthenticatedUserMiddleware::class]);
