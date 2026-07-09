@@ -26,6 +26,10 @@ const DEFAULT_RUNTIME = {
     keyword: "",
     status: "",
   },
+  pagination: {
+    page: 1,
+    pageSize: 10,
+  },
   formStep: 1,
 };
 
@@ -74,6 +78,7 @@ function render(root, router) {
   const runtime = runtimeState();
   const isForm = runtime.mode === "create" || runtime.mode === "edit";
   const filteredCars = filterCars(cars, runtime.filters);
+  const pagination = paginate(filteredCars, runtime.pagination);
 
   const notice = document.createElement("p");
   notice.id = "slrc_notice_section";
@@ -88,12 +93,13 @@ function render(root, router) {
   error.hidden = !runtime.error || isForm;
 
   const body = SellerCarsList({
-    cars: filteredCars,
+    cars: pagination.items,
     onCreate: () => setRuntime({ mode: "create", selectedCar: null, form: emptyCarForm(), error: "", notice: "", formStep: 1 }),
     onEdit: (car) => setRuntime({ mode: "edit", selectedCar: car, form: carToForm(car), error: "", notice: "", formStep: 1 }),
     onArchive: (car) => archiveCar(car),
     onImages: (car) => router?.navigate(`/seller/cars/${car.id}/images`),
     onInspection: (car) => router?.navigate(`/seller/cars/${car.id}/inspection`),
+    pagination: createCarsPagination(pagination),
   });
 
   const layout = document.createElement("section");
@@ -297,7 +303,7 @@ function carsToolbar({ filters, isForm }) {
   search.className = "min-h-11 min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-2.5 text-sm font-semibold text-[var(--pb-text)] outline-none transition duration-150 placeholder:text-gray-400 focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
   search.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
-      setRuntime({ filters: { ...runtimeState().filters, keyword: search.value.trim() } });
+      setRuntime({ filters: { ...runtimeState().filters, keyword: search.value.trim() }, pagination: { ...runtimeState().pagination, page: 1 } });
     }
   });
   searchWrap.append(search);
@@ -322,13 +328,13 @@ function carsToolbar({ filters, isForm }) {
     option.selected = value === (filters.status ?? "");
     status.append(option);
   });
-  status.addEventListener("change", () => setRuntime({ filters: { ...runtimeState().filters, status: status.value } }));
+  status.addEventListener("change", () => setRuntime({ filters: { ...runtimeState().filters, status: status.value }, pagination: { ...runtimeState().pagination, page: 1 } }));
   statusWrap.append(status);
 
   const actions = document.createElement("section");
   actions.id = "slrc_toolbar_actions_section";
   actions.className = "grid gap-2 sm:flex sm:flex-wrap sm:justify-end";
-  const apply = Button({ label: "Terapkan", variant: "secondary", onClick: () => setRuntime({ filters: { ...runtimeState().filters, keyword: search.value.trim(), status: status.value } }) });
+  const apply = Button({ label: "Terapkan", variant: "secondary", onClick: () => setRuntime({ filters: { ...runtimeState().filters, keyword: search.value.trim(), status: status.value }, pagination: { ...runtimeState().pagination, page: 1 } }) });
   apply.id = "slrc_apply_filter_button";
   apply.prepend(createIcon("filter", { className: "h-4 w-4" }));
   const main = isForm
@@ -464,6 +470,187 @@ function filterCars(cars = [], filters = {}) {
       car.listing_status,
     ].filter(Boolean).join(" ").toLowerCase().includes(keyword);
   });
+}
+
+function paginate(items = [], pagination = {}) {
+  const pageSize = allowedPageSize(pagination.pageSize);
+  const totalItems = items.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  const page = clampPage(Number(pagination.page ?? 1), totalPages);
+  const start = (page - 1) * pageSize;
+
+  return {
+    items: items.slice(start, start + pageSize),
+    page,
+    pageSize,
+    totalItems,
+    totalPages,
+  };
+}
+
+function createCarsPagination({ page, pageSize, totalItems, totalPages }) {
+  const section = document.createElement("section");
+  section.id = "slrc_pagination_section";
+  section.className = "grid gap-3 rounded-[1.35rem] border border-orange-100/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(255,247,237,0.90),rgba(239,246,255,0.82))] p-3 shadow-sm sm:p-4";
+
+  const top = document.createElement("section");
+  top.className = "flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between";
+
+  const meta = document.createElement("section");
+  meta.className = "grid gap-1";
+  meta.append(
+    textNode("p", "text-[11px] font-black uppercase tracking-[0.16em] text-gray-500", "Pagination"),
+    textNode("p", "text-sm font-semibold text-gray-700", paginationLabel({ page, pageSize, totalItems, totalPages }))
+  );
+
+  const sizeWrap = document.createElement("label");
+  sizeWrap.className = "inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.14em] text-gray-500";
+  sizeWrap.textContent = "Rows";
+  const sizeSelect = document.createElement("select");
+  sizeSelect.id = "slrc_rows_per_page_input";
+  sizeSelect.className = "min-h-10 rounded-full border border-[var(--pb-border)] bg-white px-3 text-sm font-semibold text-gray-700 shadow-sm";
+  [10, 25, 50, 100].forEach((option) => {
+    const node = document.createElement("option");
+    node.value = String(option);
+    node.textContent = String(option);
+    node.selected = Number(option) === Number(pageSize);
+    sizeSelect.append(node);
+  });
+  sizeSelect.addEventListener("change", () => {
+    setRuntime({ pagination: { page: 1, pageSize: Number(sizeSelect.value) } });
+  });
+  sizeWrap.append(sizeSelect);
+  top.append(meta, sizeWrap);
+
+  const controls = document.createElement("section");
+  controls.id = "slrc_pagination_controls_section";
+  controls.className = "flex flex-wrap items-center gap-2";
+
+  controls.append(
+    paginationButton({
+      id: "slrc_pagination_first_button",
+      label: "First",
+      disabled: page <= 1,
+      onClick: () => changePage(1),
+    }),
+    paginationButton({
+      id: "slrc_pagination_previous_button",
+      label: "Previous",
+      disabled: page <= 1,
+      onClick: () => changePage(page - 1),
+    })
+  );
+
+  pageWindow(page, totalPages).forEach((item) => {
+    if (item === "...") {
+      controls.append(textNode("span", "px-1 text-sm font-bold text-gray-400", "..."));
+      return;
+    }
+
+    controls.append(paginationButton({
+      id: item === page ? `slrc_pagination_page_current_${item}` : `slrc_pagination_page_button_${item}`,
+      label: String(item),
+      active: item === page,
+      disabled: item === page,
+      onClick: () => changePage(item),
+    }));
+  });
+
+  controls.append(
+    paginationButton({
+      id: "slrc_pagination_next_button",
+      label: "Next",
+      disabled: page >= totalPages,
+      onClick: () => changePage(page + 1),
+    }),
+    paginationButton({
+      id: "slrc_pagination_last_button",
+      label: "Last",
+      disabled: page >= totalPages,
+      onClick: () => changePage(totalPages),
+    })
+  );
+
+  section.append(top, controls);
+  return section;
+}
+
+function changePage(page) {
+  const current = runtimeState().pagination ?? DEFAULT_RUNTIME.pagination;
+  setRuntime({
+    pagination: {
+      ...current,
+      page,
+    },
+  });
+}
+
+function paginationButton({ id, label, disabled = false, active = false, onClick = null }) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.id = id;
+  button.disabled = disabled;
+  button.textContent = label;
+  button.className = active
+    ? "inline-flex min-h-10 min-w-10 items-center justify-center rounded-full border border-transparent bg-[linear-gradient(135deg,var(--pb-btn-primary-from),var(--pb-btn-primary-to))] px-3 text-sm font-semibold text-white shadow-sm"
+    : "inline-flex min-h-10 min-w-10 items-center justify-center rounded-full border border-[var(--pb-border-strong)] bg-white/82 px-3 text-sm font-semibold text-gray-700 shadow-sm transition hover:-translate-y-0.5 hover:bg-white disabled:cursor-not-allowed disabled:opacity-45";
+  if (onClick) {
+    button.addEventListener("click", onClick);
+  }
+  return button;
+}
+
+function pageWindow(page, totalPages) {
+  if (totalPages <= 9) {
+    return Array.from({ length: totalPages }, (_, index) => index + 1);
+  }
+
+  const items = [1, 2];
+  const start = Math.max(3, page - 1);
+  const end = Math.min(totalPages - 2, page + 1);
+
+  if (start > 3) {
+    items.push("...");
+  }
+
+  for (let item = start; item <= end; item += 1) {
+    items.push(item);
+  }
+
+  if (end < totalPages - 2) {
+    items.push("...");
+  }
+
+  [totalPages - 1, totalPages].forEach((item) => {
+    if (!items.includes(item)) {
+      items.push(item);
+    }
+  });
+
+  return items;
+}
+
+function paginationLabel({ page, pageSize, totalItems, totalPages }) {
+  if (!totalItems) {
+    return `Halaman ${page} dari ${totalPages}`;
+  }
+
+  const from = ((page - 1) * pageSize) + 1;
+  const to = Math.min(page * pageSize, totalItems);
+  return `${from}-${to} dari ${totalItems} mobil`;
+}
+
+function allowedPageSize(value) {
+  const normalized = Number(value);
+  return [10, 25, 50, 100].includes(normalized) ? normalized : 10;
+}
+
+function clampPage(page, totalPages) {
+  if (!Number.isFinite(page)) {
+    return 1;
+  }
+
+  return Math.max(1, Math.min(Math.trunc(page), totalPages));
 }
 
 function emptyCarForm() {
