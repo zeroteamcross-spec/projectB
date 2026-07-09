@@ -18,7 +18,7 @@ const SELLER_LINKS = [
   { href: "#/seller", label: "Dashboard Seller", icon: "dashboard" },
   { href: "#/profile", label: "Profil Saya", icon: "user" },
   { href: "#/seller/showroom", label: "Showroom Saya", icon: "showroom" },
-  { href: "#/seller/cars", label: "Mobil Saya", icon: "car" },
+  { href: "#/seller/cars", label: "Katalog", icon: "car" },
   { href: "#/seller/inspection", label: "Inspeksi", icon: "clipboard" },
   { href: "#/seller/affiliates", label: "Marketing", icon: "affiliate" },
   { href: "#/seller/affiliate-commissions", label: "Komisi Marketing", icon: "commission" },

@@ -70,7 +70,7 @@ function render(root, router, params) {
 
   const notice = message("green", runtime.notice);
   const error = message("red", runtime.error);
-  const backButton = Button({ label: "Kembali ke Mobil Saya", variant: "secondary", onClick: () => router?.navigate("/seller/cars") });
+  const backButton = Button({ label: "Kembali ke Katalog", variant: "secondary", onClick: () => router?.navigate("/seller/cars") });
   backButton.id = "slrinsp_back_to_cars_button";
   const header = SectionHeader({
     title,

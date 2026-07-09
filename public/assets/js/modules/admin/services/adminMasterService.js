@@ -61,7 +61,7 @@ const DEFAULT_SIDEBAR_SEED = [
   sidebarSeed("admin.design_studio", "admin", "Design Studio", "#/admin/design-studio", "sparkles", 80),
   sidebarSeed("seller.dashboard", "seller", "Dashboard Seller", "#/seller", "dashboard", 10),
   sidebarSeed("seller.showroom", "seller", "Showroom Saya", "#/seller/showroom", "showroom", 20),
-  sidebarSeed("seller.cars", "seller", "Mobil Saya", "#/seller/cars", "car", 30),
+  sidebarSeed("seller.cars", "seller", "Katalog", "#/seller/cars", "car", 30),
   sidebarSeed("seller.affiliates", "seller", "Marketing", "#/seller/affiliates", "affiliate", 40),
   sidebarSeed("seller.affiliate_commissions", "seller", "Komisi Marketing", "#/seller/affiliate-commissions", "commission", 50),
   sidebarSeed("seller.transactions", "seller", "Transaksi", "#/seller/transactions", "transaction", 60),

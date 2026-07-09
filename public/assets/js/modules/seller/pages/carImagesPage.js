@@ -177,7 +177,7 @@ function render(root, router, params, queueApi) {
   notice.textContent = runtime.notice;
   notice.hidden = !runtime.notice;
 
-  const backButton = Button({ label: "Kembali ke Mobil Saya", variant: "secondary", onClick: () => router?.navigate("/seller/cars") });
+  const backButton = Button({ label: "Kembali ke Katalog", variant: "secondary", onClick: () => router?.navigate("/seller/cars") });
   backButton.id = "slri_back_to_cars_button";
   backButton.prepend(createIcon("arrowLeft", { className: "h-4 w-4" }));
 
