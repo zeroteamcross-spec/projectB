@@ -8,6 +8,7 @@ import { closeModal, openModal } from "../../../ui/primitives/modal.js";
 import { showToast } from "../../../ui/primitives/toast.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 import { adminMasterService } from "../services/adminMasterService.js";
+import { adminCarsBackgroundLoader } from "../services/adminCarsBackgroundLoader.js";
 import { SellerCarForm } from "../../seller/components/sellerCarForm.js";
 import { SellerCarsList } from "../../seller/components/sellerCarsList.js";
 
@@ -108,6 +109,8 @@ function render(root, router) {
   } else {
     closeCarFormModal();
   }
+
+  startBackgroundLoad();
 }
 
 function openCarFormModal({ runtime, brandOptions }) {
@@ -427,10 +430,30 @@ function upsertCarInWorkingList(car) {
 }
 
 function resolveCarsPayload() {
-  return appStore.get("working.adminCars.cars.data", null)
-    ?? appStore.get("snapshot.admin.cars.data", null)
-    ?? appStore.get("working.adminDashboard.cars.data", null)
-    ?? { cars: [] };
+  return largestCarsPayload([
+    appStore.get("working.adminCars.cars.data", null),
+    appStore.get("snapshot.admin.cars.data", null),
+    appStore.get("working.adminDashboard.cars.data", null),
+  ]) ?? { cars: [] };
+}
+
+function largestCarsPayload(payloads = []) {
+  return payloads
+    .filter(Boolean)
+    .sort((left, right) => normalizeCarsPayload(right).length - normalizeCarsPayload(left).length)[0] ?? null;
+}
+
+function normalizeCarsPayload(payload) {
+  if (Array.isArray(payload)) {
+    return payload.filter(Boolean);
+  }
+  if (Array.isArray(payload?.cars)) {
+    return payload.cars.filter(Boolean);
+  }
+  if (Array.isArray(payload?.data?.cars)) {
+    return payload.data.cars.filter(Boolean);
+  }
+  return [];
 }
 
 function adminSellerSelector(runtime) {
@@ -643,4 +666,14 @@ function textNode(tagName, className, text) {
 
 function slugify(value) {
   return String(value ?? "").trim().toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+}
+
+function startBackgroundLoad() {
+  if (adminCarsBackgroundLoader.status().running) {
+    return;
+  }
+
+  adminCarsBackgroundLoader.ensure({ batchLimit: 100 }).catch((error) => {
+    console.warn?.("Admin cars background load failed.", error);
+  });
 }
