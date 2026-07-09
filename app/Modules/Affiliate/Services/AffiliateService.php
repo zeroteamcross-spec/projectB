@@ -457,7 +457,7 @@ class AffiliateService
     {
         if (($user['role'] ?? null) !== 'affiliate_admin') {
             throw new ValidationException([
-                'user' => 'Affiliate dashboard hanya tersedia untuk role affiliate.',
+                'user' => 'Affiliate dashboard hanya tersedia untuk level user affiliate.',
             ]);
         }
 
@@ -504,7 +504,7 @@ class AffiliateService
     {
         if (($user['role'] ?? null) !== 'affiliate_admin') {
             throw new ValidationException([
-                'user' => 'Aktivitas affiliate hanya tersedia untuk role affiliate.',
+                'user' => 'Aktivitas affiliate hanya tersedia untuk level user affiliate.',
             ]);
         }
 
@@ -546,7 +546,7 @@ class AffiliateService
     {
         if (($user['role'] ?? null) !== 'affiliate_admin') {
             throw new ValidationException([
-                'user' => 'Ledger affiliate hanya tersedia untuk role affiliate.',
+                'user' => 'Ledger affiliate hanya tersedia untuk level user affiliate.',
             ]);
         }
 
@@ -583,7 +583,7 @@ class AffiliateService
     {
         if (($user['role'] ?? null) !== 'affiliate_admin') {
             throw new ValidationException([
-                'user' => 'Settlement affiliate hanya tersedia untuk role affiliate.',
+                'user' => 'Settlement affiliate hanya tersedia untuk level user affiliate.',
             ]);
         }
 
