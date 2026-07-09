@@ -93,7 +93,7 @@ function render(root, context, getBackgroundVideoLayer) {
   maybeAutoOpenGopayResult(entry.result);
 
   if (!context.query.car_id) {
-    root.replaceChildren(backgroundShell(backgroundVideoLayer, emptyState(context, "Mobil belum dipilih", "Buka detail mobil dari katalog untuk memulai transaksi.")));
+    root.replaceChildren(backgroundShell(backgroundVideoLayer, emptyState(context, "Mobil belum dipilih", "Buka detail mobil dari katalog untuk Booking Sekarang.")));
     return;
   }
 
@@ -225,7 +225,7 @@ function heroCopy() {
   pill.textContent = "Buyer checkout";
   const title = document.createElement("h1");
   title.className = "text-2xl font-bold tracking-normal text-gray-950";
-  title.textContent = "Mulai transaksi dengan data yang sudah dicek.";
+  title.textContent = "Booking Sekarang dengan data yang sudah dicek.";
   const body = document.createElement("p");
   body.className = "text-sm leading-6 text-gray-600";
   body.textContent = "Form ini membuat transaksi awal dan sesi pembayaran dari endpoint payment yang sudah tersedia.";

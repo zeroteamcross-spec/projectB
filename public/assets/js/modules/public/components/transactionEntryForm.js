@@ -22,7 +22,7 @@ export function TransactionEntryForm({
   eyebrow.textContent = "Payment setup";
   const title = document.createElement("h2");
   title.className = "text-xl font-bold tracking-normal text-gray-950";
-  title.textContent = "Mulai transaksi";
+  title.textContent = "Booking Sekarang";
   const body = document.createElement("p");
   body.className = "text-sm leading-6 text-gray-600";
   body.textContent = "Pilih skema pembayaran awal. Sesi pembayaran akan dibuat setelah form dikirim.";

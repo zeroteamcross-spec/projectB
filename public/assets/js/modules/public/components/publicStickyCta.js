@@ -41,7 +41,7 @@ export function PublicStickyCta({ car, onStartTransaction = null, onConsult = nu
   actions.className = "grid grid-cols-[1fr_auto] gap-3";
 
   const primary = Button({
-    label: lock.locked ? lock.label : "Mulai transaksi",
+    label: lock.locked ? lock.label : "Booking Sekarang",
     variant: "primary",
     disabled: lock.locked,
     onClick: lock.locked ? null : () => onStartTransaction?.(car),

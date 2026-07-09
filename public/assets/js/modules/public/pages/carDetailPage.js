@@ -219,7 +219,7 @@ function desktopCta({ car, context }) {
     : "Gunakan WhatsApp untuk tanya kondisi, lalu lanjutkan ke transaksi saat sudah yakin.";
 
   const primary = Button({
-    label: lock.locked ? lock.label : "Mulai transaksi",
+    label: lock.locked ? lock.label : "Booking Sekarang",
     variant: "primary",
     disabled: lock.locked,
     onClick: lock.locked ? null : () => startTransactionEntry(context, car),
