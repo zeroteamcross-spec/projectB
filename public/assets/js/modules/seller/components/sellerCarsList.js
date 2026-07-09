@@ -12,6 +12,7 @@ export function SellerCarsList({
   onArchive = null,
   onImages = null,
   onInspection = null,
+  pagination = null,
 } = {}) {
   const shell = document.createElement("section");
   shell.id = "slrc_list_section";
@@ -43,6 +44,7 @@ export function SellerCarsList({
       { label: "Lokasi", value: car.location_name || "-" },
     ],
     mobileCardActions: (car) => actionButtons(car, { onEdit, onArchive, onImages, onInspection }),
+    pagination,
   }));
 
   if (!cars.length) {
