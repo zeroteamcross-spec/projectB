@@ -11,11 +11,25 @@ export const publicContactService = {
     }
 
     const title = [car?.brand_name, car?.model_name, car?.sub_model_name].filter(Boolean).join(" ") || "mobil ini";
-    const source = target.label === "Marketing" ? "via affiliate" : "dari katalog";
+    const source = whatsappSourceLabel(target.label);
     const message = encodeURIComponent(`Halo, saya ingin konsultasi untuk ${title} ${source}.`);
     window.open(`https://wa.me/${normalizePhone(target.phone)}?text=${message}`, "_blank", "noopener,noreferrer");
   },
 };
+
+function whatsappSourceLabel(label = "") {
+  const value = String(label ?? "").toLowerCase();
+
+  if (value.includes("showroom")) {
+    return "via showroom";
+  }
+
+  if (value.includes("affiliate") || value.includes("marketing")) {
+    return "via affiliate";
+  }
+
+  return "dari katalog";
+}
 
 function normalizePhone(value) {
   return String(value).replace(/[^\d]/g, "").replace(/^0/, "62");
