@@ -2,6 +2,7 @@ import { PublicCatalogPage } from "./pages/catalogPage.js";
 import { PublicCarDetailPage } from "./pages/carDetailPage.js";
 import { AuthLandingPage } from "./pages/authLandingPage.js";
 import { LandingPageSwitcher } from "./pages/landingPageSwitcher.js";
+import { SaasLandingPage } from "./pages/saasLandingPage.js";
 import { TransactionEntryPage } from "./pages/transactionEntryPage.js";
 import { publicCatalogService } from "./services/publicCatalogService.js";
 import { publicCarDetailPreloadService } from "./services/publicCarDetailPreloadService.js";
@@ -129,6 +130,13 @@ export const publicRoutes = [
   },
   {
     name: "public.saas-landing",
+    path: "/saas-landing",
+    shell: "public",
+    page: SaasLandingPage,
+    workingStateKey: null,
+  },
+  {
+    name: "public.landing-home",
     path: "/",
     shell: "public",
     page: LandingPageSwitcher,

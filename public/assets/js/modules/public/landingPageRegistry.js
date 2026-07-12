@@ -10,7 +10,7 @@ export const LANDING_PAGE_OPTIONS = Object.freeze([
   {
     name: "public.saas-landing",
     label: "Landing SaaS Jual Beli Mobil",
-    path: "/",
+    path: "/saas-landing",
     description: "Halaman marketing SaaS untuk seller/showroom, marketing, dan buyer.",
     page: SaasLandingPage,
   },
