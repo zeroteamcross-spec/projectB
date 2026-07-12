@@ -166,6 +166,29 @@ export const publicRoutes = [
     },
   },
   {
+    name: "public.example-catalog",
+    path: "/contoh-katalog",
+    shell: "public",
+    page: PublicCatalogPage,
+    workingStateKey: "publicCatalog",
+    preload: {
+      working: [
+        {
+          key: "catalog",
+          loader: ({ signal }) => publicCatalogService.list({ page: 1, limit: 12 }, { signal }),
+        },
+        {
+          key: "masterLocation",
+          loader: ({ signal }) => adminMasterService.getLocationMaster({ signal }).catch(() => adminMasterService.normalizeLocationMaster(null)),
+        },
+        {
+          key: "sliders",
+          loader: ({ signal }) => loadPublicLandingSliders(signal),
+        },
+      ],
+    },
+  },
+  {
     name: "public.car-detail",
     path: "/cars/:id",
     shell: "public",

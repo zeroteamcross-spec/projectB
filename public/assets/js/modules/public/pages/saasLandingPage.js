@@ -92,8 +92,8 @@ function heroSection(context) {
       id: "saas_landing_register_seller_button",
     }),
     ctaButton({
-      label: "Lihat katalog publik",
-      onClick: () => context.router?.navigate("/public"),
+      label: "Lihat contoh katalog",
+      onClick: () => context.router?.navigate("/contoh-katalog"),
       id: "saas_landing_catalog_button",
     }),
   );
