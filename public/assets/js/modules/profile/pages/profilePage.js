@@ -558,7 +558,6 @@ function detailPanel(profile, actions) {
       ["Cabang user", branchLabel(profile)],
       ["Scope data user", "Own"],
     ]),
-    detailSection("Informasi Relasi Data", "addressBook", relationRows(profile)),
     detailSection("Info Login", "clock", [
       ["User ID", profile.id ? `#${profile.id}` : "-"],
       ["Tanggal dibuat", formatDate(profile.created_at)],
