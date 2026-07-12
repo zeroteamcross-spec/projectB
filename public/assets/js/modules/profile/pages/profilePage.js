@@ -552,7 +552,7 @@ function detailPanel(profile, actions) {
       ["Foto Profil", avatarSource(profile) ? "Tersedia" : "Belum tersedia"],
       ["Status Akun", accountStatusLabel(profile.account_status)],
     ]),
-    detailSection("Informasi Role & Scope", "sitemap", [
+    detailSection("Informasi Level User & Scope", "sitemap", [
       ["Level login", profile.id_level || profile.login_level || profile.role || "-"],
       ["Level User efektif", roleLabel(profile.role)],
       ["Cabang user", branchLabel(profile)],
@@ -962,7 +962,7 @@ function avatarSource(profile) {
 
 function summaryFact(label, value, icon) {
   const item = document.createElement("section");
-  item.className = "grid min-w-0 grid-cols-[auto_minmax(0,1fr)] gap-3 rounded-[1rem] border border-[var(--pb-border)] bg-[var(--pb-surface-muted)] p-3";
+  item.className = "hidden grid min-w-0 grid-cols-[auto_minmax(0,1fr)] gap-3 rounded-[1rem] border border-[var(--pb-border)] bg-[var(--pb-surface-muted)] p-3";
   item.append(iconBox(icon, "h-10 w-10 rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_10%,white)] text-[var(--pb-brand-secondary)]"), textWrap(label, value));
   return item;
 }
