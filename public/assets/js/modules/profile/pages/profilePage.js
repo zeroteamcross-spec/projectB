@@ -463,7 +463,7 @@ function pageHeader() {
 
 function profileGrid(profile, actions) {
   const grid = document.createElement("section");
-  grid.className = "grid min-w-0 gap-5 lg:grid-cols-[340px_minmax(0,1fr)]";
+  grid.className = "grid min-w-0 w-full gap-5 overflow-x-clip lg:grid-cols-[minmax(260px,340px)_minmax(0,1fr)]";
   grid.append(identityCard(profile, actions), detailPanel(profile, actions));
   return grid;
 }
@@ -507,11 +507,11 @@ function identityCard(profile, actions) {
 
 function detailPanel(profile, actions) {
   const panel = document.createElement("section");
-  panel.className = "grid min-w-0 gap-5";
+  panel.className = "grid min-w-0 w-full gap-5";
 
   const blocked = isAdminImpersonatingAffiliate();
   const actionBar = document.createElement("section");
-  actionBar.className = "flex flex-col gap-2 rounded-[1.5rem] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] p-4 shadow-[var(--pb-shadow-card)] sm:flex-row sm:justify-end";
+  actionBar.className = "grid min-w-0 gap-2 rounded-[1.5rem] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] p-4 shadow-[var(--pb-shadow-card)] sm:flex sm:flex-wrap sm:justify-end";
   const edit = Button({
     label: blocked ? "Profil Dikunci" : "Edit Profil",
     disabled: blocked,
@@ -519,6 +519,7 @@ function detailPanel(profile, actions) {
     designHook: "shared.button.primary",
   });
   edit.id = "profile_edit_button";
+  edit.classList.add("w-full", "sm:w-auto");
   edit.prepend(createIcon("edit", { className: "block h-4 w-4 leading-none" }));
   const password = Button({
     label: blocked ? "Password Dikunci" : "Ubah Password",
@@ -528,6 +529,7 @@ function detailPanel(profile, actions) {
     designHook: "shared.button.secondary",
   });
   password.id = "profile_change_password_button";
+  password.classList.add("w-full", "sm:w-auto");
   password.prepend(createIcon("lock", { className: "block h-4 w-4 leading-none" }));
   if (profile.role !== "seller") {
     actionBar.append(edit, password);
@@ -569,7 +571,7 @@ function detailPanel(profile, actions) {
 
 function detailSection(title, icon, rows) {
   const section = document.createElement("section");
-  section.className = "hidden grid min-w-0 gap-4 rounded-[1.5rem] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] p-5 shadow-[var(--pb-shadow-card)]";
+  section.className = "grid min-w-0 w-full gap-4 rounded-[1.5rem] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] p-5 shadow-[var(--pb-shadow-card)]";
 
   const header = document.createElement("header");
   header.className = "flex min-w-0 items-center gap-3";
