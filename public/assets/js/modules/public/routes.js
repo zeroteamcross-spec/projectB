@@ -1,6 +1,7 @@
 import { PublicCatalogPage } from "./pages/catalogPage.js";
 import { PublicCarDetailPage } from "./pages/carDetailPage.js";
 import { AuthLandingPage } from "./pages/authLandingPage.js";
+import { LandingPageSwitcher } from "./pages/landingPageSwitcher.js";
 import { TransactionEntryPage } from "./pages/transactionEntryPage.js";
 import { publicCatalogService } from "./services/publicCatalogService.js";
 import { publicCarDetailPreloadService } from "./services/publicCarDetailPreloadService.js";
@@ -127,27 +128,11 @@ export const publicRoutes = [
     },
   },
   {
-    name: "public.catalog",
+    name: "public.saas-landing",
     path: "/",
     shell: "public",
-    page: PublicCatalogPage,
-    workingStateKey: "publicCatalog",
-    preload: {
-      working: [
-        {
-          key: "catalog",
-          loader: ({ signal }) => publicCatalogService.list({ page: 1, limit: 12 }, { signal }),
-        },
-        {
-          key: "masterLocation",
-          loader: ({ signal }) => adminMasterService.getLocationMaster({ signal }).catch(() => adminMasterService.normalizeLocationMaster(null)),
-        },
-        {
-          key: "sliders",
-          loader: ({ signal }) => loadPublicLandingSliders(signal),
-        },
-      ],
-    },
+    page: LandingPageSwitcher,
+    workingStateKey: null,
   },
   {
     name: "public.catalog-alias",

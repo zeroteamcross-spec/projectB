@@ -13,6 +13,7 @@ import { AdminSlidersPage } from "./pages/slidersPage.js";
 import { AdminMasterBankPage, AdminMasterBrandPage, AdminMasterLocationPage, AdminMasterSidebarPage } from "./pages/masterPage.js";
 import { AdminMasterInspectionPage } from "./pages/masterInspectionPage.js";
 import { AdminMigrationManagerPage } from "./pages/migrationManagerPage.js";
+import { AdminLandingPageConfigPage } from "./pages/landingPageConfigPage.js";
 import { AdminReleaseVersionManagerPage } from "./pages/releaseVersionManagerPage.js";
 import { SuperAdminDashboardPage } from "./pages/superAdminDashboardPage.js";
 import { adminSessionService } from "./services/adminSessionService.js";
@@ -357,6 +358,22 @@ export const adminRoutes = [
     shell: "app",
     role: "admin",
     page: AdminWebConfigPage,
+    workingStateKey: "adminWebConfig",
+    preload: {
+      working: [
+        {
+          key: "config",
+          loader: ({ signal }) => webConfigResource.get({ signal }).catch(() => null),
+        },
+      ],
+    },
+  },
+  {
+    name: "admin.landing-page-config",
+    path: "/admin/landing-page",
+    shell: "app",
+    role: "admin",
+    page: AdminLandingPageConfigPage,
     workingStateKey: "adminWebConfig",
     preload: {
       working: [

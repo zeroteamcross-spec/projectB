@@ -29,7 +29,7 @@ class WebConfigService
     public function update(array $user, array $payload): array
     {
         AuthPolicy::requireAdmin($user);
-        $config = $this->normalizePayload($payload);
+        $config = $this->normalizePayload($payload, $user);
         $theme = $this->theme();
         $theme['brand'] = array_merge($theme['brand'] ?? [], [
             'appName' => $config['app_name'],
@@ -43,6 +43,12 @@ class WebConfigService
             $theme['brand']['logoIcon'] = 'brandMark';
             $theme['brand']['logoMarkAsset'] = $config['icon_url'];
             $theme['brand']['iconUrl'] = $config['icon_url'];
+        }
+
+        if ($config['landing_page_route_name'] !== null) {
+            $theme['landingPage'] = array_merge($theme['landingPage'] ?? [], [
+                'routeName' => $config['landing_page_route_name'],
+            ]);
         }
 
         $this->masters->upsert(self::MASTER_KEY, [
@@ -68,12 +74,14 @@ class WebConfigService
         }
     }
 
-    private function normalizePayload(array $payload): array
+    private function normalizePayload(array $payload, array $user): array
     {
         $appName = trim((string) ($payload['app_name'] ?? ''));
         $tagline = trim((string) ($payload['tagline'] ?? ''));
         $whatsapp = trim((string) ($payload['whatsapp_number'] ?? ''));
         $iconUrl = $this->nullableString($payload['icon_url'] ?? null);
+        $hasLandingPage = array_key_exists('landing_page_route_name', $payload);
+        $landingPageRouteName = $hasLandingPage ? $this->nullableString($payload['landing_page_route_name'] ?? null) : null;
 
         $errors = [];
         if ($appName === '') {
@@ -88,6 +96,12 @@ class WebConfigService
         if ($iconUrl !== null && ! $this->isAllowedAssetUrl($iconUrl)) {
             $errors['icon_url'] = 'Icon URL harus berupa http(s), path upload, atau asset key aman.';
         }
+        if ($landingPageRouteName !== null && ($user['role'] ?? null) !== 'super_admin') {
+            $errors['landing_page_route_name'] = 'Landing page utama hanya dapat diubah oleh superadmin.';
+        }
+        if ($landingPageRouteName !== null && ! in_array($landingPageRouteName, $this->allowedLandingPageRouteNames(), true)) {
+            $errors['landing_page_route_name'] = 'Landing page utama tidak valid.';
+        }
 
         if ($errors !== []) {
             throw new ValidationException($errors);
@@ -98,6 +112,7 @@ class WebConfigService
             'app_name' => substr($appName, 0, 120),
             'tagline' => substr($tagline, 0, 180),
             'whatsapp_number' => $whatsapp,
+            'landing_page_route_name' => $landingPageRouteName,
         ];
     }
 
@@ -108,6 +123,16 @@ class WebConfigService
             'app_name' => $theme['brand']['appName'] ?? 'BeliMobil',
             'tagline' => $theme['brand']['tagline'] ?? 'Jual beli mobil terpercaya',
             'whatsapp_number' => $theme['contact']['whatsapp'] ?? '',
+            'landing_page_route_name' => $theme['landingPage']['routeName'] ?? 'public.saas-landing',
+        ];
+    }
+
+    private function allowedLandingPageRouteNames(): array
+    {
+        return [
+            'public.saas-landing',
+            'public.catalog-alias',
+            'public.auth-landing',
         ];
     }
 
