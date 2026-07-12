@@ -75,11 +75,11 @@ function heroSection(context) {
 
   const badge = pill("Platform SaaS jual beli mobil", "bolt");
   const title = document.createElement("h1");
-  title.className = "max-w-4xl text-[3.15rem] font-black leading-[0.95] tracking-normal text-slate-950 sm:text-[4.5rem] lg:text-[5.6rem]";
+  title.className = "max-w-4xl text-[3.15rem] font-black leading-[0.95] tracking-normal text-white sm:text-[4.5rem] lg:text-[5.6rem]";
   title.textContent = "Satu link untuk showroom mobil Anda.";
 
   const body = document.createElement("p");
-  body.className = "max-w-2xl text-base font-semibold leading-8 text-slate-600 sm:text-lg";
+  body.className = "max-w-2xl text-base font-semibold leading-8 text-white sm:text-lg";
   body.textContent = "Daftar, punya halaman publik sendiri, kelola profil showroom, tampilkan list mobil, dan arahkan calon pembeli ke katalog yang rapi dari satu dashboard.";
 
   const actions = document.createElement("section");
@@ -180,7 +180,7 @@ function phoneMockup({ className, title, subtitle, items }) {
 }
 
 function audienceSection() {
-  const section = landingSection("Dibuat untuk ekosistem penjualan mobil", "Seller punya halaman sendiri. Marketing bisa membagikan link. Buyer melihat katalog yang konsisten dan mudah dipahami.");
+  const section = landingSection("Dibuat untuk ekosistem penjualan mobil", "Showroom punya halaman sendiri. Marketing bisa membagikan link. Buyer melihat katalog yang konsisten dan mudah dipahami.", "text-base font-semibold leading-8 text-white");
   const grid = document.createElement("section");
   grid.className = "grid gap-4 md:grid-cols-3";
   [
@@ -231,7 +231,7 @@ function builderSection(context) {
 }
 
 function workflowSection() {
-  const section = landingSection("Dari daftar sampai mobil tayang", "Alur dibuat pendek supaya seller bisa fokus jualan, bukan mengurus teknis halaman.");
+  const section = landingSection("Dari daftar sampai mobil tayang", "Alur dibuat pendek supaya seller bisa fokus jualan, bukan mengurus teknis halaman.", "text-base font-semibold leading-8 text-white");
   const grid = document.createElement("section");
   grid.className = "grid gap-4 md:grid-cols-4";
   [
@@ -253,7 +253,7 @@ function workflowSection() {
 }
 
 function showcaseSection() {
-  const section = landingSection("Halaman publik yang terasa seperti showroom digital", "Setiap user memiliki wajah bisnis sendiri, tetapi tetap berada dalam standar platform.");
+  const section = landingSection("Halaman publik yang terasa seperti showroom digital", "Setiap user memiliki wajah bisnis sendiri, tetapi tetap berada dalam standar platform.", "text-base font-semibold leading-8 text-white");
   const grid = document.createElement("section");
   grid.className = "grid gap-4 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]";
 
@@ -310,7 +310,7 @@ function footerSection(context) {
   return footer;
 }
 
-function landingSection(title, subtitle) {
+function landingSection(title, subtitle, subtitleClass) {
   const section = document.createElement("section");
   section.className = "px-4 py-14 sm:px-6 lg:py-20";
   const frame = document.createElement("section");
@@ -318,8 +318,8 @@ function landingSection(title, subtitle) {
   const header = document.createElement("header");
   header.className = "grid max-w-3xl gap-3";
   header.append(
-    textNode("h2", "text-4xl font-black leading-tight tracking-normal text-slate-950 sm:text-5xl", title),
-    textNode("p", "text-base font-semibold leading-8 text-slate-600", subtitle),
+    textNode("h2", "text-4xl font-black leading-tight tracking-normal text-white sm:text-5xl", title),
+    textNode("p", subtitleClass || "text-base font-semibold leading-8 text-slate-600", subtitle),
   );
   frame.append(header);
   section.append(frame);
