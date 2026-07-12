@@ -67,10 +67,12 @@ export function AuthLandingPage() {
       root = document.createElement("div");
       root.className = "relative isolate min-h-screen overflow-hidden bg-transparent";
       render(root, context, state, getBackgroundVideoLayer);
+      window.scrollTo(0, 0);
       return root;
     },
     hydrate(context) {
       render(root, context, state, getBackgroundVideoLayer);
+      window.scrollTo(0, 0);
     },
     dispose() {
       backgroundVideoLayer?.dispose?.();
