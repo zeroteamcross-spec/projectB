@@ -1,31 +1,50 @@
 import { createPageLifecycle } from "../../../core/lifecycle.js";
 import { Button } from "../../../ui/primitives/button.js";
+import { createBackgroundVideoLayer } from "../../../ui/composites/backgroundVideo.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 import { brandConfig } from "../../../theme/brandConfig.js";
 
+const SAAS_LANDING_FALLBACK = "bg-[radial-gradient(circle_at_18%_12%,rgba(251,146,60,0.28),transparent_30%),radial-gradient(circle_at_82%_10%,rgba(255,255,255,0.72),transparent_28%),linear-gradient(180deg,#fff8f1_0%,#fff7ed_46%,#ffffff_100%)]";
+
 export function SaasLandingPage() {
   let root = null;
+  let backgroundVideoLayer = null;
+  const getBackgroundVideoLayer = () => {
+    backgroundVideoLayer ??= createBackgroundVideoLayer({
+      id: "saas_landing_background_video_layer",
+      fallbackClassName: SAAS_LANDING_FALLBACK,
+      overlayClassName: "bg-white/72",
+    });
+    return backgroundVideoLayer;
+  };
 
   return createPageLifecycle({
     mount(context) {
       root = document.createElement("div");
-      render(root, context);
+      render(root, context, getBackgroundVideoLayer);
       return root;
     },
     hydrate(context) {
-      render(root, context);
+      render(root, context, getBackgroundVideoLayer);
+    },
+    dispose() {
+      backgroundVideoLayer?.dispose?.();
+      backgroundVideoLayer = null;
     },
   });
 }
 
-function render(root, context) {
+function render(root, context, getBackgroundVideoLayer) {
   if (!root) {
     return;
   }
 
+  const shell = document.createElement("section");
+  shell.className = "relative isolate min-h-screen overflow-x-clip bg-transparent";
+
   const page = document.createElement("main");
   page.id = "saas_landing_page";
-  page.className = "min-h-screen overflow-x-clip bg-[#fff8f1] text-slate-950";
+  page.className = "relative z-10 min-h-screen overflow-x-clip text-slate-950";
 
   page.append(
     heroSection(context),
@@ -37,7 +56,8 @@ function render(root, context) {
     footerSection(context),
   );
 
-  root.replaceChildren(page);
+  shell.append(getBackgroundVideoLayer(), page);
+  root.replaceChildren(shell);
 }
 
 function heroSection(context) {
