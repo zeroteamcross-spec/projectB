@@ -93,15 +93,16 @@ class AuthUserRepository
     {
         $stmt = $this->pdo->prepare(
             'INSERT INTO showrooms
-                (user_id, name, address, phone_number, bank_account_number,
+                (user_id, slug, name, address, phone_number, bank_account_number,
                  bank_type, bank_account_name, created_at, updated_at)
              VALUES
-                (:user_id, :name, :address, :phone_number, :bank_account_number,
+                (:user_id, :slug, :name, :address, :phone_number, :bank_account_number,
                  :bank_type, :bank_account_name, :created_at, :updated_at)'
         );
 
         $stmt->execute([
             'user_id' => $userId,
+            'slug' => $data['slug'],
             'name' => $data['name'],
             'address' => $data['address'] ?? null,
             'phone_number' => $data['phone_number'] ?? null,
@@ -113,6 +114,16 @@ class AuthUserRepository
         ]);
 
         return (int) $this->pdo->lastInsertId();
+    }
+
+    public function showroomSlugExists(string $slug): bool
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT id FROM showrooms WHERE slug = :slug AND deleted_at IS NULL LIMIT 1'
+        );
+        $stmt->execute(['slug' => $slug]);
+
+        return (bool) $stmt->fetch();
     }
 
     public function clearOtp(int $userId): void

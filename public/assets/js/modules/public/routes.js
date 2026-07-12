@@ -14,10 +14,121 @@ export const publicReservedRoutePrefixes = Object.freeze([
   "auth",
   "cars",
   "google-login",
+  "showrooms",
   "transactions",
 ]);
 
 export const publicRoutes = [
+  {
+    name: "public.showroom.catalog",
+    path: "/showrooms/:slug",
+    shell: "public",
+    page: PublicCatalogPage,
+    workingStateKey: "publicCatalog",
+    preload: {
+      working: [
+        {
+          key: "catalog",
+          loader: ({ params, signal }) => publicCatalogService.list({ page: 1, limit: 12, showroomSlug: params.slug }, { signal }),
+        },
+        {
+          key: "masterLocation",
+          loader: ({ signal }) => adminMasterService.getLocationMaster({ signal }).catch(() => adminMasterService.normalizeLocationMaster(null)),
+        },
+        {
+          key: "sliders",
+          loader: ({ signal }) => loadPublicLandingSliders(signal),
+        },
+      ],
+    },
+  },
+  {
+    name: "public.showroom.car-detail",
+    path: "/showrooms/:slug/cars/:id",
+    shell: "public",
+    page: PublicCarDetailPage,
+    workingStateKey: "publicCarDetail",
+    preload: {
+      working: [
+        {
+          key: "detail",
+          loader: ({ params, signal }) => publicCarDetailPreloadService.detailOrFetch(params.id, { signal, showroomSlug: params.slug }).catch(() => null),
+        },
+      ],
+    },
+  },
+  {
+    name: "public.showroom.transaction-entry",
+    path: "/showrooms/:slug/transactions/new",
+    shell: "public",
+    page: TransactionEntryPage,
+    workingStateKey: "transactionEntry",
+    preload: {
+      working: [
+        {
+          key: "detail",
+          loader: ({ params, query, signal }) => query.car_id
+            ? publicCarDetailPreloadService.detailOrFetch(query.car_id, { signal, showroomSlug: params.slug }).catch(() => null)
+            : Promise.resolve(null),
+        },
+      ],
+    },
+  },
+  {
+    name: "public.showroom-legacy.catalog",
+    path: "/s/:slug",
+    shell: "public",
+    page: PublicCatalogPage,
+    workingStateKey: "publicCatalog",
+    preload: {
+      working: [
+        {
+          key: "catalog",
+          loader: ({ params, signal }) => publicCatalogService.list({ page: 1, limit: 12, showroomSlug: params.slug }, { signal }),
+        },
+        {
+          key: "masterLocation",
+          loader: ({ signal }) => adminMasterService.getLocationMaster({ signal }).catch(() => adminMasterService.normalizeLocationMaster(null)),
+        },
+        {
+          key: "sliders",
+          loader: ({ signal }) => loadPublicLandingSliders(signal),
+        },
+      ],
+    },
+  },
+  {
+    name: "public.showroom-legacy.car-detail",
+    path: "/s/:slug/cars/:id",
+    shell: "public",
+    page: PublicCarDetailPage,
+    workingStateKey: "publicCarDetail",
+    preload: {
+      working: [
+        {
+          key: "detail",
+          loader: ({ params, signal }) => publicCarDetailPreloadService.detailOrFetch(params.id, { signal, showroomSlug: params.slug }).catch(() => null),
+        },
+      ],
+    },
+  },
+  {
+    name: "public.showroom-legacy.transaction-entry",
+    path: "/s/:slug/transactions/new",
+    shell: "public",
+    page: TransactionEntryPage,
+    workingStateKey: "transactionEntry",
+    preload: {
+      working: [
+        {
+          key: "detail",
+          loader: ({ params, query, signal }) => query.car_id
+            ? publicCarDetailPreloadService.detailOrFetch(query.car_id, { signal, showroomSlug: params.slug }).catch(() => null)
+            : Promise.resolve(null),
+        },
+      ],
+    },
+  },
   {
     name: "public.affiliate.catalog",
     path: "/af/:slug",

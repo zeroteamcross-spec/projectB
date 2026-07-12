@@ -4,8 +4,9 @@ import { inspectionsResource } from "../../../resources/inspectionsResource.js";
 import { publicContextService } from "./publicContextService.js";
 
 export const publicCatalogService = {
-  async list({ page = 1, limit = 12, filters = {}, affiliateSlug = "" } = {}, options = {}) {
+  async list({ page = 1, limit = 12, filters = {}, affiliateSlug = "", showroomSlug = "" } = {}, options = {}) {
     let affiliateSellerUserId = null;
+    let showroomSellerUserId = null;
 
     if (affiliateSlug) {
       const context = await publicContextService.activateAffiliateBySlug(affiliateSlug, options);
@@ -14,6 +15,15 @@ export const publicCatalogService = {
       }
 
       affiliateSellerUserId = context.sellerUserId;
+    }
+
+    if (showroomSlug) {
+      const context = await publicContextService.activateShowroomBySlug(showroomSlug, options);
+      if (!context) {
+        return { cars: [], meta: {} };
+      }
+
+      showroomSellerUserId = context.sellerUserId;
     }
 
     const cleanFilters = Object.fromEntries(
@@ -27,22 +37,35 @@ export const publicCatalogService = {
       listing_status: "published",
     };
 
-    if (affiliateSellerUserId) {
-      scopedFilters.seller_user_id = affiliateSellerUserId;
+    if (affiliateSellerUserId || showroomSellerUserId) {
+      scopedFilters.seller_user_id = affiliateSellerUserId || showroomSellerUserId;
     }
 
     return carsResource.list(
-      affiliateSellerUserId ? scopedFilters : publicContextService.applyCatalogFilters(scopedFilters),
+      (affiliateSellerUserId || showroomSellerUserId) ? scopedFilters : publicContextService.applyCatalogFilters(scopedFilters),
       options
     );
   },
 
   async detail(carId, options = {}) {
+    let scopedSellerUserId = null;
+
     if (options.affiliateSlug) {
       const context = await publicContextService.activateAffiliateBySlug(options.affiliateSlug, options);
       if (!context) {
         return null;
       }
+
+      scopedSellerUserId = context.sellerUserId;
+    }
+
+    if (options.showroomSlug) {
+      const context = await publicContextService.activateShowroomBySlug(options.showroomSlug, options);
+      if (!context) {
+        return null;
+      }
+
+      scopedSellerUserId = context.sellerUserId;
     }
 
     let car = null;
@@ -58,6 +81,10 @@ export const publicCatalogService = {
     }
 
     if (!car) {
+      return null;
+    }
+
+    if (scopedSellerUserId && Number(car.seller_user_id) !== Number(scopedSellerUserId)) {
       return null;
     }
 

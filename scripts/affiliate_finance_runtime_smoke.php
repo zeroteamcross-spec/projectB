@@ -430,13 +430,14 @@ function createShowroom(PDO $pdo, int $sellerUserId, string $runId): int
 {
     $stmt = $pdo->prepare(
         'INSERT INTO showrooms
-            (user_id, name, address, phone_number, bank_account_number, bank_type, bank_account_name, created_at, updated_at, deleted_at)
+            (user_id, slug, name, address, phone_number, bank_account_number, bank_type, bank_account_name, created_at, updated_at, deleted_at)
          VALUES
-            (:user_id, :name, :address, :phone_number, :bank_account_number, :bank_type, :bank_account_name, :created_at, :updated_at, NULL)'
+            (:user_id, :slug, :name, :address, :phone_number, :bank_account_number, :bank_type, :bank_account_name, :created_at, :updated_at, NULL)'
     );
     $now = now();
     $stmt->execute([
         'user_id' => $sellerUserId,
+        'slug' => 'uat-affiliate-finance-' . strtolower($runId),
         'name' => 'UAT Affiliate Finance Showroom ' . $runId,
         'address' => 'UAT Disposable Address',
         'phone_number' => '628123456789',

@@ -167,7 +167,12 @@ class GoogleAuthService
                 'name' => $validated['name'],
                 'phone_number' => $validated['whatsapp'],
             ]);
+            $existingShowroom = $this->repository->findShowroomByUserId((int) $user['id']);
             $this->repository->upsertShowroom((int) $user['id'], [
+                'slug' => $this->generateShowroomSlug(
+                    $validated['showroom_name'],
+                    $existingShowroom ? (int) $existingShowroom['id'] : null
+                ),
                 'name' => $validated['showroom_name'],
                 'address' => $validated['showroom_address'] ?? null,
                 'phone_number' => $validated['whatsapp'],
@@ -644,6 +649,34 @@ class GoogleAuthService
         }
 
         return $status === 'active' && (int) ($user['is_approved'] ?? 0) === 1;
+    }
+
+    private function generateShowroomSlug(string $name, ?int $ignoreShowroomId = null): string
+    {
+        $base = $this->normalizeShowroomSlug($name);
+
+        if ($base === '') {
+            $base = 'showroom';
+        }
+
+        for ($attempt = 0; $attempt < 20; $attempt++) {
+            $suffix = $attempt === 0 ? '' : '-' . strtolower(bin2hex(random_bytes(2)));
+            $slug = substr($base, 0, 60 - strlen($suffix)) . $suffix;
+
+            if (! $this->repository->showroomSlugExists($slug, $ignoreShowroomId)) {
+                return $slug;
+            }
+        }
+
+        throw new ValidationException(['showroom.slug' => 'Unable to generate unique showroom slug.']);
+    }
+
+    private function normalizeShowroomSlug(string $value): string
+    {
+        $slug = strtolower(trim($value));
+        $slug = preg_replace('/[^a-z0-9]+/', '-', $slug) ?? '';
+
+        return trim($slug, '-');
     }
 
     private function serializeUser(array $user): array

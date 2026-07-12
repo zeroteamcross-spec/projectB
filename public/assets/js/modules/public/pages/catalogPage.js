@@ -46,9 +46,14 @@ export function PublicCatalogPage({ notFound = false } = {}) {
     async bootstrap(context) {
       publicContextService.syncRouteContext(context);
       const affiliateSlug = publicContextService.routeAffiliateSlug(context);
+      const showroomSlug = publicContextService.routeShowroomSlug(context);
 
       if (affiliateSlug) {
         await publicContextService.activateAffiliateBySlug(affiliateSlug).catch(() => null);
+      }
+
+      if (showroomSlug) {
+        await publicContextService.activateShowroomBySlug(showroomSlug).catch(() => null);
       }
     },
     mount(context) {
@@ -117,9 +122,14 @@ function render(root, context, flags) {
   }
 
   const affiliate = publicContextService.activeAffiliate();
-  const affiliateSlug = String(context.params?.slug ?? "").trim().toLowerCase();
+  const showroom = publicContextService.activeShowroom();
+  const affiliateSlug = publicContextService.routeAffiliateSlug(context);
+  const showroomSlug = publicContextService.routeShowroomSlug(context);
   const isAffiliateRoute = Boolean(affiliateSlug);
+  const isShowroomRoute = Boolean(showroomSlug);
   const invalidAffiliateRoute = isAffiliateRoute && publicContextService.invalidSlug() === affiliateSlug;
+  const invalidShowroomRoute = isShowroomRoute && publicContextService.invalidSlug() === showroomSlug;
+  const activeContext = affiliate || showroom;
   const catalogState = publicCatalogState.get();
   const snapshot = publicCatalogState.snapshotCatalog({ cars: [], meta: {} });
   const working = publicCatalogState.workingCatalog(snapshot);
@@ -130,7 +140,8 @@ function render(root, context, flags) {
   const allCars = applyQuickFilter(applyLocalFilters(sourceCars, filters), catalogState.quickFilter);
   const filterOptions = buildFilterOptions(sourceCars, resolveLocationMaster());
   const canLoadMore = canLoadMoreCatalog(meta, allCars.length, catalogState.page, catalogState.limit);
-  const contextReady = !isAffiliateRoute || (affiliate?.slug ?? "") === affiliateSlug;
+  const contextReady = (!isAffiliateRoute || (affiliate?.slug ?? "") === affiliateSlug)
+    && (!isShowroomRoute || (showroom?.slug ?? "") === showroomSlug);
   const useBackgroundVideo = isLandingRoute(context);
   const slidersBeforeRender = resolvePublicSliders();
 
@@ -142,7 +153,7 @@ function render(root, context, flags) {
       filterOptions,
       useBackgroundVideo ? flags.getBackgroundVideoLayer?.() : null,
       useBackgroundVideo,
-      affiliate,
+      activeContext,
     ));
     return;
   }
@@ -182,9 +193,9 @@ function render(root, context, flags) {
     }));
   }
 
-  if (affiliate) {
+  if (activeContext) {
     const banner = PublicAffiliateContextBanner({
-      affiliate,
+      affiliate: activeContext,
       onClear: () => {
         publicContextService.clear();
         context.router.navigate("/");
@@ -196,10 +207,10 @@ function render(root, context, flags) {
     }
   }
 
-  if (invalidAffiliateRoute) {
+  if (invalidAffiliateRoute || invalidShowroomRoute) {
     frame.append(EmptyState({
-      title: "Marketing tidak ditemukan",
-      description: "Slug marketing ini tidak aktif atau tidak tersedia lagi. Kembali ke landing utama untuk melihat katalog publik.",
+      title: invalidShowroomRoute ? "Showroom tidak ditemukan" : "Marketing tidak ditemukan",
+      description: "Slug ini tidak aktif atau tidak tersedia lagi. Kembali ke landing utama untuk melihat katalog publik.",
     }));
   } else {
     frame.append(PublicSearchFilterBar({
@@ -217,13 +228,13 @@ function render(root, context, flags) {
           idPrefix: "pubcat",
           context: "public",
           onNavigate: (path) => context.router?.navigate(path),
-          resolveCtaUrl: (url) => isAffiliateRoute ? affiliateSliderCtaUrl(url, affiliateSlug) : url,
+          resolveCtaUrl: (url) => isAffiliateRoute ? affiliateSliderCtaUrl(url, affiliateSlug) : isShowroomRoute ? showroomSliderCtaUrl(url, showroomSlug) : url,
           fallback: () => sliderSkeletonPlaceholder(),
         })
       : sliderSkeletonPlaceholder());
-    frame.append(statsPanel({ count: allCars.length, meta, affiliate }));
+    frame.append(statsPanel({ count: allCars.length, meta, affiliate: activeContext }));
     frame.append(
-      catalogToolbar(allCars.length, meta, affiliate),
+        catalogToolbar(allCars.length, meta, activeContext),
       carGrid({
         cars: allCars,
         router: context.router,
@@ -256,7 +267,7 @@ function render(root, context, flags) {
   );
   disposeSliderBanners(root);
   root.replaceChildren(shell);
-  publicCarDetailPreloadService.enqueueCars(allCars, { affiliateSlug });
+  publicCarDetailPreloadService.enqueueCars(allCars, { affiliateSlug, showroomSlug });
 }
 
 function heroSection(notFound) {
@@ -409,6 +420,31 @@ function affiliateSliderCtaUrl(url, affiliateSlug) {
   }
 
   if (hashPath.startsWith("/af/") || hashPath.startsWith("/a/")) {
+    return `#${hashPath}`;
+  }
+
+  return catalogUrl;
+}
+
+function showroomSliderCtaUrl(url, showroomSlug) {
+  const catalogUrl = `#/showrooms/${encodeURIComponent(showroomSlug)}`;
+  const value = String(url || "").trim();
+
+  if (!value) {
+    return catalogUrl;
+  }
+
+  const hashPath = sliderHashPath(value);
+
+  if (!hashPath || hashPath === "/" || hashPath === "/public") {
+    return catalogUrl;
+  }
+
+  if (hashPath.startsWith("/cars/") || hashPath.startsWith("/transactions/")) {
+    return `#/showrooms/${encodeURIComponent(showroomSlug)}${hashPath}`;
+  }
+
+  if (hashPath.startsWith("/showrooms/") || hashPath.startsWith("/s/")) {
     return `#${hashPath}`;
   }
 
@@ -703,7 +739,8 @@ async function loadMore(root, context, flags) {
   render(root, context, flags);
 
   try {
-    const affiliateSlug = String(context.params?.slug ?? "").trim().toLowerCase();
+    const affiliateSlug = publicContextService.routeAffiliateSlug(context);
+    const showroomSlug = publicContextService.routeShowroomSlug(context);
     const nextPage = publicCatalogState.page() + 1;
     const current = publicCatalogState.workingCatalog({ cars: [], meta: {} });
     const next = await publicCatalogService.list({
@@ -711,6 +748,7 @@ async function loadMore(root, context, flags) {
       limit: publicCatalogState.limit(),
       filters: publicCatalogState.filters(),
       affiliateSlug,
+      showroomSlug,
     });
 
     publicCatalogState.incrementPage();

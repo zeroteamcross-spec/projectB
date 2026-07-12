@@ -6,6 +6,7 @@ namespace App\Modules\Showrooms\Services;
 
 use App\Core\Exceptions\ForbiddenException;
 use App\Core\Exceptions\NotFoundException;
+use App\Core\Exceptions\ValidationException;
 use App\Modules\Showrooms\Repositories\ShowroomRepository;
 
 class ShowroomService
@@ -51,6 +52,7 @@ class ShowroomService
 
         if ($existing) {
             $payload = [
+                'slug' => $existing['slug'] ?: $this->generateSlug((string) ($data['name'] ?? $existing['name']), (int) $existing['id']),
                 'name' => $data['name'] ?? $existing['name'],
                 'address' => array_key_exists('address', $data) ? $data['address'] : $existing['address'],
                 'phone_number' => array_key_exists('phone_number', $data) ? $data['phone_number'] : $existing['phone_number'],
@@ -68,9 +70,37 @@ class ShowroomService
             return $this->mine($user);
         }
 
+        $data['slug'] = $this->generateSlug((string) $data['name']);
         $showroomId = $this->showrooms->create((int) $user['id'], $data);
 
         return $this->show((int) $showroomId, $user);
+    }
+
+    public function validateSlug(string $slug): array
+    {
+        $normalized = $this->normalizeSlug($slug);
+        $this->assertSlugFormat($normalized);
+        $showroom = $this->showrooms->findPublicContextBySlug($normalized);
+
+        return [
+            'slug' => $normalized,
+            'is_valid' => $showroom !== null,
+            'seller_user_id' => $showroom ? (int) $showroom['user_id'] : null,
+            'contact_whatsapp' => $showroom ? ($showroom['phone_number'] ?: $showroom['seller_phone_number']) : null,
+            'seller' => $showroom ? [
+                'id' => (int) $showroom['user_id'],
+                'name' => $showroom['seller_name'] ?? null,
+                'email' => $showroom['seller_email'] ?? null,
+                'phone_number' => $showroom['seller_phone_number'] ?? null,
+            ] : null,
+            'showroom' => $showroom ? [
+                'id' => (int) $showroom['id'],
+                'slug' => $showroom['slug'],
+                'name' => $showroom['name'] ?? null,
+                'address' => $showroom['address'] ?? null,
+                'phone_number' => $showroom['phone_number'] ?? null,
+            ] : null,
+        ];
     }
 
     private function ensureSeller(array $user): void
@@ -85,6 +115,7 @@ class ShowroomService
         return [
             'id' => (int) $showroom['id'],
             'user_id' => (int) $showroom['user_id'],
+            'slug' => $showroom['slug'] ?? null,
             'name' => $showroom['name'],
             'address' => $showroom['address'],
             'phone_number' => $showroom['phone_number'],
@@ -94,5 +125,43 @@ class ShowroomService
             'created_at' => $showroom['created_at'],
             'updated_at' => $showroom['updated_at'],
         ];
+    }
+
+    private function generateSlug(string $name, ?int $ignoreShowroomId = null): string
+    {
+        $base = $this->normalizeSlug($name);
+
+        if ($base === '') {
+            $base = 'showroom';
+        }
+
+        for ($attempt = 0; $attempt < 20; $attempt++) {
+            $suffix = $attempt === 0 ? '' : '-' . strtolower(bin2hex(random_bytes(2)));
+            $slug = substr($base, 0, 60 - strlen($suffix)) . $suffix;
+
+            if (! $this->showrooms->slugExists($slug, $ignoreShowroomId)) {
+                return $slug;
+            }
+        }
+
+        throw new ValidationException(['slug' => 'Unable to generate unique showroom slug.']);
+    }
+
+    private function normalizeSlug(string $value): string
+    {
+        $slug = strtolower(trim($value));
+        $slug = preg_replace('/[^a-z0-9]+/', '-', $slug) ?? '';
+        $slug = trim($slug, '-');
+
+        return $slug;
+    }
+
+    private function assertSlugFormat(string $slug): void
+    {
+        if ($slug === '' || ! preg_match('/^[a-z0-9-]+$/', $slug)) {
+            throw new ValidationException([
+                'slug' => 'Slug showroom hanya boleh berisi huruf kecil, angka, dan dash.',
+            ]);
+        }
     }
 }

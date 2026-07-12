@@ -60,6 +60,7 @@ class AuthService
             if ($data['role'] === 'seller') {
                 $showroom = $data['showroom'];
                 $showroom['created_at'] = $now;
+                $showroom['slug'] = $this->generateShowroomSlug((string) $showroom['name']);
                 $this->users->createShowroom($userId, $showroom);
             }
 
@@ -244,6 +245,34 @@ class AuthService
         }
 
         return $status === 'active' && (int) ($user['is_approved'] ?? 0) === 1;
+    }
+
+    private function generateShowroomSlug(string $name): string
+    {
+        $base = $this->normalizeShowroomSlug($name);
+
+        if ($base === '') {
+            $base = 'showroom';
+        }
+
+        for ($attempt = 0; $attempt < 20; $attempt++) {
+            $suffix = $attempt === 0 ? '' : '-' . strtolower(bin2hex(random_bytes(2)));
+            $slug = substr($base, 0, 60 - strlen($suffix)) . $suffix;
+
+            if (! $this->users->showroomSlugExists($slug)) {
+                return $slug;
+            }
+        }
+
+        throw new ValidationException(['showroom.slug' => 'Unable to generate unique showroom slug.']);
+    }
+
+    private function normalizeShowroomSlug(string $value): string
+    {
+        $slug = strtolower(trim($value));
+        $slug = preg_replace('/[^a-z0-9]+/', '-', $slug) ?? '';
+
+        return trim($slug, '-');
     }
 
     public function serializeUser(?array $user): array

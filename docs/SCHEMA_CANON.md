@@ -132,6 +132,7 @@ Menyimpan profil showroom milik seller.
 Field:
 - `id` bigint unsigned, PK, auto increment
 - `user_id` bigint unsigned, FK -> `users.id`, unique
+- `slug` varchar(80) not null unique
 - `name` varchar(225) not null
 - `address` varchar(512) null
 - `phone_number` varchar(25) null
@@ -144,6 +145,8 @@ Field:
 
 Catatan:
 - seller memiliki paling banyak satu showroom pada desain awal
+- `slug` dibuat otomatis saat showroom dibuat dari nama showroom
+- halaman publik showroom menggunakan slug ini dan menampilkan hanya listing milik seller/showroom tersebut
 
 ---
 

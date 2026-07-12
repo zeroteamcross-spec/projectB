@@ -5,6 +5,7 @@ const BASE = "modules.public.context";
 const DEFAULT_CONTEXT = {
   mode: "default",
   affiliate: null,
+  showroom: null,
   invalidSlug: "",
   hydratedAt: 0,
 };
@@ -22,8 +23,16 @@ export const publicContextState = {
     return appStore.get(`${BASE}.affiliate`, null);
   },
 
+  activeShowroom() {
+    return appStore.get(`${BASE}.showroom`, null);
+  },
+
   isAffiliateActive() {
     return appStore.get(`${BASE}.mode`, "default") === "affiliate" && Boolean(this.activeAffiliate());
+  },
+
+  isShowroomActive() {
+    return appStore.get(`${BASE}.mode`, "default") === "showroom" && Boolean(this.activeShowroom());
   },
 
   invalidSlug() {
@@ -34,9 +43,20 @@ export const publicContextState = {
     appStore.patchState(BASE, {
       mode: "affiliate",
       affiliate,
+      showroom: null,
       invalidSlug: "",
       hydratedAt: Date.now(),
     }, "public-context:affiliate");
+  },
+
+  setShowroom(showroom) {
+    appStore.patchState(BASE, {
+      mode: "showroom",
+      affiliate: null,
+      showroom,
+      invalidSlug: "",
+      hydratedAt: Date.now(),
+    }, "public-context:showroom");
   },
 
   setDefault() {
@@ -47,6 +67,7 @@ export const publicContextState = {
     appStore.patchState(BASE, {
       mode: "default",
       affiliate: null,
+      showroom: null,
       invalidSlug: String(slug ?? ""),
       hydratedAt: Date.now(),
     }, "public-context:invalid");

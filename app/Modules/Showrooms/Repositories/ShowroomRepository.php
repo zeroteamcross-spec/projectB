@@ -18,7 +18,7 @@ class ShowroomRepository
     public function findById(int $id): ?array
     {
         $stmt = $this->pdo->prepare(
-            'SELECT id, user_id, name, address, phone_number, bank_account_number,
+            'SELECT id, user_id, slug, name, address, phone_number, bank_account_number,
                     bank_type, bank_account_name, created_at, updated_at
              FROM showrooms
              WHERE id = :id
@@ -34,7 +34,7 @@ class ShowroomRepository
     public function findByUserId(int $userId): ?array
     {
         $stmt = $this->pdo->prepare(
-            'SELECT id, user_id, name, address, phone_number, bank_account_number,
+            'SELECT id, user_id, slug, name, address, phone_number, bank_account_number,
                     bank_type, bank_account_name, created_at, updated_at
              FROM showrooms
              WHERE user_id = :user_id
@@ -47,19 +47,55 @@ class ShowroomRepository
         return $showroom ?: null;
     }
 
+    public function findPublicContextBySlug(string $slug): ?array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT sh.id, sh.user_id, sh.slug, sh.name, sh.address, sh.phone_number,
+                    u.name AS seller_name, u.email AS seller_email, u.phone_number AS seller_phone_number
+             FROM showrooms AS sh
+             INNER JOIN users AS u ON u.id = sh.user_id
+             WHERE sh.slug = :slug
+             AND sh.deleted_at IS NULL
+             AND u.deleted_at IS NULL
+             LIMIT 1'
+        );
+        $stmt->execute(['slug' => $slug]);
+        $showroom = $stmt->fetch();
+
+        return $showroom ?: null;
+    }
+
+    public function slugExists(string $slug, ?int $ignoreShowroomId = null): bool
+    {
+        $sql = 'SELECT id FROM showrooms WHERE slug = :slug AND deleted_at IS NULL';
+        $params = ['slug' => $slug];
+
+        if ($ignoreShowroomId !== null) {
+            $sql .= ' AND id <> :id';
+            $params['id'] = $ignoreShowroomId;
+        }
+
+        $sql .= ' LIMIT 1';
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+
+        return (bool) $stmt->fetch();
+    }
+
     public function create(int $userId, array $data): int
     {
         $stmt = $this->pdo->prepare(
             'INSERT INTO showrooms
-                (user_id, name, address, phone_number, bank_account_number,
+                (user_id, slug, name, address, phone_number, bank_account_number,
                  bank_type, bank_account_name, created_at, updated_at)
              VALUES
-                (:user_id, :name, :address, :phone_number, :bank_account_number,
+                (:user_id, :slug, :name, :address, :phone_number, :bank_account_number,
                  :bank_type, :bank_account_name, :created_at, :updated_at)'
         );
 
         $stmt->execute([
             'user_id' => $userId,
+            'slug' => $data['slug'],
             'name' => $data['name'],
             'address' => $data['address'] ?? null,
             'phone_number' => $data['phone_number'] ?? null,
@@ -77,7 +113,8 @@ class ShowroomRepository
     {
         $stmt = $this->pdo->prepare(
             'UPDATE showrooms
-             SET name = :name,
+             SET slug = :slug,
+                 name = :name,
                  address = :address,
                  phone_number = :phone_number,
                  bank_account_number = :bank_account_number,
@@ -90,6 +127,7 @@ class ShowroomRepository
 
         $stmt->execute([
             'id' => $id,
+            'slug' => $data['slug'],
             'name' => $data['name'],
             'address' => $data['address'] ?? null,
             'phone_number' => $data['phone_number'] ?? null,

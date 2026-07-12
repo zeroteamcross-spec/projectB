@@ -39,9 +39,14 @@ export function PublicCarDetailPage() {
     async bootstrap(context) {
       publicContextService.syncRouteContext(context);
       const affiliateSlug = publicContextService.routeAffiliateSlug(context);
+      const showroomSlug = publicContextService.routeShowroomSlug(context);
 
       if (affiliateSlug) {
         await publicContextService.activateAffiliateBySlug(affiliateSlug).catch(() => null);
+      }
+
+      if (showroomSlug) {
+        await publicContextService.activateShowroomBySlug(showroomSlug).catch(() => null);
       }
     },
     mount(context) {
@@ -79,6 +84,8 @@ function render(root, context, getBackgroundVideoLayer) {
   const detail = String(rawDetail?.car?.id ?? "") === routeCarId ? rawDetail : null;
   const hasHydrated = Boolean(detailNode?.hydratedAt);
   const affiliate = publicContextService.activeAffiliate();
+  const showroom = publicContextService.activeShowroom();
+  const activeContext = affiliate || showroom;
   const summary = publicCatalogState.selectedCarSummary(context.params.id);
   const car = detail?.car ?? summary;
   const images = detail?.images ?? car?.images ?? [];
@@ -101,9 +108,9 @@ function render(root, context, getBackgroundVideoLayer) {
 
   const mainColumn = document.createElement("div");
   mainColumn.className = "grid gap-6";
-  const banner = affiliate
+  const banner = activeContext
     ? PublicAffiliateContextBanner({
-      affiliate,
+      affiliate: activeContext,
       onClear: () => {
         publicContextService.clear();
         context.router.navigate(`/cars/${car.id}`);
@@ -266,6 +273,8 @@ function isPublicCarDetailRoute(context) {
   const path = String(context?.path ?? "");
   return name === "public.car-detail"
     || name === "public.affiliate.car-detail"
+    || name === "public.showroom.car-detail"
     || /^\/cars\/[^/]+$/.test(path)
-    || /^\/af\/[^/]+\/cars\/[^/]+$/.test(path);
+    || /^\/af\/[^/]+\/cars\/[^/]+$/.test(path)
+    || /^\/showrooms\/[^/]+\/cars\/[^/]+$/.test(path);
 }

@@ -1,5 +1,6 @@
 import { brandConfig } from "../../../theme/brandConfig.js";
 import { affiliatesResource } from "../../../resources/affiliatesResource.js";
+import { showroomsResource } from "../../../resources/showroomsResource.js";
 import { publicContextState } from "../state/publicContextState.js";
 
 export const publicContextService = {
@@ -14,6 +15,10 @@ export const publicContextService = {
 
   activeAffiliate() {
     return publicContextState.activeAffiliate();
+  },
+
+  activeShowroom() {
+    return publicContextState.activeShowroom();
   },
 
   isAffiliateActive() {
@@ -51,6 +56,32 @@ export const publicContextService = {
     return affiliate;
   },
 
+  async activateShowroomBySlug(slug, options = {}) {
+    const normalizedSlug = String(slug ?? "").trim().toLowerCase();
+    if (!normalizedSlug) {
+      this.clear();
+      return null;
+    }
+
+    const result = await showroomsResource.validateSlug(normalizedSlug, options);
+    if (!result?.is_valid || !result?.seller_user_id) {
+      this.clearInvalidSlug(normalizedSlug);
+      return null;
+    }
+
+    const showroom = {
+      id: Number(result.showroom?.id ?? 0),
+      slug: result.slug ?? result.showroom?.slug ?? normalizedSlug,
+      sellerUserId: Number(result.seller_user_id),
+      contactWhatsapp: result.contact_whatsapp ?? result?.showroom?.phone_number ?? result?.seller?.phone_number ?? "",
+      seller: result.seller ?? null,
+      showroom: result.showroom ?? null,
+    };
+
+    publicContextState.setShowroom(showroom);
+    return showroom;
+  },
+
   clear() {
     publicContextState.setDefault();
   },
@@ -60,7 +91,7 @@ export const publicContextService = {
   },
 
   syncRouteContext(context = {}) {
-    if (this.routeAffiliateSlug(context)) {
+    if (this.routeAffiliateSlug(context) || this.routeShowroomSlug(context)) {
       return;
     }
 
@@ -80,11 +111,33 @@ export const publicContextService = {
     return isAffiliatePath || isAffiliateRoute ? slug : "";
   },
 
+  routeShowroomSlug(context = {}) {
+    const slug = String(context.params?.slug ?? "").trim().toLowerCase();
+    if (!slug) {
+      return "";
+    }
+
+    const path = String(context.path ?? "");
+    const name = String(context.name ?? context.route?.name ?? "");
+    const isShowroomPath = path.startsWith(`/showrooms/${slug}`) || path.startsWith(`/s/${slug}`);
+    const isShowroomRoute = name.includes("showroom");
+    return isShowroomPath || isShowroomRoute ? slug : "";
+  },
+
   applyCatalogFilters(filters = {}) {
     const affiliate = this.activeAffiliate();
 
     if (!affiliate?.sellerUserId) {
-      return { ...filters };
+      const showroom = this.activeShowroom();
+
+      if (!showroom?.sellerUserId) {
+        return { ...filters };
+      }
+
+      return {
+        ...filters,
+        seller_user_id: showroom.sellerUserId,
+      };
     }
 
     return {
@@ -100,6 +153,14 @@ export const publicContextService = {
       return {
         phone: affiliate.contactWhatsapp,
         label: affiliate.profile?.name ? `Affiliate ${affiliate.profile.name}` : "Marketing",
+      };
+    }
+
+    const showroom = this.activeShowroom();
+    if (showroom?.contactWhatsapp) {
+      return {
+        phone: showroom.contactWhatsapp,
+        label: showroom.showroom?.name ? `Showroom ${showroom.showroom.name}` : "Showroom",
       };
     }
 
@@ -119,13 +180,23 @@ export const publicContextService = {
 
   catalogPath() {
     const affiliate = this.activeAffiliate();
-    return affiliate?.slug ? `/af/${encodeURIComponent(affiliate.slug)}` : "/";
+    if (affiliate?.slug) {
+      return `/af/${encodeURIComponent(affiliate.slug)}`;
+    }
+
+    const showroom = this.activeShowroom();
+    return showroom?.slug ? `/showrooms/${encodeURIComponent(showroom.slug)}` : "/";
   },
 
   carDetailPath(carId) {
     const affiliate = this.activeAffiliate();
     if (affiliate?.slug) {
       return `/af/${encodeURIComponent(affiliate.slug)}/cars/${encodeURIComponent(carId)}`;
+    }
+
+    const showroom = this.activeShowroom();
+    if (showroom?.slug) {
+      return `/showrooms/${encodeURIComponent(showroom.slug)}/cars/${encodeURIComponent(carId)}`;
     }
 
     return `/cars/${encodeURIComponent(carId)}`;
@@ -135,6 +206,11 @@ export const publicContextService = {
     const affiliate = this.activeAffiliate();
     if (affiliate?.slug) {
       return `/af/${encodeURIComponent(affiliate.slug)}/transactions/new?car_id=${encodeURIComponent(carId)}`;
+    }
+
+    const showroom = this.activeShowroom();
+    if (showroom?.slug) {
+      return `/showrooms/${encodeURIComponent(showroom.slug)}/transactions/new?car_id=${encodeURIComponent(carId)}`;
     }
 
     return `/transactions/new?car_id=${encodeURIComponent(carId)}`;

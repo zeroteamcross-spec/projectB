@@ -14,6 +14,7 @@ let isLoading = false;
 export const publicCarDetailPreloadService = {
   enqueueCars(cars = [], options = {}) {
     const affiliateSlug = String(options.affiliateSlug ?? "").trim();
+    const showroomSlug = String(options.showroomSlug ?? "").trim();
     const items = Array.isArray(cars) ? cars : [];
 
     items.forEach((car) => {
@@ -24,7 +25,7 @@ export const publicCarDetailPreloadService = {
       }
 
       queuedIds.add(id);
-      queue.push({ id, affiliateSlug });
+      queue.push({ id, affiliateSlug, showroomSlug });
     });
 
     scheduleNext();
@@ -79,8 +80,13 @@ async function loadNext() {
       return;
     }
 
+    if (item.showroomSlug && !isCurrentShowroomRoute(item.showroomSlug)) {
+      return;
+    }
+
     const detail = await fetchDetailOnce(item.id, item.id, {
       affiliateSlug: item.affiliateSlug,
+      showroomSlug: item.showroomSlug,
     });
     loadedIds.add(item.id);
     rememberDetail(item.id, detail);
@@ -158,4 +164,16 @@ function isCurrentAffiliateRoute(slug) {
   }
 
   return path.startsWith(`/af/${normalizedSlug}`) || path.startsWith(`/a/${normalizedSlug}`);
+}
+
+function isCurrentShowroomRoute(slug) {
+  const route = appStore.get("app.currentRoute", null);
+  const path = String(route?.path ?? "");
+  const normalizedSlug = String(slug ?? "").trim().toLowerCase();
+
+  if (!normalizedSlug) {
+    return true;
+  }
+
+  return path.startsWith(`/showrooms/${normalizedSlug}`) || path.startsWith(`/s/${normalizedSlug}`);
 }

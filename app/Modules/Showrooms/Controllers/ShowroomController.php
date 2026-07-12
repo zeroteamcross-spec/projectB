@@ -48,4 +48,11 @@ class ShowroomController extends Controller
             'showroom' => $this->service->show((int) $request->routeParam('id'), $user),
         ], 'Showroom berhasil diambil.');
     }
+
+    public function validateSlug(Request $request): JsonResponse
+    {
+        return JsonResponse::success([
+            'showroom' => $this->service->validateSlug((string) $request->routeParam('slug')),
+        ], 'Validasi slug showroom selesai.');
+    }
 }

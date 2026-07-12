@@ -279,12 +279,14 @@ function upsertDemoShowroom(PDO $pdo, int $sellerUserId, array $data): int
     $id = $stmt->fetchColumn();
 
     $data['user_id'] = $sellerUserId;
+    $data['slug'] = showroomSlug($data['name'], $sellerUserId);
 
     if ($id) {
         $data['id'] = (int) $id;
         $pdo->prepare(
             'UPDATE showrooms
-             SET name = :name,
+             SET slug = :slug,
+                 name = :name,
                  address = :address,
                  phone_number = :phone_number,
                  bank_account_number = :bank_account_number,
@@ -294,6 +296,7 @@ function upsertDemoShowroom(PDO $pdo, int $sellerUserId, array $data): int
                  deleted_at = NULL
              WHERE id = :id'
         )->execute(only($data, [
+            'slug',
             'name',
             'address',
             'phone_number',
@@ -309,14 +312,21 @@ function upsertDemoShowroom(PDO $pdo, int $sellerUserId, array $data): int
 
     $pdo->prepare(
         'INSERT INTO showrooms
-            (user_id, name, address, phone_number, bank_account_number,
+            (user_id, slug, name, address, phone_number, bank_account_number,
              bank_type, bank_account_name, created_at, updated_at, deleted_at)
          VALUES
-            (:user_id, :name, :address, :phone_number, :bank_account_number,
+            (:user_id, :slug, :name, :address, :phone_number, :bank_account_number,
              :bank_type, :bank_account_name, :created_at, :updated_at, NULL)'
     )->execute($data);
 
     return (int) $pdo->lastInsertId();
+}
+
+function showroomSlug(string $name, int $sellerUserId): string
+{
+    $slug = strtolower(trim((string) preg_replace('/[^a-z0-9]+/i', '-', $name), '-'));
+
+    return ($slug !== '' ? $slug : 'showroom') . '-' . $sellerUserId;
 }
 
 function upsertDemoCar(PDO $pdo, int $sellerUserId, int $showroomId, array $data): int

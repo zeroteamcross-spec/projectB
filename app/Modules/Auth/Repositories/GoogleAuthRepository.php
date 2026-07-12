@@ -183,7 +183,8 @@ class GoogleAuthRepository
         if ($existing) {
             $stmt = $this->pdo->prepare(
                 'UPDATE showrooms
-                 SET name = :name,
+                 SET slug = COALESCE(slug, :slug),
+                     name = :name,
                      address = :address,
                      phone_number = :phone_number,
                      updated_at = :updated_at
@@ -192,6 +193,7 @@ class GoogleAuthRepository
             );
             $stmt->execute([
                 'id' => $existing['id'],
+                'slug' => $data['slug'],
                 'name' => $data['name'],
                 'address' => $data['address'] ?? null,
                 'phone_number' => $data['phone_number'],
@@ -203,13 +205,14 @@ class GoogleAuthRepository
 
         $stmt = $this->pdo->prepare(
             'INSERT INTO showrooms
-                (user_id, name, address, phone_number, bank_account_number, bank_type,
+                (user_id, slug, name, address, phone_number, bank_account_number, bank_type,
                  bank_account_name, created_at, updated_at, deleted_at)
              VALUES
-                (:user_id, :name, :address, :phone_number, NULL, NULL, NULL, :created_at, NULL, NULL)'
+                (:user_id, :slug, :name, :address, :phone_number, NULL, NULL, NULL, :created_at, NULL, NULL)'
         );
         $stmt->execute([
             'user_id' => $userId,
+            'slug' => $data['slug'],
             'name' => $data['name'],
             'address' => $data['address'] ?? null,
             'phone_number' => $data['phone_number'],
@@ -217,5 +220,22 @@ class GoogleAuthRepository
         ]);
 
         return (int) $this->pdo->lastInsertId();
+    }
+
+    public function showroomSlugExists(string $slug, ?int $ignoreShowroomId = null): bool
+    {
+        $sql = 'SELECT id FROM showrooms WHERE slug = :slug AND deleted_at IS NULL';
+        $params = ['slug' => $slug];
+
+        if ($ignoreShowroomId !== null) {
+            $sql .= ' AND id <> :id';
+            $params['id'] = $ignoreShowroomId;
+        }
+
+        $sql .= ' LIMIT 1';
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+
+        return (bool) $stmt->fetch();
     }
 }

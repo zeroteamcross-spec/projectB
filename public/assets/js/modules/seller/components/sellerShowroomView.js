@@ -6,6 +6,7 @@ import { createIcon } from "../../../theme/iconRegistry.js";
 
 const FIELDS = [
   { key: "name", label: "Nama showroom", icon: "showroom" },
+  { key: "public_url", label: "Halaman publik", icon: "link", wide: true },
   { key: "address", label: "Alamat", icon: "location", wide: true },
   { key: "phone_number", label: "Nomor telepon", icon: "phone" },
   { key: "bank_type", label: "Bank type", icon: "bank" },
@@ -86,7 +87,7 @@ export function SellerShowroomView({ showroom = null, onEdit = null } = {}) {
 
     const value = document.createElement("dd");
     value.className = "min-w-0 break-words text-sm font-bold leading-6 text-gray-950";
-    value.textContent = showroom[field.key] || "-";
+    value.textContent = field.key === "public_url" ? showroomPublicUrl(showroom) || "-" : showroom[field.key] || "-";
 
     item.append(labelRow, value);
     grid.append(item);
@@ -94,4 +95,17 @@ export function SellerShowroomView({ showroom = null, onEdit = null } = {}) {
 
   section.append(header, grid);
   return section;
+}
+
+function showroomPublicUrl(showroom = {}) {
+  const slug = String(showroom?.slug ?? "").trim();
+
+  if (!slug) {
+    return "";
+  }
+
+  const hostname = window.location.hostname.replace(/^(showroom|marketing|admin)\./i, "");
+  const origin = `${window.location.protocol}//${hostname}${window.location.port ? ":" + window.location.port : ""}`;
+
+  return `${origin}${window.location.pathname}#/showrooms/${encodeURIComponent(slug)}`;
 }
