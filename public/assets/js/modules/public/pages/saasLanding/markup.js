@@ -225,7 +225,7 @@ export function landingMarkup({ namaMerek, tagline, tautanWhatsapp, alamatEtalas
     </div>
 
     <div style="display:grid;gap:18px">
-      <div data-reveal="" data-tilt="" style="border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:28px 26px 30px;background:linear-gradient(168deg,rgba(255,107,26,.08),rgba(255,255,255,.02));transition:border-color .35s,transform .5s cubic-bezier(.22,.9,.28,1)" style-hover="border-color:rgba(255,107,26,.5)">
+      <div data-reveal="" data-tilt="" style="border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:28px 26px 30px;background:#141110;transition:border-color .35s,transform .5s cubic-bezier(.22,.9,.28,1)" style-hover="border-color:rgba(255,107,26,.5)">
         <div style="display:flex;gap:6px;margin-bottom:22px">
           <div style="width:30px;height:38px;border-radius:5px;background:repeating-linear-gradient(135deg,#2A211B 0 5px,#1F1915 5px 10px);border:1px solid rgba(255,107,26,.3)"></div>
           <div style="width:30px;height:38px;border-radius:5px;background:repeating-linear-gradient(135deg,#2A211B 0 5px,#1F1915 5px 10px);border:1px solid rgba(255,255,255,.1)"></div>
@@ -235,7 +235,7 @@ export function landingMarkup({ namaMerek, tagline, tautanWhatsapp, alamatEtalas
         <p style="color:#FFFFFF;font-size:15px;line-height:1.6;margin:0">Gambar iklan dan katalog PDF dibuat dari data unit Anda, siap dibagikan ke WhatsApp, Instagram, dan kanal lain.</p>
       </div>
 
-      <div data-reveal="" data-tilt="" style="border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:28px 26px 30px;background:linear-gradient(168deg,rgba(255,107,26,.08),rgba(255,255,255,.02));transition:border-color .35s,transform .5s cubic-bezier(.22,.9,.28,1)" style-hover="border-color:rgba(255,107,26,.5)">
+      <div data-reveal="" data-tilt="" style="border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:28px 26px 30px;background:#141110;transition:border-color .35s,transform .5s cubic-bezier(.22,.9,.28,1)" style-hover="border-color:rgba(255,107,26,.5)">
         <div data-leads="" style="display:grid;gap:6px;margin-bottom:22px;min-height:38px">
           <div data-lead="" style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:6px 9px;opacity:0;transform:translateY(8px);transition:opacity .5s,transform .5s"><span style="width:5px;height:5px;border-radius:50%;background:#FF6B1A"></span><span style="font-size:11.5px;color:#FFFFFF">Budi &middot; Fortuner VRZ</span></div>
           <div data-lead="" style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:6px 9px;opacity:0;transform:translateY(8px);transition:opacity .5s,transform .5s"><span style="width:5px;height:5px;border-radius:50%;background:#FF6B1A"></span><span style="font-size:11.5px;color:#FFFFFF">Sari &middot; Avanza 1.5 G</span></div>
@@ -244,7 +244,7 @@ export function landingMarkup({ namaMerek, tagline, tautanWhatsapp, alamatEtalas
         <p style="color:#FFFFFF;font-size:15px;line-height:1.6;margin:0">Setiap permintaan dari halaman showroom tercatat lengkap dengan unit yang diminati dan dapat ditugaskan ke sales tertentu.</p>
       </div>
 
-      <div data-reveal="" data-tilt="" style="border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:28px 26px 30px;background:linear-gradient(168deg,rgba(255,107,26,.08),rgba(255,255,255,.02));transition:border-color .35s,transform .5s cubic-bezier(.22,.9,.28,1)" style-hover="border-color:rgba(255,107,26,.5)">
+      <div data-reveal="" data-tilt="" style="border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:28px 26px 30px;background:#141110;transition:border-color .35s,transform .5s cubic-bezier(.22,.9,.28,1)" style-hover="border-color:rgba(255,107,26,.5)">
         <div style="display:flex;align-items:flex-end;gap:5px;height:38px;margin-bottom:22px">
           <span data-bar="" style="width:9px;height:38%;background:rgba(255,107,26,.3);border-radius:2px;transform-origin:bottom"></span>
           <span data-bar="" style="width:9px;height:58%;background:rgba(255,107,26,.45);border-radius:2px;transform-origin:bottom"></span>
