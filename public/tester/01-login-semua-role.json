@@ -9,7 +9,7 @@
   ],
   "versi": "1.0",
   "berhenti_saat_gagal": false,
-  "keterangan": "Menguji halaman login lintas role beserta jalur penolakannya. Mencakup password salah, role mismatch (kredensial benar tetapi role yang dipilih berbeda), perbedaan tab Daftar antar role, login sukses, panel sesi aktif, dan logout. Semua kredensial di bawah sudah diverifikasi hidup di database.",
+  "keterangan": "Menguji halaman login lintas role beserta jalur penolakannya. Mencakup password salah, role mismatch (kredensial benar tetapi role yang dipilih berbeda), perbedaan tab Daftar antar role, login sukses, pemantulan otomatis ke dashboard saat sesi masih aktif, dan logout lewat halaman profil. Semua kredensial di bawah sudah diverifikasi hidup di database.",
   "prasyarat_data": [
     "Server lokal berjalan di http://localhost:8000.",
     "Belum ada sesi login aktif di browser. Kalau ada, logout dulu.",
@@ -265,38 +265,59 @@
     {
       "urutan": 26,
       "halaman": "#/auth",
-      "id": "hr_auth_session_section",
-      "jenis": "container",
-      "aksi": "verifikasi",
-      "nama": "Halaman auth menampilkan panel sesi aktif",
-      "timeout_ms": 20000,
-      "catatan": "Saat sudah login, form login diganti panel sesi."
+      "aksi": "assert",
+      "nama": "Buka #/auth saat sesi aktif langsung dipantulkan ke dashboard",
+      "tunggu": {
+        "route": "#/buyer",
+        "timeout_ms": 20000
+      },
+      "harapan": {
+        "route_sama": "#/buyer"
+      },
+      "catatan": "Sesi yang masih hidup tidak lagi ditahan di kartu 'Sesi aktif'; halaman auth mengantar langsung ke dashboard rolenya. Seller yang belum disetujui tetap dipantulkan roleGuard ke halaman pending_approval."
     },
     {
       "urutan": 27,
       "aksi": "assert",
-      "nama": "Form login tidak ditampilkan lagi",
+      "nama": "Kartu sesi aktif dan form login sama-sama tidak ada",
       "harapan": {
-        "elemen_tidak_ada": "#hr_auth_login_buyer_submit_button"
-      }
+        "elemen_tidak_ada": "#hr_auth_session_section"
+      },
+      "catatan": "Penjaga regresi: kalau kartu 'Sesi aktif' muncul lagi, berarti pemantulan ke dashboard tidak jalan."
     },
     {
       "urutan": 28,
-      "id": "hr_auth_session_logout_button",
+      "halaman": "#/profile",
+      "selector": "[id$='profile_role_specific_logout_button']",
       "jenis": "button",
       "aksi": "klik",
-      "nama": "Logout dari panel sesi",
+      "nama": "Buka konfirmasi logout dari halaman profil",
       "tunggu": {
-        "elemen": "#hr_auth_role_buyer_button",
-        "timeout_ms": 20000
-      }
+        "elemen": "#profile_logout_confirm_button",
+        "timeout_ms": 15000
+      },
+      "catatan": "Logout pindah ke #/profile karena #/auth tidak lagi punya panel sesi berisi tombol logout."
     },
     {
       "urutan": 29,
-      "aksi": "assert",
-      "nama": "Setelah logout, pemilih role kembali muncul",
+      "id": "profile_logout_confirm_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Konfirmasi logout",
+      "tunggu": {
+        "ms": 2000
+      }
+    },
+    {
+      "urutan": 30,
+      "halaman": "#/auth?role=buyer",
+      "id": "hr_auth_login_buyer_submit_button",
+      "jenis": "button-submit",
+      "aksi": "verifikasi",
+      "nama": "Setelah logout, form login kembali muncul",
+      "timeout_ms": 20000,
       "harapan": {
-        "elemen_ada": "#hr_auth_role_section"
+        "elemen_ada": "#hr_auth_login_buyer_email_input"
       }
     }
   ],
@@ -428,17 +449,25 @@
       "id": "hr_auth_session_section",
       "jenis": "container",
       "nama": "Panel sesi aktif",
-      "catatan": "Menggantikan form login bila sudah login."
+      "catatan": "SUDAH DIHAPUS. Sesi yang masih aktif kini langsung dipantulkan ke dashboard rolenya. Dicantumkan supaya ketahuan bila panelnya muncul lagi."
     },
     {
       "id": "hr_auth_session_dashboard_button",
       "jenis": "button",
-      "nama": "Ke dashboard dari panel sesi"
+      "nama": "Ke dashboard dari panel sesi",
+      "catatan": "SUDAH DIHAPUS bersama panel sesi."
     },
     {
       "id": "hr_auth_session_logout_button",
       "jenis": "button",
-      "nama": "Logout dari panel sesi"
+      "nama": "Logout dari panel sesi",
+      "catatan": "SUDAH DIHAPUS. Logout sekarang lewat #/profile: [id$='profile_role_specific_logout_button'] lalu #profile_logout_confirm_button."
+    },
+    {
+      "id": "hr_auth_redirecting_section",
+      "jenis": "container",
+      "nama": "Pemberitahuan sedang diarahkan ke dashboard",
+      "catatan": "Tampil sekejap menggantikan panel sesi lama sebelum router pindah halaman."
     },
     {
       "id": "hr_auth_back_landing_button",

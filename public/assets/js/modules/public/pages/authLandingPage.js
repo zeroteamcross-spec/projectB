@@ -3,7 +3,6 @@ import { authStore } from "../../../state/authStore.js";
 import { Button } from "../../../ui/primitives/button.js";
 import { createBackgroundVideoLayer } from "../../../ui/composites/backgroundVideo.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
-import { tw } from "../../../theme/tailwindClasses.js";
 import { showToast } from "../../../ui/primitives/toast.js";
 import { publicAuthLandingService } from "../services/publicAuthLandingService.js";
 
@@ -86,7 +85,6 @@ function render(root, context, state, getBackgroundVideoLayer = null) {
     return;
   }
 
-  const currentUser = authStore.user();
   const currentRole = authStore.role();
   const requestedPath = normalizePath(context.query.from);
 
@@ -481,66 +479,6 @@ function registerForm({ selectedRole, isSubmitting, error, onSubmit }) {
   return form;
 }
 
-function authenticatedPanel({ currentUser, currentRole, selectedRole, requestedPath, router, onLogout }) {
-  const section = document.createElement("section");
-  section.id = "hr_auth_session_section";
-  section.className = "grid gap-4 rounded-[2rem] border border-white/75 bg-white/80 p-5 shadow-[0_30px_90px_rgba(15,23,42,0.14)] backdrop-blur-xl sm:p-6";
-
-  const header = document.createElement("div");
-  header.className = "grid gap-1";
-
-  const eyebrow = document.createElement("p");
-  eyebrow.className = tw.text.eyebrow;
-  eyebrow.textContent = "Sesi aktif";
-
-  const title = document.createElement("h2");
-  title.className = "text-xl font-bold tracking-normal text-gray-950";
-  title.textContent = currentUser?.name ?? currentUser?.email ?? "Akun aktif";
-
-  const body = document.createElement("p");
-  body.className = "text-sm leading-6 text-gray-600";
-  body.textContent = requestedPath
-    ? `Anda sudah masuk sebagai ${currentRole}. Gunakan dashboard yang sesuai atau logout untuk berganti akun.`
-    : `Anda sudah masuk sebagai ${currentRole}.`;
-
-  header.append(eyebrow, title, body);
-
-  const facts = document.createElement("div");
-  facts.className = `grid gap-2 ${tw.surface.insetGrid}`;
-  facts.append(
-    infoRow("Role aktif", currentRole),
-    infoRow("Role dipilih", selectedRole),
-    infoRow("Route asal", requestedPath || "-"),
-  );
-
-  const actions = document.createElement("div");
-  actions.className = "grid gap-2 sm:grid-cols-2";
-
-  const dashboard = Button({
-    label: "Buka dashboard",
-    variant: "primary",
-    onClick: () => router.navigate(publicAuthLandingService.resolveAfterLogin({
-      selectedRole,
-      actualRole: currentRole,
-      fromPath: requestedPath,
-    })),
-  });
-  dashboard.id = "hr_auth_session_dashboard_button";
-  dashboard.classList.add("w-full");
-
-  const logout = Button({
-    label: "Logout",
-    variant: "secondary",
-    onClick: onLogout,
-  });
-  logout.id = "hr_auth_session_logout_button";
-  logout.classList.add("w-full");
-
-  actions.append(dashboard, logout);
-  section.append(header, facts, actions);
-  return section;
-}
-
 function field({ id, name, label, type = "text", placeholder = "", required = true }) {
   const wrap = document.createElement("label");
   wrap.className = "grid gap-1.5 text-sm font-semibold text-gray-700";
@@ -573,22 +511,6 @@ function textareaField({ id, name, label, placeholder = "", required = true }) {
 
   wrap.append(input);
   return wrap;
-}
-
-function infoRow(label, value) {
-  const row = document.createElement("div");
-  row.className = "flex items-center justify-between gap-3 rounded-lg bg-white px-3 py-2";
-
-  const caption = document.createElement("span");
-  caption.className = "text-gray-500";
-  caption.textContent = label;
-
-  const content = document.createElement("span");
-  content.className = "text-right font-semibold text-gray-900";
-  content.textContent = value;
-
-  row.append(caption, content);
-  return row;
 }
 
 function runEntranceAnimation(frame) {
