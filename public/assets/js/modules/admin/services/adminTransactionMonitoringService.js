@@ -75,12 +75,15 @@ export const adminTransactionMonitoringService = {
       }
 
       if (status === "dp_paid") {
+        // Booking Fee menutup kewajiban pembayaran di aplikasi; sisa harga
+        // diselesaikan langsung buyer-showroom di luar sistem, jadi dueNow
+        // tetap 0 (lihat sellerTransactionService.js untuk penjelasan sama).
         return {
           total,
           paid: dpAmount,
           remaining,
-          dueNow: remaining,
-          dueNowLabel: "Sisa pelunasan",
+          dueNow: 0,
+          dueNowLabel: "Sisa diselesaikan langsung dengan buyer",
         };
       }
 

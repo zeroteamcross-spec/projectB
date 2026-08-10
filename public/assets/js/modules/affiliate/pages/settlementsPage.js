@@ -53,13 +53,17 @@ function render(root, context) {
   const hydratedAt = appStore.get("working.affiliateSettlements.settlements.hydratedAt", 0) ?? 0;
   const payload = workingPayload ?? snapshotPayload ?? null;
 
+  const backButton = Button({ label: "Dashboard marketing", variant: "secondary", onClick: () => context.router.navigate("/affiliate"), designHook: "shared.button.secondary" });
+  backButton.id = "aff_settlements_dashboard_button";
+
   const frame = document.createElement("div");
+  frame.id = "aff_settlements_page_section";
   frame.className = "grid min-w-0 w-full gap-6";
   frame.append(
     SectionHeader({
       title: "Marketing Settlements",
       description: "Pantau komisi yang masih unsettled, ledger yang sudah eligible, dan riwayat batch settlement manual yang sudah dicatat.",
-      action: Button({ label: "Dashboard marketing", variant: "secondary", onClick: () => context.router.navigate("/affiliate"), designHook: "shared.button.secondary" }),
+      action: backButton,
     }),
   );
 

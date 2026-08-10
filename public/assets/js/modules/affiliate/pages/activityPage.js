@@ -52,13 +52,17 @@ function render(root, context) {
   const payload = workingPayload ?? snapshotPayload ?? null;
   const clicks = affiliateActivityService.normalizedClicks(payload);
 
+  const backButton = Button({ label: "Dashboard marketing", variant: "secondary", onClick: () => context.router.navigate("/affiliate"), designHook: "shared.button.secondary" });
+  backButton.id = "aff_activity_dashboard_button";
+
   const frame = document.createElement("div");
+  frame.id = "aff_activity_page_section";
   frame.className = "grid min-w-0 gap-6";
   frame.append(
     SectionHeader({
       title: "Marketing Activity",
       description: "Pantau click terbaru dari landing marketing, route yang paling sering dibuka, dan ringkasan traffic dasar yang sudah tersedia saat ini.",
-      action: Button({ label: "Dashboard marketing", variant: "secondary", onClick: () => context.router.navigate("/affiliate"), designHook: "shared.button.secondary" }),
+      action: backButton,
     }),
   );
 

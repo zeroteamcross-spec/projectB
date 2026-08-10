@@ -1,0 +1,190 @@
+{
+  "nama_fitur": "11 - Seller membuat akun Marketing dan mengatur komisi umum",
+  "aplikasi": "projectB",
+  "halaman": [
+    "#/auth?role=seller"
+  ],
+  "prefix_id": [
+    "hr_auth_",
+    "slraf_",
+    "slrafc_"
+  ],
+  "versi": "1.0",
+  "warisi_variabel": true,
+  "berhenti_saat_gagal": true,
+  "keterangan": "Alur F1-F2. Seller membuat akun Marketing baru dan mengatur aturan komisi umum (persentase). Jalankan setelah 06 (tidak bergantung ke 08/09, tapi dijalankan setelahnya di rantai supaya nomor filenya urut dengan bagian bisnis flow). Mengekspor marketing_slug, marketing_email, marketing_password.",
+  "prasyarat_data": [
+    "Server lokal berjalan di http://localhost:8000."
+  ],
+  "variabel": {
+    "email_seller": "{{seller_email}}",
+    "password_seller": "{{seller_password}}"
+  },
+  "urutan_uji": [
+    {
+      "urutan": 1,
+      "halaman": "#/auth?role=seller",
+      "id": "hr_auth_role_seller_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Pilih role seller",
+      "tunggu": { "elemen": "#hr_auth_login_seller_email_input", "timeout_ms": 8000 }
+    },
+    {
+      "urutan": 2,
+      "id": "hr_auth_login_seller_email_input",
+      "jenis": "input-email",
+      "aksi": "isi",
+      "nilai": "{{email_seller}}",
+      "nama": "Email seller"
+    },
+    {
+      "urutan": 3,
+      "id": "hr_auth_login_seller_password_input",
+      "jenis": "input-password",
+      "aksi": "isi",
+      "nilai": "{{password_seller}}",
+      "nama": "Password seller"
+    },
+    {
+      "urutan": 4,
+      "id": "hr_auth_login_seller_submit_button",
+      "jenis": "button-submit",
+      "aksi": "klik",
+      "nama": "Masuk sebagai seller",
+      "tunggu": { "route": "#/seller", "timeout_ms": 15000 }
+    },
+    {
+      "urutan": 5,
+      "halaman": "#/seller/affiliates",
+      "id": "slraf_create_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "F1.1 - Klik Tambah Marketing",
+      "tunggu": { "elemen": "#slraf_affiliate_name_input", "timeout_ms": 8000 }
+    },
+    {
+      "urutan": 6,
+      "id": "slraf_affiliate_name_input",
+      "jenis": "input-text",
+      "aksi": "isi",
+      "nilai": "Marketing Uji {{stamp6}}",
+      "nama": "F1.2 - Nama Marketing"
+    },
+    {
+      "urutan": 7,
+      "id": "slraf_affiliate_phone_number_input",
+      "jenis": "input-text",
+      "aksi": "isi",
+      "nilai": "0812{{stamp6}}",
+      "nama": "F1.2 - Nomor WhatsApp Marketing"
+    },
+    {
+      "urutan": 8,
+      "id": "slraf_affiliate_referral_code_input",
+      "jenis": "input-text",
+      "aksi": "isi",
+      "nilai": "uji-mkt-{{timestamp}}",
+      "nama": "F1.2 - Slug marketing",
+      "simpan": { "nama": "marketing_slug", "dari": "nilai" }
+    },
+    {
+      "urutan": 9,
+      "id": "slraf_affiliate_email_input",
+      "jenis": "input-email",
+      "aksi": "isi",
+      "nilai": "marketing.uji.{{timestamp}}@example.test",
+      "nama": "F1.3 - Username/email login Marketing",
+      "simpan": { "nama": "marketing_email", "dari": "nilai" }
+    },
+    {
+      "urutan": 10,
+      "id": "slraf_affiliate_password_input",
+      "jenis": "input-password",
+      "aksi": "isi",
+      "nilai": "MktUji{{stamp6}}!",
+      "nama": "F1.3 - Password Marketing",
+      "simpan": { "nama": "marketing_password", "dari": "nilai" }
+    },
+    {
+      "urutan": 11,
+      "id": "slraf_affiliate_password_confirmation_input",
+      "jenis": "input-password",
+      "aksi": "isi",
+      "nilai": "MktUji{{stamp6}}!",
+      "nama": "F1.3 - Konfirmasi password Marketing"
+    },
+    {
+      "urutan": 12,
+      "id": "slraf_affiliate_status_input",
+      "jenis": "select",
+      "aksi": "pilih",
+      "nilai": "active",
+      "nama": "F1.4 - Status Aktif"
+    },
+    {
+      "urutan": 13,
+      "id": "slraf_affiliate_submit_button",
+      "jenis": "button-submit",
+      "aksi": "klik",
+      "nama": "F1.5 - Simpan Marketing",
+      "tunggu": { "elemen": "#slraf_detail_edit_button", "timeout_ms": 10000 }
+    },
+    {
+      "urutan": 14,
+      "aksi": "assert",
+      "nama": "Marketing tersimpan dengan slug yang benar",
+      "harapan": { "teks_mengandung": "{{marketing_slug}}", "lingkup": "halaman" }
+    },
+    {
+      "urutan": 15,
+      "id": "slraf_modal_close_button",
+      "jenis": "button",
+      "aksi": "klik_opsional",
+      "nama": "Tutup modal detail marketing",
+      "tunggu": { "ms": 500 }
+    },
+
+    {
+      "urutan": 20,
+      "halaman": "#/seller/affiliate-commissions",
+      "id": "slrafc_global_rule_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "F2.1 - Klik Atur komisi umum",
+      "tunggu": { "elemen": "#slrafc_global_commission_type_input", "timeout_ms": 8000 }
+    },
+    {
+      "urutan": 21,
+      "id": "slrafc_global_commission_type_input",
+      "jenis": "select",
+      "aksi": "pilih",
+      "nilai": "percent",
+      "nama": "F2.2 - Tipe komisi Persentase"
+    },
+    {
+      "urutan": 22,
+      "id": "slrafc_global_commission_value_input",
+      "jenis": "input-text",
+      "aksi": "isi",
+      "nilai": "5",
+      "nama": "F2.2 - Nilai komisi 5%"
+    },
+    {
+      "urutan": 23,
+      "id": "slrafc_global_status_input",
+      "jenis": "select",
+      "aksi": "pilih",
+      "nilai": "active",
+      "nama": "F2.2 - Status Aktif"
+    },
+    {
+      "urutan": 24,
+      "id": "slrafc_global_submit_button",
+      "jenis": "button-submit",
+      "aksi": "klik",
+      "nama": "F2.3 - Simpan aturan umum",
+      "tunggu": { "ms": 2000 }
+    }
+  ]
+}

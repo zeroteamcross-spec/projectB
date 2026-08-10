@@ -81,14 +81,16 @@ function render(root, context, flags) {
 }
 
 function header(context, transaction) {
+  const back = Button({
+    label: "Kembali ke list",
+    variant: "secondary",
+    onClick: () => context.router.navigate("/seller/transactions"),
+  });
+  back.id = "slrtx_back_to_list_button";
   return SectionHeader({
     title: transaction?.transaction_code ?? "Detail transaksi seller",
     description: "Ringkasan buyer, mobil, status transaksi, dan nominal pembayaran.",
-    action: Button({
-      label: "Kembali ke list",
-      variant: "secondary",
-      onClick: () => context.router.navigate("/seller/transactions"),
-    }),
+    action: back,
   });
 }
 

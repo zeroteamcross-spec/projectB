@@ -20,36 +20,36 @@ export function AffiliateQuickActions({
       title: "Buka landing marketing",
       description: "Cek halaman publik yang membawa slug marketing Anda.",
       icon: "affiliate",
-      action: Button({ label: "Buka landing", variant: "secondary", onClick: () => onOpenLanding?.(affiliate) }),
+      action: idButton("aff_open_landing_button", Button({ label: "Buka landing", variant: "secondary", onClick: () => onOpenLanding?.(affiliate) })),
     },
     {
       title: "Copy link landing",
       description: "Bagikan link publik marketing langsung dari dashboard ini.",
       icon: "transaction",
-      action: Button({
+      action: idButton("aff_copy_link_button", Button({
         label: copying ? "Menyalin..." : "Copy link",
         variant: "secondary",
         disabled: copying,
         onClick: () => onCopyLanding?.(affiliate),
-      }),
+      })),
     },
     {
       title: "Buka activity clicks",
       description: "Lihat click terbaru dan route marketing yang paling sering dibuka.",
       icon: "dashboard",
-      action: Button({ label: "Buka activity", variant: "secondary", onClick: () => onOpenActivity?.() }),
+      action: idButton("aff_open_activity_button", Button({ label: "Buka activity", variant: "secondary", onClick: () => onOpenActivity?.() })),
     },
     {
       title: "Buka ledger komisi",
       description: "Lihat komisi dari penjualan dan referensi transaksi yang sudah tercatat.",
       icon: "commission",
-      action: Button({ label: "Buka ledger", variant: "secondary", onClick: () => onOpenLedger?.() }),
+      action: idButton("aff_open_ledger_button", Button({ label: "Buka ledger", variant: "secondary", onClick: () => onOpenLedger?.() })),
     },
     {
       title: "Buka settlement",
       description: "Pantau komisi yang masih unsettled dan batch payout baseline yang sudah dicatat.",
       icon: "commission",
-      action: Button({ label: "Buka settlement", variant: "secondary", onClick: () => onOpenSettlements?.() }),
+      action: idButton("aff_open_settlements_button", Button({ label: "Buka settlement", variant: "secondary", onClick: () => onOpenSettlements?.() })),
     },
   ].forEach((item) => {
     const card = Card([], { variant: "raised" });
@@ -80,6 +80,11 @@ export function AffiliateQuickActions({
   });
 
   return section;
+}
+
+function idButton(id, button) {
+  button.id = id;
+  return button;
 }
 
 function textBlock(className, text) {

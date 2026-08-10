@@ -1,0 +1,135 @@
+{
+  "nama_fitur": "08 - Buyer bayar Booking Fee (car_a) sampai dp_paid",
+  "aplikasi": "projectB",
+  "halaman": [
+    "#/auth?role=buyer"
+  ],
+  "prefix_id": [
+    "hr_auth_",
+    "pubtrx_",
+    "byr_"
+  ],
+  "versi": "1.0",
+  "warisi_variabel": true,
+  "berhenti_saat_gagal": true,
+  "keterangan": "Alur D3-D4. Buyer membuat transaksi untuk car_a (dari 06), lalu Booking Fee-nya dilunaskan lewat jembatan scripts/pay_transaction_for_tester.php karena callback Midtrans butuh tanda tangan server dan tidak bisa diklik dari browser. Jalankan setelah 06. Mengekspor transaction_a_id.",
+  "prasyarat_data": [
+    "Server lokal berjalan di http://localhost:8000.",
+    "Skenario 06 sudah dijalankan pada sesi browser yang sama (tanpa Reset Rantai), sehingga {{car_a_id}} tersedia.",
+    "Kunci Midtrans sandbox terisi di .env (MIDTRANS_SERVER_KEY, MIDTRANS_VERIFY_SIGNATURE).",
+    "PENTING - langkah manual di tengah skenario ini: begitu panel log runner menampilkan 'Variabel {{transaction_a_id}} = <angka>', buka terminal SERVER (bukan browser) dan jalankan: php scripts/pay_transaction_for_tester.php <angka>. Skenario menunggu sampai 90 detik untuk ini sebelum dianggap gagal."
+  ],
+  "variabel": {
+    "email_buyer": "{{buyer_email}}",
+    "password_buyer": "{{buyer_password}}",
+    "slug_showroom": "{{seller_slug}}"
+  },
+  "urutan_uji": [
+    {
+      "urutan": 1,
+      "halaman": "#/auth?role=buyer",
+      "id": "hr_auth_role_buyer_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Pilih role buyer",
+      "tunggu": { "elemen": "#hr_auth_login_buyer_email_input", "timeout_ms": 15000 }
+    },
+    {
+      "urutan": 2,
+      "id": "hr_auth_login_buyer_email_input",
+      "jenis": "input-email",
+      "aksi": "isi",
+      "nilai": "{{email_buyer}}",
+      "nama": "Email buyer"
+    },
+    {
+      "urutan": 3,
+      "id": "hr_auth_login_buyer_password_input",
+      "jenis": "input-password",
+      "aksi": "isi",
+      "nilai": "{{password_buyer}}",
+      "nama": "Password buyer"
+    },
+    {
+      "urutan": 4,
+      "id": "hr_auth_login_buyer_submit_button",
+      "jenis": "button-submit",
+      "aksi": "klik",
+      "nama": "Masuk sebagai buyer",
+      "tunggu": { "route": "#/buyer", "timeout_ms": 20000 }
+    },
+    {
+      "urutan": 5,
+      "halaman": "#/showrooms/{{slug_showroom}}/transactions/new?car_id={{car_a_id}}",
+      "id": "pubtrx_booking_fee_value",
+      "jenis": "container",
+      "aksi": "verifikasi",
+      "nama": "Booking Fee car_a tampil, bukan placeholder kosong",
+      "timeout_ms": 20000,
+      "harapan": { "teks_tidak_mengandung": "Belum ditentukan showroom" }
+    },
+    {
+      "urutan": 6,
+      "id": "pubtrx_payment_method_bca_va_input",
+      "jenis": "radio",
+      "aksi": "klik",
+      "nama": "Pilih metode pembayaran BCA VA"
+    },
+    {
+      "urutan": 7,
+      "id": "pubtrx_submit_button",
+      "jenis": "button-submit",
+      "aksi": "klik",
+      "nama": "Buat transaksi (Booking Sekarang)",
+      "tunggu": { "elemen": "#pubtrx_result_panel", "timeout_ms": 15000 }
+    },
+    {
+      "urutan": 8,
+      "id": "pubtrx_result_panel",
+      "jenis": "container",
+      "aksi": "verifikasi",
+      "nama": "Panel Transaksi dibuat tampil, tangkap transaction_a_id",
+      "simpan": {
+        "nama": "transaction_a_id",
+        "dari": "atribut",
+        "atribut": "data-transaction-id"
+      }
+    },
+    {
+      "urutan": 9,
+      "aksi": "assert",
+      "nama": "Status awal transaksi pending payment",
+      "harapan": {
+        "teks_mengandung": "Pending Payment",
+        "lingkup": "halaman"
+      }
+    },
+    {
+      "urutan": 10,
+      "id": "pubtrx_result_open_status_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Buka status pembayaran",
+      "tunggu": { "route": "#/buyer/transactions/{{transaction_a_id}}", "timeout_ms": 10000 }
+    },
+    {
+      "urutan": 11,
+      "aksi": "assert",
+      "nama": "MANUAL: jalankan jembatan pembayaran lalu tunggu status Booking Fee Lunas",
+      "catatan": "Jalankan sekarang di terminal server: php scripts/pay_transaction_for_tester.php {{transaction_a_id}} — lihat panel log runner untuk memastikan nilai transaction_a_id yang benar. Halaman ini auto-poll status tiap 12 detik, jadi begitu callback masuk, status akan berubah sendiri tanpa perlu refresh manual.",
+      "tunggu": {
+        "teks": "Pembayaran Berhasil",
+        "timeout_ms": 90000
+      }
+    },
+    {
+      "urutan": 12,
+      "aksi": "assert",
+      "nama": "Checklist penyelesaian seller sudah tampil (tanda transaksi sudah dp_paid)",
+      "harapan": {
+        "teks_mengandung": "Checklist penyelesaian",
+        "lingkup": "halaman"
+      }
+    }
+  ]
+}

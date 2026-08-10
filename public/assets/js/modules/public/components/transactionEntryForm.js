@@ -49,6 +49,7 @@ export function TransactionEntryForm({
     variant: "primary",
     disabled: isSubmitting,
   });
+  submit.id = "pubtrx_submit_button";
   submit.type = "submit";
   submit.classList.add("w-full");
   node.append(submit);
@@ -125,6 +126,7 @@ function radioCard(name, value, title, body, currentValue, onChange) {
     : `grid cursor-pointer gap-1 ${tw.form.choiceIdle}`;
 
   const input = document.createElement("input");
+  input.id = `pubtrx_payment_method_${value}_input`;
   input.type = "radio";
   input.name = name;
   input.value = value;

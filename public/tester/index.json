@@ -1,25 +1,32 @@
 {
-  "keterangan": "Skenario uji browser, diurutkan mengikuti alur bisnis di docs/BUSINESS_FLOW.md. Jalankan berurutan dari 01 tanpa menekan Reset Rantai, karena skenario belakang memakai variabel yang diekspor skenario depan. Jalankan di tab yang terlihat, bukan tab background.",
+  "keterangan": "Skenario uji browser, diurutkan mengikuti alur bisnis di docs/BUSINESS_FLOW.md (lihat juga bagian 12, 'Urutan UAT yang Disarankan', yang jadi acuan urutan langkah 01-13). Jalankan berurutan dari 01 tanpa menekan Reset Rantai, karena skenario belakang memakai variabel yang diekspor skenario depan. Jalankan di tab yang terlihat, bukan tab background. Skenario 08, 12, dan 13 berhenti sejenak menunggu jembatan pembayaran manual (scripts/pay_transaction_for_tester.php) karena callback Midtrans butuh tanda tangan server dan tidak bisa diklik dari browser.",
   "urutan_alur_bisnis": [
     { "no": "01", "file": "01-login-semua-role.json", "alur": "prasyarat", "butuh_rantai": false },
     { "no": "02", "file": "02-showroom-daftar.json", "alur": "A - Showroom mendaftar", "butuh_rantai": false, "mengekspor": ["slug", "email_showroom", "nama_showroom_terdaftar", "password_showroom"] },
     { "no": "03", "file": "03-showroom-slug-bentrok.json", "alur": "A - jalur negatif", "butuh_rantai": false },
     { "no": "04", "file": "04-admin-approve-showroom.json", "alur": "B - Admin menyetujui", "butuh_rantai": true, "memakai": ["email_showroom"] },
     { "no": "05", "file": "05-seller-booking-fee-validasi.json", "alur": "C - Validasi Booking Fee", "butuh_rantai": false },
-    { "no": "07", "file": "07-buyer-favorit-dan-transaksi.json", "alur": "D - Buyer favorit dan transaksi", "butuh_rantai": false }
+    { "no": "06", "file": "06-seller-buat-mobil.json", "alur": "C - Seller membuat car_a dan car_b published dengan Booking Fee", "butuh_rantai": false, "mengekspor": ["car_a_id", "car_b_id"] },
+    { "no": "07", "file": "07-buyer-favorit-dan-transaksi.json", "alur": "D - Buyer favorit dan transaksi (memakai mobil demo metro-auto-jakarta, bukan car_a/car_b)", "butuh_rantai": false },
+    { "no": "08", "file": "08-bayar-booking-fee.json", "alur": "D3-D4 - Bayar Booking Fee car_a sampai dp_paid", "butuh_rantai": true, "memakai": ["car_a_id"], "mengekspor": ["transaction_a_id"], "catatan": "Butuh langkah manual di tengah: php scripts/pay_transaction_for_tester.php <transaction_a_id>." },
+    { "no": "09", "file": "09-serah-terima-dan-selesai.json", "alur": "E1-E2 - Checklist seller dan buyer menekan Selesaikan", "butuh_rantai": true, "memakai": ["transaction_a_id"] },
+    { "no": "11", "file": "11-marketing-setup.json", "alur": "F1-F2 - Seller buat akun Marketing dan atur komisi umum", "butuh_rantai": true, "memakai": ["car_a_id"], "mengekspor": ["marketing_slug", "marketing_email", "marketing_password"], "catatan": "Nomornya loncat dari 09 ke 11 karena 10 tidak pernah dipakai di rencana sebelumnya; dibiarkan begitu supaya nomor file selaras dengan draft lama." },
+    { "no": "12", "file": "12-marketing-transaksi-dan-retur.json", "alur": "F3 + D + E3 - Transaksi car_b lewat link Marketing sampai accrued, lalu diretur", "butuh_rantai": true, "memakai": ["car_b_id", "marketing_slug", "marketing_email", "marketing_password"], "mengekspor": ["transaction_b_id"], "catatan": "Butuh langkah manual di tengah: php scripts/pay_transaction_for_tester.php <transaction_b_id>." },
+    { "no": "13", "file": "13-settlement-komisi.json", "alur": "G + jalur negatif E3 - Settlement komisi, lalu retur ditolak karena paid_out", "butuh_rantai": true, "memakai": ["car_b_id", "marketing_slug", "marketing_email", "marketing_password"], "mengekspor": ["transaction_c_id", "settlement_id"], "catatan": "Butuh langkah manual di tengah: php scripts/pay_transaction_for_tester.php <transaction_c_id>." }
   ],
-  "belum_ada": [
-    { "no": "06", "rencana": "06-seller-buat-mobil.json", "alur": "C - Seller membuat mobil published dengan Booking Fee, mengekspor car_id" },
-    { "no": "08", "rencana": "08-bayar-booking-fee", "alur": "D - Pembayaran", "catatan": "TIDAK BISA lewat browser. Callback Midtrans butuh tanda tangan server. Pakai scripts/smoke_payment_flow.php atau jembatan PHP." },
-    { "no": "09", "rencana": "09-serah-terima.json", "alur": "E - Checklist showroom dan buyer menekan Selesaikan", "catatan": "Butuh transaksi berstatus dp_paid, jadi bergantung pada 08." },
-    { "no": "10", "rencana": "10-retur-transaksi.json", "alur": "E3 - Showroom meretur", "catatan": "Butuh transaksi berstatus dp_paid, jadi bergantung pada 08." }
-  ],
+  "belum_ada": [],
   "files": [
     "01-login-semua-role.json",
     "02-showroom-daftar.json",
     "03-showroom-slug-bentrok.json",
     "04-admin-approve-showroom.json",
     "05-seller-booking-fee-validasi.json",
-    "07-buyer-favorit-dan-transaksi.json"
+    "06-seller-buat-mobil.json",
+    "07-buyer-favorit-dan-transaksi.json",
+    "08-bayar-booking-fee.json",
+    "09-serah-terima-dan-selesai.json",
+    "11-marketing-setup.json",
+    "12-marketing-transaksi-dan-retur.json",
+    "13-settlement-komisi.json"
   ]
 }

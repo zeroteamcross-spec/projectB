@@ -1,0 +1,359 @@
+{
+  "nama_fitur": "13 - Settlement komisi lalu retur ditolak karena sudah paid_out",
+  "aplikasi": "projectB",
+  "halaman": [
+    "#/af/{{marketing_slug}}"
+  ],
+  "prefix_id": [
+    "hr_auth_",
+    "pubtrx_",
+    "adfc_",
+    "adst_",
+    "slrtx_",
+    "aff_",
+    "profile_"
+  ],
+  "versi": "1.0",
+  "warisi_variabel": true,
+  "berhenti_saat_gagal": true,
+  "keterangan": "Alur G + jalur negatif E3. car_b (published lagi setelah retur di skenario 12) dibeli ketiga kalinya lewat link Marketing yang sama, dibayar, lalu admin membuat settlement batch dan menandainya settled. Setelah itu showroom mencoba retur transaksi ketiga dan HARUS ditolak karena komisinya sudah paid_out. Ditutup dengan memastikan riwayat settlement tampil di dashboard Marketing. Jalankan setelah 06, 11, 12. Mengekspor transaction_c_id dan settlement_id.",
+  "prasyarat_data": [
+    "Server lokal berjalan di http://localhost:8000.",
+    "Skenario 06, 11, dan 12 sudah dijalankan pada sesi browser yang sama.",
+    "Kredensial admin diambil dari tester/akun.json (admin_email/admin_password).",
+    "PENTING - langkah manual di tengah skenario ini: begitu panel log menampilkan 'Variabel {{transaction_c_id}} = <angka>', jalankan di terminal server: php scripts/pay_transaction_for_tester.php <angka>."
+  ],
+  "variabel": {
+    "email_buyer": "{{buyer_email}}",
+    "password_buyer": "{{buyer_password}}",
+    "email_seller": "{{seller_email}}",
+    "password_seller": "{{seller_password}}",
+    "email_admin": "{{admin_email}}",
+    "password_admin": "{{admin_password}}"
+  },
+  "urutan_uji": [
+    {
+      "urutan": 1,
+      "halaman": "#/auth?role=buyer",
+      "id": "hr_auth_role_buyer_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Pilih role buyer",
+      "tunggu": { "elemen": "#hr_auth_login_buyer_email_input", "timeout_ms": 15000 }
+    },
+    {
+      "urutan": 2,
+      "id": "hr_auth_login_buyer_email_input",
+      "jenis": "input-email",
+      "aksi": "isi",
+      "nilai": "{{email_buyer}}",
+      "nama": "Email buyer"
+    },
+    {
+      "urutan": 3,
+      "id": "hr_auth_login_buyer_password_input",
+      "jenis": "input-password",
+      "aksi": "isi",
+      "nilai": "{{password_buyer}}",
+      "nama": "Password buyer"
+    },
+    {
+      "urutan": 4,
+      "id": "hr_auth_login_buyer_submit_button",
+      "jenis": "button-submit",
+      "aksi": "klik",
+      "nama": "Masuk sebagai buyer",
+      "tunggu": { "route": "#/buyer", "timeout_ms": 20000 }
+    },
+    {
+      "urutan": 5,
+      "halaman": "#/af/{{marketing_slug}}/transactions/new?car_id={{car_b_id}}",
+      "id": "pubtrx_booking_fee_value",
+      "jenis": "container",
+      "aksi": "verifikasi",
+      "nama": "car_b tersedia lagi untuk dibeli ketiga kalinya",
+      "timeout_ms": 15000,
+      "harapan": { "teks_tidak_mengandung": "Belum ditentukan showroom" }
+    },
+    {
+      "urutan": 6,
+      "id": "pubtrx_payment_method_bca_va_input",
+      "jenis": "radio",
+      "aksi": "klik",
+      "nama": "Pilih metode pembayaran BCA VA"
+    },
+    {
+      "urutan": 7,
+      "id": "pubtrx_submit_button",
+      "jenis": "button-submit",
+      "aksi": "klik",
+      "nama": "Buat transaksi ketiga (car_b)",
+      "tunggu": { "elemen": "#pubtrx_result_panel", "timeout_ms": 15000 }
+    },
+    {
+      "urutan": 8,
+      "id": "pubtrx_result_panel",
+      "jenis": "container",
+      "aksi": "verifikasi",
+      "nama": "Tangkap transaction_c_id",
+      "simpan": { "nama": "transaction_c_id", "dari": "atribut", "atribut": "data-transaction-id" }
+    },
+    {
+      "urutan": 9,
+      "id": "pubtrx_result_open_status_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Buka status pembayaran transaction_c",
+      "tunggu": { "route": "#/buyer/transactions/{{transaction_c_id}}", "timeout_ms": 10000 }
+    },
+    {
+      "urutan": 10,
+      "aksi": "assert",
+      "nama": "MANUAL: jalankan jembatan pembayaran untuk transaction_c lalu tunggu Booking Fee Lunas",
+      "catatan": "Jalankan sekarang: php scripts/pay_transaction_for_tester.php {{transaction_c_id}}",
+      "tunggu": { "teks": "Pembayaran Berhasil", "timeout_ms": 90000 }
+    },
+
+    {
+      "urutan": 20,
+      "halaman": "#/profile",
+      "id": "byr_profile_role_specific_logout_button",
+      "jenis": "button",
+      "aksi": "klik_opsional",
+      "nama": "Buka konfirmasi logout buyer",
+      "tunggu": { "elemen": "#profile_logout_confirm_button", "timeout_ms": 8000 }
+    },
+    {
+      "urutan": 21,
+      "id": "profile_logout_confirm_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Konfirmasi logout buyer",
+      "tunggu": { "ms": 1500 }
+    },
+    {
+      "urutan": 22,
+      "halaman": "#/auth?role=admin",
+      "id": "hr_auth_role_admin_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Pilih role Admin",
+      "tunggu": { "elemen": "#hr_auth_login_admin_email_input", "timeout_ms": 15000 }
+    },
+    {
+      "urutan": 23,
+      "id": "hr_auth_login_admin_email_input",
+      "jenis": "input-email",
+      "aksi": "isi",
+      "nilai": "{{email_admin}}",
+      "nama": "Email admin"
+    },
+    {
+      "urutan": 24,
+      "id": "hr_auth_login_admin_password_input",
+      "jenis": "input-password",
+      "aksi": "isi",
+      "nilai": "{{password_admin}}",
+      "nama": "Password admin"
+    },
+    {
+      "urutan": 25,
+      "id": "hr_auth_login_admin_submit_button",
+      "jenis": "button-submit",
+      "aksi": "klik",
+      "nama": "G1 - Masuk sebagai admin",
+      "tunggu": { "route": "#/admin", "timeout_ms": 20000 }
+    },
+    {
+      "urutan": 26,
+      "halaman": "#/admin/affiliate-commissions",
+      "selector": "[data-transaction-id='{{transaction_c_id}}']",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "G2 - Centang ledger transaction_c untuk settlement",
+      "timeout_ms": 15000,
+      "tunggu": { "ms": 500 }
+    },
+    {
+      "urutan": 27,
+      "id": "adfc_create_settlement_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "G3 - Klik Buat settlement (n)",
+      "tunggu": { "elemen": "#adfc_settlement_submit_button", "timeout_ms": 8000 }
+    },
+    {
+      "urutan": 28,
+      "id": "adfc_settlement_reference_input",
+      "jenis": "input-text",
+      "aksi": "isi",
+      "nilai": "UJI-REF-{{stamp6}}",
+      "nama": "Referensi pembayaran (opsional)"
+    },
+    {
+      "urutan": 29,
+      "id": "adfc_settlement_submit_button",
+      "jenis": "button-submit",
+      "aksi": "klik",
+      "nama": "Konfirmasi buat batch pending",
+      "tunggu": { "ms": 2000 }
+    },
+
+    {
+      "urutan": 30,
+      "halaman": "#/admin/settlements",
+      "selector": "[id^='adst_mark_settled_button_desktop_']",
+      "indeks": 0,
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "G6 - Tandai batch settlement terbaru selesai",
+      "timeout_ms": 15000,
+      "simpan": { "nama": "settlement_id", "dari": "id_sufiks", "awalan": "adst_mark_settled_button_desktop_" },
+      "tunggu": { "ms": 1500 }
+    },
+    {
+      "urutan": 31,
+      "selector": "#adst_detail_button_desktop_{{settlement_id}}",
+      "jenis": "button",
+      "aksi": "verifikasi",
+      "nama": "Batch settlement tersimpan dan berstatus settled",
+      "harapan": { "teks_mengandung": "Settled", "lingkup": "halaman" }
+    },
+
+    {
+      "urutan": 40,
+      "halaman": "#/profile",
+      "id": "profile_role_specific_logout_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Buka konfirmasi logout admin",
+      "tunggu": { "elemen": "#profile_logout_confirm_button", "timeout_ms": 8000 }
+    },
+    {
+      "urutan": 41,
+      "id": "profile_logout_confirm_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Konfirmasi logout admin",
+      "tunggu": { "ms": 1500 }
+    },
+    {
+      "urutan": 42,
+      "halaman": "#/auth?role=seller",
+      "id": "hr_auth_role_seller_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Pilih role seller",
+      "tunggu": { "elemen": "#hr_auth_login_seller_email_input", "timeout_ms": 15000 }
+    },
+    {
+      "urutan": 43,
+      "id": "hr_auth_login_seller_email_input",
+      "jenis": "input-email",
+      "aksi": "isi",
+      "nilai": "{{email_seller}}",
+      "nama": "Email seller"
+    },
+    {
+      "urutan": 44,
+      "id": "hr_auth_login_seller_password_input",
+      "jenis": "input-password",
+      "aksi": "isi",
+      "nilai": "{{password_seller}}",
+      "nama": "Password seller"
+    },
+    {
+      "urutan": 45,
+      "id": "hr_auth_login_seller_submit_button",
+      "jenis": "button-submit",
+      "aksi": "klik",
+      "nama": "Masuk sebagai seller",
+      "tunggu": { "route": "#/seller", "timeout_ms": 15000 }
+    },
+    {
+      "urutan": 46,
+      "halaman": "#/seller/transactions/{{transaction_c_id}}",
+      "id": "slrtx_return_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "23 - Coba retur transaksi ketiga (HARUS ditolak)",
+      "dialog_jawaban": [
+        "Percobaan retur setelah settled - uji otomatis",
+        true
+      ],
+      "abaikan_error_endpoint": true,
+      "tunggu": { "teks": "sudah dibayarkan lewat settlement", "timeout_ms": 10000 }
+    },
+    {
+      "urutan": 47,
+      "aksi": "assert",
+      "nama": "Retur benar-benar ditolak, transaksi TIDAK menjadi Diretur",
+      "harapan": {
+        "teks_mengandung": "sudah dibayarkan lewat settlement",
+        "teks_tidak_mengandung": "Diretur",
+        "lingkup": "halaman"
+      }
+    },
+
+    {
+      "urutan": 50,
+      "halaman": "#/profile",
+      "id": "profile_role_specific_logout_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Buka konfirmasi logout seller",
+      "tunggu": { "elemen": "#profile_logout_confirm_button", "timeout_ms": 8000 }
+    },
+    {
+      "urutan": 51,
+      "id": "profile_logout_confirm_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Konfirmasi logout seller",
+      "tunggu": { "ms": 1500 }
+    },
+    {
+      "urutan": 52,
+      "halaman": "#/auth?role=affiliate_admin",
+      "id": "hr_auth_role_affiliate_admin_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Pilih role Marketing",
+      "tunggu": { "elemen": "#hr_auth_login_affiliate_admin_email_input", "timeout_ms": 15000 }
+    },
+    {
+      "urutan": 53,
+      "id": "hr_auth_login_affiliate_admin_email_input",
+      "jenis": "input-email",
+      "aksi": "isi",
+      "nilai": "{{marketing_email}}",
+      "nama": "Email Marketing"
+    },
+    {
+      "urutan": 54,
+      "id": "hr_auth_login_affiliate_admin_password_input",
+      "jenis": "input-password",
+      "aksi": "isi",
+      "nilai": "{{marketing_password}}",
+      "nama": "Password Marketing"
+    },
+    {
+      "urutan": 55,
+      "id": "hr_auth_login_affiliate_admin_submit_button",
+      "jenis": "button-submit",
+      "aksi": "klik",
+      "nama": "Masuk sebagai Marketing",
+      "tunggu": { "route": "#/affiliate", "timeout_ms": 20000 }
+    },
+    {
+      "urutan": 56,
+      "halaman": "#/affiliate/settlements",
+      "id": "aff_settlement_list_section",
+      "jenis": "container",
+      "aksi": "verifikasi",
+      "nama": "24 - Riwayat settlement tampil di dashboard Marketing",
+      "timeout_ms": 15000,
+      "harapan": { "teks_mengandung": "Settled" }
+    }
+  ]
+}

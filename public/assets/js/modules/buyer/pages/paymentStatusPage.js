@@ -314,7 +314,7 @@ function fulfillmentProgressPanel({ transaction, isFinishing = false, onFinish =
   const checklist = transaction?.fulfillment_checklist ?? [];
   const status = String(transaction?.transaction_status ?? "").toLowerCase();
   const isCompleted = status === "completed";
-  const canFinish = status === "paid" && isFulfillmentChecklistComplete(transaction);
+  const canFinish = ["dp_paid", "paid"].includes(status) && isFulfillmentChecklistComplete(transaction);
   const doneCount = checklist.filter((item) => Boolean(item.is_completed)).length;
 
   const section = document.createElement("section");

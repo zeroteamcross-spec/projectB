@@ -233,12 +233,16 @@ function openSettlementModal({ ledgers, state, onSubmit }) {
   form.className = "grid gap-4";
   const total = ledgers.reduce((sum, ledger) => sum + Number(ledger.commission_amount ?? ledger.amount ?? 0), 0);
   const reference = input("Referensi pembayaran", "");
+  reference.id = "adfc_settlement_reference_input";
   const method = input("Metode pembayaran", "");
+  method.id = "adfc_settlement_method_input";
   const note = document.createElement("textarea");
+  note.id = "adfc_settlement_note_input";
   note.className = `${reference.className} min-h-24`;
   note.placeholder = "Catatan pembayaran";
   const summary = textNode("p", "text-sm font-semibold text-gray-800", `${ledgers.length} ledger | ${formatCurrency(total)}`);
   const submit = Button({ label: state.isCreating ? "Memproses..." : "Buat batch pending", variant: "primary" });
+  submit.id = "adfc_settlement_submit_button";
   submit.type = "submit";
   form.append(summary, reference, method, note, submit);
   form.addEventListener("submit", (event) => {

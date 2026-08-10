@@ -5,6 +5,10 @@ import { formatCurrency } from "../../../utils/formatCurrency.js";
 
 export function TransactionResultPanel({ transaction, onOpenDashboard = null, onOpenStatus = null } = {}) {
   const section = document.createElement("section");
+  section.id = "pubtrx_result_panel";
+  if (transaction?.id) {
+    section.dataset.transactionId = String(transaction.id);
+  }
   section.className = `grid gap-5 ${tw.surface.successPanel} p-5 sm:p-6`;
 
   const header = document.createElement("div");
@@ -24,7 +28,7 @@ export function TransactionResultPanel({ transaction, onOpenDashboard = null, on
   details.className = `grid gap-2 ${tw.surface.insetGrid}`;
   const paymentDetails = resolvePaymentArtifacts(transaction);
   details.append(
-    row("ID transaksi", transaction?.id ? `#${transaction.id}` : "-"),
+    row("ID transaksi", transaction?.id ? `#${transaction.id}` : "-", "pubtrx_result_transaction_id_value"),
     row("Kode transaksi", transaction?.transaction_code ?? "-"),
     row("Tipe pembayaran", transaction?.payment_type === "dp" ? "DP" : "Full"),
     row("Nominal utama", formatCurrency(primaryAmount(transaction))),
@@ -58,19 +62,23 @@ export function TransactionResultPanel({ transaction, onOpenDashboard = null, on
     variant: "secondary",
     onClick: onOpenStatus ?? onOpenDashboard,
   });
+  button.id = "pubtrx_result_open_status_button";
   button.classList.add("w-full");
   actions.append(button);
   section.append(header, details, instructions, actions);
   return section;
 }
 
-function row(label, value) {
+function row(label, value, valueId) {
   const item = document.createElement("div");
   item.className = "flex items-center justify-between gap-3 rounded-2xl bg-white/90 px-3 py-3 shadow-sm";
   const caption = document.createElement("span");
   caption.className = "text-gray-500";
   caption.textContent = label;
   const content = document.createElement("span");
+  if (valueId) {
+    content.id = valueId;
+  }
   content.className = "text-right font-semibold text-gray-900";
   content.textContent = value;
   item.append(caption, content);

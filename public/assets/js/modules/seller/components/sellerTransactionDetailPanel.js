@@ -73,17 +73,10 @@ function fulfillmentChecklistCard({
 } = {}) {
   const status = String(transaction?.transaction_status ?? "").toLowerCase();
   const checklist = transaction?.fulfillment_checklist ?? [];
-  const shouldShow = checklist.length || status === "paid" || status === "completed";
+  const isPaidLike = ["dp_paid", "paid"].includes(status);
+  const shouldShow = checklist.length || isPaidLike || status === "completed";
 
   if (!shouldShow) {
-    if (status === "dp_paid") {
-      return identityCard("Fulfillment", [
-        ["Pembayaran", "DP Dibayar"],
-        ["Status mobil", "Terkunci DP"],
-        ["Langkah seller", "Pantau pelunasan buyer sebelum serah terima"],
-      ]);
-    }
-
     return document.createDocumentFragment();
   }
 
@@ -117,7 +110,7 @@ function fulfillmentChecklistCard({
     list.append(checklistItem({
       item,
       draft: checklistDraft[item.key] ?? item,
-      disabled: status === "completed" || status !== "paid",
+      disabled: status === "completed" || !isPaidLike,
       onToggle: onChecklistToggle,
       onNote: onChecklistNote,
       onDate: onChecklistDate,
@@ -128,10 +121,11 @@ function fulfillmentChecklistCard({
   const action = Button({
     label: checklistSaving ? "Menyimpan..." : "Simpan Checklist",
     variant: "primary",
-    disabled: checklistSaving || status !== "paid",
+    disabled: checklistSaving || !isPaidLike,
     onClick: onChecklistSave,
     designHook: "shared.button.primary",
   });
+  action.id = "slrtx_save_checklist_button";
   action.classList.add("sticky", "bottom-3", "z-10", "w-full", "shadow-[0_16px_42px_rgba(249,115,22,0.28)]", "sm:w-fit", "sm:justify-self-end");
   card.append(action);
 
@@ -164,6 +158,7 @@ function checklistItem({ item, draft, disabled, onToggle, onNote, onDate }) {
 
     const dateInput = document.createElement("input");
     dateInput.type = "date";
+    dateInput.id = `slrtx_checklist_${item.key}_handover_date_input`;
     dateInput.value = draft?.handover_date ?? extractHandoverDate(draft?.notes ?? item.notes ?? "");
     dateInput.disabled = disabled;
     dateInput.className = "min-h-11 min-w-0 rounded-[0.9rem] border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-800 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100 disabled:bg-gray-100 disabled:text-gray-500";
@@ -175,6 +170,7 @@ function checklistItem({ item, draft, disabled, onToggle, onNote, onDate }) {
   }
 
   const note = document.createElement("textarea");
+  note.id = `slrtx_checklist_${item.key}_notes_input`;
   note.value = stripHandoverDate(draft?.notes ?? "");
   note.placeholder = "Catatan seller";
   note.disabled = disabled;
@@ -224,6 +220,7 @@ function statusCard(transaction, statusMeta, { isCancelling = false, onCancel = 
       onClick: onCancel,
       designHook: "shared.button.secondary",
     });
+    cancel.id = "slrtx_cancel_button";
     cancel.classList.add("w-full", "sm:w-fit");
     actions.append(cancel);
   }

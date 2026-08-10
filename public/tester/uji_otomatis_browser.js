@@ -16,6 +16,8 @@
  *   - Punya variabel: simpan nilai dari satu langkah, pakai di langkah lain
  *   - Error endpoint ikut menggagalkan langkah, tidak hanya dicatat
  *   - Laporan bisa diunduh sebagai file JSON
+ *   - Bisa menjawab window.prompt()/window.confirm() lewat field
+ *     "dialog_jawaban" pada langkah (retur/batalkan transaksi memakainya)
  * ===================================================================== */
 (function () {
   "use strict";
@@ -65,7 +67,8 @@
     vars: {},
     batchRunning: false,
     batchStop: false,
-    akun: {}
+    akun: {},
+    dialogQueue: []
   };
 
   /* =================== util dasar =================== */
@@ -841,7 +844,11 @@
       return hasil("GAGAL", pesanHilang);
     }
 
-    // 4. Jalankan aksi
+    // 4. Jalankan aksi (siapkan dulu jawaban dialog native bila langkah ini
+    // memicu window.prompt()/window.confirm(), misalnya tombol Retur/Batalkan)
+    if (step.dialog_jawaban) {
+      primeDialogs(step.dialog_jawaban);
+    }
     var hasilAksi = null;
     try {
       hasilAksi = await jalankanAksi(step);
@@ -1359,6 +1366,51 @@
     if (ui.fileSel.value) muatFile(ui.fileSel.value);
   }
 
+  /* =================== dialog native (prompt/confirm) =================== */
+
+  /**
+   * Beberapa aksi seller/buyer (retur, batalkan transaksi) memakai
+   * window.prompt()/window.confirm() bawaan browser, bukan elemen form biasa
+   * di DOM — makanya tidak bisa diisi lewat selector seperti langkah lain.
+   *
+   * Sebelum langkah yang memicu dialog itu dijalankan, JSON bisa menitipkan
+   * jawaban lewat field `dialog_jawaban` (array, sesuai urutan dialog yang
+   * akan muncul: string untuk prompt, boolean untuk confirm). Tanpa
+   * `dialog_jawaban`, prompt mengembalikan string kosong dan confirm
+   * mengembalikan true, supaya rantai tidak diam-diam terhenti menunggu
+   * dialog yang tidak pernah bisa dijawab manusia dalam mode otomatis.
+   */
+  function primeDialogs(jawaban) {
+    state.dialogQueue = Array.isArray(jawaban) ? jawaban.slice() : [];
+  }
+
+  function pasangPenahanDialogNative() {
+    if (window.__pbt_dialog_guard) return;
+    window.__pbt_dialog_guard = true;
+
+    window.prompt = function (pesan, def) {
+      if (state.dialogQueue.length) {
+        var jawaban = state.dialogQueue.shift();
+        log("[prompt] " + pesan + " -> " + JSON.stringify(jawaban));
+        return jawaban === null ? null : String(jawaban);
+      }
+      log("[prompt] " + pesan + " -> (tidak ada dialog_jawaban, pakai default kosong)", "warn");
+      return def !== undefined ? String(def) : "";
+    };
+
+    window.confirm = function (pesan) {
+      if (state.dialogQueue.length) {
+        var jawaban = state.dialogQueue.shift();
+        log("[confirm] " + pesan + " -> " + Boolean(jawaban));
+        return Boolean(jawaban);
+      }
+      log("[confirm] " + pesan + " -> (tidak ada dialog_jawaban, default true)", "warn");
+      return true;
+    };
+
+    log("Penahan dialog native (prompt/confirm) aktif.");
+  }
+
   /* =================== init =================== */
 
   /**
@@ -1419,6 +1471,7 @@
   function init() {
     installEndpointRecorder();
     pasangPenahanOAuth();
+    pasangPenahanDialogNative();
     loadVars();
 
     if (window.alert && !window.__pbt_alert) {

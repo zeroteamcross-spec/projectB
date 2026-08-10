@@ -1,0 +1,427 @@
+{
+  "nama_fitur": "Wali Kelas Pendamping dan Akses Menu Tugas",
+  "halaman": [
+    "akademik/rombel",
+    "tugas/tugas_santri"
+  ],
+  "prefix_id": [
+    "rom_",
+    "tgs_"
+  ],
+  "versi": "1.1",
+  "keterangan": "Daftar id elemen dan urutan klik untuk menguji bisnis flow wali kelas pendamping. Flow utama: set pendamping di Data Rombel, lalu gunakan rombel tersebut di Menu Tugas/Tugas Siswa. Pada form tambah rombel, Wali Kelas Pendamping harus disabled sampai Nama Wali Kelas dipilih, lalu opsi wali utama tidak boleh muncul di dropdown pendamping. Id tombol tabel bersifat dinamis mengikuti id rombel atau token tugas.",
+  "prasyarat_data": [
+    "Login sebagai user level admin/operator yang bisa membuka Data Rombel dan Menu Tugas.",
+    "Database sudah menjalankan Migration/20260807110000_add_wali_pendamping_to_data_akademik_rombel.sql.",
+    "Tersedia minimal 1 rombel aktif, 2 data karyawan/guru berbeda, kaldik aktif, dan minimal 1 siswa dalam rombel.",
+    "Untuk uji akses pendamping, siapkan akun guru pendamping dengan fid_keterangan sama dengan karyawan_id_pendamping yang dipilih."
+  ],
+  "urutan_uji": [
+    {
+      "urutan": 1,
+      "halaman": "akademik/rombel",
+      "id": "rom_filter_cabang",
+      "jenis": "select",
+      "aksi": "pilih",
+      "nama": "Filter cabang Data Rombel",
+      "catatan": "Hanya tampil untuk idlevel 1 atau >= 100. Pilih cabang yang berisi rombel uji."
+    },
+    {
+      "urutan": 2,
+      "halaman": "akademik/rombel",
+      "id": "rom_filter_periode",
+      "jenis": "select",
+      "aksi": "pilih",
+      "nama": "Filter periode akademik",
+      "catatan": "Pilih periode aktif yang memuat rombel uji."
+    },
+    {
+      "urutan": 3,
+      "halaman": "akademik/rombel",
+      "id": "rom_btn_refresh",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Refresh Data Rombel",
+      "catatan": "Memuat ulang tabel #rom_table setelah filter siap."
+    },
+    {
+      "urutan": 4,
+      "halaman": "akademik/rombel",
+      "id": "rom_btn_new",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Buka form rombel baru",
+      "catatan": "Klik hanya bila ingin membuat rombel baru. Setelah modal terbuka, verifikasi #rom_wali_pendamping masih disabled sampai #rom_wali_kelas dipilih. Untuk rombel yang sudah ada, lanjut ke langkah 15 memakai pola id rom_btn_edit_<id_rombel>."
+    },
+    {
+      "urutan": 5,
+      "halaman": "akademik/rombel",
+      "id": "rom_lembaga",
+      "jenis": "select",
+      "aksi": "pilih",
+      "nama": "Lembaga",
+      "catatan": "Pilih lembaga/cabang pada form rombel."
+    },
+    {
+      "urutan": 6,
+      "halaman": "akademik/rombel",
+      "id": "rom_periode",
+      "jenis": "input-readonly",
+      "aksi": "verifikasi",
+      "nama": "Periode akademik form",
+      "catatan": "Terisi otomatis dari periode aktif. Hidden value disimpan di #rom_akademik_id."
+    },
+    {
+      "urutan": 7,
+      "halaman": "akademik/rombel",
+      "id": "rom_nama_rombel",
+      "jenis": "select",
+      "aksi": "pilih",
+      "nama": "Nama Rombel",
+      "catatan": "Pilih rombel yang akan diberi wali utama dan pendamping."
+    },
+    {
+      "urutan": 8,
+      "halaman": "akademik/rombel",
+      "id": "rom_wali_kelas",
+      "jenis": "select",
+      "aksi": "pilih",
+      "nama": "Wali kelas utama",
+      "catatan": "Pilih guru utama. Setelah dipilih, #rom_wali_pendamping harus enabled dan nama guru utama ini tidak boleh muncul lagi sebagai opsi pendamping."
+    },
+    {
+      "urutan": 9,
+      "halaman": "akademik/rombel",
+      "id": "rom_wali_pendamping",
+      "jenis": "select",
+      "aksi": "pilih",
+      "nama": "Wali kelas pendamping",
+      "catatan": "Pilih guru pendamping yang berbeda dari #rom_wali_kelas. Opsi yang sama dengan wali utama harus sudah tersaring dari dropdown; server validation tetap menjadi pengaman bila ada submit manual."
+    },
+    {
+      "urutan": 10,
+      "halaman": "akademik/rombel",
+      "id": "rom_kaldik",
+      "jenis": "select",
+      "aksi": "pilih",
+      "nama": "Kaldik Akademik",
+      "catatan": "Pilih kaldik/pertemuan yang sesuai."
+    },
+    {
+      "urutan": 11,
+      "halaman": "akademik/rombel",
+      "id": "rom_status_aktif",
+      "jenis": "radio",
+      "aksi": "pilih",
+      "nama": "Status Aktif",
+      "catatan": "Pilih aktif agar rombel bisa dipakai pada Menu Tugas."
+    },
+    {
+      "urutan": 12,
+      "halaman": "akademik/rombel",
+      "id": "rom_btn_submit",
+      "jenis": "button-submit",
+      "aksi": "klik",
+      "nama": "Simpan rombel",
+      "catatan": "Menyimpan wali utama dan pendamping. Verifikasi notifikasi sukses."
+    },
+    {
+      "urutan": 13,
+      "halaman": "akademik/rombel",
+      "id": "rom_table",
+      "jenis": "table",
+      "aksi": "verifikasi",
+      "nama": "Tabel Data Rombel",
+      "catatan": "Cari baris rombel yang disimpan dan pastikan kolom Wali Kelas menampilkan teks Pendamping."
+    },
+    {
+      "urutan": 14,
+      "halaman": "akademik/rombel",
+      "pola_id": "rom_btn_view_<id_rombel>",
+      "jenis": "button-dinamis",
+      "aksi": "klik",
+      "nama": "Lihat detail rombel",
+      "catatan": "Klik tombol view pada baris rombel uji. Verifikasi #rom_detail_master menampilkan Wali Pendamping."
+    },
+    {
+      "urutan": 15,
+      "halaman": "akademik/rombel",
+      "id": "rom_btn_detail_close",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Tutup detail rombel",
+      "catatan": "Menutup modal detail."
+    },
+    {
+      "urutan": 16,
+      "halaman": "akademik/rombel",
+      "pola_id": "rom_btn_edit_<id_rombel>",
+      "jenis": "button-dinamis",
+      "aksi": "klik",
+      "nama": "Edit rombel",
+      "catatan": "Klik tombol edit pada baris rombel uji untuk memastikan #rom_wali_pendamping terisi ulang."
+    },
+    {
+      "urutan": 17,
+      "halaman": "akademik/rombel",
+      "id": "rom_wali_pendamping",
+      "jenis": "select",
+      "aksi": "verifikasi_atau_ubah",
+      "nama": "Verifikasi pendamping saat edit",
+      "catatan": "Pastikan nilai pendamping terset sesuai data. Ubah bila ingin menguji update."
+    },
+    {
+      "urutan": 18,
+      "halaman": "akademik/rombel",
+      "id": "rom_btn_submit",
+      "jenis": "button-submit",
+      "aksi": "klik",
+      "nama": "Update rombel",
+      "catatan": "Simpan perubahan edit."
+    },
+    {
+      "urutan": 19,
+      "halaman": "tugas/tugas_santri",
+      "id": "tgs_filter_cabang",
+      "jenis": "select",
+      "aksi": "pilih",
+      "nama": "Filter cabang Tugas",
+      "catatan": "Hanya tampil untuk idlevel 1 atau >= 100. Pilih cabang yang sama dengan Data Rombel."
+    },
+    {
+      "urutan": 20,
+      "halaman": "tugas/tugas_santri",
+      "id": "reportrange",
+      "jenis": "daterangepicker",
+      "aksi": "pilih",
+      "nama": "Filter tanggal tugas",
+      "catatan": "Pilih rentang tanggal. Hidden tanggal disimpan di #DS dan #DE oleh script global."
+    },
+    {
+      "urutan": 21,
+      "halaman": "tugas/tugas_santri",
+      "id": "tgs_btn_refresh",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Refresh Tugas",
+      "catatan": "Memuat ulang #tgs_table."
+    },
+    {
+      "urutan": 22,
+      "halaman": "tugas/tugas_santri",
+      "id": "tgs_btn_new",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Buka form tugas baru",
+      "catatan": "Membuka modal pembuatan Tugas Siswa."
+    },
+    {
+      "urutan": 23,
+      "halaman": "tugas/tugas_santri",
+      "id": "tgs_lembaga",
+      "jenis": "select",
+      "aksi": "pilih",
+      "nama": "Lembaga tugas",
+      "catatan": "Pilih lembaga/cabang yang sama."
+    },
+    {
+      "urutan": 24,
+      "halaman": "tugas/tugas_santri",
+      "id": "tgs_rombel",
+      "jenis": "select",
+      "aksi": "pilih",
+      "nama": "Rombel tugas",
+      "catatan": "Pilih rombel yang sudah diberi wali pendamping. Saat login sebagai pendamping, rombel ini harus tetap muncul."
+    },
+    {
+      "urutan": 25,
+      "halaman": "tugas/tugas_santri",
+      "id": "tgs_siswa",
+      "jenis": "select",
+      "aksi": "pilih",
+      "nama": "Siswa",
+      "catatan": "Pilih siswa dari rombel."
+    },
+    {
+      "urutan": 26,
+      "halaman": "tugas/tugas_santri",
+      "id": "tgs_jumlah",
+      "jenis": "input-number",
+      "aksi": "isi",
+      "nama": "Jumlah Tugas",
+      "catatan": "Isi angka, contoh 2. Sistem akan membuat input dinamis #tgs_nama_materi_1 dan seterusnya."
+    },
+    {
+      "urutan": 27,
+      "halaman": "tugas/tugas_santri",
+      "pola_id": "tgs_nama_materi_<no>",
+      "jenis": "input-text-dinamis",
+      "aksi": "isi",
+      "nama": "Uraian tugas",
+      "catatan": "Isi setiap uraian tugas sesuai jumlah. Contoh #tgs_nama_materi_1, #tgs_nama_materi_2."
+    },
+    {
+      "urutan": 28,
+      "halaman": "tugas/tugas_santri",
+      "id": "tgs_btn_submit",
+      "jenis": "button-submit",
+      "aksi": "klik",
+      "nama": "Simpan tugas",
+      "catatan": "Menyimpan tugas dan menutup modal. Verifikasi notifikasi sukses."
+    },
+    {
+      "urutan": 29,
+      "halaman": "tugas/tugas_santri",
+      "id": "tgs_table",
+      "jenis": "table",
+      "aksi": "verifikasi",
+      "nama": "Tabel Tugas Siswa",
+      "catatan": "Cari tugas yang baru dibuat. Simpan token/baris untuk tombol dinamis."
+    },
+    {
+      "urutan": 30,
+      "halaman": "tugas/tugas_santri",
+      "pola_id": "tgs_btn_view_<token>",
+      "jenis": "button-dinamis",
+      "aksi": "klik",
+      "nama": "Lihat detail tugas",
+      "catatan": "Buka detail tugas. Verifikasi #tgs_view_detail menampilkan wali pendamping."
+    },
+    {
+      "urutan": 31,
+      "halaman": "tugas/tugas_santri",
+      "pola_id": "tgs_btn_edit_<token>",
+      "jenis": "button-dinamis",
+      "aksi": "klik",
+      "nama": "Edit tugas",
+      "catatan": "Hanya tampil untuk user level 1-29. Pastikan form edit memuat #tgs_jumlah dan input uraian tugas."
+    },
+    {
+      "urutan": 32,
+      "halaman": "tugas/tugas_santri",
+      "id": "tgs_btn_submit",
+      "jenis": "button-submit",
+      "aksi": "klik",
+      "nama": "Simpan edit tugas",
+      "catatan": "Simpan edit tanpa mengubah akses pendamping."
+    },
+    {
+      "urutan": 33,
+      "halaman": "tugas/tugas_santri",
+      "pola_id": "tgs_btn_kerjakan_<token>",
+      "jenis": "button-dinamis",
+      "aksi": "klik",
+      "nama": "Kerjakan tugas",
+      "catatan": "Hanya tampil untuk user siswa/orang tua level 30-49. Buka form pengerjaan."
+    },
+    {
+      "urutan": 34,
+      "halaman": "tugas/tugas_santri",
+      "pola_id": "tgs_keterangan_<id_kontrol_ortu>",
+      "jenis": "input-text-dinamis",
+      "aksi": "isi",
+      "nama": "Keterangan pengerjaan",
+      "catatan": "Isi keterangan pengerjaan per tugas. Upload file opsional memakai pola #tgs_file_<id_kontrol_ortu>."
+    },
+    {
+      "urutan": 35,
+      "halaman": "tugas/tugas_santri",
+      "id": "tgs_btn_close_pengerjaan",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Tutup pengerjaan",
+      "catatan": "Menutup modal pengerjaan tugas."
+    },
+    {
+      "urutan": 36,
+      "halaman": "tugas/tugas_santri",
+      "pola_id": "tgs_btn_delete_<token>",
+      "jenis": "button-dinamis",
+      "aksi": "klik_opsional",
+      "nama": "Hapus tugas",
+      "catatan": "Opsional dan destruktif. Tombol hanya muncul jika belum ada tugas terlaksana."
+    },
+    {
+      "urutan": 37,
+      "halaman": "tugas/tugas_santri",
+      "id": "tgs_btn_delete_cancel",
+      "jenis": "button-dinamis-modal",
+      "aksi": "klik",
+      "nama": "Batal hapus tugas",
+      "catatan": "Gunakan cancel dalam otomasi standar agar data uji tidak hilang. Jika memang menguji delete, klik #tgs_btn_delete_confirm."
+    }
+  ],
+  "daftar_id_elemen": [
+    { "id": "rom_btn_data_siswa", "jenis": "link-button", "nama": "Data Siswa" },
+    { "id": "rom_btn_new", "jenis": "button", "nama": "Baru Data Rombel" },
+    { "id": "rom_btn_refresh", "jenis": "button", "nama": "Refresh Data Rombel" },
+    { "id": "rom_filter_cabang", "jenis": "select", "nama": "Filter cabang rombel" },
+    { "id": "rom_filter_periode", "jenis": "select", "nama": "Filter periode rombel" },
+    { "id": "rom_table", "jenis": "table", "nama": "Tabel Data Rombel" },
+    { "id": "rom_form", "jenis": "form", "nama": "Form Data Rombel" },
+    { "id": "rom_id_rombel", "jenis": "input-hidden", "nama": "ID Rombel" },
+    { "id": "rom_lembaga", "jenis": "select", "nama": "Lembaga" },
+    { "id": "rom_periode", "jenis": "input-readonly", "nama": "Periode" },
+    { "id": "rom_akademik_id", "jenis": "input-hidden", "nama": "ID Akademik" },
+    { "id": "rom_nama_rombel", "jenis": "select", "nama": "Nama Rombel" },
+    { "id": "rom_wali_kelas", "jenis": "select", "nama": "Wali Kelas Utama" },
+    { "id": "rom_wali_pendamping", "jenis": "select", "nama": "Wali Kelas Pendamping", "catatan": "Default disabled pada tambah baru; enabled setelah #rom_wali_kelas dipilih dan tidak memuat opsi wali utama yang sama." },
+    { "id": "rom_kaldik", "jenis": "select", "nama": "Kaldik Akademik" },
+    { "id": "rom_status_aktif", "jenis": "radio", "nama": "Status Aktif" },
+    { "id": "rom_status_nonaktif", "jenis": "radio", "nama": "Status Non-Aktif" },
+    { "id": "rom_btn_modal_close", "jenis": "button", "nama": "Close modal form rombel" },
+    { "id": "rom_btn_cancel", "jenis": "button", "nama": "Batal form rombel" },
+    { "id": "rom_btn_submit", "jenis": "button-submit", "nama": "Simpan/Update rombel" },
+    { "id": "rom_detail_master", "jenis": "container", "nama": "Detail master rombel" },
+    { "id": "rom_detail_list", "jenis": "container", "nama": "Detail siswa rombel" },
+    { "id": "rom_btn_detail_modal_close", "jenis": "button", "nama": "Close modal detail rombel" },
+    { "id": "rom_btn_detail_close", "jenis": "button", "nama": "Selesai detail rombel" },
+    { "id": "rom_btn_view_<id_rombel>", "jenis": "button-dinamis", "nama": "View rombel (pola)" },
+    { "id": "rom_btn_print_<id_rombel>", "jenis": "link-button-dinamis", "nama": "Print rombel (pola)" },
+    { "id": "rom_btn_edit_<id_rombel>", "jenis": "button-dinamis", "nama": "Edit rombel (pola)" },
+    { "id": "rom_btn_delete_<id_rombel>", "jenis": "button-dinamis", "nama": "Delete rombel (pola)" },
+    { "id": "rom_btn_delete_confirm", "jenis": "button-dinamis-modal", "nama": "Konfirmasi hapus rombel" },
+    { "id": "rom_btn_delete_cancel", "jenis": "button-dinamis-modal", "nama": "Batal hapus rombel" },
+    { "id": "tgs_btn_new", "jenis": "button", "nama": "Baru Tugas" },
+    { "id": "tgs_btn_refresh", "jenis": "button", "nama": "Refresh Tugas" },
+    { "id": "tgs_filter_cabang", "jenis": "select", "nama": "Filter cabang tugas" },
+    { "id": "reportrange", "jenis": "daterangepicker", "nama": "Filter tanggal tugas" },
+    { "id": "DS", "jenis": "input-hidden", "nama": "Tanggal mulai filter" },
+    { "id": "DE", "jenis": "input-hidden", "nama": "Tanggal selesai filter" },
+    { "id": "tgs_table", "jenis": "table", "nama": "Tabel Tugas Siswa" },
+    { "id": "tgs_form", "jenis": "form", "nama": "Form Tugas" },
+    { "id": "tgs_id_extra", "jenis": "input-hidden", "nama": "Token tugas/form mode" },
+    { "id": "tgs_lembaga", "jenis": "select", "nama": "Lembaga tugas" },
+    { "id": "tgs_rombel", "jenis": "select", "nama": "Rombel tugas" },
+    { "id": "tgs_siswa", "jenis": "select", "nama": "Siswa tugas" },
+    { "id": "tgs_tanggal_tugas", "jenis": "input-readonly", "nama": "Tanggal tugas" },
+    { "id": "tgs_jumlah", "jenis": "input-number", "nama": "Jumlah tugas" },
+    { "id": "tgs_result_urutan", "jenis": "tbody", "nama": "Container input tugas dinamis" },
+    { "id": "tgs_urut_materi_<no>", "jenis": "input-hidden-dinamis", "nama": "Urutan materi tugas (pola)" },
+    { "id": "tgs_nama_materi_<no>", "jenis": "input-text-dinamis", "nama": "Nama materi/tugas (pola)" },
+    { "id": "tgs_btn_form_modal_close", "jenis": "button", "nama": "Close modal form tugas" },
+    { "id": "tgs_btn_cancel_form", "jenis": "button", "nama": "Batal form tugas" },
+    { "id": "tgs_btn_submit", "jenis": "button-submit", "nama": "Simpan/Update tugas" },
+    { "id": "tgs_id_extra_pengerjaan", "jenis": "input-hidden", "nama": "Token pengerjaan tugas" },
+    { "id": "tgs_materi_tugas", "jenis": "container", "nama": "Info master tugas" },
+    { "id": "tgs_detail_tugas", "jenis": "container", "nama": "Detail pengerjaan tugas" },
+    { "id": "tgs_btn_pengerjaan_modal_close", "jenis": "button", "nama": "Close modal pengerjaan" },
+    { "id": "tgs_btn_close_pengerjaan", "jenis": "button", "nama": "Selesai pengerjaan" },
+    { "id": "tgs_view_detail", "jenis": "container", "nama": "Detail view tugas" },
+    { "id": "tgs_btn_view_modal_close", "jenis": "button", "nama": "Close modal view tugas" },
+    { "id": "tgs_btn_view_<token>", "jenis": "button-dinamis", "nama": "View tugas (pola)" },
+    { "id": "tgs_btn_edit_<token>", "jenis": "button-dinamis", "nama": "Edit tugas (pola)" },
+    { "id": "tgs_btn_delete_<token>", "jenis": "button-dinamis", "nama": "Delete tugas (pola)" },
+    { "id": "tgs_btn_kerjakan_<token>", "jenis": "button-dinamis", "nama": "Kerjakan tugas (pola)" },
+    { "id": "tgs_id_kontrol_<id_kontrol_ortu>", "jenis": "input-hidden-dinamis", "nama": "ID kontrol tugas (pola)" },
+    { "id": "tgs_keterangan_<id_kontrol_ortu>", "jenis": "input-text-dinamis", "nama": "Keterangan pengerjaan (pola)" },
+    { "id": "tgs_preview_<id_kontrol_ortu>", "jenis": "container-dinamis", "nama": "Preview file tugas (pola)" },
+    { "id": "tgs_file_<id_kontrol_ortu>", "jenis": "input-file-dinamis", "nama": "Upload pengerjaan (pola)" },
+    { "id": "tgs_file_old_<id_kontrol_ortu>", "jenis": "input-hidden-dinamis", "nama": "File lama (pola)" },
+    { "id": "tgs_file_new_<id_kontrol_ortu>", "jenis": "input-hidden-dinamis", "nama": "File baru (pola)" },
+    { "id": "tgs_switch_<id_kontrol_ortu>", "jenis": "checkbox-dinamis", "nama": "Switch terlaksana (pola)" },
+    { "id": "tgs_switch_value_<id_kontrol_ortu>", "jenis": "input-hidden-dinamis", "nama": "Nilai switch terlaksana (pola)" },
+    { "id": "tgs_btn_delete_confirm", "jenis": "button-dinamis-modal", "nama": "Konfirmasi hapus tugas" },
+    { "id": "tgs_btn_delete_cancel", "jenis": "button-dinamis-modal", "nama": "Batal hapus tugas" }
+  ]
+}

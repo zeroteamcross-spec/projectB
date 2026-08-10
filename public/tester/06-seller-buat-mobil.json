@@ -1,0 +1,375 @@
+{
+  "nama_fitur": "06 - Seller membuat mobil published dengan Booking Fee",
+  "aplikasi": "projectB",
+  "halaman": [
+    "#/auth?role=seller"
+  ],
+  "prefix_id": [
+    "hr_auth_",
+    "slrc_",
+    "slri_",
+    "slrinsp_"
+  ],
+  "versi": "1.0",
+  "berhenti_saat_gagal": true,
+  "keterangan": "Alur C. Membuat DUA mobil published dengan Booking Fee terisi: car_a (dipakai sampai transaksi selesai lewat skenario 08-09) dan car_b (dipakai untuk jalur Marketing/retur/settlement lewat skenario 12-13, karena mobil yang sudah 'sold' tidak bisa dibeli ulang sampai diretur). car_a mendapat langkah C3 (unggah foto) dan C4 (inspeksi) yang lebih lengkap; car_b dibuat ringkas karena tujuannya cuma jadi unit yang bisa dibeli berkali-kali lewat siklus retur. Mengekspor car_a_id dan car_b_id.",
+  "prasyarat_data": [
+    "Server lokal berjalan di http://localhost:8000.",
+    "Master brand (locations.cities tidak relevan di sini, tapi master_brand) sudah ter-seed sehingga dropdown Merek/Model terisi.",
+    "Kredensial diambil dari tester/akun.json yang dimuat runner otomatis."
+  ],
+  "variabel": {
+    "email_seller": "{{seller_email}}",
+    "password_seller": "{{seller_password}}"
+  },
+  "urutan_uji": [
+    {
+      "urutan": 1,
+      "halaman": "#/auth?role=seller",
+      "id": "hr_auth_role_seller_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Pilih role seller",
+      "tunggu": { "elemen": "#hr_auth_login_seller_email_input", "timeout_ms": 8000 }
+    },
+    {
+      "urutan": 2,
+      "id": "hr_auth_login_seller_email_input",
+      "jenis": "input-email",
+      "aksi": "isi",
+      "nilai": "{{email_seller}}",
+      "nama": "Email seller"
+    },
+    {
+      "urutan": 3,
+      "id": "hr_auth_login_seller_password_input",
+      "jenis": "input-password",
+      "aksi": "isi",
+      "nilai": "{{password_seller}}",
+      "nama": "Password seller"
+    },
+    {
+      "urutan": 4,
+      "id": "hr_auth_login_seller_submit_button",
+      "jenis": "button-submit",
+      "aksi": "klik",
+      "nama": "Masuk sebagai seller",
+      "tunggu": { "route": "#/seller", "timeout_ms": 15000 }
+    },
+
+    {
+      "urutan": 10,
+      "halaman": "#/seller/cars",
+      "id": "slrc_add_car_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "[car_a] Buka form mobil baru",
+      "tunggu": { "elemen": "#slrc_license_plate_number_input", "timeout_ms": 8000 }
+    },
+    {
+      "urutan": 11,
+      "id": "slrc_license_plate_number_input",
+      "jenis": "input-text",
+      "aksi": "isi",
+      "nilai": "UJI A {{stamp6}}",
+      "nama": "[car_a] Nomor Polisi"
+    },
+    {
+      "urutan": 12,
+      "id": "slrc_brand_name_input",
+      "jenis": "select",
+      "aksi": "pilih",
+      "nama": "[car_a] Merek Mobil",
+      "catatan": "Tanpa nilai eksplisit: pilih opsi valid pertama dari master brand, apa pun isinya."
+    },
+    {
+      "urutan": 13,
+      "id": "slrc_model_name_input",
+      "jenis": "select",
+      "aksi": "pilih",
+      "nama": "[car_a] Model",
+      "catatan": "Terisi setelah merek dipilih."
+    },
+    {
+      "urutan": 14,
+      "id": "slrc_car_form_next_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "[car_a] Lanjut ke Spesifikasi Teknis",
+      "tunggu": { "elemen": "#slrc_registration_date_input", "timeout_ms": 8000 }
+    },
+    {
+      "urutan": 15,
+      "id": "slrc_registration_date_input",
+      "jenis": "input-date",
+      "aksi": "isi",
+      "nilai": "{{tanggal_hari_ini}}",
+      "nama": "[car_a] Tanggal registrasi"
+    },
+    {
+      "urutan": 16,
+      "id": "slrc_engine_number_input",
+      "jenis": "input-text",
+      "aksi": "isi",
+      "nilai": "MSN-{{stamp6}}",
+      "nama": "[car_a] Nomor mesin"
+    },
+    {
+      "urutan": 17,
+      "id": "slrc_chassis_number_input",
+      "jenis": "input-text",
+      "aksi": "isi",
+      "nilai": "CHS-{{stamp6}}",
+      "nama": "[car_a] Nomor rangka"
+    },
+    {
+      "urutan": 18,
+      "id": "slrc_car_form_next_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "[car_a] Lanjut ke Harga dan Deskripsi",
+      "tunggu": { "elemen": "#slrc_dp_amount_input", "timeout_ms": 8000 }
+    },
+    {
+      "urutan": 19,
+      "id": "slrc_price_cash_input",
+      "jenis": "input-number",
+      "aksi": "isi",
+      "nilai": "215000000",
+      "nama": "[car_a] Harga cash"
+    },
+    {
+      "urutan": 20,
+      "id": "slrc_dp_amount_input",
+      "jenis": "input-number",
+      "aksi": "isi",
+      "nilai": "15000000",
+      "nama": "[car_a] Nominal Booking Fee"
+    },
+    {
+      "urutan": 21,
+      "id": "slrc_listing_status_input",
+      "jenis": "select",
+      "aksi": "pilih",
+      "nilai": "published",
+      "nama": "[car_a] Status listing langsung Published",
+      "catatan": "Simplifikasi sengaja: alur UI nyata (C2.5+C5) membuat draft dulu baru mengedit ke published lewat form terpisah. Di sini langsung published sejak awal supaya skenario ini tetap satu file dan fokus ke pembuatan fixture, bukan menguji ulang transisi draft->published (itu sudah diuji di 05)."
+    },
+    {
+      "urutan": 22,
+      "id": "slrc_car_form_submit_button",
+      "jenis": "button-submit",
+      "aksi": "klik",
+      "nama": "[car_a] Simpan mobil",
+      "tunggu": { "hilang": "#slrc_car_form_submit_button", "timeout_ms": 10000 }
+    },
+    {
+      "urutan": 23,
+      "selector": "[id^='slrc_edit_car_button_']",
+      "indeks": 0,
+      "jenis": "button",
+      "aksi": "verifikasi",
+      "nama": "[car_a] Tangkap car_a_id dari baris terbaru",
+      "catatan": "Mobil baru selalu ditaruh di depan daftar (unshift), jadi indeks 0 adalah car_a.",
+      "simpan": {
+        "nama": "car_a_id",
+        "dari": "id_sufiks",
+        "awalan": "slrc_edit_car_button_"
+      }
+    },
+
+    {
+      "urutan": 30,
+      "selector": "#slrc_car_images_button_{{car_a_id}}",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "[car_a] Buka halaman Foto",
+      "tunggu": { "elemen": "#slri_upload_image_input", "timeout_ms": 8000 }
+    },
+    {
+      "urutan": 31,
+      "id": "slri_upload_image_input",
+      "jenis": "input-file",
+      "aksi": "verifikasi",
+      "nama": "[car_a] C3 - Panel unggah foto tersedia",
+      "harapan": { "elemen_ada": "#slri_upload_image_input" },
+      "catatan": "Batas teknis runner: input file tidak bisa diisi otomatis dari console tanpa file lokal nyata. Langkah ini hanya membuktikan panelnya ada dan siap dipakai; unggah sungguhan tetap manual."
+    },
+    {
+      "urutan": 32,
+      "id": "slri_back_to_cars_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "[car_a] Kembali ke Katalog",
+      "tunggu": { "route": "#/seller/cars", "timeout_ms": 8000 }
+    },
+
+    {
+      "urutan": 40,
+      "selector": "#slrc_car_inspection_button_{{car_a_id}}",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "[car_a] Buka halaman Inspeksi",
+      "tunggu": { "ms": 1500 }
+    },
+    {
+      "urutan": 41,
+      "id": "slrinsp_create_report_button",
+      "jenis": "button",
+      "aksi": "klik_opsional",
+      "nama": "[car_a] Mulai isi checklist",
+      "catatan": "Opsional: kalau report inspeksi sudah pernah dibuat di data seed, tombol ini tidak ada lagi dan langkah dilewati.",
+      "tunggu": { "elemen": "#slrinsp_items_section", "timeout_ms": 8000 }
+    },
+    {
+      "urutan": 42,
+      "id": "slrinsp_items_section",
+      "jenis": "container",
+      "aksi": "verifikasi",
+      "nama": "[car_a] C4 - Checklist master inspection tampil",
+      "harapan": { "elemen_ada": "#slrinsp_items_section" }
+    },
+    {
+      "urutan": 43,
+      "selector": "[id^='slrinsp_condition_']",
+      "indeks": 0,
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "[car_a] Isi kondisi item inspeksi pertama",
+      "catatan": "Demonstrasi nyata pengisian satu item checklist. Booking Fee, bukan status inspeksi, yang menentukan mobil bisa ditransaksikan, jadi checklist tidak perlu tuntas 100% untuk fixture ini."
+    },
+    {
+      "urutan": 44,
+      "id": "slrinsp_save_draft_button",
+      "jenis": "button",
+      "aksi": "klik_opsional",
+      "nama": "[car_a] Simpan Inspeksi (draft)"
+    },
+    {
+      "urutan": 45,
+      "id": "slrinsp_back_to_cars_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "[car_a] Kembali ke Katalog dari Inspeksi",
+      "tunggu": { "route": "#/seller/cars", "timeout_ms": 8000 }
+    },
+
+    {
+      "urutan": 50,
+      "halaman": "#/seller/cars",
+      "id": "slrc_add_car_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "[car_b] Buka form mobil baru",
+      "catatan": "car_b dibuat ringkas (tanpa foto/inspeksi) karena hanya dipakai sebagai unit yang dibeli-retur-dibeli lagi di skenario 12 dan 13.",
+      "tunggu": { "elemen": "#slrc_license_plate_number_input", "timeout_ms": 8000 }
+    },
+    {
+      "urutan": 51,
+      "id": "slrc_license_plate_number_input",
+      "jenis": "input-text",
+      "aksi": "isi",
+      "nilai": "UJI B {{stamp6}}",
+      "nama": "[car_b] Nomor Polisi"
+    },
+    {
+      "urutan": 52,
+      "id": "slrc_brand_name_input",
+      "jenis": "select",
+      "aksi": "pilih",
+      "nama": "[car_b] Merek Mobil"
+    },
+    {
+      "urutan": 53,
+      "id": "slrc_model_name_input",
+      "jenis": "select",
+      "aksi": "pilih",
+      "nama": "[car_b] Model"
+    },
+    {
+      "urutan": 54,
+      "id": "slrc_car_form_next_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "[car_b] Lanjut ke Spesifikasi Teknis",
+      "tunggu": { "elemen": "#slrc_registration_date_input", "timeout_ms": 8000 }
+    },
+    {
+      "urutan": 55,
+      "id": "slrc_registration_date_input",
+      "jenis": "input-date",
+      "aksi": "isi",
+      "nilai": "{{tanggal_hari_ini}}",
+      "nama": "[car_b] Tanggal registrasi"
+    },
+    {
+      "urutan": 56,
+      "id": "slrc_engine_number_input",
+      "jenis": "input-text",
+      "aksi": "isi",
+      "nilai": "MSN-B-{{stamp6}}",
+      "nama": "[car_b] Nomor mesin"
+    },
+    {
+      "urutan": 57,
+      "id": "slrc_chassis_number_input",
+      "jenis": "input-text",
+      "aksi": "isi",
+      "nilai": "CHS-B-{{stamp6}}",
+      "nama": "[car_b] Nomor rangka"
+    },
+    {
+      "urutan": 58,
+      "id": "slrc_car_form_next_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "[car_b] Lanjut ke Harga dan Deskripsi",
+      "tunggu": { "elemen": "#slrc_dp_amount_input", "timeout_ms": 8000 }
+    },
+    {
+      "urutan": 59,
+      "id": "slrc_price_cash_input",
+      "jenis": "input-number",
+      "aksi": "isi",
+      "nilai": "180000000",
+      "nama": "[car_b] Harga cash"
+    },
+    {
+      "urutan": 60,
+      "id": "slrc_dp_amount_input",
+      "jenis": "input-number",
+      "aksi": "isi",
+      "nilai": "10000000",
+      "nama": "[car_b] Nominal Booking Fee"
+    },
+    {
+      "urutan": 61,
+      "id": "slrc_listing_status_input",
+      "jenis": "select",
+      "aksi": "pilih",
+      "nilai": "published",
+      "nama": "[car_b] Status listing langsung Published"
+    },
+    {
+      "urutan": 62,
+      "id": "slrc_car_form_submit_button",
+      "jenis": "button-submit",
+      "aksi": "klik",
+      "nama": "[car_b] Simpan mobil",
+      "tunggu": { "hilang": "#slrc_car_form_submit_button", "timeout_ms": 10000 }
+    },
+    {
+      "urutan": 63,
+      "selector": "[id^='slrc_edit_car_button_']",
+      "indeks": 0,
+      "jenis": "button",
+      "aksi": "verifikasi",
+      "nama": "[car_b] Tangkap car_b_id dari baris terbaru",
+      "simpan": {
+        "nama": "car_b_id",
+        "dari": "id_sufiks",
+        "awalan": "slrc_edit_car_button_"
+      }
+    }
+  ]
+}

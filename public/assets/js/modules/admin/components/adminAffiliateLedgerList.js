@@ -80,6 +80,7 @@ function selectionCell(ledger, selectedIds, onToggle) {
     onClick: () => onToggle?.(ledger),
   });
   button.id = `adfc_select_ledger_button_${ledger.id}`;
+  button.dataset.transactionId = String(ledger.transaction_id ?? "");
   button.prepend(createIcon("check", { className: "h-4 w-4" }));
   return button;
 }

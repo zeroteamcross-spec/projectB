@@ -12,10 +12,14 @@ export function AffiliateLedgerList({ ledgers = [] } = {}) {
   }
 
   const wrap = document.createElement("div");
+  wrap.id = "aff_ledger_list_section";
   wrap.className = "grid min-w-0 gap-3";
 
   ledgers.forEach((ledger) => {
     const card = Card([], { variant: "raised" });
+    card.id = `aff_ledger_${ledger.transaction_id ?? ledger.id}_section`;
+    card.dataset.ledgerStatus = ledger.ledger_status ?? "";
+    card.dataset.transactionId = String(ledger.transaction_id ?? "");
     card.classList.add("grid", "min-w-0", "gap-4", "overflow-hidden");
 
     const top = document.createElement("div");

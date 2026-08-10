@@ -82,6 +82,7 @@ export function SellerAffiliateForm({
 
   form.append(
     Input({
+      id: "slraf_affiliate_name_input",
       name: "name",
       label: "Nama Marketing",
       value: draft.user?.name ?? draft.name ?? "",
@@ -96,12 +97,14 @@ export function SellerAffiliateForm({
       placeholder: "affiliate@example.com",
     }),
     Input({
+      id: "slraf_affiliate_referral_code_input",
       name: "referral_code",
       label: "Slug marketing",
       value: draft.referral_code ?? "",
       placeholder: "Contoh: JOKO_SANTOSO",
     }),
     Input({
+      id: "slraf_affiliate_phone_number_input",
       name: "phone_number",
       label: "Nomor WhatsApp",
       value: draft.phone_number ?? draft.user?.phone_number ?? "",
@@ -133,6 +136,7 @@ export function SellerAffiliateForm({
   statusField.className = tw.form.label;
   statusField.append(document.createTextNode("Status marketing"));
   const statusSelect = document.createElement("select");
+  statusSelect.id = "slraf_affiliate_status_input";
   statusSelect.name = "status";
   statusSelect.className = tw.form.control;
   [
@@ -174,21 +178,23 @@ export function SellerAffiliateForm({
 
   const actions = document.createElement("div");
   actions.className = "flex flex-col gap-2 sm:flex-row sm:flex-wrap";
-  actions.append(
-    Button({
-      label: saving ? "Menyimpan..." : mode === "edit" ? "Simpan perubahan" : "Buat marketing",
-      disabled: saving,
-      onClick: () => form.requestSubmit(),
-    }),
-  );
+  const submitButton = Button({
+    label: saving ? "Menyimpan..." : mode === "edit" ? "Simpan perubahan" : "Buat marketing",
+    disabled: saving,
+    onClick: () => form.requestSubmit(),
+  });
+  submitButton.id = "slraf_affiliate_submit_button";
+  actions.append(submitButton);
 
   if (mode === "edit") {
-    actions.append(Button({
+    const newButton = Button({
       label: "Marketing baru",
       variant: "secondary",
       disabled: saving,
       onClick: () => onCreateNew?.(),
-    }));
+    });
+    newButton.id = "slraf_affiliate_new_button";
+    actions.append(newButton);
   }
 
   form.append(actions);

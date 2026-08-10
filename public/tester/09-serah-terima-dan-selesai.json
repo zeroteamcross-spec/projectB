@@ -1,0 +1,195 @@
+{
+  "nama_fitur": "09 - Serah terima (seller) dan penutupan transaksi (buyer)",
+  "aplikasi": "projectB",
+  "halaman": [
+    "#/auth?role=seller"
+  ],
+  "prefix_id": [
+    "hr_auth_",
+    "slrtx_",
+    "byr_",
+    "profile_"
+  ],
+  "versi": "1.0",
+  "warisi_variabel": true,
+  "berhenti_saat_gagal": true,
+  "keterangan": "Alur E1-E2. Seller mengisi dan menyimpan checklist fulfillment untuk transaction_a (harus sudah dp_paid, lihat skenario 08), lalu logout dan login ulang sebagai buyer untuk menekan Selesaikan. Jalankan setelah 08.",
+  "prasyarat_data": [
+    "Server lokal berjalan di http://localhost:8000.",
+    "Skenario 08 sudah dijalankan sampai transaction_a berstatus dp_paid, sehingga {{transaction_a_id}} tersedia."
+  ],
+  "variabel": {
+    "email_seller": "{{seller_email}}",
+    "password_seller": "{{seller_password}}",
+    "email_buyer": "{{buyer_email}}",
+    "password_buyer": "{{buyer_password}}"
+  },
+  "urutan_uji": [
+    {
+      "urutan": 1,
+      "halaman": "#/auth?role=seller",
+      "id": "hr_auth_role_seller_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Pilih role seller",
+      "tunggu": { "elemen": "#hr_auth_login_seller_email_input", "timeout_ms": 8000 }
+    },
+    {
+      "urutan": 2,
+      "id": "hr_auth_login_seller_email_input",
+      "jenis": "input-email",
+      "aksi": "isi",
+      "nilai": "{{email_seller}}",
+      "nama": "Email seller"
+    },
+    {
+      "urutan": 3,
+      "id": "hr_auth_login_seller_password_input",
+      "jenis": "input-password",
+      "aksi": "isi",
+      "nilai": "{{password_seller}}",
+      "nama": "Password seller"
+    },
+    {
+      "urutan": 4,
+      "id": "hr_auth_login_seller_submit_button",
+      "jenis": "button-submit",
+      "aksi": "klik",
+      "nama": "Masuk sebagai seller",
+      "tunggu": { "route": "#/seller", "timeout_ms": 15000 }
+    },
+    {
+      "urutan": 5,
+      "halaman": "#/seller/transactions/{{transaction_a_id}}",
+      "aksi": "assert",
+      "nama": "E1.2 - Kartu Proses Transaksi muncul karena status dp_paid",
+      "harapan": { "teks_mengandung": "Proses Transaksi", "lingkup": "halaman" },
+      "timeout_ms": 15000
+    },
+    {
+      "urutan": 6,
+      "id": "slrtx_checklist_vehicle_documents",
+      "jenis": "checkbox",
+      "aksi": "klik",
+      "nama": "Centang: Dokumen kendaraan disiapkan"
+    },
+    {
+      "urutan": 7,
+      "id": "slrtx_checklist_invoice_receipt",
+      "jenis": "checkbox",
+      "aksi": "klik",
+      "nama": "Centang: Kwitansi/invoice disiapkan"
+    },
+    {
+      "urutan": 8,
+      "id": "slrtx_checklist_unit_final_check",
+      "jenis": "checkbox",
+      "aksi": "klik",
+      "nama": "Centang: Kondisi unit dicek ulang"
+    },
+    {
+      "urutan": 9,
+      "selector": "#slrtx_checklist_handover_schedule_handover_date_input",
+      "jenis": "input-date",
+      "aksi": "isi",
+      "nilai": "{{tanggal_hari_ini}}",
+      "nama": "E1.3 - Tanggal serah terima"
+    },
+    {
+      "urutan": 10,
+      "id": "slrtx_checklist_handover_schedule",
+      "jenis": "checkbox",
+      "aksi": "klik",
+      "nama": "Centang: Jadwal serah terima dikonfirmasi"
+    },
+    {
+      "urutan": 11,
+      "id": "slrtx_checklist_handover_done",
+      "jenis": "checkbox",
+      "aksi": "klik",
+      "nama": "Centang: Serah terima kendaraan selesai"
+    },
+    {
+      "urutan": 12,
+      "id": "slrtx_save_checklist_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "E1.4 - Simpan Checklist",
+      "tunggu": { "teks": "5/5 selesai", "timeout_ms": 10000 }
+    },
+
+    {
+      "urutan": 20,
+      "halaman": "#/profile",
+      "id": "profile_role_specific_logout_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Buka konfirmasi logout seller",
+      "tunggu": { "elemen": "#profile_logout_confirm_button", "timeout_ms": 8000 }
+    },
+    {
+      "urutan": 21,
+      "id": "profile_logout_confirm_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Konfirmasi logout seller",
+      "tunggu": { "ms": 1500 }
+    },
+
+    {
+      "urutan": 22,
+      "halaman": "#/auth?role=buyer",
+      "id": "hr_auth_role_buyer_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Pilih role buyer",
+      "tunggu": { "elemen": "#hr_auth_login_buyer_email_input", "timeout_ms": 15000 }
+    },
+    {
+      "urutan": 23,
+      "id": "hr_auth_login_buyer_email_input",
+      "jenis": "input-email",
+      "aksi": "isi",
+      "nilai": "{{email_buyer}}",
+      "nama": "Email buyer"
+    },
+    {
+      "urutan": 24,
+      "id": "hr_auth_login_buyer_password_input",
+      "jenis": "input-password",
+      "aksi": "isi",
+      "nilai": "{{password_buyer}}",
+      "nama": "Password buyer"
+    },
+    {
+      "urutan": 25,
+      "id": "hr_auth_login_buyer_submit_button",
+      "jenis": "button-submit",
+      "aksi": "klik",
+      "nama": "Masuk sebagai buyer",
+      "tunggu": { "route": "#/buyer", "timeout_ms": 20000 }
+    },
+    {
+      "urutan": 26,
+      "halaman": "#/buyer/transactions/{{transaction_a_id}}",
+      "aksi": "assert",
+      "nama": "E2.1 - Buyer melihat checklist lengkap dari seller",
+      "harapan": { "teks_mengandung": "5/5 selesai", "lingkup": "halaman" },
+      "timeout_ms": 15000
+    },
+    {
+      "urutan": 27,
+      "id": "buyer_finish_transaction_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "E2.2 - Klik Selesaikan",
+      "tunggu": { "teks": "Transaksi Selesai", "timeout_ms": 10000 }
+    },
+    {
+      "urutan": 28,
+      "aksi": "assert",
+      "nama": "Status akhir transaksi completed",
+      "harapan": { "teks_mengandung": "Transaksi Selesai", "lingkup": "halaman" }
+    }
+  ]
+}

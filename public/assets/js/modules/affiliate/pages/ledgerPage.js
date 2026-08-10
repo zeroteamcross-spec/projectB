@@ -52,13 +52,17 @@ function render(root, context) {
   const payload = workingPayload ?? snapshotPayload ?? null;
   const ledgers = affiliateLedgerService.normalizedLedgers(payload);
 
+  const backButton = Button({ label: "Dashboard marketing", variant: "secondary", onClick: () => context.router.navigate("/affiliate"), designHook: "shared.button.secondary" });
+  backButton.id = "aff_ledger_dashboard_button";
+
   const frame = document.createElement("div");
+  frame.id = "aff_ledger_page_section";
   frame.className = "grid min-w-0 w-full gap-6";
   frame.append(
     SectionHeader({
       title: "Marketing Ledger",
       description: "Pantau komisi yang berasal dari penjualan, referensi transaksi, dan catatan ledger yang sudah tercatat saat ini.",
-      action: Button({ label: "Dashboard marketing", variant: "secondary", onClick: () => context.router.navigate("/affiliate"), designHook: "shared.button.secondary" }),
+      action: backButton,
     }),
   );
 

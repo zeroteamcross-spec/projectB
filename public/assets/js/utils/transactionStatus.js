@@ -161,12 +161,15 @@ export function isPaymentPaid(transaction) {
   const paymentStatus = normalizeStatus(transaction?.payment_status);
   const transactionStatus = normalizeStatus(transaction?.transaction_status ?? transaction?.status);
 
-  return paymentStatus === "paid" || ["paid", "completed"].includes(transactionStatus);
+  // dp_paid adalah status "lunas" yang sungguh dicapai sejak Booking Fee
+  // menjadi satu-satunya pembayaran; "paid" masih diperiksa untuk transaksi
+  // lunas lama yang dibuat sebelum perubahan ini.
+  return paymentStatus === "paid" || ["dp_paid", "paid", "completed"].includes(transactionStatus);
 }
 
 export function isTransactionFulfillment(transaction) {
   const status = normalizeStatus(transaction?.transaction_status ?? transaction?.status ?? transaction);
-  return ["paid", "processing", "handover"].includes(status);
+  return ["dp_paid", "paid", "processing", "handover"].includes(status);
 }
 
 export function isTransactionCompleted(transaction) {
@@ -182,11 +185,9 @@ export function isTransactionCancelled(transaction) {
 export function derivedPaymentStatus(transaction) {
   const status = normalizeStatus(transaction?.transaction_status ?? transaction?.status ?? transaction);
 
-  if (status === "dp_paid") {
-    return "partial";
-  }
-
-  if (["paid", "completed"].includes(status)) {
+  // Booking Fee menutup kewajiban pembayaran; tidak ada lagi pelunasan
+  // bertahap, jadi dp_paid berarti lunas, bukan "partial".
+  if (["dp_paid", "paid", "completed"].includes(status)) {
     return "paid";
   }
 
@@ -204,16 +205,14 @@ export function listingStatusForTransaction(transaction, previousTransaction = n
   const previousListing = normalizeStatus(previousTransaction?.car?.listing_status ?? previousTransaction?.listing_status);
   const listing = currentListing || previousListing || "";
 
-  if (status === "dp_paid") {
-    return "reserved";
-  }
-
-  if (["paid", "completed"].includes(status)) {
+  // Booking Fee langsung menjualkan mobil; tidak ada lagi tahap "reserved"
+  // terpisah antara dp_paid dan paid (lihat BUSINESS_FLOW.md bagian 11).
+  if (["dp_paid", "paid", "completed"].includes(status)) {
     return "sold";
   }
 
   if (status === "cancelled") {
-    if (["paid", "completed"].includes(previousStatus) || listing === "sold") {
+    if (["dp_paid", "paid", "completed"].includes(previousStatus) || listing === "sold") {
       return "sold";
     }
 
@@ -221,11 +220,7 @@ export function listingStatusForTransaction(transaction, previousTransaction = n
   }
 
   if (status === "expired") {
-    if (["dp_paid"].includes(previousStatus) || listing === "reserved") {
-      return "reserved";
-    }
-
-    if (["paid", "completed"].includes(previousStatus) || listing === "sold") {
+    if (["dp_paid", "paid", "completed"].includes(previousStatus) || listing === "sold" || listing === "reserved") {
       return "sold";
     }
 
@@ -290,23 +285,16 @@ export function getListingLockStatus(transaction) {
   const transactionStatus = normalizeStatus(transaction?.transaction_status ?? transaction?.status);
   const listingStatus = normalizeStatus(transaction?.car?.listing_status ?? transaction?.listing_status);
 
-  if (transactionStatus === "paid" || listingStatus === "sold") {
+  // dp_paid langsung menjualkan mobil (lihat BUSINESS_FLOW.md bagian 11);
+  // listingStatus "reserved" tetap diperiksa untuk data lama sebelum
+  // perubahan ini, supaya tidak tiba-tiba terbuka lagi untuk dibeli.
+  if (["dp_paid", "paid"].includes(transactionStatus) || ["sold", "reserved"].includes(listingStatus)) {
     return {
       status: "sold",
       label: "Terjual",
       variant: "info",
       locked: true,
-      reason: "Pembayaran sudah lunas.",
-    };
-  }
-
-  if (transactionStatus === "dp_paid" || listingStatus === "reserved") {
-    return {
-      status: "reserved",
-      label: "Terkunci DP",
-      variant: "warning",
-      locked: true,
-      reason: "DP sudah dibayar.",
+      reason: "Booking Fee sudah dibayar.",
     };
   }
 

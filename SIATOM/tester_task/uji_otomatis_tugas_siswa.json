@@ -1,0 +1,387 @@
+{
+  "nama_fitur": "Menu Tugas / Tugas Siswa",
+  "halaman": [
+    "tugas/tugas_santri"
+  ],
+  "prefix_id": [
+    "tgs_"
+  ],
+  "versi": "1.0",
+  "keterangan": "Daftar id elemen dan urutan klik khusus untuk tester nyata browser pada Menu Tugas / Tugas Siswa. Flow utama mencakup filter data, tambah tugas siswa, verifikasi detail, edit tugas, pengerjaan tugas oleh siswa/orang tua, dan skenario hapus opsional. Id tombol tabel bersifat dinamis mengikuti token tugas.",
+  "prasyarat_data": [
+    "Login sebagai user level admin/operator atau wali kelas yang memiliki akses Menu Tugas / Tugas Siswa.",
+    "Tersedia minimal 1 cabang/lembaga aktif, 1 rombel aktif, dan minimal 1 siswa dalam rombel.",
+    "Jika menguji akses wali pendamping, rombel sudah memiliki karyawan_id_pendamping dan login memakai akun pendamping tersebut.",
+    "Untuk flow pengerjaan, login sebagai akun siswa/orang tua level 30-49 yang memiliki tugas pada rentang tanggal uji.",
+    "Untuk flow delete, gunakan data tugas yang belum memiliki tugas terlaksana agar tombol hapus muncul."
+  ],
+  "urutan_uji": [
+    {
+      "urutan": 1,
+      "halaman": "tugas/tugas_santri",
+      "id": "tgs_filter_cabang",
+      "jenis": "select",
+      "aksi": "pilih",
+      "nama": "Filter cabang tugas",
+      "catatan": "Hanya tampil untuk idlevel 1 atau >= 100. Pilih cabang yang berisi rombel uji."
+    },
+    {
+      "urutan": 2,
+      "halaman": "tugas/tugas_santri",
+      "id": "reportrange",
+      "jenis": "daterangepicker",
+      "aksi": "pilih",
+      "nama": "Filter rentang tanggal",
+      "catatan": "Pilih rentang tanggal tugas. Script global akan mengisi hidden #DS dan #DE."
+    },
+    {
+      "urutan": 3,
+      "halaman": "tugas/tugas_santri",
+      "id": "DS",
+      "jenis": "input-hidden",
+      "aksi": "verifikasi",
+      "nama": "Tanggal mulai filter",
+      "catatan": "Pastikan terisi setelah rentang tanggal dipilih."
+    },
+    {
+      "urutan": 4,
+      "halaman": "tugas/tugas_santri",
+      "id": "DE",
+      "jenis": "input-hidden",
+      "aksi": "verifikasi",
+      "nama": "Tanggal selesai filter",
+      "catatan": "Pastikan terisi setelah rentang tanggal dipilih."
+    },
+    {
+      "urutan": 5,
+      "halaman": "tugas/tugas_santri",
+      "id": "tgs_btn_refresh",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Refresh tabel tugas",
+      "catatan": "Memuat ulang data pada #tgs_table berdasarkan cabang dan rentang tanggal."
+    },
+    {
+      "urutan": 6,
+      "halaman": "tugas/tugas_santri",
+      "id": "tgs_table",
+      "jenis": "table",
+      "aksi": "verifikasi",
+      "nama": "Tabel Tugas Siswa",
+      "catatan": "Pastikan tabel tampil dan tidak error setelah filter dijalankan."
+    },
+    {
+      "urutan": 7,
+      "halaman": "tugas/tugas_santri",
+      "id": "tgs_btn_new",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Buka form tambah tugas",
+      "catatan": "Tombol tampil untuk user level 1-29. Modal form #tgs_form harus terbuka."
+    },
+    {
+      "urutan": 8,
+      "halaman": "tugas/tugas_santri",
+      "id": "tgs_id_extra",
+      "jenis": "input-hidden",
+      "aksi": "verifikasi",
+      "nama": "Mode form tugas",
+      "catatan": "Saat tambah baru, value harus new."
+    },
+    {
+      "urutan": 9,
+      "halaman": "tugas/tugas_santri",
+      "id": "tgs_lembaga",
+      "jenis": "select",
+      "aksi": "pilih",
+      "nama": "Pilih lembaga",
+      "catatan": "Pilih lembaga/cabang yang sama dengan data rombel uji."
+    },
+    {
+      "urutan": 10,
+      "halaman": "tugas/tugas_santri",
+      "id": "tgs_rombel",
+      "jenis": "select",
+      "aksi": "pilih",
+      "nama": "Pilih rombel",
+      "catatan": "Pilih rombel tujuan tugas. Untuk uji wali pendamping, rombel ini harus tampil saat login sebagai pendamping."
+    },
+    {
+      "urutan": 11,
+      "halaman": "tugas/tugas_santri",
+      "id": "tgs_siswa",
+      "jenis": "select",
+      "aksi": "pilih",
+      "nama": "Pilih siswa",
+      "catatan": "Pilih siswa penerima tugas dari rombel."
+    },
+    {
+      "urutan": 12,
+      "halaman": "tugas/tugas_santri",
+      "id": "tgs_tanggal_tugas",
+      "jenis": "input-readonly",
+      "aksi": "verifikasi",
+      "nama": "Tanggal tugas",
+      "catatan": "Tanggal tugas readonly/disabled dan terisi dari tanggal sistem atau script tanggal."
+    },
+    {
+      "urutan": 13,
+      "halaman": "tugas/tugas_santri",
+      "id": "tgs_jumlah",
+      "jenis": "input-number",
+      "aksi": "isi",
+      "nama": "Jumlah tugas",
+      "catatan": "Isi angka lebih dari 0, contoh 2. Sistem akan membuat baris input dinamis pada #tgs_result_urutan."
+    },
+    {
+      "urutan": 14,
+      "halaman": "tugas/tugas_santri",
+      "id": "tgs_result_urutan",
+      "jenis": "tbody",
+      "aksi": "verifikasi",
+      "nama": "Container uraian tugas",
+      "catatan": "Pastikan jumlah baris input sesuai nilai #tgs_jumlah."
+    },
+    {
+      "urutan": 15,
+      "halaman": "tugas/tugas_santri",
+      "pola_id": "tgs_nama_materi_<no>",
+      "jenis": "input-text-dinamis",
+      "aksi": "isi",
+      "nama": "Isi uraian tugas",
+      "catatan": "Isi setiap input uraian tugas. Contoh #tgs_nama_materi_1 dan #tgs_nama_materi_2."
+    },
+    {
+      "urutan": 16,
+      "halaman": "tugas/tugas_santri",
+      "pola_id": "tgs_urut_materi_<no>",
+      "jenis": "input-hidden-dinamis",
+      "aksi": "verifikasi",
+      "nama": "Urutan materi tugas",
+      "catatan": "Pastikan hidden urutan tersedia sesuai jumlah tugas."
+    },
+    {
+      "urutan": 17,
+      "halaman": "tugas/tugas_santri",
+      "id": "tgs_btn_submit",
+      "jenis": "button-submit",
+      "aksi": "klik",
+      "nama": "Simpan tugas",
+      "catatan": "Submit form tambah tugas. Verifikasi notifikasi sukses dan tabel reload."
+    },
+    {
+      "urutan": 18,
+      "halaman": "tugas/tugas_santri",
+      "id": "tgs_table",
+      "jenis": "table",
+      "aksi": "verifikasi",
+      "nama": "Verifikasi tugas tersimpan",
+      "catatan": "Cari baris tugas yang baru dibuat dan ambil token untuk tombol dinamis."
+    },
+    {
+      "urutan": 19,
+      "halaman": "tugas/tugas_santri",
+      "pola_id": "tgs_btn_view_<token>",
+      "jenis": "button-dinamis",
+      "aksi": "klik",
+      "nama": "Lihat detail tugas",
+      "catatan": "Klik tombol view pada baris tugas uji."
+    },
+    {
+      "urutan": 20,
+      "halaman": "tugas/tugas_santri",
+      "id": "tgs_view_detail",
+      "jenis": "container",
+      "aksi": "verifikasi",
+      "nama": "Konten detail tugas",
+      "catatan": "Pastikan detail tugas tampil, termasuk data siswa, rombel, wali utama, dan wali pendamping bila tersedia."
+    },
+    {
+      "urutan": 21,
+      "halaman": "tugas/tugas_santri",
+      "id": "tgs_btn_view_modal_close",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Tutup detail tugas",
+      "catatan": "Tutup modal detail tugas."
+    },
+    {
+      "urutan": 22,
+      "halaman": "tugas/tugas_santri",
+      "pola_id": "tgs_btn_edit_<token>",
+      "jenis": "button-dinamis",
+      "aksi": "klik",
+      "nama": "Edit tugas",
+      "catatan": "Tombol tampil untuk user level 1-29. Form edit harus memuat data tugas sebelumnya."
+    },
+    {
+      "urutan": 23,
+      "halaman": "tugas/tugas_santri",
+      "id": "tgs_jumlah",
+      "jenis": "input-number",
+      "aksi": "verifikasi_atau_ubah",
+      "nama": "Jumlah tugas saat edit",
+      "catatan": "Jika tugas sudah memiliki pelaksanaan, field bisa readonly. Jika belum, boleh diubah dan input dinamis akan menyesuaikan."
+    },
+    {
+      "urutan": 24,
+      "halaman": "tugas/tugas_santri",
+      "pola_id": "tgs_nama_materi_<no>",
+      "jenis": "input-text-dinamis",
+      "aksi": "verifikasi_atau_ubah",
+      "nama": "Uraian tugas saat edit",
+      "catatan": "Pastikan uraian lama muncul. Ubah salah satu uraian bila menguji update."
+    },
+    {
+      "urutan": 25,
+      "halaman": "tugas/tugas_santri",
+      "id": "tgs_btn_submit",
+      "jenis": "button-submit",
+      "aksi": "klik",
+      "nama": "Simpan edit tugas",
+      "catatan": "Submit perubahan dan verifikasi notifikasi sukses."
+    },
+    {
+      "urutan": 26,
+      "halaman": "tugas/tugas_santri",
+      "pola_id": "tgs_btn_kerjakan_<token>",
+      "jenis": "button-dinamis",
+      "aksi": "klik",
+      "nama": "Buka pengerjaan tugas",
+      "catatan": "Tombol tampil untuk user siswa/orang tua level 30-49. Login ulang sebagai siswa/orang tua jika tombol tidak tampil pada akun admin."
+    },
+    {
+      "urutan": 27,
+      "halaman": "tugas/tugas_santri",
+      "id": "tgs_id_extra_pengerjaan",
+      "jenis": "input-hidden",
+      "aksi": "verifikasi",
+      "nama": "Token pengerjaan",
+      "catatan": "Pastikan token tugas terisi saat modal pengerjaan terbuka."
+    },
+    {
+      "urutan": 28,
+      "halaman": "tugas/tugas_santri",
+      "id": "tgs_materi_tugas",
+      "jenis": "container",
+      "aksi": "verifikasi",
+      "nama": "Master pengerjaan tugas",
+      "catatan": "Pastikan ringkasan tugas tampil."
+    },
+    {
+      "urutan": 29,
+      "halaman": "tugas/tugas_santri",
+      "id": "tgs_detail_tugas",
+      "jenis": "container",
+      "aksi": "verifikasi",
+      "nama": "Detail pengerjaan tugas",
+      "catatan": "Pastikan daftar tugas per kontrol tampil."
+    },
+    {
+      "urutan": 30,
+      "halaman": "tugas/tugas_santri",
+      "pola_id": "tgs_keterangan_<id_kontrol_ortu>",
+      "jenis": "input-text-dinamis",
+      "aksi": "isi",
+      "nama": "Isi keterangan pengerjaan",
+      "catatan": "Isi keterangan pengerjaan untuk minimal satu tugas."
+    },
+    {
+      "urutan": 31,
+      "halaman": "tugas/tugas_santri",
+      "pola_id": "tgs_file_<id_kontrol_ortu>",
+      "jenis": "input-file-dinamis",
+      "aksi": "upload_opsional",
+      "nama": "Upload file pengerjaan",
+      "catatan": "Opsional. Upload JPG/PNG. Setelah upload sukses, #tgs_file_old_<id_kontrol_ortu>, #tgs_file_new_<id_kontrol_ortu>, dan #tgs_preview_<id_kontrol_ortu> harus berubah."
+    },
+    {
+      "urutan": 32,
+      "halaman": "tugas/tugas_santri",
+      "pola_id": "tgs_switch_<id_kontrol_ortu>",
+      "jenis": "checkbox-dinamis",
+      "aksi": "klik",
+      "nama": "Tandai tugas terlaksana",
+      "catatan": "Klik switch untuk menandai terlaksana. Hidden #tgs_switch_value_<id_kontrol_ortu> harus berubah sesuai status."
+    },
+    {
+      "urutan": 33,
+      "halaman": "tugas/tugas_santri",
+      "id": "tgs_btn_close_pengerjaan",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Tutup pengerjaan",
+      "catatan": "Tutup modal pengerjaan dan pastikan tabel dapat direfresh kembali."
+    },
+    {
+      "urutan": 34,
+      "halaman": "tugas/tugas_santri",
+      "pola_id": "tgs_btn_delete_<token>",
+      "jenis": "button-dinamis",
+      "aksi": "klik_opsional",
+      "nama": "Buka konfirmasi hapus",
+      "catatan": "Opsional dan destruktif. Tombol hapus hanya muncul bila tugas belum terlaksana."
+    },
+    {
+      "urutan": 35,
+      "halaman": "tugas/tugas_santri",
+      "id": "tgs_btn_delete_cancel",
+      "jenis": "button-dinamis-modal",
+      "aksi": "klik",
+      "nama": "Batal hapus tugas",
+      "catatan": "Klik cancel untuk standar otomasi agar data uji tidak terhapus."
+    },
+    {
+      "urutan": 36,
+      "halaman": "tugas/tugas_santri",
+      "id": "tgs_btn_delete_confirm",
+      "jenis": "button-dinamis-modal",
+      "aksi": "klik_opsional_destruktif",
+      "nama": "Konfirmasi hapus tugas",
+      "catatan": "Gunakan hanya pada skenario delete khusus. Jangan dijalankan pada smoke test harian."
+    }
+  ],
+  "daftar_id_elemen": [
+    { "id": "tgs_btn_new", "jenis": "button", "nama": "Baru Tugas" },
+    { "id": "tgs_btn_refresh", "jenis": "button", "nama": "Refresh Tugas" },
+    { "id": "tgs_filter_cabang", "jenis": "select", "nama": "Filter cabang tugas" },
+    { "id": "reportrange", "jenis": "daterangepicker", "nama": "Filter tanggal tugas" },
+    { "id": "DS", "jenis": "input-hidden", "nama": "Tanggal mulai filter" },
+    { "id": "DE", "jenis": "input-hidden", "nama": "Tanggal selesai filter" },
+    { "id": "tgs_table", "jenis": "table", "nama": "Tabel Tugas Siswa" },
+    { "id": "tgs_form", "jenis": "form", "nama": "Form Tugas Siswa" },
+    { "id": "tgs_id_extra", "jenis": "input-hidden", "nama": "Token tugas/form mode" },
+    { "id": "tgs_lembaga", "jenis": "select", "nama": "Lembaga tugas" },
+    { "id": "tgs_rombel", "jenis": "select", "nama": "Rombel tugas" },
+    { "id": "tgs_siswa", "jenis": "select", "nama": "Siswa tugas" },
+    { "id": "tgs_tanggal_tugas", "jenis": "input-readonly", "nama": "Tanggal tugas" },
+    { "id": "tgs_jumlah", "jenis": "input-number", "nama": "Jumlah tugas" },
+    { "id": "tgs_result_urutan", "jenis": "tbody", "nama": "Container input tugas dinamis" },
+    { "id": "tgs_urut_materi_<no>", "jenis": "input-hidden-dinamis", "nama": "Urutan materi tugas (pola)" },
+    { "id": "tgs_nama_materi_<no>", "jenis": "input-text-dinamis", "nama": "Nama materi/tugas (pola)" },
+    { "id": "tgs_btn_form_modal_close", "jenis": "button", "nama": "Close modal form tugas" },
+    { "id": "tgs_btn_cancel_form", "jenis": "button", "nama": "Batal form tugas" },
+    { "id": "tgs_btn_submit", "jenis": "button-submit", "nama": "Simpan/Update tugas" },
+    { "id": "tgs_id_extra_pengerjaan", "jenis": "input-hidden", "nama": "Token pengerjaan tugas" },
+    { "id": "tgs_materi_tugas", "jenis": "container", "nama": "Info master tugas" },
+    { "id": "tgs_detail_tugas", "jenis": "container", "nama": "Detail pengerjaan tugas" },
+    { "id": "tgs_btn_pengerjaan_modal_close", "jenis": "button", "nama": "Close modal pengerjaan" },
+    { "id": "tgs_btn_close_pengerjaan", "jenis": "button", "nama": "Selesai pengerjaan" },
+    { "id": "tgs_view_detail", "jenis": "container", "nama": "Detail view tugas" },
+    { "id": "tgs_btn_view_modal_close", "jenis": "button", "nama": "Close modal view tugas" },
+    { "id": "tgs_btn_view_<token>", "jenis": "button-dinamis", "nama": "View tugas (pola)" },
+    { "id": "tgs_btn_edit_<token>", "jenis": "button-dinamis", "nama": "Edit tugas (pola)" },
+    { "id": "tgs_btn_delete_<token>", "jenis": "button-dinamis", "nama": "Delete tugas (pola)" },
+    { "id": "tgs_btn_kerjakan_<token>", "jenis": "button-dinamis", "nama": "Kerjakan tugas (pola)" },
+    { "id": "tgs_id_kontrol_<id_kontrol_ortu>", "jenis": "input-hidden-dinamis", "nama": "ID kontrol tugas (pola)" },
+    { "id": "tgs_keterangan_<id_kontrol_ortu>", "jenis": "input-text-dinamis", "nama": "Keterangan pengerjaan (pola)" },
+    { "id": "tgs_preview_<id_kontrol_ortu>", "jenis": "container-dinamis", "nama": "Preview file tugas (pola)" },
+    { "id": "tgs_file_<id_kontrol_ortu>", "jenis": "input-file-dinamis", "nama": "Upload pengerjaan (pola)" },
+    { "id": "tgs_file_old_<id_kontrol_ortu>", "jenis": "input-hidden-dinamis", "nama": "File lama (pola)" },
+    { "id": "tgs_file_new_<id_kontrol_ortu>", "jenis": "input-hidden-dinamis", "nama": "File baru (pola)" },
+    { "id": "tgs_switch_<id_kontrol_ortu>", "jenis": "checkbox-dinamis", "nama": "Switch terlaksana (pola)" },
+    { "id": "tgs_switch_value_<id_kontrol_ortu>", "jenis": "input-hidden-dinamis", "nama": "Nilai switch terlaksana (pola)" },
+    { "id": "tgs_btn_delete_confirm", "jenis": "button-dinamis-modal", "nama": "Konfirmasi hapus tugas" },
+    { "id": "tgs_btn_delete_cancel", "jenis": "button-dinamis-modal", "nama": "Batal hapus tugas" }
+  ]
+}

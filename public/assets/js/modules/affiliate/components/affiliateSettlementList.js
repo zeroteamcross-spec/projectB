@@ -13,10 +13,13 @@ export function AffiliateSettlementList({ settlements = [] } = {}) {
   }
 
   const wrap = document.createElement("div");
+  wrap.id = "aff_settlement_list_section";
   wrap.className = "grid min-w-0 gap-3";
 
   settlements.forEach((settlement) => {
     const card = Card([], { variant: "raised" });
+    card.id = `aff_settlement_${settlement.id}_section`;
+    card.dataset.settlementStatus = settlement.status ?? "";
     card.classList.add("grid", "min-w-0", "gap-4", "overflow-hidden");
 
     const top = document.createElement("div");

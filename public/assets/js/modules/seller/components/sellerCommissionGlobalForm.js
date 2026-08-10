@@ -51,6 +51,7 @@ export function SellerCommissionGlobalForm({
   typeField.className = tw.form.label;
   typeField.append(document.createTextNode("Tipe komisi"));
   const typeSelect = document.createElement("select");
+  typeSelect.id = "slrafc_global_commission_type_input";
   typeSelect.name = "commission_type";
   typeSelect.className = tw.form.control;
   [
@@ -66,6 +67,7 @@ export function SellerCommissionGlobalForm({
   typeField.append(typeSelect);
 
   const valueField = Input({
+    id: "slrafc_global_commission_value_input",
     name: "commission_value",
     label: "Nilai komisi",
     type: "text",
@@ -92,6 +94,7 @@ export function SellerCommissionGlobalForm({
   statusField.className = tw.form.label;
   statusField.append(document.createTextNode("Status aturan umum"));
   const statusSelect = document.createElement("select");
+  statusSelect.id = "slrafc_global_status_input";
   statusSelect.name = "status";
   statusSelect.className = tw.form.control;
   [
@@ -110,12 +113,14 @@ export function SellerCommissionGlobalForm({
 
   const actions = document.createElement("div");
   actions.className = "flex flex-col gap-2 sm:flex-row";
-  actions.append(Button({
+  const submitButton = Button({
     label: saving ? "Menyimpan..." : "Simpan aturan umum",
     disabled: saving,
     designHook: "shared.button.primary",
     onClick: () => form.requestSubmit(),
-  }));
+  });
+  submitButton.id = "slrafc_global_submit_button";
+  actions.append(submitButton);
   form.append(actions);
 
   form.addEventListener("submit", (event) => {
