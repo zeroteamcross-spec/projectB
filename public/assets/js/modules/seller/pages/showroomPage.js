@@ -10,6 +10,9 @@ import { closeModal, openModal } from "../../../ui/primitives/modal.js";
 import { sellerState } from "../state/sellerState.js";
 import { SellerShowroomForm } from "../components/sellerShowroomForm.js";
 import { SellerShowroomView } from "../components/sellerShowroomView.js";
+import { ModalHeaderFormActions } from "../../../ui/composites/modalHeaderFormActions.js";
+
+const FORM_ID = "slrsr_form_section";
 
 const RUNTIME_KEY = "sellerShowroom";
 const EDIT_MODAL_KEY = "seller-showroom-edit-modal";
@@ -86,7 +89,6 @@ function openShowroomEditModal({ showroom, bankOptions, runtime, router }) {
     saving: runtime.saving,
     error: runtime.error,
     bankOptions,
-    onCancel: () => closeModal(),
     onSubmit: (payload) => saveShowroom(payload, router),
   }), "seller.showroom.form"));
 
@@ -100,7 +102,15 @@ function openShowroomEditModal({ showroom, bankOptions, runtime, router }) {
     panelId: "slrsr_edit_modal_section",
     bodyId: "slrsr_edit_modal_body_section",
     headerId: "slrsr_edit_modal_header_section",
-    closeButtonId: "slrsr_edit_modal_close_button",
+    // Batal/Simpan showroom replace the corner close button, since the form
+    // (profil + kontak + rekening) is long enough to need scrolling.
+    headerActions: () => ModalHeaderFormActions({
+      formId: FORM_ID,
+      idPrefix: "slrsr_edit_modal",
+      submitLabel: "Simpan showroom",
+      saving: runtime.saving,
+      onCancel: () => closeModal(),
+    }),
     onClose: () => setRuntime({ editing: false, error: "" }),
     preserveContentOnSameSignature: true,
     contentSignature: showroomModalSignature({ showroom, runtime }),

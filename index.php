@@ -100,6 +100,10 @@ if (
         'ico' => 'image/x-icon',
         'mp4' => 'video/mp4',
         'webm' => 'video/webm',
+        // Model 3D landing. Tanpa MIME ini GLTFLoader menolak berkasnya.
+        'glb' => 'model/gltf-binary',
+        'gltf' => 'model/gltf+json',
+        'wasm' => 'application/wasm',
         'woff' => 'font/woff',
         'woff2' => 'font/woff2',
         'ttf' => 'font/ttf',
@@ -107,10 +111,21 @@ if (
     ];
 
     header('Content-Type: ' . ($mimeMap[$ext] ?? 'application/octet-stream'));
-    header('Content-Length: ' . filesize($staticFile));
-    sendStaticCacheHeaders($ext, basename($staticFile));
+    sendStaticCacheHeaders($ext, basename($staticFile), $uriPath);
 
-    readfile($staticFile);
+    // Without validators the browser cannot revalidate, so "no-cache" turns into
+    // a full re-download of every asset on every page load.
+    if (sendStaticValidators($staticFile, $ext, basename($staticFile))) {
+        http_response_code(304);
+        exit;
+    }
+
+    header('Content-Length: ' . filesize($staticFile));
+
+    if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'HEAD') {
+        readfile($staticFile);
+    }
+
     exit;
 }
 
@@ -143,10 +158,18 @@ header('Content-Type: text/plain; charset=utf-8');
 echo "ProjectB SPA entry not found.\n";
 echo "Expected index.html or app.html in: {$publicRoot}\n";
 
-function sendStaticCacheHeaders(string $extension, string $filename): void
+function sendStaticCacheHeaders(string $extension, string $filename, string $uriPath = ''): void
 {
     if ($extension === 'html' || $filename === 'release-manifest.json') {
         sendNoStoreHeaders();
+        return;
+    }
+
+    // Pustaka pihak ketiga dikunci versinya lewat path, misalnya
+    // /assets/vendor/three/0.160.0/. Isinya tidak akan pernah berubah, jadi
+    // tidak perlu divalidasi ulang; naik versi berarti path baru.
+    if (isImmutableVendorPath($uriPath)) {
+        header('Cache-Control: public, max-age=31536000, immutable');
         return;
     }
 
@@ -158,11 +181,68 @@ function sendStaticCacheHeaders(string $extension, string $filename): void
     header('Cache-Control: public, max-age=604800');
 }
 
+function isImmutableVendorPath(string $uriPath): bool
+{
+    return strpos($uriPath, '/assets/vendor/') === 0;
+}
+
 function sendNoStoreHeaders(): void
 {
     header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
     header('Pragma: no-cache');
     header('Expires: 0');
+}
+
+/**
+ * Emits ETag/Last-Modified and reports whether the client's copy is still current.
+ *
+ * Returns true when the caller should answer 304 instead of sending a body.
+ */
+function sendStaticValidators(string $path, string $extension, string $filename): bool
+{
+    // no-store responses must not be stored, so there is nothing to revalidate.
+    if ($extension === 'html' || $filename === 'release-manifest.json') {
+        return false;
+    }
+
+    $modifiedAt = filemtime($path);
+    $size = filesize($path);
+
+    if ($modifiedAt === false || $size === false) {
+        return false;
+    }
+
+    $etag = '"' . dechex($modifiedAt) . '-' . dechex($size) . '"';
+    $lastModified = gmdate('D, d M Y H:i:s', $modifiedAt) . ' GMT';
+
+    header('ETag: ' . $etag);
+    header('Last-Modified: ' . $lastModified);
+
+    $ifNoneMatch = trim((string) ($_SERVER['HTTP_IF_NONE_MATCH'] ?? ''));
+
+    if ($ifNoneMatch !== '') {
+        // A cache may send several entity tags, and may weaken them with W/.
+        foreach (explode(',', $ifNoneMatch) as $candidate) {
+            $candidate = trim($candidate);
+
+            if ($candidate === '*' || ltrim($candidate, 'W/') === $etag) {
+                return true;
+            }
+        }
+
+        // An ETag was offered but did not match, so the body really changed.
+        return false;
+    }
+
+    $ifModifiedSince = trim((string) ($_SERVER['HTTP_IF_MODIFIED_SINCE'] ?? ''));
+
+    if ($ifModifiedSince !== '') {
+        $since = strtotime($ifModifiedSince);
+
+        return $since !== false && $modifiedAt <= $since;
+    }
+
+    return false;
 }
 
 function renderSpaEntry(string $path, int $appSplashMaxWaitMs): void

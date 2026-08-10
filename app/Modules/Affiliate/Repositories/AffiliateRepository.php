@@ -97,7 +97,7 @@ class AffiliateRepository
                     a.status, a.created_at, a.updated_at,
                     u.name AS user_name, u.email AS user_email, u.role AS user_role, u.phone_number AS user_phone_number,
                     s.name AS seller_name, s.email AS seller_email, s.phone_number AS seller_phone_number,
-                    sh.id AS showroom_id, sh.name AS showroom_name, sh.address AS showroom_address, sh.phone_number AS showroom_phone_number
+                    sh.id AS showroom_id, sh.slug AS showroom_slug, sh.name AS showroom_name, sh.address AS showroom_address, sh.phone_number AS showroom_phone_number
              FROM affiliates AS a
              INNER JOIN users AS u ON u.id = a.user_id
              INNER JOIN users AS s ON s.id = a.seller_user_id

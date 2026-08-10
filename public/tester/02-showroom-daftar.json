@@ -1,0 +1,224 @@
+{
+  "nama_fitur": "02 - Showroom mendaftar",
+  "aplikasi": "projectB",
+  "halaman": [
+    "#/daftar-showroom"
+  ],
+  "prefix_id": [
+    "shr_"
+  ],
+  "versi": "1.0",
+  "berhenti_saat_gagal": true,
+  "keterangan": "Alur A. CRUD nyata: mendaftarkan showroom baru lewat form asli. Mengekspor slug, email, dan password sebagai variabel rantai supaya skenario 04 dan 05 memakai showroom yang SAMA. Jalankan setelah 01.",
+  "prasyarat_data": [
+    "Server lokal berjalan di http://localhost:8000.",
+    "Master locations.cities sudah ter-seed, sehingga dropdown Kota terisi.",
+    "Master payments.banks sudah ter-seed, sehingga dropdown Bank terisi.",
+    "Tidak perlu login. Halaman ini publik."
+  ],
+  "variabel": {
+    "nama_showroom": "Showroom Uji Otomatis",
+    "kota": "Surabaya",
+    "bank": "BCA",
+    "password_showroom": "RahasiaKu123"
+  },
+  "urutan_uji": [
+    {
+      "urutan": 1,
+      "halaman": "#/daftar-showroom",
+      "id": "shr_register_form",
+      "jenis": "form",
+      "aksi": "verifikasi",
+      "nama": "Form pendaftaran tampil",
+      "harapan": {
+        "elemen_ada": "#shr_register_submit_button"
+      },
+      "catatan": "Memastikan halaman benar-benar terbuka sebelum mengisi apa pun."
+    },
+    {
+      "urutan": 2,
+      "id": "shr_register_city_input",
+      "jenis": "select",
+      "aksi": "verifikasi",
+      "nama": "Dropdown kota terisi dari master",
+      "harapan": {
+        "teks_mengandung": "Surabaya"
+      },
+      "catatan": "Kalau master locations.cities belum ter-seed, langkah ini merah."
+    },
+    {
+      "urutan": 3,
+      "id": "shr_register_name_input",
+      "jenis": "input-text",
+      "aksi": "isi",
+      "nilai": "Pemilik Uji {{stamp6}}",
+      "nama": "Nama pemilik"
+    },
+    {
+      "urutan": 4,
+      "id": "shr_register_email_input",
+      "jenis": "input-email",
+      "aksi": "isi",
+      "nilai": "uji.{{timestamp}}@example.test",
+      "nama": "Email pemilik",
+      "simpan": {
+        "nama": "email_showroom",
+        "dari": "nilai"
+      }
+    },
+    {
+      "urutan": 5,
+      "id": "shr_register_password_input",
+      "jenis": "input-password",
+      "aksi": "isi",
+      "nilai": "{{password_showroom}}",
+      "nama": "Password"
+    },
+    {
+      "urutan": 6,
+      "id": "shr_register_phone_input",
+      "jenis": "input-text",
+      "aksi": "isi",
+      "nilai": "08123456789",
+      "nama": "Nomor WhatsApp pemilik"
+    },
+    {
+      "urutan": 7,
+      "id": "shr_register_address_input",
+      "jenis": "textarea",
+      "aksi": "isi",
+      "nilai": "Jalan Uji Otomatis No {{stamp6}}",
+      "nama": "Alamat pemilik"
+    },
+    {
+      "urutan": 8,
+      "id": "shr_register_showroom_name_input",
+      "jenis": "input-text",
+      "aksi": "isi",
+      "nilai": "{{nama_showroom}} {{stamp6}}",
+      "nama": "Nama showroom",
+      "catatan": "Mengetik nama akan mengisi slug otomatis.",
+      "simpan": {
+        "nama": "nama_showroom_terdaftar",
+        "dari": "nilai"
+      }
+    },
+    {
+      "urutan": 9,
+      "id": "shr_register_showroom_slug_input",
+      "jenis": "input-text",
+      "aksi": "isi",
+      "nilai": "uji-otomatis-{{timestamp}}",
+      "nama": "Alamat halaman showroom",
+      "simpan": {
+        "nama": "slug",
+        "dari": "nilai"
+      },
+      "catatan": "Ditimpa manual supaya unik dan bisa disimpan sebagai variabel untuk langkah verifikasi."
+    },
+    {
+      "urutan": 10,
+      "id": "shr_register_slug_preview",
+      "jenis": "container",
+      "aksi": "verifikasi",
+      "nama": "Preview URL halaman showroom",
+      "harapan": {
+        "teks_mengandung": "/#/showrooms/uji-otomatis-{{timestamp}}"
+      },
+      "catatan": "Membuktikan normalisasi slug di frontend sama dengan yang akan disimpan server."
+    },
+    {
+      "urutan": 11,
+      "id": "shr_register_city_input",
+      "jenis": "select",
+      "aksi": "pilih",
+      "nilai": "{{kota}}",
+      "nama": "Pilih kota"
+    },
+    {
+      "urutan": 12,
+      "id": "shr_register_showroom_phone_input",
+      "jenis": "input-text",
+      "aksi": "isi",
+      "nilai": "0311234567",
+      "nama": "Telepon showroom"
+    },
+    {
+      "urutan": 13,
+      "id": "shr_register_bank_type_input",
+      "jenis": "select",
+      "aksi": "pilih",
+      "nilai": "{{bank}}",
+      "nama": "Bank"
+    },
+    {
+      "urutan": 14,
+      "id": "shr_register_bank_account_number_input",
+      "jenis": "input-text",
+      "aksi": "isi",
+      "nilai": "1234567890",
+      "nama": "Nomor rekening"
+    },
+    {
+      "urutan": 15,
+      "id": "shr_register_bank_account_name_input",
+      "jenis": "input-text",
+      "aksi": "isi",
+      "nilai": "Pemilik Uji {{stamp6}}",
+      "nama": "Nama pemilik rekening"
+    },
+    {
+      "urutan": 16,
+      "id": "shr_register_submit_button",
+      "jenis": "button-submit",
+      "aksi": "klik",
+      "nama": "Daftarkan showroom",
+      "tunggu": {
+        "elemen": "#shr_register_success_section",
+        "timeout_ms": 12000
+      },
+      "catatan": "POST /api/auth/register. Menunggu panel sukses, bukan jeda buta."
+    },
+    {
+      "urutan": 17,
+      "id": "shr_register_success_section",
+      "jenis": "container",
+      "aksi": "verifikasi",
+      "nama": "Panel pendaftaran diterima",
+      "harapan": {
+        "teks_mengandung": "Pendaftaran diterima"
+      }
+    },
+    {
+      "urutan": 18,
+      "id": "shr_register_success_section",
+      "jenis": "container",
+      "aksi": "verifikasi",
+      "nama": "Panel memuat slug yang didaftarkan",
+      "harapan": {
+        "teks_mengandung": "{{slug}}"
+      },
+      "catatan": "Memakai variabel yang ditangkap di langkah 9."
+    },
+    {
+      "urutan": 19,
+      "id": "shr_register_success_section",
+      "jenis": "container",
+      "aksi": "verifikasi",
+      "nama": "Panel menyebut status menunggu persetujuan",
+      "harapan": {
+        "teks_mengandung": "menunggu persetujuan admin"
+      }
+    },
+    {
+      "urutan": 20,
+      "id": "shr_register_success_login_button",
+      "jenis": "button",
+      "aksi": "verifikasi",
+      "nama": "Tombol Masuk sekarang tersedia",
+      "harapan": {
+        "elemen_ada": "#shr_register_success_login_button"
+      }
+    }
+  ]
+}

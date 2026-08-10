@@ -18,6 +18,10 @@ import { BUYER_MOBILE_FOOTER_ITEMS, BuyerMobileFooterNav } from "../components/b
 import { BuyerDesktopTopNav } from "../components/buyerDesktopTopNav.js";
 import { isPaymentPaid } from "../../../utils/transactionStatus.js";
 
+// Booking Fee menutup kewajiban bayar, jadi tidak ada pelunasan lanjutan.
+// Setel true untuk menghidupkan kembali jalur pelunasan lama.
+const PELUNASAN_AKTIF = false;
+
 const AUTO_STATUS_POLL_INTERVAL_MS = 12000;
 const PAYMENT_SUCCESS_SEEN_PREFIX = "projectB:payment_success_seen:";
 
@@ -177,7 +181,9 @@ function render(root, context, flags) {
     }), "buyer.payment.actions"));
   }
 
-  if (completion.open) {
+  // Pelunasan ditutup dari UI sejak Booking Fee menjadi pembayaran terakhir.
+  // Kodenya dibiarkan utuh agar jalur lama bisa dihidupkan lagi bila perlu.
+  if (completion.open && PELUNASAN_AKTIF) {
     aside.append(applyDesignHook(CompletionPaymentPanel({
       transaction,
       form: completion.form ?? { payment_method: "bca_va" },

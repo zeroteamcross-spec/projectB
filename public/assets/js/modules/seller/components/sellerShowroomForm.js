@@ -2,7 +2,7 @@ import { Button } from "../../../ui/primitives/button.js";
 import { tw } from "../../../ui/theme/tailwindClasses.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 
-export function SellerShowroomForm({ showroom = null, saving = false, error = "", bankOptions = [], onSubmit = null, onCancel = null } = {}) {
+export function SellerShowroomForm({ showroom = null, saving = false, error = "", bankOptions = [], onSubmit = null } = {}) {
   const form = document.createElement("form");
   form.id = "slrsr_form_section";
   form.className = "grid gap-5 rounded-[1.5rem] border border-gray-100 bg-white p-4 shadow-sm transition duration-150 sm:p-5";
@@ -48,22 +48,9 @@ export function SellerShowroomForm({ showroom = null, saving = false, error = ""
     inputField({ id: "slrsr_bank_account_name_input", name: "bank_account_name", label: "Bank account name", value: showroom?.bank_account_name ?? "", placeholder: "Nama pemilik rekening" })
   );
 
-  const actions = document.createElement("section");
-  actions.id = "slrsr_form_actions_section";
-  actions.className = "flex flex-col-reverse gap-2 sm:flex-row sm:justify-end";
-  const submitButton = Button({ label: saving ? "Menyimpan..." : "Simpan showroom", disabled: saving });
-  submitButton.id = "slrsr_save_showroom_button";
-  submitButton.type = "submit";
-  submitButton.prepend(createIcon("circleCheck", { className: "h-4 w-4" }));
-  const cancelButton = Button({ label: "Batal", variant: "secondary", disabled: saving, onClick: onCancel });
-  cancelButton.id = "slrsr_cancel_showroom_button";
-  cancelButton.type = "button";
-  actions.append(
-    cancelButton,
-    submitButton
-  );
-
-  form.append(header, errorNode, profileSection.section, contactSection.section, bankSection.section, actions);
+  // Batal/Simpan showroom live in the modal header (see showroomPage.js),
+  // not here, so they stay visible without scrolling this form's length.
+  form.append(header, errorNode, profileSection.section, contactSection.section, bankSection.section);
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     const formData = new FormData(form);

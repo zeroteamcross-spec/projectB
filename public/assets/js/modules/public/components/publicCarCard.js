@@ -5,10 +5,16 @@ import { formatCurrency } from "../../../utils/formatCurrency.js";
 import { applyDesignHook } from "../../../theme/designStudioHooks.js";
 import { getListingLockStatus } from "../../../utils/transactionStatus.js";
 
-export function PublicCarCard({ car, onOpenDetail = null } = {}) {
+export function PublicCarCard({
+  car,
+  onOpenDetail = null,
+  showFavorite = false,
+  isFavorite = false,
+  onToggleFavorite = null,
+} = {}) {
   const lock = getListingLockStatus({ car });
   const root = Card([], { designHook: "catalog.card.root" });
-  root.className = "group overflow-hidden rounded-[22px] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] p-0 shadow-[var(--pb-shadow-card)] backdrop-blur";
+  root.className = "group relative overflow-hidden rounded-[22px] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] p-0 shadow-[var(--pb-shadow-card)] backdrop-blur";
 
   const button = document.createElement("button");
   button.type = "button";
@@ -90,7 +96,56 @@ export function PublicCarCard({ car, onOpenDetail = null } = {}) {
   body.append(heading, specs, priceBlock, footer, action);
   button.append(media, body);
   root.append(button);
+
+  if (showFavorite) {
+    root.append(favoriteToggle({ car, isFavorite, onToggleFavorite }));
+  }
+
   return root;
+}
+
+/**
+ * Sits above the card button rather than inside it, so tapping the heart never
+ * opens the car detail.
+ */
+function favoriteToggle({ car, isFavorite, onToggleFavorite }) {
+  const toggle = document.createElement("button");
+  toggle.type = "button";
+  toggle.dataset.favoriteToggle = String(car?.id ?? "");
+  toggle.setAttribute("aria-pressed", isFavorite ? "true" : "false");
+  toggle.setAttribute(
+    "aria-label",
+    isFavorite ? `Hapus ${carTitle(car)} dari favorit` : `Simpan ${carTitle(car)} ke favorit`
+  );
+  toggle.title = isFavorite ? "Hapus dari favorit" : "Simpan ke favorit";
+  toggle.className = favoriteToggleClassName(isFavorite);
+  toggle.append(createIcon("heart", { className: "block h-4 w-4 shrink-0 leading-none" }));
+
+  toggle.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (toggle.disabled) {
+      return;
+    }
+
+    toggle.disabled = true;
+    Promise.resolve(onToggleFavorite?.(car))
+      .catch(() => null)
+      .finally(() => {
+        toggle.disabled = false;
+      });
+  });
+
+  return toggle;
+}
+
+function favoriteToggleClassName(active) {
+  const base = "absolute right-2.5 top-2.5 z-20 inline-flex h-9 w-9 items-center justify-center rounded-full border shadow-[var(--pb-shadow-card)] transition disabled:opacity-60";
+
+  return active
+    ? `${base} border-transparent bg-[var(--pb-brand-primary)] text-white`
+    : `${base} border-[var(--pb-border)] bg-white/90 text-[var(--pb-text-muted)] hover:text-[var(--pb-brand-primary)]`;
 }
 
 function mediaOverlay() {

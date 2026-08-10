@@ -83,10 +83,24 @@ class TransactionService
 
         $carPrice = $this->resolveCarPrice($car);
         $paymentType = $data['payment_type'];
-        $dpAmount = $paymentType === 'dp' ? (int) $data['dp_amount'] : null;
 
-        if ($paymentType === 'dp' && $dpAmount >= $carPrice) {
-            throw new ValidationException(['dp_amount' => 'The dp_amount field must be lower than car_price.']);
+        // Booking Fee ditentukan showroom pada mobilnya. Nominal dari client
+        // sengaja diabaikan supaya buyer tidak bisa menawar lewat payload.
+        $dpAmount = null;
+        if ($paymentType === 'dp') {
+            $dpAmount = isset($car['dp_amount']) && $car['dp_amount'] !== null ? (int) $car['dp_amount'] : 0;
+
+            if ($dpAmount <= 0) {
+                throw new ValidationException([
+                    'car_id' => 'Mobil ini belum memiliki Booking Fee. Hubungi showroom.',
+                ]);
+            }
+
+            if ($dpAmount >= $carPrice) {
+                throw new ValidationException([
+                    'car_id' => 'Booking Fee mobil ini tidak valid karena melebihi harga.',
+                ]);
+            }
         }
 
         $remainingAmount = $paymentType === 'dp' ? $carPrice - $dpAmount : 0;
@@ -255,9 +269,11 @@ class TransactionService
         $transaction = $this->requireTransaction($transactionId);
         TransactionPolicy::ensureCanManageFulfillmentChecklist($user, $transaction);
 
-        if (($transaction['transaction_status'] ?? null) !== 'paid') {
+        // Serah terima dimulai begitu Booking Fee masuk. `paid` tetap diterima
+        // untuk transaksi lunas lama.
+        if (! in_array($transaction['transaction_status'] ?? null, ['dp_paid', 'paid'], true)) {
             throw new ValidationException([
-                'transaction_status' => 'Checklist hanya bisa diproses setelah pembayaran lunas.',
+                'transaction_status' => 'Checklist hanya bisa diproses setelah Booking Fee dibayar.',
             ]);
         }
 
@@ -296,6 +312,65 @@ class TransactionService
             $this->pdo->commit();
         } catch (Throwable $exception) {
             if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+
+            throw $exception;
+        }
+
+        return $this->detail($user, $transactionId);
+    }
+
+    /**
+     * Retur transaksi oleh showroom setelah Booking Fee dibayar.
+     *
+     * Tiga hal terjadi sekaligus dan harus atomik: transaksi menjadi
+     * `returned`, mobil kembali dijual, dan komisi marketing dibatalkan.
+     * Bila komisinya sudah dibayarkan, seluruh retur dibatalkan.
+     */
+    public function returnTransaction(array $user, int $transactionId, array $data): array
+    {
+        $transaction = $this->requireTransaction($transactionId);
+        TransactionPolicy::ensureCanReturn($user, $transaction);
+
+        $statusSekarang = (string) ($transaction['transaction_status'] ?? '');
+
+        if ($statusSekarang === 'returned') {
+            throw new ValidationException([
+                'transaction_status' => 'Transaksi ini sudah diretur.',
+            ]);
+        }
+
+        if ($statusSekarang !== 'dp_paid') {
+            throw new ValidationException([
+                'transaction_status' => 'Retur hanya bisa dilakukan pada transaksi yang Booking Fee-nya sudah dibayar.',
+            ]);
+        }
+
+        $reason = trim((string) ($data['return_reason'] ?? ''));
+        $startedTransaction = ! $this->pdo->inTransaction();
+
+        try {
+            if ($startedTransaction) {
+                $this->pdo->beginTransaction();
+            }
+
+            // Dijalankan lebih dulu supaya retur batal seluruhnya bila komisi
+            // sudah paid_out.
+            $this->affiliateService->voidCommissionForReturnedTransaction($transaction, 'Transaksi diretur: ' . $reason);
+
+            $this->transactions->markReturned($transactionId, $reason);
+            $this->transactions->updateCarListingStatus(
+                (int) $transaction['car_id'],
+                'published',
+                ['sold', 'reserved']
+            );
+
+            if ($startedTransaction) {
+                $this->pdo->commit();
+            }
+        } catch (Throwable $exception) {
+            if ($startedTransaction && $this->pdo->inTransaction()) {
                 $this->pdo->rollBack();
             }
 
@@ -529,8 +604,13 @@ class TransactionService
             throw new ValidationException(['transaction_status' => 'dp_paid is only valid for DP transactions.']);
         }
 
-        if ($status === 'completed' && ($transaction['transaction_status'] ?? null) !== 'paid') {
-            throw new ValidationException(['transaction_status' => 'Only paid transactions can be completed.']);
+        // Booking Fee menutup pembayaran, jadi `dp_paid` sudah layak diselesaikan.
+        // `paid` tetap diterima untuk transaksi lunas lama.
+        if ($status === 'completed'
+            && ! in_array($transaction['transaction_status'] ?? null, ['dp_paid', 'paid'], true)) {
+            throw new ValidationException([
+                'transaction_status' => 'Hanya transaksi yang sudah dibayar yang bisa diselesaikan.',
+            ]);
         }
 
         if ($status === 'completed' && ! $this->isFulfillmentChecklistComplete($transaction)) {
@@ -562,7 +642,10 @@ class TransactionService
             }
 
             if ($status === 'dp_paid') {
+                // Sisa harga tetap dicatat sebagai informasi, tetapi tidak
+                // ditagih lagi lewat sistem. Booking Fee menutup kewajiban.
                 $remainingAmount = max(0, (int) $transaction['car_price'] - (int) ($transaction['dp_amount'] ?? 0));
+                $paidAt = $paidAt ?: date('Y-m-d H:i:s');
             }
 
             $this->transactions->updateStatus((int) $transaction['id'], [
@@ -572,7 +655,11 @@ class TransactionService
                 'updated_at' => date('Y-m-d H:i:s'),
             ]);
 
-            if ($status === 'paid') {
+            // Komisi terbit saat kewajiban bayar selesai. Sejak Booking Fee
+            // menjadi pembayaran terakhir, titik itu adalah `dp_paid`.
+            // `paid` tetap ditangani demi transaksi lunas lama; accrual sudah
+            // idempoten sehingga transisi dp_paid -> paid tidak menggandakan.
+            if ($status === 'dp_paid' || $status === 'paid') {
                 $paidTransaction = $this->requireTransaction((int) $transaction['id']);
                 $this->affiliateService->accrueCommissionForPaidTransaction($paidTransaction);
                 if ($this->notificationService !== null) {
@@ -681,35 +768,31 @@ class TransactionService
         }
 
         $currentStatus = (string) ($transaction['transaction_status'] ?? '');
-        $targetListingStatus = $status === 'paid' ? 'sold' : 'reserved';
+        // Booking Fee sudah menutup pembayaran, jadi mobil langsung terjual.
+        // Tidak ada lagi tahap `reserved` menunggu pelunasan.
+        $targetListingStatus = 'sold';
         $allowedCurrentStatuses = $this->allowedListingStatusesForLock($status, $currentStatus);
 
         if (! $this->transactions->updateCarListingStatus($carId, $targetListingStatus, $allowedCurrentStatuses)) {
             throw new ValidationException([
-                'car_id' => $status === 'dp_paid'
-                    ? 'Mobil tidak bisa dikunci untuk DP karena status listing sudah berubah.'
-                    : 'Mobil tidak bisa ditandai terjual karena status listing sudah berubah.',
+                'car_id' => 'Mobil tidak bisa ditandai terjual karena status listing sudah berubah.',
             ]);
         }
     }
 
     private function allowedListingStatusesForLock(string $status, string $currentTransactionStatus): array
     {
-        if ($status === 'dp_paid') {
-            return $currentTransactionStatus === 'dp_paid'
-                ? ['published', 'reserved']
-                : ['published'];
-        }
-
+        // `reserved` tetap diterima sebagai status asal demi data lama yang
+        // sempat dikunci DP sebelum Booking Fee langsung menjadikannya sold.
         if ($currentTransactionStatus === 'paid') {
             return ['published', 'reserved', 'sold'];
         }
 
         if ($currentTransactionStatus === 'dp_paid') {
-            return ['published', 'reserved'];
+            return ['published', 'reserved', 'sold'];
         }
 
-        return ['published'];
+        return ['published', 'reserved'];
     }
 
     private function createProviderSession(int $transactionId, callable $callback): array

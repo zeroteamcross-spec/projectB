@@ -15,6 +15,7 @@ export function SellerTransactionDetailPage() {
   let unsubscribe = null;
   const flags = {
     isCancelling: false,
+    isReturning: false,
   };
 
   return createPageLifecycle({
@@ -73,6 +74,8 @@ function render(root, context, flags) {
       transaction,
       isCancelling: flags.isCancelling,
       onCancel: () => cancelTransaction(root, context, flags, transaction),
+      isReturning: flags.isReturning,
+      onReturn: () => returnTransaction(root, context, flags, transaction),
     })
   );
 }
@@ -131,4 +134,48 @@ async function cancelTransaction(root, context, flags, transaction) {
 
 function canSellerCancel(transaction) {
   return ["pending_payment", "dp_paid"].includes(String(transaction?.transaction_status ?? "").toLowerCase());
+}
+
+function canSellerReturn(transaction) {
+  return String(transaction?.transaction_status ?? "").toLowerCase() === "dp_paid";
+}
+
+async function returnTransaction(root, context, flags, transaction) {
+  if (!transaction?.id || flags.isReturning || !canSellerReturn(transaction)) {
+    return;
+  }
+
+  const reason = window.prompt("Alasan retur transaksi (minimal 5 karakter)", "");
+  if (reason === null) {
+    return;
+  }
+
+  if (!window.confirm("Retur transaksi ini? Mobil kembali dijual dan komisi marketing dibatalkan.")) {
+    return;
+  }
+
+  flags.isReturning = true;
+  render(root, context, flags);
+
+  try {
+    const updated = await sellerTransactionService.returnTransaction(transaction.id, {
+      return_reason: reason,
+    });
+    if (updated) {
+      appStore.patchState("working.sellerTransactionDetail.transaction", {
+        data: updated,
+        hydratedAt: Date.now(),
+      }, "seller-transaction-detail:return");
+      syncBusinessTransaction(updated, {
+        primaryRole: "seller",
+        source: "seller-transaction-detail:return",
+      });
+    }
+    showToast("Transaksi berhasil diretur.", { type: "success" });
+  } catch (error) {
+    showToast(error.message || "Gagal meretur transaksi.", { type: "error" });
+  } finally {
+    flags.isReturning = false;
+    render(root, context, flags);
+  }
 }

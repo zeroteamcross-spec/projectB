@@ -55,6 +55,7 @@ class ShowroomService
                 'slug' => $existing['slug'] ?: $this->generateSlug((string) ($data['name'] ?? $existing['name']), (int) $existing['id']),
                 'name' => $data['name'] ?? $existing['name'],
                 'address' => array_key_exists('address', $data) ? $data['address'] : $existing['address'],
+                'city_name' => array_key_exists('city_name', $data) ? $data['city_name'] : $existing['city_name'],
                 'phone_number' => array_key_exists('phone_number', $data) ? $data['phone_number'] : $existing['phone_number'],
                 'bank_account_number' => array_key_exists('bank_account_number', $data)
                     ? $data['bank_account_number']
@@ -98,6 +99,7 @@ class ShowroomService
                 'slug' => $showroom['slug'],
                 'name' => $showroom['name'] ?? null,
                 'address' => $showroom['address'] ?? null,
+                'city_name' => $showroom['city_name'] ?? null,
                 'phone_number' => $showroom['phone_number'] ?? null,
             ] : null,
         ];
@@ -118,6 +120,7 @@ class ShowroomService
             'slug' => $showroom['slug'] ?? null,
             'name' => $showroom['name'],
             'address' => $showroom['address'],
+            'city_name' => $showroom['city_name'] ?? null,
             'phone_number' => $showroom['phone_number'],
             'bank_account_number' => $showroom['bank_account_number'],
             'bank_type' => $showroom['bank_type'],

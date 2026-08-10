@@ -1,0 +1,127 @@
+{
+  "nama_fitur": "Pendaftaran Showroom - slug bentrok ditolak",
+  "aplikasi": "projectB",
+  "halaman": ["#/daftar-showroom"],
+  "prefix_id": ["shr_"],
+  "versi": "1.0",
+  "berhenti_saat_gagal": true,
+  "keterangan": "Jalur negatif. Mendaftar memakai slug yang sudah dipakai showroom lain, lalu memastikan server menolak dan pesan errornya memuat saran alternatif. Tidak ada data baru yang tersimpan bila lulus.",
+  "prasyarat_data": [
+    "Server lokal berjalan di http://localhost:8000.",
+    "Showroom dengan slug 'metro-auto-jakarta' sudah ada di database (dari seed demo)."
+  ],
+  "variabel": {
+    "slug_terpakai": "metro-auto-jakarta"
+  },
+  "urutan_uji": [
+    {
+      "urutan": 1,
+      "halaman": "#/daftar-showroom",
+      "id": "shr_register_form",
+      "jenis": "form",
+      "aksi": "verifikasi",
+      "nama": "Form pendaftaran tampil",
+      "harapan": { "elemen_ada": "#shr_register_submit_button" }
+    },
+    {
+      "urutan": 2,
+      "id": "shr_register_name_input",
+      "jenis": "input-text",
+      "aksi": "isi",
+      "nilai": "Bentrok Uji {{stamp6}}",
+      "nama": "Nama pemilik"
+    },
+    {
+      "urutan": 3,
+      "id": "shr_register_email_input",
+      "jenis": "input-email",
+      "aksi": "isi",
+      "nilai": "bentrok.{{timestamp}}@example.test",
+      "nama": "Email pemilik"
+    },
+    {
+      "urutan": 4,
+      "id": "shr_register_password_input",
+      "jenis": "input-password",
+      "aksi": "isi",
+      "nilai": "RahasiaKu123",
+      "nama": "Password"
+    },
+    {
+      "urutan": 5,
+      "id": "shr_register_showroom_name_input",
+      "jenis": "input-text",
+      "aksi": "isi",
+      "nilai": "Bentrok Uji {{stamp6}}",
+      "nama": "Nama showroom"
+    },
+    {
+      "urutan": 6,
+      "id": "shr_register_showroom_slug_input",
+      "jenis": "input-text",
+      "aksi": "isi",
+      "nilai": "{{slug_terpakai}}",
+      "nama": "Isi slug yang sudah dipakai"
+    },
+    {
+      "urutan": 7,
+      "id": "shr_register_city_input",
+      "jenis": "select",
+      "aksi": "pilih",
+      "nilai": "Jakarta",
+      "nama": "Pilih kota"
+    },
+    {
+      "urutan": 8,
+      "id": "shr_register_submit_button",
+      "jenis": "button-submit",
+      "aksi": "klik",
+      "nama": "Daftarkan showroom",
+      "abaikan_error_endpoint": true,
+      "tunggu": { "elemen": "#shr_register_error_message", "timeout_ms": 12000 },
+      "catatan": "Server sengaja membalas 422. abaikan_error_endpoint dipasang karena kegagalan HTTP di sini memang yang diharapkan."
+    },
+    {
+      "urutan": 9,
+      "id": "shr_register_error_message",
+      "jenis": "container",
+      "aksi": "verifikasi",
+      "nama": "Banner error tampil",
+      "harapan": { "teks_mengandung": "Periksa kembali isian yang ditandai" }
+    },
+    {
+      "urutan": 10,
+      "selector": "label:has(#shr_register_showroom_slug_input) .text-red-600",
+      "jenis": "container",
+      "aksi": "verifikasi",
+      "nama": "Pesan error pada field slug",
+      "harapan": { "teks_mengandung": "sudah dipakai" },
+      "catatan": "Server harus menyebut slug mana yang bentrok."
+    },
+    {
+      "urutan": 11,
+      "selector": "label:has(#shr_register_showroom_slug_input) .text-red-600",
+      "jenis": "container",
+      "aksi": "verifikasi",
+      "nama": "Pesan error menyarankan alternatif",
+      "harapan": { "teks_mengandung": "Coba '{{slug_terpakai}}-2'" },
+      "catatan": "Saran alternatif harus slug yang benar-benar tersedia."
+    },
+    {
+      "urutan": 12,
+      "aksi": "assert",
+      "nama": "Panel sukses TIDAK boleh muncul",
+      "harapan": { "elemen_tidak_ada": "#shr_register_success_section" },
+      "catatan": "Memakai aksi assert karena assertion negatif tidak boleh menuntut elemennya ada lebih dulu."
+    },
+    {
+      "urutan": 13,
+      "id": "shr_register_showroom_slug_input",
+      "jenis": "input-text",
+      "aksi": "verifikasi",
+      "nama": "Isian slug dipertahankan setelah gagal",
+      "harapan": { "nilai_sama": "{{slug_terpakai}}" },
+      "catatan": "Draft tidak boleh hilang saat submit ditolak."
+    }
+  ]
+}

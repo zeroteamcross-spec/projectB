@@ -121,7 +121,8 @@ class RepositoryQueryTest extends TestCase
             engine_capacity_cc INTEGER NULL, mileage_km INTEGER NULL, seat_count INTEGER NULL,
             previous_owner_count INTEGER NULL, has_service_book INTEGER, key_count INTEGER,
             description TEXT NULL, youtube_url TEXT NULL, price_cash INTEGER NULL, price_discount INTEGER NULL,
-            price_credit INTEGER NULL, inspection_summary_status TEXT, published_at TEXT NULL,
+            price_credit INTEGER NULL,
+            dp_amount INTEGER NULL, inspection_summary_status TEXT, published_at TEXT NULL,
             created_at TEXT, updated_at TEXT NULL, deleted_at TEXT NULL
         )');
         $pdo->exec('CREATE TABLE car_images (
@@ -178,6 +179,8 @@ class RepositoryQueryTest extends TestCase
             midtrans_redirect_url TEXT NULL,
             expires_at TEXT NULL,
             paid_at TEXT NULL,
+            returned_at TEXT NULL,
+            return_reason TEXT NULL,
             created_at TEXT,
             updated_at TEXT NULL,
             deleted_at TEXT NULL

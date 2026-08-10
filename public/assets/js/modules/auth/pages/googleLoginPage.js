@@ -8,8 +8,22 @@ import { googleLoginService } from "../services/googleLoginService.js";
 const PAGE_BG = "bg-[radial-gradient(circle_at_10%_0%,color-mix(in_srgb,var(--pb-brand-primary)_18%,transparent),transparent_34%),radial-gradient(circle_at_90%_8%,color-mix(in_srgb,var(--pb-brand-accent)_16%,transparent),transparent_30%),linear-gradient(135deg,#f7fbf9,#fff7ed_52%,#eef7f3)]";
 const BUYER_FALLBACK_BG = "bg-[radial-gradient(circle_at_20%_4%,rgba(207,211,255,0.42),transparent_30%),radial-gradient(circle_at_92%_88%,rgba(210,216,255,0.72),transparent_34%),linear-gradient(180deg,#fbfbff_0%,#ffffff_42%,#f2f4ff_100%)]";
 
-export function GoogleLoginPage({ roleSlug } = {}) {
+/**
+ * @param {string} roleSlug
+ * @param {string} [next] Path to return to after a successful login, e.g.
+ *   "/s/showroom-anda". Empty keeps the default per-role home, unchanged
+ *   from before this option existed.
+ * @param {string} [showroomSlug] For roleSlug "buyer" only: records this
+ *   showroom as the one the buyer is a customer of (users.home_showroom_id),
+ *   so a later logout returns them here even in a brand new session.
+ * @param {string} [subtitle] Overrides the generic glass-login subtitle.
+ * @param {{ label: string, path: string }} [footerLink] Optional secondary
+ *   link rendered under the Google button, for scoped logins that should
+ *   offer a way back to where the buyer came from.
+ */
+export function GoogleLoginPage({ roleSlug, next = "", showroomSlug = "", subtitle = "", footerLink = null } = {}) {
   let root = null;
+  const options = { next, showroomSlug, subtitle, footerLink };
   let backgroundVideoLayer = null;
   let previousBodyOverflow = "";
   let previousHtmlOverflow = "";
@@ -50,7 +64,7 @@ export function GoogleLoginPage({ roleSlug } = {}) {
       root.className = usesGlassLoginDesign
         ? "relative isolate min-h-screen overflow-hidden bg-transparent"
         : `min-h-screen ${PAGE_BG} px-4 py-8 sm:px-6 lg:px-10`;
-      render(root, context, config, state, usesGlassLoginDesign ? getBackgroundVideoLayer : null);
+      render(root, context, config, state, usesGlassLoginDesign ? getBackgroundVideoLayer : null, options);
       return root;
     },
     async hydrate(context) {
@@ -65,7 +79,7 @@ export function GoogleLoginPage({ roleSlug } = {}) {
         state.error = error.message || "Status Google Login gagal diambil.";
       } finally {
         state.loading = false;
-        render(root, context, config, state, usesGlassLoginDesign ? getBackgroundVideoLayer : null);
+        render(root, context, config, state, usesGlassLoginDesign ? getBackgroundVideoLayer : null, options);
       }
     },
     dispose() {
@@ -79,13 +93,13 @@ export function GoogleLoginPage({ roleSlug } = {}) {
   });
 }
 
-function render(root, context, config, state, getBackgroundVideoLayer = null) {
+function render(root, context, config, state, getBackgroundVideoLayer = null, options = {}) {
   if (!root || !config) {
     return;
   }
 
   if (getBackgroundVideoLayer) {
-    renderGlassLogin(root, context, config, state, getBackgroundVideoLayer);
+    renderGlassLogin(root, context, config, state, getBackgroundVideoLayer, options);
     return;
   }
 
@@ -109,7 +123,7 @@ function render(root, context, config, state, getBackgroundVideoLayer = null) {
   root.replaceChildren(wrap);
 }
 
-function renderGlassLogin(root, context, config, state, getBackgroundVideoLayer) {
+function renderGlassLogin(root, context, config, state, getBackgroundVideoLayer, options = {}) {
   const frame = document.createElement("section");
   frame.id = `google_login_${config.slug}_panel`;
   frame.className = "relative z-10 mx-auto grid min-h-screen w-full max-w-[400px] content-center overflow-hidden px-5 py-5 text-center sm:px-6 lg:mx-0 lg:ml-auto lg:mr-[8vw] lg:max-w-[420px]";
@@ -125,7 +139,7 @@ function renderGlassLogin(root, context, config, state, getBackgroundVideoLayer)
 
   const content = document.createElement("div");
   content.className = "relative z-10 grid justify-items-center gap-4 rounded-[1.5rem] border border-white/45 bg-[linear-gradient(135deg,rgba(255,255,255,0.72),rgba(214,220,235,0.42)_42%,rgba(244,247,252,0.62)_100%)] px-5 py-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.82),0_22px_60px_rgba(18,24,45,0.18)] backdrop-blur-xl sm:px-6 sm:py-7";
-  content.append(appIcon(), glassLoginHeader(config), glassLoginActionContent(root, context, config, state));
+  content.append(appIcon(), glassLoginHeader(config, options), glassLoginActionContent(root, context, config, state, options));
 
   frame.append(topWave, bottomWave, bottomWaveDeep, plantDecor("left"), plantDecor("right"), content, homeIndicator());
   const backgroundLayer = getBackgroundVideoLayer?.();
@@ -153,7 +167,7 @@ function appIcon() {
   return wrap;
 }
 
-function glassLoginHeader(config) {
+function glassLoginHeader(config, options = {}) {
   const headerEl = document.createElement("header");
   headerEl.className = "grid max-w-[320px] gap-2.5";
 
@@ -164,13 +178,13 @@ function glassLoginHeader(config) {
 
   const subtitle = document.createElement("p");
   subtitle.className = "text-sm font-medium leading-6 tracking-normal text-black sm:text-base sm:leading-7";
-  subtitle.textContent = "Masuk untuk melanjutkan dan nikmati pengalaman terbaik.";
+  subtitle.textContent = options.subtitle || "Masuk untuk melanjutkan dan nikmati pengalaman terbaik.";
 
   headerEl.append(title, subtitle);
   return headerEl;
 }
 
-function glassLoginActionContent(root, context, config, state) {
+function glassLoginActionContent(root, context, config, state, options = {}) {
   const fragment = document.createDocumentFragment();
   const actionWrap = document.createElement("div");
   actionWrap.className = "grid w-full max-w-[310px] gap-4";
@@ -190,12 +204,14 @@ function glassLoginActionContent(root, context, config, state) {
 
   if (!config.googleEnabled) {
     actionWrap.append(messageBox(config.warning || "Google Login tidak tersedia untuk role ini.", "info"));
+    appendFooterLink(actionWrap, context, options);
     fragment.append(actionWrap);
     return fragment;
   }
 
   if (!state.status?.enabled) {
     actionWrap.append(messageBox("Google Login belum dikonfigurasi.", "info"));
+    appendFooterLink(actionWrap, context, options);
     fragment.append(actionWrap);
     return fragment;
   }
@@ -206,11 +222,30 @@ function glassLoginActionContent(root, context, config, state) {
   button.disabled = state.submitting;
   button.className = "inline-flex min-h-12 w-full items-center justify-center gap-3.5 rounded-[1rem] border border-white/60 bg-[linear-gradient(135deg,rgba(255,255,255,0.84),rgba(216,222,236,0.58))] px-4 text-sm font-black tracking-normal text-[#171a35] shadow-[inset_0_1px_0_rgba(255,255,255,0.88),0_14px_30px_rgba(84,92,170,0.13)] backdrop-blur transition duration-200 hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-4 focus:ring-[#dfe3ff] disabled:cursor-wait disabled:opacity-70";
   button.append(googleGlyph(), document.createTextNode(state.submitting ? "Membuka Google..." : "Login dengan Google"));
-  button.addEventListener("click", () => beginGoogleLogin(root, context, config, state));
+  button.addEventListener("click", () => beginGoogleLogin(root, context, config, state, options));
 
   actionWrap.append(button, divider());
+  appendFooterLink(actionWrap, context, options);
   fragment.append(actionWrap);
   return fragment;
+}
+
+/**
+ * Secondary way out, e.g. "Kembali ke katalog" for a showroom-scoped login.
+ * Absent by default so the four existing role login pages render unchanged.
+ */
+function appendFooterLink(actionWrap, context, options) {
+  if (!options.footerLink?.path) {
+    return;
+  }
+
+  const link = document.createElement("button");
+  link.type = "button";
+  link.id = "google_login_footer_link";
+  link.className = "text-sm font-bold text-[#4a4fb8] underline underline-offset-2";
+  link.textContent = options.footerLink.label || "Kembali";
+  link.addEventListener("click", () => context.router.navigate(options.footerLink.path));
+  actionWrap.append(link);
 }
 
 function googleGlyph() {
@@ -350,18 +385,18 @@ function actionContent(root, context, config, state) {
   return fragment;
 }
 
-async function beginGoogleLogin(root, context, config, state) {
+async function beginGoogleLogin(root, context, config, state, options = {}) {
   state.submitting = true;
-  render(root, context, config, state, () => document.getElementById(`google_login_${config.slug}_background_video_layer`));
+  render(root, context, config, state, () => document.getElementById(`google_login_${config.slug}_background_video_layer`), options);
 
   try {
-    const authUrl = await googleLoginService.begin(config);
+    const authUrl = await googleLoginService.begin(config, options.next, options.showroomSlug);
     window.location.assign(authUrl);
   } catch (error) {
     state.error = error.message || "Google Login gagal dimulai.";
     state.submitting = false;
     showToast(state.error, { type: "error", key: `google-login-${config.slug}-error`, dedupeMs: 3000 });
-    render(root, context, config, state, () => document.getElementById(`google_login_${config.slug}_background_video_layer`));
+    render(root, context, config, state, () => document.getElementById(`google_login_${config.slug}_background_video_layer`), options);
   }
 }
 

@@ -93,10 +93,10 @@ class AuthUserRepository
     {
         $stmt = $this->pdo->prepare(
             'INSERT INTO showrooms
-                (user_id, slug, name, address, phone_number, bank_account_number,
+                (user_id, slug, name, address, city_name, phone_number, bank_account_number,
                  bank_type, bank_account_name, created_at, updated_at)
              VALUES
-                (:user_id, :slug, :name, :address, :phone_number, :bank_account_number,
+                (:user_id, :slug, :name, :address, :city_name, :phone_number, :bank_account_number,
                  :bank_type, :bank_account_name, :created_at, :updated_at)'
         );
 
@@ -105,6 +105,7 @@ class AuthUserRepository
             'slug' => $data['slug'],
             'name' => $data['name'],
             'address' => $data['address'] ?? null,
+            'city_name' => $data['city_name'] ?? null,
             'phone_number' => $data['phone_number'] ?? null,
             'bank_account_number' => $data['bank_account_number'] ?? null,
             'bank_type' => $data['bank_type'] ?? null,
@@ -124,6 +125,17 @@ class AuthUserRepository
         $stmt->execute(['slug' => $slug]);
 
         return (bool) $stmt->fetch();
+    }
+
+    public function findShowroomSlugById(int $showroomId): ?string
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT slug FROM showrooms WHERE id = :id AND deleted_at IS NULL LIMIT 1'
+        );
+        $stmt->execute(['id' => $showroomId]);
+        $slug = $stmt->fetchColumn();
+
+        return $slug !== false ? (string) $slug : null;
     }
 
     public function clearOtp(int $userId): void

@@ -481,6 +481,7 @@ class AffiliateService
             'showroom' => isset($affiliate['showroom_id']) && $affiliate['showroom_id'] !== null
                 ? [
                     'id' => (int) $affiliate['showroom_id'],
+                    'slug' => $affiliate['showroom_slug'] ?? null,
                     'name' => $affiliate['showroom_name'] ?? null,
                     'address' => $affiliate['showroom_address'] ?? null,
                     'phone_number' => $affiliate['showroom_phone_number'] ?? null,
@@ -751,12 +752,55 @@ class AffiliateService
         return $this->mapCommissionRule($this->requireCommissionRule($ruleId), 'override');
     }
 
+    /**
+     * Membatalkan komisi karena transaksinya diretur showroom.
+     *
+     * Menolak bila komisi sudah `paid_out`: uangnya sudah keluar lewat
+     * settlement, jadi membatalkan ledger di sini akan membuat pembukuan tidak
+     * cocok. Admin harus membatalkan batch-nya lebih dulu.
+     */
+    public function voidCommissionForReturnedTransaction(array $transaction, string $reason): ?array
+    {
+        $transactionId = (int) ($transaction['id'] ?? 0);
+        if ($transactionId <= 0) {
+            return null;
+        }
+
+        $ledger = $this->ledgers->findAccrualByTransactionId($transactionId);
+        if (! $ledger) {
+            return null;
+        }
+
+        $statusSekarang = (string) ($ledger['ledger_status'] ?? '');
+
+        if ($statusSekarang === 'voided') {
+            return AffiliateMapper::ledger($ledger);
+        }
+
+        if ($statusSekarang === 'paid_out') {
+            throw new ValidationException([
+                'commission_ledger' => 'Komisi transaksi ini sudah dibayarkan lewat settlement. '
+                    . 'Batalkan batch settlement-nya lebih dulu sebelum meretur.',
+            ]);
+        }
+
+        $this->ledgers->updateStatusesByIds([(int) $ledger['id']], 'voided', null, $reason);
+        $this->ledgers->syncAffiliateAggregate((int) $ledger['affiliate_id']);
+
+        return AffiliateMapper::ledger($this->ledgers->findById((int) $ledger['id']) ?? $ledger);
+    }
+
     public function accrueCommissionForPaidTransaction(array $transaction): ?array
     {
         $transactionId = (int) ($transaction['id'] ?? 0);
         $affiliateId = isset($transaction['affiliate_id']) ? (int) $transaction['affiliate_id'] : 0;
 
-        if ($transactionId <= 0 || $affiliateId <= 0 || ($transaction['transaction_status'] ?? null) !== 'paid') {
+        // Booking Fee menutup kewajiban bayar, jadi komisi terbit di `dp_paid`.
+        // `paid` tetap diterima untuk transaksi lunas lama.
+        $statusFinal = ['dp_paid', 'paid'];
+
+        if ($transactionId <= 0 || $affiliateId <= 0
+            || ! in_array($transaction['transaction_status'] ?? null, $statusFinal, true)) {
             return null;
         }
 

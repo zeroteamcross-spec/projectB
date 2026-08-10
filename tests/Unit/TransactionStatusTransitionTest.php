@@ -306,6 +306,8 @@ class TransactionStatusTransitionTest extends TestCase
             midtrans_redirect_url TEXT NULL,
             expires_at TEXT NULL,
             paid_at TEXT NULL,
+            returned_at TEXT NULL,
+            return_reason TEXT NULL,
             created_at TEXT,
             updated_at TEXT NULL,
             deleted_at TEXT NULL

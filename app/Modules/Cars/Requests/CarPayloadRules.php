@@ -39,6 +39,9 @@ trait CarPayloadRules
             'price_cash' => 'nullable|integer|min_value:0',
             'price_discount' => 'nullable|integer|min_value:0',
             'price_credit' => 'nullable|integer|min_value:0',
+            // Booking Fee. Wajib saat membuat mobil karena tanpa ini mobil
+            // tidak bisa ditransaksikan sama sekali.
+            'dp_amount' => $required . '|integer|min_value:1',
             'inspection_summary_status' => 'nullable|string|in:not_checked,partial,completed',
         ];
     }
@@ -67,11 +70,46 @@ trait CarPayloadRules
             }
         }
 
+        $this->validateBookingFee($data, $errors, $creating);
+
         if (! $creating) {
             $allowed = array_keys($this->carRules(false));
             if (array_intersect(array_keys($data), $allowed) === []) {
                 $errors['payload'] = 'At least one car field must be provided.';
             }
+        }
+    }
+
+    /**
+     * Booking Fee harus masuk akal terhadap harga: lebih dari nol, dan lebih
+     * kecil dari harga cash. Booking Fee yang sama atau melebihi harga berarti
+     * pelunasan, bukan pengikat unit.
+     */
+    private function validateBookingFee(array $data, array &$errors, bool $creating): void
+    {
+        $diisi = array_key_exists('dp_amount', $data) && $data['dp_amount'] !== null && $data['dp_amount'] !== '';
+
+        if (! $diisi) {
+            if ($creating) {
+                $errors['dp_amount'] = 'Booking Fee wajib diisi.';
+            }
+
+            return;
+        }
+
+        $bookingFee = (int) $data['dp_amount'];
+
+        if ($bookingFee <= 0) {
+            $errors['dp_amount'] = 'Booking Fee harus lebih besar dari 0.';
+            return;
+        }
+
+        $hargaCash = array_key_exists('price_cash', $data) && $data['price_cash'] !== null && $data['price_cash'] !== ''
+            ? (int) $data['price_cash']
+            : null;
+
+        if ($hargaCash !== null && $hargaCash > 0 && $bookingFee >= $hargaCash) {
+            $errors['dp_amount'] = 'Booking Fee harus lebih kecil dari harga cash.';
         }
     }
 }

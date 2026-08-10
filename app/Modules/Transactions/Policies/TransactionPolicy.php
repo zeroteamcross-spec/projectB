@@ -96,6 +96,23 @@ class TransactionPolicy
         throw new ForbiddenException('Hanya seller yang dapat memperbarui checklist transaksi.');
     }
 
+    /**
+     * Retur adalah keputusan showroom pemilik transaksi. Admin platform ikut
+     * diizinkan untuk kebutuhan penanganan sengketa.
+     */
+    public static function ensureCanReturn(array $user, array $transaction): void
+    {
+        if (($user['role'] ?? null) === 'seller' && (int) $user['id'] === (int) $transaction['seller_user_id']) {
+            return;
+        }
+
+        if (in_array(($user['role'] ?? null), ['admin', 'super_admin'], true)) {
+            return;
+        }
+
+        throw new ForbiddenException('Hanya showroom pemilik transaksi yang dapat melakukan retur.');
+    }
+
     public static function ensureCanCompletePayment(array $user, array $transaction): void
     {
         if (in_array(($user['role'] ?? null), ['admin', 'super_admin'], true)) {

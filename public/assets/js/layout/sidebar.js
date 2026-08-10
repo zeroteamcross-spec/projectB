@@ -7,9 +7,11 @@ import { adminMasterService } from "../modules/admin/services/adminMasterService
 import { uiStore } from "../state/uiStore.js";
 import { designStudioV2MenuItem, isDesignStudioV2Allowed } from "../modules/designStudioV2/accessGuard.js";
 
+// "Katalog" (#/buyer/cars) is intentionally absent: it lists cars across every
+// showroom, which is not how buyers browse. They arrive through a showroom or
+// marketing link instead. The route itself is still reachable directly.
 const BUYER_LINKS = [
   { href: "#/buyer", label: "Buyer Home", icon: "dashboard" },
-  { href: "#/buyer/cars", label: "Katalog", icon: "car" },
   { href: "#/buyer/transactions", label: "Transaksi", icon: "transaction" },
   { href: "#/profile", label: "Profil Saya", icon: "user" },
 ];

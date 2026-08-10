@@ -28,8 +28,8 @@ const ROLE_CONFIG = Object.freeze({
     role: "seller",
     slug: "seller",
     label: "Seller",
-    title: "Login Seller",
-    subtitle: "Masuk sebagai Seller",
+    title: "Login Showroom",
+    subtitle: "Masuk sebagai Showroom",
     home: "/seller",
     icon: "showroom",
     emailPlaceholder: "seller@projectb.local",
@@ -49,7 +49,13 @@ const ROLE_CONFIG = Object.freeze({
 const ROLE_TO_SLUG = Object.freeze(Object.values(ROLE_CONFIG).reduce((carry, item) => {
   carry[item.role] = item.slug;
   return carry;
-}, {}));
+}, {
+  // super_admin has no ROLE_CONFIG entry of its own — it shares admin's.
+  // Without this, configForRole("super_admin") falls through to its "buyer"
+  // default, which mislabels a super admin as "Buyer" anywhere role names
+  // are displayed (e.g. the "sesi aktif" guard panel below).
+  super_admin: "admin",
+}));
 
 export const roleSpecificLoginService = {
   configForSlug(slug) {
@@ -83,7 +89,7 @@ export const roleSpecificLoginService = {
   },
 
   roleMismatchError(config) {
-    const error = new Error(`Akun ini bukan akun ${config.label}. Silakan gunakan halaman login yang sesuai.`);
+    const error = new Error(`Maaf, Silakan login dengan akun yang sesuai.`);
     error.code = "ROLE_MISMATCH";
     return error;
   },

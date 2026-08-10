@@ -10,15 +10,9 @@ import { CacheManager } from "../preload/cacheManager.js";
 import { PreloadManager } from "../preload/preloadManager.js";
 import { preloadPlans } from "../preload/preloadPlans.js";
 import { ShellHost } from "../layout/shellHost.js";
-import { buyerManifest } from "../modules/buyer/manifest.js";
-import { adminManifest } from "../modules/admin/manifest.js";
-import { affiliateManifest } from "../modules/affiliate/manifest.js";
 import { authManifest } from "../modules/auth/manifest.js";
 import { publicManifest } from "../modules/public/manifest.js";
 import { publicContextService } from "../modules/public/services/publicContextService.js";
-import { sellerManifest } from "../modules/seller/manifest.js";
-import { notificationsManifest } from "../modules/notifications/manifest.js";
-import { profileManifest } from "../modules/profile/manifest.js";
 import { notificationService } from "../modules/notifications/services/notificationService.js";
 import { bindModal } from "../ui/primitives/modal.js";
 import { bindToastContainer } from "../ui/primitives/toast.js";
@@ -26,6 +20,53 @@ import { showToast } from "../ui/primitives/toast.js";
 import { createRoleGuard } from "./roleGuard.js";
 import { bindDesignStudioPreviewRuntime } from "../theme/designStudioPreviewRuntime.js";
 import { bindDesignStudioStyleLoader } from "../theme/designStudioStyleLoader.js";
+
+/**
+ * Manifest yang dimuat sesuai kebutuhan, bukan di awal.
+ *
+ * Sebelumnya kedelapan manifest di-import statis, sehingga tamu yang membuka
+ * halaman depan ikut mengunduh seluruh graf modul admin, seller, dan
+ * marketing. Publik dan auth tetap statis karena selalu dibutuhkan: landing,
+ * katalog, login, dan halaman notFound berasal dari sana.
+ */
+const MANIFEST_TERTUNDA = [
+  {
+    kunci: "buyer",
+    awalan: ["/buyer"],
+    role: ["buyer"],
+    muat: () => import("../modules/buyer/manifest.js").then((m) => m.buyerManifest),
+  },
+  {
+    kunci: "seller",
+    awalan: ["/seller"],
+    role: ["seller"],
+    muat: () => import("../modules/seller/manifest.js").then((m) => m.sellerManifest),
+  },
+  {
+    kunci: "admin",
+    awalan: ["/admin", "/super-admin"],
+    role: ["admin", "super_admin"],
+    muat: () => import("../modules/admin/manifest.js").then((m) => m.adminManifest),
+  },
+  {
+    kunci: "affiliate",
+    awalan: ["/affiliate"],
+    role: ["affiliate_admin"],
+    muat: () => import("../modules/affiliate/manifest.js").then((m) => m.affiliateManifest),
+  },
+  {
+    kunci: "notifications",
+    awalan: ["/notifications"],
+    role: [],
+    muat: () => import("../modules/notifications/manifest.js").then((m) => m.notificationsManifest),
+  },
+  {
+    kunci: "profile",
+    awalan: ["/profile"],
+    role: [],
+    muat: () => import("../modules/profile/manifest.js").then((m) => m.profileManifest),
+  },
+];
 
 export function createProjectBApp(options = {}) {
   return new ProjectBApp(options);
@@ -54,8 +95,59 @@ export class ProjectBApp {
       bus: this.bus,
       notFound: () => publicManifest.pages.notFound(),
       guard: createRoleGuard({ auth: authStore }),
+      resolveMissing: (path) => this.muatManifestUntukPath(path),
     });
     this.cleanup = [];
+    this.manifestTermuat = new Set();
+  }
+
+  /**
+   * Memuat manifest yang memiliki path ini, bila belum termuat.
+   * Mengembalikan true kalau ada yang baru didaftarkan, sehingga router tahu
+   * perlu mencocokkan ulang.
+   */
+  async muatManifestUntukPath(path) {
+    const jalur = String(path || "");
+    const entri = MANIFEST_TERTUNDA.find((m) => m.awalan.some(
+      (awalan) => jalur === awalan || jalur.startsWith(`${awalan}/`)
+    ));
+
+    if (!entri) {
+      return false;
+    }
+
+    return this.muatManifest(entri);
+  }
+
+  async muatManifest(entri) {
+    if (this.manifestTermuat.has(entri.kunci)) {
+      return false;
+    }
+
+    // Ditandai sebelum await supaya dua navigasi beruntun tidak memuat ganda.
+    this.manifestTermuat.add(entri.kunci);
+
+    try {
+      const manifest = await entri.muat();
+      this.registerFeatures([manifest]);
+      return true;
+    } catch (error) {
+      this.manifestTermuat.delete(entri.kunci);
+      console.error(`Gagal memuat manifest ${entri.kunci}.`, error);
+      return false;
+    }
+  }
+
+  /**
+   * Memuat manifest milik role yang sedang login, di awal, supaya halaman
+   * pertama setelah login tidak menunggu satu putaran tambahan.
+   */
+  async muatManifestUntukRole(role) {
+    const entri = MANIFEST_TERTUNDA.filter(
+      (m) => m.role.includes(role) || m.role.length === 0
+    );
+
+    await Promise.all(entri.map((m) => this.muatManifest(m)));
   }
 
   async bootstrap() {
@@ -90,11 +182,14 @@ export class ProjectBApp {
     this.cleanup.push(notificationService.bindRealtimeLifecycle(appStore));
     bindDesignStudioPreviewRuntime();
     bindDesignStudioStyleLoader(this.bus);
-    this.registerFeatures([publicManifest, authManifest, profileManifest, buyerManifest, sellerManifest, adminManifest, affiliateManifest, notificationsManifest]);
+    // Hanya publik dan auth yang selalu dibutuhkan. Manifest role menyusul
+    // sesuai role yang login, atau saat rute miliknya benar-benar dibuka.
+    this.registerFeatures([publicManifest, authManifest]);
     publicContextService.restore();
 
     await this.checkReleaseVersion();
     await this.loadAuthContext();
+    await this.muatManifestUntukRole(authStore.role());
     await this.bootstrapDesignStudioV2();
     await notificationService.ensureSnapshot({ force: true, store: appStore });
     await this.preloadManager.boot(authStore.role());

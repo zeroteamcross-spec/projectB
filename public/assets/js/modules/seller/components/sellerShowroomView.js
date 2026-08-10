@@ -107,5 +107,7 @@ function showroomPublicUrl(showroom = {}) {
   const hostname = window.location.hostname.replace(/^(showroom|marketing|admin)\./i, "");
   const origin = `${window.location.protocol}//${hostname}${window.location.port ? ":" + window.location.port : ""}`;
 
-  return `${origin}${window.location.pathname}#/showrooms/${encodeURIComponent(slug)}`;
+  // Alias pendek, sama dengan yang dijanjikan landing page dan panel sukses
+  // pendaftaran. Menuju halaman yang sama dengan /#/showrooms/<slug>.
+  return `${origin}${window.location.pathname}#/s/${encodeURIComponent(slug)}`;
 }

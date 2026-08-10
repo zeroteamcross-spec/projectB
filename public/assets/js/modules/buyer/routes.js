@@ -1,4 +1,5 @@
 import { carsResource } from "../../resources/carsResource.js";
+import { favoritesStore } from "../../state/favoritesStore.js";
 import { profileResource } from "../../resources/profileResource.js";
 import { transactionsResource } from "../../resources/transactionsResource.js";
 import { slidersResource } from "../../resources/slidersResource.js";
@@ -22,8 +23,9 @@ export const buyerRoutes = [
     preload: {
       working: [
         {
-          key: "catalog",
-          loader: ({ signal }) => carsResource.list({ limit: 10, listing_status: "published" }, { signal }),
+          // Home shows the buyer's own favorites, not a cross-showroom catalog.
+          key: "favorites",
+          loader: ({ signal }) => favoritesStore.load({ force: true, signal }).catch(() => null),
         },
         {
           key: "transactions",

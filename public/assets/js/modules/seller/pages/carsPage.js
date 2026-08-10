@@ -75,6 +75,10 @@ function render(root, router) {
   const workingBrandMaster = sellerState.working("sellerCars", "masterBrand", snapshotBrandMaster);
   const brandMaster = adminMasterService.normalizeMaster(workingBrandMaster ?? snapshotBrandMaster);
   const brandOptions = brandMaster?.data?.brands ?? [];
+  const snapshotLocationMaster = sellerState.snapshot("masterLocation", adminMasterService.normalizeLocationMaster(null));
+  const workingLocationMaster = sellerState.working("sellerCars", "masterLocation", snapshotLocationMaster);
+  const locationMaster = adminMasterService.normalizeLocationMaster(workingLocationMaster ?? snapshotLocationMaster);
+  const cityOptions = locationMaster?.data?.cities ?? [];
   const runtime = runtimeState();
   const isForm = runtime.mode === "create" || runtime.mode === "edit";
   const filteredCars = filterCars(cars, runtime.filters);
@@ -117,13 +121,13 @@ function render(root, router) {
   root.replaceChildren(layout);
 
   if (isForm) {
-    openCarFormModal({ runtime, brandOptions });
+    openCarFormModal({ runtime, brandOptions, cityOptions });
   } else {
     closeCarFormModal();
   }
 }
 
-function openCarFormModal({ runtime, brandOptions }) {
+function openCarFormModal({ runtime, brandOptions, cityOptions }) {
   const isEdit = runtime.mode === "edit" && runtime.selectedCar?.id;
   const content = document.createElement("section");
   content.id = "slrc_car_form_modal_content_section";
@@ -134,6 +138,7 @@ function openCarFormModal({ runtime, brandOptions }) {
     saving: runtime.saving,
     error: runtime.error,
     brandOptions,
+    cityOptions,
     step: runtime.formStep ?? 1,
     showNavigation: false,
     onStepChange: (formStep) => setRuntime({ formStep }),

@@ -139,7 +139,7 @@ function header() {
 
   const body = document.createElement("p");
   body.className = "text-sm leading-7 text-gray-600";
-  body.textContent = "Seller wajib melengkapi WhatsApp format 62 dan data showroom sebelum proses approval admin.";
+  body.textContent = "Showroom wajib melengkapi WhatsApp format 62 dan data showroom sebelum proses approval admin.";
 
   headerEl.append(eyebrow, title, body);
   return headerEl;

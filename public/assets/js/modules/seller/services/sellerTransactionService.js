@@ -22,6 +22,10 @@ export const sellerTransactionService = {
     return transactionsResource.cancel(transactionId, payload, options);
   },
 
+  returnTransaction(transactionId, payload = {}, options = {}) {
+    return transactionsResource.returnTransaction(transactionId, payload, options);
+  },
+
   summarize(transactions = []) {
     return {
       total: transactions.length,

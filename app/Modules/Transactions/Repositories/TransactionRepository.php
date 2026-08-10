@@ -19,7 +19,7 @@ class TransactionRepository
     {
         $stmt = $this->pdo->prepare(
             'SELECT id, seller_user_id, listing_status, brand_name, model_name,
-                    showroom_id, price_cash, price_discount, price_credit
+                    showroom_id, price_cash, price_discount, price_credit, dp_amount
              FROM cars
              WHERE id = :id
              AND deleted_at IS NULL
@@ -166,6 +166,26 @@ class TransactionRepository
         );
         $data['id'] = $id;
         $stmt->execute($data);
+    }
+
+    public function markReturned(int $id, string $reason): void
+    {
+        $now = date('Y-m-d H:i:s');
+        $stmt = $this->pdo->prepare(
+            "UPDATE transactions
+             SET transaction_status = 'returned',
+                 returned_at = :returned_at,
+                 return_reason = :return_reason,
+                 updated_at = :updated_at
+             WHERE id = :id
+             AND deleted_at IS NULL"
+        );
+        $stmt->execute([
+            'id' => $id,
+            'returned_at' => $now,
+            'return_reason' => $reason,
+            'updated_at' => $now,
+        ]);
     }
 
     public function listStalePending(string $threshold): array
@@ -430,6 +450,7 @@ class TransactionRepository
                        t.car_price, t.payment_type, t.dp_amount, t.remaining_amount,
                        t.transaction_status, t.midtrans_order_id, t.midtrans_token,
                        t.midtrans_redirect_url, t.expires_at, t.paid_at,
+                       t.returned_at, t.return_reason,
                        t.affiliate_id, t.affiliate_referral_code_snapshot,
                        t.created_at, t.updated_at,
                        buyer.name AS buyer_name, buyer.email AS buyer_email,

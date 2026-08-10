@@ -1,6 +1,8 @@
 import { createPageLifecycle } from "../../../core/lifecycle.js";
 import { appStore } from "../../../state/store.js";
 import { authStore } from "../../../state/authStore.js";
+import { canUseFavorites, favoritesStore } from "../../../state/favoritesStore.js";
+import { showToast } from "../../../ui/primitives/toast.js";
 import { mergeActiveUserIdentity } from "../../../state/sync/authUserSync.js";
 import { Button } from "../../../ui/primitives/button.js";
 import { Badge } from "../../../ui/primitives/badge.js";
@@ -52,7 +54,6 @@ export function BuyerDashboardPage({ notFound = false } = {}) {
     transmission: "",
     location_name: "",
     locations: [],
-    favorites: new Set(),
     quickFilter: "newest",
   };
 
@@ -92,17 +93,14 @@ export function BuyerDashboardPage({ notFound = false } = {}) {
         currentContext?.router?.navigate(publicContextService.carDetailPath(car.id));
       }
     },
-    toggleFavorite(carId, button) {
-      const key = String(carId ?? "");
-      if (!key) {
-        return;
-      }
-      if (uiState.favorites.has(key)) {
-        uiState.favorites.delete(key);
-      } else {
-        uiState.favorites.add(key);
-      }
-      syncFavoriteButton(button, uiState.favorites.has(key));
+    toggleFavorite(car) {
+      return favoritesStore.toggle(car?.id).catch((error) => {
+        showToast(error?.message || "Favorit gagal disimpan.", {
+          type: "error",
+          key: "favorite-toggle-error",
+          dedupeMs: 3000,
+        });
+      });
     },
   };
 
@@ -142,13 +140,14 @@ function render(root, context, actions, uiState, notFound) {
     return;
   }
 
-  const snapshotCatalog = buyerState.snapshot("catalog", { cars: [] });
   const snapshotTransactions = buyerState.snapshot("transactions", { transactions: [] });
-  const workingCatalog = buyerState.working("buyerDashboard", "catalog", snapshotCatalog);
   const workingTransactions = buyerState.working("buyerDashboard", "transactions", snapshotTransactions);
-  const cars = marketableCars(normalizeCars(workingCatalog?.cars ?? snapshotCatalog?.cars ?? []));
+  // Home is favorites-only. It deliberately no longer lists cars across every
+  // showroom; buyers save cars from a showroom catalog and find them here.
+  const cars = marketableCars(normalizeCars(favoritesStore.cars()));
   const transactions = normalizeTransactions(workingTransactions ?? snapshotTransactions);
   const filteredCars = filterCars(cars, uiState);
+  const hasFavorites = cars.length > 0;
   const activePath = context?.path ?? appStore.get("app.currentRoute.path", "/buyer");
   const user = resolveBuyerUser();
 
@@ -163,7 +162,7 @@ function render(root, context, actions, uiState, notFound) {
       user,
       actions,
     }),
-    buyerSearchBar({ cars, uiState, actions }),
+    ...(hasFavorites ? [buyerSearchBar({ cars, uiState, actions })] : []),
     SliderBanner({
       sliders: resolveBuyerSliders(),
       idPrefix: "byr",
@@ -173,7 +172,7 @@ function render(root, context, actions, uiState, notFound) {
     }),
     buyerCategoryMenu({ activePath, actions }),
     latestTransactionsSection({ transactions, actions }),
-    recommendationsSection({ cars: filteredCars, actions }),
+    recommendationsSection({ cars: filteredCars, actions, hasFavorites }),
     creditPromoBanner(actions),
     buyerBottomNavigation({ activePath, actions }),
   );
@@ -443,7 +442,7 @@ function latestTransactionsSection({ transactions, actions }) {
   });
 }
 
-function recommendationsSection({ cars, actions }) {
+function recommendationsSection({ cars, actions, hasFavorites = false }) {
   const section = document.createElement("section");
   section.id = "byr_recommendations_section";
   section.className = "grid min-w-0 gap-4";
@@ -451,10 +450,18 @@ function recommendationsSection({ cars, actions }) {
 
   section.append(recommendationsToolbar({ count: cars.length, actions }));
 
+  if (!hasFavorites) {
+    section.append(EmptyState({
+      title: "Belum ada mobil favorit",
+      description: "Buka halaman showroom, lalu tekan ikon hati pada mobil yang Anda minati. Mobil itu akan muncul di sini.",
+    }));
+    return section;
+  }
+
   if (!cars.length) {
     section.append(EmptyState({
-      title: "Mobil tidak ditemukan",
-      description: "Ubah pencarian atau filter lokal untuk melihat rekomendasi lain.",
+      title: "Favorit tidak ditemukan",
+      description: "Ubah pencarian atau filter lokal untuk melihat favorit lainnya.",
     }));
     return section;
   }
@@ -462,8 +469,14 @@ function recommendationsSection({ cars, actions }) {
   const grid = document.createElement("section");
   grid.id = "byr_recommendations_grid";
   grid.className = "grid min-w-0 gap-4 sm:grid-cols-2 lg:grid-cols-3";
-  cars.slice(0, 3).forEach((car) => {
-    grid.append(PublicCarCard({ car, onOpenDetail: actions.openCar }));
+  cars.forEach((car) => {
+    grid.append(PublicCarCard({
+      car,
+      onOpenDetail: actions.openCar,
+      showFavorite: canUseFavorites(),
+      isFavorite: favoritesStore.isFavorited(car.id),
+      onToggleFavorite: actions.toggleFavorite,
+    }));
   });
   section.append(grid);
   return section;
@@ -477,7 +490,7 @@ function recommendationsToolbar({ count, actions }) {
   copy.className = "grid min-w-0 gap-1";
   // copy.className = "";
   copy.append(
-    textNode("h2", "break-words text-sm font-bold tracking-normal text-white", "Mobil Pilihan Terbaik"),
+    textNode("h2", "break-words text-sm font-bold tracking-normal text-white", "Mobil Favorit Saya"),
     // textNode("p", "text-sm font-medium text-white/70", count ? `${count} rekomendasi tersedia` : "Rekomendasi akan muncul di sini"),
   );
 
@@ -487,55 +500,6 @@ function recommendationsToolbar({ count, actions }) {
 
   bar.append(copy, action);
   return bar;
-}
-
-function buyerCarCard({ car, actions, favorite = false }) {
-  const card = document.createElement("article");
-  card.className = "group grid min-w-0 overflow-hidden rounded-[1.55rem] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] text-left shadow-[0_18px_48px_rgba(15,23,42,0.08)] transition hover:shadow-[0_22px_58px_rgba(15,23,42,0.12)]";
-  card.dataset.ds = "buyer.dashboard.car_card";
-
-  const media = document.createElement("section");
-  media.className = "relative aspect-[1.38/1] overflow-hidden bg-[linear-gradient(135deg,var(--pb-surface-muted),var(--pb-surface-inset))]";
-  const image = document.createElement("img");
-  image.src = carImageUrl(car) || fallbackCarImageUrl();
-  image.alt = carTitle(car);
-  image.loading = "lazy";
-  image.className = "block h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]";
-  image.addEventListener("error", () => {
-    image.src = fallbackCarImageUrl();
-  }, { once: true });
-  media.append(image);
-
-  const heart = document.createElement("button");
-  heart.id = `byr_car_${car.id ?? "unknown"}_wishlist_button`;
-  heart.type = "button";
-  heart.className = favoriteButtonClassName(favorite);
-  heart.setAttribute("aria-label", "Simpan mobil");
-  heart.addEventListener("click", (event) => {
-    event.stopPropagation();
-    actions.toggleFavorite(car.id, heart);
-  });
-  heart.append(createIcon("heart", { className: "block h-4 w-4 leading-none" }));
-  media.append(heart);
-
-  const body = document.createElement("section");
-  body.className = "grid min-w-0 gap-2 p-4";
-  body.append(
-    textNode("h3", "line-clamp-2 min-h-[2.5rem] break-words text-base font-black leading-5 text-[var(--pb-text)]", carTitle(car)),
-    textNode("p", "truncate text-sm font-semibold text-[var(--pb-text-muted)]", carMeta(car)),
-    textNode("p", "truncate text-lg font-black text-[var(--pb-brand-secondary)]", formatCurrency(carPrice(car))),
-  );
-
-  const footer = document.createElement("section");
-  footer.className = "flex min-w-0 items-center justify-between gap-2 pt-1";
-  footer.append(
-    premiumBadge(car),
-    cardDetailButton(car, actions),
-  );
-  body.append(footer);
-
-  card.append(media, body);
-  return card;
 }
 
 function creditPromoBanner(actions) {
@@ -802,9 +766,11 @@ function refreshRecommendations(root, cars, actions, uiState) {
   if (!section) {
     return;
   }
+  const source = marketableCars(cars);
   section.replaceWith(recommendationsSection({
-    cars: filterCars(marketableCars(cars), uiState),
+    cars: filterCars(source, uiState),
     actions,
+    hasFavorites: source.length > 0,
   }));
 }
 
@@ -1194,19 +1160,6 @@ function isPremiumCar(car) {
   const price = Number(carPrice(car));
   const text = [car.brand_name, car.model_name, car.sub_model_name, car.segment].filter(Boolean).join(" ").toLowerCase();
   return price >= 500000000 || ["mercedes", "bmw", "lexus", "audi", "porsche", "premium"].some((keyword) => text.includes(keyword));
-}
-
-function favoriteButtonClassName(active) {
-  return active
-    ? "absolute right-3 top-3 inline-flex h-10 w-10 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_16%,white)] text-[var(--pb-brand-secondary)] shadow-[var(--pb-shadow-card)] ring-1 ring-[color-mix(in_srgb,var(--pb-brand-primary)_28%,var(--pb-border))] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]"
-    : "absolute right-3 top-3 inline-flex h-10 w-10 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--pb-surface-card)_92%,transparent)] text-[var(--pb-text)] shadow-[var(--pb-shadow-card)] ring-1 ring-[var(--pb-border)] transition hover:text-[var(--pb-brand-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]";
-}
-
-function syncFavoriteButton(button, active) {
-  if (!button) {
-    return;
-  }
-  button.className = favoriteButtonClassName(active);
 }
 
 function optionButtonClassName(active) {

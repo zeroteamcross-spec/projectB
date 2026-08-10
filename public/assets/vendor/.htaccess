@@ -1,0 +1,15 @@
+# Pustaka pihak ketiga dikunci versinya lewat path, misalnya
+# /assets/vendor/three/0.160.0/. Isinya tidak akan pernah berubah, jadi tidak
+# perlu divalidasi ulang setiap kunjungan; naik versi berarti path baru.
+#
+# Aturan yang sama ada di sendStaticCacheHeaders() pada index.php di root,
+# untuk deployment yang melayani aset lewat bridge PHP, bukan langsung Apache.
+<IfModule mod_headers.c>
+Header set Cache-Control "public, max-age=31536000, immutable"
+</IfModule>
+
+<IfModule mod_mime.c>
+AddType application/wasm .wasm
+</IfModule>
+
+Options -Indexes

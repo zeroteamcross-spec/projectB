@@ -1,6 +1,5 @@
 # Local environment and secrets
-.env
-.env.*
+!.env
 !.env.example
 
 # Local runtime files
@@ -9,7 +8,13 @@
 !/storage/logs/.gitkeep
 !/storage/cache/.gitkeep
 /public/uploads/demo/
-
+/docs/*
+docs/*
+reports/*
+RUN_LOCAL.md
+testing_guide.md
+AGENTS.md
+x
 # Manual test artifacts
 /callback*.json
 /midtrans*.json
@@ -21,6 +26,9 @@
 *.tar.gz
 *.rar
 *.7z
+*.md
+.env
+.env.example
 
 # Dependencies and tooling caches
 /vendor/
@@ -39,3 +47,4 @@ desktop.ini
 *.log
 *.tmp
 *.temp
+/docs/

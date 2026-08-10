@@ -13,13 +13,34 @@ Header set Pragma "no-cache"
 Header set Expires "0"
 </FilesMatch>
 
-<FilesMatch "\.(js|mjs|css)$">
+# Kode aplikasi selalu divalidasi ulang, supaya perubahan kode langsung terlihat
+# tanpa hard refresh. Balasannya 304 tanpa body, jadi murah.
+# json dan map ikut di sini agar sama dengan sendStaticCacheHeaders() di index.php;
+# tanpa aturan ini Apache tidak mengirim Cache-Control sama sekali dan peramban
+# menebak sendiri berapa lama boleh menyimpannya.
+<FilesMatch "\.(js|mjs|css|json|map)$">
 Header set Cache-Control "no-cache, must-revalidate"
 </FilesMatch>
 
-<FilesMatch "\.(png|jpg|jpeg|gif|svg|webp|ico|mp4|webm|woff|woff2|ttf)$">
+<FilesMatch "\.(png|jpg|jpeg|gif|svg|webp|ico|mp4|webm|woff|woff2|ttf|glb|gltf|wasm)$">
 Header set Cache-Control "public, max-age=604800"
 </FilesMatch>
+</IfModule>
+
+# Kompresi. Tanpa ini three.module.js terkirim 1,2 MB penuh, bukan sekitar 300 KB.
+<IfModule mod_deflate.c>
+AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml
+AddOutputFilterByType DEFLATE application/javascript application/x-javascript
+AddOutputFilterByType DEFLATE application/json application/xml
+AddOutputFilterByType DEFLATE image/svg+xml model/gltf+json
+</IfModule>
+
+# Model 3D landing. Tanpa MIME ini GLTFLoader menolak berkasnya.
+# wasm dipakai dekoder Draco milik three.js.
+<IfModule mod_mime.c>
+AddType model/gltf-binary .glb
+AddType model/gltf+json .gltf
+AddType application/wasm .wasm
 </IfModule>
 
 <IfModule mod_rewrite.c>
@@ -41,3 +62,6 @@ RewriteRule ^ - [L]
 # Hash routing is client-side; unknown non-API paths use PHP so share metadata can be injected.
 RewriteRule ^ index.php [QSA,L]
 </IfModule>
+
+# Jangan tampilkan isi folder yang tidak punya index.
+Options -Indexes

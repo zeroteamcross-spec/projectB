@@ -83,9 +83,9 @@ function canOpenPayment(transaction) {
 }
 
 function canComplete(transaction) {
-  return transaction?.payment_type === "dp"
-    && transaction.transaction_status === "dp_paid"
-    && Number(transaction.remaining_amount ?? 0) > 0;
+  // Booking Fee adalah pembayaran terakhir di sistem, jadi tidak ada CTA
+  // pelunasan. Sisa harga diselesaikan langsung dengan showroom.
+  return false;
 }
 
 function isExpired(value) {

@@ -38,6 +38,7 @@ class CarMapper
             'price_cash' => self::nullableInt($car['price_cash']),
             'price_discount' => self::nullableInt($car['price_discount']),
             'price_credit' => self::nullableInt($car['price_credit']),
+            'dp_amount' => self::nullableInt($car['dp_amount'] ?? null),
             'inspection_summary_status' => $car['inspection_summary_status'],
             'published_at' => $car['published_at'],
             'created_at' => $car['created_at'],

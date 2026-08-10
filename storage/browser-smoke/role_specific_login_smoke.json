@@ -63,7 +63,7 @@
       "expectedResult": "ditolak dan tetap tidak login",
       "actualResult": {
         "hash": "#/login/seller",
-        "errorText": "Akun ini bukan akun Seller. Silakan gunakan halaman login yang sesuai.",
+        "errorText": "Akun ini bukan akun Showroom. Silakan gunakan halaman login yang sesuai.",
         "autologinRole": null
       },
       "result": "PASS"

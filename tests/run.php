@@ -26,6 +26,9 @@ $tests = [
     Tests\Unit\EnvironmentReadinessTest::class,
     Tests\Unit\MidtransCallbackEndpointTest::class,
     Tests\Unit\DesignStudioV2DraftTest::class,
+    Tests\Unit\FavoritesTest::class,
+    Tests\Unit\ShowroomRegistrationTest::class,
+    Tests\Unit\BookingFeeAndReturnTest::class,
 ];
 
 $passed = 0;
