@@ -18,7 +18,7 @@ class ShowroomRepository
     public function findById(int $id): ?array
     {
         $stmt = $this->pdo->prepare(
-            'SELECT id, user_id, slug, name, address, phone_number, bank_account_number,
+            'SELECT id, user_id, slug, name, address, city_name, phone_number, bank_account_number,
                     bank_type, bank_account_name, created_at, updated_at
              FROM showrooms
              WHERE id = :id
@@ -34,7 +34,7 @@ class ShowroomRepository
     public function findByUserId(int $userId): ?array
     {
         $stmt = $this->pdo->prepare(
-            'SELECT id, user_id, slug, name, address, phone_number, bank_account_number,
+            'SELECT id, user_id, slug, name, address, city_name, phone_number, bank_account_number,
                     bank_type, bank_account_name, created_at, updated_at
              FROM showrooms
              WHERE user_id = :user_id
@@ -50,7 +50,7 @@ class ShowroomRepository
     public function findPublicContextBySlug(string $slug): ?array
     {
         $stmt = $this->pdo->prepare(
-            'SELECT sh.id, sh.user_id, sh.slug, sh.name, sh.address, sh.phone_number,
+            'SELECT sh.id, sh.user_id, sh.slug, sh.name, sh.address, sh.city_name, sh.phone_number,
                     u.name AS seller_name, u.email AS seller_email, u.phone_number AS seller_phone_number
              FROM showrooms AS sh
              INNER JOIN users AS u ON u.id = sh.user_id
@@ -86,10 +86,10 @@ class ShowroomRepository
     {
         $stmt = $this->pdo->prepare(
             'INSERT INTO showrooms
-                (user_id, slug, name, address, phone_number, bank_account_number,
+                (user_id, slug, name, address, city_name, phone_number, bank_account_number,
                  bank_type, bank_account_name, created_at, updated_at)
              VALUES
-                (:user_id, :slug, :name, :address, :phone_number, :bank_account_number,
+                (:user_id, :slug, :name, :address, :city_name, :phone_number, :bank_account_number,
                  :bank_type, :bank_account_name, :created_at, :updated_at)'
         );
 
@@ -98,6 +98,7 @@ class ShowroomRepository
             'slug' => $data['slug'],
             'name' => $data['name'],
             'address' => $data['address'] ?? null,
+            'city_name' => $data['city_name'] ?? null,
             'phone_number' => $data['phone_number'] ?? null,
             'bank_account_number' => $data['bank_account_number'] ?? null,
             'bank_type' => $data['bank_type'] ?? null,
@@ -116,6 +117,7 @@ class ShowroomRepository
              SET slug = :slug,
                  name = :name,
                  address = :address,
+                 city_name = :city_name,
                  phone_number = :phone_number,
                  bank_account_number = :bank_account_number,
                  bank_type = :bank_type,
@@ -130,6 +132,7 @@ class ShowroomRepository
             'slug' => $data['slug'],
             'name' => $data['name'],
             'address' => $data['address'] ?? null,
+            'city_name' => $data['city_name'] ?? null,
             'phone_number' => $data['phone_number'] ?? null,
             'bank_account_number' => $data['bank_account_number'] ?? null,
             'bank_type' => $data['bank_type'] ?? null,

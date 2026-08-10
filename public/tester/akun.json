@@ -1,0 +1,144 @@
+{
+  "keterangan": "Sumber kebenaran akun untuk tester otomatis. Dimuat runner saat start dan tersedia sebagai variabel di SEMUA skenario tanpa perlu dideklarasikan ulang. Skenario tetap boleh menimpanya lewat blok variabel sendiri.",
+  "diverifikasi_pada": "2026-08-09",
+  "cara_verifikasi": "Setiap pasangan email dan password di bawah diuji login sungguhan ke POST /api/auth/login. Hanya yang berhasil yang dicantumkan.",
+
+  "aturan_password": {
+    "frontend-*": "DemoPass123!",
+    "tanpa awalan": "SmokePass123!",
+    "uat_aff_fin_*": "SmokePass123!",
+    "buyer.google@projectb.test": "DemoPass123!",
+    "showroom demo": "DemoPass123!",
+    "ringkas": "Ada kata 'frontend' berarti Demo, tidak ada berarti Smoke."
+  },
+
+  "variabel": {
+    "pw_demo": "DemoPass123!",
+    "pw_smoke": "SmokePass123!",
+
+    "superadmin_email": "frontend-superadmin@projectb.local",
+    "superadmin_password": "DemoPass123!",
+
+    "admin_email": "frontend-admin@projectb.local",
+    "admin_password": "DemoPass123!",
+
+    "admin_smoke_email": "admin@projectb.local",
+    "admin_smoke_password": "SmokePass123!",
+
+    "seller_email": "metro-auto@projectb.local",
+    "seller_password": "DemoPass123!",
+    "seller_slug": "metro-auto-jakarta",
+
+    "seller2_email": "parahyangan-cars@projectb.local",
+    "seller2_password": "DemoPass123!",
+    "seller2_slug": "parahyangan-cars-bandung",
+
+    "seller_tanpa_showroom_email": "pending-seller@projectb.local",
+    "seller_tanpa_showroom_password": "SmokePass123!",
+
+    "buyer_email": "frontend-buyer@projectb.local",
+    "buyer_password": "DemoPass123!",
+
+    "buyer_google_email": "buyer.google@projectb.test",
+    "buyer_google_password": "DemoPass123!",
+
+    "marketing_email": "affiliate@projectb.local",
+    "marketing_password": "SmokePass123!"
+  },
+
+  "akun": [
+    {
+      "role": "super_admin",
+      "email": "frontend-superadmin@projectb.local",
+      "password": "DemoPass123!",
+      "variabel": "superadmin_email / superadmin_password",
+      "catatan": "Satu-satunya role yang bisa membuka Design Studio V2."
+    },
+    {
+      "role": "admin",
+      "email": "frontend-admin@projectb.local",
+      "password": "DemoPass123!",
+      "variabel": "admin_email / admin_password",
+      "catatan": "Admin utama untuk approval dan settlement."
+    },
+    {
+      "role": "admin",
+      "email": "admin@projectb.local",
+      "password": "SmokePass123!",
+      "variabel": "admin_smoke_email / admin_smoke_password",
+      "catatan": "Admin versi smoke. Password berbeda dari frontend-admin."
+    },
+    {
+      "role": "seller",
+      "email": "metro-auto@projectb.local",
+      "password": "DemoPass123!",
+      "showroom": "metro-auto-jakarta",
+      "variabel": "seller_email / seller_password / seller_slug",
+      "catatan": "Showroom utama untuk pengujian katalog dan transaksi."
+    },
+    {
+      "role": "seller",
+      "email": "parahyangan-cars@projectb.local",
+      "password": "DemoPass123!",
+      "showroom": "parahyangan-cars-bandung",
+      "variabel": "seller2_email / seller2_password / seller2_slug",
+      "catatan": "Showroom kedua, berguna untuk menguji isolasi antar tenant."
+    },
+    {
+      "role": "seller",
+      "email": "nusantara-wheels@projectb.local",
+      "password": "DemoPass123!",
+      "showroom": "nusantara-wheels-surabaya"
+    },
+    {
+      "role": "seller",
+      "email": "seller@projectb.local",
+      "password": "SmokePass123!",
+      "showroom": "smoke-showroom"
+    },
+    {
+      "role": "seller",
+      "email": "pending-seller@projectb.local",
+      "password": "SmokePass123!",
+      "showroom": null,
+      "variabel": "seller_tanpa_showroom_email / seller_tanpa_showroom_password",
+      "catatan": "Sengaja tanpa showroom. Untuk menguji seller yang belum melengkapi profil."
+    },
+    {
+      "role": "buyer",
+      "email": "frontend-buyer@projectb.local",
+      "password": "DemoPass123!",
+      "variabel": "buyer_email / buyer_password"
+    },
+    {
+      "role": "buyer",
+      "email": "buyer.google@projectb.test",
+      "password": "DemoPass123!",
+      "variabel": "buyer_google_email / buyer_google_password",
+      "catatan": "Punya baris user_oauth_identities provider=google. Login lewat jalur normal, sesinya identik dengan buyer Google sungguhan. Bukan bypass autentikasi. Seed dengan php scripts/seed_buyer_google_identity.php"
+    },
+    {
+      "role": "buyer",
+      "email": "buyer@projectb.local",
+      "password": "SmokePass123!"
+    },
+    {
+      "role": "affiliate_admin",
+      "email": "affiliate@projectb.local",
+      "password": "SmokePass123!",
+      "variabel": "marketing_email / marketing_password",
+      "catatan": "Satu-satunya akun marketing. Seed demo frontend tidak membuat role ini, jadi passwordnya smoke."
+    }
+  ],
+
+  "cara_menyeed_ulang": [
+    "php scripts/seed_frontend_demo.php",
+    "php scripts/seed_smoke_readiness.php",
+    "php scripts/seed_buyer_google_identity.php"
+  ],
+
+  "peringatan": [
+    "Hanya untuk lokal dan staging. Jangan pernah diseed ke production.",
+    "Mobil hasil seed belum punya Booking Fee, sehingga belum bisa ditransaksikan. Isi dulu lewat #/seller/cars."
+  ]
+}

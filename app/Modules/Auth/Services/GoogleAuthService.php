@@ -52,7 +52,7 @@ class GoogleAuthService
         ];
     }
 
-    public function redirectForHost(string $host, ?string $next = null): array
+    public function redirectForHost(string $host, ?string $next = null, ?string $showroomSlug = null): array
     {
         $context = $this->contextForHost($host);
 
@@ -64,11 +64,12 @@ class GoogleAuthService
             (string) $context['role'],
             $this->redirectUriForHost((string) $context['host']),
             (string) $context['host'],
-            $next
+            $next,
+            $showroomSlug
         );
     }
 
-    public function redirect(string $role, ?string $redirectUri = null, ?string $host = null, ?string $next = null): array
+    public function redirect(string $role, ?string $redirectUri = null, ?string $host = null, ?string $next = null, ?string $showroomSlug = null): array
     {
         $role = $this->normalizeRole($role);
 
@@ -90,6 +91,16 @@ class GoogleAuthService
 
         if ($next !== null && $next !== '') {
             $statePayload['next'] = $next;
+        }
+
+        // Only buyers are "customers of" a showroom. A bogus or unknown slug
+        // is simply dropped here rather than failing the whole login attempt.
+        if ($role === 'buyer' && $showroomSlug !== null && $showroomSlug !== '') {
+            $showroomId = $this->repository->findShowroomIdBySlug($this->normalizeShowroomSlug($showroomSlug));
+
+            if ($showroomId !== null) {
+                $statePayload['showroom_id'] = $showroomId;
+            }
         }
 
         $state = $this->signedToken($statePayload);
@@ -134,6 +145,10 @@ class GoogleAuthService
                 'completion_cookie' => null,
                 'remember_token' => null,
             ];
+        }
+
+        if ($role === 'buyer' && isset($statePayload['showroom_id'])) {
+            $this->repository->setHomeShowroomId((int) $user['id'], (int) $statePayload['showroom_id']);
         }
 
         return [

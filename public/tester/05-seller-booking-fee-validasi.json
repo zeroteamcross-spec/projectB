@@ -1,0 +1,198 @@
+{
+  "nama_fitur": "Booking Fee wajib pada form mobil seller",
+  "aplikasi": "projectB",
+  "halaman": [
+    "#/auth?role=seller"
+  ],
+  "prefix_id": [
+    "hr_auth_",
+    "slrc_"
+  ],
+  "versi": "1.0",
+  "berhenti_saat_gagal": true,
+  "keterangan": "CRUD nyata sebagai showroom. Login, buka form mobil, pastikan field Nominal Booking Fee ada dan wajib, lalu buktikan server menolak bila dikosongkan dan bila nilainya melebihi harga cash.",
+  "prasyarat_data": [
+    "Server lokal berjalan di http://localhost:8000.",
+    "Migrasi 20260809_booking_fee_and_return.sql sudah dijalankan.",
+    "Kredensial diambil dari tester/akun.json yang dimuat runner otomatis."
+  ],
+  "variabel": {
+    "email_seller": "{{seller_email}}",
+    "password_seller": "{{seller_password}}"
+  },
+  "urutan_uji": [
+    {
+      "urutan": 1,
+      "halaman": "#/auth?role=seller",
+      "id": "hr_auth_role_seller_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Pilih role seller",
+      "tunggu": {
+        "elemen": "#hr_auth_login_seller_email_input",
+        "timeout_ms": 8000
+      }
+    },
+    {
+      "urutan": 2,
+      "aksi": "assert",
+      "nama": "Tab Daftar tidak ada untuk seller",
+      "harapan": {
+        "elemen_tidak_ada": "#hr_auth_tab_register_button"
+      },
+      "catatan": "Pendaftaran showroom sudah dipindah ke halaman tersendiri."
+    },
+    {
+      "urutan": 3,
+      "id": "hr_auth_login_seller_email_input",
+      "jenis": "input-email",
+      "aksi": "isi",
+      "nilai": "{{email_seller}}",
+      "nama": "Email seller"
+    },
+    {
+      "urutan": 4,
+      "id": "hr_auth_login_seller_password_input",
+      "jenis": "input-password",
+      "aksi": "isi",
+      "nilai": "{{password_seller}}",
+      "nama": "Password seller"
+    },
+    {
+      "urutan": 5,
+      "id": "hr_auth_login_seller_submit_button",
+      "jenis": "button-submit",
+      "aksi": "klik",
+      "nama": "Masuk sebagai seller",
+      "tunggu": {
+        "route": "#/seller",
+        "timeout_ms": 15000
+      }
+    },
+    {
+      "urutan": 6,
+      "halaman": "#/seller/cars",
+      "id": "slrc_toolbar_actions_section",
+      "jenis": "container",
+      "aksi": "verifikasi",
+      "nama": "Halaman katalog seller terbuka",
+      "timeout_ms": 15000
+    },
+    {
+      "urutan": 7,
+      "selector": "#slrc_toolbar_actions_section button",
+      "jenis": "button",
+      "aksi": "klik",
+      "berisi_teks": "Tambah",
+      "nama": "Buka form mobil baru",
+      "tunggu": {
+        "elemen": "#slrc_car_form_next_button",
+        "timeout_ms": 8000
+      }
+    },
+    {
+      "urutan": 8,
+      "id": "slrc_car_form_next_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Lanjut ke langkah 2",
+      "tunggu": {
+        "ms": 600
+      }
+    },
+    {
+      "urutan": 9,
+      "id": "slrc_car_form_next_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Lanjut ke langkah 3",
+      "tunggu": {
+        "elemen": "#slrc_dp_amount_input",
+        "timeout_ms": 8000
+      }
+    },
+    {
+      "urutan": 10,
+      "id": "slrc_dp_amount_input",
+      "jenis": "input-number",
+      "aksi": "verifikasi",
+      "nama": "Field Nominal Booking Fee tersedia",
+      "harapan": {
+        "elemen_ada": "#slrc_dp_amount_input"
+      },
+      "catatan": "Inti perubahan: showroom menentukan Booking Fee di sini."
+    },
+    {
+      "urutan": 11,
+      "aksi": "assert",
+      "nama": "Labelnya memakai istilah Booking Fee, bukan DP",
+      "harapan": {
+        "teks_mengandung": "Nominal Booking Fee",
+        "lingkup": "halaman"
+      }
+    },
+    {
+      "urutan": 12,
+      "id": "slrc_price_cash_input",
+      "jenis": "input-number",
+      "aksi": "isi",
+      "nilai": "200000000",
+      "nama": "Harga cash"
+    },
+    {
+      "urutan": 13,
+      "id": "slrc_dp_amount_input",
+      "jenis": "input-number",
+      "aksi": "isi",
+      "nilai": "250000000",
+      "nama": "Booking Fee melebihi harga cash",
+      "catatan": "Sengaja salah untuk membuktikan validasinya bekerja."
+    },
+    {
+      "urutan": 14,
+      "id": "slrc_car_form_submit_button",
+      "jenis": "button-submit",
+      "aksi": "klik",
+      "nama": "Coba simpan dengan Booking Fee tidak wajar",
+      "abaikan_error_endpoint": true,
+      "tunggu": {
+        "ms": 2000
+      }
+    },
+    {
+      "urutan": 15,
+      "aksi": "assert",
+      "nama": "Form tidak boleh tertutup karena ditolak",
+      "harapan": {
+        "elemen_ada": "#slrc_dp_amount_input"
+      },
+      "catatan": "Bila form tertutup, artinya data tidak wajar lolos tersimpan."
+    },
+    {
+      "urutan": 16,
+      "id": "slrc_dp_amount_input",
+      "jenis": "input-number",
+      "aksi": "isi",
+      "nilai": "5000000",
+      "nama": "Perbaiki Booking Fee jadi wajar"
+    },
+    {
+      "urutan": 17,
+      "id": "slrc_dp_amount_input",
+      "jenis": "input-number",
+      "aksi": "verifikasi",
+      "nama": "Nilai Booking Fee tersimpan di field",
+      "harapan": {
+        "nilai_sama": "5000000"
+      }
+    },
+    {
+      "urutan": 18,
+      "id": "slrc_cancel_car_button",
+      "jenis": "button",
+      "aksi": "klik_opsional",
+      "nama": "Batalkan form agar tidak menambah data uji",
+      "catatan": "Skenario ini hanya menguji validasi, jadi tidak perlu menyimpan mobil."
+    }
+  ]
+}

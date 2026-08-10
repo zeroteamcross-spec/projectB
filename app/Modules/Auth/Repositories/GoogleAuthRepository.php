@@ -222,6 +222,54 @@ class GoogleAuthRepository
         return (int) $this->pdo->lastInsertId();
     }
 
+    public function findShowroomIdBySlug(string $slug): ?int
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT id FROM showrooms WHERE slug = :slug AND deleted_at IS NULL LIMIT 1'
+        );
+        $stmt->execute(['slug' => $slug]);
+        $id = $stmt->fetchColumn();
+
+        return $id !== false ? (int) $id : null;
+    }
+
+    /**
+     * Records which showroom a buyer is a customer of right now. Overwritten
+     * on every showroom-scoped login, never additive — a buyer only "belongs"
+     * to the showroom they most recently logged in through.
+     */
+    public function setHomeShowroomId(int $userId, int $showroomId): void
+    {
+        $stmt = $this->pdo->prepare(
+            'UPDATE users
+             SET home_showroom_id = :showroom_id,
+                 updated_at = :updated_at
+             WHERE id = :id
+             AND deleted_at IS NULL'
+        );
+        $stmt->execute([
+            'id' => $userId,
+            'showroom_id' => $showroomId,
+            'updated_at' => date('Y-m-d H:i:s'),
+        ]);
+    }
+
+    public function findHomeShowroomSlug(int $userId): ?string
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT sh.slug
+             FROM users AS u
+             INNER JOIN showrooms AS sh ON sh.id = u.home_showroom_id AND sh.deleted_at IS NULL
+             WHERE u.id = :id
+             AND u.deleted_at IS NULL
+             LIMIT 1'
+        );
+        $stmt->execute(['id' => $userId]);
+        $slug = $stmt->fetchColumn();
+
+        return $slug !== false ? (string) $slug : null;
+    }
+
     public function showroomSlugExists(string $slug, ?int $ignoreShowroomId = null): bool
     {
         $sql = 'SELECT id FROM showrooms WHERE slug = :slug AND deleted_at IS NULL';

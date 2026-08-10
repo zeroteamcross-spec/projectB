@@ -13,7 +13,8 @@ class CarRepository
         secondary_color, color_variation, document_type, registration_date, transmission,
         engine_number, chassis_number, location_name, engine_capacity_cc, mileage_km,
         seat_count, previous_owner_count, has_service_book, key_count, description,
-        youtube_url, price_cash, price_discount, price_credit, inspection_summary_status, published_at,
+        youtube_url, price_cash, price_discount, price_credit, dp_amount,
+        inspection_summary_status, published_at,
         created_at, updated_at,
         (
             SELECT cover_image.file_path
@@ -83,6 +84,39 @@ class CarRepository
         $car = $stmt->fetch();
 
         return $car ?: null;
+    }
+
+    /**
+     * @param array<int, int> $ids
+     */
+    public function listByIds(array $ids, array $filters = []): array
+    {
+        $ids = array_values(array_unique(array_map('intval', $ids)));
+
+        if ($ids === []) {
+            return [];
+        }
+
+        [$where, $params] = $this->buildWhere($filters);
+        $placeholders = [];
+
+        foreach ($ids as $index => $id) {
+            $placeholder = 'id_' . $index;
+            $placeholders[] = ':' . $placeholder;
+            $params[$placeholder] = $id;
+        }
+
+        $sql = 'SELECT ' . self::SELECT_COLUMNS . ' FROM cars '
+            . $where . ' AND id IN (' . implode(', ', $placeholders) . ') ORDER BY id DESC';
+        $stmt = $this->pdo->prepare($sql);
+
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
+        }
+
+        $stmt->execute();
+
+        return $stmt->fetchAll();
     }
 
     public function showroomIdForSeller(int $sellerUserId): ?int

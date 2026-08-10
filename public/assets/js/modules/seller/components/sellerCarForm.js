@@ -17,7 +17,7 @@ const STEP_META = [
 const REQUIRED_FIELDS = {
   1: ["license_plate_number", "brand_name", "model_name"],
   2: ["registration_date", "engine_number", "chassis_number"],
-  3: ["price_cash"],
+  3: ["price_cash", "dp_amount"],
 };
 
 const STATUS_OPTIONS = [
@@ -69,6 +69,7 @@ export function SellerCarForm({
   saving = false,
   error = "",
   brandOptions = [],
+  cityOptions = [],
   step = 1,
   showNavigation = true,
   onStepChange = null,
@@ -128,7 +129,7 @@ export function SellerCarForm({
     Select({ id: "slrc_has_service_book_input", name: "has_service_book", label: "Buku servis", value: serviceBookValue(values.has_service_book), options: SERVICE_BOOK_OPTIONS }),
     NumericInput({ id: "slrc_key_count_input", name: "key_count", label: "Jumlah kunci", value: values.key_count ?? "", placeholder: "2" }),
     Select({ id: "slrc_transmission_input", name: "transmission", label: "Transmisi", value: values.transmission ?? "", options: TRANSMISSION_OPTIONS }),
-    Input({ id: "slrc_location_name_input", name: "location_name", label: "Lokasi", value: values.location_name ?? "", placeholder: "Jakarta Selatan" })
+    Select({ id: "slrc_location_name_input", name: "location_name", label: "Lokasi", value: values.location_name ?? "", options: cityOptionsList(cityOptions, values.location_name) })
   );
   step2.append(technical.section);
 
@@ -140,6 +141,7 @@ export function SellerCarForm({
     NumericInput({ id: "slrc_price_cash_input", name: "price_cash", label: "Harga cash", value: values.price_cash ?? "", placeholder: "250000000" }),
     NumericInput({ id: "slrc_price_discount_input", name: "price_discount", label: "Harga diskon", value: values.price_discount ?? "", placeholder: "240000000" }),
     NumericInput({ id: "slrc_price_credit_input", name: "price_credit", label: "Harga kredit", value: values.price_credit ?? "", placeholder: "260000000" }),
+    NumericInput({ id: "slrc_dp_amount_input", name: "dp_amount", label: "Nominal Booking Fee", value: values.dp_amount ?? "", placeholder: "5000000" }),
     NumericInput({ id: "slrc_stock_input", name: "stock", label: "Stok", value: values.stock ?? 1, placeholder: "1" }),
     Select({ id: "slrc_listing_status_input", name: "listing_status", label: "Status listing", value: values.listing_status ?? "draft", options: STATUS_OPTIONS }),
     Select({ id: "slrc_inspection_summary_status_input", name: "inspection_summary_status", label: "Status inspeksi", value: values.inspection_summary_status ?? "not_checked", options: INSPECTION_STATUS_OPTIONS }),
@@ -542,11 +544,35 @@ function normalizeCarPayload(formData) {
     price_cash: numberValue(formData, "price_cash"),
     price_discount: numberValue(formData, "price_discount"),
     price_credit: numberValue(formData, "price_credit"),
+    dp_amount: numberValue(formData, "dp_amount"),
     listing_status: textValue(formData, "listing_status") || "draft",
     inspection_summary_status: textValue(formData, "inspection_summary_status") || "not_checked",
     youtube_url: nullableText(formData, "youtube_url"),
     description: nullableText(formData, "description"),
   };
+}
+
+/**
+ * Kota diambil dari Master Lokasi (yang sama dipakai #/daftar-showroom),
+ * bukan diketik bebas, supaya nama kota konsisten di seluruh listing.
+ * Nilai lama yang sudah tersimpan tapi tidak ada di master tetap ditampilkan,
+ * seperti pola yang sama dipakai createBrandSelect di atas.
+ */
+function cityOptionsList(cities = [], selectedValue = "") {
+  const active = (Array.isArray(cities) ? cities : [])
+    .filter((city) => (city?.status ?? "active") === "active")
+    .map((city) => String(city?.name ?? "").trim())
+    .filter(Boolean);
+
+  const options = [{ value: "", label: active.length ? "Pilih kota" : "Master Lokasi belum tersedia" }];
+  active.forEach((name) => options.push({ value: name, label: name }));
+
+  const current = String(selectedValue ?? "").trim();
+  if (current && !active.includes(current)) {
+    options.push({ value: current, label: `${current} (data lama)` });
+  }
+
+  return options;
 }
 
 function colorOptions() {

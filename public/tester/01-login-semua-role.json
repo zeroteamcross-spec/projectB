@@ -1,0 +1,455 @@
+{
+  "nama_fitur": "Login semua role dan penolakannya",
+  "aplikasi": "projectB",
+  "halaman": [
+    "#/auth"
+  ],
+  "prefix_id": [
+    "hr_auth_"
+  ],
+  "versi": "1.0",
+  "berhenti_saat_gagal": false,
+  "keterangan": "Menguji halaman login lintas role beserta jalur penolakannya. Mencakup password salah, role mismatch (kredensial benar tetapi role yang dipilih berbeda), perbedaan tab Daftar antar role, login sukses, panel sesi aktif, dan logout. Semua kredensial di bawah sudah diverifikasi hidup di database.",
+  "prasyarat_data": [
+    "Server lokal berjalan di http://localhost:8000.",
+    "Belum ada sesi login aktif di browser. Kalau ada, logout dulu.",
+    "Akun seed tersedia: frontend-buyer, metro-auto, frontend-admin, affiliate.",
+    "Kredensial diambil dari tester/akun.json yang dimuat runner otomatis."
+  ],
+  "variabel": {
+    "email_buyer": "{{buyer_email}}",
+    "email_seller": "{{seller_email}}",
+    "email_admin": "{{admin_email}}",
+    "email_marketing": "{{marketing_email}}",
+    "password_demo": "{{pw_demo}}",
+    "password_smoke": "{{pw_smoke}}",
+    "password_salah": "SalahTotal999"
+  },
+  "urutan_uji": [
+    {
+      "urutan": 1,
+      "halaman": "#/auth",
+      "id": "hr_auth_role_section",
+      "jenis": "container",
+      "aksi": "verifikasi",
+      "nama": "Pemilih role tampil",
+      "timeout_ms": 20000,
+      "harapan": {
+        "elemen_ada": "#hr_auth_role_buyer_button"
+      }
+    },
+    {
+      "urutan": 2,
+      "id": "hr_auth_role_buyer_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Pilih role buyer",
+      "tunggu": {
+        "elemen": "#hr_auth_login_buyer_email_input",
+        "timeout_ms": 15000
+      }
+    },
+    {
+      "urutan": 3,
+      "aksi": "assert",
+      "nama": "Buyer punya tab Masuk dan Daftar",
+      "harapan": {
+        "elemen_ada": "#hr_auth_tab_register_button"
+      },
+      "catatan": "Hanya buyer yang boleh mendaftar dari halaman ini."
+    },
+    {
+      "urutan": 4,
+      "id": "hr_auth_login_buyer_email_input",
+      "jenis": "input-email",
+      "aksi": "isi",
+      "nilai": "{{email_buyer}}",
+      "nama": "Email buyer"
+    },
+    {
+      "urutan": 5,
+      "id": "hr_auth_login_buyer_password_input",
+      "jenis": "input-password",
+      "aksi": "isi",
+      "nilai": "{{password_salah}}",
+      "nama": "Password sengaja salah"
+    },
+    {
+      "urutan": 6,
+      "id": "hr_auth_login_buyer_submit_button",
+      "jenis": "button-submit",
+      "aksi": "klik",
+      "nama": "Coba masuk dengan password salah",
+      "abaikan_error_endpoint": true,
+      "tunggu": {
+        "ms": 3000
+      }
+    },
+    {
+      "urutan": 7,
+      "aksi": "assert",
+      "nama": "Login gagal, tetap di halaman auth",
+      "harapan": {
+        "route_sama": "#/auth"
+      },
+      "catatan": "Password salah tidak boleh meloloskan buyer ke dashboard."
+    },
+    {
+      "urutan": 8,
+      "aksi": "assert",
+      "nama": "Form login masih tampil",
+      "harapan": {
+        "elemen_ada": "#hr_auth_login_buyer_submit_button"
+      }
+    },
+    {
+      "urutan": 9,
+      "id": "hr_auth_role_seller_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Pindah ke role seller",
+      "tunggu": {
+        "elemen": "#hr_auth_login_seller_email_input",
+        "timeout_ms": 15000
+      }
+    },
+    {
+      "urutan": 10,
+      "aksi": "assert",
+      "nama": "Seller tidak punya tab Daftar",
+      "harapan": {
+        "elemen_tidak_ada": "#hr_auth_tab_register_button"
+      }
+    },
+    {
+      "urutan": 11,
+      "aksi": "assert",
+      "nama": "Seller tidak punya bar tab sama sekali",
+      "harapan": {
+        "elemen_tidak_ada": "#hr_auth_tab_login_button"
+      },
+      "catatan": "Satu tab tunggal dihapus karena tidak ada yang bisa dipilih."
+    },
+    {
+      "urutan": 12,
+      "id": "hr_auth_seller_register_link",
+      "jenis": "button",
+      "aksi": "verifikasi",
+      "nama": "Ada link ke pendaftaran showroom",
+      "harapan": {
+        "teks_mengandung": "Daftarkan showroom"
+      }
+    },
+    {
+      "urutan": 13,
+      "id": "hr_auth_login_seller_email_input",
+      "jenis": "input-email",
+      "aksi": "isi",
+      "nilai": "{{email_buyer}}",
+      "nama": "Isi kredensial BUYER pada form seller"
+    },
+    {
+      "urutan": 14,
+      "id": "hr_auth_login_seller_password_input",
+      "jenis": "input-password",
+      "aksi": "isi",
+      "nilai": "{{password_demo}}",
+      "nama": "Password buyer yang benar"
+    },
+    {
+      "urutan": 15,
+      "id": "hr_auth_login_seller_submit_button",
+      "jenis": "button-submit",
+      "aksi": "klik",
+      "nama": "Coba masuk sebagai seller memakai akun buyer",
+      "abaikan_error_endpoint": true,
+      "tunggu": {
+        "ms": 4000
+      },
+      "catatan": "Kredensialnya benar tetapi rolenya tidak cocok. Sistem harus menolak dan melogout ulang."
+    },
+    {
+      "urutan": 16,
+      "aksi": "assert",
+      "nama": "Role mismatch ditolak, tidak masuk ke dashboard seller",
+      "harapan": {
+        "route_sama": "#/auth"
+      },
+      "catatan": "Bila lolos ke #/seller, ini lubang keamanan serius."
+    },
+    {
+      "urutan": 17,
+      "id": "hr_auth_role_admin_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Pindah ke role admin",
+      "tunggu": {
+        "elemen": "#hr_auth_login_admin_email_input",
+        "timeout_ms": 15000
+      }
+    },
+    {
+      "urutan": 18,
+      "aksi": "assert",
+      "nama": "Admin memakai akun dari admin, tanpa tab Daftar",
+      "harapan": {
+        "teks_mengandung": "Role ini memakai akun dari admin",
+        "lingkup": "halaman"
+      }
+    },
+    {
+      "urutan": 19,
+      "id": "hr_auth_role_affiliate_admin_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Pindah ke role marketing",
+      "tunggu": {
+        "elemen": "#hr_auth_login_affiliate_admin_email_input",
+        "timeout_ms": 15000
+      }
+    },
+    {
+      "urutan": 20,
+      "aksi": "assert",
+      "nama": "Marketing juga tanpa tab Daftar",
+      "harapan": {
+        "elemen_tidak_ada": "#hr_auth_tab_register_button"
+      }
+    },
+    {
+      "urutan": 21,
+      "id": "hr_auth_role_buyer_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Kembali ke role buyer",
+      "tunggu": {
+        "elemen": "#hr_auth_login_buyer_email_input",
+        "timeout_ms": 15000
+      }
+    },
+    {
+      "urutan": 22,
+      "id": "hr_auth_login_buyer_email_input",
+      "jenis": "input-email",
+      "aksi": "isi",
+      "nilai": "{{email_buyer}}",
+      "nama": "Email buyer"
+    },
+    {
+      "urutan": 23,
+      "id": "hr_auth_login_buyer_password_input",
+      "jenis": "input-password",
+      "aksi": "isi",
+      "nilai": "{{password_demo}}",
+      "nama": "Password buyer yang benar"
+    },
+    {
+      "urutan": 24,
+      "id": "hr_auth_login_buyer_submit_button",
+      "jenis": "button-submit",
+      "aksi": "klik",
+      "nama": "Masuk sebagai buyer",
+      "tunggu": {
+        "route": "#/buyer",
+        "timeout_ms": 20000
+      }
+    },
+    {
+      "urutan": 25,
+      "aksi": "assert",
+      "nama": "Buyer mendarat di home buyer",
+      "harapan": {
+        "route_sama": "#/buyer"
+      }
+    },
+    {
+      "urutan": 26,
+      "halaman": "#/auth",
+      "id": "hr_auth_session_section",
+      "jenis": "container",
+      "aksi": "verifikasi",
+      "nama": "Halaman auth menampilkan panel sesi aktif",
+      "timeout_ms": 20000,
+      "catatan": "Saat sudah login, form login diganti panel sesi."
+    },
+    {
+      "urutan": 27,
+      "aksi": "assert",
+      "nama": "Form login tidak ditampilkan lagi",
+      "harapan": {
+        "elemen_tidak_ada": "#hr_auth_login_buyer_submit_button"
+      }
+    },
+    {
+      "urutan": 28,
+      "id": "hr_auth_session_logout_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Logout dari panel sesi",
+      "tunggu": {
+        "elemen": "#hr_auth_role_buyer_button",
+        "timeout_ms": 20000
+      }
+    },
+    {
+      "urutan": 29,
+      "aksi": "assert",
+      "nama": "Setelah logout, pemilih role kembali muncul",
+      "harapan": {
+        "elemen_ada": "#hr_auth_role_section"
+      }
+    }
+  ],
+  "daftar_id_elemen": [
+    {
+      "id": "hr_auth_frame",
+      "jenis": "container",
+      "nama": "Kerangka halaman auth"
+    },
+    {
+      "id": "hr_auth_role_section",
+      "jenis": "container",
+      "nama": "Pemilih role"
+    },
+    {
+      "id": "hr_auth_role_buyer_button",
+      "jenis": "button",
+      "nama": "Role Buyer"
+    },
+    {
+      "id": "hr_auth_role_seller_button",
+      "jenis": "button",
+      "nama": "Role Seller"
+    },
+    {
+      "id": "hr_auth_role_admin_button",
+      "jenis": "button",
+      "nama": "Role Admin"
+    },
+    {
+      "id": "hr_auth_role_affiliate_admin_button",
+      "jenis": "button",
+      "nama": "Role Marketing"
+    },
+    {
+      "id": "hr_auth_panel_section",
+      "jenis": "container",
+      "nama": "Panel login atau daftar"
+    },
+    {
+      "id": "hr_auth_tab_login_button",
+      "jenis": "button",
+      "nama": "Tab Masuk",
+      "catatan": "Hanya dirender bila role bisa mendaftar. Untuk seller, admin, dan marketing bar tab tidak ada sama sekali."
+    },
+    {
+      "id": "hr_auth_tab_register_button",
+      "jenis": "button",
+      "nama": "Tab Daftar",
+      "catatan": "Hanya untuk buyer."
+    },
+    {
+      "id": "hr_auth_login_buyer_email_input",
+      "jenis": "input-email",
+      "nama": "Email login buyer"
+    },
+    {
+      "id": "hr_auth_login_buyer_password_input",
+      "jenis": "input-password",
+      "nama": "Password login buyer"
+    },
+    {
+      "id": "hr_auth_login_buyer_submit_button",
+      "jenis": "button-submit",
+      "nama": "Submit login buyer"
+    },
+    {
+      "id": "hr_auth_login_seller_email_input",
+      "jenis": "input-email",
+      "nama": "Email login seller"
+    },
+    {
+      "id": "hr_auth_login_seller_password_input",
+      "jenis": "input-password",
+      "nama": "Password login seller"
+    },
+    {
+      "id": "hr_auth_login_seller_submit_button",
+      "jenis": "button-submit",
+      "nama": "Submit login seller"
+    },
+    {
+      "id": "hr_auth_login_admin_email_input",
+      "jenis": "input-email",
+      "nama": "Email login admin"
+    },
+    {
+      "id": "hr_auth_login_admin_password_input",
+      "jenis": "input-password",
+      "nama": "Password login admin"
+    },
+    {
+      "id": "hr_auth_login_admin_submit_button",
+      "jenis": "button-submit",
+      "nama": "Submit login admin"
+    },
+    {
+      "id": "hr_auth_login_affiliate_admin_email_input",
+      "jenis": "input-email",
+      "nama": "Email login marketing"
+    },
+    {
+      "id": "hr_auth_login_affiliate_admin_password_input",
+      "jenis": "input-password",
+      "nama": "Password login marketing"
+    },
+    {
+      "id": "hr_auth_login_affiliate_admin_submit_button",
+      "jenis": "button-submit",
+      "nama": "Submit login marketing"
+    },
+    {
+      "id": "hr_auth_seller_register_link",
+      "jenis": "button",
+      "nama": "Link Daftarkan showroom",
+      "catatan": "Hanya muncul saat role seller dipilih."
+    },
+    {
+      "id": "hr_auth_seller_no_register_note",
+      "jenis": "container",
+      "nama": "Catatan pendaftaran seller pindah halaman"
+    },
+    {
+      "id": "hr_auth_admin_no_register_note",
+      "jenis": "container",
+      "nama": "Catatan akun admin dibuat admin"
+    },
+    {
+      "id": "hr_auth_session_section",
+      "jenis": "container",
+      "nama": "Panel sesi aktif",
+      "catatan": "Menggantikan form login bila sudah login."
+    },
+    {
+      "id": "hr_auth_session_dashboard_button",
+      "jenis": "button",
+      "nama": "Ke dashboard dari panel sesi"
+    },
+    {
+      "id": "hr_auth_session_logout_button",
+      "jenis": "button",
+      "nama": "Logout dari panel sesi"
+    },
+    {
+      "id": "hr_auth_back_landing_button",
+      "jenis": "button",
+      "nama": "Kembali ke landing page"
+    },
+    {
+      "id": "google_login_buyer_button",
+      "jenis": "button",
+      "nama": "Login Google buyer",
+      "catatan": "Ada di gate transaksi, bukan di halaman auth."
+    }
+  ]
+}

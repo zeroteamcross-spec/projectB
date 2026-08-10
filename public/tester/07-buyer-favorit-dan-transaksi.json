@@ -1,0 +1,254 @@
+{
+  "nama_fitur": "07 - Buyer (identitas Google) favorit dan transaksi",
+  "aplikasi": "projectB",
+  "halaman": [
+    "#/auth?role=buyer",
+    "#/showrooms/metro-auto-jakarta"
+  ],
+  "prefix_id": [
+    "hr_auth_",
+    "pubtrx_",
+    "byr_"
+  ],
+  "versi": "1.0",
+  "berhenti_saat_gagal": true,
+  "keterangan": "Alur D. Memakai buyer yang identitasnya berasal dari Google (baris user_oauth_identities provider=google), tetapi login lewat jalur normal email dan password. Sesinya identik dengan buyer Google sungguhan, jadi alur di belakangnya teruji apa adanya tanpa perlu OAuth online.",
+  "prasyarat_data": [
+    "Server lokal berjalan di http://localhost:8000.",
+    "Jalankan lebih dulu: php scripts/seed_buyer_google_identity.php",
+    "Showroom metro-auto-jakarta punya minimal satu mobil published yang sudah diisi Booking Fee.",
+    "Kunci Midtrans sandbox terisi di .env.",
+    "Kredensial diambil dari tester/akun.json yang dimuat runner otomatis."
+  ],
+  "variabel": {
+    "email_buyer": "{{buyer_google_email}}",
+    "password_buyer": "{{buyer_google_password}}",
+    "slug_showroom": "{{seller_slug}}"
+  },
+  "urutan_uji": [
+    {
+      "urutan": 1,
+      "halaman": "#/auth?role=buyer",
+      "id": "hr_auth_role_buyer_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Pilih role buyer",
+      "tunggu": {
+        "elemen": "#hr_auth_login_buyer_email_input",
+        "timeout_ms": 15000
+      }
+    },
+    {
+      "urutan": 2,
+      "aksi": "assert",
+      "nama": "Buyer masih boleh mendaftar dari sini",
+      "harapan": {
+        "elemen_ada": "#hr_auth_tab_register_button"
+      },
+      "catatan": "Hanya seller yang tab Daftar-nya dihapus."
+    },
+    {
+      "urutan": 3,
+      "id": "hr_auth_login_buyer_email_input",
+      "jenis": "input-email",
+      "aksi": "isi",
+      "nilai": "{{email_buyer}}",
+      "nama": "Email buyer"
+    },
+    {
+      "urutan": 4,
+      "id": "hr_auth_login_buyer_password_input",
+      "jenis": "input-password",
+      "aksi": "isi",
+      "nilai": "{{password_buyer}}",
+      "nama": "Password buyer"
+    },
+    {
+      "urutan": 5,
+      "id": "hr_auth_login_buyer_submit_button",
+      "jenis": "button-submit",
+      "aksi": "klik",
+      "nama": "Masuk sebagai buyer",
+      "tunggu": {
+        "route": "#/buyer",
+        "timeout_ms": 20000
+      }
+    },
+    {
+      "urutan": 6,
+      "halaman": "#/showrooms/{{slug_showroom}}",
+      "selector": "[data-favorite-toggle]",
+      "jenis": "button",
+      "aksi": "verifikasi",
+      "nama": "Tombol hati muncul untuk buyer yang login",
+      "timeout_ms": 20000,
+      "catatan": "Tamu tidak boleh melihat tombol ini; buyer harus melihatnya."
+    },
+    {
+      "urutan": 7,
+      "selector": "[data-favorite-toggle]",
+      "jenis": "button",
+      "aksi": "klik",
+      "indeks": 0,
+      "nama": "Favoritkan mobil pertama",
+      "simpan": {
+        "nama": "car_id_favorit",
+        "dari": "atribut",
+        "atribut": "data-favorite-toggle"
+      },
+      "tunggu": {
+        "ms": 2500
+      }
+    },
+    {
+      "urutan": 8,
+      "selector": "[data-favorite-toggle][aria-pressed='true']",
+      "jenis": "button",
+      "aksi": "verifikasi",
+      "nama": "Status hati berubah jadi aktif",
+      "harapan": {
+        "elemen_ada": "[data-favorite-toggle][aria-pressed='true']"
+      }
+    },
+    {
+      "urutan": 9,
+      "halaman": "#/buyer",
+      "id": "byr_recommendations_section",
+      "jenis": "container",
+      "aksi": "verifikasi",
+      "nama": "Home buyer menampilkan bagian favorit",
+      "timeout_ms": 20000,
+      "harapan": {
+        "teks_mengandung": "Mobil Favorit Saya"
+      }
+    },
+    {
+      "urutan": 10,
+      "id": "byr_recommendations_grid",
+      "jenis": "container",
+      "aksi": "verifikasi",
+      "nama": "Grid favorit berisi minimal satu mobil",
+      "harapan": {
+        "jumlah_baris_minimal": 1
+      }
+    },
+    {
+      "urutan": 11,
+      "halaman": "#/showrooms/{{slug_showroom}}/transactions/new?car_id={{car_id_favorit}}",
+      "id": "pubtrx_booking_fee_block",
+      "jenis": "container",
+      "aksi": "verifikasi",
+      "nama": "Panel Booking Fee tampil di form transaksi",
+      "timeout_ms": 20000,
+      "harapan": {
+        "teks_mengandung": "Booking Fee"
+      }
+    },
+    {
+      "urutan": 12,
+      "aksi": "assert",
+      "nama": "Tidak ada pilihan tipe pembayaran",
+      "harapan": {
+        "teks_tidak_mengandung": "Tipe pembayaran",
+        "lingkup": "halaman"
+      },
+      "catatan": "Pilihan DP atau Lunas sudah dihapus."
+    },
+    {
+      "urutan": 13,
+      "aksi": "assert",
+      "nama": "Tidak ada input nominal yang bisa diubah buyer",
+      "harapan": {
+        "elemen_tidak_ada": "#pubtrx_dp_amount_input"
+      },
+      "catatan": "Nominal ditentukan showroom, bukan buyer."
+    },
+    {
+      "urutan": 14,
+      "id": "pubtrx_booking_fee_value",
+      "jenis": "container",
+      "aksi": "verifikasi",
+      "nama": "Nominal Booking Fee bukan placeholder kosong",
+      "harapan": {
+        "teks_tidak_mengandung": "Belum ditentukan showroom"
+      },
+      "catatan": "Kalau merah, berarti mobilnya belum diisi Booking Fee oleh showroom."
+    }
+  ],
+  "daftar_id_elemen": [
+    {
+      "id": "hr_auth_role_buyer_button",
+      "jenis": "button",
+      "nama": "Pilih role buyer"
+    },
+    {
+      "id": "hr_auth_role_seller_button",
+      "jenis": "button",
+      "nama": "Pilih role seller"
+    },
+    {
+      "id": "hr_auth_tab_login_button",
+      "jenis": "button",
+      "nama": "Tab Masuk"
+    },
+    {
+      "id": "hr_auth_tab_register_button",
+      "jenis": "button",
+      "nama": "Tab Daftar",
+      "catatan": "Hanya muncul untuk buyer."
+    },
+    {
+      "id": "hr_auth_login_buyer_email_input",
+      "jenis": "input-email",
+      "nama": "Email login buyer"
+    },
+    {
+      "id": "hr_auth_login_buyer_password_input",
+      "jenis": "input-password",
+      "nama": "Password login buyer"
+    },
+    {
+      "id": "hr_auth_login_buyer_submit_button",
+      "jenis": "button-submit",
+      "nama": "Submit login buyer"
+    },
+    {
+      "id": "hr_auth_seller_register_link",
+      "jenis": "button",
+      "nama": "Link daftar showroom",
+      "catatan": "Hanya muncul saat role seller dipilih."
+    },
+    {
+      "id": "data-favorite-toggle",
+      "jenis": "button-dinamis",
+      "nama": "Tombol hati pada kartu mobil",
+      "catatan": "Atribut data, bukan id. Nilainya adalah car_id. Hanya untuk buyer yang login, hanya di halaman showroom dan marketing."
+    },
+    {
+      "id": "byr_recommendations_section",
+      "jenis": "container",
+      "nama": "Bagian Mobil Favorit Saya di home buyer"
+    },
+    {
+      "id": "byr_recommendations_grid",
+      "jenis": "container",
+      "nama": "Grid kartu favorit"
+    },
+    {
+      "id": "pubtrx_booking_fee_block",
+      "jenis": "container",
+      "nama": "Panel Booking Fee di form transaksi"
+    },
+    {
+      "id": "pubtrx_booking_fee_value",
+      "jenis": "container",
+      "nama": "Nominal Booking Fee"
+    },
+    {
+      "id": "pubtrx_dp_amount_input",
+      "jenis": "input-number",
+      "nama": "Input nominal DP",
+      "catatan": "SUDAH DIHAPUS. Dicantumkan agar ketahuan bila muncul lagi."
+    }
+  ]
+}

@@ -13,10 +13,15 @@ use App\Modules\Auth\Policies\AuthPolicy;
 use DateInterval;
 use DateTimeImmutable;
 use PDO;
+use PDOException;
 use Throwable;
 
 class AuthService
 {
+    private const SHOWROOM_SLUG_MIN_LENGTH = 3;
+
+    private const SHOWROOM_SLUG_MAX_LENGTH = 80;
+
     private PDO $pdo;
 
     private AuthUserRepository $users;
@@ -41,6 +46,9 @@ class AuthService
         $now = date('Y-m-d H:i:s');
         $accountStatus = $data['role'] === 'buyer' ? 'active' : 'pending';
         $isApproved = $data['role'] === 'buyer' ? 1 : 0;
+        $showroomSlug = $data['role'] === 'seller'
+            ? $this->resolveShowroomSlug((string) ($data['showroom']['slug'] ?? ''))
+            : null;
 
         try {
             $this->pdo->beginTransaction();
@@ -60,7 +68,7 @@ class AuthService
             if ($data['role'] === 'seller') {
                 $showroom = $data['showroom'];
                 $showroom['created_at'] = $now;
-                $showroom['slug'] = $this->generateShowroomSlug((string) $showroom['name']);
+                $showroom['slug'] = $showroomSlug;
                 $this->users->createShowroom($userId, $showroom);
             }
 
@@ -68,6 +76,13 @@ class AuthService
         } catch (Throwable $exception) {
             if ($this->pdo->inTransaction()) {
                 $this->pdo->rollBack();
+            }
+
+            // Two registrations can pass the availability check and still collide
+            // on the unique index. Surface that as the same validation error
+            // instead of a 500.
+            if ($showroomSlug !== null && $this->isShowroomSlugConflict($exception)) {
+                throw $this->showroomSlugTakenException($showroomSlug);
             }
 
             throw $exception;
@@ -247,24 +262,72 @@ class AuthService
         return $status === 'active' && (int) ($user['is_approved'] ?? 0) === 1;
     }
 
-    private function generateShowroomSlug(string $name): string
+    /**
+     * The showroom picks its own slug at registration. Normalize it, hold it to
+     * the canon format, then make sure nothing else already owns it.
+     */
+    private function resolveShowroomSlug(string $requested): string
     {
-        $base = $this->normalizeShowroomSlug($name);
+        $slug = $this->normalizeShowroomSlug($requested);
 
-        if ($base === '') {
-            $base = 'showroom';
+        if (strlen($slug) < self::SHOWROOM_SLUG_MIN_LENGTH) {
+            throw new ValidationException([
+                'showroom.slug' => 'Slug showroom minimal ' . self::SHOWROOM_SLUG_MIN_LENGTH
+                    . ' karakter huruf kecil, angka, atau dash.',
+            ]);
         }
 
-        for ($attempt = 0; $attempt < 20; $attempt++) {
-            $suffix = $attempt === 0 ? '' : '-' . strtolower(bin2hex(random_bytes(2)));
-            $slug = substr($base, 0, 60 - strlen($suffix)) . $suffix;
+        if (strlen($slug) > self::SHOWROOM_SLUG_MAX_LENGTH) {
+            throw new ValidationException([
+                'showroom.slug' => 'Slug showroom maksimal ' . self::SHOWROOM_SLUG_MAX_LENGTH . ' karakter.',
+            ]);
+        }
 
-            if (! $this->users->showroomSlugExists($slug)) {
-                return $slug;
+        if ($this->users->showroomSlugExists($slug)) {
+            throw $this->showroomSlugTakenException($slug);
+        }
+
+        return $slug;
+    }
+
+    private function showroomSlugTakenException(string $slug): ValidationException
+    {
+        $suggestion = $this->suggestShowroomSlug($slug);
+        $message = "Slug '{$slug}' sudah dipakai.";
+
+        if ($suggestion !== null) {
+            $message .= " Coba '{$suggestion}'.";
+        }
+
+        return new ValidationException(['showroom.slug' => $message]);
+    }
+
+    private function suggestShowroomSlug(string $base): ?string
+    {
+        for ($counter = 2; $counter <= 50; $counter++) {
+            $suffix = '-' . $counter;
+            $candidate = substr($base, 0, self::SHOWROOM_SLUG_MAX_LENGTH - strlen($suffix)) . $suffix;
+
+            if (! $this->users->showroomSlugExists($candidate)) {
+                return $candidate;
             }
         }
 
-        throw new ValidationException(['showroom.slug' => 'Unable to generate unique showroom slug.']);
+        return null;
+    }
+
+    private function isShowroomSlugConflict(Throwable $exception): bool
+    {
+        if (! $exception instanceof PDOException) {
+            return false;
+        }
+
+        if (($exception->errorInfo[0] ?? null) !== '23000') {
+            return false;
+        }
+
+        return stripos($exception->getMessage(), 'showrooms_slug_unique') !== false
+            || stripos($exception->getMessage(), 'slug') !== false;
     }
 
     private function normalizeShowroomSlug(string $value): string
@@ -293,6 +356,24 @@ class AuthService
             'created_at' => $user['created_at'] ?? null,
             'updated_at' => $user['updated_at'] ?? null,
             'has_google_identity' => (bool) ($user['has_google_identity'] ?? false),
+            'home_showroom_slug' => $this->homeShowroomSlug($user),
         ];
+    }
+
+    /**
+     * Which showroom this buyer is a customer of, set the first time they log
+     * in through a showroom-scoped Google login and overwritten on every
+     * later login through a different showroom's link. Meaningless for other
+     * roles, so this stays null for them.
+     */
+    private function homeShowroomSlug(array $user): ?string
+    {
+        if (($user['role'] ?? null) !== 'buyer') {
+            return null;
+        }
+
+        $showroomId = $user['home_showroom_id'] ?? null;
+
+        return $showroomId !== null ? $this->users->findShowroomSlugById((int) $showroomId) : null;
     }
 }

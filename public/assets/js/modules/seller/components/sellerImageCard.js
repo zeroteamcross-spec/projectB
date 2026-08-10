@@ -34,7 +34,10 @@ export function SellerImageCard({
   img.className = "aspect-[4/3] w-full bg-gray-100 object-cover transition duration-200 group-hover:scale-[1.015]";
   img.src = image.file_path;
   img.alt = image.file_name ?? `Gambar ${index + 1}`;
-  img.loading = "lazy";
+  // Not "lazy": this card is only ever created once the gallery is already
+  // expanded (see carsPage.js's showGallery toggle) and the list is small,
+  // so there is no offscreen-list benefit — only a chance the browser's
+  // lazy-load intersection check misfires and the thumbnail never appears.
 
   const overlay = document.createElement("div");
   overlay.className = "pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-2 bg-gradient-to-b from-black/45 to-transparent p-3";

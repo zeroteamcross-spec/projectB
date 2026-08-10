@@ -5,7 +5,8 @@ const PAYMENT_STATUS_LABELS = {
   failed: "Gagal",
   refunded: "Refunded",
   pending_payment: "Belum Dibayar",
-  dp_paid: "DP Dibayar",
+  dp_paid: "Booking Fee Lunas",
+  returned: "Diretur",
   expired: "Kadaluarsa",
   cancelled: "Dibatalkan",
 };
@@ -47,11 +48,18 @@ const TRANSACTION_STATUS_META = {
     description: "Transaksi menunggu pembayaran DP.",
   },
   dp_paid: {
-    label: "DP Dibayar",
-    shortLabel: "DP Dibayar",
-    variant: "info",
+    label: "Booking Fee Lunas",
+    shortLabel: "Booking Fee Lunas",
+    variant: "success",
     bucket: "process",
-    description: "DP sudah diterima. Mobil sudah dikunci dan transaksi menunggu pelunasan.",
+    description: "Booking Fee sudah diterima. Mobil terjual dan menunggu serah terima.",
+  },
+  returned: {
+    label: "Diretur",
+    shortLabel: "Diretur",
+    variant: "danger",
+    bucket: "closed",
+    description: "Transaksi diretur showroom. Mobil kembali dijual dan komisi dibatalkan.",
   },
   paid: {
     label: "Pembayaran Lunas",
@@ -141,7 +149,7 @@ const LISTING_STATUS_META = {
 };
 
 export const CANON_LISTING_STATUSES = Object.freeze(["draft", "published", "reserved", "sold", "archived"]);
-export const CANON_TRANSACTION_STATUSES = Object.freeze(["pending_payment", "dp_paid", "paid", "completed", "expired", "cancelled"]);
+export const CANON_TRANSACTION_STATUSES = Object.freeze(["pending_payment", "dp_paid", "paid", "completed", "expired", "cancelled", "returned"]);
 export const CANON_SETTLEMENT_STATUSES = Object.freeze(["pending", "settled", "cancelled"]);
 export const CANON_AFFILIATE_LEDGER_STATUSES = Object.freeze(["accrued", "pending", "paid_out", "voided"]);
 

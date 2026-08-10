@@ -13,6 +13,8 @@ import { formatDate } from "../../../utils/formatDate.js";
 import { NotificationBell } from "../../notifications/components/notificationBell.js";
 import { BUYER_MOBILE_FOOTER_ITEMS, BuyerMobileFooterNav } from "../../buyer/components/buyerMobileFooterNav.js";
 import { AffiliateAccountLayout, affiliateAccountActions } from "../../affiliate/components/affiliateAccountShell.js";
+import { publicContextService } from "../../public/services/publicContextService.js";
+import { ModalHeaderFormActions } from "../../../ui/composites/modalHeaderFormActions.js";
 
 const PROFILE_MODAL_KEY = "profile-edit-modal";
 const PASSWORD_MODAL_KEY = "profile-password-modal";
@@ -481,7 +483,7 @@ function identityCard(profile, actions) {
   );
 
   const badges = document.createElement("section");
-  badges.className = "flex flex-wrap justify-center gap-2";
+  badges.className = "hidden flex flex-wrap justify-center gap-2";
   badges.append(
     Badge({ label: roleLabel(profile.role), variant: "info" }),
     Badge({ label: accountStatusLabel(profile.account_status), variant: profile.account_status === "suspended" ? "danger" : "success" }),
@@ -552,14 +554,7 @@ function detailPanel(profile, actions) {
       ["Foto Profil", avatarSource(profile) ? "Tersedia" : "Belum tersedia"],
       ["Status Akun", accountStatusLabel(profile.account_status)],
     ]),
-    detailSection("Informasi Level User & Scope", "sitemap", [
-      ["Level login", profile.id_level || profile.login_level || profile.role || "-"],
-      ["Level User efektif", roleLabel(profile.role)],
-      ["Cabang user", branchLabel(profile)],
-      ["Scope data user", "Own"],
-    ]),
     detailSection("Info Login", "clock", [
-      ["User ID", profile.id ? `#${profile.id}` : "-"],
       ["Tanggal dibuat", formatDate(profile.created_at)],
       ["Terakhir diperbarui", formatDate(profile.updated_at)],
     ]),
@@ -631,7 +626,12 @@ function openEditProfileModal(profile, onSaved) {
 
   const renderModal = () => {
     const form = document.createElement("form");
+    form.id = "profile_edit_form";
     form.className = "grid min-w-0 gap-4";
+    const cancelEdit = () => {
+      mounted = false;
+      closeModal({ notify: false });
+    };
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
       errors = validateProfile(draft);
@@ -670,10 +670,6 @@ function openEditProfileModal(profile, onSaved) {
       formInput("Email", "profile_email_input", "email", draft.email, (value) => { draft.email = value; }, errors.email, saving),
       formInput("Nomor HP", "profile_phone_input", "text", draft.phone_number, (value) => { draft.phone_number = value; }, errors.phone_number, saving),
       formTextarea("Alamat", "profile_address_input", draft.address, (value) => { draft.address = value; }, errors.address, saving),
-      modalActions(saving, saving ? "Menyimpan..." : "Simpan", () => {
-        mounted = false;
-        closeModal({ notify: false });
-      }),
     );
 
     openModal(form, {
@@ -685,7 +681,14 @@ function openEditProfileModal(profile, onSaved) {
       panelId: "profile_edit_modal",
       headerId: "profile_edit_modal_header",
       bodyId: "profile_edit_modal_body",
-      closeButtonId: "profile_edit_modal_close_button",
+      // Batal/Simpan replace the corner close button here, instead of living
+      // at the bottom of a form long enough to need scrolling to reach them.
+      headerActions: () => ModalHeaderFormActions({
+        formId: "profile_edit_form",
+        idPrefix: "profile_edit_modal",
+        saving,
+        onCancel: cancelEdit,
+      }),
     });
   };
 
@@ -758,7 +761,7 @@ function openChangePasswordModal() {
 
 function openLogoutConfirmModal() {
   let processing = false;
-  const loginHash = logoutLoginHash(authStore.role());
+  const logoutHash = logoutRedirectHash(authStore.role());
 
   const renderModal = () => {
     const content = document.createElement("section");
@@ -795,7 +798,7 @@ function openLogoutConfirmModal() {
           await authService.logout();
           closeModal({ notify: false });
           showToast("Logout berhasil.", { type: "success" });
-          window.location.hash = loginHash;
+          window.location.hash = logoutHash;
         } catch (error) {
           processing = false;
           renderModal();
@@ -826,20 +829,42 @@ function openLogoutConfirmModal() {
   renderModal();
 }
 
-function logoutLoginHash(role) {
-  if (role === "admin" || role === "super_admin") {
-    return "#/google-login/admin";
-  }
+/**
+ * Where logout lands, per role.
+ *
+ * Admin and seller (a showroom account) always go to the landing page —
+ * their session doesn't belong to any one showroom the way a buyer's or a
+ * marketing's does. Buyer and marketing return to the showroom they belong
+ * to; otherwise they fall back to the landing page too, since "#/s/" without
+ * a slug isn't a real page.
+ */
+function logoutRedirectHash(role) {
+  if (role === "buyer") {
+    // The durable signal: which showroom this buyer is a customer of,
+    // recorded in users.home_showroom_id the last time they logged in
+    // through that showroom's #/s/<slug>/login. This is what makes them
+    // "a customer of that showroom" in the SaaS sense, not just whichever
+    // catalog page happens to be open right now.
+    const homeSlug = authStore.user()?.home_showroom_slug;
+    if (homeSlug) {
+      return `#/s/${encodeURIComponent(homeSlug)}`;
+    }
 
-  if (role === "seller") {
-    return "#/google-login/seller";
+    // Falls back to the in-session catalog context for buyers who never
+    // logged in through a showroom link (e.g. a password account predating
+    // this feature, or a generic Google login) but are browsing one now.
+    const activeSlug = publicContextService.activeShowroom()?.slug;
+    return activeSlug ? `#/s/${encodeURIComponent(activeSlug)}` : "#/";
   }
 
   if (role === "affiliate_admin") {
-    return "#/login/affiliate";
+    // Preloaded at boot for every affiliate_admin session (preloadPlans.js),
+    // so this is already in the store by the time Logout is reachable.
+    const slug = appStore.get("snapshot.affiliate_admin.affiliateProfile.data.showroom.slug", null);
+    return slug ? `#/s/${encodeURIComponent(slug)}` : "#/";
   }
 
-  return "#/google-login/buyer";
+  return "#/";
 }
 
 function formInput(label, id, type, value, onChange, error, disabled) {

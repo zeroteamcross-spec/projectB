@@ -28,5 +28,6 @@ return static function (Router $router): void {
         $router->patch('/{transaction_id}/fulfillment-checklist', [TransactionController::class, 'updateFulfillmentChecklist']);
         $router->post('/{transaction_id}/complete-payment', [TransactionController::class, 'completePayment']);
         $router->post('/{transaction_id}/cancel', [TransactionController::class, 'cancel']);
+        $router->post('/{transaction_id}/return', [TransactionController::class, 'returnTransaction']);
     }, [AuthenticatedUserMiddleware::class]);
 };

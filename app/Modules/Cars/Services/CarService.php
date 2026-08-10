@@ -198,6 +198,7 @@ class CarService
             'price_cash' => isset($data['price_cash']) ? (int) $data['price_cash'] : null,
             'price_discount' => isset($data['price_discount']) ? (int) $data['price_discount'] : null,
             'price_credit' => isset($data['price_credit']) ? (int) $data['price_credit'] : null,
+            'dp_amount' => isset($data['dp_amount']) ? (int) $data['dp_amount'] : null,
         ];
     }
 

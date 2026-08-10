@@ -149,6 +149,12 @@ export const preloadPlans = {
         version: "seller-master-brand-v1",
         loader: ({ signal }) => adminMasterService.getBrandMaster({ signal }).catch(() => adminMasterService.normalizeMaster(null)),
       },
+      {
+        key: "masterLocation",
+        ttl: 120,
+        version: "seller-master-location-v1",
+        loader: ({ signal }) => adminMasterService.getLocationMaster({ signal }).catch(() => adminMasterService.normalizeLocationMaster(null)),
+      },
     ],
   },
   admin: {

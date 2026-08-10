@@ -12,6 +12,7 @@ use App\Modules\Transactions\Requests\CancelTransactionRequest;
 use App\Modules\Transactions\Requests\CompleteTransactionRequest;
 use App\Modules\Transactions\Requests\CreateTransactionRequest;
 use App\Modules\Transactions\Requests\ProviderCallbackRequest;
+use App\Modules\Transactions\Requests\ReturnTransactionRequest;
 use App\Modules\Transactions\Requests\UpdateFulfillmentChecklistRequest;
 use App\Modules\Transactions\Requests\UpdateTransactionStatusRequest;
 use App\Infrastructure\Payment\Midtrans\MidtransCallbackHandler;
@@ -120,6 +121,20 @@ class TransactionController extends Controller
         return JsonResponse::success([
             'transaction' => $this->service->cancel($user, (int) $request->routeParam('transaction_id'), $payload),
         ], 'Transaksi berhasil dibatalkan.');
+    }
+
+    public function returnTransaction(Request $request): JsonResponse
+    {
+        $user = $this->user($request);
+        $payload = (new ReturnTransactionRequest($request))->validate();
+
+        return JsonResponse::success([
+            'transaction' => $this->service->returnTransaction(
+                $user,
+                (int) $request->routeParam('transaction_id'),
+                $payload
+            ),
+        ], 'Transaksi berhasil diretur.');
     }
 
     public function providerCallback(Request $request): JsonResponse

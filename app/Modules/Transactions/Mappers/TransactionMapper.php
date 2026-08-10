@@ -26,6 +26,8 @@ class TransactionMapper
             'midtrans_redirect_url' => $transaction['midtrans_redirect_url'],
             'expires_at' => $transaction['expires_at'],
             'paid_at' => $transaction['paid_at'],
+            'returned_at' => $transaction['returned_at'] ?? null,
+            'return_reason' => $transaction['return_reason'] ?? null,
             'created_at' => $transaction['created_at'],
             'updated_at' => $transaction['updated_at'],
             'buyer' => isset($transaction['buyer_name'])

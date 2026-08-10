@@ -1,6 +1,10 @@
 export class Router {
-  constructor({ outlet, store, preloadManager, bus, notFound = null, guard = null } = {}) {
+  constructor({ outlet, store, preloadManager, bus, notFound = null, guard = null, resolveMissing = null } = {}) {
     this.routes = [];
+    // Dipanggil bila sebuah path tidak cocok dengan rute mana pun. Dipakai
+    // untuk memuat manifest role secara malas, supaya tamu tidak ikut
+    // mengunduh graf modul admin, seller, dan marketing.
+    this.resolveMissing = resolveMissing;
     this.outletResolver = outlet;
     this.store = store;
     this.preloadManager = preloadManager;
@@ -33,7 +37,22 @@ export class Router {
 
   async handleChange() {
     const location = this.location();
-    const match = this.match(location.path);
+    let match = this.match(location.path);
+
+    // Rute bisa belum terdaftar karena manifest pemiliknya sengaja ditunda.
+    // Muat dulu, baru cocokkan ulang. Ini harus terjadi sebelum guard, karena
+    // guard memutuskan berdasarkan ada tidaknya rute.
+    if (!match && typeof this.resolveMissing === "function") {
+      try {
+        const dimuat = await this.resolveMissing(location.path);
+        if (dimuat) {
+          match = this.match(location.path);
+        }
+      } catch (error) {
+        console.error("Gagal memuat modul rute secara malas.", error);
+      }
+    }
+
     const requestedRoute = match?.route ?? null;
     const requestedParams = match?.params ?? {};
     const access = this.guard?.({

@@ -26,7 +26,9 @@ const DEFAULT_RUNTIME = {
   queueVersion: 0,
   queueModalOpen: false,
   queueAutoStartVersion: 0,
-  showGallery: false,
+  // Visible by default: a seller who just uploaded a photo and doesn't
+  // notice the toggle would otherwise conclude the upload silently failed.
+  showGallery: true,
   previewOpen: false,
   previewIndex: 0,
 };

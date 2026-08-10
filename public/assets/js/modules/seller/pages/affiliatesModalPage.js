@@ -366,12 +366,7 @@ function openAffiliateModal({ mode, selectedAffiliate, runtime, actions }) {
   content.className = "grid min-w-0 gap-4";
 
   if (mode === "detail") {
-    content.append(affiliateDetailPanel({
-      affiliate: selectedAffiliate,
-      onEdit: () => selectedAffiliate ? actions.editAffiliate(selectedAffiliate) : null,
-      onCopyLanding: () => selectedAffiliate ? actions.copyLanding(selectedAffiliate) : null,
-      onOpenLanding: () => selectedAffiliate ? actions.openLanding(selectedAffiliate) : null,
-    }));
+    content.append(affiliateDetailPanel({ affiliate: selectedAffiliate }));
   } else {
     const formDraft = ensureAffiliateFormDraft({
       mode,
@@ -409,6 +404,16 @@ function openAffiliateModal({ mode, selectedAffiliate, runtime, actions }) {
     headerId: "slraf_modal_header_section",
     bodyId: "slraf_modal_body_section",
     closeButtonId: "slraf_modal_close_button",
+    // Detail mode replaces the corner close button with Edit/Copy Link/Buka
+    // Landing, since those are the only actions this read-only view offers.
+    headerActions: mode === "detail"
+      ? () => affiliateDetailHeaderActions({
+        disabled: !selectedAffiliate,
+        onEdit: () => selectedAffiliate ? actions.editAffiliate(selectedAffiliate) : null,
+        onCopyLanding: () => selectedAffiliate ? actions.copyLanding(selectedAffiliate) : null,
+        onOpenLanding: () => selectedAffiliate ? actions.openLanding(selectedAffiliate) : null,
+      })
+      : undefined,
     onClose: () => actions.closeModal(),
     preserveContentOnSameSignature: true,
     contentSignature: affiliateModalSignature({ mode, selectedAffiliate, runtime }),
@@ -620,7 +625,7 @@ function summaryCardClass(index) {
   ][index % 4];
 }
 
-function affiliateDetailPanel({ affiliate, onEdit, onCopyLanding, onOpenLanding }) {
+function affiliateDetailPanel({ affiliate }) {
   const section = document.createElement("section");
   section.id = "slraf_detail_panel_section";
   section.className = "grid min-w-0 gap-4";
@@ -657,21 +662,28 @@ function affiliateDetailPanel({ affiliate, onEdit, onCopyLanding, onOpenLanding 
     facts.append(card);
   });
 
-  const actions = document.createElement("section");
-  actions.className = "flex flex-wrap gap-2";
-  const edit = Button({ label: "Edit", variant: "primary", onClick: onEdit });
+  // Edit/Copy Link/Buka Landing now live in the modal header (see
+  // openAffiliateModal), not here.
+  section.append(header, facts);
+  return section;
+}
+
+function affiliateDetailHeaderActions({ disabled, onEdit, onCopyLanding, onOpenLanding }) {
+  const wrap = document.createElement("div");
+  wrap.className = "flex shrink-0 flex-wrap items-center justify-end gap-2";
+
+  const edit = Button({ label: "Edit", variant: "primary", disabled, onClick: onEdit });
   edit.id = "slraf_detail_edit_button";
   edit.prepend(createIcon("edit", { className: "h-4 w-4" }));
-  const copy = Button({ label: "Copy Link", variant: "secondary", onClick: onCopyLanding });
+  const copy = Button({ label: "Copy Link", variant: "secondary", disabled, onClick: onCopyLanding });
   copy.id = "slraf_detail_copy_link_button";
   copy.prepend(createIcon("link", { className: "h-4 w-4" }));
-  const open = Button({ label: "Buka Landing", variant: "secondary", onClick: onOpenLanding });
+  const open = Button({ label: "Buka Landing", variant: "secondary", disabled, onClick: onOpenLanding });
   open.id = "slraf_detail_open_landing_button";
   open.prepend(createIcon("globe", { className: "h-4 w-4" }));
-  actions.append(edit, copy, open);
 
-  section.append(header, facts, actions);
-  return section;
+  wrap.append(edit, copy, open);
+  return wrap;
 }
 
 function filterAffiliates(affiliates, query) {

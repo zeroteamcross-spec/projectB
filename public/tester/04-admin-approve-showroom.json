@@ -1,0 +1,195 @@
+{
+  "nama_fitur": "04 - Admin menyetujui showroom",
+  "aplikasi": "projectB",
+  "halaman": [
+    "#/auth?role=admin"
+  ],
+  "prefix_id": [
+    "hr_auth_",
+    "adm_",
+    "adpv_"
+  ],
+  "versi": "1.0",
+  "warisi_variabel": true,
+  "berhenti_saat_gagal": true,
+  "keterangan": "Alur B. Menyetujui showroom yang didaftarkan skenario 02, bukan showroom sembarangan. Memakai variabel warisan {{email_showroom}} untuk menemukan baris yang tepat di antrean approval. Jalankan setelah 02.",
+  "prasyarat_data": [
+    "Skenario 02 sudah dijalankan pada sesi browser yang sama, sehingga {{email_showroom}} tersedia.",
+    "Jangan tekan Reset Rantai di antara 02 dan 04.",
+    "Kredensial diambil dari tester/akun.json yang dimuat runner otomatis."
+  ],
+  "variabel": {
+    "email_admin": "{{admin_email}}",
+    "password_admin": "{{admin_password}}"
+  },
+  "urutan_uji": [
+    {
+      "urutan": 1,
+      "aksi": "assert",
+      "nama": "Variabel warisan dari skenario 02 tersedia",
+      "harapan": {
+        "teks_tidak_mengandung": "{{email_showroom}}",
+        "lingkup": "halaman"
+      },
+      "catatan": "Bila {{email_showroom}} belum tergantikan nilainya, artinya rantai putus. Jalankan 02 lebih dulu tanpa menekan Reset Rantai."
+    },
+    {
+      "urutan": 2,
+      "halaman": "#/auth?role=admin",
+      "id": "hr_auth_role_admin_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Pilih role admin",
+      "tunggu": {
+        "elemen": "#hr_auth_login_admin_email_input",
+        "timeout_ms": 20000
+      }
+    },
+    {
+      "urutan": 3,
+      "id": "hr_auth_login_admin_email_input",
+      "jenis": "input-email",
+      "aksi": "isi",
+      "nilai": "{{email_admin}}",
+      "nama": "Email admin"
+    },
+    {
+      "urutan": 4,
+      "id": "hr_auth_login_admin_password_input",
+      "jenis": "input-password",
+      "aksi": "isi",
+      "nilai": "{{password_admin}}",
+      "nama": "Password admin"
+    },
+    {
+      "urutan": 5,
+      "id": "hr_auth_login_admin_submit_button",
+      "jenis": "button-submit",
+      "aksi": "klik",
+      "nama": "Masuk sebagai admin",
+      "tunggu": {
+        "route": "#/admin",
+        "timeout_ms": 25000
+      }
+    },
+    {
+      "urutan": 6,
+      "id": "adm_dashboard_approval_queue_button",
+      "jenis": "button",
+      "aksi": "klik",
+      "nama": "Buka Approval queue dari dashboard",
+      "timeout_ms": 25000,
+      "tunggu": {
+        "route": "#/admin/approvals",
+        "timeout_ms": 20000
+      }
+    },
+    {
+      "urutan": 7,
+      "aksi": "assert",
+      "nama": "Showroom dari skenario 02 ada di antrean",
+      "harapan": {
+        "teks_mengandung": "{{email_showroom}}",
+        "lingkup": "halaman"
+      },
+      "tunggu": {
+        "teks": "{{email_showroom}}",
+        "timeout_ms": 25000
+      },
+      "catatan": "Membuktikan pendaftaran benar-benar masuk antrean approval, bukan sekadar tampil sukses di layar."
+    },
+    {
+      "urutan": 8,
+      "selector": "[id^='adpv_approve_button_']",
+      "jenis": "button-dinamis",
+      "aksi": "verifikasi",
+      "nama": "Tombol Approve tersedia",
+      "harapan": {
+        "teks_mengandung": "Approve"
+      },
+      "catatan": "Tombol hanya muncul untuk user yang memang layak disetujui."
+    },
+    {
+      "urutan": 9,
+      "selector": "[id^='adpv_approve_button_']",
+      "jenis": "button-dinamis",
+      "aksi": "klik",
+      "indeks": 0,
+      "nama": "Setujui showroom",
+      "simpan": {
+        "nama": "id_user_disetujui",
+        "dari": "id_sufiks",
+        "awalan": "adpv_approve_button_desktop_"
+      },
+      "tunggu": {
+        "ms": 4000
+      },
+      "catatan": "PERINGATAN: mengambil baris teratas antrean. Bila antrean berisi banyak showroom lama, yang disetujui bisa bukan milik skenario 02. Lihat catatan keterbatasan di README."
+    },
+    {
+      "urutan": 10,
+      "aksi": "assert",
+      "nama": "Tidak ada error endpoint saat menyetujui",
+      "harapan": {
+        "route_sama": "#/admin/approvals"
+      }
+    }
+  ],
+  "daftar_id_elemen": [
+    {
+      "id": "adm_dashboard_approval_queue_button",
+      "jenis": "button",
+      "nama": "Approval queue di quick actions dashboard admin"
+    },
+    {
+      "id": "adm_dashboard_quick_actions_section",
+      "jenis": "container",
+      "nama": "Quick actions dashboard admin"
+    },
+    {
+      "id": "adm_dashboard_transactions_focus_button",
+      "jenis": "button",
+      "nama": "Fokus transaksi"
+    },
+    {
+      "id": "adpv_review_button_desktop_<user_id>",
+      "jenis": "button-dinamis",
+      "nama": "Review baris antrean (desktop)"
+    },
+    {
+      "id": "adpv_review_button_mobile_<user_id>",
+      "jenis": "button-dinamis",
+      "nama": "Review baris antrean (mobile)"
+    },
+    {
+      "id": "adpv_approve_button_desktop_<user_id>",
+      "jenis": "button-dinamis",
+      "nama": "Approve baris antrean (desktop)"
+    },
+    {
+      "id": "adpv_approve_button_mobile_<user_id>",
+      "jenis": "button-dinamis",
+      "nama": "Approve baris antrean (mobile)"
+    },
+    {
+      "id": "adpv_mobile_row_section_<user_id>",
+      "jenis": "container-dinamis",
+      "nama": "Baris antrean versi mobile"
+    },
+    {
+      "id": "hr_auth_login_admin_email_input",
+      "jenis": "input-email",
+      "nama": "Email login admin"
+    },
+    {
+      "id": "hr_auth_login_admin_password_input",
+      "jenis": "input-password",
+      "nama": "Password login admin"
+    },
+    {
+      "id": "hr_auth_login_admin_submit_button",
+      "jenis": "button-submit",
+      "nama": "Submit login admin"
+    }
+  ]
+}

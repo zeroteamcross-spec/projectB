@@ -1,5 +1,6 @@
 import { createPageLifecycle } from "../../../core/lifecycle.js";
 import { appStore } from "../../../state/store.js";
+import { canUseFavorites, favoritesStore } from "../../../state/favoritesStore.js";
 import { Button } from "../../../ui/primitives/button.js";
 import { EmptyState } from "../../../ui/primitives/emptyState.js";
 import { Skeleton } from "../../../ui/primitives/skeleton.js";
@@ -55,6 +56,10 @@ export function PublicCatalogPage({ notFound = false } = {}) {
       if (showroomSlug) {
         await publicContextService.activateShowroomBySlug(showroomSlug).catch(() => null);
       }
+
+      if ((affiliateSlug || showroomSlug) && canUseFavorites()) {
+        await favoritesStore.load().catch(() => null);
+      }
     },
     mount(context) {
       root = document.createElement("div");
@@ -107,6 +112,7 @@ function shouldRenderCatalogForAction(action) {
   return [
     "auth.",
     "auth:",
+    "favorites:",
     "public:",
     "public-context:",
     "working:set",
@@ -239,6 +245,9 @@ function render(root, context, flags) {
         cars: allCars,
         router: context.router,
         isRefreshing: flags.isRefreshing,
+        // Favorites belong to the showroom and marketing catalogs only. The
+        // demo catalog and the parked global catalog stay untouched.
+        showFavorite: (isShowroomRoute || isAffiliateRoute) && canUseFavorites(),
       }),
       loadMoreSection({
         canLoadMore,
@@ -518,7 +527,7 @@ function catalogToolbar(count, meta, affiliate = null) {
   return bar;
 }
 
-function carGrid({ cars, router, isRefreshing }) {
+function carGrid({ cars, router, isRefreshing, showFavorite = false }) {
   if (isRefreshing) {
     const grid = document.createElement("div");
     grid.className = "grid gap-4 sm:grid-cols-2 lg:grid-cols-3";
@@ -538,6 +547,15 @@ function carGrid({ cars, router, isRefreshing }) {
   cars.forEach((car) => {
     grid.append(PublicCarCard({
       car,
+      showFavorite,
+      isFavorite: showFavorite && favoritesStore.isFavorited(car.id),
+      onToggleFavorite: (selectedCar) => favoritesStore.toggle(selectedCar.id).catch((error) => {
+        showToast(error?.message || "Favorit gagal disimpan.", {
+          type: "error",
+          key: "favorite-toggle-error",
+          dedupeMs: 3000,
+        });
+      }),
       onOpenDetail: (selectedCar) => {
         publicCatalogState.saveScrollPosition(window.scrollY);
         publicCatalogState.setSelectedCar(selectedCar.id);

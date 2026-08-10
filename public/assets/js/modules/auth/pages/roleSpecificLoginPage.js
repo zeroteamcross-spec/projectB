@@ -113,7 +113,7 @@ function loginPanel({ config, isSubmitting, error, onSubmit }) {
 
   const lockNote = document.createElement("p");
   lockNote.className = "rounded-2xl bg-orange-50/80 px-3 py-2 text-center text-sm leading-6 text-gray-600";
-  lockNote.textContent = `Halaman ini hanya menerima akun ${config.label}.`;
+  lockNote.textContent = ``;
 
   section.append(iconWrap, header, lockNote, loginForm({ config, isSubmitting, error, onSubmit }));
   return section;
@@ -221,6 +221,15 @@ async function submitRoleLogin(payload, context, config, state, root, getBackgro
       dedupeMs: 3000,
     });
     context.router.navigate(result.target);
+    // Router.navigate() only sets location.hash; the actual page swap runs on
+    // the next hashchange tick, and can take a while since it waits for the
+    // destination role's dashboard data to preload first. Re-rendering this
+    // page in the meantime — now authenticated — used to flash the "sesi
+    // aktif, sudah login sebagai X" guard panel (mislabeling the role, since
+    // this page's own config is stale) right before the real dashboard took
+    // over. Leaving this page as-is (still showing "Memproses...") avoids
+    // that misleading flash; it disappears the moment the route swap lands.
+    return;
   } catch (error) {
     state.error = error.message || "Login gagal.";
     showToast(state.error, {
@@ -228,10 +237,10 @@ async function submitRoleLogin(payload, context, config, state, root, getBackgro
       key: `role-login-${config.slug}-error`,
       dedupeMs: 3000,
     });
-  } finally {
-    state.isSubmitting = false;
-    render(root, context, config, state, getBackgroundVideoLayer);
   }
+
+  state.isSubmitting = false;
+  render(root, context, config, state, getBackgroundVideoLayer);
 }
 
 function runEntranceAnimation(frame) {

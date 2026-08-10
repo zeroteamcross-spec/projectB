@@ -3,7 +3,9 @@ import { PublicCarDetailPage } from "./pages/carDetailPage.js";
 import { AuthLandingPage } from "./pages/authLandingPage.js";
 import { LandingPageSwitcher } from "./pages/landingPageSwitcher.js";
 import { SaasLandingPage } from "./pages/saasLandingPage.js";
+import { ShowroomRegisterPage } from "./pages/showroomRegisterPage.js";
 import { TransactionEntryPage } from "./pages/transactionEntryPage.js";
+import { GoogleLoginPage } from "../auth/pages/googleLoginPage.js";
 import { publicCatalogService } from "./services/publicCatalogService.js";
 import { publicCarDetailPreloadService } from "./services/publicCarDetailPreloadService.js";
 import { slidersResource } from "../../resources/slidersResource.js";
@@ -128,6 +130,24 @@ export const publicRoutes = [
         },
       ],
     },
+  },
+  {
+    // Buyer-only Google login scoped to one showroom, e.g. the "Masuk" link
+    // on a catalog page a buyer reached via /#/s/<slug>. Login always returns
+    // here, to this same showroom, instead of the generic buyer home — and
+    // records it as the showroom this buyer belongs to, so a later logout
+    // (from any session) returns them here too.
+    name: "public.showroom-legacy.buyer-login",
+    path: "/s/:slug/login",
+    shell: "public",
+    page: (context) => GoogleLoginPage({
+      roleSlug: "buyer",
+      next: `/s/${encodeURIComponent(context.params.slug)}`,
+      showroomSlug: context.params.slug,
+      subtitle: "Masuk untuk melanjutkan ke katalog showroom ini.",
+      footerLink: { label: "Kembali ke katalog", path: `/s/${encodeURIComponent(context.params.slug)}` },
+    }),
+    workingStateKey: null,
   },
   {
     name: "public.affiliate.catalog",
@@ -336,6 +356,14 @@ export const publicRoutes = [
     path: "/auth",
     shell: "public",
     page: AuthLandingPage,
+    workingStateKey: null,
+  },
+  {
+    name: "public.showroom-register",
+    path: "/daftar-showroom",
+    shell: "public",
+    role: "public",
+    page: ShowroomRegisterPage,
     workingStateKey: null,
   },
 ];

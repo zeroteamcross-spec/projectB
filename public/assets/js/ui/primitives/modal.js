@@ -45,6 +45,21 @@ function syncModalHeader(panel, modal) {
     copy.append(description);
   }
 
+  // A caller can replace the corner close (X) button with its own actions —
+  // e.g. Batal/Simpan for a form that fills the whole modal, so saving isn't
+  // buried below a scrollable body. Omit headerActions entirely and nothing
+  // changes: same X button as always.
+  const customActions = modalRuntime.get(modal.key)?.headerActions;
+  const resolvedCustomActions = typeof customActions === "function" ? customActions() : customActions;
+  const rightSlot = resolvedCustomActions instanceof Node ? resolvedCustomActions : defaultCloseButton(header, modal);
+
+  header.replaceChildren(copy, rightSlot);
+  if (!existing) {
+    panel.prepend(header);
+  }
+}
+
+function defaultCloseButton(header, modal) {
   const close = header.querySelector('[data-modal-part="close"]') ?? Button({ label: "", variant: "secondary", onClick: () => closeModal() });
   close.dataset.modalPart = "close";
   close.className = "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[var(--pb-border)] bg-[var(--pb-btn-secondary-bg)] text-[var(--pb-btn-secondary-text)] leading-none shadow-sm transition hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]";
@@ -58,11 +73,7 @@ function syncModalHeader(panel, modal) {
   icon.className = "fa-solid fa-xmark block h-4 w-4 leading-none";
   icon.setAttribute("aria-hidden", "true");
   close.replaceChildren(icon);
-
-  header.replaceChildren(copy, close);
-  if (!existing) {
-    panel.prepend(header);
-  }
+  return close;
 }
 
 function syncModalBody(panel, modal) {
@@ -107,7 +118,30 @@ function syncModalFooter(panel, modal) {
   const runtime = modalRuntime.get(modal.key);
   const customFooter = runtime?.footer ?? null;
   if (customFooter instanceof Node) {
-    footer.replaceChildren(customFooter);
+    // bindModal() re-syncs on every appStore change, with no filter for
+    // "did this modal's own state actually change" — a caller whose footer
+    // node reference is stable across renders (e.g. built once when the
+    // modal opens, per seller/pages/carsPage.js) would otherwise get it
+    // detached and reattached on every unrelated store patch, including
+    // ones fired by typing in the modal's own form fields. If that detach
+    // happens to land inside a click's mousedown→click gesture — exactly
+    // what typing-then-clicking-a-footer-button does, since the field's
+    // blur fires a change event first — the browser drops the pending
+    // click, so the button silently needs a second click to respond.
+    // bindModal() re-syncs on every appStore change, with no filter for "did
+    // this modal's own state actually change" — a caller whose footer node
+    // reference is stable across renders (e.g. built once when the modal
+    // opens, per seller/pages/carsPage.js) would otherwise get it detached
+    // and reattached on every unrelated store patch, including ones fired by
+    // typing in the modal's own form fields (see onChange in
+    // sellerCarForm.js). If that detach lands inside a click's mousedown→
+    // click gesture — exactly what happens when a field's blur fires a
+    // change event right as the user clicks a footer button — some browsers
+    // drop the pending click, so the button silently needs a second click,
+    // or a click elsewhere first to blur the field before the real click.
+    if (footer.childNodes.length !== 1 || footer.firstChild !== customFooter) {
+      footer.replaceChildren(customFooter);
+    }
   } else if (typeof customFooter === "function") {
     footer.replaceChildren(customFooter());
   } else {
@@ -166,6 +200,7 @@ export function openModal(content, options = {}) {
       modalRuntime.set(current.key, {
         ...previousRuntime,
         footer: options.footerNode ?? previousRuntime?.footer ?? null,
+        headerActions: options.headerActions ?? previousRuntime?.headerActions ?? null,
         onClose: options.onClose ?? previousRuntime?.onClose ?? null,
         contentSignature: nextSignature,
       });
@@ -175,6 +210,7 @@ export function openModal(content, options = {}) {
     modalRuntime.set(current.key, {
       content,
       footer: options.footerNode ?? null,
+      headerActions: options.headerActions ?? null,
       onClose: options.onClose ?? null,
       contentSignature: nextSignature,
     });
@@ -189,6 +225,7 @@ export function openModal(content, options = {}) {
   modalRuntime.set(key, {
     content,
     footer: options.footerNode ?? null,
+    headerActions: options.headerActions ?? null,
     onClose: options.onClose ?? null,
     contentSignature: options.contentSignature ?? "",
   });

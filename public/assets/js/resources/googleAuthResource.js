@@ -6,11 +6,14 @@ export const googleAuthResource = {
     return response.data ?? {};
   },
 
-  async redirect(role, next = "", options = {}) {
+  async redirect(role, next = "", showroomSlug = "", options = {}) {
     const query = new URLSearchParams();
     query.set("role", role);
     if (next) {
       query.set("next", next);
+    }
+    if (showroomSlug) {
+      query.set("showroom_slug", showroomSlug);
     }
     const response = await apiClient.get(`/auth/google/redirect?${query.toString()}`, options);
     return response.data ?? {};

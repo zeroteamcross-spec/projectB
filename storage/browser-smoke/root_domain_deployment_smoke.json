@@ -14,7 +14,7 @@
       "pathname": "/",
       "hash": "#/auth?role=buyer&from=%2Fbuyer",
       "appHasContent": true,
-      "bodyText": "BeliMobil\nJual beli mobil terpercaya\nKembali ke landing page\nMasuk ke akun\n\nMasuk, lalu kembali ke halaman tujuan.\n\nMasuk\nDaftar\nEmail\nPassword\nIngat saya di pe"
+      "bodyText": "BeliMobil\nJual beli mobil terpercaya\nKembali ke Beranda\nMasuk ke akun\n\nMasuk, lalu kembali ke halaman tujuan.\n\nMasuk\nDaftar\nEmail\nPassword\nIngat saya di pe"
     },
     {
       "requestedHash": "#/seller",
@@ -22,7 +22,7 @@
       "pathname": "/",
       "hash": "#/auth?role=seller&from=%2Fseller",
       "appHasContent": true,
-      "bodyText": "BeliMobil\nJual beli mobil terpercaya\nKembali ke landing page\nMasuk ke akun\n\nMasuk, lalu kembali ke halaman tujuan.\n\nMasuk\nDaftar\nEmail\nPassword\nIngat saya di pe"
+      "bodyText": "BeliMobil\nJual beli mobil terpercaya\nKembali ke Beranda\nMasuk ke akun\n\nMasuk, lalu kembali ke halaman tujuan.\n\nMasuk\nDaftar\nEmail\nPassword\nIngat saya di pe"
     },
     {
       "requestedHash": "#/admin",
@@ -30,7 +30,7 @@
       "pathname": "/",
       "hash": "#/auth?role=admin&from=%2Fadmin",
       "appHasContent": true,
-      "bodyText": "BeliMobil\nJual beli mobil terpercaya\nKembali ke landing page\nMasuk ke akun\n\nMasuk, lalu kembali ke halaman tujuan.\n\nMasuk\nDaftar\n\nRole ini memakai akun dari adm"
+      "bodyText": "BeliMobil\nJual beli mobil terpercaya\nKembali ke Beranda\nMasuk ke akun\n\nMasuk, lalu kembali ke halaman tujuan.\n\nMasuk\nDaftar\n\nRole ini memakai akun dari adm"
     },
     {
       "requestedHash": "#/affiliate",
@@ -38,7 +38,7 @@
       "pathname": "/",
       "hash": "#/auth?role=affiliate_admin&from=%2Faffiliate",
       "appHasContent": true,
-      "bodyText": "BeliMobil\nJual beli mobil terpercaya\nKembali ke landing page\nMasuk ke akun\n\nMasuk, lalu kembali ke halaman tujuan.\n\nMasuk\nDaftar\n\nRole ini memakai akun dari adm"
+      "bodyText": "BeliMobil\nJual beli mobil terpercaya\nKembali ke Beranda\nMasuk ke akun\n\nMasuk, lalu kembali ke halaman tujuan.\n\nMasuk\nDaftar\n\nRole ini memakai akun dari adm"
     },
     {
       "requestedHash": "#/notifications",
@@ -46,7 +46,7 @@
       "pathname": "/",
       "hash": "#/auth?role=public&from=%2Fnotifications",
       "appHasContent": true,
-      "bodyText": "BeliMobil\nJual beli mobil terpercaya\nKembali ke landing page\nMasuk ke akun\n\nMasuk, lalu kembali ke halaman tujuan.\n\nMasuk\nDaftar\nEmail\nPassword\nIngat saya di pe"
+      "bodyText": "BeliMobil\nJual beli mobil terpercaya\nKembali ke Beranda\nMasuk ke akun\n\nMasuk, lalu kembali ke halaman tujuan.\n\nMasuk\nDaftar\nEmail\nPassword\nIngat saya di pe"
     }
   ],
   "backwardCompatibility": {

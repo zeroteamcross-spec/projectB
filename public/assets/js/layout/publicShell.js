@@ -8,6 +8,14 @@ import { renderImpersonationBanner as mountImpersonationBanner } from "./imperso
 import { defaultLoginHash } from "../config/authUxConfig.js";
 import { BuyerMobileFooterNav } from "../modules/buyer/components/buyerMobileFooterNav.js";
 
+/**
+ * Rute publik yang sengaja tidak menampilkan tombol Login di header.
+ *
+ * Halaman pendaftaran showroom memang dirancang hanya untuk mendaftar; jalan
+ * masuk login-nya ada di landing page, bukan di sini.
+ */
+const RUTE_TANPA_TOMBOL_LOGIN = Object.freeze(["/daftar-showroom"]);
+
 export class PublicShell {
   constructor({ store } = {}) {
     this.store = store;
@@ -112,7 +120,11 @@ export class PublicShell {
 
     const isAuthenticated = this.store?.get("auth.isAuthenticated", false) ?? false;
     const role = this.store?.get("auth.role", "public") ?? "public";
-    const target = isAuthenticated ? dashboardHash(role) : loginHashForCurrentHost();
+    const target = isAuthenticated ? dashboardHash(role) : loginHashForShowroomRoute() ?? loginHashForCurrentHost();
+
+    // Saat sudah login tautan ini menjadi pintasan dashboard, bukan tombol
+    // login, jadi yang disembunyikan hanya versi tamunya.
+    this.actionLink.style.display = !isAuthenticated && tanpaTombolLogin() ? "none" : "";
     this.brandTitleNode && (this.brandTitleNode.textContent = brandConfig.appName);
     this.brandSubtitleNode && (this.brandSubtitleNode.textContent = brandConfig.appTagline || "Showroom mobil pilihan");
     if (this.brandMarkNode) {
@@ -172,6 +184,13 @@ export class PublicShell {
   }
 }
 
+function tanpaTombolLogin() {
+  const jalur = window.location.hash.replace(/^#/, "").split("?")[0] || "/";
+  const dinormalkan = jalur.length > 1 ? jalur.replace(/\/$/, "") : jalur;
+
+  return RUTE_TANPA_TOMBOL_LOGIN.includes(dinormalkan);
+}
+
 function publicLogoIcon() {
   return brandConfig.logoIcon === "bell" ? "brandMark" : brandConfig.logoIcon;
 }
@@ -194,6 +213,18 @@ function dashboardHash(role) {
   }
 
   return "#/";
+}
+
+/**
+ * On a showroom's own catalog page, "Login" should return the buyer to that
+ * same showroom rather than to the generic buyer home. Returns null outside
+ * that route so the caller falls back to loginHashForCurrentHost().
+ */
+function loginHashForShowroomRoute() {
+  const jalur = window.location.hash.replace(/^#/, "").split("?")[0] || "/";
+  const cocok = jalur.match(/^\/(?:s|showrooms)\/([^/]+)$/);
+
+  return cocok ? `#/s/${cocok[1]}/login` : null;
 }
 
 function loginHashForCurrentHost() {

@@ -3,7 +3,7 @@ import { authStore } from "../../../state/authStore.js";
 import { Button } from "../../../ui/primitives/button.js";
 import { createBackgroundVideoLayer } from "../../../ui/composites/backgroundVideo.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
-import { cx, tw } from "../../../theme/tailwindClasses.js";
+import { tw } from "../../../theme/tailwindClasses.js";
 import { showToast } from "../../../ui/primitives/toast.js";
 import { publicAuthLandingService } from "../services/publicAuthLandingService.js";
 
@@ -158,6 +158,7 @@ function render(root, context, state, getBackgroundVideoLayer = null) {
       },
       onLogin: (payload) => loginSelectedRole(payload, context, state, root),
       onRegister: (payload) => registerSelectedRole(payload, context, state, root),
+      onNavigate: (path) => context?.router?.navigate(path),
     }));
   }
 
@@ -281,6 +282,7 @@ function authPanel({
   onModeChange,
   onLogin,
   onRegister,
+  onNavigate,
 }) {
   const roleMeta = publicAuthLandingService.roleCopy(selectedRole);
   const canRegister = publicAuthLandingService.canRegisterRole(selectedRole);
@@ -304,12 +306,34 @@ function authPanel({
     : "Gunakan email dan password sesuai akun Anda.";
 
   header.append(title, body);
-  section.append(header, authModeTabs({ activeMode, canRegister, onModeChange }));
+  section.append(header);
+
+  // A single "Masuk" tab has nothing to switch to, so the bar only appears when
+  // the role can actually choose between logging in and registering.
+  if (canRegister) {
+    section.append(authModeTabs({ activeMode, onModeChange }));
+  }
 
   if (!canRegister) {
+    const registerPath = publicAuthLandingService.registerPathForRole(selectedRole);
     const note = document.createElement("p");
+    note.id = `hr_auth_${selectedRole}_no_register_note`;
     note.className = "rounded-2xl bg-orange-50/80 px-3 py-2 text-sm leading-6 text-gray-600";
-    note.textContent = "Role ini memakai akun dari admin.";
+
+    if (registerPath) {
+      note.append(document.createTextNode("Belum punya showroom? Pendaftaran ada di halaman terpisah."));
+
+      const link = document.createElement("button");
+      link.id = "hr_auth_seller_register_link";
+      link.type = "button";
+      link.className = "ml-1 font-bold text-[var(--pb-brand-secondary)] underline underline-offset-2";
+      link.textContent = "Daftarkan showroom";
+      link.addEventListener("click", () => onNavigate?.(registerPath));
+      note.append(link);
+    } else {
+      note.textContent = "Role ini memakai akun dari admin.";
+    }
+
     section.append(note);
   }
 
@@ -320,30 +344,25 @@ function authPanel({
   return section;
 }
 
-function authModeTabs({ activeMode, canRegister, onModeChange }) {
+function authModeTabs({ activeMode, onModeChange }) {
   const tabs = document.createElement("div");
   tabs.className = "grid grid-cols-2 gap-1 rounded-2xl border border-gray-100 bg-gray-100/80 p-1";
   tabs.append(
-    authModeButton("login", "Masuk", activeMode, false, onModeChange),
-    authModeButton("register", "Daftar", activeMode, !canRegister, onModeChange),
+    authModeButton("login", "Masuk", activeMode, onModeChange),
+    authModeButton("register", "Daftar", activeMode, onModeChange),
   );
   return tabs;
 }
 
-function authModeButton(value, label, activeMode, disabled, onModeChange) {
+function authModeButton(value, label, activeMode, onModeChange) {
   const button = document.createElement("button");
   button.id = `hr_auth_tab_${value}_button`;
   button.type = "button";
-  button.disabled = disabled;
   button.className = value === activeMode
     ? "rounded-xl bg-white px-3 py-2.5 text-sm font-black text-gray-950 shadow-sm transition duration-200"
-    : cx("rounded-xl px-3 py-2.5 text-sm font-bold text-gray-500 transition duration-200 hover:bg-white/70 hover:text-gray-800", disabled ? "cursor-not-allowed opacity-45 hover:bg-transparent" : "");
+    : "rounded-xl px-3 py-2.5 text-sm font-bold text-gray-500 transition duration-200 hover:bg-white/70 hover:text-gray-800";
   button.textContent = label;
-  button.addEventListener("click", () => {
-    if (!disabled) {
-      onModeChange?.(value);
-    }
-  });
+  button.addEventListener("click", () => onModeChange?.(value));
   return button;
 }
 

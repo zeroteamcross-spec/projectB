@@ -215,6 +215,8 @@ class TransactionFoundationHardeningTest extends TestCase
             midtrans_redirect_url TEXT,
             expires_at TEXT,
             paid_at TEXT,
+            returned_at TEXT NULL,
+            return_reason TEXT NULL,
             created_at TEXT,
             updated_at TEXT,
             deleted_at TEXT

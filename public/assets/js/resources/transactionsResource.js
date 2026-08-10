@@ -45,6 +45,11 @@ export const transactionsResource = {
     return response.data?.transaction ?? null;
   },
 
+  async returnTransaction(id, payload = {}, options = {}) {
+    const response = await apiClient.post(`/transactions/${encodeURIComponent(id)}/return`, payload, options);
+    return response.data?.transaction ?? null;
+  },
+
   async downloadPaymentQr(id, options = {}) {
     const response = await fetch(apiClient.url(`/transactions/${encodeURIComponent(id)}/payment-qr`), {
       method: "GET",

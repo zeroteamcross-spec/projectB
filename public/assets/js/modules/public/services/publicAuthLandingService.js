@@ -68,7 +68,13 @@ export const publicAuthLandingService = {
   },
 
   canRegisterRole(role) {
-    return role === "buyer" || role === "seller";
+    // Seller registration lives on its own page (#/daftar-showroom) because it
+    // also captures showroom, slug, and bank details.
+    return role === "buyer";
+  },
+
+  registerPathForRole(role) {
+    return role === "seller" ? "/daftar-showroom" : null;
   },
 
   homeForRole(role) {

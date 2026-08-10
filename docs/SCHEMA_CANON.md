@@ -57,6 +57,27 @@ Gunakan:
 
 ---
 
+## 2.6 Padanan Istilah UI dan Database
+
+Beberapa kolom sengaja memakai penamaan berbeda dari yang dilihat pengguna.
+Ini keputusan sadar, bukan kelalaian: penamaan database dipertahankan agar
+tidak memecah data dan kode yang sudah ada, sementara UI memakai istilah yang
+lazim di pasar.
+
+| Di database | Di UI dan dokumen |
+|---|---|
+| `cars.dp_amount` | Booking Fee |
+| `transactions.dp_amount` | Booking Fee |
+| `transactions.payment_type = 'dp'` | Booking Fee |
+| `transaction_status = 'dp_paid'` | Booking Fee Lunas |
+| `transaction_status = 'returned'` | Diretur |
+| `showrooms.city_name` | Kota |
+
+Aturan: saat menambah kolom baru untuk konsep yang sudah punya padanan di
+atas, ikuti penamaan database yang sudah ada, lalu perbarui tabel ini.
+
+---
+
 ## 3. Tabel Canon
 
 Daftar tabel inti untuk `projectB`:
@@ -85,7 +106,8 @@ Daftar tabel inti untuk `projectB`:
 22. `sliders`
 23. `affiliate_settlement_histories`
 24. `user_oauth_identities`
-25. `schema_migrations`
+25. `car_favorites`
+26. `schema_migrations`
 
 Catatan:
 - beberapa tabel adalah hasil normalisasi dari struktur lama
@@ -114,13 +136,23 @@ Field:
 - `otp_expires_at` datetime null
 - `security_key` text null
 - `is_approved` tinyint(1) not null default 0
+- `home_showroom_id` bigint unsigned null, FK -> `showrooms.id`, ON DELETE SET NULL
 - `created_at` datetime not null
 - `updated_at` datetime null
 - `deleted_at` datetime null
 
+Index:
+- index on `home_showroom_id`
+
 Catatan:
 - data showroom dipisahkan dari tabel ini
 - `otp_code` dan `security_key` masih dipertahankan untuk kompatibilitas perilaku, tetapi secara domain bisa dipisah lagi nanti
+- `home_showroom_id` hanya bermakna untuk role `buyer`. Menyatakan showroom
+  mana yang sedang jadi "rumah" buyer ini — diisi saat login lewat
+  `#/s/<slug>/login`, dan ditimpa lagi setiap kali buyer login lewat link
+  showroom lain. Buyer tetap bebas login ke showroom mana pun bila punya
+  link-nya; kolom ini hanya mencatat yang terakhir dipakai, untuk diarahkan
+  ke sana lagi saat logout.
 
 ---
 
@@ -135,6 +167,7 @@ Field:
 - `slug` varchar(80) not null unique
 - `name` varchar(225) not null
 - `address` varchar(512) null
+- `city_name` varchar(100) null
 - `phone_number` varchar(25) null
 - `bank_account_number` varchar(50) null
 - `bank_type` varchar(100) null
@@ -143,10 +176,18 @@ Field:
 - `updated_at` datetime null
 - `deleted_at` datetime null
 
+Index:
+- unique on `slug`
+- unique on `user_id`
+- index on `city_name`
+- index on `deleted_at`
+
 Catatan:
 - seller memiliki paling banyak satu showroom pada desain awal
-- `slug` dibuat otomatis saat showroom dibuat dari nama showroom
+- `slug` ditentukan sendiri oleh showroom saat pendaftaran, wajib unik, dan dinormalisasi ke huruf kecil, angka, dan dash
 - halaman publik showroom menggunakan slug ini dan menampilkan hanya listing milik seller/showroom tersebut
+- `city_name` dipilih dari master `locations.cities` dan disimpan sebagai nama kota, bukan id, mengikuti pola `cars.location_name` yang memakai master yang sama
+- `city_name` disimpan denormalized supaya nama kota historis tidak ikut berubah saat master kota disunting
 
 ---
 
@@ -207,6 +248,7 @@ Field:
 - `price_cash` bigint null
 - `price_discount` bigint null
 - `price_credit` bigint null
+- `dp_amount` bigint null
 - `inspection_summary_status` enum(`not_checked`, `partial`, `completed`) not null default `not_checked`
 - `published_at` datetime null
 - `created_at` datetime not null
@@ -223,6 +265,9 @@ Index:
 Catatan:
 - `brand_name` dan `model_name` masih disimpan sebagai string agar migrasi lebih ringan
 - bila master brand-model sudah stabil, bisa dinormalisasi di fase lanjutan
+- `dp_amount` adalah **Booking Fee** yang ditentukan showroom untuk mobil ini. Wajib diisi saat membuat atau menyunting mobil, harus lebih besar dari 0 dan lebih kecil dari `price_cash`
+- mobil dengan `dp_amount` kosong tidak bisa ditransaksikan; data lama perlu diisi showroom sebelum bisa dibeli
+- nominal transaksi diambil dari kolom ini, bukan dari input buyer
 
 ---
 
@@ -343,12 +388,14 @@ Field:
 - `payment_type` enum(`dp`, `full`) not null
 - `dp_amount` bigint null
 - `remaining_amount` bigint null
-- `transaction_status` enum(`pending_payment`, `dp_paid`, `paid`, `completed`, `expired`, `cancelled`) not null default `pending_payment`
+- `transaction_status` enum(`pending_payment`, `dp_paid`, `paid`, `completed`, `expired`, `cancelled`, `returned`) not null default `pending_payment`
 - `midtrans_order_id` varchar(100) null
 - `midtrans_token` varchar(200) null
 - `midtrans_redirect_url` varchar(300) null
 - `expires_at` datetime null
 - `paid_at` datetime null
+- `returned_at` datetime null
+- `return_reason` varchar(500) null
 - `created_at` datetime not null
 - `updated_at` datetime null
 - `deleted_at` datetime null
@@ -365,6 +412,9 @@ Index:
 Catatan penting:
 - ini menggantikan struktur lama yang ambigu pada `id_transaksi`
 - PK dan kode transaksi dipisahkan secara tegas
+- `dp_amount` disalin dari `cars.dp_amount` saat transaksi dibuat, bukan dari input buyer. Salinan ini menjaga nominal historis tetap utuh bila showroom mengubah Booking Fee mobil di kemudian hari
+- `remaining_amount` bersifat informatif. Sisa pembayaran diselesaikan di luar sistem, tidak ada penagihan lanjutan di aplikasi
+- `returned_at` dan `return_reason` diisi saat showroom meretur transaksi. Retur hanya boleh dari status `dp_paid`
 
 ---
 
@@ -836,6 +886,32 @@ Catatan:
 
 ---
 
+## 4.25 `car_favorites`
+
+Tujuan:
+Menyimpan mobil yang difavoritkan buyer. Menjadi sumber data grid favorit pada home buyer.
+
+Field:
+- `id` bigint unsigned, PK, auto increment
+- `user_id` bigint unsigned, FK -> `users.id`
+- `car_id` bigint unsigned, FK -> `cars.id`
+- `created_at` datetime not null
+- `updated_at` datetime null
+- `deleted_at` datetime null
+
+Index:
+- unique on (`user_id`, `car_id`)
+- index on (`user_id`, `deleted_at`)
+- index on `car_id`
+
+Catatan:
+- hanya role `buyer` yang boleh menulis ke tabel ini.
+- un-favorit memakai soft delete `deleted_at`, bukan hapus baris, agar unique key tetap menahan duplikat saat mobil yang sama difavoritkan ulang.
+- favorit ulang mengosongkan kembali `deleted_at` pada baris yang sama.
+- endpoint favorit wajib scope ke `user_id` dari auth context, bukan dari input client.
+
+---
+
 ## 5. Mapping dari Struktur Lama ke Canon Baru
 
 ### 5.1 `Users` lama
@@ -1020,6 +1096,12 @@ Label domain UI:
 - `completed`
 - `expired`
 - `cancelled`
+- `returned`
+
+Catatan:
+- `dp_paid` adalah status terminal untuk pembayaran. Setelah Booking Fee masuk, tidak ada tagihan lanjutan di sistem
+- `paid` masih ada untuk transaksi lama dan pelunasan penuh, tetapi jalur UI-nya sudah ditutup
+- `returned` hanya bisa dicapai dari `dp_paid`, lewat aksi retur oleh showroom pemilik transaksi
 
 ### 6.8 Affiliate status
 - `active`

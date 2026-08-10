@@ -16,6 +16,8 @@ export function SellerTransactionDetailPanel({
   onChecklistSave = null,
   isCancelling = false,
   onCancel = null,
+  isReturning = false,
+  onReturn = null,
 } = {}) {
   if (!transaction) {
     return EmptyState({
@@ -29,7 +31,7 @@ export function SellerTransactionDetailPanel({
   const layout = document.createElement("div");
   layout.className = "grid min-w-0 gap-4";
   layout.append(
-    statusCard(transaction, statusMeta, { isCancelling, onCancel }),
+    statusCard(transaction, statusMeta, { isCancelling, onCancel, isReturning, onReturn }),
     fulfillmentChecklistCard({
       transaction,
       checklistDraft,
@@ -196,7 +198,7 @@ function stripHandoverDate(notes = "") {
     .trim();
 }
 
-function statusCard(transaction, statusMeta, { isCancelling = false, onCancel = null } = {}) {
+function statusCard(transaction, statusMeta, { isCancelling = false, onCancel = null, isReturning = false, onReturn = null } = {}) {
   const header = document.createElement("div");
   header.className = "flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between";
 
@@ -226,12 +228,30 @@ function statusCard(transaction, statusMeta, { isCancelling = false, onCancel = 
     actions.append(cancel);
   }
 
+  if (canSellerReturn(transaction)) {
+    const retur = Button({
+      label: isReturning ? "Memproses retur..." : "Retur",
+      variant: "danger",
+      disabled: isReturning,
+      onClick: onReturn,
+      designHook: "shared.button.secondary",
+    });
+    retur.id = "slrtx_return_button";
+    retur.classList.add("w-full", "sm:w-fit");
+    actions.append(retur);
+  }
+
   header.append(copy, actions);
   return Card(header);
 }
 
 function canSellerCancel(transaction) {
   return ["pending_payment", "dp_paid"].includes(String(transaction?.transaction_status ?? "").toLowerCase());
+}
+
+// Retur hanya setelah Booking Fee masuk dan sebelum buyer menutup transaksi.
+function canSellerReturn(transaction) {
+  return String(transaction?.transaction_status ?? "").toLowerCase() === "dp_paid";
 }
 
 function financialCard(financials) {
