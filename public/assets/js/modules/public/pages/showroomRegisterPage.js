@@ -490,18 +490,32 @@ function field({ id, name, label, type = "text", placeholder = "", required = tr
 }
 
 /**
- * Combobox: input teks yang bisa dicari, dibantu <datalist> bawaan browser.
- * Lebih cocok dibanding <select> polos begitu daftarnya (kota, bank) tumbuh
- * lebih dari selusin — mengetik "band" langsung menyaring ke "Bandung".
- * Tetap mengirim `name` yang sama seperti sebelumnya, jadi validasi backend
- * dan frontend (cek non-kosong) tidak berubah.
+ * Combobox bergaya dropdown-dan-cari (seperti Select2 di jQuery), dibangun
+ * sendiri tanpa menambah dependency baru — aplikasi ini murni vanilla JS di
+ * semua tempat lain, jadi menarik jQuery+plugin hanya untuk dua field ini
+ * akan jadi satu-satunya pengecualian. <input list>+<datalist> bawaan
+ * browser yang dipakai sebelumnya punya masalah yang sama persis dengan
+ * yang dikeluhkan: panel sarannya di-render browser sendiri (putih polos,
+ * font sistem) dan sama sekali tidak bisa di-styling lewat CSS.
+ *
+ * Klik atau fokus pada input membuka panel; mengetik menyaring opsi secara
+ * live; klik salah satu opsi mengisi input dan menutup panel. Nilai yang
+ * dikirim ke form tetap teks polos dari input (sama seperti versi
+ * datalist), jadi validasi backend dan frontend tidak berubah.
  */
 function selectField({ id, name, label, placeholder = "", options = [], required = true, value = "", error = "" }) {
-  const wrap = document.createElement("label");
+  const wrap = document.createElement("div");
   wrap.className = "grid gap-1.5 text-sm font-semibold text-gray-700";
-  wrap.append(document.createTextNode(label));
 
-  const listId = `${id}_options`;
+  const labelNode = document.createElement("label");
+  labelNode.htmlFor = id;
+  labelNode.textContent = label;
+  wrap.append(labelNode);
+
+  const comboWrap = document.createElement("div");
+  comboWrap.id = `${id}_combobox`;
+  comboWrap.className = "relative";
+
   const input = document.createElement("input");
   input.id = id;
   input.name = name;
@@ -509,19 +523,124 @@ function selectField({ id, name, label, placeholder = "", options = [], required
   input.required = required;
   input.autocomplete = "off";
   input.placeholder = placeholder ? `${placeholder} — ketik untuk mencari` : "Ketik untuk mencari";
-  input.setAttribute("list", listId);
   input.value = value ?? "";
-  input.className = inputClassName(Boolean(error));
+  input.className = `${inputClassName(Boolean(error))} pr-10`;
+  input.setAttribute("role", "combobox");
+  input.setAttribute("aria-expanded", "false");
+  input.setAttribute("aria-autocomplete", "list");
+  input.setAttribute("aria-controls", `${id}_listbox`);
 
-  const datalist = document.createElement("datalist");
-  datalist.id = listId;
-  options.forEach((option) => {
-    const node = document.createElement("option");
-    node.value = option;
-    datalist.append(node);
+  const chevron = document.createElement("span");
+  chevron.className = "pointer-events-none absolute right-3.5 top-1/2 flex -translate-y-1/2 text-gray-400";
+  chevron.append(createIcon("chevronRight", { className: "block h-3 w-3 rotate-90 leading-none" }));
+
+  const panel = document.createElement("div");
+  panel.id = `${id}_listbox`;
+  panel.setAttribute("role", "listbox");
+  panel.className = "modal-scrollbar absolute inset-x-0 top-[calc(100%+0.4rem)] z-30 max-h-56 overflow-y-auto rounded-2xl border border-gray-100 bg-white p-1.5 shadow-[0_20px_45px_rgba(15,23,42,0.16)]";
+  panel.hidden = true;
+
+  let filtered = options.slice();
+  let highlighted = -1;
+
+  function filterOptions(query) {
+    const q = String(query ?? "").trim().toLowerCase();
+    return q ? options.filter((option) => option.toLowerCase().includes(q)) : options.slice();
+  }
+
+  function renderOptions() {
+    panel.replaceChildren();
+
+    if (!filtered.length) {
+      const empty = document.createElement("p");
+      empty.className = "px-3 py-2 text-sm font-medium text-gray-400";
+      empty.textContent = "Tidak ada hasil.";
+      panel.append(empty);
+      return;
+    }
+
+    filtered.forEach((option, index) => {
+      const item = document.createElement("button");
+      item.type = "button";
+      item.dataset.comboboxOption = option;
+      item.setAttribute("role", "option");
+      item.className = [
+        "block w-full rounded-xl px-3 py-2 text-left text-sm font-semibold transition",
+        index === highlighted ? "bg-orange-50 text-orange-700" : "text-gray-800 hover:bg-gray-50",
+      ].join(" ");
+      item.textContent = option;
+      // mousedown (bukan click) supaya terjadi sebelum blur input menutup panel.
+      item.addEventListener("mousedown", (event) => {
+        event.preventDefault();
+        selectOption(option);
+      });
+      panel.append(item);
+    });
+  }
+
+  function openPanel() {
+    filtered = filterOptions(input.value);
+    highlighted = -1;
+    renderOptions();
+    panel.hidden = false;
+    input.setAttribute("aria-expanded", "true");
+  }
+
+  function closePanel() {
+    panel.hidden = true;
+    input.setAttribute("aria-expanded", "false");
+  }
+
+  function selectOption(option) {
+    input.value = option;
+    // Menutup panel HARUS terakhir: listener "input" di bawah membuka lagi
+    // panelnya (dipakai saat mengetik manual), jadi kalau closePanel() lebih
+    // dulu, dispatch "input" ini langsung membukanya kembali.
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+    closePanel();
+  }
+
+  input.addEventListener("focus", openPanel);
+  input.addEventListener("input", () => {
+    filtered = filterOptions(input.value);
+    highlighted = -1;
+    renderOptions();
+    panel.hidden = false;
+    input.setAttribute("aria-expanded", "true");
+  });
+  input.addEventListener("blur", closePanel);
+  input.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      if (panel.hidden) {
+        openPanel();
+        return;
+      }
+      highlighted = Math.min(highlighted + 1, filtered.length - 1);
+      renderOptions();
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault();
+      highlighted = Math.max(highlighted - 1, 0);
+      renderOptions();
+    } else if (event.key === "Enter") {
+      if (!panel.hidden && filtered[highlighted]) {
+        event.preventDefault();
+        selectOption(filtered[highlighted]);
+      }
+    } else if (event.key === "Escape") {
+      closePanel();
+    }
   });
 
-  wrap.append(input, datalist);
+  comboWrap.append(input, chevron, panel);
+  wrap.append(comboWrap);
+
+  // Render sekali di awal (tetap hidden) supaya opsinya sudah ada di DOM
+  // sebelum panel pernah dibuka — dibutuhkan alat uji otomatis yang mengecek
+  // opsi lewat querySelector, dan menghindari kedipan kosong sesaat panel
+  // pertama kali dibuka.
+  renderOptions();
 
   if (error) {
     wrap.append(errorNode(error));

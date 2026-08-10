@@ -37,14 +37,14 @@
     },
     {
       "urutan": 2,
-      "id": "shr_register_city_input",
-      "jenis": "select",
+      "selector": "#shr_register_city_input_listbox",
+      "jenis": "container",
       "aksi": "verifikasi",
       "nama": "Dropdown kota terisi dari master",
       "harapan": {
-        "teks_mengandung": "Surabaya"
+        "elemen_ada": "[data-combobox-option='Surabaya']"
       },
-      "catatan": "Kalau master locations.cities belum ter-seed, langkah ini merah."
+      "catatan": "Kalau master locations.cities belum ter-seed, langkah ini merah. Field Kota kini combobox custom (bukan <select>), opsinya ada di DOM listbox-nya sejak render awal, terlepas dari panelnya sedang terbuka atau tidak."
     },
     {
       "urutan": 3,
@@ -130,10 +130,10 @@
     {
       "urutan": 11,
       "id": "shr_register_city_input",
-      "jenis": "select",
-      "aksi": "pilih",
+      "jenis": "input-text",
+      "aksi": "isi",
       "nilai": "{{kota}}",
-      "nama": "Pilih kota"
+      "nama": "Pilih kota (combobox custom, isi langsung)"
     },
     {
       "urutan": 12,
@@ -146,10 +146,10 @@
     {
       "urutan": 13,
       "id": "shr_register_bank_type_input",
-      "jenis": "select",
-      "aksi": "pilih",
+      "jenis": "input-text",
+      "aksi": "isi",
       "nilai": "{{bank}}",
-      "nama": "Bank"
+      "nama": "Bank (combobox custom, isi langsung)"
     },
     {
       "urutan": 14,
