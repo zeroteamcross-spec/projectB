@@ -4,8 +4,9 @@
   "halaman": ["#/daftar-showroom"],
   "prefix_id": ["shr_"],
   "versi": "1.0",
+  "warisi_variabel": true,
   "berhenti_saat_gagal": true,
-  "keterangan": "Jalur negatif. Mendaftar memakai slug yang sudah dipakai showroom lain, lalu memastikan server menolak dan pesan errornya memuat saran alternatif. Tidak ada data baru yang tersimpan bila lulus.",
+  "keterangan": "Jalur negatif. Mendaftar memakai slug yang sudah dipakai showroom lain, lalu memastikan server menolak dan pesan errornya memuat saran alternatif. Tidak ada data baru yang tersimpan bila lulus. warisi_variabel dipasang murni supaya skenario ini tidak menghapus {{email_showroom}}/{{slug}} yang diekspor 02 dan dibutuhkan 04 setelahnya -- 03 sendiri tidak memakai variabel warisan itu.",
   "prasyarat_data": [
     "Server lokal berjalan di http://localhost:8000.",
     "Showroom dengan slug 'metro-auto-jakarta' sudah ada di database (dari seed demo)."
@@ -66,10 +67,10 @@
     {
       "urutan": 7,
       "id": "shr_register_city_input",
-      "jenis": "select",
-      "aksi": "pilih",
+      "jenis": "input-text",
+      "aksi": "isi",
       "nilai": "Jakarta",
-      "nama": "Pilih kota"
+      "nama": "Pilih kota (combobox custom, isi langsung)"
     },
     {
       "urutan": 8,

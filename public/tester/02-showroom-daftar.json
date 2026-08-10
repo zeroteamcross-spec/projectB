@@ -40,11 +40,12 @@
       "selector": "#shr_register_city_input_listbox",
       "jenis": "container",
       "aksi": "verifikasi",
+      "abaikan_visible": true,
       "nama": "Dropdown kota terisi dari master",
       "harapan": {
         "elemen_ada": "[data-combobox-option='Surabaya']"
       },
-      "catatan": "Kalau master locations.cities belum ter-seed, langkah ini merah. Field Kota kini combobox custom (bukan <select>), opsinya ada di DOM listbox-nya sejak render awal, terlepas dari panelnya sedang terbuka atau tidak."
+      "catatan": "Kalau master locations.cities belum ter-seed, langkah ini merah. Field Kota kini combobox custom (bukan <select>), opsinya ada di DOM listbox-nya sejak render awal walau panelnya baru terbuka saat difokus/diklik — abaikan_visible dibutuhkan karena panelnya memang sengaja hidden secara default."
     },
     {
       "urutan": 3,
@@ -123,9 +124,9 @@
       "aksi": "verifikasi",
       "nama": "Preview URL halaman showroom",
       "harapan": {
-        "teks_mengandung": "/#/showrooms/uji-otomatis-{{timestamp}}"
+        "teks_mengandung": "/#/s/uji-otomatis-{{timestamp}}"
       },
-      "catatan": "Membuktikan normalisasi slug di frontend sama dengan yang akan disimpan server."
+      "catatan": "Membuktikan normalisasi slug di frontend sama dengan yang akan disimpan server. Alamat pendek /#/s/<slug> memang bentuk yang ditampilkan di sini per BUSINESS_FLOW.md bagian 2 (dulunya tes ini salah mengecek bentuk panjang /#/showrooms/<slug>)."
     },
     {
       "urutan": 11,

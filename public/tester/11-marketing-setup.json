@@ -23,12 +23,35 @@
   "urutan_uji": [
     {
       "urutan": 1,
-      "halaman": "#/auth?role=seller",
-      "id": "hr_auth_role_seller_button",
+      "halaman": "#/profile",
+      "selector": "[id$='profile_role_specific_logout_button']",
       "jenis": "button",
-      "aksi": "klik",
-      "nama": "Pilih role seller",
-      "tunggu": { "elemen": "#hr_auth_login_seller_email_input", "timeout_ms": 8000 }
+      "aksi": "klik_opsional",
+      "nama": "Buka konfirmasi logout sesi lama (bila masih login)",
+      "tunggu": {
+        "elemen": "#profile_logout_confirm_button",
+        "timeout_ms": 8000
+      },
+      "catatan": "Dilewati bila memang sudah logout. Sejak #/auth langsung mengarahkan sesi aktif ke dashboard, pembersihan sesi harus lewat halaman profil."
+    },
+    {
+      "urutan": 1.1,
+      "id": "profile_logout_confirm_button",
+      "jenis": "button",
+      "aksi": "klik_opsional",
+      "nama": "Konfirmasi logout sesi lama",
+      "tunggu": {
+        "ms": 1500
+      }
+    },
+    {
+      "urutan": 1.2,
+      "halaman": "#/auth?role=seller",
+      "selector": "#hr_auth_login_seller_email_input",
+      "jenis": "input-email",
+      "aksi": "verifikasi",
+      "nama": "Form login siap untuk seller",
+      "timeout_ms": 15000
     },
     {
       "urutan": 2,
@@ -52,7 +75,10 @@
       "jenis": "button-submit",
       "aksi": "klik",
       "nama": "Masuk sebagai seller",
-      "tunggu": { "route": "#/seller", "timeout_ms": 15000 }
+      "tunggu": {
+        "route": "#/seller",
+        "timeout_ms": 15000
+      }
     },
     {
       "urutan": 5,
@@ -61,7 +87,10 @@
       "jenis": "button",
       "aksi": "klik",
       "nama": "F1.1 - Klik Tambah Marketing",
-      "tunggu": { "elemen": "#slraf_affiliate_name_input", "timeout_ms": 8000 }
+      "tunggu": {
+        "elemen": "#slraf_affiliate_name_input",
+        "timeout_ms": 8000
+      }
     },
     {
       "urutan": 6,
@@ -86,7 +115,10 @@
       "aksi": "isi",
       "nilai": "uji-mkt-{{timestamp}}",
       "nama": "F1.2 - Slug marketing",
-      "simpan": { "nama": "marketing_slug", "dari": "nilai" }
+      "simpan": {
+        "nama": "marketing_slug",
+        "dari": "nilai"
+      }
     },
     {
       "urutan": 9,
@@ -95,7 +127,10 @@
       "aksi": "isi",
       "nilai": "marketing.uji.{{timestamp}}@example.test",
       "nama": "F1.3 - Username/email login Marketing",
-      "simpan": { "nama": "marketing_email", "dari": "nilai" }
+      "simpan": {
+        "nama": "marketing_email",
+        "dari": "nilai"
+      }
     },
     {
       "urutan": 10,
@@ -104,7 +139,10 @@
       "aksi": "isi",
       "nilai": "MktUji{{stamp6}}!",
       "nama": "F1.3 - Password Marketing",
-      "simpan": { "nama": "marketing_password", "dari": "nilai" }
+      "simpan": {
+        "nama": "marketing_password",
+        "dari": "nilai"
+      }
     },
     {
       "urutan": 11,
@@ -128,13 +166,19 @@
       "jenis": "button-submit",
       "aksi": "klik",
       "nama": "F1.5 - Simpan Marketing",
-      "tunggu": { "elemen": "#slraf_detail_edit_button", "timeout_ms": 10000 }
+      "tunggu": {
+        "elemen": "#slraf_detail_edit_button",
+        "timeout_ms": 10000
+      }
     },
     {
       "urutan": 14,
       "aksi": "assert",
       "nama": "Marketing tersimpan dengan slug yang benar",
-      "harapan": { "teks_mengandung": "{{marketing_slug}}", "lingkup": "halaman" }
+      "harapan": {
+        "teks_mengandung": "{{marketing_slug}}",
+        "lingkup": "halaman"
+      }
     },
     {
       "urutan": 15,
@@ -142,9 +186,10 @@
       "jenis": "button",
       "aksi": "klik_opsional",
       "nama": "Tutup modal detail marketing",
-      "tunggu": { "ms": 500 }
+      "tunggu": {
+        "ms": 500
+      }
     },
-
     {
       "urutan": 20,
       "halaman": "#/seller/affiliate-commissions",
@@ -152,7 +197,10 @@
       "jenis": "button",
       "aksi": "klik",
       "nama": "F2.1 - Klik Atur komisi umum",
-      "tunggu": { "elemen": "#slrafc_global_commission_type_input", "timeout_ms": 8000 }
+      "tunggu": {
+        "elemen": "#slrafc_global_commission_type_input",
+        "timeout_ms": 8000
+      }
     },
     {
       "urutan": 21,
@@ -184,7 +232,9 @@
       "jenis": "button-submit",
       "aksi": "klik",
       "nama": "F2.3 - Simpan aturan umum",
-      "tunggu": { "ms": 2000 }
+      "tunggu": {
+        "ms": 2000
+      }
     }
   ]
 }

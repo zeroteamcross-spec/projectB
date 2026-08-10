@@ -30,12 +30,35 @@
   "urutan_uji": [
     {
       "urutan": 1,
-      "halaman": "#/auth?role=buyer",
-      "id": "hr_auth_role_buyer_button",
+      "halaman": "#/profile",
+      "selector": "[id$='profile_role_specific_logout_button']",
       "jenis": "button",
-      "aksi": "klik",
-      "nama": "Pilih role buyer",
-      "tunggu": { "elemen": "#hr_auth_login_buyer_email_input", "timeout_ms": 15000 }
+      "aksi": "klik_opsional",
+      "nama": "Buka konfirmasi logout sesi lama (bila masih login)",
+      "tunggu": {
+        "elemen": "#profile_logout_confirm_button",
+        "timeout_ms": 8000
+      },
+      "catatan": "Dilewati bila memang sudah logout. Sejak #/auth langsung mengarahkan sesi aktif ke dashboard, pembersihan sesi harus lewat halaman profil."
+    },
+    {
+      "urutan": 1.1,
+      "id": "profile_logout_confirm_button",
+      "jenis": "button",
+      "aksi": "klik_opsional",
+      "nama": "Konfirmasi logout sesi lama",
+      "tunggu": {
+        "ms": 1500
+      }
+    },
+    {
+      "urutan": 1.2,
+      "halaman": "#/auth?role=buyer",
+      "selector": "#hr_auth_login_buyer_email_input",
+      "jenis": "input-email",
+      "aksi": "verifikasi",
+      "nama": "Form login siap untuk buyer",
+      "timeout_ms": 15000
     },
     {
       "urutan": 2,
@@ -59,14 +82,19 @@
       "jenis": "button-submit",
       "aksi": "klik",
       "nama": "Masuk sebagai buyer",
-      "tunggu": { "route": "#/buyer", "timeout_ms": 20000 }
+      "tunggu": {
+        "route": "#/buyer",
+        "timeout_ms": 20000
+      }
     },
     {
       "urutan": 5,
       "halaman": "#/af/{{marketing_slug}}",
       "aksi": "assert",
       "nama": "F3.4 - Kunjungan lewat link Marketing tercatat (route aktif)",
-      "harapan": { "route_sama": "#/af/{{marketing_slug}}" },
+      "harapan": {
+        "route_sama": "#/af/{{marketing_slug}}"
+      },
       "timeout_ms": 15000
     },
     {
@@ -77,7 +105,9 @@
       "aksi": "verifikasi",
       "nama": "Booking Fee car_b tampil lewat konteks Marketing",
       "timeout_ms": 15000,
-      "harapan": { "teks_tidak_mengandung": "Belum ditentukan showroom" }
+      "harapan": {
+        "teks_tidak_mengandung": "Belum ditentukan showroom"
+      }
     },
     {
       "urutan": 7,
@@ -92,7 +122,10 @@
       "jenis": "button-submit",
       "aksi": "klik",
       "nama": "Buat transaksi kedua (car_b, lewat Marketing)",
-      "tunggu": { "elemen": "#pubtrx_result_panel", "timeout_ms": 15000 }
+      "tunggu": {
+        "elemen": "#pubtrx_result_panel",
+        "timeout_ms": 15000
+      }
     },
     {
       "urutan": 9,
@@ -100,7 +133,11 @@
       "jenis": "container",
       "aksi": "verifikasi",
       "nama": "Tangkap transaction_b_id",
-      "simpan": { "nama": "transaction_b_id", "dari": "atribut", "atribut": "data-transaction-id" }
+      "simpan": {
+        "nama": "transaction_b_id",
+        "dari": "atribut",
+        "atribut": "data-transaction-id"
+      }
     },
     {
       "urutan": 10,
@@ -108,16 +145,21 @@
       "jenis": "button",
       "aksi": "klik",
       "nama": "Buka status pembayaran transaction_b",
-      "tunggu": { "route": "#/buyer/transactions/{{transaction_b_id}}", "timeout_ms": 10000 }
+      "tunggu": {
+        "route": "#/buyer/transactions/{{transaction_b_id}}",
+        "timeout_ms": 10000
+      }
     },
     {
       "urutan": 11,
       "aksi": "assert",
       "nama": "MANUAL: jalankan jembatan pembayaran untuk transaction_b lalu tunggu Booking Fee Lunas",
       "catatan": "Jalankan sekarang: php scripts/pay_transaction_for_tester.php {{transaction_b_id}}",
-      "tunggu": { "teks": "Pembayaran Berhasil", "timeout_ms": 90000 }
+      "tunggu": {
+        "teks": "Pembayaran Berhasil",
+        "timeout_ms": 90000
+      }
     },
-
     {
       "urutan": 20,
       "halaman": "#/profile",
@@ -125,7 +167,10 @@
       "jenis": "button",
       "aksi": "klik_opsional",
       "nama": "Buka konfirmasi logout buyer",
-      "tunggu": { "elemen": "#profile_logout_confirm_button", "timeout_ms": 8000 }
+      "tunggu": {
+        "elemen": "#profile_logout_confirm_button",
+        "timeout_ms": 8000
+      }
     },
     {
       "urutan": 21,
@@ -133,16 +178,41 @@
       "jenis": "button",
       "aksi": "klik",
       "nama": "Konfirmasi logout buyer",
-      "tunggu": { "ms": 1500 }
+      "tunggu": {
+        "ms": 1500
+      }
     },
     {
       "urutan": 22,
-      "halaman": "#/auth?role=affiliate_admin",
-      "id": "hr_auth_role_affiliate_admin_button",
+      "halaman": "#/profile",
+      "selector": "[id$='profile_role_specific_logout_button']",
       "jenis": "button",
-      "aksi": "klik",
-      "nama": "Pilih role Marketing",
-      "tunggu": { "elemen": "#hr_auth_login_affiliate_admin_email_input", "timeout_ms": 15000 }
+      "aksi": "klik_opsional",
+      "nama": "Buka konfirmasi logout sesi lama (bila masih login)",
+      "tunggu": {
+        "elemen": "#profile_logout_confirm_button",
+        "timeout_ms": 8000
+      },
+      "catatan": "Dilewati bila memang sudah logout. Sejak #/auth langsung mengarahkan sesi aktif ke dashboard, pembersihan sesi harus lewat halaman profil."
+    },
+    {
+      "urutan": 22.1,
+      "id": "profile_logout_confirm_button",
+      "jenis": "button",
+      "aksi": "klik_opsional",
+      "nama": "Konfirmasi logout sesi lama",
+      "tunggu": {
+        "ms": 1500
+      }
+    },
+    {
+      "urutan": 22.2,
+      "halaman": "#/auth?role=affiliate_admin",
+      "selector": "#hr_auth_login_affiliate_admin_email_input",
+      "jenis": "input-email",
+      "aksi": "verifikasi",
+      "nama": "Form login siap untuk affiliate_admin",
+      "timeout_ms": 15000
     },
     {
       "urutan": 23,
@@ -166,7 +236,10 @@
       "jenis": "button-submit",
       "aksi": "klik",
       "nama": "F3.1 - Masuk sebagai Marketing",
-      "tunggu": { "route": "#/affiliate", "timeout_ms": 20000 }
+      "tunggu": {
+        "route": "#/affiliate",
+        "timeout_ms": 20000
+      }
     },
     {
       "urutan": 26,
@@ -176,7 +249,9 @@
       "aksi": "verifikasi",
       "nama": "Ledger transaction_b berstatus accrued",
       "timeout_ms": 15000,
-      "harapan": { "elemen_ada": "#aff_ledger_{{transaction_b_id}}_section[data-ledger-status='accrued']" }
+      "harapan": {
+        "elemen_ada": "#aff_ledger_{{transaction_b_id}}_section[data-ledger-status='accrued']"
+      }
     },
     {
       "urutan": 27,
@@ -185,7 +260,6 @@
       "aksi": "klik_opsional",
       "nama": "Kembali ke dashboard Marketing"
     },
-
     {
       "urutan": 30,
       "halaman": "#/profile",
@@ -193,7 +267,10 @@
       "jenis": "button",
       "aksi": "klik_opsional",
       "nama": "Buka konfirmasi logout Marketing",
-      "tunggu": { "elemen": "#profile_logout_confirm_button", "timeout_ms": 8000 }
+      "tunggu": {
+        "elemen": "#profile_logout_confirm_button",
+        "timeout_ms": 8000
+      }
     },
     {
       "urutan": 31,
@@ -201,16 +278,41 @@
       "jenis": "button",
       "aksi": "klik",
       "nama": "Konfirmasi logout Marketing",
-      "tunggu": { "ms": 1500 }
+      "tunggu": {
+        "ms": 1500
+      }
     },
     {
       "urutan": 32,
-      "halaman": "#/auth?role=seller",
-      "id": "hr_auth_role_seller_button",
+      "halaman": "#/profile",
+      "selector": "[id$='profile_role_specific_logout_button']",
       "jenis": "button",
-      "aksi": "klik",
-      "nama": "Pilih role seller",
-      "tunggu": { "elemen": "#hr_auth_login_seller_email_input", "timeout_ms": 15000 }
+      "aksi": "klik_opsional",
+      "nama": "Buka konfirmasi logout sesi lama (bila masih login)",
+      "tunggu": {
+        "elemen": "#profile_logout_confirm_button",
+        "timeout_ms": 8000
+      },
+      "catatan": "Dilewati bila memang sudah logout. Sejak #/auth langsung mengarahkan sesi aktif ke dashboard, pembersihan sesi harus lewat halaman profil."
+    },
+    {
+      "urutan": 32.1,
+      "id": "profile_logout_confirm_button",
+      "jenis": "button",
+      "aksi": "klik_opsional",
+      "nama": "Konfirmasi logout sesi lama",
+      "tunggu": {
+        "ms": 1500
+      }
+    },
+    {
+      "urutan": 32.2,
+      "halaman": "#/auth?role=seller",
+      "selector": "#hr_auth_login_seller_email_input",
+      "jenis": "input-email",
+      "aksi": "verifikasi",
+      "nama": "Form login siap untuk seller",
+      "timeout_ms": 15000
     },
     {
       "urutan": 33,
@@ -234,7 +336,10 @@
       "jenis": "button-submit",
       "aksi": "klik",
       "nama": "Masuk sebagai seller",
-      "tunggu": { "route": "#/seller", "timeout_ms": 15000 }
+      "tunggu": {
+        "route": "#/seller",
+        "timeout_ms": 15000
+      }
     },
     {
       "urutan": 36,
@@ -247,13 +352,19 @@
         "Alasan retur uji otomatis dari tester",
         true
       ],
-      "tunggu": { "teks": "Diretur", "timeout_ms": 10000 }
+      "tunggu": {
+        "teks": "Diretur",
+        "timeout_ms": 10000
+      }
     },
     {
       "urutan": 37,
       "aksi": "assert",
       "nama": "E3.x - Transaksi berstatus Diretur",
-      "harapan": { "teks_mengandung": "Diretur", "lingkup": "halaman" }
+      "harapan": {
+        "teks_mengandung": "Diretur",
+        "lingkup": "halaman"
+      }
     },
     {
       "urutan": 38,
@@ -263,9 +374,10 @@
       "aksi": "verifikasi",
       "nama": "car_b kembali berstatus Published",
       "timeout_ms": 15000,
-      "harapan": { "teks_mengandung": "Tersedia" }
+      "harapan": {
+        "teks_mengandung": "Tersedia"
+      }
     },
-
     {
       "urutan": 40,
       "halaman": "#/profile",
@@ -273,7 +385,10 @@
       "jenis": "button",
       "aksi": "klik",
       "nama": "Buka konfirmasi logout seller",
-      "tunggu": { "elemen": "#profile_logout_confirm_button", "timeout_ms": 8000 }
+      "tunggu": {
+        "elemen": "#profile_logout_confirm_button",
+        "timeout_ms": 8000
+      }
     },
     {
       "urutan": 41,
@@ -281,16 +396,41 @@
       "jenis": "button",
       "aksi": "klik",
       "nama": "Konfirmasi logout seller",
-      "tunggu": { "ms": 1500 }
+      "tunggu": {
+        "ms": 1500
+      }
     },
     {
       "urutan": 42,
-      "halaman": "#/auth?role=affiliate_admin",
-      "id": "hr_auth_role_affiliate_admin_button",
+      "halaman": "#/profile",
+      "selector": "[id$='profile_role_specific_logout_button']",
       "jenis": "button",
-      "aksi": "klik",
-      "nama": "Pilih role Marketing lagi",
-      "tunggu": { "elemen": "#hr_auth_login_affiliate_admin_email_input", "timeout_ms": 15000 }
+      "aksi": "klik_opsional",
+      "nama": "Buka konfirmasi logout sesi lama (bila masih login)",
+      "tunggu": {
+        "elemen": "#profile_logout_confirm_button",
+        "timeout_ms": 8000
+      },
+      "catatan": "Dilewati bila memang sudah logout. Sejak #/auth langsung mengarahkan sesi aktif ke dashboard, pembersihan sesi harus lewat halaman profil."
+    },
+    {
+      "urutan": 42.1,
+      "id": "profile_logout_confirm_button",
+      "jenis": "button",
+      "aksi": "klik_opsional",
+      "nama": "Konfirmasi logout sesi lama",
+      "tunggu": {
+        "ms": 1500
+      }
+    },
+    {
+      "urutan": 42.2,
+      "halaman": "#/auth?role=affiliate_admin",
+      "selector": "#hr_auth_login_affiliate_admin_email_input",
+      "jenis": "input-email",
+      "aksi": "verifikasi",
+      "nama": "Form login siap untuk affiliate_admin",
+      "timeout_ms": 15000
     },
     {
       "urutan": 43,
@@ -314,7 +454,10 @@
       "jenis": "button-submit",
       "aksi": "klik",
       "nama": "Masuk lagi sebagai Marketing",
-      "tunggu": { "route": "#/affiliate", "timeout_ms": 20000 }
+      "tunggu": {
+        "route": "#/affiliate",
+        "timeout_ms": 20000
+      }
     },
     {
       "urutan": 46,
@@ -324,7 +467,9 @@
       "aksi": "verifikasi",
       "nama": "E3.x - Ledger transaction_b berstatus voided setelah retur",
       "timeout_ms": 15000,
-      "harapan": { "elemen_ada": "#aff_ledger_{{transaction_b_id}}_section[data-ledger-status='voided']" }
+      "harapan": {
+        "elemen_ada": "#aff_ledger_{{transaction_b_id}}_section[data-ledger-status='voided']"
+      }
     }
   ]
 }

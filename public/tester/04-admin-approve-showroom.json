@@ -35,15 +35,35 @@
     },
     {
       "urutan": 2,
-      "halaman": "#/auth?role=admin",
-      "id": "hr_auth_role_admin_button",
+      "halaman": "#/profile",
+      "selector": "[id$='profile_role_specific_logout_button']",
       "jenis": "button",
-      "aksi": "klik",
-      "nama": "Pilih role admin",
+      "aksi": "klik_opsional",
+      "nama": "Buka konfirmasi logout sesi lama (bila masih login)",
       "tunggu": {
-        "elemen": "#hr_auth_login_admin_email_input",
-        "timeout_ms": 20000
+        "elemen": "#profile_logout_confirm_button",
+        "timeout_ms": 8000
+      },
+      "catatan": "Dilewati bila memang sudah logout. Sejak #/auth langsung mengarahkan sesi aktif ke dashboard, pembersihan sesi harus lewat halaman profil."
+    },
+    {
+      "urutan": 2.1,
+      "id": "profile_logout_confirm_button",
+      "jenis": "button",
+      "aksi": "klik_opsional",
+      "nama": "Konfirmasi logout sesi lama",
+      "tunggu": {
+        "ms": 1500
       }
+    },
+    {
+      "urutan": 2.2,
+      "halaman": "#/auth?role=admin",
+      "selector": "#hr_auth_login_admin_email_input",
+      "jenis": "input-email",
+      "aksi": "verifikasi",
+      "nama": "Form login siap untuk admin",
+      "timeout_ms": 15000
     },
     {
       "urutan": 3,

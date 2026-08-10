@@ -27,12 +27,35 @@
   "urutan_uji": [
     {
       "urutan": 1,
-      "halaman": "#/auth?role=buyer",
-      "id": "hr_auth_role_buyer_button",
+      "halaman": "#/profile",
+      "selector": "[id$='profile_role_specific_logout_button']",
       "jenis": "button",
-      "aksi": "klik",
-      "nama": "Pilih role buyer",
-      "tunggu": { "elemen": "#hr_auth_login_buyer_email_input", "timeout_ms": 15000 }
+      "aksi": "klik_opsional",
+      "nama": "Buka konfirmasi logout sesi lama (bila masih login)",
+      "tunggu": {
+        "elemen": "#profile_logout_confirm_button",
+        "timeout_ms": 8000
+      },
+      "catatan": "Dilewati bila memang sudah logout. Sejak #/auth langsung mengarahkan sesi aktif ke dashboard, pembersihan sesi harus lewat halaman profil."
+    },
+    {
+      "urutan": 1.1,
+      "id": "profile_logout_confirm_button",
+      "jenis": "button",
+      "aksi": "klik_opsional",
+      "nama": "Konfirmasi logout sesi lama",
+      "tunggu": {
+        "ms": 1500
+      }
+    },
+    {
+      "urutan": 1.2,
+      "halaman": "#/auth?role=buyer",
+      "selector": "#hr_auth_login_buyer_email_input",
+      "jenis": "input-email",
+      "aksi": "verifikasi",
+      "nama": "Form login siap untuk buyer",
+      "timeout_ms": 15000
     },
     {
       "urutan": 2,
@@ -56,7 +79,10 @@
       "jenis": "button-submit",
       "aksi": "klik",
       "nama": "Masuk sebagai buyer",
-      "tunggu": { "route": "#/buyer", "timeout_ms": 20000 }
+      "tunggu": {
+        "route": "#/buyer",
+        "timeout_ms": 20000
+      }
     },
     {
       "urutan": 5,
@@ -66,7 +92,9 @@
       "aksi": "verifikasi",
       "nama": "Booking Fee car_a tampil, bukan placeholder kosong",
       "timeout_ms": 20000,
-      "harapan": { "teks_tidak_mengandung": "Belum ditentukan showroom" }
+      "harapan": {
+        "teks_tidak_mengandung": "Belum ditentukan showroom"
+      }
     },
     {
       "urutan": 6,
@@ -81,7 +109,10 @@
       "jenis": "button-submit",
       "aksi": "klik",
       "nama": "Buat transaksi (Booking Sekarang)",
-      "tunggu": { "elemen": "#pubtrx_result_panel", "timeout_ms": 15000 }
+      "tunggu": {
+        "elemen": "#pubtrx_result_panel",
+        "timeout_ms": 15000
+      }
     },
     {
       "urutan": 8,
@@ -110,7 +141,10 @@
       "jenis": "button",
       "aksi": "klik",
       "nama": "Buka status pembayaran",
-      "tunggu": { "route": "#/buyer/transactions/{{transaction_a_id}}", "timeout_ms": 10000 }
+      "tunggu": {
+        "route": "#/buyer/transactions/{{transaction_a_id}}",
+        "timeout_ms": 10000
+      }
     },
     {
       "urutan": 11,

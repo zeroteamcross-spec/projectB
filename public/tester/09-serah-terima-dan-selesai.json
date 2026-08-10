@@ -27,12 +27,35 @@
   "urutan_uji": [
     {
       "urutan": 1,
-      "halaman": "#/auth?role=seller",
-      "id": "hr_auth_role_seller_button",
+      "halaman": "#/profile",
+      "selector": "[id$='profile_role_specific_logout_button']",
       "jenis": "button",
-      "aksi": "klik",
-      "nama": "Pilih role seller",
-      "tunggu": { "elemen": "#hr_auth_login_seller_email_input", "timeout_ms": 8000 }
+      "aksi": "klik_opsional",
+      "nama": "Buka konfirmasi logout sesi lama (bila masih login)",
+      "tunggu": {
+        "elemen": "#profile_logout_confirm_button",
+        "timeout_ms": 8000
+      },
+      "catatan": "Dilewati bila memang sudah logout. Sejak #/auth langsung mengarahkan sesi aktif ke dashboard, pembersihan sesi harus lewat halaman profil."
+    },
+    {
+      "urutan": 1.1,
+      "id": "profile_logout_confirm_button",
+      "jenis": "button",
+      "aksi": "klik_opsional",
+      "nama": "Konfirmasi logout sesi lama",
+      "tunggu": {
+        "ms": 1500
+      }
+    },
+    {
+      "urutan": 1.2,
+      "halaman": "#/auth?role=seller",
+      "selector": "#hr_auth_login_seller_email_input",
+      "jenis": "input-email",
+      "aksi": "verifikasi",
+      "nama": "Form login siap untuk seller",
+      "timeout_ms": 15000
     },
     {
       "urutan": 2,
@@ -56,14 +79,20 @@
       "jenis": "button-submit",
       "aksi": "klik",
       "nama": "Masuk sebagai seller",
-      "tunggu": { "route": "#/seller", "timeout_ms": 15000 }
+      "tunggu": {
+        "route": "#/seller",
+        "timeout_ms": 15000
+      }
     },
     {
       "urutan": 5,
       "halaman": "#/seller/transactions/{{transaction_a_id}}",
       "aksi": "assert",
       "nama": "E1.2 - Kartu Proses Transaksi muncul karena status dp_paid",
-      "harapan": { "teks_mengandung": "Proses Transaksi", "lingkup": "halaman" },
+      "harapan": {
+        "teks_mengandung": "Proses Transaksi",
+        "lingkup": "halaman"
+      },
       "timeout_ms": 15000
     },
     {
@@ -115,9 +144,11 @@
       "jenis": "button",
       "aksi": "klik",
       "nama": "E1.4 - Simpan Checklist",
-      "tunggu": { "teks": "5/5 selesai", "timeout_ms": 10000 }
+      "tunggu": {
+        "teks": "5/5 selesai",
+        "timeout_ms": 10000
+      }
     },
-
     {
       "urutan": 20,
       "halaman": "#/profile",
@@ -125,7 +156,10 @@
       "jenis": "button",
       "aksi": "klik",
       "nama": "Buka konfirmasi logout seller",
-      "tunggu": { "elemen": "#profile_logout_confirm_button", "timeout_ms": 8000 }
+      "tunggu": {
+        "elemen": "#profile_logout_confirm_button",
+        "timeout_ms": 8000
+      }
     },
     {
       "urutan": 21,
@@ -133,17 +167,41 @@
       "jenis": "button",
       "aksi": "klik",
       "nama": "Konfirmasi logout seller",
-      "tunggu": { "ms": 1500 }
+      "tunggu": {
+        "ms": 1500
+      }
     },
-
     {
       "urutan": 22,
-      "halaman": "#/auth?role=buyer",
-      "id": "hr_auth_role_buyer_button",
+      "halaman": "#/profile",
+      "selector": "[id$='profile_role_specific_logout_button']",
       "jenis": "button",
-      "aksi": "klik",
-      "nama": "Pilih role buyer",
-      "tunggu": { "elemen": "#hr_auth_login_buyer_email_input", "timeout_ms": 15000 }
+      "aksi": "klik_opsional",
+      "nama": "Buka konfirmasi logout sesi lama (bila masih login)",
+      "tunggu": {
+        "elemen": "#profile_logout_confirm_button",
+        "timeout_ms": 8000
+      },
+      "catatan": "Dilewati bila memang sudah logout. Sejak #/auth langsung mengarahkan sesi aktif ke dashboard, pembersihan sesi harus lewat halaman profil."
+    },
+    {
+      "urutan": 22.1,
+      "id": "profile_logout_confirm_button",
+      "jenis": "button",
+      "aksi": "klik_opsional",
+      "nama": "Konfirmasi logout sesi lama",
+      "tunggu": {
+        "ms": 1500
+      }
+    },
+    {
+      "urutan": 22.2,
+      "halaman": "#/auth?role=buyer",
+      "selector": "#hr_auth_login_buyer_email_input",
+      "jenis": "input-email",
+      "aksi": "verifikasi",
+      "nama": "Form login siap untuk buyer",
+      "timeout_ms": 15000
     },
     {
       "urutan": 23,
@@ -167,14 +225,20 @@
       "jenis": "button-submit",
       "aksi": "klik",
       "nama": "Masuk sebagai buyer",
-      "tunggu": { "route": "#/buyer", "timeout_ms": 20000 }
+      "tunggu": {
+        "route": "#/buyer",
+        "timeout_ms": 20000
+      }
     },
     {
       "urutan": 26,
       "halaman": "#/buyer/transactions/{{transaction_a_id}}",
       "aksi": "assert",
       "nama": "E2.1 - Buyer melihat checklist lengkap dari seller",
-      "harapan": { "teks_mengandung": "5/5 selesai", "lingkup": "halaman" },
+      "harapan": {
+        "teks_mengandung": "5/5 selesai",
+        "lingkup": "halaman"
+      },
       "timeout_ms": 15000
     },
     {
@@ -183,13 +247,19 @@
       "jenis": "button",
       "aksi": "klik",
       "nama": "E2.2 - Klik Selesaikan",
-      "tunggu": { "teks": "Transaksi Selesai", "timeout_ms": 10000 }
+      "tunggu": {
+        "teks": "Transaksi Selesai",
+        "timeout_ms": 10000
+      }
     },
     {
       "urutan": 28,
       "aksi": "assert",
       "nama": "Status akhir transaksi completed",
-      "harapan": { "teks_mengandung": "Transaksi Selesai", "lingkup": "halaman" }
+      "harapan": {
+        "teks_mengandung": "Transaksi Selesai",
+        "lingkup": "halaman"
+      }
     }
   ]
 }

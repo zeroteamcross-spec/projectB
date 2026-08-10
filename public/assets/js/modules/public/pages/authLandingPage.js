@@ -121,29 +121,23 @@ function render(root, context, state, getBackgroundVideoLayer = null) {
   right.append(backToLandingButton(context.router));
 
   if (authStore.isAuthenticated()) {
-    right.append(authenticatedPanel({
-      currentUser,
-      currentRole,
-      selectedRole: state.selectedRole,
-      requestedPath,
-      router: context.router,
-      onLogout: async () => {
-        state.isSubmitting = true;
-        state.error = "";
-        render(root, context, state);
+    // Sesi masih aktif: antar langsung ke dashboard rolenya, jangan tahan di
+    // kartu "sesi aktif" yang menuntut satu klik lagi. Seller yang belum
+    // disetujui tidak perlu dikecualikan di sini — roleGuard yang memutuskan,
+    // dan memantulkannya ke halaman pending_approval begitu /seller dibuka.
+    const tujuan = publicAuthLandingService.resolveAfterLogin({
+      selectedRole: currentRole,
+      actualRole: currentRole,
+      fromPath: requestedPath,
+    });
 
-        try {
-          await publicAuthLandingService.logout();
-          showToast("Logout berhasil.", { type: "success" });
-        } catch (error) {
-          state.error = error.message || "Logout gagal.";
-          showToast(state.error, { type: "error" });
-        } finally {
-          state.isSubmitting = false;
-          render(root, context, state);
-        }
-      },
-    }));
+    right.append(redirectingNotice(publicAuthLandingService.roleLabel(currentRole)));
+    // Ditunda satu tick supaya navigasi tidak terjadi di tengah render.
+    window.setTimeout(() => {
+      if (authStore.isAuthenticated()) {
+        context.router.navigate(tujuan);
+      }
+    }, 0);
   } else {
     right.append(authPanel({
       selectedRole: state.selectedRole,
@@ -166,6 +160,23 @@ function render(root, context, state, getBackgroundVideoLayer = null) {
   const backgroundLayer = getBackgroundVideoLayer?.() ?? state.getBackgroundVideoLayer?.();
   root.replaceChildren(...[backgroundLayer, frame].filter(Boolean));
   runEntranceAnimation(frame);
+}
+
+function redirectingNotice(roleLabel) {
+  const section = document.createElement("section");
+  section.id = "hr_auth_redirecting_section";
+  section.className = "grid gap-2 rounded-[1.5rem] border border-white/70 bg-white/85 px-5 py-6 text-center shadow-[0_24px_70px_rgba(15,23,42,0.12)] backdrop-blur-xl";
+
+  const title = document.createElement("p");
+  title.className = "text-sm font-black text-gray-900";
+  title.textContent = "Sesi Anda masih aktif";
+
+  const body = document.createElement("p");
+  body.className = "text-sm leading-6 text-gray-600";
+  body.textContent = `Mengarahkan ke dashboard ${roleLabel}...`;
+
+  section.append(title, body);
+  return section;
 }
 
 function backToLandingButton(router) {
@@ -614,6 +625,11 @@ async function loginSelectedRole(payload, context, state, root) {
       dedupeMs: 3000,
     });
     context.router.navigate(target);
+    // Berhenti di sini. router.navigate() hanya mengganti hash; pergantian
+    // halamannya jalan pada tick hashchange berikutnya. Merender ulang halaman
+    // ini sekarang — dengan status sudah terautentikasi — cuma menampilkan
+    // panel peralihan sekejap sebelum dashboard mengambil alih.
+    return;
   } catch (error) {
     state.error = error.message || "Login gagal.";
     showToast(state.error, {
@@ -621,10 +637,10 @@ async function loginSelectedRole(payload, context, state, root) {
       key: "auth-login-error",
       dedupeMs: 3000,
     });
-  } finally {
-    state.isSubmitting = false;
-          render(root, context, state);
   }
+
+  state.isSubmitting = false;
+  render(root, context, state);
 }
 
 async function registerSelectedRole(payload, context, state, root) {

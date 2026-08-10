@@ -34,12 +34,35 @@
   "urutan_uji": [
     {
       "urutan": 1,
-      "halaman": "#/auth?role=buyer",
-      "id": "hr_auth_role_buyer_button",
+      "halaman": "#/profile",
+      "selector": "[id$='profile_role_specific_logout_button']",
       "jenis": "button",
-      "aksi": "klik",
-      "nama": "Pilih role buyer",
-      "tunggu": { "elemen": "#hr_auth_login_buyer_email_input", "timeout_ms": 15000 }
+      "aksi": "klik_opsional",
+      "nama": "Buka konfirmasi logout sesi lama (bila masih login)",
+      "tunggu": {
+        "elemen": "#profile_logout_confirm_button",
+        "timeout_ms": 8000
+      },
+      "catatan": "Dilewati bila memang sudah logout. Sejak #/auth langsung mengarahkan sesi aktif ke dashboard, pembersihan sesi harus lewat halaman profil."
+    },
+    {
+      "urutan": 1.1,
+      "id": "profile_logout_confirm_button",
+      "jenis": "button",
+      "aksi": "klik_opsional",
+      "nama": "Konfirmasi logout sesi lama",
+      "tunggu": {
+        "ms": 1500
+      }
+    },
+    {
+      "urutan": 1.2,
+      "halaman": "#/auth?role=buyer",
+      "selector": "#hr_auth_login_buyer_email_input",
+      "jenis": "input-email",
+      "aksi": "verifikasi",
+      "nama": "Form login siap untuk buyer",
+      "timeout_ms": 15000
     },
     {
       "urutan": 2,
@@ -63,7 +86,10 @@
       "jenis": "button-submit",
       "aksi": "klik",
       "nama": "Masuk sebagai buyer",
-      "tunggu": { "route": "#/buyer", "timeout_ms": 20000 }
+      "tunggu": {
+        "route": "#/buyer",
+        "timeout_ms": 20000
+      }
     },
     {
       "urutan": 5,
@@ -73,7 +99,9 @@
       "aksi": "verifikasi",
       "nama": "car_b tersedia lagi untuk dibeli ketiga kalinya",
       "timeout_ms": 15000,
-      "harapan": { "teks_tidak_mengandung": "Belum ditentukan showroom" }
+      "harapan": {
+        "teks_tidak_mengandung": "Belum ditentukan showroom"
+      }
     },
     {
       "urutan": 6,
@@ -88,7 +116,10 @@
       "jenis": "button-submit",
       "aksi": "klik",
       "nama": "Buat transaksi ketiga (car_b)",
-      "tunggu": { "elemen": "#pubtrx_result_panel", "timeout_ms": 15000 }
+      "tunggu": {
+        "elemen": "#pubtrx_result_panel",
+        "timeout_ms": 15000
+      }
     },
     {
       "urutan": 8,
@@ -96,7 +127,11 @@
       "jenis": "container",
       "aksi": "verifikasi",
       "nama": "Tangkap transaction_c_id",
-      "simpan": { "nama": "transaction_c_id", "dari": "atribut", "atribut": "data-transaction-id" }
+      "simpan": {
+        "nama": "transaction_c_id",
+        "dari": "atribut",
+        "atribut": "data-transaction-id"
+      }
     },
     {
       "urutan": 9,
@@ -104,16 +139,21 @@
       "jenis": "button",
       "aksi": "klik",
       "nama": "Buka status pembayaran transaction_c",
-      "tunggu": { "route": "#/buyer/transactions/{{transaction_c_id}}", "timeout_ms": 10000 }
+      "tunggu": {
+        "route": "#/buyer/transactions/{{transaction_c_id}}",
+        "timeout_ms": 10000
+      }
     },
     {
       "urutan": 10,
       "aksi": "assert",
       "nama": "MANUAL: jalankan jembatan pembayaran untuk transaction_c lalu tunggu Booking Fee Lunas",
       "catatan": "Jalankan sekarang: php scripts/pay_transaction_for_tester.php {{transaction_c_id}}",
-      "tunggu": { "teks": "Pembayaran Berhasil", "timeout_ms": 90000 }
+      "tunggu": {
+        "teks": "Pembayaran Berhasil",
+        "timeout_ms": 90000
+      }
     },
-
     {
       "urutan": 20,
       "halaman": "#/profile",
@@ -121,7 +161,10 @@
       "jenis": "button",
       "aksi": "klik_opsional",
       "nama": "Buka konfirmasi logout buyer",
-      "tunggu": { "elemen": "#profile_logout_confirm_button", "timeout_ms": 8000 }
+      "tunggu": {
+        "elemen": "#profile_logout_confirm_button",
+        "timeout_ms": 8000
+      }
     },
     {
       "urutan": 21,
@@ -129,16 +172,41 @@
       "jenis": "button",
       "aksi": "klik",
       "nama": "Konfirmasi logout buyer",
-      "tunggu": { "ms": 1500 }
+      "tunggu": {
+        "ms": 1500
+      }
     },
     {
       "urutan": 22,
-      "halaman": "#/auth?role=admin",
-      "id": "hr_auth_role_admin_button",
+      "halaman": "#/profile",
+      "selector": "[id$='profile_role_specific_logout_button']",
       "jenis": "button",
-      "aksi": "klik",
-      "nama": "Pilih role Admin",
-      "tunggu": { "elemen": "#hr_auth_login_admin_email_input", "timeout_ms": 15000 }
+      "aksi": "klik_opsional",
+      "nama": "Buka konfirmasi logout sesi lama (bila masih login)",
+      "tunggu": {
+        "elemen": "#profile_logout_confirm_button",
+        "timeout_ms": 8000
+      },
+      "catatan": "Dilewati bila memang sudah logout. Sejak #/auth langsung mengarahkan sesi aktif ke dashboard, pembersihan sesi harus lewat halaman profil."
+    },
+    {
+      "urutan": 22.1,
+      "id": "profile_logout_confirm_button",
+      "jenis": "button",
+      "aksi": "klik_opsional",
+      "nama": "Konfirmasi logout sesi lama",
+      "tunggu": {
+        "ms": 1500
+      }
+    },
+    {
+      "urutan": 22.2,
+      "halaman": "#/auth?role=admin",
+      "selector": "#hr_auth_login_admin_email_input",
+      "jenis": "input-email",
+      "aksi": "verifikasi",
+      "nama": "Form login siap untuk admin",
+      "timeout_ms": 15000
     },
     {
       "urutan": 23,
@@ -162,7 +230,10 @@
       "jenis": "button-submit",
       "aksi": "klik",
       "nama": "G1 - Masuk sebagai admin",
-      "tunggu": { "route": "#/admin", "timeout_ms": 20000 }
+      "tunggu": {
+        "route": "#/admin",
+        "timeout_ms": 20000
+      }
     },
     {
       "urutan": 26,
@@ -172,7 +243,9 @@
       "aksi": "klik",
       "nama": "G2 - Centang ledger transaction_c untuk settlement",
       "timeout_ms": 15000,
-      "tunggu": { "ms": 500 }
+      "tunggu": {
+        "ms": 500
+      }
     },
     {
       "urutan": 27,
@@ -180,7 +253,10 @@
       "jenis": "button",
       "aksi": "klik",
       "nama": "G3 - Klik Buat settlement (n)",
-      "tunggu": { "elemen": "#adfc_settlement_submit_button", "timeout_ms": 8000 }
+      "tunggu": {
+        "elemen": "#adfc_settlement_submit_button",
+        "timeout_ms": 8000
+      }
     },
     {
       "urutan": 28,
@@ -196,9 +272,10 @@
       "jenis": "button-submit",
       "aksi": "klik",
       "nama": "Konfirmasi buat batch pending",
-      "tunggu": { "ms": 2000 }
+      "tunggu": {
+        "ms": 2000
+      }
     },
-
     {
       "urutan": 30,
       "halaman": "#/admin/settlements",
@@ -208,8 +285,14 @@
       "aksi": "klik",
       "nama": "G6 - Tandai batch settlement terbaru selesai",
       "timeout_ms": 15000,
-      "simpan": { "nama": "settlement_id", "dari": "id_sufiks", "awalan": "adst_mark_settled_button_desktop_" },
-      "tunggu": { "ms": 1500 }
+      "simpan": {
+        "nama": "settlement_id",
+        "dari": "id_sufiks",
+        "awalan": "adst_mark_settled_button_desktop_"
+      },
+      "tunggu": {
+        "ms": 1500
+      }
     },
     {
       "urutan": 31,
@@ -217,9 +300,11 @@
       "jenis": "button",
       "aksi": "verifikasi",
       "nama": "Batch settlement tersimpan dan berstatus settled",
-      "harapan": { "teks_mengandung": "Settled", "lingkup": "halaman" }
+      "harapan": {
+        "teks_mengandung": "Settled",
+        "lingkup": "halaman"
+      }
     },
-
     {
       "urutan": 40,
       "halaman": "#/profile",
@@ -227,7 +312,10 @@
       "jenis": "button",
       "aksi": "klik",
       "nama": "Buka konfirmasi logout admin",
-      "tunggu": { "elemen": "#profile_logout_confirm_button", "timeout_ms": 8000 }
+      "tunggu": {
+        "elemen": "#profile_logout_confirm_button",
+        "timeout_ms": 8000
+      }
     },
     {
       "urutan": 41,
@@ -235,16 +323,41 @@
       "jenis": "button",
       "aksi": "klik",
       "nama": "Konfirmasi logout admin",
-      "tunggu": { "ms": 1500 }
+      "tunggu": {
+        "ms": 1500
+      }
     },
     {
       "urutan": 42,
-      "halaman": "#/auth?role=seller",
-      "id": "hr_auth_role_seller_button",
+      "halaman": "#/profile",
+      "selector": "[id$='profile_role_specific_logout_button']",
       "jenis": "button",
-      "aksi": "klik",
-      "nama": "Pilih role seller",
-      "tunggu": { "elemen": "#hr_auth_login_seller_email_input", "timeout_ms": 15000 }
+      "aksi": "klik_opsional",
+      "nama": "Buka konfirmasi logout sesi lama (bila masih login)",
+      "tunggu": {
+        "elemen": "#profile_logout_confirm_button",
+        "timeout_ms": 8000
+      },
+      "catatan": "Dilewati bila memang sudah logout. Sejak #/auth langsung mengarahkan sesi aktif ke dashboard, pembersihan sesi harus lewat halaman profil."
+    },
+    {
+      "urutan": 42.1,
+      "id": "profile_logout_confirm_button",
+      "jenis": "button",
+      "aksi": "klik_opsional",
+      "nama": "Konfirmasi logout sesi lama",
+      "tunggu": {
+        "ms": 1500
+      }
+    },
+    {
+      "urutan": 42.2,
+      "halaman": "#/auth?role=seller",
+      "selector": "#hr_auth_login_seller_email_input",
+      "jenis": "input-email",
+      "aksi": "verifikasi",
+      "nama": "Form login siap untuk seller",
+      "timeout_ms": 15000
     },
     {
       "urutan": 43,
@@ -268,7 +381,10 @@
       "jenis": "button-submit",
       "aksi": "klik",
       "nama": "Masuk sebagai seller",
-      "tunggu": { "route": "#/seller", "timeout_ms": 15000 }
+      "tunggu": {
+        "route": "#/seller",
+        "timeout_ms": 15000
+      }
     },
     {
       "urutan": 46,
@@ -282,7 +398,10 @@
         true
       ],
       "abaikan_error_endpoint": true,
-      "tunggu": { "teks": "sudah dibayarkan lewat settlement", "timeout_ms": 10000 }
+      "tunggu": {
+        "teks": "sudah dibayarkan lewat settlement",
+        "timeout_ms": 10000
+      }
     },
     {
       "urutan": 47,
@@ -294,7 +413,6 @@
         "lingkup": "halaman"
       }
     },
-
     {
       "urutan": 50,
       "halaman": "#/profile",
@@ -302,7 +420,10 @@
       "jenis": "button",
       "aksi": "klik",
       "nama": "Buka konfirmasi logout seller",
-      "tunggu": { "elemen": "#profile_logout_confirm_button", "timeout_ms": 8000 }
+      "tunggu": {
+        "elemen": "#profile_logout_confirm_button",
+        "timeout_ms": 8000
+      }
     },
     {
       "urutan": 51,
@@ -310,16 +431,41 @@
       "jenis": "button",
       "aksi": "klik",
       "nama": "Konfirmasi logout seller",
-      "tunggu": { "ms": 1500 }
+      "tunggu": {
+        "ms": 1500
+      }
     },
     {
       "urutan": 52,
-      "halaman": "#/auth?role=affiliate_admin",
-      "id": "hr_auth_role_affiliate_admin_button",
+      "halaman": "#/profile",
+      "selector": "[id$='profile_role_specific_logout_button']",
       "jenis": "button",
-      "aksi": "klik",
-      "nama": "Pilih role Marketing",
-      "tunggu": { "elemen": "#hr_auth_login_affiliate_admin_email_input", "timeout_ms": 15000 }
+      "aksi": "klik_opsional",
+      "nama": "Buka konfirmasi logout sesi lama (bila masih login)",
+      "tunggu": {
+        "elemen": "#profile_logout_confirm_button",
+        "timeout_ms": 8000
+      },
+      "catatan": "Dilewati bila memang sudah logout. Sejak #/auth langsung mengarahkan sesi aktif ke dashboard, pembersihan sesi harus lewat halaman profil."
+    },
+    {
+      "urutan": 52.1,
+      "id": "profile_logout_confirm_button",
+      "jenis": "button",
+      "aksi": "klik_opsional",
+      "nama": "Konfirmasi logout sesi lama",
+      "tunggu": {
+        "ms": 1500
+      }
+    },
+    {
+      "urutan": 52.2,
+      "halaman": "#/auth?role=affiliate_admin",
+      "selector": "#hr_auth_login_affiliate_admin_email_input",
+      "jenis": "input-email",
+      "aksi": "verifikasi",
+      "nama": "Form login siap untuk affiliate_admin",
+      "timeout_ms": 15000
     },
     {
       "urutan": 53,
@@ -343,7 +489,10 @@
       "jenis": "button-submit",
       "aksi": "klik",
       "nama": "Masuk sebagai Marketing",
-      "tunggu": { "route": "#/affiliate", "timeout_ms": 20000 }
+      "tunggu": {
+        "route": "#/affiliate",
+        "timeout_ms": 20000
+      }
     },
     {
       "urutan": 56,
@@ -353,7 +502,9 @@
       "aksi": "verifikasi",
       "nama": "24 - Riwayat settlement tampil di dashboard Marketing",
       "timeout_ms": 15000,
-      "harapan": { "teks_mengandung": "Settled" }
+      "harapan": {
+        "teks_mengandung": "Settled"
+      }
     }
   ]
 }
