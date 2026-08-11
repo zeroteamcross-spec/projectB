@@ -102,8 +102,10 @@ function pasangReveal(qa) {
       if (status) {
         waktu.push(setTimeout(() => {
           status.textContent = "Tayang";
-          status.style.color = "#7ED08C";
-          status.style.background = "rgba(126,208,140,.12)";
+          // Hijau muda bawaan paket asli dibuat untuk latar gelap; di atas
+          // kartu putih tulisannya hilang. Dipakai hijau palet yang pekat.
+          status.style.color = "#15803d";
+          status.style.background = "rgba(21,128,61,.12)";
         }, 1600));
       }
 
