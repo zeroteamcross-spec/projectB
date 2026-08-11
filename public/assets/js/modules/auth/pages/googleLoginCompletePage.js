@@ -233,7 +233,7 @@ function field({ name, label, value = "", placeholder = "", required = false, re
   input.placeholder = placeholder;
   input.required = required;
   input.readOnly = readonly;
-  input.className = "min-h-11 w-full rounded-2xl border border-gray-200 bg-white/90 px-4 py-2.5 text-sm text-gray-950 outline-none transition placeholder:text-gray-400 focus:border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] focus:ring-4 focus:ring-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)] read-only:bg-gray-50 read-only:text-gray-500";
+  input.className = "min-h-11 w-full rounded-2xl border border-gray-200 bg-white/90 px-4 py-2.5 text-sm text-gray-950 outline-none transition placeholder:text-[var(--pb-text-muted)] focus:border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] focus:ring-4 focus:ring-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)] read-only:bg-gray-50 read-only:text-gray-500";
 
   wrap.append(input);
   return wrap;

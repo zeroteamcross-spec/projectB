@@ -317,8 +317,10 @@ function pasangUiGulir(q, qa) {
           aktif = i;
         }
       });
+      // Pita navigasi sekarang berlatar putih tembus pandang, jadi tautannya
+      // gelap: biru penuh untuk yang aktif, abu tulisan untuk sisanya.
       tautan.forEach((l, i) => {
-        l.style.color = i === aktif ? "#FFFFFF" : "rgba(255,255,255,.62)";
+        l.style.color = i === aktif ? "#17698F" : "rgba(28,25,23,.62)";
       });
     });
   };

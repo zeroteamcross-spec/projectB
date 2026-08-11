@@ -296,7 +296,7 @@ function carsToolbar({ filters, isForm }) {
   search.id = "adcars_search_input";
   search.value = filters.keyword ?? "";
   search.placeholder = "Brand, model, warna, lokasi";
-  search.className = "min-h-11 min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-2.5 text-sm font-semibold text-[var(--pb-text)] outline-none transition duration-150 placeholder:text-gray-400 focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  search.className = "min-h-11 min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-2.5 text-sm font-semibold text-[var(--pb-text)] outline-none transition duration-150 placeholder:text-[var(--pb-text-muted)] focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
   search.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
       setRuntime({ filters: { ...runtimeState().filters, keyword: search.value.trim() }, pagination: { ...runtimeState().pagination, page: 1 } });
@@ -656,7 +656,7 @@ function createCarsPagination({ page, pageSize, totalItems, totalPages }) {
 
   pageWindow(page, totalPages).forEach((item) => {
     if (item === "...") {
-      controls.append(textNode("span", "px-1 text-sm font-bold text-gray-400", "..."));
+      controls.append(textNode("span", "px-1 text-sm font-bold text-[var(--pb-text-muted)]", "..."));
       return;
     }
 

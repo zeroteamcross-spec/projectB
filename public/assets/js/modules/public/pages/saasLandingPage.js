@@ -27,7 +27,10 @@ export function SaasLandingPage() {
       root = document.createElement("div");
       root.id = "saas_landing_root";
       root.className = "relative w-full";
-      root.style.background = "#0C0A09";
+      // Krem, bukan hitam. Teks landing sudah gelap sejak palet baru, jadi
+      // latar hitam di sini bikin tulisan hilang di celah antar seksi yang
+      // tidak tertutup kanvas 3D.
+      root.style.background = "#FAF4ED";
       root.innerHTML = landingMarkup({
         namaMerek: brandConfig.appName,
         tagline: brandConfig.appTagline,

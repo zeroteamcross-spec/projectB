@@ -219,7 +219,7 @@ function menuCell(item) {
   copy.append(
     textBlock("font-black text-gray-950", item.label),
     textBlock("text-sm text-gray-500", item.route || "Parent menu"),
-    textBlock("text-xs font-semibold text-gray-400", item.key),
+    textBlock("text-xs font-semibold text-[var(--pb-text-muted)]", item.key),
   );
   wrap.append(icon, copy);
   return wrap;

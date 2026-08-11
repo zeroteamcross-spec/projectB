@@ -707,7 +707,7 @@ function compactStat(value, label, colorClass) {
   number.textContent = value;
 
   const caption = document.createElement("span");
-  caption.className = "text-[10px] font-medium leading-4 text-slate-400";
+  caption.className = "text-[10px] font-medium leading-4 text-[var(--pb-text-muted)]";
   caption.textContent = label;
 
   item.append(number, caption);

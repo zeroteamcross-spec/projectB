@@ -264,12 +264,12 @@ function renderIconPreview(preview, url) {
     image.alt = "Icon aplikasi";
     image.className = "h-full w-full object-contain p-2";
     image.addEventListener("error", () => {
-      preview.replaceChildren(createIcon("brandMark", { className: "h-9 w-9 text-gray-400" }));
+      preview.replaceChildren(createIcon("brandMark", { className: "h-9 w-9 text-[var(--pb-text-muted)]" }));
     }, { once: true });
     preview.append(image);
     return;
   }
-  preview.append(createIcon("brandMark", { className: "h-8 w-8 text-gray-400" }));
+  preview.append(createIcon("brandMark", { className: "h-8 w-8 text-[var(--pb-text-muted)]" }));
 }
 
 function uploadDropzone({ input, preview, uploading, onFile }) {

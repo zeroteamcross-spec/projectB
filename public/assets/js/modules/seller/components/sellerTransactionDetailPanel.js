@@ -175,7 +175,7 @@ function checklistItem({ item, draft, disabled, onToggle, onNote, onDate }) {
   note.placeholder = "Catatan seller";
   note.disabled = disabled;
   note.rows = 2;
-  note.className = "min-w-0 resize-y rounded-[0.9rem] border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-800 outline-none transition placeholder:text-gray-400 focus:border-[color-mix(in_srgb,var(--pb-brand-primary)_45%,white)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)] disabled:bg-gray-100 disabled:text-gray-500";
+  note.className = "min-w-0 resize-y rounded-[0.9rem] border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-800 outline-none transition placeholder:text-[var(--pb-text-muted)] focus:border-[color-mix(in_srgb,var(--pb-brand-primary)_45%,white)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)] disabled:bg-gray-100 disabled:text-gray-500";
   note.addEventListener("input", () => onNote?.(item.key, note.value));
 
   content.append(note);

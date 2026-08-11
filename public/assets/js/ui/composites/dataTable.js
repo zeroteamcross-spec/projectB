@@ -211,7 +211,7 @@ export function DataTablePagination({
 
   buildPageWindow({ page, totalPages }).forEach((item) => {
     if (item === "...") {
-      controls.append(textNode("span", "px-1 text-sm font-bold text-gray-400", "..."));
+      controls.append(textNode("span", "px-1 text-sm font-bold text-[var(--pb-text-muted)]", "..."));
       return;
     }
     const pageButton = createPaginationButton({
@@ -327,7 +327,7 @@ function createMobileCard({ rowKey, title, subtitle, badges, fields, actions, id
   const copy = document.createElement("div");
   copy.className = "grid gap-1";
   copy.append(
-    textNode("p", "break-words text-base font-black text-white", title),
+    textNode("p", "break-words text-base font-black text-[var(--pb-text-strong)]", title),
     textNode("p", "break-words text-sm text-gray-500", subtitle),
   );
   top.append(copy);
@@ -392,7 +392,7 @@ function createMobileDisclosureRow({
   const top = document.createElement("div");
   top.className = "grid gap-2";
   top.append(
-    textNode("p", "break-words text-base font-black text-white", title),
+    textNode("p", "break-words text-base font-black text-[var(--pb-text-strong)]", title),
     textNode("p", "break-words text-sm text-gray-500", subtitle),
   );
   if (Array.isArray(badges) && badges.length) {

@@ -71,7 +71,7 @@ export function AdminAffiliateLedgerList({
 
 function selectionCell(ledger, selectedIds, onToggle) {
   if (ledger.ledger_status !== "accrued") {
-    return textBlock("text-sm font-semibold text-gray-400", "-");
+    return textBlock("text-sm font-semibold text-[var(--pb-text-muted)]", "-");
   }
 
   const button = Button({

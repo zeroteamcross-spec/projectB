@@ -379,7 +379,7 @@ function previewCell(slider) {
     wrap.append(image);
     return wrap;
   }
-  wrap.append(createIcon("image", { className: "h-5 w-5 text-gray-400" }));
+  wrap.append(createIcon("image", { className: "h-5 w-5 text-[var(--pb-text-muted)]" }));
   return wrap;
 }
 

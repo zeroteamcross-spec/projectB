@@ -20,7 +20,7 @@ const POLA_TIDAK = /\b(batal|batalkan|tutup|kembali|hapus|archive|arsip|retur|to
 // Diperiksa sebelum POLA_YA supaya "Lihat Detail" tidak ikut tertangkap kata
 // "lihat" yang tidak ada di mana-mana, lalu jatuh ke variant "primary" dan
 // jadi hijau. Semua kata di sini cuma memindahkan mata, tidak mengubah data.
-const POLA_NETRAL = /\b(detail|lihat|buka|tampilkan|preview|pratinjau|foto|galeri|inspeksi|salin|copy|unduh|download|cari|filter|urutkan|muat|selengkapnya|kelola|review|riwayat|dashboard|beranda|katalog|sebelumnya|berikutnya|previous)\b/i;
+const POLA_NETRAL = /\b(detail|lihat|buka|tampilkan|preview|pratinjau|foto|galeri|inspeksi|salin|copy|unduh|download|cari|filter|urutkan|muat|selengkapnya|kelola|edit|review|riwayat|dashboard|beranda|katalog|sebelumnya|berikutnya|previous)\b/i;
 const POLA_YA = /\b(simpan|save|daftar|daftarkan|masuk|login|lanjut|lanjutkan|next|tambah|tambahkan|buat|kirim|submit|approve|setujui|selesai|selesaikan|booking|bayar|terapkan|pilih|unggah|upload|publish|tayangkan|aktifkan|konfirmasi|ya)\b/i;
 
 const VARIAN_EKSPLISIT = new Set(["ya", "tidak", "netral", "ghost"]);

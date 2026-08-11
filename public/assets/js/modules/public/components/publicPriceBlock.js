@@ -39,7 +39,7 @@ function priceRow(label, value, muted = false) {
   caption.textContent = label;
 
   const content = document.createElement("span");
-  content.className = muted ? "break-words text-left font-semibold text-gray-400 line-through sm:text-right" : "break-words text-left font-semibold text-gray-800 sm:text-right";
+  content.className = muted ? "break-words text-left font-semibold text-[var(--pb-text-muted)] line-through sm:text-right" : "break-words text-left font-semibold text-gray-800 sm:text-right";
   content.textContent = value;
 
   row.append(caption, content);

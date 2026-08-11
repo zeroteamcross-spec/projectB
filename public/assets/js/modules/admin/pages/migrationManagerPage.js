@@ -280,7 +280,7 @@ function actionCell(migration, state, actions) {
 
   if (migration.status !== "pending") {
     const text = document.createElement("span");
-    text.className = "text-xs font-semibold text-gray-400";
+    text.className = "text-xs font-semibold text-[var(--pb-text-muted)]";
     text.textContent = "-";
     td.append(text);
     return td;

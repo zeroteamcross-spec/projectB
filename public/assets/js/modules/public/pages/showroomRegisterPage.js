@@ -532,7 +532,7 @@ function selectField({ id, name, label, placeholder = "", options = [], required
   input.setAttribute("aria-controls", `${id}_listbox`);
 
   const chevron = document.createElement("span");
-  chevron.className = "pointer-events-none absolute right-3.5 top-1/2 flex -translate-y-1/2 text-gray-400";
+  chevron.className = "pointer-events-none absolute right-3.5 top-1/2 flex -translate-y-1/2 text-[var(--pb-text-muted)]";
   chevron.append(createIcon("chevronRight", { className: "block h-3 w-3 rotate-90 leading-none" }));
 
   const panel = document.createElement("div");
@@ -554,7 +554,7 @@ function selectField({ id, name, label, placeholder = "", options = [], required
 
     if (!filtered.length) {
       const empty = document.createElement("p");
-      empty.className = "px-3 py-2 text-sm font-medium text-gray-400";
+      empty.className = "px-3 py-2 text-sm font-medium text-[var(--pb-text-muted)]";
       empty.textContent = "Tidak ada hasil.";
       panel.append(empty);
       return;
@@ -673,7 +673,7 @@ function textareaField({ id, name, label, placeholder = "", required = true, val
 }
 
 function inputClassName(hasError) {
-  const base = "min-h-11 min-w-0 w-full rounded-2xl border bg-white/90 px-4 py-2.5 text-sm text-gray-950 outline-none transition duration-200 placeholder:text-gray-400 focus:bg-white focus:ring-4";
+  const base = "min-h-11 min-w-0 w-full rounded-2xl border bg-white/90 px-4 py-2.5 text-sm text-gray-950 outline-none transition duration-200 placeholder:text-[var(--pb-text-muted)] focus:bg-white focus:ring-4";
 
   return hasError
     ? `${base} border-[color-mix(in_srgb,var(--pb-danger)_42%,white)] focus:border-[color-mix(in_srgb,var(--pb-danger)_70%,white)] focus:ring-[color-mix(in_srgb,var(--pb-danger)_14%,white)]`
