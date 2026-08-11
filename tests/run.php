@@ -32,6 +32,7 @@ $tests = [
     Tests\Unit\FrontendAssetVersioningTest::class,
     Tests\Unit\AuthCookieTest::class,
     Tests\Unit\RoleLabelTest::class,
+    Tests\Unit\ThemeBootstrapTest::class,
 ];
 
 $passed = 0;

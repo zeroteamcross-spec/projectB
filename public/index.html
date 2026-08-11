@@ -14,7 +14,23 @@
     <title>JualBeliMobil</title>
     <script>window.__PROJECTB_ROLE_HOSTS__ = __ROLE_HOSTS__;</script>
     <script src="/assets/v-__ASSET_VER__/js/theme/tailwindRuntimeConfig.js"></script>
-    <script src="/api/theme/runtime-config.js?v=20260423-design-studio"></script>
+    <!-- Tema ditanam server, bukan diambil lewat permintaan kedua. URL yang
+         berakhiran .js sempat dijawab 404 oleh Nginx, peramban membatalkan
+         skripnya, dan seluruh tema diam-diam kembali ke bawaan. Lihat
+         themeConfigJson() di public/index.php. -->
+    <script>
+      (function terapkanTema(global) {
+        if (typeof global.__PROJECTB_APPLY_THEME__ !== "function") {
+          return;
+        }
+
+        try {
+          global.__PROJECTB_APPLY_THEME__(__THEME_CONFIG__);
+        } catch (error) {
+          console.error("ProjectB theme bootstrap failed.", error);
+        }
+      }(window));
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <script src="/assets/v-__ASSET_VER__/js/theme/tailwindcss.js"></script>
     <style>

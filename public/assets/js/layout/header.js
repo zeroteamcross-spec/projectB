@@ -80,7 +80,11 @@ export function header(store) {
  */
 function renderBrand(mark, title) {
   mark.replaceChildren();
-  const logoMark = getAsset(brandConfig.logoMarkAsset);
+  // uploadedLogoUrl memeriksa iconUrl lebih dulu -- itu kolom yang benar-benar
+  // diisi form unggah. logoMarkAsset kebetulan juga diisi, tapi nilai
+  // bawaannya adalah kunci registry "brand.logoMark" yang selalu kosong, jadi
+  // membacanya sendirian membuat logo yang sudah diunggah terlewat.
+  const logoMark = getAsset(brandConfig.uploadedLogoUrl);
 
   if (logoMark) {
     mark.className = "grid shrink-0 place-items-center";

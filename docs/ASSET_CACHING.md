@@ -68,6 +68,34 @@ Kunjungan pertama masih ~12 detik karena 148 modul kecil diambil satu per satu.
 Itu batas berikutnya, dan menyelesaikannya butuh bundling -- di luar cakupan
 perubahan ini.
 
+## Jebakan: URL berakhiran `.js` yang bukan berkas
+
+Di carlynk.id, **setiap URL yang berakhiran `.js` dan tidak ada berkasnya di
+disk dijawab dengan status 404**, meskipun badan responsnya tetap datang dari
+PHP dengan benar. Nginx punya aturan yang mencocokkan akhiran itu, gagal
+menemukan berkasnya, lalu meneruskan ke PHP lewat `error_page` tanpa
+mengembalikan status.
+
+Bisa dibuktikan dari luar:
+
+| Permintaan | Status | Badan |
+| --- | --- | --- |
+| `/tidak-ada.txt` | 200 | shell SPA |
+| `/tidak-ada.js` | **404** | shell SPA, isi sama persis |
+
+Ini pernah memakan korban: shell memuat tema lewat
+`<script src="/api/theme/runtime-config.js">`. Responsnya benar, statusnya 404,
+peramban membatalkan skripnya, dan seluruh tema diam-diam kembali ke bawaan --
+nama aplikasi, warna, dan logo dari Konfigurasi WEB tidak pernah terpakai.
+Tidak ada error di sisi PHP maupun di konsol yang menyebut tema.
+
+Temanya sekarang ditanam langsung ke HTML (`themeConfigJson()` di
+`public/index.php`), jadi tidak ada permintaan kedua yang bisa gagal.
+`tests/Unit/ThemeBootstrapTest.php` menjaga bentuk itu.
+
+**Sebelum membuat endpoint API baru, jangan beri akhiran `.js`** selama aturan
+Nginx-nya belum diperbaiki.
+
 ## Melepasnya
 
 1. Hapus `/www/server/panel/vhost/nginx/extension/carlynk.id/aset-beversi.conf`,

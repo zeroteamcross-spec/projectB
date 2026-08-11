@@ -49,10 +49,12 @@ function serveSpaShell(string $basePath, string $publicPath, string $path): bool
     header('Expires: 0');
 
     if ($method !== 'HEAD') {
+        $theme = loadThemeConfig($basePath);
         $html = str_replace('__APP_SPLASH_MAX_WAIT_MS__', '1600', $html);
         $html = str_replace('__ASSET_VER__', assetVersionToken($publicPath), $html);
         $html = str_replace('__ROLE_HOSTS__', roleHostsJson(), $html);
-        echo injectPublicMetadata($html, loadPublicWebConfigMetadata($basePath));
+        $html = str_replace('__THEME_CONFIG__', themeConfigJson($theme), $html);
+        echo injectPublicMetadata($html, loadPublicWebConfigMetadata($theme));
     }
 
     return true;
@@ -204,21 +206,24 @@ function assetContentType(string $berkas): string
     return $peta[$ekstensi] ?? (mime_content_type($berkas) ?: 'application/octet-stream');
 }
 
-function loadPublicWebConfigMetadata(string $basePath): array
+/**
+ * Baris tema dari Konfigurasi WEB, atau array kosong kalau tidak terbaca.
+ *
+ * Dibaca sekali per penyajian HTML, lalu dipakai dua kali: untuk metadata
+ * <head> dan untuk menyuntikkan temanya sendiri ke halaman.
+ *
+ * Kegagalan apa pun -- .env belum ada, database mati, JSON rusak -- menghasilkan
+ * array kosong, dan frontend memakai DEFAULT_THEME. Shell tetap tersaji.
+ */
+function loadThemeConfig(string $basePath): array
 {
-    $defaults = [
-        'app_name' => 'BeliMobil',
-        'tagline' => 'Jual beli mobil terpercaya',
-        'icon_url' => '',
-    ];
-
     try {
         require_once $basePath . DIRECTORY_SEPARATOR . 'bootstrap' . DIRECTORY_SEPARATOR . 'helpers.php';
         load_env($basePath . DIRECTORY_SEPARATOR . '.env');
 
         $database = (string) env('DB_DATABASE', '');
         if ($database === '') {
-            return $defaults;
+            return [];
         }
 
         $host = (string) env('DB_HOST', '127.0.0.1');
@@ -244,17 +249,58 @@ function loadPublicWebConfigMetadata(string $basePath): array
         $stmt->execute(['master_key' => 'design_studio.theme_config']);
         $row = $stmt->fetch();
         $theme = is_array($row) ? json_decode((string) ($row['data_json'] ?? ''), true) : null;
-        $brand = is_array($theme) && is_array($theme['brand'] ?? null) ? $theme['brand'] : [];
-        $iconUrl = trim((string) ($brand['iconUrl'] ?? $brand['logoMarkAsset'] ?? ''));
 
-        return [
-            'app_name' => trim((string) ($brand['appName'] ?? '')) ?: $defaults['app_name'],
-            'tagline' => trim((string) ($brand['tagline'] ?? '')) ?: $defaults['tagline'],
-            'icon_url' => isPublicShareableIconUrl($iconUrl) ? $iconUrl : '',
-        ];
+        return is_array($theme) ? $theme : [];
     } catch (Throwable $exception) {
-        return $defaults;
+        return [];
     }
+}
+
+/**
+ * Tema yang siap ditanam di dalam <script> pada shell.
+ *
+ * Sebelumnya halaman mengambilnya lewat <script src="/api/theme/...js">, dan
+ * itu rapuh karena satu alasan yang tidak kelihatan dari kode PHP mana pun:
+ * Nginx di server punya aturan yang mencocokkan akhiran .js, tidak menemukan
+ * berkasnya di disk, lalu meneruskan ke PHP tanpa mengembalikan statusnya --
+ * jadi responsnya benar tapi berstatus 404, dan peramban membatalkan skripnya.
+ * Akibatnya seluruh tema diam-diam kembali ke bawaan: nama aplikasi, warna,
+ * dan logo yang diunggah lewat Konfigurasi WEB semuanya tidak terpakai.
+ *
+ * Ditanam langsung, tidak ada permintaan kedua yang bisa gagal, dan halaman
+ * hemat satu perjalanan bolak-balik. Endpoint lamanya dibiarkan hidup untuk
+ * pemanggil lain.
+ *
+ * JSON_HEX_TAG penting: tanpa itu string berisi "</script>" akan menutup blok
+ * skripnya lebih awal.
+ */
+function themeConfigJson(array $theme): string
+{
+    if ($theme === []) {
+        return '{}';
+    }
+
+    $json = json_encode($theme, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
+
+    return $json === false ? '{}' : $json;
+}
+
+function loadPublicWebConfigMetadata(array $theme): array
+{
+    $defaults = [
+        'app_name' => 'BeliMobil',
+        'tagline' => 'Jual beli mobil terpercaya',
+        'icon_url' => '',
+    ];
+
+    $brand = is_array($theme['brand'] ?? null) ? $theme['brand'] : [];
+    $iconUrl = trim((string) ($brand['iconUrl'] ?? $brand['logoMarkAsset'] ?? ''));
+
+    return [
+        'app_name' => trim((string) ($brand['appName'] ?? '')) ?: $defaults['app_name'],
+        'tagline' => trim((string) ($brand['tagline'] ?? '')) ?: $defaults['tagline'],
+        'icon_url' => isPublicShareableIconUrl($iconUrl) ? $iconUrl : '',
+    ];
 }
 
 function injectPublicMetadata(string $html, array $metadata): string
