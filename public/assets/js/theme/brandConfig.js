@@ -21,6 +21,17 @@ export const brandConfig = {
   get logoMarkAsset() {
     return runtimeTheme().brand?.logoMarkAsset ?? "brand.logoMark";
   },
+  /**
+   * Logo yang diunggah lewat Konfigurasi WEB di Admin, kalau ada.
+   *
+   * iconUrl diperiksa lebih dulu karena itu yang diisi form unggah; halaman
+   * publik di index.php membaca urutan yang sama.
+   */
+  get uploadedLogoUrl() {
+    const brand = runtimeTheme().brand ?? {};
+
+    return String(brand.iconUrl ?? brand.logoMarkAsset ?? "").trim();
+  },
   colors: {
     get primary() {
       return "brand-700";

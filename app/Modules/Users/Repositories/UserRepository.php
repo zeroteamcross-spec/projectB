@@ -130,6 +130,31 @@ class UserRepository
         ]);
     }
 
+    /**
+     * Menjadikan akun aktif dan disetujui.
+     *
+     * Dipakai saat super admin membuat akun: approval-nya sudah terjadi di
+     * momen pembuatan, jadi tidak masuk antrean approval yang harus disetujui
+     * lagi oleh orang yang sama.
+     */
+    public function activateAccount(int $id): void
+    {
+        $stmt = $this->pdo->prepare(
+            'UPDATE users
+             SET account_status = :account_status,
+                 is_approved = 1,
+                 updated_at = :updated_at
+             WHERE id = :id
+             AND deleted_at IS NULL'
+        );
+
+        $stmt->execute([
+            'id' => $id,
+            'account_status' => 'active',
+            'updated_at' => date('Y-m-d H:i:s'),
+        ]);
+    }
+
     public function listForAdmin(array $filters = []): array
     {
         $limit = max(1, min(100, (int) ($filters['limit'] ?? 20)));

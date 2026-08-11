@@ -1,5 +1,6 @@
 import { createPageLifecycle } from "../../../core/lifecycle.js";
 import { brandConfig } from "../../../theme/brandConfig.js";
+import { getAsset } from "../../../theme/assetRegistry.js";
 import { landingMarkup } from "./saasLanding/markup.js";
 import { pasangInteraksi } from "./saasLanding/interactions.js";
 import { pasangGaya, lepasGaya } from "./saasLanding/styles.js";
@@ -32,6 +33,7 @@ export function SaasLandingPage() {
         tagline: brandConfig.appTagline,
         tautanWhatsapp: tautanWhatsapp(),
         alamatEtalase: alamatEtalase(),
+        logoUrl: getAsset(brandConfig.uploadedLogoUrl),
       });
 
       pasangGaya();

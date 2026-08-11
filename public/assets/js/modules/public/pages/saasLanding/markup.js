@@ -17,8 +17,10 @@ export const RUTE = Object.freeze({
   masuk: "#/login/seller",
 });
 
-export function landingMarkup({ namaMerek, tagline, tautanWhatsapp, alamatEtalase }) {
+export function landingMarkup({ namaMerek, tagline, tautanWhatsapp, alamatEtalase, logoUrl = "" }) {
   const merek = escapeHtml(namaMerek);
+  const lencanaNav = lencanaMerek(logoUrl, merek, 24, 18);
+  const lencanaKaki = lencanaMerek(logoUrl, merek, 22, 17);
 
   return `
 <div style="position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(70% 55% at 18% 8%,rgba(30,129,176,.10),transparent 62%),radial-gradient(60% 50% at 88% 22%,rgba(234,182,118,.12),transparent 60%),linear-gradient(180deg,#ffffff,#fdfdfc 55%,#fbfaf8)"></div>
@@ -28,8 +30,7 @@ export function landingMarkup({ namaMerek, tagline, tautanWhatsapp, alamatEtalas
 <div style="position:sticky;top:0;z-index:60;backdrop-filter:blur(18px);background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,.5));border-bottom:1px solid rgba(28,25,23,.06)">
   <div style="max-width:1180px;margin:0 auto;padding:15px 24px;display:flex;align-items:center;gap:36px">
     <div style="display:flex;align-items:center;gap:11px">
-      <div data-logo="" style="width:24px;height:24px;border-radius:7px;background:linear-gradient(135deg,#1e81b0,#eab676);box-shadow:0 0 20px rgba(30,129,176,.5);transition:transform .5s cubic-bezier(.22,.9,.28,1)"></div>
-      <span style="font-family:Sora,sans-serif;font-weight:700;font-size:18px;letter-spacing:-.03em">${merek}</span>
+      ${lencanaNav}
     </div>
     <div data-navlinks="" style="display:flex;gap:26px;font-size:14.5px;margin-left:8px">
       <a href="#halaman" data-scroll="halaman" data-navlink="" style="color:#1c1917;transition:color .25s" style-hover="color:#1c1917">Halaman showroom</a>
@@ -240,8 +241,7 @@ export function landingMarkup({ namaMerek, tagline, tautanWhatsapp, alamatEtalas
   <div style="max-width:1180px;margin:0 auto;padding:56px 24px 40px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:40px">
     <div style="min-width:200px">
       <div style="display:flex;align-items:center;gap:11px;margin-bottom:14px">
-        <div style="width:22px;height:22px;border-radius:7px;background:linear-gradient(135deg,#1e81b0,#eab676)"></div>
-        <span style="font-family:Sora,sans-serif;font-weight:700;font-size:17px;letter-spacing:-.03em">${merek}</span>
+        ${lencanaKaki}
       </div>
       <p style="color:#1c1917;font-size:14px;line-height:1.6;margin:0;max-width:30ch">${escapeHtml(tagline)}</p>
     </div>
@@ -274,6 +274,27 @@ export function landingMarkup({ namaMerek, tagline, tautanWhatsapp, alamatEtalas
 
 </div>
 `;
+}
+
+/**
+ * Lencana merek di nav dan footer.
+ *
+ * Kalau logo sudah diunggah lewat Konfigurasi WEB di Admin, logo itu berdiri
+ * sendiri -- tanpa kotak gradien dan tanpa teks nama, karena logo yang bagus
+ * sudah memuat namanya. Nama merek pindah ke atribut alt supaya pembaca layar
+ * dan mesin pencari tetap mendapatkannya.
+ *
+ * Tanpa logo, tampilan lama dipakai: kotak gradien plus nama merek.
+ */
+function lencanaMerek(logoUrl, merekTerescape, ukuran, ukuranFont) {
+  const logo = String(logoUrl || "").trim();
+
+  if (logo !== "") {
+    return `<img data-logo="" src="${escapeHtml(logo)}" alt="${merekTerescape}" style="height:${ukuran + 8}px;width:auto;max-width:190px;object-fit:contain;display:block;transition:transform .5s cubic-bezier(.22,.9,.28,1)">`;
+  }
+
+  return `<div data-logo="" style="width:${ukuran}px;height:${ukuran}px;border-radius:7px;background:linear-gradient(135deg,#1e81b0,#eab676);box-shadow:0 0 20px rgba(30,129,176,.5);transition:transform .5s cubic-bezier(.22,.9,.28,1)"></div>`
+    + `<span style="font-family:Sora,sans-serif;font-weight:700;font-size:${ukuranFont}px;letter-spacing:-.03em">${merekTerescape}</span>`;
 }
 
 function escapeHtml(value) {

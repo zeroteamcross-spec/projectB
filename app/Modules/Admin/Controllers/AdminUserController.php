@@ -7,6 +7,7 @@ namespace App\Modules\Admin\Controllers;
 use App\Core\Controller;
 use App\Core\JsonResponse;
 use App\Core\Request;
+use App\Modules\Admin\Requests\CreateAccountRequest;
 use App\Modules\Admin\Requests\ListAdminUsersRequest;
 use App\Modules\Admin\Services\AdminUserService;
 
@@ -30,5 +31,20 @@ class AdminUserController extends Controller
         ], 'Daftar user admin berhasil diambil.', [
             'filters' => $filters === [] ? (object) [] : $filters,
         ]);
+    }
+
+    public function store(Request $request): JsonResponse
+    {
+        $actor = $this->user($request);
+        $payload = (new CreateAccountRequest($request))->validate();
+
+        return JsonResponse::success(
+            $this->service->createAccount($actor, $payload),
+            $payload['role'] === 'admin'
+                ? 'Akun admin berhasil dibuat.'
+                : 'Akun showroom berhasil dibuat.',
+            [],
+            201
+        );
     }
 }

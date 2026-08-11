@@ -52,13 +52,21 @@ function render(root, context) {
       icon: "database",
       label: "Buka Migration Manager",
       onClick: () => context.router?.navigate("/admin/migrations"),
+    }),
+    actionCard({
+      id: "sadm_dashboard_accounts_button",
+      title: "Buat Akun",
+      body: "Membuat akun admin atau akun showroom. Langsung aktif, tanpa antrean approval.",
+      icon: "user",
+      label: "Buka pembuatan akun",
+      onClick: () => context.router?.navigate("/super-admin/accounts"),
     })
   );
 
   root.replaceChildren(header, grid);
 }
 
-function actionCard({ title, body, icon, label, onClick }) {
+function actionCard({ title, body, icon, label, onClick, id = "" }) {
   const card = document.createElement("article");
   card.className = "grid gap-4 rounded-lg border border-[var(--pb-border)] bg-white p-5 shadow-sm";
   const iconWrap = document.createElement("span");
@@ -73,6 +81,12 @@ function actionCard({ title, body, icon, label, onClick }) {
   description.className = "text-sm leading-6 text-[var(--pb-text-muted)]";
   description.textContent = body;
   copy.append(heading, description);
-  card.append(iconWrap, copy, Button({ label, variant: "primary", onClick }));
+
+  const tombol = Button({ label, variant: "primary", onClick });
+  if (id) {
+    tombol.id = id;
+  }
+
+  card.append(iconWrap, copy, tombol);
   return card;
 }

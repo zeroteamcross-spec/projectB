@@ -11,6 +11,9 @@ use App\Modules\Auth\Middleware\AuthenticatedUserMiddleware;
 return static function (Router $router): void {
     $router->group('/api/admin', static function (Router $router): void {
         $router->get('/users', [AdminUserController::class, 'index']);
+        // Khusus super admin; dijaga di AdminUserService, bukan di rute --
+        // grup ini hanya memeriksa "sudah login".
+        $router->post('/accounts', [AdminUserController::class, 'store']);
         $router->post('/sellers/{seller_user_id}/impersonate', [AdminImpersonationController::class, 'startSeller']);
         $router->post('/affiliates/{affiliate_user_id}/impersonate', [AdminImpersonationController::class, 'startAffiliate']);
         $router->post('/impersonations', [AdminImpersonationController::class, 'start']);

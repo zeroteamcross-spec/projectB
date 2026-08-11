@@ -34,6 +34,19 @@ class AuthPolicy
         return self::requireRole($user, ['admin', 'super_admin']);
     }
 
+    /**
+     * Lebih ketat dari requireAdmin: admin biasa ikut ditolak.
+     *
+     * Dipakai untuk hal yang bisa menambah pemegang akses, seperti membuat
+     * akun admin baru. Rute /api/admin hanya dijaga "sudah login", jadi
+     * pembatasan ini harus ada di service -- menyembunyikan menunya di
+     * frontend tidak menghalangi siapa pun memanggil endpointnya langsung.
+     */
+    public static function requireSuperAdmin(?array $user): array
+    {
+        return self::requireRole($user, ['super_admin']);
+    }
+
     public static function ensureCanViewUser(?array $actor, int $targetUserId): array
     {
         $actor = self::requireUser($actor);

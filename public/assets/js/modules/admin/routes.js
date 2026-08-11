@@ -15,6 +15,7 @@ import { AdminMasterInspectionPage } from "./pages/masterInspectionPage.js";
 import { AdminMigrationManagerPage } from "./pages/migrationManagerPage.js";
 import { AdminLandingPageConfigPage } from "./pages/landingPageConfigPage.js";
 import { AdminReleaseVersionManagerPage } from "./pages/releaseVersionManagerPage.js";
+import { SuperAdminAccountsPage } from "./pages/superAdminAccountsPage.js";
 import { SuperAdminDashboardPage } from "./pages/superAdminDashboardPage.js";
 import { adminSessionService } from "./services/adminSessionService.js";
 import { transactionsResource } from "../../resources/transactionsResource.js";
@@ -33,6 +34,16 @@ export const adminRoutes = [
     role: "admin",
     page: SuperAdminDashboardPage,
     workingStateKey: "superAdminDashboard",
+  },
+  {
+    name: "super-admin.accounts",
+    path: "/super-admin/accounts",
+    shell: "app",
+    // Rutenya terbuka untuk role admin seperti rute admin lain; yang menolak
+    // admin biasa adalah halamannya dan, yang menentukan, servernya.
+    role: "admin",
+    page: SuperAdminAccountsPage,
+    workingStateKey: null,
   },
   {
     name: "admin.dashboard",
