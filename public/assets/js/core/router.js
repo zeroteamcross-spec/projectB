@@ -160,7 +160,11 @@ export class Router {
       return;
     }
 
-    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    // "instant", bukan "auto". "auto" berarti ikut CSS, dan landing memasang
+    // scroll-behavior:smooth di <html>; pemulangan gulir jadi dianimasikan,
+    // lalu terpotong di tengah jalan saat halaman lama dilepas dan berhenti
+    // beberapa piksel dari atas.
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
   }
 
   async leaveActivePage() {
