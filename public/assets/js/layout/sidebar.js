@@ -51,8 +51,15 @@ const ADMIN_LINKS = [
   { href: "#/admin/web-config", label: "Konfigurasi WEB", icon: "settings" },
 ];
 
+/**
+ * Sidebar super admin ditulis tetap di sini, tidak diambil dari master data
+ * app.sidebar seperti peran lain -- renderLinks() menimpa apa pun dengan daftar
+ * ini begitu peran aslinya super_admin. Halaman super admin yang baru harus
+ * didaftarkan di sini, kalau tidak menunya tidak akan pernah muncul.
+ */
 const SUPER_ADMIN_LINKS = [
   { href: "#/super-admin", label: "Superadmin Dashboard", icon: "dashboard" },
+  { href: "#/super-admin/accounts", label: "Buat Akun", icon: "user" },
   { href: "#/admin/web-config", label: "Konfigurasi WEB", icon: "settings" },
   { href: "#/admin/landing-page", label: "Landing Page", icon: "home" },
   { href: "#/admin/release-versions", label: "Release Version Manager", icon: "download" },
