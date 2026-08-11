@@ -7,6 +7,14 @@
 /storage/cache/*
 !/storage/logs/.gitkeep
 !/storage/cache/.gitkeep
+# Membuka satu rute di aplikasi membuat Design Studio menulis draft.json kosong
+# untuk rute itu. Sekadar efek samping menjelajah, bukan desain yang dibuat
+# siapa pun, dan tiap sesi uji melahirkan belasan file baru.
+#
+# Polanya sengaja satu tingkat direktori, bukan seluruh folder routes/: yang
+# di atasnya -- routes/draft.json, routes/published.json, dan routes/history/ --
+# berisi desain sungguhan dan tetap dilacak.
+/storage/design-studio/routes/*/draft.json
 /public/uploads/demo/
 /docs/*
 docs/*
