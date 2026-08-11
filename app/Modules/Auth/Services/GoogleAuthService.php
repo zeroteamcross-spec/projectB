@@ -846,15 +846,31 @@ class GoogleAuthService
         return $context;
     }
 
+    /**
+     * Skema ditentukan host-nya sendiri, bukan nama domain tertentu.
+     *
+     * Dulu https dipakai hanya kalau host memuat "garasi-mobil.com", selain itu
+     * mengikuti AUTH_REMEMBER_SECURE. Di carlynk.id nilainya false, jadi
+     * redirect_uri yang dikirim jadi http:// sementara yang terdaftar di Google
+     * Console https:// -- Google menolak dengan redirect_uri_mismatch, dan
+     * kegagalannya baru terlihat setelah pengguna memilih akunnya.
+     *
+     * Hanya host pengembangan lokal yang memakai http.
+     */
     private function redirectUriForHost(string $host): string
     {
-        $scheme = (bool) config('google.auth.state_cookie.secure', false) ? 'https' : 'http';
+        return $this->schemeForHost($host) . '://' . $host . '/api/auth/google/callback';
+    }
 
-        if (strpos($host, 'garasi-mobil.com') !== false) {
-            $scheme = 'https';
-        }
+    private function schemeForHost(string $host): string
+    {
+        $tanpaPort = strtolower((string) strtok($host, ':'));
 
-        return $scheme . '://' . $host . '/api/auth/google/callback';
+        $lokal = in_array($tanpaPort, ['localhost', '127.0.0.1', '::1'], true)
+            || substr($tanpaPort, -6) === '.local'
+            || substr($tanpaPort, -5) === '.test';
+
+        return $lokal ? 'http' : 'https';
     }
 
     private function normalizeHost(string $host): string
