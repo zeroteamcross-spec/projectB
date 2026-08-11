@@ -255,7 +255,6 @@ function uraiGaya(teks) {
 
 function pasangUiGulir(q, qa) {
   const bar = q("[data-progress]");
-  const logo = q("[data-logo]");
   const petunjuk = q("[data-scrollhint]");
   const tautan = qa("[data-navlink]");
   let menunggu = false;
@@ -273,7 +272,10 @@ function pasangUiGulir(q, qa) {
       const p = Math.min(y / maks, 1);
 
       if (bar) bar.style.width = `${(p * 100).toFixed(2)}%`;
-      if (logo) logo.style.transform = `rotate(${(p * 320).toFixed(1)}deg)`;
+      // Logonya tidak lagi diputar mengikuti gulir. Itu masuk akal waktu
+      // brandnya masih kotak gradien tanpa arah; begitu yang tampil logo
+      // unggahan pengguna, memutarnya sampai 320 derajat membuat namanya
+      // terbaca miring dan terbalik sepanjang halaman.
       if (petunjuk) petunjuk.style.opacity = y > 120 ? "0" : "1";
 
       let aktif = -1;
