@@ -316,7 +316,7 @@ function affiliatorPanel({ user, actions }) {
     grid,
     EmptyState({
       title: "Fitur affiliator sedang disiapkan",
-      description: "Endpoint buyer-affiliator belum tersedia. Dashboard ini disiapkan sebagai area awal tanpa mengubah modul affiliate lama.",
+      description: "Endpoint buyer-affiliator belum tersedia. Dashboard ini disiapkan sebagai area awal tanpa mengubah modul marketing lama.",
     }),
   );
   return section;

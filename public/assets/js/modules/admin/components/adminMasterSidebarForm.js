@@ -26,11 +26,11 @@ export function AdminMasterSidebarForm({
 
   const role = selectField({
     id: "admst_sidebar_form_role_input",
-    label: "Role target",
+    label: "Level User target",
     value: draft.role,
     options: [
       ["admin", "Admin"],
-      ["seller", "Seller"],
+      ["seller", "Showroom"],
       ["affiliate", "Marketing"],
     ],
   });

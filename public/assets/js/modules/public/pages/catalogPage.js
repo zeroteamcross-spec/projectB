@@ -321,7 +321,7 @@ function heroSection(notFound) {
   eyebrowIcon.className = "inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/15";
   eyebrowIcon.append(createIcon("bolt", { className: "block h-3 w-3 leading-none" }));
   const eyebrowText = document.createElement("span");
-  eyebrowText.textContent = affiliate ? "Mega sale affiliate" : "Mega sale!";
+  eyebrowText.textContent = affiliate ? "Mega sale marketing" : "Mega sale!";
   eyebrow.append(eyebrowIcon, eyebrowText);
 
   const title = document.createElement("h1");

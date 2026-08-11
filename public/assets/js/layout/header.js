@@ -1,4 +1,5 @@
 import { brandConfig } from "../theme/brandConfig.js";
+import { roleLabel } from "../core/roleLabels.js";
 import { getAsset } from "../theme/assetRegistry.js";
 import { createIcon } from "../theme/iconRegistry.js";
 import { showToast } from "../ui/primitives/toast.js";
@@ -43,7 +44,7 @@ export function header(store) {
 
   const sync = (state) => {
     const isAuthenticated = Boolean(state.auth?.isAuthenticated);
-    role.textContent = `Level User: ${state.auth?.role ?? state.app.activeRole ?? "public"}`;
+    role.textContent = `Level User: ${roleLabel(state.auth?.role ?? state.app.activeRole ?? "public")}`;
     renderBrandMark(mark);
     title.textContent = brandConfig.shellTitle;
     renderBanner(bannerHost, state);

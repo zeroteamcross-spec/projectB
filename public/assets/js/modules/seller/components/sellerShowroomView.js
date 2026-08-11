@@ -29,7 +29,7 @@ export function SellerShowroomView({ showroom = null, onEdit = null } = {}) {
     wrap.append(
       EmptyState({
         title: "Showroom belum tersedia",
-        description: "Lengkapi profil showroom agar seller bisa mengelola listing dan transaksi dengan jelas.",
+        description: "Lengkapi profil showroom agar showroom bisa mengelola listing dan transaksi dengan jelas.",
       }),
       action
     );
@@ -55,7 +55,7 @@ export function SellerShowroomView({ showroom = null, onEdit = null } = {}) {
   title.textContent = showroom.name || "Showroom";
   const subtitle = document.createElement("p");
   subtitle.className = `max-w-2xl text-xs leading-6 ${tw.text.muted}`;
-  subtitle.textContent = "Profil showroom dan informasi rekening seller.";
+  subtitle.textContent = "Profil showroom dan informasi rekening showroom.";
   titleWrap.append(eyebrow, title, subtitle);
 
   const actions = document.createElement("section");
@@ -85,11 +85,31 @@ export function SellerShowroomView({ showroom = null, onEdit = null } = {}) {
     label.textContent = field.label;
     labelRow.append(icon, label);
 
+    const publicUrl = field.key === "public_url" ? showroomPublicUrl(showroom) : "";
+
     const value = document.createElement("dd");
     value.className = "min-w-0 break-words text-xs font-bold leading-6 text-gray-950";
-    value.textContent = field.key === "public_url" ? showroomPublicUrl(showroom) || "-" : showroom[field.key] || "-";
+    value.textContent = field.key === "public_url" ? publicUrl || "-" : showroom[field.key] || "-";
 
     item.append(labelRow, value);
+
+    // Alamatnya sudah tertulis di atas, tapi menyalinnya ke bilah alamat itu
+    // kerja yang tidak perlu. Tombolnya hanya muncul kalau slug-nya ada --
+    // tanpa slug tidak ada halaman publik untuk dituju.
+    if (field.key === "public_url" && publicUrl) {
+      const openButton = Button({
+        label: "Lihat Halaman Showroom",
+        onClick: () => window.open(publicUrl, "_blank", "noopener"),
+      });
+      openButton.id = "slrsr_open_public_page_button";
+      openButton.prepend(createIcon("eye", { className: "h-4 w-4" }));
+
+      const openWrap = document.createElement("div");
+      openWrap.className = "flex pt-1";
+      openWrap.append(openButton);
+      item.append(openWrap);
+    }
+
     grid.append(item);
   });
 

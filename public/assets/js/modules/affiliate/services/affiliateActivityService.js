@@ -79,7 +79,7 @@ function parseLanding(url = "") {
     return {
       label: "Landing katalog",
       sourceLabel: "Landing marketing",
-      targetLabel: "Katalog seller",
+      targetLabel: "Katalog showroom",
       slugLabel: slug || "-",
     };
   }

@@ -17,7 +17,7 @@ const BUYER_LINKS = [
 ];
 
 const SELLER_LINKS = [
-  { href: "#/seller", label: "Dashboard Seller", icon: "dashboard" },
+  { href: "#/seller", label: "Dashboard Showroom", icon: "dashboard" },
   { href: "#/profile", label: "Profil Saya", icon: "user" },
   { href: "#/seller/showroom", label: "Showroom Saya", icon: "showroom" },
   { href: "#/seller/cars", label: "Katalog", icon: "car" },
@@ -71,7 +71,7 @@ const SUPER_ADMIN_LINKS = [
     children: [
       { href: "#/admin", label: "Admin View", icon: "dashboard" },
       { href: "#/buyer", label: "Buyer View", icon: "user" },
-      { href: "#/seller", label: "Seller View", icon: "car" },
+      { href: "#/seller", label: "Showroom View", icon: "car" },
       { href: "#/affiliate", label: "Marketing View", icon: "affiliate" },
     ],
   },

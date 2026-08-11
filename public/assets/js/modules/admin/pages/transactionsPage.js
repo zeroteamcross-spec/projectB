@@ -187,7 +187,7 @@ function render(root, context, state, actions) {
     }), "admin.transactions.detail"), {
       key: `adtr-detail-${filters.transactionId}`,
       title: "Review transaksi",
-      description: "Periksa buyer, seller, unit, payment summary, timeline, dan log pembayaran dari satu popup.",
+      description: "Periksa buyer, showroom, unit, payment summary, timeline, dan log pembayaran dari satu popup.",
       size: "lg",
       footer: null,
       panelId: "adtr_detail_modal_section",

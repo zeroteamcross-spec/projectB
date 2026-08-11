@@ -8,7 +8,7 @@ export function PublicSellerSummary({ car } = {}) {
 
   const title = document.createElement("h2");
   title.className = "text-base font-bold tracking-normal text-gray-950";
-  title.textContent = "Ringkasan seller";
+  title.textContent = "Ringkasan showroom";
 
   const body = document.createElement("p");
   body.className = "text-xs leading-6 text-gray-600";
@@ -20,7 +20,7 @@ export function PublicSellerSummary({ car } = {}) {
   facts.className = "grid gap-2 rounded-[22px] bg-gray-50 p-4 text-xs";
   facts.append(
     factRow("Showroom ID", car?.showroom_id ? `#${car.showroom_id}` : "-"),
-    factRow("Seller ID", car?.seller_user_id ? `#${car.seller_user_id}` : "-"),
+    factRow("Showroom ID", car?.seller_user_id ? `#${car.seller_user_id}` : "-"),
     factRow("Lokasi", car?.location_name ?? "-")
   );
 

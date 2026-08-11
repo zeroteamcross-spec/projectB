@@ -436,7 +436,7 @@ function latestTransactionsSection({ transactions, actions }) {
     mobileCardFields: (transaction) => [
       { label: "Tanggal", value: formatDate(transaction.created_at) },
       { label: "Nilai", value: formatCurrency(transaction.car_price ?? transaction.dp_amount ?? 0) },
-      { label: "Seller", value: transaction.seller?.name || transaction.car?.seller?.name || "Seller terdaftar" },
+      { label: "Showroom", value: transaction.seller?.name || transaction.car?.seller?.name || "Showroom terdaftar" },
     ],
     mobileCardActions: (transaction) => transactionAction(transaction, actions),
   });

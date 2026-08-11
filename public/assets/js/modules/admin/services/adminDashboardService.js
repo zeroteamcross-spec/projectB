@@ -37,7 +37,7 @@ export const adminDashboardService = {
       },
       {
         title: "Pending approvals",
-        description: "Lihat seller yang masih menunggu approval admin.",
+        description: "Lihat showroom yang masih menunggu approval admin.",
         actionLabel: "Lihat approval",
         onClick: onPending,
       },
@@ -55,7 +55,7 @@ export const adminDashboardService = {
       },
       {
         title: "Impersonation",
-        description: "Masuk ke konteks buyer atau seller dari user management.",
+        description: "Masuk ke konteks buyer atau showroom dari user management.",
         actionLabel: "Masuk act-as",
         onClick: onActAs,
       },

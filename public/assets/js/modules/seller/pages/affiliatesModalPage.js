@@ -163,7 +163,7 @@ export function SellerAffiliatesModalPage() {
         });
         upsertAffiliate(updated);
         syncAffiliateSnapshot();
-        showToast(nextStatus === "active" ? "Affiliate diaktifkan." : "Affiliate dinonaktifkan.", { type: "success" });
+        showToast(nextStatus === "active" ? "Marketing diaktifkan." : "Marketing dinonaktifkan.", { type: "success" });
       } catch (error) {
         setRuntime({ error: error?.message ?? "Status marketing gagal diperbarui." });
         showToast(error?.message ?? "Status marketing gagal diperbarui.", { type: "error" });

@@ -1,4 +1,5 @@
 import { authService } from "../../../core/auth.js";
+import { roleLabel as labelPeran } from "../../../core/roleLabels.js";
 
 const ROLE_HOMES = {
   public: "/",
@@ -118,21 +119,13 @@ export const publicAuthLandingService = {
   },
 
   roleLabel(role) {
-    const labels = {
-      buyer: "buyer",
-      seller: "seller",
-      admin: "admin",
-      affiliate_admin: "marketing admin",
-      public: "publik",
-    };
-
-    return labels[role] ?? role;
+    return labelPeran(role);
   },
 
   roleCopy(role) {
     if (role === "seller") {
       return {
-        title: "Masuk sebagai seller",
+        title: "Masuk sebagai showroom",
         description: "Kelola showroom, listing, dan transaksi.",
       };
     }
@@ -146,7 +139,7 @@ export const publicAuthLandingService = {
 
     if (role === "affiliate_admin") {
       return {
-        title: "Masuk sebagai affiliate",
+        title: "Masuk sebagai marketing",
         description: "Pantau aktivitas, ledger, dan settlement.",
       };
     }

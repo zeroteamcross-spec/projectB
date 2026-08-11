@@ -27,7 +27,7 @@ const ROLE_CONFIG = Object.freeze({
   seller: {
     role: "seller",
     slug: "seller",
-    label: "Seller",
+    label: "Showroom",
     title: "Login Showroom",
     subtitle: "Masuk sebagai Showroom",
     home: "/seller",
@@ -72,7 +72,7 @@ export const roleSpecificLoginService = {
 
   async login(config, credentials) {
     if (!config?.role) {
-      throw new Error("Role login tidak valid.");
+      throw new Error("Level User login tidak valid.");
     }
 
     await authService.login(credentials);

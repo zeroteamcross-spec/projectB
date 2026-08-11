@@ -27,7 +27,7 @@ export function SellerAffiliatesList({
 
   shell.append(DataTable({
     shellId: "slraf_affiliates_table",
-    title: "Daftar affiliate",
+    title: "Daftar marketing",
     subtitle: `${totalItems} affiliate cocok dengan filter aktif`,
     icon: tableIcon(),
     columns: affiliateColumns({
@@ -43,8 +43,8 @@ export function SellerAffiliatesList({
     loading,
     emptyTitle: sourceTotal ? "Marketing tidak ditemukan" : "Belum ada marketing",
     emptyDescription: sourceTotal
-      ? "Ubah kata kunci atau status filter untuk melihat affiliate lain."
-      : "Tambahkan partner affiliate untuk mulai membagikan link referral showroom Anda.",
+      ? "Ubah kata kunci atau status filter untuk melihat marketing lain."
+      : "Tambahkan partner marketing untuk mulai membagikan link referral showroom Anda.",
     tableMinWidth: "min-w-[1080px]",
     mobileMode: "stack",
     getRowKey: (affiliate) => affiliate.id,

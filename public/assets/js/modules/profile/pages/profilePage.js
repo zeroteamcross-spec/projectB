@@ -1,5 +1,6 @@
 import { createPageLifecycle } from "../../../core/lifecycle.js";
 import { authService } from "../../../core/auth.js";
+import { roleLabel } from "../../../core/roleLabels.js";
 import { profileResource } from "../../../resources/profileResource.js";
 import { appStore } from "../../../state/store.js";
 import { authStore } from "../../../state/authStore.js";
@@ -263,7 +264,7 @@ function buyerAccountCard(profile) {
       ["Nama", profileName(profile)],
       ["Email", cleanValue(profile.email)],
       ["Nomor HP", cleanValue(profile.phone_number || profile.phone)],
-      ["Role", roleLabel(profile.role)],
+      ["Level User", roleLabel(profile.role)],
       ["Status akun", accountStatusLabel(profile.account_status)],
       ["Tanggal bergabung", cleanValue(formatDate(profile.created_at))],
     ],
@@ -492,7 +493,7 @@ function identityCard(profile, actions) {
   const facts = document.createElement("section");
   facts.className = "grid min-w-0 gap-2";
   facts.append(
-    summaryFact("Role", roleLabel(profile.role), "shield"),
+    summaryFact("Level User", roleLabel(profile.role), "shield"),
     summaryFact("Cabang", branchLabel(profile), "showroom"),
     summaryFact("Scope", "Own", "lock"),
   );
@@ -1031,16 +1032,6 @@ function profileName(profile) {
 
 function initials(profile) {
   return profileName(profile).split(/\s+/).filter(Boolean).slice(0, 2).map((word) => word[0]?.toUpperCase()).join("") || "U";
-}
-
-function roleLabel(role) {
-  const labels = {
-    admin: "Admin",
-    seller: "Seller",
-    buyer: "Buyer",
-    affiliate_admin: "Marketing Admin",
-  };
-  return labels[role] ?? statusLabel(role || "-");
 }
 
 function accountStatusLabel(status) {

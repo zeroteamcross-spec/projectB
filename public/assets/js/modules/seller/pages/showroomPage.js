@@ -95,7 +95,7 @@ function openShowroomEditModal({ showroom, bankOptions, runtime, router }) {
   openModal(modalBody, {
     key: EDIT_MODAL_KEY,
     title: showroom ? "Edit showroom" : "Buat showroom",
-    description: "Perbarui profil, kontak, dan rekening pembayaran seller.",
+    description: "Perbarui profil, kontak, dan rekening pembayaran showroom.",
     size: "xl",
     footer: null,
     closeLabel: "Tutup",

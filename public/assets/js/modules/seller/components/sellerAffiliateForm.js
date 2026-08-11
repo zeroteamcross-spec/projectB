@@ -41,10 +41,10 @@ export function SellerAffiliateForm({
   headerCopy.className = "grid gap-2";
   headerCopy.append(
     textBlock("text-xs font-semibold text-gray-500", mode === "edit" ? "Edit marketing" : "Marketing baru"),
-    textBlock("text-lg font-bold text-gray-950", mode === "edit" ? (draft.user?.name || draft.name || "Marketing") : "Buat marketing seller"),
+    textBlock("text-lg font-bold text-gray-950", mode === "edit" ? (draft.user?.name || draft.name || "Marketing") : "Buat marketing showroom"),
     textBlock(`text-xs ${tw.text.muted}`, mode === "edit"
-      ? "Perbarui username/email login, slug, nomor WhatsApp, status, atau isi password baru untuk reset akses login affiliate."
-      : "Tambahkan affiliate dengan username/email login, password, slug unik global, dan nomor WhatsApp yang dipakai di landing."),
+      ? "Perbarui username/email login, slug, nomor WhatsApp, status, atau isi password baru untuk reset akses login marketing."
+      : "Tambahkan marketing dengan username/email login, password, slug unik global, dan nomor WhatsApp yang dipakai di landing."),
   );
   headerTop.append(headerCopy);
 
@@ -94,7 +94,7 @@ export function SellerAffiliateForm({
       label: "Username / email login Marketing",
       type: "email",
       value: draft.user?.email ?? draft.email ?? "",
-      placeholder: "affiliate@example.com",
+      placeholder: "marketing@example.com",
     }),
     Input({
       id: "slraf_affiliate_referral_code_input",
@@ -204,7 +204,7 @@ export function SellerAffiliateForm({
     const landing = document.createElement("div");
     landing.className = `grid gap-3 ${tw.surface.inset}`;
     landing.append(
-      textBlock("text-[10px] font-semibold text-gray-500", "Link landing affiliate"),
+      textBlock("text-[10px] font-semibold text-gray-500", "Link landing marketing"),
       textBlock("break-all text-xs font-medium text-gray-900", sellerAffiliateService.landingUrl(draft.referral_code)),
     );
 

@@ -801,7 +801,7 @@ function masterSidebarFilterBar({ filters, items, onSubmit }) {
     idPrefix: "admst_sidebar",
     onReset: () => onSubmit?.({ keyword: "", role: "admin", status: "" }),
   });
-  form.append(labelWrap("Keyword", keyword), labelWrap("Role", role), labelWrap("Status", status), actions.wrap);
+  form.append(labelWrap("Keyword", keyword), labelWrap("Level User", role), labelWrap("Status", status), actions.wrap);
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     onSubmit?.({ keyword: keyword.value.trim(), role: role.value, status: status.value });

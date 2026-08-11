@@ -200,7 +200,7 @@ function render(root, router, params, queueApi) {
       header,
       EmptyState({
         title: "Mobil tidak ditemukan",
-        description: "Pastikan gambar dibuka dari list mobil seller yang masih tersedia.",
+        description: "Pastikan gambar dibuka dari list mobil showroom yang masih tersedia.",
       }),
     ]));
     return;

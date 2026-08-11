@@ -203,7 +203,7 @@ function glassLoginActionContent(root, context, config, state, options = {}) {
   }
 
   if (!config.googleEnabled) {
-    actionWrap.append(messageBox(config.warning || "Google Login tidak tersedia untuk role ini.", "info"));
+    actionWrap.append(messageBox(config.warning || "Google Login tidak tersedia untuk level user ini.", "info"));
     appendFooterLink(actionWrap, context, options);
     fragment.append(actionWrap);
     return fragment;

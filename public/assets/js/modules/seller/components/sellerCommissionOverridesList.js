@@ -27,7 +27,7 @@ export function SellerCommissionOverridesList({
     columns: commissionColumns({ onDetail, onEdit }),
     rows: overrides,
     loading,
-    emptyTitle: "Belum ada komisi affiliate",
+    emptyTitle: "Belum ada komisi marketing",
     emptyDescription: "Komisi akan muncul setelah aturan umum atau aturan khusus per mobil diatur.",
     tableMinWidth: "min-w-[1040px]",
     mobileMode: "stack",

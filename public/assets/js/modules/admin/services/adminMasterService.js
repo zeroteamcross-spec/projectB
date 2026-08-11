@@ -60,7 +60,7 @@ const DEFAULT_SIDEBAR_SEED = [
   sidebarSeed("admin.master_inspection", "admin", "Master Inspection", "#/admin/master-inspection", "clipboard", 40, "admin.master"),
   sidebarSeed("admin.master_location", "admin", "Master Lokasi", "#/admin/master-location", "location", 50, "admin.master"),
   sidebarSeed("admin.design_studio", "admin", "Design Studio", "#/admin/design-studio", "sparkles", 80),
-  sidebarSeed("seller.dashboard", "seller", "Dashboard Seller", "#/seller", "dashboard", 10),
+  sidebarSeed("seller.dashboard", "seller", "Dashboard Showroom", "#/seller", "dashboard", 10),
   sidebarSeed("seller.showroom", "seller", "Showroom Saya", "#/seller/showroom", "showroom", 20),
   sidebarSeed("seller.cars", "seller", "Katalog", "#/seller/cars", "car", 30),
   sidebarSeed("seller.affiliates", "seller", "Marketing", "#/seller/affiliates", "affiliate", 40),
@@ -629,7 +629,7 @@ function validateSidebarItems(items = []) {
 
   normalized.forEach((item) => {
     if (!["admin", "seller", "affiliate"].includes(item.role)) {
-      errors.push(`Role tidak valid untuk ${item.label}.`);
+      errors.push(`Level User tidak valid untuk ${item.label}.`);
     }
 
     if (!/^[a-z0-9_.-]+$/.test(item.key)) {

@@ -62,7 +62,7 @@ function render(root, context, flags) {
       header(context, null),
       EmptyState({
         title: "Transaksi tidak ditemukan",
-        description: "Pastikan transaksi dibuka dari daftar transaksi seller yang sesuai.",
+        description: "Pastikan transaksi dibuka dari daftar transaksi showroom yang sesuai.",
       })
     );
     return;
@@ -88,7 +88,7 @@ function header(context, transaction) {
   });
   back.id = "slrtx_back_to_list_button";
   return SectionHeader({
-    title: transaction?.transaction_code ?? "Detail transaksi seller",
+    title: transaction?.transaction_code ?? "Detail transaksi showroom",
     description: "Ringkasan buyer, mobil, status transaksi, dan nominal pembayaran.",
     action: back,
   });

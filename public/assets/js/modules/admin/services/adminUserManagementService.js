@@ -67,7 +67,7 @@ export const adminUserManagementService = {
 
   impersonationLabel(user = null) {
     if ((user?.role ?? null) === "seller") {
-      return "Seller";
+      return "Showroom";
     }
 
     if ((user?.role ?? null) === "affiliate_admin") {

@@ -359,7 +359,7 @@ function editorSection({ template, saving, onSave }) {
   active.className = "h-4 w-4 rounded border-gray-300 text-[var(--pb-brand-secondary)] focus:ring-[color-mix(in_srgb,var(--pb-brand-primary)_45%,white)]";
   const activeWrap = document.createElement("label");
   activeWrap.className = "flex items-center gap-2 rounded-xl border border-gray-100 bg-gray-50 px-3 py-3 text-xs font-bold text-gray-700";
-  activeWrap.append(active, document.createTextNode("Item aktif untuk flow seller"));
+  activeWrap.append(active, document.createTextNode("Item aktif untuk flow showroom"));
 
   const save = Button({ label: saving ? "Menyimpan..." : "Simpan Master", variant: "primary" });
   save.id = "admstinsp_save_template_button";

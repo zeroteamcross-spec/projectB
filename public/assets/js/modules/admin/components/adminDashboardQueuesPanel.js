@@ -30,12 +30,12 @@ function pendingApprovalsCard(users, onClick) {
   const card = Card([], { variant: "raised" });
   card.id = "adm_dashboard_pending_card";
   card.className = "grid gap-4 rounded-[1.6rem] border border-[color-mix(in_srgb,var(--pb-warning)_14%,white)] bg-[linear-gradient(135deg,rgba(255,255,255,0.9),rgba(250,244,237,0.72))] p-5 shadow-[0_18px_55px_rgba(15,23,42,0.08)] backdrop-blur transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_26px_70px_rgba(15,23,42,0.12)]";
-  card.append(sectionHeader("Pending approvals", "Seller yang masih menunggu verifikasi admin.", onClick, "Buka user management", "bell", "adm_dashboard_pending_open_button"));
+  card.append(sectionHeader("Pending approvals", "Showroom yang masih menunggu verifikasi admin.", onClick, "Buka user management", "bell", "adm_dashboard_pending_open_button"));
 
   if (!users.length) {
     card.append(EmptyState({
-      title: "Tidak ada seller pending",
-      description: "Approval seller saat ini sudah bersih.",
+      title: "Tidak ada showroom pending",
+      description: "Approval showroom saat ini sudah bersih.",
     }));
     return card;
   }
@@ -72,14 +72,14 @@ function pendingTable(users) {
     subtitle: `${users.length} seller perlu screening cepat`,
     icon,
     columns: [
-      { label: "Seller", render: (user) => textBlock("font-bold text-gray-950", user.name || user.email || `User #${user.id}`) },
+      { label: "Showroom", render: (user) => textBlock("font-bold text-gray-950", user.name || user.email || `User #${user.id}`) },
       { label: "Kontak", render: (user) => textBlock("text-gray-600", `${user.email || "-"} | ${user.phone_number || "-"}`) },
       { label: "Status", render: (user) => Badge({ label: user.account_status || "pending", variant: "warning" }) },
     ],
     rows: users,
     mobileMode: "disclosure",
-    emptyTitle: "Tidak ada seller pending",
-    emptyDescription: "Approval seller saat ini sudah bersih.",
+    emptyTitle: "Tidak ada showroom pending",
+    emptyDescription: "Approval showroom saat ini sudah bersih.",
     mobileCardTitle: (user) => user.name || user.email || `User #${user.id}`,
     mobileCardSubtitle: (user) => user.showroom?.name || user.email || "-",
     mobileCardBadges: (user) => [Badge({ label: user.account_status || "pending", variant: "warning" })],

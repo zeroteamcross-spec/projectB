@@ -11,7 +11,7 @@ export const LANDING_PAGE_OPTIONS = Object.freeze([
     name: "public.saas-landing",
     label: "Landing SaaS Jual Beli Mobil",
     path: "/saas-landing",
-    description: "Halaman marketing SaaS untuk seller/showroom, marketing, dan buyer.",
+    description: "Halaman marketing SaaS untuk showroom, marketing, dan buyer.",
     page: SaasLandingPage,
   },
   {
@@ -25,7 +25,7 @@ export const LANDING_PAGE_OPTIONS = Object.freeze([
     name: "public.auth-landing",
     label: "Login / Register",
     path: "/auth",
-    description: "Halaman autentikasi publik untuk buyer, seller, admin, dan marketing.",
+    description: "Halaman autentikasi publik untuk buyer, showroom, admin, dan marketing.",
     page: AuthLandingPage,
   },
 ]);

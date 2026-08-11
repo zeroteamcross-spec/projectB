@@ -37,7 +37,7 @@ export function AffiliateIdentityPanel({
   [
     ["Slug marketing", affiliate?.referral_code || "-"],
     ["Link landing", landingUrl || "-"],
-    ["Seller owner", affiliate?.seller?.name || "-"],
+    ["Showroom owner", affiliate?.seller?.name || "-"],
     ["Showroom", affiliate?.showroom?.name || "-"],
     ["Dibuat", formatDate(affiliate?.created_at)],
     ["Diupdate", formatDate(affiliate?.updated_at)],

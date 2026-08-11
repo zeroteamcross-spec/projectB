@@ -5,7 +5,7 @@ const TASKS = [
   {
     key: "showroom",
     title: "Lengkapi showroom",
-    description: "Nama, kontak, alamat, dan rekening seller siap dipakai.",
+    description: "Nama, kontak, alamat, dan rekening showroom siap dipakai.",
     route: "/seller/showroom",
     icon: "showroom",
     accent: "from-[var(--pb-brand-primary)] to-[var(--pb-warning)]",
@@ -34,8 +34,8 @@ const TASKS = [
   },
   {
     key: "affiliates",
-    title: "Kelola affiliate",
-    description: "Slug marketing, nomor WhatsApp, dan landing seller.",
+    title: "Kelola marketing",
+    description: "Slug marketing, nomor WhatsApp, dan landing showroom.",
     route: "/seller/affiliates",
     icon: "affiliate",
     accent: "from-[var(--pb-brand-primary)] to-[var(--pb-brand-primary)]",
@@ -45,7 +45,7 @@ const TASKS = [
   {
     key: "commissions",
     title: "Atur komisi",
-    description: "Rule global dan override per mobil untuk affiliate.",
+    description: "Rule global dan override per mobil untuk marketing.",
     route: "/seller/affiliate-commissions",
     icon: "commission",
     accent: "from-[var(--pb-success)] to-[var(--pb-brand-primary)]",

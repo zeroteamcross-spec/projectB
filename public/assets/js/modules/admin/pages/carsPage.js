@@ -141,7 +141,7 @@ function openCarFormModal({ runtime, brandOptions }) {
   openModal(content, {
     key: CAR_FORM_MODAL_KEY,
     title: isEdit ? "Edit mobil" : "Tambah mobil",
-    description: "Admin dapat mengelola listing seluruh seller/showroom dari katalog ini.",
+    description: "Admin dapat mengelola listing seluruh showroom dari katalog ini.",
     size: "xl",
     footer: "custom",
     footerNode: createCarFormFooter(runtime),
@@ -349,8 +349,8 @@ async function saveCar(payload) {
   const isEdit = runtime.mode === "edit" && runtime.selectedCar?.id;
   const sellerUserId = Number(runtime.form?.seller_user_id ?? runtime.selectedCar?.seller_user_id ?? 0);
   if (!sellerUserId) {
-    setRuntime({ error: "Pilih seller/showroom terlebih dahulu." });
-    showToast("Pilih seller/showroom terlebih dahulu.", { type: "error" });
+    setRuntime({ error: "Pilih showroom terlebih dahulu." });
+    showToast("Pilih showroom terlebih dahulu.", { type: "error" });
     return;
   }
   setRuntime({ saving: true, error: "", notice: "" });
@@ -476,7 +476,7 @@ function adminSellerSelector(runtime) {
 
   const label = document.createElement("label");
   label.className = "grid gap-1.5 text-xs font-bold text-gray-700";
-  label.textContent = "Seller / showroom";
+  label.textContent = "Showroom";
 
   const select = document.createElement("select");
   select.id = "adcars_seller_user_id_input";
@@ -484,7 +484,7 @@ function adminSellerSelector(runtime) {
 
   const placeholder = document.createElement("option");
   placeholder.value = "";
-  placeholder.textContent = sellers.length ? "Pilih seller" : "Seller belum tersedia di preload users";
+  placeholder.textContent = sellers.length ? "Pilih showroom" : "Showroom belum tersedia di preload users";
   placeholder.selected = !selectedSellerId;
   select.append(placeholder);
 
@@ -510,7 +510,7 @@ function adminSellerSelector(runtime) {
 
   const helper = document.createElement("p");
   helper.className = "text-[10px] font-semibold leading-5 text-[var(--pb-brand-secondary)]";
-  helper.textContent = "Wajib dipilih agar listing admin tercatat sebagai milik seller/showroom yang benar.";
+  helper.textContent = "Wajib dipilih agar listing admin tercatat sebagai milik showroom yang benar.";
 
   label.append(select);
   section.append(label, helper);

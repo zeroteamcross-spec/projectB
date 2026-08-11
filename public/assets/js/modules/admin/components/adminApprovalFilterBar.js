@@ -16,7 +16,7 @@ export function AdminApprovalFilterBar({ filters = {}, counts = {}, onSubmit = n
   copy.className = "grid min-w-0 gap-1";
   copy.append(
     textBlock("text-[10px] font-black uppercase tracking-[0.16em] text-[color-mix(in_srgb,var(--pb-brand-primary)_84%,black)]", "Approval filter"),
-    textBlock("text-xs leading-6 text-gray-600", "Saring approval queue supaya review seller dan account state lebih cepat diputuskan."),
+    textBlock("text-xs leading-6 text-gray-600", "Saring approval queue supaya review showroom dan account state lebih cepat diputuskan."),
   );
   heading.append(
     icon,
@@ -35,8 +35,8 @@ export function AdminApprovalFilterBar({ filters = {}, counts = {}, onSubmit = n
     name: "role",
     value: filters.role ?? "",
     options: [
-      { value: "", label: "Semua role" },
-      { value: "seller", label: "Seller" },
+      { value: "", label: "Semua level user" },
+      { value: "seller", label: "Showroom" },
       { value: "buyer", label: "Buyer" },
       { value: "affiliate_admin", label: "Marketing Admin" },
       { value: "admin", label: "Admin" },

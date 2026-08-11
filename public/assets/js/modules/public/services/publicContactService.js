@@ -25,7 +25,7 @@ function whatsappSourceLabel(label = "") {
   }
 
   if (value.includes("affiliate") || value.includes("marketing")) {
-    return "via affiliate";
+    return "via marketing";
   }
 
   return "dari katalog";

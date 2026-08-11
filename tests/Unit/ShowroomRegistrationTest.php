@@ -24,6 +24,29 @@ class ShowroomRegistrationTest extends TestCase
         $this->registrationStoresNormalizedSlugAndBankDetails();
         $this->takenSlugIsRejectedWithAnAvailableSuggestion();
         $this->tooShortSlugIsRejected();
+        $this->registerPageSendsTheShowroomAddress();
+    }
+
+    /**
+     * The backend has always accepted showroom.address; the register page simply
+     * never sent it, so every showroom created there stored null and
+     * #/seller/showroom showed a blank address. Nothing failed loudly -- the
+     * field is nullable -- so this guard watches the payload itself.
+     */
+    private function registerPageSendsTheShowroomAddress(): void
+    {
+        $page = (string) file_get_contents(
+            dirname(__DIR__, 2) . '/public/assets/js/modules/public/pages/showroomRegisterPage.js'
+        );
+
+        $this->assertTrue(
+            strpos($page, 'name: "showroom_address"') !== false,
+            'The register form must offer a showroom address field of its own.'
+        );
+        $this->assertTrue(
+            preg_match('/showroom:\s*\{[^}]*address:\s*emptyToNull\(data\.showroom_address\)/s', $page) === 1,
+            'showroom.address must be part of the register payload, not just the owner address.'
+        );
     }
 
     private function sellerRegistrationRequiresShowroomSlug(): void
@@ -102,6 +125,7 @@ class ShowroomRegistrationTest extends TestCase
             'showroom' => [
                 'name' => 'Toko Jaya Motor',
                 'slug' => '  Toko JAYA Motor!!  ',
+                'address' => 'Jl Showroom 9',
                 'city_name' => 'Surabaya',
                 'phone_number' => '0217654321',
                 'bank_type' => 'BCA',
@@ -113,6 +137,10 @@ class ShowroomRegistrationTest extends TestCase
         $showroom = $pdo->query('SELECT * FROM showrooms LIMIT 1')->fetch();
         $this->assertSame('toko-jaya-motor', $showroom['slug'], 'Slug must be normalized before it is stored.');
         $this->assertSame('Surabaya', $showroom['city_name'], 'City picked from the master must be stored.');
+        // The owner's own address lives on users.address and is a different
+        // field. Storing only that one left showrooms.address null, which is
+        // what #/seller/showroom reads.
+        $this->assertSame('Jl Showroom 9', $showroom['address'], 'Showroom address must reach the showrooms row.');
         $this->assertSame('0217654321', $showroom['phone_number']);
         $this->assertSame('BCA', $showroom['bank_type']);
         $this->assertSame('1234567890', $showroom['bank_account_number']);

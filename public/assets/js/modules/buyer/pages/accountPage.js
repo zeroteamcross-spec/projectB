@@ -1,4 +1,5 @@
 import { createPageLifecycle } from "../../../core/lifecycle.js";
+import { roleLabel } from "../../../core/roleLabels.js";
 import { appStore } from "../../../state/store.js";
 import { authStore } from "../../../state/authStore.js";
 import { mergeActiveUserIdentity, syncAuthUserPatch } from "../../../state/sync/authUserSync.js";
@@ -175,7 +176,7 @@ function accountInfoSection(user, actions) {
     ["Nama lengkap", userName(user), "user"],
     ["Email", user.email || "-", "envelope"],
     ["Nomor HP", user.phone_number || user.phone || "-", "phone"],
-    ["Role", statusLabel(user.role || "buyer"), "shield"],
+    ["Level User", roleLabel(user.role || "buyer"), "shield"],
     ["Status akun", statusLabel(user.account_status || "-"), "circleCheck"],
     ["Tanggal bergabung", formatDate(user.created_at), "calendar"],
     ["Alamat", user.address || "-", "location"],

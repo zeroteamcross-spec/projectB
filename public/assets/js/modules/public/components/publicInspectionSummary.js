@@ -161,7 +161,7 @@ function emptyInspection(car) {
   body.className = "text-xs leading-6 text-gray-600";
   body.textContent = car?.inspection_summary_status
     ? `Status ringkas listing: ${reportLabel(car.inspection_summary_status)}.`
-    : "Seller belum mempublikasikan laporan inspeksi untuk unit ini.";
+    : "Showroom belum mempublikasikan laporan inspeksi untuk unit ini.";
 
   empty.append(icon, title, body);
   return empty;

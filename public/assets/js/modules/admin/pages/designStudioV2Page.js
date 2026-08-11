@@ -91,7 +91,7 @@ function render(root, context, status) {
       header,
       EmptyState({
         title: "Design Studio V2 belum aktif",
-        description: "Menu ini membutuhkan role super_admin, feature flag Design Studio V2, dan design mode.",
+        description: "Menu ini membutuhkan level user super_admin, feature flag Design Studio V2, dan design mode.",
       }),
     );
     return;

@@ -1,4 +1,5 @@
 import { Badge } from "../../../ui/primitives/badge.js";
+import { roleLabel } from "../../../core/roleLabels.js";
 import { Button } from "../../../ui/primitives/button.js";
 import { formatDate } from "../../../utils/formatDate.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
@@ -55,7 +56,7 @@ export function AdminUsersList({
     icon,
     columns: [
       { label: "User", render: (user) => userIdentity(user) },
-      { label: "Role", render: (user) => Badge({ label: user.role || "-", variant: "default" }) },
+      { label: "Level User", render: (user) => Badge({ label: roleLabel(user.role), variant: "default" }) },
       { label: "Account", render: (user) => Badge(adminUserManagementService.statusMeta(user.account_status)) },
       { label: "Approval", render: (user) => Badge(adminUserManagementService.approvalMeta(user)) },
       { label: "Kontak", render: (user) => contactBlock(user) },
@@ -68,13 +69,13 @@ export function AdminUsersList({
     emptyTitle: "User tidak ditemukan",
     emptyDescription: "Coba ubah filter atau keyword pencarian.",
     mobileCardTitle: (user) => user.name || user.email || `User #${user.id}`,
-    mobileCardSubtitle: (user) => `${user.role || "-"} | ${formatDate(user.created_at)}`,
+    mobileCardSubtitle: (user) => `${roleLabel(user.role)} | ${formatDate(user.created_at)}`,
     mobileCardBadges: (user) => [
       Badge(adminUserManagementService.statusMeta(user.account_status)),
       Badge(adminUserManagementService.approvalMeta(user)),
     ],
     mobilePrimaryFields: (user) => [
-      { label: "Role", value: user.role || "-" },
+      { label: "Level User", value: roleLabel(user.role) },
       { label: "Telepon", value: user.phone_number || "-" },
       { label: "Account", value: adminUserManagementService.statusMeta(user.account_status).label },
     ],

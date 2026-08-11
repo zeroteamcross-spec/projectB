@@ -1,5 +1,6 @@
 import { defaultLoginPath, googleLoginPathForRole } from "../config/authUxConfig.js";
 import { roleForCurrentHost } from "./roleHosts.js";
+import { roleLabel } from "./roleLabels.js";
 
 const PUBLIC_ROLE = "public";
 const SUPER_VIEWER_ROLE = "admin";
@@ -144,19 +145,6 @@ function redirect({ route, currentRole, requiredRole, fromPath }) {
 
 function mismatchMessage(currentRole, requiredRole) {
   return `Akun ${roleLabel(currentRole)} tidak dapat membuka area ${roleLabel(requiredRole)}.`;
-}
-
-function roleLabel(role) {
-  const labels = {
-    public: "publik",
-    buyer: "buyer",
-    seller: "seller",
-    admin: "admin",
-    super_admin: "super admin",
-    affiliate_admin: "marketing admin",
-  };
-
-  return labels[role] ?? role;
 }
 
 function homeForRole(role) {

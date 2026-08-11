@@ -1,6 +1,7 @@
 import { Button } from "../../../ui/primitives/button.js";
 import { Input } from "../../../ui/primitives/input.js";
 import { NumericInput } from "../../../ui/primitives/numericInput.js";
+import { SearchableSelect } from "../../../ui/primitives/searchableSelect.js";
 import { Select } from "../../../ui/primitives/select.js";
 import { Textarea } from "../../../ui/primitives/textarea.js";
 import { tw } from "../../../ui/theme/tailwindClasses.js";
@@ -129,7 +130,19 @@ export function SellerCarForm({
     Select({ id: "slrc_has_service_book_input", name: "has_service_book", label: "Buku servis", value: serviceBookValue(values.has_service_book), options: SERVICE_BOOK_OPTIONS }),
     NumericInput({ id: "slrc_key_count_input", name: "key_count", label: "Jumlah kunci", value: values.key_count ?? "", placeholder: "2" }),
     Select({ id: "slrc_transmission_input", name: "transmission", label: "Transmisi", value: values.transmission ?? "", options: TRANSMISSION_OPTIONS }),
-    Select({ id: "slrc_location_name_input", name: "location_name", label: "Lokasi", value: values.location_name ?? "", options: cityOptionsList(cityOptions, values.location_name) })
+    // Master Lokasi bisa memuat ratusan kota, jadi ini satu-satunya kolom di
+    // form yang perlu dicari, bukan digulir.
+    SearchableSelect({
+      id: "slrc_location_name_input",
+      name: "location_name",
+      label: "Lokasi",
+      value: values.location_name ?? "",
+      options: cityOptionsList(cityOptions, values.location_name),
+      helper: cityOptions.length ? "Ketik untuk mencari kota." : "Master Lokasi belum tersedia.",
+      emptyLabel: "Kota tidak ditemukan",
+      labelClass: "grid min-w-0 gap-1.5 text-xs font-bold text-gray-700",
+      controlClass: fieldClass(),
+    })
   );
   step2.append(technical.section);
 

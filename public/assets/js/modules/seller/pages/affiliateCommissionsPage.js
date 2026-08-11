@@ -214,7 +214,7 @@ function render(root, context, actions) {
 
   if (!rulesHydratedAt && !(snapshotPayload?.global_rule || snapshotPayload?.overrides?.length)) {
     left.append(EmptyState({
-      title: "Memuat aturan komisi affiliate",
+      title: "Memuat aturan komisi marketing",
       description: "Komisi marketing sedang dimuat.",
     }));
   } else {
@@ -279,7 +279,7 @@ function summaryCards(summary, globalRule) {
 
   [
     ["Aturan umum", summary.hasGlobalRule ? sellerAffiliateCommissionService.formatValue(globalRule) : "Belum diatur", "Fallback komisi bila tidak ada aturan khusus aktif."],
-    ["Status umum", summary.hasGlobalRule ? (summary.activeGlobalRule ? "Aktif" : "Nonaktif") : "Belum ada", "Status aturan dasar seller."],
+    ["Status umum", summary.hasGlobalRule ? (summary.activeGlobalRule ? "Aktif" : "Nonaktif") : "Belum ada", "Status aturan dasar showroom."],
     ["Khusus aktif", String(summary.activeOverrides), "Aturan per mobil yang sedang aktif."],
     ["Total khusus", String(summary.totalOverrides), "Jumlah aturan khusus dari data lokal."],
   ].forEach(([label, value, note], index) => {
@@ -566,7 +566,7 @@ function openDetailModal({ rule, actions }) {
 
   openModal(content, {
     key: `${COMMISSION_MODAL_KEY}-detail`,
-    title: "Detail komisi affiliate",
+    title: "Detail komisi marketing",
     description: "Rincian aturan komisi yang sedang berlaku.",
     size: "lg",
     footer: null,
@@ -617,8 +617,8 @@ function openOverrideFormModal({ mode, selectedOverride, availableCars, carsSnap
 
   if (!carsHydratedAt && !(carsSnapshot?.cars?.length)) {
     content.append(EmptyState({
-      title: "Memuat daftar mobil seller",
-      description: "Daftar mobil seller sedang dihydrate untuk form aturan khusus.",
+      title: "Memuat daftar mobil showroom",
+      description: "Daftar mobil showroom sedang dihydrate untuk form aturan khusus.",
     }));
   } else {
     content.append(applyDesignHook(SellerCommissionOverrideForm({
@@ -679,8 +679,8 @@ function commissionDetailPanel({ rule, onEdit }) {
   const facts = document.createElement("section");
   facts.className = "grid gap-3 sm:grid-cols-2";
   [
-    ["Marketing", "Semua marketing seller"],
-    ["Kode referral", "Mengikuti slug affiliate pada transaksi"],
+    ["Marketing", "Semua marketing showroom"],
+    ["Kode referral", "Mengikuti slug marketing pada transaksi"],
     ["Transaksi / mobil", sellerAffiliateCommissionService.carLabel(rule.car)],
     ["Nilai transaksi", rule.car?.price_cash ? formatCurrency(rule.car.price_cash) : "-"],
     ["Tipe komisi", labelize(rule.commission_type)],

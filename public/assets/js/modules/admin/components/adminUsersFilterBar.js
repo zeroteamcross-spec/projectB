@@ -16,7 +16,7 @@ export function AdminUsersFilterBar({ filters = {}, counts = {}, onSubmit = null
   copy.className = "grid min-w-0 gap-1";
   copy.append(
     textBlock("text-[10px] font-black uppercase tracking-[0.16em] text-[color-mix(in_srgb,var(--pb-brand-primary)_84%,black)]", "User filter"),
-    textBlock("text-xs leading-6 text-gray-600", "Saring role, status, dan keyword supaya review operasional tetap cepat dibaca."),
+    textBlock("text-xs leading-6 text-gray-600", "Saring level user, status, dan keyword supaya review operasional tetap cepat dibaca."),
   );
   heading.append(icon, copy);
 
@@ -32,9 +32,9 @@ export function AdminUsersFilterBar({ filters = {}, counts = {}, onSubmit = null
     name: "role",
     value: filters.role ?? "",
     options: [
-      { value: "", label: "Semua role" },
+      { value: "", label: "Semua level user" },
       { value: "buyer", label: "Buyer" },
-      { value: "seller", label: "Seller" },
+      { value: "seller", label: "Showroom" },
       { value: "affiliate_admin", label: "Marketing Admin" },
       { value: "admin", label: "Admin" },
     ],

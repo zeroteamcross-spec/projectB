@@ -22,7 +22,7 @@ export function AdminDashboardSummaryCards({ summary } = {}) {
       icon: "bell",
       label: "Pending approvals",
       value: String(summary?.pendingApprovals ?? 0),
-      note: "Seller yang masih menunggu keputusan approval admin.",
+      note: "Showroom yang masih menunggu keputusan approval admin.",
       tone: "from-[var(--pb-brand-primary)] to-[var(--pb-warning)]",
       surface: "bg-[linear-gradient(135deg,rgba(255,255,255,0.94),rgba(245,236,225,0.86))] border-[var(--pb-border)]",
     },

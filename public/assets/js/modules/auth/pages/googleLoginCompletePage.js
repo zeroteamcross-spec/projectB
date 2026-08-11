@@ -110,7 +110,7 @@ function render(root, context, state, startPolling) {
   if (state.loading) {
     card.append(text("Memeriksa status Google Login..."));
   } else if (state.error) {
-    card.append(messageBox(state.error, "error"), navButton("Kembali ke Google Login Seller", () => context.router.navigate("/google-login/seller")));
+    card.append(messageBox(state.error, "error"), navButton("Kembali ke Google Login Showroom", () => context.router.navigate("/google-login/seller")));
   } else if (isPendingApproval) {
     card.append(pendingApprovalPanel(context, state, root, startPolling));
   } else if (state.done) {
@@ -164,7 +164,7 @@ function completionForm(root, context, state) {
   form.append(hint);
 
   const submit = Button({
-    label: state.submitting ? "Menyimpan..." : "Simpan data seller",
+    label: state.submitting ? "Menyimpan..." : "Simpan data showroom",
     variant: "primary",
     disabled: state.submitting,
   });
@@ -216,7 +216,7 @@ function donePanel(context, done) {
   wrap.append(messageBox(done.message || "Profil Google berhasil dilengkapi.", done.status === "ready" ? "info" : "warning"));
 
   if (done.target) {
-    wrap.append(navButton(done.status === "ready" ? "Lanjut" : "Buka Login Seller", () => context.router.navigate(done.target)));
+    wrap.append(navButton(done.status === "ready" ? "Lanjut" : "Buka Login Showroom", () => context.router.navigate(done.target)));
   }
 
   return wrap;

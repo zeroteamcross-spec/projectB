@@ -83,10 +83,34 @@ const ICONS = {
 
 export const iconRegistry = Object.freeze(Object.keys(ICONS));
 
+/**
+ * Icon di aplikasi ini adalah font icon: glyph-nya digambar oleh ::before,
+ * bukan oleh elemen tersendiri. Jadi kotak <i> bisa duduk persis di tengah
+ * lingkarannya sementara glyph di dalam kotak itu tidak.
+ *
+ * Ukuran kotak datang dari h-4 w-4 (16px), ukuran glyph dari font-size yang
+ * diwarisi. Selama keduanya kebetulan sama besar glyph terlihat pas. Begitu
+ * font seluruh aplikasi dikecilkan satu langkah, font-size turun ke 12px
+ * sementara kotaknya tetap 16px -- dan karena baris teks menempel ke atas
+ * dengan text-align start, glyph pindah ke pojok kiri atas.
+ *
+ * Ditulis sebagai style inline, bukan kelas: 78 dari 322 pemanggil createIcon
+ * sudah mengirim display sendiri lewat className (block, grid, inline-block),
+ * dan siapa yang menang antar kelas Tailwind ditentukan urutan di stylesheet,
+ * bukan urutan di atribut class. Style inline menang tanpa perlu ditebak.
+ */
+function pusatkanGlyph(icon) {
+  icon.style.display = "inline-flex";
+  icon.style.alignItems = "center";
+  icon.style.justifyContent = "center";
+  icon.style.lineHeight = "1";
+}
+
 export function createIcon(name, { className = "", title = "" } = {}) {
   const icon = document.createElement("i");
   icon.className = `${ICONS[name] ?? ICONS.brandMark} ${className}`.trim();
   icon.setAttribute("aria-hidden", title ? "false" : "true");
+  pusatkanGlyph(icon);
 
   if (title) {
     icon.setAttribute("role", "img");

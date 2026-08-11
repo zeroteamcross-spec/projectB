@@ -272,7 +272,7 @@ function filterBar({ uiState, actions }) {
   input.id = "byrtx_search_input";
   input.type = "search";
   input.value = uiState.search;
-  input.placeholder = "Cari transaksi, mobil, atau seller...";
+  input.placeholder = "Cari transaksi, mobil, atau showroom...";
   input.autocomplete = "off";
   input.className = "min-h-10 min-w-0 border-0 bg-transparent text-xs font-semibold text-[var(--pb-text)] outline-none placeholder:text-[var(--pb-text-muted)]";
   input.addEventListener("input", () => actions.setSearch(input.value));
@@ -767,7 +767,7 @@ function transactionCarLabel(transaction) {
 }
 
 function sellerLabel(transaction) {
-  return transaction.seller?.name || transaction.showroom?.name || transaction.car?.seller?.name || transaction.car?.showroom?.name || "Seller terdaftar";
+  return transaction.seller?.name || transaction.showroom?.name || transaction.car?.seller?.name || transaction.car?.showroom?.name || "Showroom terdaftar";
 }
 
 function paymentTypeLabel(paymentType) {

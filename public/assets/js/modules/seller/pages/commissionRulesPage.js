@@ -172,7 +172,7 @@ function render(root, context, actions) {
 
   if (!cars.length && !(carsSnapshot?.cars?.length)) {
     right.replaceChildren(EmptyState({
-      title: "Mobil seller belum tersedia",
+      title: "Mobil showroom belum tersedia",
       description: "Tambahkan mobil lebih dulu sebelum membuat override komisi per mobil.",
     }));
   }

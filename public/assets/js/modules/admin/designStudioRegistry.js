@@ -5,7 +5,7 @@ export const DESIGN_STUDIO_PREVIEW_ROUTES = [
   { id: "affiliate-dashboard", label: "Marketing Dashboard", route: "/#/affiliate", roleContext: "affiliate_admin", viewportPresets: ["mobile", "desktop"] },
   { id: "affiliate-ledger", label: "Marketing Ledger", route: "/#/affiliate/ledger", roleContext: "affiliate_admin", viewportPresets: ["mobile", "desktop"] },
   { id: "affiliate-settlements", label: "Marketing Settlements", route: "/#/affiliate/settlements", roleContext: "affiliate_admin", viewportPresets: ["mobile", "desktop"] },
-  { id: "seller-dashboard", label: "Seller Dashboard", route: "/#/seller", roleContext: "seller", viewportPresets: ["mobile", "desktop"] },
+  { id: "seller-dashboard", label: "Showroom Dashboard", route: "/#/seller", roleContext: "seller", viewportPresets: ["mobile", "desktop"] },
   { id: "admin-dashboard", label: "Admin Dashboard", route: "/#/admin", roleContext: "admin", viewportPresets: ["desktop"] },
 ];
 

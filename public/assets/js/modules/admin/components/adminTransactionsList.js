@@ -53,7 +53,7 @@ export function AdminTransactionsList({
     icon,
     columns: [
       { label: "Transaksi", render: (transaction) => transactionIdentity(transaction) },
-      { label: "Buyer / Seller", render: (transaction) => partyBlock(transaction) },
+      { label: "Buyer / Showroom", render: (transaction) => partyBlock(transaction) },
       { label: "Payment", render: (transaction) => paymentBlock(transaction) },
       { label: "Status", render: (transaction) => statusBlock(transaction) },
       { label: "Timeline", render: (transaction) => timelineBlock(transaction) },
@@ -63,7 +63,7 @@ export function AdminTransactionsList({
     rows: transactions,
     mobileMode: "disclosure",
     emptyTitle: "Transaksi belum tersedia",
-    emptyDescription: "Daftar transaksi admin akan muncul setelah ada aktivitas buyer dan seller atau saat filter cocok.",
+    emptyDescription: "Daftar transaksi admin akan muncul setelah ada aktivitas buyer dan showroom atau saat filter cocok.",
     mobileCardTitle: (transaction) => transaction.transaction_code || `TRX #${transaction.id}`,
     mobileCardSubtitle: (transaction) => `${transaction.buyer?.name || "-"} -> ${transaction.seller?.name || "-"}`,
     mobileCardBadges: (transaction) => [
@@ -122,7 +122,7 @@ function partyBlock(transaction) {
   wrap.className = "grid min-w-0 gap-1";
   wrap.append(
     iconLine("user", transaction.buyer?.name || "Buyer terdaftar"),
-    iconLine("showroom", transaction.seller?.name || "Seller terdaftar"),
+    iconLine("showroom", transaction.seller?.name || "Showroom terdaftar"),
     textBlock("break-words text-xs text-gray-500", transaction.showroom?.name || "-"),
   );
   return wrap;

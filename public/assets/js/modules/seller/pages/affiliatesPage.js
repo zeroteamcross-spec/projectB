@@ -232,8 +232,8 @@ function render(root, modalHost, context, actions) {
   frame.className = "mx-auto grid w-full max-w-[1180px] gap-6";
   frame.append(
     SectionHeader({
-      title: "Marketing Seller",
-      description: "Kelola marketing milik seller, siapkan slug publik, dan arahkan CTA landing ke nomor WhatsApp marketing yang tepat.",
+      title: "Marketing Showroom",
+      description: "Kelola marketing milik showroom, siapkan slug publik, dan arahkan CTA landing ke nomor WhatsApp marketing yang tepat.",
       action: Button({ label: "Marketing baru", onClick: () => actions.createNew(), designHook: "shared.button.primary" }),
     }),
     applyDesignHook(summaryCards(counts), "seller.affiliates.summary"),
@@ -247,7 +247,7 @@ function render(root, modalHost, context, actions) {
 
   if (!listHydratedAt && !(snapshotPayload?.affiliates?.length)) {
     listWrap.append(EmptyState({
-      title: "Memuat marketing seller",
+      title: "Memuat marketing showroom",
       description: "Daftar marketing sedang dimuat.",
     }));
   } else {

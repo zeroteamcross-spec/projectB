@@ -15,7 +15,7 @@ const ROLE_OPTIONS = [
   },
   {
     role: "seller",
-    label: "Seller",
+    label: "Showroom",
     icon: "showroom",
     futureCopy: "Showroom dan listing.",
   },
@@ -212,8 +212,8 @@ function brandAnchor({ requestedPath }) {
   const body = document.createElement("p");
   body.className = "max-w-md text-xs leading-6 text-gray-600 sm:text-sm";
   body.textContent = requestedPath
-    ? "Pilih role, lalu lanjutkan ke halaman tujuan."
-    : "Satu pintu untuk buyer, seller, admin, dan affiliate.";
+    ? "Pilih level user, lalu lanjutkan ke halaman tujuan."
+    : "Satu pintu untuk buyer, showroom, admin, dan marketing.";
 
   const rail = document.createElement("div");
   rail.className = "flex flex-wrap gap-2 text-[10px] font-semibold text-gray-600";
@@ -338,7 +338,7 @@ function authPanel({
       link.addEventListener("click", () => onNavigate?.(registerPath));
       note.append(link);
     } else {
-      note.textContent = "Role ini memakai akun dari admin.";
+      note.textContent = "Level User ini memakai akun dari admin.";
     }
 
     section.append(note);
@@ -448,7 +448,7 @@ function registerForm({ selectedRole, isSubmitting, error, onSubmit }) {
   const helper = document.createElement("p");
   helper.className = "text-xs leading-6 text-gray-600";
   helper.textContent = selectedRole === "seller"
-    ? "Akun seller akan masuk antrean approval admin sebelum bisa login."
+    ? "Akun showroom akan masuk antrean approval admin sebelum bisa login."
     : "Akun buyer aktif setelah registrasi dan akan langsung diarahkan ke area buyer.";
   form.append(helper);
 
@@ -586,7 +586,7 @@ async function registerSelectedRole(payload, context, state, root) {
     }
 
     state.authMode = "login";
-    showToast("Registrasi seller berhasil. Tunggu approval admin sebelum login.", { type: "success" });
+    showToast("Registrasi showroom berhasil. Tunggu approval admin sebelum login.", { type: "success" });
   } catch (error) {
     state.error = error.message || "Registrasi gagal.";
     showToast(state.error, { type: "error" });
@@ -629,5 +629,5 @@ function registerEmailPlaceholder(role) {
 }
 
 function registerSubmitLabel(role) {
-  return role === "seller" ? "Daftar seller" : "Daftar buyer";
+  return role === "seller" ? "Daftar showroom" : "Daftar buyer";
 }

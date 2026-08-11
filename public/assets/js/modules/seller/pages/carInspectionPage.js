@@ -75,7 +75,7 @@ function render(root, router, params) {
   backButton.id = "slrinsp_back_to_cars_button";
   const header = SectionHeader({
     title,
-    description: "Kelola inspection report seller untuk mobil ini.",
+    description: "Kelola inspection report showroom untuk mobil ini.",
     action: backButton,
   });
 
@@ -89,7 +89,7 @@ function render(root, router, params) {
       header,
       EmptyState({
         title: "Mobil tidak ditemukan",
-        description: "Pastikan inspection dibuka dari list mobil seller yang aktif.",
+        description: "Pastikan inspection dibuka dari list mobil showroom yang aktif.",
       })
     );
     return;
@@ -142,7 +142,7 @@ function render(root, router, params) {
   } else {
     body.append(EmptyState({
       title: "Master inspection belum tersedia",
-      description: "Checklist seller akan tampil setelah admin mengaktifkan master inspection.",
+      description: "Checklist showroom akan tampil setelah admin mengaktifkan master inspection.",
     }));
   }
 

@@ -57,7 +57,7 @@ function transactionsTable(transactions) {
     icon,
     columns: [
       { label: "Kode", render: (transaction) => textBlock("font-bold text-gray-950", transaction.transaction_code || `TRX #${transaction.id}`) },
-      { label: "Buyer / Seller", render: (transaction) => textBlock("text-gray-600", `${transaction.buyer?.name || "-"} -> ${transaction.seller?.name || "-"}`) },
+      { label: "Buyer / Showroom", render: (transaction) => textBlock("text-gray-600", `${transaction.buyer?.name || "-"} -> ${transaction.seller?.name || "-"}`) },
       { label: "Mobil", render: (transaction) => textBlock("text-gray-600", `${transaction.car?.brand_name || "-"} ${transaction.car?.model_name || ""}`.trim() || "-") },
       { label: "Nilai", render: (transaction) => textBlock("font-semibold text-gray-950", paymentLabel(transaction)) },
       { label: "Status", render: (transaction) => badgeNode(transaction) },
@@ -78,7 +78,7 @@ function transactionsTable(transactions) {
     mobileDisclosureFields: (transaction) => [
       { label: "Status", value: adminDashboardService.transactionStatusMeta(transaction.transaction_status).label },
       { label: "Buyer", value: transaction.buyer?.name || "-" },
-      { label: "Seller", value: transaction.seller?.name || "-" },
+      { label: "Showroom", value: transaction.seller?.name || "-" },
     ],
     mobileCardId: (transaction, index) => `adm_dashboard_transaction_${transaction.id ?? index + 1}_row`,
     tableMinWidth: "min-w-[760px]",

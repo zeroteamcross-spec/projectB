@@ -68,7 +68,7 @@ export function AdminUserDetailPanel({
 
   if (adminUserManagementService.isPendingApproval(user)) {
     const approve = Button({
-      label: approvingUserId === user.id ? "Memproses approval..." : "Approve seller",
+      label: approvingUserId === user.id ? "Memproses approval..." : "Approve showroom",
       variant: "secondary",
       disabled: approvingUserId !== null,
       onClick: () => onApprove?.(user),
@@ -93,7 +93,7 @@ export function AdminUserDetailPanel({
 
   if (adminUserManagementService.isPendingApproval(user)) {
     actions.append(textBlock("text-xs leading-6 text-[color-mix(in_srgb,var(--pb-warning)_84%,black)] sm:col-span-2",
-      "Approval seller akan mengubah akun menjadi active dan approved sebelum user dipakai normal di flow seller."));
+      "Approval showroom akan mengubah akun menjadi active dan approved sebelum user dipakai normal di flow showroom."));
   }
 
   panel.append(heading, facts, actions);

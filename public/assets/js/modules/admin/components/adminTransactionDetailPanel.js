@@ -20,7 +20,7 @@ export function AdminTransactionDetailPanel({ transaction = null, isHydrating = 
   if (!transaction) {
     aside.append(EmptyState({
       title: "Pilih transaksi",
-      description: "Buka item dari daftar untuk melihat buyer, seller, nominal, dan status pembayaran secara lengkap.",
+      description: "Buka item dari daftar untuk melihat buyer, showroom, nominal, dan status pembayaran secara lengkap.",
     }));
     return aside;
   }
@@ -41,7 +41,7 @@ export function AdminTransactionDetailPanel({ transaction = null, isHydrating = 
       ["Email", transaction?.buyer?.email ?? "-"],
     ]),
     factsCard("Seller", [
-      ["Nama", transaction?.seller?.name ?? "Seller terdaftar"],
+      ["Nama", transaction?.seller?.name ?? "Showroom terdaftar"],
       ["Email", transaction?.seller?.email ?? "-"],
       ["Showroom", transaction?.showroom?.name ?? "-"],
     ]),

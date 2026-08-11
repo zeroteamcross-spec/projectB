@@ -36,8 +36,8 @@ export function SellerShowroomPanel({ summary = {} } = {}) {
     "p",
     "max-w-3xl text-xs leading-6 text-gray-600",
     summary.showroomReady
-      ? "Profil showroom sudah cukup untuk memulai pengelolaan listing dan transaksi seller."
-      : "Lengkapi showroom sebelum UAT seller agar listing dan transaksi lebih mudah diverifikasi.",
+      ? "Profil showroom sudah cukup untuk memulai pengelolaan listing dan transaksi showroom."
+      : "Lengkapi showroom sebelum UAT showroom agar listing dan transaksi lebih mudah diverifikasi.",
   );
 
   const facts = document.createElement("section");

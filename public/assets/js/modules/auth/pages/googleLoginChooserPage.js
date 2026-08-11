@@ -34,7 +34,7 @@ function render(root, context) {
 
   const body = document.createElement("p");
   body.className = "mx-auto max-w-2xl text-xs leading-7 text-gray-600 sm:text-sm";
-  body.textContent = "Gunakan halaman Google Login sesuai role akun. Login lama tetap tersedia hanya lewat URL manual untuk kebutuhan darurat.";
+  body.textContent = "Gunakan halaman Google Login sesuai level user akun. Login lama tetap tersedia hanya lewat URL manual untuk kebutuhan darurat.";
 
   header.append(eyebrow, title, body);
 

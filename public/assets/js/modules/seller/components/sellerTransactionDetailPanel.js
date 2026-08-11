@@ -22,7 +22,7 @@ export function SellerTransactionDetailPanel({
   if (!transaction) {
     return EmptyState({
       title: "Detail transaksi tidak tersedia",
-      description: "Buka transaksi dari daftar seller yang aktif.",
+      description: "Buka transaksi dari daftar showroom yang aktif.",
     });
   }
 
@@ -172,7 +172,7 @@ function checklistItem({ item, draft, disabled, onToggle, onNote, onDate }) {
   const note = document.createElement("textarea");
   note.id = `slrtx_checklist_${item.key}_notes_input`;
   note.value = stripHandoverDate(draft?.notes ?? "");
-  note.placeholder = "Catatan seller";
+  note.placeholder = "Catatan showroom";
   note.disabled = disabled;
   note.rows = 2;
   note.className = "min-w-0 resize-y rounded-[0.9rem] border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-800 outline-none transition placeholder:text-[var(--pb-text-muted)] focus:border-[color-mix(in_srgb,var(--pb-brand-primary)_45%,white)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)] disabled:bg-gray-100 disabled:text-gray-500";

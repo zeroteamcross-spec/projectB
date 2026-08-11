@@ -28,7 +28,7 @@ function renderRoleGuardPage(config, context) {
 
   const title = document.createElement("h1");
   title.className = tw.text.title;
-  title.textContent = config.title ?? "Halaman ini membutuhkan role yang berbeda.";
+  title.textContent = config.title ?? "Halaman ini membutuhkan level user yang berbeda.";
 
   const body = document.createElement("p");
   body.className = `max-w-2xl text-xs leading-6 md:text-sm ${tw.text.muted}`;

@@ -284,6 +284,17 @@ function registerPanel(state, actions, context) {
         value: state.draft.city_name,
         error: state.fieldErrors["showroom.city_name"],
       }),
+      // Alamat showroom, bukan alamat pemilik di atas. Keduanya memang terpisah:
+      // yang ini yang tampil di #/seller/showroom dan di halaman publik showroom.
+      textareaField({
+        id: "shr_register_showroom_address_input",
+        name: "showroom_address",
+        label: "Alamat showroom",
+        placeholder: "Alamat lengkap showroom",
+        required: false,
+        value: state.draft.showroom_address,
+        error: state.fieldErrors["showroom.address"],
+      }),
       field({
         id: "shr_register_showroom_phone_input",
         name: "showroom_phone_number",
@@ -384,6 +395,7 @@ function registerPanel(state, actions, context) {
       showroom: {
         name: String(data.showroom_name ?? "").trim(),
         slug: normalizeSlug(data.showroom_slug),
+        address: emptyToNull(data.showroom_address),
         city_name: emptyToNull(data.city_name),
         phone_number: emptyToNull(data.showroom_phone_number),
         bank_type: emptyToNull(data.bank_type),

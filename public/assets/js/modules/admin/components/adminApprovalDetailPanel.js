@@ -1,4 +1,5 @@
 import { Badge } from "../../../ui/primitives/badge.js";
+import { roleLabel } from "../../../core/roleLabels.js";
 import { Button } from "../../../ui/primitives/button.js";
 import { EmptyState } from "../../../ui/primitives/emptyState.js";
 import { formatDate } from "../../../utils/formatDate.js";
@@ -52,7 +53,7 @@ export function AdminApprovalDetailPanel({
   const badges = document.createElement("div");
   badges.className = "flex flex-wrap gap-2";
   badges.append(
-    Badge({ label: user.role || "-", variant: "default" }),
+    Badge({ label: roleLabel(user.role), variant: "default" }),
     Badge({ label: meta.label, variant: meta.variant }),
     Badge({ label: user.account_status || "-", variant: user.account_status === "active" ? "success" : "warning" }),
   );

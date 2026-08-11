@@ -218,7 +218,7 @@ function carQueueSection({ cars, overview }) {
   const copy = node("section", "slrinsp_queue_copy_section", "grid min-w-0 gap-1");
   copy.append(
     textNode("p", "text-[10px] font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", "Data halaman"),
-    textNode("h2", "text-lg font-black tracking-normal text-gray-950", "Daftar inspeksi seller"),
+    textNode("h2", "text-lg font-black tracking-normal text-gray-950", "Daftar inspeksi showroom"),
     textNode("p", "text-xs leading-6 text-gray-500", `${cars.length} mobil tersedia dari state halaman`)
   );
   const refreshHint = textNode("p", "rounded-full border border-[color-mix(in_srgb,var(--pb-success)_14%,white)] bg-[color-mix(in_srgb,var(--pb-success)_8%,white)] px-3 py-1 text-[10px] font-bold text-[color-mix(in_srgb,var(--pb-success)_84%,black)]", "Hydrate background aktif");
@@ -355,7 +355,7 @@ function emptyReportSection({ car, templates, runtime }) {
   section.append(
     EmptyState({
       title: templates.length ? "Checklist belum dibuat" : "Master inspeksi belum tersedia",
-      description: templates.length ? "Draft dibuat dari master inspection paten yang sudah dipreload." : "Jalankan seed master inspection canon sebelum seller mengisi checklist.",
+      description: templates.length ? "Draft dibuat dari master inspection paten yang sudah dipreload." : "Jalankan seed master inspection canon sebelum showroom mengisi checklist.",
     }),
     actions
   );

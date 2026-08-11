@@ -58,7 +58,7 @@ export function AdminMasterSidebarList({
     icon,
     columns: [
       { label: "Menu", render: (item) => menuCell(item) },
-      { label: "Role", render: (item) => pill(item.role) },
+      { label: "Level User", render: (item) => pill(item.role) },
       { label: "Parent", render: (item) => textBlock("text-xs font-semibold text-gray-800", item.parent_key || "-") },
       { label: "Urutan", render: (item) => textBlock("text-xs font-black text-gray-950", String(item.order ?? 0)) },
       { label: "Status", render: (item) => statusGroup(item) },
@@ -73,7 +73,7 @@ export function AdminMasterSidebarList({
     mobileCardSubtitle: (item) => `${item.role} | ${item.route || "parent only"}`,
     mobileCardBadges: (item) => [visibilityBadge(item), activeBadge(item)],
     mobilePrimaryFields: (item) => [
-      { label: "Role", value: item.role },
+      { label: "Level User", value: item.role },
       { label: "Icon", value: item.icon },
       { label: "Urutan", value: String(item.order ?? 0) },
     ],
@@ -109,7 +109,7 @@ function reorderBoard({ items = [], onReorder = null }) {
   copy.className = "grid gap-1";
   copy.append(
     textBlock("text-[10px] font-black uppercase tracking-[0.16em] text-[color-mix(in_srgb,var(--pb-brand-primary)_84%,black)]", "Drag & drop ordering"),
-    textBlock("text-xs font-semibold text-gray-700", "Geser kartu menu untuk mengubah urutan role yang sedang dipilih."),
+    textBlock("text-xs font-semibold text-gray-700", "Geser kartu menu untuk mengubah urutan level user yang sedang dipilih."),
   );
   const controls = document.createElement("div");
   controls.className = "flex flex-wrap items-center gap-2";
@@ -134,7 +134,7 @@ function reorderBoard({ items = [], onReorder = null }) {
     const empty = document.createElement("section");
     empty.id = "admst_sidebar_reorder_empty_section";
     empty.className = "rounded-[1.25rem] border border-dashed border-[var(--pb-border)] bg-white/70 px-4 py-5 text-xs font-semibold text-gray-500";
-    empty.textContent = "Pilih role Admin, Seller, atau Marketing untuk mengatur urutan menu.";
+    empty.textContent = "Pilih level user Admin, Showroom, atau Marketing untuk mengatur urutan menu.";
     list.append(empty);
     section.append(head, list);
     return section;

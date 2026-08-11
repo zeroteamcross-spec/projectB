@@ -7,7 +7,7 @@ export function AffiliateOwnerPanel({ affiliate = null } = {}) {
 
   const title = document.createElement("h2");
   title.className = `${tw.text.sectionTitle} min-w-0 break-words`;
-  title.textContent = "Seller owner";
+  title.textContent = "Showroom owner";
 
   const inset = document.createElement("div");
   inset.className = `grid min-w-0 gap-3 ${tw.surface.inset}`;

@@ -283,7 +283,7 @@ function heroTrustRow() {
   [
     "Data mobil aktif sudah dibawa dari detail page",
     "Payment session dibuat tanpa memutus funnel public",
-    "Affiliate context tetap ikut bila sedang aktif",
+    "Marketing context tetap ikut bila sedang aktif",
   ].forEach((copy) => {
     const item = document.createElement("p");
     item.className = "break-words rounded-2xl bg-[var(--pb-surface-muted)] px-3 py-2";

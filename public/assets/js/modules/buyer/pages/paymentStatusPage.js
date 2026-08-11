@@ -271,7 +271,7 @@ function carSummary(transaction) {
   name.textContent = [transaction?.car?.brand_name, transaction?.car?.model_name].filter(Boolean).join(" ") || `Mobil #${transaction?.car_id ?? "-"}`;
   const seller = document.createElement("p");
   seller.className = "text-xs text-gray-500";
-  seller.textContent = transaction?.seller?.name ? `Seller: ${transaction.seller.name}` : "Seller terdaftar";
+  seller.textContent = transaction?.seller?.name ? `Seller: ${transaction.seller.name}` : "Showroom terdaftar";
   section.append(title, name, seller);
   return section;
 }
@@ -291,12 +291,12 @@ function paymentSuccessPanel(transaction) {
   body.className = "text-xs leading-6 text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
   body.textContent = isCompleted
     ? "Buyer sudah menyelesaikan transaksi ini."
-    : "Pembayaran Anda sudah diterima 100%. Transaksi sedang diproses oleh showroom/seller.";
+    : "Pembayaran Anda sudah diterima 100%. Transaksi sedang diproses oleh showroom.";
   const detail = document.createElement("p");
   detail.className = "text-xs leading-6 text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
   detail.textContent = isCompleted
     ? "Terima kasih, status akhir transaksi sudah tercatat."
-    : "Tim seller akan menyiapkan dokumen dan proses serah terima kendaraan.";
+    : "Tim showroom akan menyiapkan dokumen dan proses serah terima kendaraan.";
   copy.append(title, body, detail);
 
   const action = Button({
@@ -327,7 +327,7 @@ function fulfillmentProgressPanel({ transaction, isFinishing = false, onFinish =
   copy.className = "grid gap-1";
   const eyebrow = document.createElement("p");
   eyebrow.className = tw.text.eyebrow;
-  eyebrow.textContent = "Proses seller";
+  eyebrow.textContent = "Proses showroom";
   const title = document.createElement("h2");
   title.className = "text-base font-bold tracking-normal text-gray-950";
   title.textContent = "Checklist penyelesaian";
@@ -335,7 +335,7 @@ function fulfillmentProgressPanel({ transaction, isFinishing = false, onFinish =
   body.className = "text-xs leading-6 text-gray-600";
   body.textContent = isCompleted
     ? "Semua proses sudah selesai dan transaksi sudah ditutup."
-    : "Buyer bisa menyelesaikan transaksi setelah seluruh checklist seller selesai.";
+    : "Buyer bisa menyelesaikan transaksi setelah seluruh checklist showroom selesai.";
   copy.append(eyebrow, title, body);
 
   const progress = document.createElement("span");
@@ -406,7 +406,7 @@ function handoverInstructionPanel() {
   title.textContent = "Instruksi serah terima";
   const body = document.createElement("p");
   body.className = "text-xs leading-6 text-gray-600";
-  body.textContent = "Seller akan menghubungi buyer untuk jadwal serah terima, kesiapan dokumen, dan konfirmasi unit.";
+  body.textContent = "Showroom akan menghubungi buyer untuk jadwal serah terima, kesiapan dokumen, dan konfirmasi unit.";
 
   section.append(eyebrow, title, body);
   return section;
@@ -732,7 +732,7 @@ async function finishTransaction(context, flags) {
   }
 
   if (!isFulfillmentChecklistComplete(transaction)) {
-    showToast("Checklist seller belum lengkap.", { type: "error" });
+    showToast("Checklist showroom belum lengkap.", { type: "error" });
     return;
   }
 

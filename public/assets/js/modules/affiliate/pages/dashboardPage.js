@@ -136,7 +136,7 @@ function render(root, context, notFound, actions) {
   if (!affiliate) {
     frame.append(EmptyState({
       title: "Marketing belum siap",
-      description: "Akun ini belum terhubung ke profil marketing aktif. Seller perlu membuat marketing terlebih dahulu atau data marketing belum lengkap.",
+      description: "Akun ini belum terhubung ke profil marketing aktif. Showroom perlu membuat marketing terlebih dahulu atau data marketing belum lengkap.",
     }));
     root.replaceChildren(AffiliateAccountLayout({
       activePath: context.path,

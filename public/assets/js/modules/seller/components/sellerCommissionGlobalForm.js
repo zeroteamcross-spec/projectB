@@ -21,7 +21,7 @@ export function SellerCommissionGlobalForm({
   header.className = "grid gap-2";
   header.append(
     textBlock("text-xs font-semibold text-gray-500", "Aturan komisi umum"),
-    textBlock("text-lg font-bold text-gray-950", "Atur komisi dasar seluruh mobil seller"),
+    textBlock("text-lg font-bold text-gray-950", "Atur komisi dasar seluruh mobil showroom"),
     textBlock(`text-xs ${tw.text.muted}`, sellerAffiliateCommissionService.priorityCopy()),
   );
 
@@ -82,12 +82,12 @@ export function SellerCommissionGlobalForm({
 
   const valueHint = textBlock(`text-xs ${tw.text.muted}`, draft.commission_type === "percent"
     ? "Gunakan angka 0 sampai 100 untuk persen komisi."
-    : "Gunakan nominal rupiah tetap yang berlaku untuk seluruh mobil seller.");
+    : "Gunakan nominal rupiah tetap yang berlaku untuk seluruh mobil showroom.");
 
   typeSelect.addEventListener("change", () => {
     valueHint.textContent = typeSelect.value === "percent"
       ? "Gunakan angka 0 sampai 100 untuk persen komisi."
-      : "Gunakan nominal rupiah tetap yang berlaku untuk seluruh mobil seller.";
+      : "Gunakan nominal rupiah tetap yang berlaku untuk seluruh mobil showroom.";
   });
 
   const statusField = document.createElement("label");

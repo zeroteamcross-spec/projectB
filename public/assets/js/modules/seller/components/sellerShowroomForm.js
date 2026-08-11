@@ -20,7 +20,7 @@ export function SellerShowroomForm({ showroom = null, saving = false, error = ""
 
   const helper = document.createElement("p");
   helper.className = `max-w-2xl text-xs leading-6 ${tw.text.muted}`;
-  helper.textContent = "Isi data utama showroom dan rekening seller untuk kebutuhan transaksi.";
+  helper.textContent = "Isi data utama showroom dan rekening showroom untuk kebutuhan transaksi.";
   header.append(eyebrow, title, helper);
 
   const errorNode = document.createElement("p");

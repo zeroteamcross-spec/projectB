@@ -1,4 +1,5 @@
 import { Badge } from "../../../ui/primitives/badge.js";
+import { roleLabel } from "../../../core/roleLabels.js";
 import { Button } from "../../../ui/primitives/button.js";
 import { formatDate } from "../../../utils/formatDate.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
@@ -53,7 +54,7 @@ export function AdminApprovalQueueList({
     icon,
     columns: [
       { label: "User", render: (user) => userIdentity(user) },
-      { label: "Role", render: (user) => Badge({ label: user.role || "-", variant: "default" }) },
+      { label: "Level User", render: (user) => Badge({ label: roleLabel(user.role), variant: "default" }) },
       { label: "Status", render: (user) => Badge(adminApprovalQueueService.approvalMeta(user)) },
       { label: "Showroom", render: (user) => textBlock("max-w-[220px] text-xs font-semibold text-gray-800", user.showroom?.name || "-") },
       { label: "Dibuat", render: (user) => textBlock("whitespace-nowrap text-xs text-gray-600", formatDate(user.created_at)) },
@@ -64,13 +65,13 @@ export function AdminApprovalQueueList({
     emptyTitle: "Approval queue kosong",
     emptyDescription: "Tidak ada user pending yang cocok dengan filter saat ini.",
     mobileCardTitle: (user) => user.name || user.email || `User #${user.id}`,
-    mobileCardSubtitle: (user) => `${user.role || "-"} | ${formatDate(user.created_at)}`,
+    mobileCardSubtitle: (user) => `${roleLabel(user.role)} | ${formatDate(user.created_at)}`,
     mobileCardBadges: (user) => [
       Badge(adminApprovalQueueService.approvalMeta(user)),
       Badge({ label: user.account_status || "-", variant: "default" }),
     ],
     mobilePrimaryFields: (user) => [
-      { label: "Role", value: user.role || "-" },
+      { label: "Level User", value: roleLabel(user.role) },
       { label: "Approval", value: adminApprovalQueueService.approvalMeta(user).label },
       { label: "Showroom", value: user.showroom?.name || "-" },
     ],

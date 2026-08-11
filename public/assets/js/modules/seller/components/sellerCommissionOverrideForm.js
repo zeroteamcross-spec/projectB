@@ -36,7 +36,7 @@ export function SellerCommissionOverrideForm({
     textBlock("text-lg font-bold text-gray-950", mode === "edit"
       ? sellerAffiliateCommissionService.carLabel(rule?.car)
       : "Buat aturan untuk mobil tertentu"),
-    textBlock(`text-xs ${tw.text.muted}`, "Gunakan aturan khusus jika mobil tertentu butuh komisi berbeda dari aturan umum seller."),
+    textBlock(`text-xs ${tw.text.muted}`, "Gunakan aturan khusus jika mobil tertentu butuh komisi berbeda dari aturan umum showroom."),
   );
 
   if (mode === "edit" && rule) {
@@ -136,7 +136,7 @@ export function SellerCommissionOverrideForm({
 
   const hint = document.createElement("div");
   hint.className = tw.surface.inset;
-  hint.append(textBlock(`text-xs ${tw.text.muted}`, "Jika aturan khusus nonaktif, perhitungan komisi akan kembali memakai aturan umum seller bila aktif."));
+  hint.append(textBlock(`text-xs ${tw.text.muted}`, "Jika aturan khusus nonaktif, perhitungan komisi akan kembali memakai aturan umum showroom bila aktif."));
 
   form.append(carField, typeField, valueField, statusField, hint);
 

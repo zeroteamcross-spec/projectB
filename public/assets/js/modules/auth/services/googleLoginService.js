@@ -25,10 +25,10 @@ const ROLE_CONFIG = Object.freeze({
   seller: {
     role: "seller",
     slug: "seller",
-    label: "Seller",
-    title: "Google Login Seller",
-    subtitle: "Masuk atau daftar sebagai Seller dengan Google.",
-    warning: "Seller baru wajib melengkapi WhatsApp format 62 dan data showroom.",
+    label: "Showroom",
+    title: "Google Login Showroom",
+    subtitle: "Masuk atau daftar sebagai Showroom dengan Google.",
+    warning: "Showroom baru wajib melengkapi WhatsApp format 62 dan data showroom.",
     home: "/seller",
     googleEnabled: true,
   },
@@ -38,7 +38,7 @@ const ROLE_CONFIG = Object.freeze({
     label: "Marketing",
     title: "Google Login Marketing",
     subtitle: "Marketing tetap memakai login user/password.",
-    warning: "Google Login Marketing dinonaktifkan sesuai policy onboarding affiliate.",
+    warning: "Google Login Marketing dinonaktifkan sesuai policy onboarding marketing.",
     home: "/affiliate",
     googleEnabled: false,
   },
@@ -68,7 +68,7 @@ export const googleLoginService = {
 
   async begin(config, next = "", showroomSlug = "") {
     if (!config?.role || !config.googleEnabled) {
-      throw new Error(config?.warning || "Google Login tidak tersedia untuk role ini.");
+      throw new Error(config?.warning || "Google Login tidak tersedia untuk level user ini.");
     }
 
     const status = await this.status();
@@ -80,7 +80,7 @@ export const googleLoginService = {
     const roleStatus = status.roles?.[config.slug] ?? status.roles?.[config.role] ?? null;
 
     if (roleStatus && roleStatus.enabled === false) {
-      throw new Error(roleStatus.message || "Google Login tidak tersedia untuk role ini.");
+      throw new Error(roleStatus.message || "Google Login tidak tersedia untuk level user ini.");
     }
 
     const result = await googleAuthResource.redirect(config.role, next, showroomSlug);

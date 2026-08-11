@@ -79,7 +79,7 @@ function sellerHero({ router, summary = {}, notFound = false }) {
   copy.append(
     icon,
     textNode("p", "text-[10px] font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", ""),
-    textNode("h1", "max-w-2xl text-2xl font-black leading-tight tracking-normal text-gray-950 sm:text-3xl", notFound ? "Halaman seller tidak ditemukan" : "Dashboard Seller"),
+    textNode("h1", "max-w-2xl text-2xl font-black leading-tight tracking-normal text-gray-950 sm:text-3xl", notFound ? "Halaman showroom tidak ditemukan" : "Dashboard Showroom"),
     textNode("p", "max-w-2xl text-xs leading-6 text-gray-600", ""),
   );
 

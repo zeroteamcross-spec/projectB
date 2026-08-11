@@ -74,6 +74,6 @@ export const affiliateDashboardService = {
       return affiliate.seller.name;
     }
 
-    return "Seller owner";
+    return "Showroom owner";
   },
 };

@@ -4,7 +4,7 @@ import { SectionHeader } from "../../../ui/composites/sectionHeader.js";
 import { Button } from "../../../ui/primitives/button.js";
 import { tw } from "../../../ui/theme/tailwindClasses.js";
 
-export function SellerPlaceholderPage({ title = "Seller", description = "" } = {}) {
+export function SellerPlaceholderPage({ title = "Showroom", description = "" } = {}) {
   let root = null;
 
   return createPageLifecycle({
@@ -30,7 +30,7 @@ function render(root, router, title, description) {
 
   const text = document.createElement("p");
   text.className = `mt-2 text-xs ${tw.text.muted}`;
-  text.textContent = "Halaman ini disiapkan sebagai entry point seller berikutnya tanpa membangun seluruh modul seller sekaligus.";
+  text.textContent = "Halaman ini disiapkan sebagai entry point showroom berikutnya tanpa membangun seluruh modul showroom sekaligus.";
 
   const content = document.createElement("div");
   content.append(heading, text);

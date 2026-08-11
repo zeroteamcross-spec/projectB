@@ -55,7 +55,7 @@ function summaryHelper(key, summary) {
   if (key === "totalValue") {
     return "Dihitung dari data lokal";
   }
-  return "Monitoring transaksi seller";
+  return "Monitoring transaksi showroom";
 }
 
 function summaryCardClass(index) {

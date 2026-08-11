@@ -106,7 +106,7 @@ export const sellerAffiliateCommissionService = {
 
   carLabel(car = null) {
     if (!car) {
-      return "Mobil seller";
+      return "Mobil showroom";
     }
 
     return [car.brand_name, car.model_name, car.sub_model_name].filter(Boolean).join(" ");

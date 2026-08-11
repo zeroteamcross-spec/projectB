@@ -41,7 +41,7 @@ export function AdminTransactionsFilterBar({ filters = {}, counts = {}, onSubmit
   keywordInput.id = "adtr_keyword_input";
   keywordInput.name = "keyword";
   keywordInput.className = `${tw.form.control} min-w-0 max-w-full`;
-  keywordInput.placeholder = "Kode transaksi, buyer, seller, mobil";
+  keywordInput.placeholder = "Kode transaksi, buyer, showroom, mobil";
   keywordInput.value = filters.keyword ?? "";
   keywordLabel.append(keywordInput);
 

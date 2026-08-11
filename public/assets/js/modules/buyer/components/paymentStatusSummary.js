@@ -70,7 +70,7 @@ function statusCopy(status) {
   return {
     pending_payment: "Pembayaran belum selesai. Buka link pembayaran atau ikuti instruksi VA, lalu refresh status setelah membayar.",
     dp_paid: "Booking Fee sudah diterima. Mobil ini sudah menjadi milik Anda; sisa harga diselesaikan langsung dengan showroom di luar aplikasi.",
-    paid: "Pembayaran Anda sudah diterima 100%. Transaksi sedang diproses oleh showroom/seller.",
+    paid: "Pembayaran Anda sudah diterima 100%. Transaksi sedang diproses oleh showroom.",
     expired: "Sesi pembayaran sudah kedaluwarsa. Buat transaksi baru atau hubungi operasional.",
     cancelled: "Transaksi dibatalkan. Tidak ada pembayaran yang perlu dilanjutkan.",
   }[status] ?? "Status transaksi sedang diproses.";
