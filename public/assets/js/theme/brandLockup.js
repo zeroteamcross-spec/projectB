@@ -53,27 +53,43 @@ export function renderBrandLockup(mark, teks = [], {
     image.addEventListener("error", () => {
       mark.className = markClass;
       mark.replaceChildren(createIcon(iconName ?? brandConfig.logoIcon, { className: iconClass }));
-      simpulTeks.forEach((simpul) => {
-        simpul.hidden = false;
-      });
+      simpulTeks.forEach(tampilkan);
     }, { once: true });
 
     mark.append(image);
-
-    simpulTeks.forEach((simpul) => {
-      simpul.hidden = true;
-    });
+    simpulTeks.forEach(sembunyikan);
 
     return true;
   }
 
   mark.className = markClass;
-  mark.hidden = false;
+  tampilkan(mark);
   mark.append(createIcon(iconName ?? brandConfig.logoIcon, { className: iconClass }));
 
-  simpulTeks.forEach((simpul) => {
-    simpul.hidden = false;
-  });
+  simpulTeks.forEach(tampilkan);
 
   return false;
+}
+
+/**
+ * Atribut `hidden` saja tidak cukup di sini.
+ *
+ * `[hidden] { display: none }` dan `.grid { display: grid }` punya kekhususan
+ * yang sama, jadi yang menang adalah urutan di stylesheet -- dan utilitas
+ * Tailwind ditulis setelah preflight. Pembungkus teks di header publik memakai
+ * kelas `grid`, sehingga ia tetap tampil meski atributnya sudah dipasang.
+ * Header aplikasi kebetulan lolos karena elemennya <strong> tanpa utilitas
+ * display sama sekali.
+ *
+ * Style inline menang atas keduanya, jadi itu yang dipakai. Atributnya tetap
+ * ikut dipasang supaya pembaca layar juga melewatinya.
+ */
+function sembunyikan(simpul) {
+  simpul.hidden = true;
+  simpul.style.display = "none";
+}
+
+function tampilkan(simpul) {
+  simpul.hidden = false;
+  simpul.style.removeProperty("display");
 }
