@@ -69,6 +69,21 @@ sendiri.
 Tidak ada jalur yang memantul dua kali: apa pun yang mendarat di domain utama
 memetakan ke domain utama.
 
+## Siapa lagi yang membaca peta host
+
+Peta yang sama dipakai di tiga tempat, semuanya lewat
+`public/assets/js/core/roleHosts.js`. Jangan menyalinnya lagi ke berkas keempat:
+tiga salinan pertama dulu dipatok ke `garasi-mobil.com` dan ketiganya diam-diam
+berhenti bekerja saat domainnya berganti, tanpa satu pun error.
+
+- `domainRouteGuard.js` -- memutuskan rute mana yang boleh di host mana.
+- `roleGuard.js` -- `loginPathForCurrentHost()` memilih halaman login untuk host
+  yang sedang dibuka. Host khusus peran mendapat form email dan password
+  (`/login/admin`); host umum mendapat pemilih peran. Tombol Login di
+  `layout/publicShell.js` hanya membungkusnya dengan `#`.
+- `modules/public/pages/catalogPage.js` -- `hostMilikAplikasi()` menentukan CTA
+  mana yang dihitung sebagai tautan internal, termasuk subdomain domain utama.
+
 ## Mematikannya lagi
 
 Kosongkan `ROLE_HOST_DEFAULT`, `ROLE_HOST_ADMIN`, dan `AUTH_COOKIE_DOMAIN` di
