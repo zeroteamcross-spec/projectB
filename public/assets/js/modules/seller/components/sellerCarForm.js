@@ -125,7 +125,7 @@ export function SellerCarForm({
     Input({ id: "slrc_chassis_number_input", name: "chassis_number", label: "Nomor rangka", value: values.chassis_number ?? "", placeholder: "Nomor rangka" }),
     NumericInput({ id: "slrc_engine_capacity_cc_input", name: "engine_capacity_cc", label: "Kapasitas mesin (cc)", value: values.engine_capacity_cc ?? "", placeholder: "1500" }),
     NumericInput({ id: "slrc_mileage_km_input", name: "mileage_km", label: "Jarak tempuh (km)", value: values.mileage_km ?? "", placeholder: "15000" }),
-    Select({ id: "slrc_seat_count_input", name: "seat_count", label: "Jumlah kursi", value: values.seat_count ?? "", options: SEAT_OPTIONS }),
+    Select({ id: "slrc_seat_count_input", name: "seat_count", label: "Jumlah kursi", value: seatCountValue(values.seat_count), options: SEAT_OPTIONS }),
     NumericInput({ id: "slrc_previous_owner_count_input", name: "previous_owner_count", label: "Jumlah pemilik sebelum", value: values.previous_owner_count ?? "", placeholder: "1" }),
     Select({ id: "slrc_has_service_book_input", name: "has_service_book", label: "Buku servis", value: serviceBookValue(values.has_service_book), options: SERVICE_BOOK_OPTIONS }),
     NumericInput({ id: "slrc_key_count_input", name: "key_count", label: "Jumlah kunci", value: values.key_count ?? "", placeholder: "2" }),
@@ -563,6 +563,10 @@ function normalizeCarPayload(formData) {
     youtube_url: nullableText(formData, "youtube_url"),
     description: nullableText(formData, "description"),
   };
+}
+
+function seatCountValue(value) {
+  return value === null || value === undefined || value === "" ? "" : String(value);
 }
 
 /**
