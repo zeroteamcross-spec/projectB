@@ -99,7 +99,7 @@ export function sidebar(store = null, options = {}) {
     : brandClassName(collapsed);
 
   const brandCopy = document.createElement("div");
-  brandCopy.className = "grid min-w-0 gap-1";
+  brandCopy.className = brandCopyClassName(collapsed);
 
   const brandName = document.createElement("div");
   brandName.className = mode === "drawer" ? tw.layout.brand : brandNameClassName(collapsed);
@@ -142,6 +142,7 @@ export function sidebar(store = null, options = {}) {
     brand.className = mode === "drawer"
       ? "mb-[var(--pb-space-lg)] flex min-w-0 items-start justify-between gap-3"
       : brandClassName(collapsed);
+    brandCopy.className = mode === "drawer" ? "grid min-w-0 gap-1" : brandCopyClassName(collapsed);
     brandName.className = mode === "drawer" ? tw.layout.brand : brandNameClassName(collapsed);
     tagline.className = mode === "drawer" ? tw.layout.sidebarTagline : taglineClassName(collapsed);
     nav.className = mode === "drawer" ? tw.layout.nav : navClassName(collapsed);
@@ -176,13 +177,19 @@ export function sidebar(store = null, options = {}) {
 function renderBrandMark(mark, teks = [], markClass = "", collapsed = false) {
   renderBrandLockup(mark, teks, {
     markClass,
-    // Saat melebar logonya menggantikan nama dan tagline, jadi boleh sebesar
-    // di header mobile. Saat diciutkan rail-nya hanya 80px dengan padding
-    // 12px di tiap sisi, jadi 90px tidak akan muat.
-    imageClass: collapsed
-      ? "block h-8 w-8 object-contain"
-      : KELAS_GAMBAR_LOGO,
+    imageClass: KELAS_GAMBAR_LOGO,
+    // Rail yang diciutkan hanya menyisakan 56px. Logo memanjang di sana akan
+    // jadi pita 9px yang tidak terbaca, jadi rail memakai icon dan nama
+    // aplikasi tetap disembunyikan seperti label menu lainnya.
+    pakaiLogo: !collapsed,
   });
+
+  if (collapsed) {
+    teks.filter(Boolean).forEach((simpul) => {
+      simpul.hidden = true;
+      simpul.style.display = "none";
+    });
+  }
 }
 
 /**
@@ -195,6 +202,18 @@ function renderBrandMark(mark, teks = [], markClass = "", collapsed = false) {
  */
 function isSidebarCollapsed(store, mode = "desktop") {
   return mode === "desktop" && Boolean(store?.get("ui.sidebarCollapsed", false));
+}
+
+/**
+ * w-full wajib di sini. Induknya memakai justify-items, yang membuat setiap
+ * item grid menyusut ke isinya. Begitu nama dan tagline disembunyikan karena
+ * ada logo, isinya tinggal gambar ber-w-auto yang justru menunggu lebar dari
+ * wadahnya -- keduanya saling menunggu dan hasilnya nol.
+ */
+function brandCopyClassName(collapsed = false) {
+  return collapsed
+    ? "grid w-full min-w-0 justify-items-center gap-1"
+    : "grid w-full min-w-0 gap-1";
 }
 
 function brandClassName(collapsed = false) {

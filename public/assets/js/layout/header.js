@@ -90,7 +90,7 @@ function renderBrand(mark, title) {
   // sidebar -- di bawah itu tidak ada sidebar, jadi header yang membawanya.
   renderBrandLockup(mark, [title], {
     markClass: tw.layout.shellMark,
-    markLogoClass: "inline-flex shrink-0 items-center md:hidden",
+    markLogoClass: "flex w-full min-w-0 flex-1 items-center md:hidden",
     iconClass: "h-5 w-5",
   });
 }

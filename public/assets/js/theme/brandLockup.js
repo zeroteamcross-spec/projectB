@@ -23,13 +23,18 @@ import { createIcon } from "./iconRegistry.js";
  * @param {Array<HTMLElement|null>} teks  Simpul teks yang disembunyikan saat ada logo.
  */
 /**
- * Tinggi logo di header. Lebarnya ikut rasio gambar, dibatasi max-w supaya
- * logo yang sangat memanjang tidak mendorong isi header lainnya.
+ * Batas logo: persegi panjang, bukan persegi.
  *
- * Header ikut meninggi mengikuti angka ini -- itu memang konsekuensinya, bukan
- * efek samping yang terlewat.
+ * Dibatasi tinggi DAN lebar, dan yang lebih dulu mentok itulah yang mengikat.
+ * Logo memanjang -- wordmark dengan rasio hampir 6:1 -- terikat lebar dan
+ * mengisi kolomnya penuh; logo persegi terikat tinggi. Satu aturan menangani
+ * keduanya tanpa perlu tahu bentuk berkasnya.
+ *
+ * Kotak persegi yang dipakai sebelumnya memaksa wordmark menyusut sampai
+ * setinggi 15px di dalam kotak 90px, jadi terlihat kecil justru karena
+ * kotaknya besar.
  */
-export const KELAS_GAMBAR_LOGO = "block h-[90px] w-auto max-w-full object-contain";
+export const KELAS_GAMBAR_LOGO = "block h-auto w-auto max-h-16 max-w-full object-contain";
 
 export function renderBrandLockup(mark, teks = [], {
   markClass = "",
@@ -38,16 +43,24 @@ export function renderBrandLockup(mark, teks = [], {
   // yang dipakai versi icon harus hilang, tapi pemanggil kadang masih perlu
   // menempelkan aturan sendiri -- header aplikasi menyembunyikannya di desktop
   // karena logonya sudah pindah ke sidebar.
-  markLogoClass = "inline-flex shrink-0 items-center",
+  // w-full dan flex-1 keduanya perlu, bukan hiasan. Gambar ber-w-auto tanpa
+  // ukuran bawaan menyusut sampai 0x0 kalau wadahnya tidak punya lebar pasti --
+  // ada di DOM, tidak terlihat sama sekali. flex-1 mengurusnya saat wadahnya di
+  // dalam baris flex (header), w-full saat di dalam grid (sidebar).
+  markLogoClass = "flex w-full min-w-0 flex-1 items-center",
   iconName = null,
   iconClass = "block h-5 w-5 leading-none",
+  // Rail sidebar yang diciutkan hanya selebar 56px. Wordmark memanjang di sana
+  // akan setinggi 9px dan tidak terbaca, jadi pemanggil bisa meminta versi
+  // icon meski logonya ada.
+  pakaiLogo = true,
 } = {}) {
   if (!mark) {
     return false;
   }
 
   mark.replaceChildren();
-  const logo = getAsset(brandConfig.uploadedLogoUrl);
+  const logo = pakaiLogo ? getAsset(brandConfig.uploadedLogoUrl) : "";
   const simpulTeks = teks.filter(Boolean);
 
   if (logo) {

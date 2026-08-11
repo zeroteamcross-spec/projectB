@@ -162,8 +162,18 @@ class MasterAssetService
             $content = preg_replace('/<svg\b/i', '<svg viewBox="0 0 96 96"', $content, 1) ?? $content;
         }
 
-        $content = preg_replace('/<svg\b/i', '<svg width="96" height="96"', $content, 1) ?? $content;
-
+        // Lebar dan tinggi sengaja TIDAK dipasang lagi.
+        //
+        // Dulu di sini ditulis width="96" height="96", dan itu memaksa setiap
+        // logo jadi persegi. Logo yang memanjang -- misalnya wordmark dengan
+        // viewBox 22048x3688, rasio hampir 6:1 -- tetap dilaporkan ke peramban
+        // sebagai 96x96, lalu gambarnya diletakkan di tengah kotak itu sebagai
+        // pita tipis. Hasilnya logo terlihat kecil dengan ruang kosong lebar di
+        // atas dan bawahnya, dan tidak ada CSS di sisi frontend yang bisa
+        // memperbaikinya karena rasio bawaannya sudah telanjur salah.
+        //
+        // Tanpa keduanya, viewBox yang menentukan rasio, dan `w-auto` di CSS
+        // menghasilkan ukuran yang benar untuk logo persegi maupun memanjang.
         return trim($content);
     }
 
