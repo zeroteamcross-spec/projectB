@@ -1,4 +1,4 @@
-import { getAsset } from "../theme/assetRegistry.js";
+import { renderBrandLockup } from "../theme/brandLockup.js";
 import { brandConfig } from "../theme/brandConfig.js";
 import { createIcon } from "../theme/iconRegistry.js";
 import { RouteHydrateAlert } from "../ui/composites/routeHydrateAlert.js";
@@ -15,6 +15,10 @@ import { BuyerMobileFooterNav } from "../modules/buyer/components/buyerMobileFoo
  * masuk login-nya ada di landing page, bukan di sini.
  */
 const RUTE_TANPA_TOMBOL_LOGIN = Object.freeze(["/daftar-showroom"]);
+
+// Kotak lambang saat belum ada logo yang diunggah. Begitu logonya ada, kelas
+// ini tidak dipakai sama sekali -- gambarnya berdiri sendiri tanpa kotak.
+const PUBLIC_MARK_CLASS = "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--pb-radius-xl)] bg-[linear-gradient(135deg,var(--pb-brand-primary),var(--pb-brand-accent),var(--pb-brand-secondary))] text-white leading-none shadow-[var(--pb-shadow-card)]";
 
 export class PublicShell {
   constructor({ store } = {}) {
@@ -61,17 +65,6 @@ export class PublicShell {
     brand.className = "flex min-w-0 flex-1 items-center gap-2.5 no-underline";
 
     const mark = document.createElement("span");
-    mark.className = "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--pb-radius-xl)] bg-[linear-gradient(135deg,var(--pb-brand-primary),var(--pb-brand-accent),var(--pb-brand-secondary))] text-white leading-none shadow-[var(--pb-shadow-card)]";
-    const logoMark = getAsset(brandConfig.logoMarkAsset);
-    if (logoMark) {
-      const image = document.createElement("img");
-      image.src = logoMark;
-      image.alt = brandConfig.appName;
-      image.className = "h-6 w-6 object-contain";
-      mark.append(image);
-    } else {
-      mark.append(createIcon(publicLogoIcon(), { className: "block h-5 w-5 leading-none" }));
-    }
 
     const copy = document.createElement("span");
     copy.className = "grid min-w-0";
@@ -85,6 +78,13 @@ export class PublicShell {
     subtitle.textContent = "Showroom mobil pilihan";
 
     copy.append(title, subtitle);
+
+    renderBrandLockup(mark, [copy], {
+      markClass: PUBLIC_MARK_CLASS,
+      imageClass: "block h-10 w-auto max-w-[10rem] object-contain",
+      iconName: publicLogoIcon(),
+    });
+
     brand.append(mark, copy);
 
     const actions = document.createElement("div");
@@ -104,6 +104,7 @@ export class PublicShell {
     this.brandTitleNode = title;
     this.brandSubtitleNode = subtitle;
     this.brandMarkNode = mark;
+    this.brandCopyNode = copy;
     header.append(inner);
     header.append(this.bannerHost);
     return header;
@@ -127,19 +128,11 @@ export class PublicShell {
     this.actionLink.style.display = !isAuthenticated && tanpaTombolLogin() ? "none" : "";
     this.brandTitleNode && (this.brandTitleNode.textContent = brandConfig.appName);
     this.brandSubtitleNode && (this.brandSubtitleNode.textContent = brandConfig.appTagline || "Showroom mobil pilihan");
-    if (this.brandMarkNode) {
-      this.brandMarkNode.replaceChildren();
-      const logoMark = getAsset(brandConfig.logoMarkAsset);
-      if (logoMark) {
-        const image = document.createElement("img");
-        image.src = logoMark;
-        image.alt = brandConfig.appName;
-        image.className = "h-6 w-6 object-contain";
-        this.brandMarkNode.append(image);
-      } else {
-        this.brandMarkNode.append(createIcon(publicLogoIcon(), { className: "block h-5 w-5 leading-none" }));
-      }
-    }
+    renderBrandLockup(this.brandMarkNode, [this.brandCopyNode], {
+      markClass: PUBLIC_MARK_CLASS,
+      imageClass: "block h-10 w-auto max-w-[10rem] object-contain",
+      iconName: publicLogoIcon(),
+    });
     this.actionLink.href = target;
     this.actionLink.title = isAuthenticated ? "Dashboard akun" : "Masuk";
     const isTargetBuyer = isAuthenticated && target === "#/buyer";

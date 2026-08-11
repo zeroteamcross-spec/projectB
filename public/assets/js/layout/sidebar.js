@@ -1,5 +1,5 @@
 import { brandConfig } from "../theme/brandConfig.js";
-import { getAsset } from "../theme/assetRegistry.js";
+import { renderBrandLockup } from "../theme/brandLockup.js";
 import { createIcon } from "../theme/iconRegistry.js";
 import { tw } from "../theme/tailwindClasses.js";
 import { applyDesignHook } from "../theme/designStudioHooks.js";
@@ -110,10 +110,11 @@ export function sidebar(store = null, options = {}) {
   tagline.textContent = brandConfig.appTagline;
 
   const compactMark = document.createElement("span");
-  compactMark.className = mode === "drawer"
-    ? "hidden"
-    : compactMarkClassName(compactExpanded);
-  renderBrandMark(compactMark);
+  renderBrandMark(
+    compactMark,
+    [brandName, tagline],
+    mode === "drawer" ? "hidden" : compactMarkClassName(compactExpanded)
+  );
 
   brandCopy.append(compactMark, brandName, tagline);
   brand.append(brandCopy);
@@ -142,12 +143,15 @@ export function sidebar(store = null, options = {}) {
       : brandClassName(expanded);
     brandName.className = mode === "drawer" ? tw.layout.brand : brandNameClassName(expanded);
     tagline.className = mode === "drawer" ? tw.layout.sidebarTagline : taglineClassName(expanded);
-    compactMark.className = mode === "drawer" ? "hidden" : compactMarkClassName(expanded);
     nav.className = mode === "drawer" ? tw.layout.nav : navClassName(expanded);
     syncCompactToggle(compactToggle, expanded);
     brandName.textContent = brandConfig.appName;
     tagline.textContent = brandConfig.appTagline;
-    renderBrandMark(compactMark);
+    renderBrandMark(
+      compactMark,
+      [brandName, tagline],
+      mode === "drawer" ? "hidden" : compactMarkClassName(expanded)
+    );
   };
 
   const unsubscribe = store?.subscribe?.(() => {
@@ -160,19 +164,18 @@ export function sidebar(store = null, options = {}) {
   return aside;
 }
 
-function renderBrandMark(mark) {
-  mark.replaceChildren();
-  const logoMark = getAsset(brandConfig.logoMarkAsset);
-  if (logoMark) {
-    const image = document.createElement("img");
-    image.src = logoMark;
-    image.alt = brandConfig.appName;
-    image.className = "block h-7 w-7 object-contain";
-    mark.append(image);
-    return;
-  }
-
-  mark.append(createIcon(brandConfig.logoIcon, { className: "block h-5 w-5 leading-none" }));
+/**
+ * Sidebar memakai aturan yang sama: logo unggahan tampil sendirian, dan nama
+ * beserta taglinenya ikut disembunyikan.
+ *
+ * Kelas wadahnya dihitung ulang tiap sync mengikuti keadaan compact, jadi
+ * dioperkan setiap kali, bukan disimpan.
+ */
+function renderBrandMark(mark, teks = [], markClass = "") {
+  renderBrandLockup(mark, teks, {
+    markClass,
+    imageClass: "block h-9 w-auto max-w-[9rem] object-contain",
+  });
 }
 
 function isCompactExpanded(store, mode = "desktop") {

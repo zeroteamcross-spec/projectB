@@ -1,7 +1,6 @@
 import { brandConfig } from "../theme/brandConfig.js";
 import { roleLabel } from "../core/roleLabels.js";
-import { getAsset } from "../theme/assetRegistry.js";
-import { createIcon } from "../theme/iconRegistry.js";
+import { renderBrandLockup } from "../theme/brandLockup.js";
 import { showToast } from "../ui/primitives/toast.js";
 import { tw } from "../theme/tailwindClasses.js";
 import { adminSessionService } from "../modules/admin/services/adminSessionService.js";
@@ -79,29 +78,17 @@ export function header(store) {
  * Aturan yang sama sudah dipakai landing page sejak 354e6d7.
  */
 function renderBrand(mark, title) {
-  mark.replaceChildren();
-  // uploadedLogoUrl memeriksa iconUrl lebih dulu -- itu kolom yang benar-benar
-  // diisi form unggah. logoMarkAsset kebetulan juga diisi, tapi nilai
-  // bawaannya adalah kunci registry "brand.logoMark" yang selalu kosong, jadi
-  // membacanya sendirian membuat logo yang sudah diunggah terlewat.
-  const logoMark = getAsset(brandConfig.uploadedLogoUrl);
-
-  if (logoMark) {
-    mark.className = "grid shrink-0 place-items-center";
-    const image = document.createElement("img");
-    image.src = logoMark;
-    image.alt = brandConfig.appName;
-    image.className = "h-10 w-auto max-w-[9rem] object-contain";
-    mark.append(image);
-    title.hidden = true;
-    title.textContent = "";
-    return;
-  }
-
-  mark.className = tw.layout.shellMark;
-  mark.append(createIcon(brandConfig.logoIcon, { className: "h-5 w-5" }));
-  title.hidden = false;
+  // Teksnya selalu diisi; yang menentukan tampil atau tidak adalah lockup.
+  // Mengosongkannya saat ada logo terasa lebih rapi, tapi kalau logonya gagal
+  // dimuat lockup akan memunculkan kembali elemen yang isinya sudah telanjur
+  // kosong.
   title.textContent = brandConfig.shellTitle;
+
+  renderBrandLockup(mark, [title], {
+    markClass: tw.layout.shellMark,
+    imageClass: "block h-10 w-auto max-w-[10rem] object-contain",
+    iconClass: "h-5 w-5",
+  });
 }
 
 function currentRole(store) {
