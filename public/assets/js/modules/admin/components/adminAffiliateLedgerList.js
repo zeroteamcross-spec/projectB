@@ -42,7 +42,7 @@ export function AdminAffiliateLedgerList({
       { label: "Marketing", render: affiliateCell },
       { label: "Komisi", render: amountCell },
       { label: "Status", render: statusCell },
-      { label: "Tanggal", render: (ledger) => textBlock("text-sm font-semibold text-gray-800", formatDate(ledger.created_at)) },
+      { label: "Tanggal", render: (ledger) => textBlock("text-xs font-semibold text-gray-800", formatDate(ledger.created_at)) },
     ],
     loading,
     rows: ledgers,
@@ -71,7 +71,7 @@ export function AdminAffiliateLedgerList({
 
 function selectionCell(ledger, selectedIds, onToggle) {
   if (ledger.ledger_status !== "accrued") {
-    return textBlock("text-sm font-semibold text-[var(--pb-text-muted)]", "-");
+    return textBlock("text-xs font-semibold text-[var(--pb-text-muted)]", "-");
   }
 
   const button = Button({
@@ -90,7 +90,7 @@ function identityCell(ledger) {
   wrap.className = "grid min-w-0 gap-1";
   wrap.append(
     textBlock("font-black text-gray-950", ledger.transactionCodeLabel),
-    textBlock("text-sm text-gray-500", ledger.carLabel),
+    textBlock("text-xs text-gray-500", ledger.carLabel),
   );
   return wrap;
 }
@@ -100,7 +100,7 @@ function affiliateCell(ledger) {
   wrap.className = "grid min-w-0 gap-1";
   wrap.append(
     textBlock("font-semibold text-gray-900", ledger.affiliateLabel),
-    textBlock("text-sm text-gray-500", `Marketing #${ledger.affiliate_id ?? "-"}`),
+    textBlock("text-xs text-gray-500", `Marketing #${ledger.affiliate_id ?? "-"}`),
   );
   return wrap;
 }
@@ -110,7 +110,7 @@ function amountCell(ledger) {
   wrap.className = "grid min-w-0 gap-1";
   wrap.append(
     textBlock("font-black text-gray-950", ledger.amountLabel),
-    textBlock("text-sm text-gray-500", `Base ${ledger.baseAmountLabel}`),
+    textBlock("text-xs text-gray-500", `Base ${ledger.baseAmountLabel}`),
   );
   return wrap;
 }

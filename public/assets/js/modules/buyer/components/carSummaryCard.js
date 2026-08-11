@@ -8,15 +8,15 @@ import { getListingLockStatus } from "../../../utils/transactionStatus.js";
 export function CarSummaryCard({ car, onOpenDetail = null } = {}) {
   const lock = getListingLockStatus({ car });
   const title = document.createElement("strong");
-  title.className = "block text-base font-bold tracking-normal text-gray-950";
+  title.className = "block text-sm font-bold tracking-normal text-gray-950";
   title.textContent = [car.brand_name, car.model_name, car.sub_model_name].filter(Boolean).join(" ");
 
   const price = document.createElement("p");
-  price.className = `text-lg font-semibold ${tw.text.price}`;
+  price.className = `text-base font-semibold ${tw.text.price}`;
   price.textContent = formatCurrency(car.price_discount ?? car.price_cash ?? car.price_credit);
 
   const meta = document.createElement("p");
-  meta.className = `text-sm ${tw.text.muted}`;
+  meta.className = `text-xs ${tw.text.muted}`;
   meta.textContent = [car.location_name, car.transmission, car.mileage_km ? `${car.mileage_km} km` : null]
     .filter(Boolean)
     .join(" | ");

@@ -93,10 +93,10 @@ function toastNode(toast) {
   const copy = document.createElement("span");
   copy.className = "grid min-w-0 gap-0.5";
   const title = document.createElement("span");
-  title.className = "text-sm font-black text-gray-950";
+  title.className = "text-xs font-black text-gray-950";
   title.textContent = config.title;
   const message = document.createElement("span");
-  message.className = "break-words text-sm font-semibold leading-5 text-gray-600";
+  message.className = "break-words text-xs font-semibold leading-5 text-gray-600";
   message.dataset.toastMessage = "true";
   message.textContent = toast.message ?? "";
   copy.append(title, message);

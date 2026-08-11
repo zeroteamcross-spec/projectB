@@ -359,8 +359,8 @@ function render(root, context, notFound) {
   previewColumn.className = "grid gap-4 xl:sticky xl:top-6 xl:self-start";
   previewColumn.append(
     Card([
-      textBlock("text-sm font-semibold text-[var(--pb-text)]", "Live Preview"),
-      textBlock("text-sm text-[var(--pb-text-muted)]", "Snippet public, controls, dan internal memakai token yang sama dengan aplikasi."),
+      textBlock("text-xs font-semibold text-[var(--pb-text)]", "Live Preview"),
+      textBlock("text-xs text-[var(--pb-text-muted)]", "Snippet public, controls, dan internal memakai token yang sama dengan aplikasi."),
     ], { variant: "raised" }),
     dataDsStudioPanel(state),
     hookInspectorCard(activeSection, sectionHooks, selectedHook),
@@ -379,9 +379,9 @@ function hookInspectorCard(section, hooks, selectedHook) {
   const heading = document.createElement("div");
   heading.className = "grid gap-1";
   heading.append(
-    textBlock("text-xs font-bold uppercase tracking-normal text-[var(--pb-brand-secondary)]", "Bagian yang terhubung"),
-    textBlock("text-base font-semibold text-[var(--pb-text)]", `${hooks.length} elemen untuk section ${section.title}`),
-    textBlock("text-sm text-[var(--pb-text-muted)]", "Pilih item untuk melihat bagian UI yang dimaksud. Identitas memakai data-ds, jadi tidak bergantung pada class Tailwind."),
+    textBlock("text-[10px] font-bold uppercase tracking-normal text-[var(--pb-brand-secondary)]", "Bagian yang terhubung"),
+    textBlock("text-sm font-semibold text-[var(--pb-text)]", `${hooks.length} elemen untuk section ${section.title}`),
+    textBlock("text-xs text-[var(--pb-text-muted)]", "Pilih item untuk melihat bagian UI yang dimaksud. Identitas memakai data-ds, jadi tidak bergantung pada class Tailwind."),
   );
   card.append(heading);
 
@@ -402,8 +402,8 @@ function hookInspectorCard(section, hooks, selectedHook) {
     const detail = document.createElement("div");
     detail.className = "grid gap-2 rounded-[var(--pb-radius-xl)] border border-[var(--pb-border)] bg-[var(--pb-surface-muted)] p-4";
     detail.append(
-      textBlock("text-sm font-semibold text-[var(--pb-text)]", selectedHook.label),
-      textBlock("text-sm text-[var(--pb-text-muted)]", selectedHook.description),
+      textBlock("text-xs font-semibold text-[var(--pb-text)]", selectedHook.label),
+      textBlock("text-xs text-[var(--pb-text-muted)]", selectedHook.description),
       metaLine("Hook", selectedHook.id),
       metaLine("Kategori", selectedHook.category),
       metaLine("Token terkait", selectedHook.tokens.join(", ") || "-"),
@@ -423,16 +423,16 @@ function hookListItem(hook, active) {
     ? "grid gap-1 rounded-[var(--pb-radius-xl)] border border-[color-mix(in_srgb,var(--pb-brand-primary)_35%,white)] bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] px-4 py-3 text-left"
     : "grid gap-1 rounded-[var(--pb-radius-xl)] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] px-4 py-3 text-left";
   button.append(
-    textBlock("text-sm font-semibold text-[var(--pb-text)]", hook.label),
-    textBlock("text-xs text-[var(--pb-text-muted)]", hook.description),
-    textBlock("text-[11px] font-medium text-[var(--pb-brand-secondary)]", hook.id),
+    textBlock("text-xs font-semibold text-[var(--pb-text)]", hook.label),
+    textBlock("text-[10px] text-[var(--pb-text-muted)]", hook.description),
+    textBlock("text-[10px] font-medium text-[var(--pb-brand-secondary)]", hook.id),
   );
   return button;
 }
 
 function metaLine(label, value) {
   const node = document.createElement("div");
-  node.className = "text-xs text-[var(--pb-text-muted)]";
+  node.className = "text-[10px] text-[var(--pb-text-muted)]";
   node.textContent = `${label}: ${value}`;
   return node;
 }
@@ -457,8 +457,8 @@ function renderField(field, draft) {
   const labelRow = document.createElement("div");
   labelRow.className = "grid gap-1";
   labelRow.append(
-    textBlock("text-sm font-medium text-[var(--pb-text-strong)]", field.label),
-    textBlock("text-xs text-[var(--pb-text-muted)]", field.type === "range" ? `Nilai saat ini: ${value}` : field.path)
+    textBlock("text-xs font-medium text-[var(--pb-text-strong)]", field.label),
+    textBlock("text-[10px] text-[var(--pb-text-muted)]", field.type === "range" ? `Nilai saat ini: ${value}` : field.path)
   );
 
   wrap.append(labelRow);
@@ -477,7 +477,7 @@ function renderField(field, draft) {
     text.type = "text";
     text.value = value;
     text.dataset.fieldPath = field.path;
-    text.className = "min-h-11 min-w-0 flex-1 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-sm text-[var(--pb-text)] outline-none";
+    text.className = "min-h-11 min-w-0 flex-1 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-xs text-[var(--pb-text)] outline-none";
 
     row.append(picker, text);
     wrap.append(row);
@@ -487,7 +487,7 @@ function renderField(field, draft) {
   if (field.type === "select") {
     const select = document.createElement("select");
     select.dataset.fieldPath = field.path;
-    select.className = "min-h-11 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-sm text-[var(--pb-text)] outline-none";
+    select.className = "min-h-11 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-xs text-[var(--pb-text)] outline-none";
     field.options.forEach((option) => {
       const item = document.createElement("option");
       item.value = option.value;
@@ -505,7 +505,7 @@ function renderField(field, draft) {
   input.dataset.fieldPath = field.path;
   input.className = field.type === "range"
     ? "w-full accent-[var(--pb-brand-primary)]"
-    : "min-h-11 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-sm text-[var(--pb-text)] outline-none";
+    : "min-h-11 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-xs text-[var(--pb-text)] outline-none";
 
   if (field.type === "range") {
     input.min = String(field.min);
@@ -532,12 +532,12 @@ function helperPanel(state) {
   card.append(top);
 
   if (state.notice) {
-    card.append(textBlock("text-sm text-[var(--pb-text-muted)]", state.notice));
+    card.append(textBlock("text-xs text-[var(--pb-text-muted)]", state.notice));
   }
 
   if (state.error) {
     const error = document.createElement("div");
-    error.className = "rounded-[var(--pb-radius-xl)] border border-[var(--pb-error-border)] bg-[var(--pb-error-bg)] px-4 py-3 text-sm text-[var(--pb-danger)]";
+    error.className = "rounded-[var(--pb-radius-xl)] border border-[var(--pb-error-border)] bg-[var(--pb-error-bg)] px-4 py-3 text-xs text-[var(--pb-danger)]";
     error.textContent = state.error;
     card.append(error);
   }
@@ -550,8 +550,8 @@ function sectionNavigator(activeSectionId) {
   card.className = `${card.className} grid gap-3 p-4`;
 
   card.append(
-    textBlock("text-xs font-bold uppercase tracking-normal text-[var(--pb-brand-secondary)]", "Studio Sections"),
-    textBlock("text-sm text-[var(--pb-text-muted)]", "Pilih area visual yang ingin diatur. Editor utama hanya menampilkan satu section agar tetap rapi."),
+    textBlock("text-[10px] font-bold uppercase tracking-normal text-[var(--pb-brand-secondary)]", "Studio Sections"),
+    textBlock("text-xs text-[var(--pb-text-muted)]", "Pilih area visual yang ingin diatur. Editor utama hanya menampilkan satu section agar tetap rapi."),
   );
 
   const list = document.createElement("div");
@@ -565,8 +565,8 @@ function sectionNavigator(activeSectionId) {
       ? "grid gap-1 rounded-[var(--pb-radius-xl)] border border-[color-mix(in_srgb,var(--pb-brand-primary)_35%,white)] bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] px-4 py-3 text-left shadow-[var(--pb-shadow-soft)]"
       : "grid gap-1 rounded-[var(--pb-radius-xl)] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] px-4 py-3 text-left";
     button.append(
-      textBlock("text-sm font-semibold text-[var(--pb-text)]", section.title),
-      textBlock("text-xs text-[var(--pb-text-muted)]", section.description),
+      textBlock("text-xs font-semibold text-[var(--pb-text)]", section.title),
+      textBlock("text-[10px] text-[var(--pb-text-muted)]", section.description),
     );
     list.append(button);
   });
@@ -579,9 +579,9 @@ function sectionHero(section) {
   const card = Card([], { variant: "raised" });
   card.className = `${card.className} grid gap-2 p-5`;
   card.append(
-    textBlock("text-xs font-bold uppercase tracking-normal text-[var(--pb-brand-secondary)]", section.title),
-    textBlock("text-lg font-bold text-[var(--pb-text)]", `Konfigurasi ${section.title}`),
-    textBlock("text-sm text-[var(--pb-text-muted)]", section.description),
+    textBlock("text-[10px] font-bold uppercase tracking-normal text-[var(--pb-brand-secondary)]", section.title),
+    textBlock("text-base font-bold text-[var(--pb-text)]", `Konfigurasi ${section.title}`),
+    textBlock("text-xs text-[var(--pb-text-muted)]", section.description),
   );
   return card;
 }
@@ -601,7 +601,7 @@ function dataDsStudioPanel(state) {
   const viewport = DESIGN_STUDIO_VIEWPORTS[state.previewViewportId] ?? DESIGN_STUDIO_VIEWPORTS.mobile;
 
   card.append(
-    textBlock("text-xs font-bold uppercase tracking-normal text-[var(--pb-brand-secondary)]", "data-ds Registry"),
+    textBlock("text-[10px] font-bold uppercase tracking-normal text-[var(--pb-brand-secondary)]", "data-ds Registry"),
     dataDsToolbar(state),
     dataDsRegistryList(state, selected?.key),
     dataDsPreviewControls(state, route, viewport),
@@ -620,7 +620,7 @@ function dataDsToolbar(state) {
   input.placeholder = "Cari elemen design...";
   input.value = state.dsSearch ?? "";
   input.dataset.runtimeField = "dsSearch";
-  input.className = "min-h-11 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-sm text-[var(--pb-text)] outline-none";
+  input.className = "min-h-11 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-xs text-[var(--pb-text)] outline-none";
   wrap.append(input);
   return wrap;
 }
@@ -643,9 +643,9 @@ function dataDsRegistryList(state, selectedKey) {
       ? "grid gap-1 rounded-[var(--pb-radius-lg)] border border-[color-mix(in_srgb,var(--pb-brand-primary)_35%,white)] bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] px-3 py-2 text-left"
       : "grid gap-1 rounded-[var(--pb-radius-lg)] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] px-3 py-2 text-left";
     button.append(
-      textBlock("text-sm font-semibold text-[var(--pb-text)]", item.label),
-      textBlock("text-[11px] text-[var(--pb-brand-secondary)]", item.key),
-      textBlock("text-xs text-[var(--pb-text-muted)]", `${item.group} - ${item.editable ? "editable" : "read only"} - ${item.riskLevel}`),
+      textBlock("text-xs font-semibold text-[var(--pb-text)]", item.label),
+      textBlock("text-[10px] text-[var(--pb-brand-secondary)]", item.key),
+      textBlock("text-[10px] text-[var(--pb-text-muted)]", `${item.group} - ${item.editable ? "editable" : "read only"} - ${item.riskLevel}`),
     );
     list.append(button);
   });
@@ -686,7 +686,7 @@ function dataDsPreviewControls(state, route, viewport) {
     actionButton("reset-temporary", "Reset Preview", "secondary"),
     actionButton("export-data-ds-draft", "Export JSON Draft", "secondary"),
   );
-  wrap.append(row, textBlock("text-xs text-[var(--pb-text-muted)]", `Preview memakai session saat ini. Protected route akan mengikuti role guard existing: ${route.roleContext}.`), actions);
+  wrap.append(row, textBlock("text-[10px] text-[var(--pb-text-muted)]", `Preview memakai session saat ini. Protected route akan mengikuti role guard existing: ${route.roleContext}.`), actions);
   return wrap;
 }
 
@@ -713,11 +713,11 @@ function dataDsEditor(selected, state) {
   const box = document.createElement("div");
   box.className = "grid gap-3 rounded-[var(--pb-radius-xl)] border border-[var(--pb-border)] bg-[var(--pb-surface-muted)] p-4";
   if (!selected) {
-    box.append(textBlock("text-sm text-[var(--pb-text-muted)]", "Pilih registry item untuk mulai edit temporary."));
+    box.append(textBlock("text-xs text-[var(--pb-text-muted)]", "Pilih registry item untuk mulai edit temporary."));
     return box;
   }
   box.append(
-    textBlock("text-sm font-semibold text-[var(--pb-text)]", selected.label),
+    textBlock("text-xs font-semibold text-[var(--pb-text)]", selected.label),
     metaLine("data-ds", selected.key),
     metaLine("Allowed styles", selected.allowedStyles.join(", ")),
   );
@@ -727,9 +727,9 @@ function dataDsEditor(selected, state) {
     input.placeholder = propValuePlaceholder(prop);
     input.value = state.temporaryStyles?.[selected.key]?.[prop] ?? "";
     input.dataset.styleProp = prop;
-    input.className = "min-h-10 rounded-[var(--pb-radius-lg)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-sm text-[var(--pb-text)] outline-none";
+    input.className = "min-h-10 rounded-[var(--pb-radius-lg)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-xs text-[var(--pb-text)] outline-none";
     const label = document.createElement("label");
-    label.className = "grid gap-1 text-xs font-semibold text-[var(--pb-text-muted)]";
+    label.className = "grid gap-1 text-[10px] font-semibold text-[var(--pb-text-muted)]";
     label.textContent = prop;
     label.append(input);
     box.append(label);
@@ -742,19 +742,19 @@ function unregisteredDataDs(state) {
   const found = (state.foundDataDs ?? []).filter((item) => !registered.has(item.key));
   const box = document.createElement("div");
   box.className = "grid gap-2";
-  box.append(textBlock("text-sm font-semibold text-[var(--pb-text)]", "Unregistered data-ds"));
+  box.append(textBlock("text-xs font-semibold text-[var(--pb-text)]", "Unregistered data-ds"));
   if (!found.length) {
-    box.append(textBlock("text-xs text-[var(--pb-text-muted)]", "Belum ada unregistered data-ds dari preview saat ini."));
+    box.append(textBlock("text-[10px] text-[var(--pb-text-muted)]", "Belum ada unregistered data-ds dari preview saat ini."));
     return box;
   }
-  found.forEach((item) => box.append(textBlock("text-xs text-[var(--pb-text-muted)]", `${item.key} (${item.tagName}) - Add to registry required before editing.`)));
+  found.forEach((item) => box.append(textBlock("text-[10px] text-[var(--pb-text-muted)]", `${item.key} (${item.tagName}) - Add to registry required before editing.`)));
   return box;
 }
 
 function selectControl(field, options, value) {
   const select = document.createElement("select");
   select.dataset.runtimeField = field;
-  select.className = "min-h-11 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-sm text-[var(--pb-text)] outline-none";
+  select.className = "min-h-11 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-xs text-[var(--pb-text)] outline-none";
   options.forEach((option) => {
     const item = document.createElement("option");
     item.value = option.value;
@@ -872,7 +872,7 @@ function badge(label, variant) {
     warning: "bg-[color-mix(in_srgb,var(--pb-warning)_14%,white)] text-[var(--pb-warning)]",
     info: "bg-[color-mix(in_srgb,var(--pb-info)_14%,white)] text-[var(--pb-info)]",
   };
-  node.className = `inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${classes[variant] ?? classes.default}`;
+  node.className = `inline-flex items-center rounded-full px-3 py-1 text-[10px] font-semibold ${classes[variant] ?? classes.default}`;
   node.textContent = label;
   return node;
 }

@@ -26,12 +26,12 @@ export function AdminDashboardQuickActions({ actions = [] } = {}) {
     // ikut peran netral: biru primary, sama seperti tombol Detail di halaman
     // lain. Dulu tiap kartu punya gradien sendiri (biru, oranye, rose, hijau)
     // yang membuat satu baris kartu tampak seperti pelangi.
-    button.className = `inline-flex min-h-10 max-w-full w-full items-center justify-center gap-2 break-words rounded-[var(--pb-radius-xl)] border px-4 py-2 text-sm font-bold shadow-[0_14px_30px_rgba(15,23,42,0.12)] transition duration-200 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)] disabled:cursor-not-allowed disabled:opacity-55 ${tw.button.netral}`;
+    button.className = `inline-flex min-h-10 max-w-full w-full items-center justify-center gap-2 break-words rounded-[var(--pb-radius-xl)] border px-4 py-2 text-xs font-bold shadow-[0_14px_30px_rgba(15,23,42,0.12)] transition duration-200 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)] disabled:cursor-not-allowed disabled:opacity-55 ${tw.button.netral}`;
     button.prepend(createIcon(resolveIcon(item.title), { className: "h-4 w-4 shrink-0" }));
     card.append(
       iconWrap,
-      textBlock("text-base font-black text-gray-950", item.title),
-      textBlock(`text-sm ${tw.text.muted}`, item.description),
+      textBlock("text-sm font-black text-gray-950", item.title),
+      textBlock(`text-xs ${tw.text.muted}`, item.description),
       button,
     );
     section.append(card);

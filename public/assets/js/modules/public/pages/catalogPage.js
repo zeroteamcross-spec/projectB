@@ -289,11 +289,11 @@ function heroSection(notFound) {
     eyebrow.textContent = "Katalog publik";
 
     const title = document.createElement("h1");
-    title.className = "max-w-2xl text-2xl font-bold tracking-normal text-gray-950 xsm:text-1xl";
+    title.className = "max-w-2xl text-xl font-bold tracking-normal text-gray-950 xsm:text-1xl";
     title.textContent = "Halaman tidak ditemukan";
 
     const body = document.createElement("p");
-    body.className = "max-w-2xl text-base leading-7 text-gray-600";
+    body.className = "max-w-2xl text-sm leading-7 text-gray-600";
     body.textContent = "Kembali ke katalog untuk melihat mobil yang tersedia.";
 
     section.append(eyebrow, title, body);
@@ -315,7 +315,7 @@ function heroSection(notFound) {
   copy.className = "grid gap-3";
 
   const eyebrow = document.createElement("p");
-  eyebrow.className = "inline-flex w-fit max-w-full items-center gap-2 rounded-full bg-white/16 px-3 py-1 text-[11px] font-semibold uppercase tracking-normal text-[var(--pb-brand-accent)]";
+  eyebrow.className = "inline-flex w-fit max-w-full items-center gap-2 rounded-full bg-white/16 px-3 py-1 text-[10px] font-semibold uppercase tracking-normal text-[var(--pb-brand-accent)]";
   const eyebrowIcon = document.createElement("span");
   eyebrowIcon.className = "inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/15";
   eyebrowIcon.append(createIcon("bolt", { className: "block h-3 w-3 leading-none" }));
@@ -324,30 +324,30 @@ function heroSection(notFound) {
   eyebrow.append(eyebrowIcon, eyebrowText);
 
   const title = document.createElement("h1");
-  title.className = "max-w-3xl break-words text-[1.85rem] font-bold leading-tight tracking-normal text-white sm:text-4xl xl:text-[2.65rem]";
+  title.className = "max-w-3xl break-words text-[1.85rem] font-bold leading-tight tracking-normal text-white sm:text-3xl xl:text-[2.65rem]";
   title.textContent = affiliate?.showroom?.name
     ? `Diskon mobil ${affiliate.showroom.name} sampai 50 juta.`
     : "Diskon hingga 50 Juta";
 
   const body = document.createElement("p");
-  body.className = "max-w-2xl text-sm leading-6 text-white/85 sm:text-base";
+  body.className = "max-w-2xl text-xs leading-6 text-white/85 sm:text-sm";
   body.textContent = affiliate?.profile?.name
     ? `Masuk lewat affiliate ${affiliate.profile.name}. Context katalog, CTA konsultasi, dan transaksi akan tetap ikut selama sesi ini.`
     : "Berlaku dalam 2 hari lagi";
 
   const promoMeta = document.createElement("p");
-  promoMeta.className = "text-xs font-semibold text-white/75";
+  promoMeta.className = "text-[10px] font-semibold text-white/75";
   promoMeta.textContent = "Promo mobil pilihan";
 
   const actions = document.createElement("div");
   actions.className = "flex flex-wrap items-center gap-2.5 pt-1";
 
   const cta = document.createElement("span");
-  cta.className = "inline-flex items-center rounded-full bg-white/18 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur";
+  cta.className = "inline-flex items-center rounded-full bg-white/18 px-3 py-1.5 text-[10px] font-semibold text-white backdrop-blur";
   cta.textContent = "Promo";
 
   const countText = document.createElement("span");
-  countText.className = "text-xs font-medium text-white/75";
+  countText.className = "text-[10px] font-medium text-white/75";
   countText.textContent = `${metaCount(meta?.total ?? count)} unit siap tampil`;
 
   actions.append(cta, countText);
@@ -507,18 +507,18 @@ function catalogToolbar(count, meta, affiliate = null) {
   const title = document.createElement("h2");
   // Teks ini duduk langsung di atas kanvas halaman, bukan di atas kartu
   // berwarna. Dulu putih karena latarnya video gelap; sekarang kanvasnya krem.
-  title.className = "break-words text-sm font-bold tracking-normal text-[var(--pb-text-strong)]";
+  title.className = "break-words text-xs font-bold tracking-normal text-[var(--pb-text-strong)]";
   title.textContent = affiliate?.showroom?.name
     ? `Mobil Pilihan ${affiliate.showroom.name}`
     : "Mobil Pilihan Terbaik";
 
   const summary = document.createElement("p");
-  summary.className = "text-sm font-medium text-[var(--pb-text-muted)]";
+  summary.className = "text-xs font-medium text-[var(--pb-text-muted)]";
   // summary.textContent = `${count} tampil${meta?.total ? ` dari ${meta.total}` : ""}`;
 
   const action = document.createElement("a");
   action.href = publicContextService.catalogPath();
-  action.className = "hidden inline-flex w-fit items-center gap-1 text-sm font-semibold text-[var(--pb-brand-accent)] no-underline";
+  action.className = "hidden inline-flex w-fit items-center gap-1 text-xs font-semibold text-[var(--pb-brand-accent)] no-underline";
   action.textContent = "Semua >";
 
   copy.append(title, summary);
@@ -672,7 +672,7 @@ function loadMoreSection({ canLoadMore, isLoadingMore, onLoadMore }) {
 
   if (!canLoadMore) {
     const end = document.createElement("p");
-    end.className = "text-sm text-[var(--pb-text-muted)]";
+    end.className = "text-xs text-[var(--pb-text-muted)]";
     end.textContent = "Semua mobil yang cocok sudah ditampilkan.";
     wrap.append(end, trustMarks());
     return wrap;
@@ -709,7 +709,7 @@ function compactStat(value, label, colorClass) {
   item.className = "grid min-w-0 gap-1 bg-white px-3 py-3 text-center";
 
   const number = document.createElement("strong");
-  number.className = `break-words text-base font-bold sm:text-lg ${colorClass}`;
+  number.className = `break-words text-sm font-bold sm:text-base ${colorClass}`;
   number.textContent = value;
 
   const caption = document.createElement("span");
@@ -744,7 +744,7 @@ function metaCount(value) {
 
 function trustMarks() {
   const row = document.createElement("div");
-  row.className = "flex flex-wrap items-center justify-center gap-4 text-xs font-medium text-[var(--pb-text-muted)]";
+  row.className = "flex flex-wrap items-center justify-center gap-4 text-[10px] font-medium text-[var(--pb-text-muted)]";
 
   ["Inspeksi jelas", "Harga terarah", "Support cepat"].forEach((item) => {
     const pill = document.createElement("span");
@@ -959,7 +959,7 @@ function greetingBlock(user) {
   wrap.className = "grid min-w-0 gap-0.5";
 
   const greeting = document.createElement("h1");
-  greeting.className = "truncate text-xl font-black leading-tight tracking-normal text-[var(--pb-text-strong)]";
+  greeting.className = "truncate text-lg font-black leading-tight tracking-normal text-[var(--pb-text-strong)]";
   greeting.textContent = ` ${name}`;
 
   wrap.append(greeting, textNode("p", "truncate text-[5] font-semibold text-[var(--pb-text-muted)]", "Selamat datang kembali!"));
@@ -983,8 +983,8 @@ function buyerProfileAction({ user, actions, compact = false } = {}) {
   const button = document.createElement("button");
   button.type = "button";
   button.className = compact
-    ? "inline-flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] text-sm font-black text-[var(--pb-brand-secondary)] shadow-[var(--pb-shadow-card)] ring-1 ring-[var(--pb-border)] transition hover:bg-[var(--pb-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]"
-    : "inline-flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] text-sm font-black text-[var(--pb-brand-secondary)] shadow-[var(--pb-shadow-card)] ring-1 ring-[var(--pb-border)] transition hover:bg-[var(--pb-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+    ? "inline-flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] text-xs font-black text-[var(--pb-brand-secondary)] shadow-[var(--pb-shadow-card)] ring-1 ring-[var(--pb-border)] transition hover:bg-[var(--pb-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]"
+    : "inline-flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] text-xs font-black text-[var(--pb-brand-secondary)] shadow-[var(--pb-shadow-card)] ring-1 ring-[var(--pb-border)] transition hover:bg-[var(--pb-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]";
   button.setAttribute("aria-label", "Buka profil buyer");
   button.title = "Profil";
   button.addEventListener("click", () => actions?.navigate?.("/profile"));

@@ -372,8 +372,8 @@ function buyerMobileHeader({ user, actions }) {
   const copy = document.createElement("section");
   copy.className = "grid min-w-0 flex-1 gap-0.5";
   copy.append(
-    textNode("p", "text-sm font-bold text-[var(--pb-text-muted)]", "Pusat Notifikasi"),
-    textNode("h1", "truncate text-2xl font-black leading-tight tracking-normal text-[var(--pb-text)]", "Notifikasi"),
+    textNode("p", "text-xs font-bold text-[var(--pb-text-muted)]", "Pusat Notifikasi"),
+    textNode("h1", "truncate text-xl font-black leading-tight tracking-normal text-[var(--pb-text)]", "Notifikasi"),
   );
 
   const actionsWrap = document.createElement("section");
@@ -397,7 +397,7 @@ function buyerTopNavigation({ activePath, user, actions }) {
   brand.className = "flex min-w-0 items-center gap-3 px-1";
   brand.append(
     iconBox("bell", "h-11 w-11 rounded-full bg-[linear-gradient(135deg,var(--pb-btn-primary-from),var(--pb-btn-primary-to))] text-white shadow-[var(--pb-shadow-soft)]"),
-    textNode("strong", "truncate text-base font-black text-[var(--pb-text)]", "Notifikasi"),
+    textNode("strong", "truncate text-sm font-black text-[var(--pb-text)]", "Notifikasi"),
   );
 
   const links = document.createElement("section");
@@ -429,9 +429,9 @@ function buyerNotificationsHeader({ unreadCount, working, actions }) {
   const copy = document.createElement("section");
   copy.className = "grid min-w-0 gap-2";
   copy.append(
-    textNode("p", "text-xs font-black uppercase tracking-normal text-[var(--pb-brand-secondary)]", unreadCount > 0 ? `${unreadCount} belum dibaca` : "Semua sudah dibaca"),
-    textNode("h2", "break-words text-3xl font-black leading-tight tracking-normal text-[var(--pb-text)] md:text-4xl", "Notifikasi"),
-    textNode("p", "max-w-2xl text-sm font-semibold leading-6 text-[var(--pb-text-muted)]", "Pantau update transaksi, pembayaran, dan aktivitas akun Anda."),
+    textNode("p", "text-[10px] font-black uppercase tracking-normal text-[var(--pb-brand-secondary)]", unreadCount > 0 ? `${unreadCount} belum dibaca` : "Semua sudah dibaca"),
+    textNode("h2", "break-words text-2xl font-black leading-tight tracking-normal text-[var(--pb-text)] md:text-3xl", "Notifikasi"),
+    textNode("p", "max-w-2xl text-xs font-semibold leading-6 text-[var(--pb-text-muted)]", "Pantau update transaksi, pembayaran, dan aktivitas akun Anda."),
   );
 
   const actionWrap = document.createElement("section");
@@ -490,8 +490,8 @@ function buyerEmptyStateForFilter(filter, actions) {
   card.className = "grid min-h-[320px] min-w-0 place-items-center gap-4 rounded-[1.75rem] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] p-6 text-center shadow-[var(--pb-shadow-card)]";
   card.append(
     iconBox("bell", "h-14 w-14 rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_10%,white)] text-[var(--pb-brand-secondary)]"),
-    textNode("h2", "text-xl font-black text-[var(--pb-text)]", copy.title),
-    textNode("p", "max-w-md text-sm font-semibold leading-6 text-[var(--pb-text-muted)]", copy.description),
+    textNode("h2", "text-lg font-black text-[var(--pb-text)]", copy.title),
+    textNode("p", "max-w-md text-xs font-semibold leading-6 text-[var(--pb-text-muted)]", copy.description),
   );
   if (filter === "all") {
     const home = Button({
@@ -513,8 +513,8 @@ function buyerErrorState(actions) {
   wrap.className = "grid min-h-[320px] min-w-0 place-items-center gap-4 rounded-[1.75rem] border border-[var(--pb-error-border)] bg-[var(--pb-error-bg)] p-6 text-center shadow-[var(--pb-shadow-card)]";
   wrap.append(
     iconBox("triangleWarning", "h-14 w-14 rounded-full bg-white text-[var(--pb-danger)] shadow-[var(--pb-shadow-soft)]"),
-    textNode("h2", "text-xl font-black text-[var(--pb-danger)]", "Notifikasi belum bisa dimuat"),
-    textNode("p", "max-w-md text-sm font-semibold leading-6 text-[var(--pb-text-muted)]", "Coba lagi nanti."),
+    textNode("h2", "text-lg font-black text-[var(--pb-danger)]", "Notifikasi belum bisa dimuat"),
+    textNode("p", "max-w-md text-xs font-semibold leading-6 text-[var(--pb-text-muted)]", "Coba lagi nanti."),
   );
   const retry = Button({
     label: "Coba Lagi",
@@ -544,8 +544,8 @@ function buyerDesktopNavLink(item, activePath, actions) {
     });
   }
   link.className = active
-    ? "inline-flex min-w-0 items-center justify-center gap-2 rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] px-4 py-2 text-sm font-black text-[var(--pb-brand-secondary)] no-underline shadow-[var(--pb-shadow-soft)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]"
-    : "inline-flex min-w-0 items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-bold text-[var(--pb-text-muted)] no-underline transition hover:bg-[var(--pb-surface-muted)] hover:text-[var(--pb-text)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)] disabled:cursor-not-allowed disabled:opacity-55";
+    ? "inline-flex min-w-0 items-center justify-center gap-2 rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] px-4 py-2 text-xs font-black text-[var(--pb-brand-secondary)] no-underline shadow-[var(--pb-shadow-soft)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]"
+    : "inline-flex min-w-0 items-center justify-center gap-2 rounded-full px-4 py-2 text-xs font-bold text-[var(--pb-text-muted)] no-underline transition hover:bg-[var(--pb-surface-muted)] hover:text-[var(--pb-text)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)] disabled:cursor-not-allowed disabled:opacity-55";
   if (active) {
     link.setAttribute("aria-current", "page");
   }
@@ -560,8 +560,8 @@ function buyerProfileAvatarButton(user, actions, compact = false) {
   const button = document.createElement("button");
   button.type = "button";
   button.className = compact
-    ? "inline-flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] text-sm font-black text-[var(--pb-brand-secondary)] shadow-[var(--pb-shadow-card)] ring-1 ring-[var(--pb-border)] transition hover:bg-[var(--pb-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]"
-    : "inline-flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] text-sm font-black text-[var(--pb-brand-secondary)] shadow-[var(--pb-shadow-card)] ring-1 ring-[var(--pb-border)] transition hover:bg-[var(--pb-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+    ? "inline-flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] text-xs font-black text-[var(--pb-brand-secondary)] shadow-[var(--pb-shadow-card)] ring-1 ring-[var(--pb-border)] transition hover:bg-[var(--pb-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]"
+    : "inline-flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] text-xs font-black text-[var(--pb-brand-secondary)] shadow-[var(--pb-shadow-card)] ring-1 ring-[var(--pb-border)] transition hover:bg-[var(--pb-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]";
   button.setAttribute("aria-label", "Profil Saya");
   button.title = "Profil Saya";
   button.addEventListener("click", () => actions.navigate("/profile"));
@@ -619,13 +619,13 @@ function pageHeader(unreadCount, working, actions) {
   const copy = document.createElement("section");
   copy.className = "grid min-w-0 gap-2";
   const eyebrow = document.createElement("p");
-  eyebrow.className = "text-xs font-black uppercase tracking-normal text-[var(--pb-brand-secondary)]";
+  eyebrow.className = "text-[10px] font-black uppercase tracking-normal text-[var(--pb-brand-secondary)]";
   eyebrow.textContent = `${unreadCount} belum dibaca`;
   const title = document.createElement("h1");
-  title.className = "break-words text-2xl font-black leading-tight tracking-normal text-[var(--pb-text)] sm:text-3xl";
+  title.className = "break-words text-xl font-black leading-tight tracking-normal text-[var(--pb-text)] sm:text-2xl";
   title.textContent = "Notifikasi";
   const subtitle = document.createElement("p");
-  subtitle.className = "break-words text-sm font-semibold leading-6 text-[var(--pb-text-muted)]";
+  subtitle.className = "break-words text-xs font-semibold leading-6 text-[var(--pb-text-muted)]";
   subtitle.textContent = "Pantau aktivitas penting dari akun Anda.";
   copy.append(eyebrow, title, subtitle);
 
@@ -658,7 +658,7 @@ function inlineLoadingState() {
   const wrap = document.createElement("section");
   wrap.className = "pointer-events-none absolute inset-x-0 top-2 z-10 flex justify-center";
   const pill = document.createElement("span");
-  pill.className = "inline-flex min-h-9 items-center justify-center rounded-full border border-[var(--pb-border)] bg-[color-mix(in_srgb,var(--pb-surface-card)_94%,transparent)] px-4 text-xs font-black text-[var(--pb-brand-secondary)] shadow-[var(--pb-shadow-soft)] backdrop-blur-md";
+  pill.className = "inline-flex min-h-9 items-center justify-center rounded-full border border-[var(--pb-border)] bg-[color-mix(in_srgb,var(--pb-surface-card)_94%,transparent)] px-4 text-[10px] font-black text-[var(--pb-brand-secondary)] shadow-[var(--pb-shadow-soft)] backdrop-blur-md";
   pill.textContent = "Memuat filter...";
   wrap.append(pill);
   return wrap;
@@ -702,10 +702,10 @@ function errorState(actions) {
   icon.className = "inline-flex h-12 w-12 items-center justify-center rounded-full bg-white text-[var(--pb-danger)] shadow-[var(--pb-shadow-soft)]";
   icon.append(createIcon("triangleWarning", { className: "block h-5 w-5 leading-none" }));
   const title = document.createElement("h2");
-  title.className = "text-lg font-black text-[var(--pb-danger)]";
+  title.className = "text-base font-black text-[var(--pb-danger)]";
   title.textContent = "Notifikasi belum bisa dimuat";
   const text = document.createElement("p");
-  text.className = "text-sm font-semibold text-[var(--pb-text-muted)]";
+  text.className = "text-xs font-semibold text-[var(--pb-text-muted)]";
   text.textContent = "Coba lagi nanti.";
   wrap.append(icon, title, text, Button({
     label: "Coba Lagi",

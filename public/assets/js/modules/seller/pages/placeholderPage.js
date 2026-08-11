@@ -29,7 +29,7 @@ function render(root, router, title, description) {
   heading.textContent = "Fondasi route sudah siap";
 
   const text = document.createElement("p");
-  text.className = `mt-2 text-sm ${tw.text.muted}`;
+  text.className = `mt-2 text-xs ${tw.text.muted}`;
   text.textContent = "Halaman ini disiapkan sebagai entry point seller berikutnya tanpa membangun seluruh modul seller sekaligus.";
 
   const content = document.createElement("div");

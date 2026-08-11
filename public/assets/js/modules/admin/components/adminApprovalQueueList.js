@@ -55,8 +55,8 @@ export function AdminApprovalQueueList({
       { label: "User", render: (user) => userIdentity(user) },
       { label: "Role", render: (user) => Badge({ label: user.role || "-", variant: "default" }) },
       { label: "Status", render: (user) => Badge(adminApprovalQueueService.approvalMeta(user)) },
-      { label: "Showroom", render: (user) => textBlock("max-w-[220px] text-sm font-semibold text-gray-800", user.showroom?.name || "-") },
-      { label: "Dibuat", render: (user) => textBlock("whitespace-nowrap text-sm text-gray-600", formatDate(user.created_at)) },
+      { label: "Showroom", render: (user) => textBlock("max-w-[220px] text-xs font-semibold text-gray-800", user.showroom?.name || "-") },
+      { label: "Dibuat", render: (user) => textBlock("whitespace-nowrap text-xs text-gray-600", formatDate(user.created_at)) },
       { label: "Aksi", render: (user) => actionGroup({ user, selected: Number(selectedUserId) === Number(user.id), approvingUserId, reviewingUserId, onReview, onApprove }) },
     ],
     rows: users,
@@ -103,7 +103,7 @@ function userIdentity(user) {
   copy.className = "grid min-w-0 gap-1";
   copy.append(
     textBlock("break-words font-black text-gray-950", user.name || user.email || `User #${user.id}`),
-    textBlock("break-words text-sm text-gray-500", user.email || "-"),
+    textBlock("break-words text-xs text-gray-500", user.email || "-"),
   );
   wrap.append(avatar, copy);
   return wrap;

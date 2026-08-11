@@ -164,11 +164,11 @@ function redirectingNotice(roleLabel) {
   section.className = "grid gap-2 rounded-[1.5rem] border border-white/70 bg-white/85 px-5 py-6 text-center shadow-[0_24px_70px_rgba(15,23,42,0.12)] backdrop-blur-xl";
 
   const title = document.createElement("p");
-  title.className = "text-sm font-black text-gray-900";
+  title.className = "text-xs font-black text-gray-900";
   title.textContent = "Sesi Anda masih aktif";
 
   const body = document.createElement("p");
-  body.className = "text-sm leading-6 text-gray-600";
+  body.className = "text-xs leading-6 text-gray-600";
   body.textContent = `Mengarahkan ke dashboard ${roleLabel}...`;
 
   section.append(title, body);
@@ -202,21 +202,21 @@ function brandAnchor({ requestedPath }) {
   content.className = "relative grid max-w-xl gap-5";
 
   const mark = document.createElement("div");
-  mark.className = "grid h-14 w-14 place-items-center rounded-2xl bg-[linear-gradient(135deg,var(--pb-brand-primary),var(--pb-brand-accent))] text-lg font-black text-white shadow-[0_16px_40px_rgba(30,129,176,0.28)] transition duration-200 hover:scale-[1.02]";
+  mark.className = "grid h-14 w-14 place-items-center rounded-2xl bg-[linear-gradient(135deg,var(--pb-brand-primary),var(--pb-brand-accent))] text-base font-black text-white shadow-[0_16px_40px_rgba(30,129,176,0.28)] transition duration-200 hover:scale-[1.02]";
   mark.textContent = "BM";
 
   const title = document.createElement("h1");
-  title.className = "max-w-lg text-4xl font-black leading-[0.98] tracking-[-0.04em] text-gray-950 sm:text-5xl";
+  title.className = "max-w-lg text-3xl font-black leading-[0.98] tracking-[-0.04em] text-gray-950 sm:text-4xl";
   title.textContent = "Masuk dengan akun yang tepat.";
 
   const body = document.createElement("p");
-  body.className = "max-w-md text-sm leading-6 text-gray-600 sm:text-base";
+  body.className = "max-w-md text-xs leading-6 text-gray-600 sm:text-sm";
   body.textContent = requestedPath
     ? "Pilih role, lalu lanjutkan ke halaman tujuan."
     : "Satu pintu untuk buyer, seller, admin, dan affiliate.";
 
   const rail = document.createElement("div");
-  rail.className = "flex flex-wrap gap-2 text-xs font-semibold text-gray-600";
+  rail.className = "flex flex-wrap gap-2 text-[10px] font-semibold text-gray-600";
   ["Cepat", "Aman", "Ringkas"].forEach((item, index) => {
     const pill = document.createElement("span");
     pill.className = "rounded-full border border-white/80 bg-white/75 px-3 py-1 shadow-sm";
@@ -257,11 +257,11 @@ function roleChooser({ selectedRole, onChange }) {
     copy.className = "grid gap-1";
 
     const title = document.createElement("strong");
-    title.className = "text-sm font-black text-gray-950";
+    title.className = "text-xs font-black text-gray-950";
     title.textContent = option.label;
 
     const text = document.createElement("span");
-    text.className = "text-xs leading-5 text-gray-500";
+    text.className = "text-[10px] leading-5 text-gray-500";
     text.textContent = option.futureCopy;
 
     copy.append(title, text);
@@ -269,8 +269,8 @@ function roleChooser({ selectedRole, onChange }) {
 
     const status = document.createElement("span");
     status.className = option.role === selectedRole
-      ? "w-fit rounded-full bg-[color-mix(in_srgb,var(--pb-brand-accent)_28%,white)] px-2.5 py-1 text-[11px] font-bold text-[var(--pb-brand-secondary)]"
-      : "w-fit rounded-full bg-white/70 px-2.5 py-1 text-[11px] font-semibold text-gray-500";
+      ? "w-fit rounded-full bg-[color-mix(in_srgb,var(--pb-brand-accent)_28%,white)] px-2.5 py-1 text-[10px] font-bold text-[var(--pb-brand-secondary)]"
+      : "w-fit rounded-full bg-white/70 px-2.5 py-1 text-[10px] font-semibold text-gray-500";
     status.textContent = option.role === selectedRole ? "Aktif" : "Pilih";
 
     button.append(top, status);
@@ -303,11 +303,11 @@ function authPanel({
   header.className = "grid gap-1.5";
 
   const title = document.createElement("h2");
-  title.className = "text-2xl font-black tracking-[-0.03em] text-gray-950";
+  title.className = "text-xl font-black tracking-[-0.03em] text-gray-950";
   title.textContent = activeMode === "register" ? `Daftar ${publicAuthLandingService.roleLabel(selectedRole)}` : "Masuk ke akun";
 
   const body = document.createElement("p");
-  body.className = "text-sm leading-6 text-gray-600";
+  body.className = "text-xs leading-6 text-gray-600";
   body.textContent = requestedPath
     ? "Masuk, lalu kembali ke halaman tujuan."
     : "Gunakan email dan password sesuai akun Anda.";
@@ -325,7 +325,7 @@ function authPanel({
     const registerPath = publicAuthLandingService.registerPathForRole(selectedRole);
     const note = document.createElement("p");
     note.id = `hr_auth_${selectedRole}_no_register_note`;
-    note.className = "rounded-2xl bg-[var(--pb-surface-muted)] px-3 py-2 text-sm leading-6 text-gray-600";
+    note.className = "rounded-2xl bg-[var(--pb-surface-muted)] px-3 py-2 text-xs leading-6 text-gray-600";
 
     if (registerPath) {
       note.append(document.createTextNode("Belum punya showroom? Pendaftaran ada di halaman terpisah."));
@@ -366,8 +366,8 @@ function authModeButton(value, label, activeMode, onModeChange) {
   button.id = `hr_auth_tab_${value}_button`;
   button.type = "button";
   button.className = value === activeMode
-    ? "rounded-xl bg-white px-3 py-2.5 text-sm font-black text-gray-950 shadow-sm transition duration-200"
-    : "rounded-xl px-3 py-2.5 text-sm font-bold text-gray-500 transition duration-200 hover:bg-white/70 hover:text-gray-800";
+    ? "rounded-xl bg-white px-3 py-2.5 text-xs font-black text-gray-950 shadow-sm transition duration-200"
+    : "rounded-xl px-3 py-2.5 text-xs font-bold text-gray-500 transition duration-200 hover:bg-white/70 hover:text-gray-800";
   button.textContent = label;
   button.addEventListener("click", () => onModeChange?.(value));
   return button;
@@ -383,7 +383,7 @@ function loginForm({ selectedRole, isSubmitting, error, onSubmit }) {
 
   if (error) {
     const message = document.createElement("p");
-    message.className = "rounded-lg border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-3 py-2 text-sm font-medium text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
+    message.className = "rounded-lg border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-3 py-2 text-xs font-medium text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
     message.textContent = error;
     form.append(message);
   }
@@ -430,7 +430,7 @@ function registerForm({ selectedRole, isSubmitting, error, onSubmit }) {
 
   if (error) {
     const message = document.createElement("p");
-    message.className = "rounded-lg border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-3 py-2 text-sm font-medium text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
+    message.className = "rounded-lg border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-3 py-2 text-xs font-medium text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
     message.textContent = error;
     form.append(message);
   }
@@ -446,7 +446,7 @@ function registerForm({ selectedRole, isSubmitting, error, onSubmit }) {
   form.append(submit);
 
   const helper = document.createElement("p");
-  helper.className = "text-sm leading-6 text-gray-600";
+  helper.className = "text-xs leading-6 text-gray-600";
   helper.textContent = selectedRole === "seller"
     ? "Akun seller akan masuk antrean approval admin sebelum bisa login."
     : "Akun buyer aktif setelah registrasi dan akan langsung diarahkan ke area buyer.";
@@ -479,7 +479,7 @@ function registerForm({ selectedRole, isSubmitting, error, onSubmit }) {
 
 function field({ id, name, label, type = "text", placeholder = "", required = true }) {
   const wrap = document.createElement("label");
-  wrap.className = "grid gap-1.5 text-sm font-semibold text-gray-700";
+  wrap.className = "grid gap-1.5 text-xs font-semibold text-gray-700";
   wrap.textContent = label;
 
   const input = document.createElement("input");
@@ -488,7 +488,7 @@ function field({ id, name, label, type = "text", placeholder = "", required = tr
   input.type = type;
   input.required = required;
   input.placeholder = placeholder;
-  input.className = "min-h-11 min-w-0 w-full rounded-2xl border border-gray-200 bg-white/90 px-4 py-2.5 text-sm text-gray-950 outline-none transition duration-200 placeholder:text-[var(--pb-text-muted)] focus:border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] focus:bg-white focus:ring-4 focus:ring-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)]";
+  input.className = "min-h-11 min-w-0 w-full rounded-2xl border border-gray-200 bg-white/90 px-4 py-2.5 text-xs text-gray-950 outline-none transition duration-200 placeholder:text-[var(--pb-text-muted)] focus:border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] focus:bg-white focus:ring-4 focus:ring-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)]";
 
   wrap.append(input);
   return wrap;
@@ -496,7 +496,7 @@ function field({ id, name, label, type = "text", placeholder = "", required = tr
 
 function textareaField({ id, name, label, placeholder = "", required = true }) {
   const wrap = document.createElement("label");
-  wrap.className = "grid gap-1.5 text-sm font-semibold text-gray-700";
+  wrap.className = "grid gap-1.5 text-xs font-semibold text-gray-700";
   wrap.textContent = label;
 
   const input = document.createElement("textarea");
@@ -505,7 +505,7 @@ function textareaField({ id, name, label, placeholder = "", required = true }) {
   input.required = required;
   input.placeholder = placeholder;
   input.rows = 3;
-  input.className = "min-h-24 min-w-0 w-full resize-y rounded-2xl border border-gray-200 bg-white/90 px-4 py-2.5 text-sm text-gray-950 outline-none transition duration-200 placeholder:text-[var(--pb-text-muted)] focus:border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] focus:bg-white focus:ring-4 focus:ring-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)]";
+  input.className = "min-h-24 min-w-0 w-full resize-y rounded-2xl border border-gray-200 bg-white/90 px-4 py-2.5 text-xs text-gray-950 outline-none transition duration-200 placeholder:text-[var(--pb-text-muted)] focus:border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] focus:bg-white focus:ring-4 focus:ring-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)]";
 
   wrap.append(input);
   return wrap;

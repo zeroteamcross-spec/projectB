@@ -77,11 +77,11 @@ export class PublicShell {
     copy.className = "grid min-w-0";
 
     const title = document.createElement("strong");
-    title.className = `min-w-0 truncate text-base font-bold tracking-normal ${tw.text.gradientBrand}`;
+    title.className = `min-w-0 truncate text-sm font-bold tracking-normal ${tw.text.gradientBrand}`;
     title.textContent = brandConfig.appName;
 
     const subtitle = document.createElement("span");
-    subtitle.className = "hidden text-xs font-medium text-[var(--pb-text-muted)] sm:block";
+    subtitle.className = "hidden text-[10px] font-medium text-[var(--pb-text-muted)] sm:block";
     subtitle.textContent = "Showroom mobil pilihan";
 
     copy.append(title, subtitle);
@@ -92,7 +92,7 @@ export class PublicShell {
 
     const login = document.createElement("a");
     this.actionLink = login;
-    login.className = "inline-flex h-10 shrink-0 items-center justify-center rounded-[var(--pb-radius-xl)] border border-[var(--pb-border)] bg-[var(--pb-btn-secondary-bg)] px-3 text-sm font-semibold text-[var(--pb-btn-secondary-text)] leading-none shadow-[var(--pb-shadow-soft)] transition hover:brightness-95";
+    login.className = "inline-flex h-10 shrink-0 items-center justify-center rounded-[var(--pb-radius-xl)] border border-[var(--pb-border)] bg-[var(--pb-btn-secondary-bg)] px-3 text-xs font-semibold text-[var(--pb-btn-secondary-text)] leading-none shadow-[var(--pb-shadow-soft)] transition hover:brightness-95";
     login.setAttribute("aria-label", "Akun");
     this.syncActionLink();
 

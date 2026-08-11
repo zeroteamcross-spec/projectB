@@ -33,7 +33,7 @@ export function SellerCarCard({ car, onEdit = null, onArchive = null, onImages =
   title.textContent = [car.brand_name, car.model_name, car.sub_model_name].filter(Boolean).join(" ") || "Mobil";
 
   const meta = document.createElement("p");
-  meta.className = `text-sm leading-6 ${tw.text.muted}`;
+  meta.className = `text-xs leading-6 ${tw.text.muted}`;
   meta.textContent = [car.registration_date?.slice(0, 4), labelize(car.transmission), car.primary_color, car.location_name]
     .filter(Boolean)
     .join(" | ") || "Detail listing belum lengkap";
@@ -98,10 +98,10 @@ function factNode(id, label, value, iconName) {
   const copy = document.createElement("span");
   copy.className = "grid min-w-0";
   const caption = document.createElement("span");
-  caption.className = "text-[11px] font-black uppercase tracking-[0.12em] text-gray-500";
+  caption.className = "text-[10px] font-black uppercase tracking-[0.12em] text-gray-500";
   caption.textContent = label;
   const content = document.createElement("span");
-  content.className = "min-w-0 truncate text-sm font-black text-gray-950";
+  content.className = "min-w-0 truncate text-xs font-black text-gray-950";
   content.textContent = value ?? "-";
   copy.append(caption, content);
   node.append(icon, copy);

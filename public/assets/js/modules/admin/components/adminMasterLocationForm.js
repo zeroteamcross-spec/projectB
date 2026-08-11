@@ -20,8 +20,8 @@ export function AdminMasterLocationForm({
   intro.id = "admstloc_form_intro_section";
   intro.className = "rounded-[1.5rem] border border-[var(--pb-border)] bg-[linear-gradient(135deg,rgba(250,244,237,0.94),rgba(234,244,249,0.82))] p-4";
   intro.append(
-    textNode("p", "text-xs font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", mode === "edit" ? "Edit lokasi" : "Create lokasi"),
-    textNode("p", "mt-1 text-sm font-semibold leading-6 text-gray-600", "Field provinsi bersifat opsional agar master ini siap diperluas ke tingkat provinsi tanpa mengubah schema payload."),
+    textNode("p", "text-[10px] font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", mode === "edit" ? "Edit lokasi" : "Create lokasi"),
+    textNode("p", "mt-1 text-xs font-semibold leading-6 text-gray-600", "Field provinsi bersifat opsional agar master ini siap diperluas ke tingkat provinsi tanpa mengubah schema payload."),
   );
 
   const fields = document.createElement("section");
@@ -83,26 +83,26 @@ export function AdminMasterLocationForm({
 
 function inputField(id, name, label, value, placeholder) {
   const wrap = document.createElement("label");
-  wrap.className = "grid gap-1 text-sm font-semibold text-gray-700";
+  wrap.className = "grid gap-1 text-xs font-semibold text-gray-700";
   wrap.textContent = label;
   const input = document.createElement("input");
   input.id = id;
   input.name = name;
   input.value = value ?? "";
   input.placeholder = placeholder;
-  input.className = "min-h-11 min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-2.5 text-sm text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  input.className = "min-h-11 min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-2.5 text-xs text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
   wrap.append(input);
   return { wrap, input };
 }
 
 function selectField(id, name, label, value, options) {
   const wrap = document.createElement("label");
-  wrap.className = "grid gap-1 text-sm font-semibold text-gray-700";
+  wrap.className = "grid gap-1 text-xs font-semibold text-gray-700";
   wrap.textContent = label;
   const select = document.createElement("select");
   select.id = id;
   select.name = name;
-  select.className = "min-h-11 min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-2.5 text-sm text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  select.className = "min-h-11 min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-2.5 text-xs text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
   options.forEach(([optionValue, optionLabel]) => {
     const option = document.createElement("option");
     option.value = optionValue;

@@ -126,8 +126,8 @@ function buyerMobileHeader({ actions }) {
   const copy = document.createElement("section");
   copy.className = "grid min-w-0 flex-1 gap-0.5";
   copy.append(
-    textNode("p", "text-sm font-bold text-[var(--pb-text-muted)]", "Buyer Center"),
-    textNode("h1", "truncate text-2xl font-black leading-tight tracking-normal text-[var(--pb-text)]", "Portofolio"),
+    textNode("p", "text-xs font-bold text-[var(--pb-text-muted)]", "Buyer Center"),
+    textNode("h1", "truncate text-xl font-black leading-tight tracking-normal text-[var(--pb-text)]", "Portofolio"),
   );
 
   const actionGroup = document.createElement("section");
@@ -155,9 +155,9 @@ function portfolioHeader({ summary, actions }) {
   const copy = document.createElement("section");
   copy.className = "grid min-w-0 gap-2";
   copy.append(
-    textNode("p", "text-xs font-black uppercase tracking-normal text-[var(--pb-brand-secondary)]", "Portofolio Buyer"),
-    textNode("h1", "break-words text-xl font-black leading-tight tracking-normal text-[var(--pb-text)] md:text-4xl", "Transaksi & Affiliator"),
-    textNode("p", "max-w-2xl text-sm font-semibold leading-6 text-[var(--pb-text-muted)]", "Ringkasan transaksi buyer dan area awal untuk sistem affiliator buyer."),
+    textNode("p", "text-[10px] font-black uppercase tracking-normal text-[var(--pb-brand-secondary)]", "Portofolio Buyer"),
+    textNode("h1", "break-words text-lg font-black leading-tight tracking-normal text-[var(--pb-text)] md:text-3xl", "Transaksi & Affiliator"),
+    textNode("p", "max-w-2xl text-xs font-semibold leading-6 text-[var(--pb-text-muted)]", "Ringkasan transaksi buyer dan area awal untuk sistem affiliator buyer."),
   );
 
   const meta = document.createElement("section");
@@ -197,8 +197,8 @@ function summaryCards({ summary }) {
         icon,
         iconSize: "h-4 w-4",
       }),
-      textNode("span", "text-xs font-black text-[var(--pb-text-muted)]", label),
-      textNode("strong", "text-2xl font-black text-[var(--pb-text)]", String(summary[key] ?? 0)),
+      textNode("span", "text-[10px] font-black text-[var(--pb-text-muted)]", label),
+      textNode("strong", "text-xl font-black text-[var(--pb-text)]", String(summary[key] ?? 0)),
     );
     section.append(card);
   });
@@ -247,16 +247,16 @@ function transactionRow({ transaction, actions }) {
   const copy = document.createElement("section");
   copy.className = "grid min-w-0 gap-2";
   copy.append(
-    textNode("h3", "line-clamp-2 break-words text-base font-black text-[var(--pb-text)]", transactionCarLabel(transaction)),
-    textNode("p", "break-words text-sm font-semibold text-[var(--pb-text-muted)]", transaction.transaction_code || `Transaksi #${transaction.id ?? "-"}`),
+    textNode("h3", "line-clamp-2 break-words text-sm font-black text-[var(--pb-text)]", transactionCarLabel(transaction)),
+    textNode("p", "break-words text-xs font-semibold text-[var(--pb-text-muted)]", transaction.transaction_code || `Transaksi #${transaction.id ?? "-"}`),
   );
 
   const meta = document.createElement("section");
   meta.className = "flex flex-wrap gap-2";
   meta.append(
     Badge({ label: getTransactionStatusMeta(transaction.transaction_status).label, variant: getTransactionStatusMeta(transaction.transaction_status).variant }),
-    textNode("span", "inline-flex min-h-8 items-center rounded-full bg-[var(--pb-surface-card)] px-3 text-xs font-black text-[var(--pb-brand-secondary)]", formatCurrency(transaction.car_price ?? transaction.dp_amount ?? 0)),
-    textNode("span", "inline-flex min-h-8 items-center rounded-full bg-[var(--pb-surface-card)] px-3 text-xs font-bold text-[var(--pb-text-muted)]", formatDate(transaction.created_at)),
+    textNode("span", "inline-flex min-h-8 items-center rounded-full bg-[var(--pb-surface-card)] px-3 text-[10px] font-black text-[var(--pb-brand-secondary)]", formatCurrency(transaction.car_price ?? transaction.dp_amount ?? 0)),
+    textNode("span", "inline-flex min-h-8 items-center rounded-full bg-[var(--pb-surface-card)] px-3 text-[10px] font-bold text-[var(--pb-text-muted)]", formatDate(transaction.created_at)),
   );
   copy.append(meta);
 
@@ -306,8 +306,8 @@ function affiliatorPanel({ user, actions }) {
     card.addEventListener("click", actions.showDevelopmentToast);
     card.append(
       iconBox({ size: "h-10 w-10", className: "rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_10%,white)] text-[var(--pb-brand-secondary)]", icon, iconSize: "h-4 w-4" }),
-      textNode("span", "text-xs font-black text-[var(--pb-text-muted)]", label),
-      textNode("strong", "break-words text-lg font-black text-[var(--pb-text)]", value),
+      textNode("span", "text-[10px] font-black text-[var(--pb-text-muted)]", label),
+      textNode("strong", "break-words text-base font-black text-[var(--pb-text)]", value),
     );
     grid.append(card);
   });
@@ -340,8 +340,8 @@ function buyerProfileAction({ actions, compact = false } = {}) {
   const button = document.createElement("button");
   button.type = "button";
   button.className = compact
-    ? "inline-flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] text-sm font-black text-[var(--pb-brand-secondary)] shadow-[var(--pb-shadow-card)] ring-1 ring-[var(--pb-border)] transition hover:bg-[var(--pb-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]"
-    : "inline-flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] text-sm font-black text-[var(--pb-brand-secondary)] shadow-[var(--pb-shadow-card)] ring-1 ring-[var(--pb-border)] transition hover:bg-[var(--pb-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+    ? "inline-flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] text-xs font-black text-[var(--pb-brand-secondary)] shadow-[var(--pb-shadow-card)] ring-1 ring-[var(--pb-border)] transition hover:bg-[var(--pb-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]"
+    : "inline-flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] text-xs font-black text-[var(--pb-brand-secondary)] shadow-[var(--pb-shadow-card)] ring-1 ring-[var(--pb-border)] transition hover:bg-[var(--pb-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]";
   button.setAttribute("aria-label", "Profil Saya");
   button.title = "Profil Saya";
   button.addEventListener("click", () => actions?.navigate?.("/profile"));
@@ -412,7 +412,7 @@ function transactionCarLabel(transaction) {
 
 function headerPill(icon, label) {
   const pill = document.createElement("span");
-  pill.className = "inline-flex min-h-10 items-center gap-2 rounded-full border border-[var(--pb-border)] bg-[var(--pb-surface-card)] px-3 text-sm font-black text-[var(--pb-text-strong)] shadow-[var(--pb-shadow-soft)]";
+  pill.className = "inline-flex min-h-10 items-center gap-2 rounded-full border border-[var(--pb-border)] bg-[var(--pb-surface-card)] px-3 text-xs font-black text-[var(--pb-text-strong)] shadow-[var(--pb-shadow-soft)]";
   pill.append(
     iconBox({ size: "h-7 w-7", className: "rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_10%,white)] text-[var(--pb-brand-secondary)]", icon, iconSize: "h-3.5 w-3.5" }),
     document.createTextNode(label),
@@ -424,8 +424,8 @@ function textWrap(title, description) {
   const wrap = document.createElement("section");
   wrap.className = "grid min-w-0 gap-1";
   wrap.append(
-    textNode("span", "break-words text-sm font-black text-[var(--pb-text)]", title),
-    textNode("span", "break-words text-sm font-semibold text-[var(--pb-text-muted)]", description),
+    textNode("span", "break-words text-xs font-black text-[var(--pb-text)]", title),
+    textNode("span", "break-words text-xs font-semibold text-[var(--pb-text-muted)]", description),
   );
   return wrap;
 }

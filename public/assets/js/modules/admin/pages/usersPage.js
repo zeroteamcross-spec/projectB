@@ -9,7 +9,6 @@ import { adminUserManagementService } from "../services/adminUserManagementServi
 import { AdminUsersFilterBar } from "../components/adminUsersFilterBar.js";
 import { AdminUsersList } from "../components/adminUsersList.js";
 import { AdminUserDetailPanel } from "../components/adminUserDetailPanel.js";
-import { buildAdminUsersPreviewDataset } from "../utils/adminUsersPreviewDataset.js";
 import { applyDesignHook } from "../../../theme/designStudioHooks.js";
 
 export function AdminUsersPage() {
@@ -67,9 +66,7 @@ export function AdminUsersPage() {
       };
       syncUsersUrl(state.query);
       rerender();
-      if (!user?.is_preview_seed) {
-        hydrateUserDetail(user.id);
-      }
+      hydrateUserDetail(user.id);
     },
     closeUserDetail() {
       state.error = "";
@@ -178,12 +175,12 @@ function render(root, context, state, actions) {
   const usersHydratedAt = appStore.get("working.adminUsers.users.hydratedAt", 0) ?? 0;
   const hasUsersSource = Boolean(workingUsersPayload || snapshotUsersPayload);
 
-  const previewDataset = buildAdminUsersPreviewDataset({
-    users: usersPayload.users ?? [],
-    pendingUsers: pendingPayload.users ?? [],
-  });
-  const users = previewDataset.users;
-  const pendingUsers = previewDataset.pendingUsers;
+  // Super admin tidak ditampilkan di sini. Halaman ini untuk mengelola
+  // pengguna operasional; akun super admin tidak diapa-apakan dari sini --
+  // tidak di-approve, tidak di-impersonate -- jadi menampilkannya hanya
+  // memberi tahu setiap admin siapa saja pemegang akses tertinggi.
+  const users = tanpaSuperAdmin(usersPayload.users ?? []);
+  const pendingUsers = tanpaSuperAdmin(pendingPayload.users ?? []);
   const filteredUsers = adminUserManagementService.filterUsers(users, filters);
   const counts = adminUserManagementService.counts(users);
   const currentPage = Math.max(1, Number(filters.page || 1));
@@ -231,7 +228,7 @@ function render(root, context, state, actions) {
 
   if (state.error) {
     const error = document.createElement("div");
-    error.className = "rounded-lg border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-sm font-medium text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
+    error.className = "rounded-lg border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-xs font-medium text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
     error.textContent = state.error;
     main.append(error);
   }
@@ -308,9 +305,9 @@ function usersHero({ action }) {
 
   copy.append(
     icon,
-    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", ""),
-    textNode("h1", "max-w-2xl text-3xl font-black leading-tight tracking-normal text-gray-950 sm:text-4xl", "User Management"),
-    textNode("p", "max-w-xl text-sm leading-6 text-gray-600", ""),
+    textNode("p", "text-[10px] font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", ""),
+    textNode("h1", "max-w-2xl text-2xl font-black leading-tight tracking-normal text-gray-950 sm:text-3xl", "User Management"),
+    textNode("p", "max-w-xl text-xs leading-6 text-gray-600", ""),
   );
 
   layout.append(copy, action);
@@ -414,6 +411,10 @@ function createUsersQuery(query = {}) {
   };
 }
 
+function tanpaSuperAdmin(users) {
+  return (Array.isArray(users) ? users : []).filter((user) => user?.role !== "super_admin");
+}
+
 function syncUsersUrl(query) {
   const nextHash = `#${buildUsersPath(query)}`;
   const url = new URL(window.location.href);
@@ -473,21 +474,21 @@ function openImpersonationModal({ user, onConfirm }) {
     });
 
     const note = document.createElement("div");
-    note.className = "grid gap-2 rounded-2xl border border-[color-mix(in_srgb,var(--pb-warning)_26%,white)] bg-[color-mix(in_srgb,var(--pb-warning)_8%,white)] px-4 py-3 text-sm text-[color-mix(in_srgb,var(--pb-warning)_84%,black)]";
+    note.className = "grid gap-2 rounded-2xl border border-[color-mix(in_srgb,var(--pb-warning)_26%,white)] bg-[color-mix(in_srgb,var(--pb-warning)_8%,white)] px-4 py-3 text-xs text-[color-mix(in_srgb,var(--pb-warning)_84%,black)]";
     note.append(
       textNode("strong", "break-words", `Masuk sebagai ${targetLabel.toLowerCase()} ${user.name || user.email || `User #${user.id}`}`),
       textNode("p", "break-words text-[color-mix(in_srgb,var(--pb-warning)_84%,black)]", "Aksi ini akan tercatat di audit log. Anda tetap bisa kembali ke akun admin dari banner impersonation."),
     );
 
     const reasonField = document.createElement("label");
-    reasonField.className = "grid min-w-0 gap-1 text-sm font-bold text-[var(--pb-text-strong)]";
+    reasonField.className = "grid min-w-0 gap-1 text-xs font-bold text-[var(--pb-text-strong)]";
     const textarea = document.createElement("textarea");
     textarea.id = "adusr_affiliate_impersonation_reason_input";
     textarea.rows = 3;
     textarea.value = draft.reason;
     textarea.disabled = processing;
     textarea.placeholder = "Alasan support/debugging (opsional)";
-    textarea.className = "min-h-24 w-full resize-y rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-sm font-semibold text-[var(--pb-text)] outline-none focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)] disabled:opacity-60";
+    textarea.className = "min-h-24 w-full resize-y rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-xs font-semibold text-[var(--pb-text)] outline-none focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)] disabled:opacity-60";
     textarea.addEventListener("input", () => {
       draft.reason = textarea.value;
     });

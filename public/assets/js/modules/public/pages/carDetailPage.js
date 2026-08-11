@@ -211,15 +211,15 @@ function desktopCta({ car, context }) {
   const lock = getListingLockStatus({ car });
 
   const eyebrow = document.createElement("span");
-  eyebrow.className = "text-[11px] font-semibold uppercase tracking-normal text-[var(--pb-brand-secondary)]";
+  eyebrow.className = "text-[10px] font-semibold uppercase tracking-normal text-[var(--pb-brand-secondary)]";
   eyebrow.textContent = "Lanjutkan minat";
 
   const title = document.createElement("h2");
-  title.className = "text-lg font-bold tracking-normal text-gray-950";
+  title.className = "text-base font-bold tracking-normal text-gray-950";
   title.textContent = lock.locked ? `${lock.label}. Konsultasi seller untuk alternatif unit.` : "Buka transaksi atau konsultasi lebih dulu.";
 
   const body = document.createElement("p");
-  body.className = "text-sm leading-6 text-gray-600";
+  body.className = "text-xs leading-6 text-gray-600";
   body.textContent = lock.locked
     ? "Unit ini tidak lagi tersedia untuk checkout karena sudah dikunci transaksi."
     : "Gunakan WhatsApp untuk tanya kondisi, lalu lanjutkan ke transaksi saat sudah yakin.";
@@ -247,15 +247,15 @@ function descriptionSection(car) {
   applyDesignHook(section, "public.car_detail.description");
 
   const eyebrow = document.createElement("span");
-  eyebrow.className = "text-[11px] font-semibold uppercase tracking-normal text-[var(--pb-brand-secondary)]";
+  eyebrow.className = "text-[10px] font-semibold uppercase tracking-normal text-[var(--pb-brand-secondary)]";
   eyebrow.textContent = "Catatan listing";
 
   const title = document.createElement("h2");
-  title.className = "text-lg font-bold tracking-normal text-gray-950";
+  title.className = "text-base font-bold tracking-normal text-gray-950";
   title.textContent = "Catatan mobil";
 
   const body = document.createElement("p");
-  body.className = "text-sm leading-7 text-gray-600";
+  body.className = "text-xs leading-7 text-gray-600";
   body.textContent = car?.description || "Deskripsi detail belum tersedia. Gunakan konsultasi untuk menanyakan kondisi dan dokumen mobil.";
 
   section.append(eyebrow, title, body);

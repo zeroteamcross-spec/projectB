@@ -14,13 +14,13 @@ export function TransactionResultPanel({ transaction, onOpenDashboard = null, on
   const header = document.createElement("div");
   header.className = "grid gap-1";
   const eyebrow = document.createElement("p");
-  eyebrow.className = "text-[11px] font-semibold uppercase tracking-[0.16em] text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
+  eyebrow.className = "text-[10px] font-semibold uppercase tracking-[0.16em] text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
   eyebrow.textContent = "Transaksi dibuat";
   const title = document.createElement("h2");
-  title.className = "text-2xl font-bold tracking-normal text-gray-950";
+  title.className = "text-xl font-bold tracking-normal text-gray-950";
   title.textContent = transaction?.transaction_code ?? `Transaksi #${transaction?.id ?? "-"}`;
   const body = document.createElement("p");
-  body.className = "text-sm leading-6 text-gray-600";
+  body.className = "text-xs leading-6 text-gray-600";
   body.textContent = "Sesi pembayaran awal sudah dibuat. Simpan informasi ini untuk pengecekan status pembayaran berikutnya.";
   header.append(eyebrow, title, body);
 
@@ -110,7 +110,7 @@ function paymentInstructionSummary(details) {
   box.className = "grid gap-3 rounded-[1.5rem] border border-[color-mix(in_srgb,var(--pb-success)_26%,white)] bg-white/80 px-4 py-4";
 
   const title = document.createElement("h3");
-  title.className = "text-sm font-bold text-gray-950";
+  title.className = "text-xs font-bold text-gray-950";
   title.textContent = details.method === "gopay"
     ? "Instruksi GoPay"
     : details.method === "qris"
@@ -137,7 +137,7 @@ function paymentInstructionSummary(details) {
   }
 
   const list = document.createElement("ol");
-  list.className = "grid list-decimal gap-2 pl-5 text-sm leading-6 text-gray-700";
+  list.className = "grid list-decimal gap-2 pl-5 text-xs leading-6 text-gray-700";
   instructionSteps(details.method, {
     hasQr: Boolean(details.qrCodeUrl),
     hasDeeplink: Boolean(details.deeplinkUrl),

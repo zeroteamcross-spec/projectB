@@ -5,11 +5,11 @@ export function PublicSpecSummary({ car } = {}) {
   const eyebrow = document.createElement("span");
   // Bagian ini berdiri di kanvas halaman, bukan di kartu berwarna, jadi teksnya
   // ikut warna teks tema -- dulu putih karena latarnya video gelap.
-  eyebrow.className = "text-[11px] font-semibold uppercase tracking-normal text-[var(--pb-text-muted)]";
+  eyebrow.className = "text-[10px] font-semibold uppercase tracking-normal text-[var(--pb-text-muted)]";
   eyebrow.textContent = "Ringkasan mobil";
 
   const title = document.createElement("h2");
-  title.className = "text-lg font-bold tracking-normal text-[var(--pb-text-strong)]";
+  title.className = "text-base font-bold tracking-normal text-[var(--pb-text-strong)]";
   title.textContent = "Ringkasan spesifikasi";
 
   const grid = document.createElement("div");
@@ -34,11 +34,11 @@ function specItem(label, value) {
   node.className = "rounded-[24px] border border-white/75 bg-white/95 p-4 shadow-card backdrop-blur";
 
   const caption = document.createElement("p");
-  caption.className = "text-xs font-medium text-gray-500";
+  caption.className = "text-[10px] font-medium text-gray-500";
   caption.textContent = label;
 
   const content = document.createElement("p");
-  content.className = "mt-1 text-sm font-bold tracking-normal text-gray-950";
+  content.className = "mt-1 text-xs font-bold tracking-normal text-gray-950";
   content.textContent = value || "-";
 
   node.append(caption, content);

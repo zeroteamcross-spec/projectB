@@ -22,10 +22,10 @@ export function CompletionPaymentPanel({
   eyebrow.className = tw.text.eyebrow;
   eyebrow.textContent = "Pelunasan";
   const title = document.createElement("h2");
-  title.className = "text-lg font-bold tracking-normal text-gray-950";
+  title.className = "text-base font-bold tracking-normal text-gray-950";
   title.textContent = "Bayar sisa transaksi";
   const body = document.createElement("p");
-  body.className = "text-sm leading-6 text-gray-600";
+  body.className = "text-xs leading-6 text-gray-600";
   body.textContent = "Pilih metode pembayaran untuk membuat sesi pelunasan.";
   header.append(eyebrow, title, body);
 
@@ -94,7 +94,7 @@ function paymentMethodField(value, onChange) {
   wrap.className = "grid gap-2";
 
   const label = document.createElement("legend");
-  label.className = "text-sm font-bold text-gray-800";
+  label.className = "text-xs font-bold text-gray-800";
   label.textContent = "Metode pembayaran";
 
   const grid = document.createElement("div");
@@ -115,11 +115,11 @@ function paymentMethodField(value, onChange) {
     input.addEventListener("change", () => onChange?.({ payment_method: option.value }));
 
     const title = document.createElement("strong");
-    title.className = "text-base text-gray-950";
+    title.className = "text-sm text-gray-950";
     title.textContent = option.label;
 
     const body = document.createElement("span");
-    body.className = "text-xs text-gray-500";
+    body.className = "text-[10px] text-gray-500";
     body.textContent = option.description;
 
     card.append(input, title, body);
@@ -134,7 +134,7 @@ function resultBox(transaction) {
   box.className = `grid gap-4 ${tw.surface.successInset} shadow-sm`;
 
   const title = document.createElement("strong");
-  title.className = "text-base text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
+  title.className = "text-sm text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
   title.textContent = "Sesi pelunasan dibuat";
 
   const detailsState = resolvePaymentArtifacts(transaction);
@@ -157,7 +157,7 @@ function resultBox(transaction) {
     box.append(virtualAccountBox(virtualAccount));
   } else {
     const note = document.createElement("p");
-    note.className = "rounded-2xl border border-[color-mix(in_srgb,var(--pb-success)_26%,white)] bg-white px-4 py-3 text-sm leading-6 text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
+    note.className = "rounded-2xl border border-[color-mix(in_srgb,var(--pb-success)_26%,white)] bg-white px-4 py-3 text-xs leading-6 text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
     note.textContent = detailsState.method === "gopay"
       ? "Gunakan halaman status pembayaran buyer untuk membuka aplikasi GoPay, melihat QR, dan cek status."
       : "Gunakan halaman status pembayaran buyer untuk melihat QRIS, mengunduh QR, dan cek status.";
@@ -176,7 +176,7 @@ function resultBox(transaction) {
   }
 
   const note = document.createElement("p");
-  note.className = "text-sm leading-6 text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
+  note.className = "text-xs leading-6 text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
   note.textContent = "Setelah membayar, kembali ke halaman ini. Status akan dicek otomatis; Refresh status tetap tersedia sebagai fallback.";
   box.append(note);
 
@@ -188,22 +188,22 @@ function virtualAccountBox(info) {
   box.className = "grid gap-2 rounded-2xl border border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] bg-white px-4 py-4 shadow-sm";
 
   const label = document.createElement("span");
-  label.className = "text-xs font-semibold uppercase tracking-normal text-gray-500";
+  label.className = "text-[10px] font-semibold uppercase tracking-normal text-gray-500";
   label.textContent = info.type === "mandiri_bill"
     ? "Kode bayar Mandiri"
     : "Nomor virtual account";
 
   const value = document.createElement("strong");
-  value.className = "break-all text-2xl font-black tracking-normal text-[var(--pb-brand-secondary)]";
+  value.className = "break-all text-xl font-black tracking-normal text-[var(--pb-brand-secondary)]";
   value.textContent = info.value || "Belum tersedia";
 
   const bank = document.createElement("span");
-  bank.className = "text-sm font-semibold text-gray-700";
+  bank.className = "text-xs font-semibold text-gray-700";
   bank.textContent = info.bank ? `Bank ${String(info.bank).toUpperCase()}` : "Provider Midtrans";
 
   if (info.type === "mandiri_bill" && info.billerCode) {
     const biller = document.createElement("span");
-    biller.className = "text-xs font-medium text-gray-500";
+    biller.className = "text-[10px] font-medium text-gray-500";
     biller.textContent = `Biller code: ${info.billerCode}`;
     box.append(label, value, bank, biller);
     return box;

@@ -34,13 +34,13 @@ function syncModalHeader(panel, modal) {
   copy.className = "grid min-w-0 gap-1";
 
   const title = copy.querySelector("h2") ?? document.createElement("h2");
-  title.className = "break-words text-lg font-black tracking-normal text-gray-950 sm:text-xl";
+  title.className = "break-words text-base font-black tracking-normal text-gray-950 sm:text-lg";
   title.textContent = modal.title ?? "";
   copy.replaceChildren(title);
 
   if (modal.description) {
     const description = document.createElement("p");
-    description.className = "break-words text-sm leading-6 text-[var(--pb-text-muted)]";
+    description.className = "break-words text-xs leading-6 text-[var(--pb-text-muted)]";
     description.textContent = modal.description;
     copy.append(description);
   }

@@ -93,13 +93,13 @@ export function SellerCarForm({
 
   const errorNode = document.createElement("p");
   errorNode.id = "slrc_car_form_error_section";
-  errorNode.className = "rounded-lg border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-3 py-2 text-sm font-medium text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
+  errorNode.className = "rounded-lg border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-3 py-2 text-xs font-medium text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
   errorNode.textContent = error;
   errorNode.hidden = !error;
 
   const validationNode = document.createElement("p");
   validationNode.id = "slrc_car_form_validation_section";
-  validationNode.className = "rounded-lg border border-[color-mix(in_srgb,var(--pb-warning)_26%,white)] bg-[color-mix(in_srgb,var(--pb-warning)_8%,white)] px-3 py-2 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-warning)_84%,black)]";
+  validationNode.className = "rounded-lg border border-[color-mix(in_srgb,var(--pb-warning)_26%,white)] bg-[color-mix(in_srgb,var(--pb-warning)_8%,white)] px-3 py-2 text-xs font-semibold text-[color-mix(in_srgb,var(--pb-warning)_84%,black)]";
   validationNode.hidden = true;
 
   const step1 = createStepPanel(1, currentStep);
@@ -207,14 +207,14 @@ function formHeader(car) {
   title.className = tw.text.sectionTitle;
   title.textContent = car?.id ? "Edit mobil" : "Tambah mobil";
   const helper = document.createElement("p");
-  helper.className = `text-sm leading-6 ${tw.text.muted}`;
+  helper.className = `text-xs leading-6 ${tw.text.muted}`;
   helper.textContent = "";
   copy.append(title, helper);
   copyWrap.append(icon, copy);
 
   const badge = document.createElement("section");
   badge.id = "slrc_car_form_progress_summary_section";
-  badge.className = "rounded-2xl border border-[var(--pb-border)] bg-[var(--pb-surface-muted)] px-3 py-2 text-xs font-black uppercase tracking-[0.12em] text-[var(--pb-brand-secondary)]";
+  badge.className = "rounded-2xl border border-[var(--pb-border)] bg-[var(--pb-surface-muted)] px-3 py-2 text-[10px] font-black uppercase tracking-[0.12em] text-[var(--pb-brand-secondary)]";
   badge.textContent = "3 step";
   header.append(copyWrap, badge);
   return header;
@@ -229,8 +229,8 @@ function createStepper(currentStep) {
   top.id = "slrc_car_form_stepper_summary_section";
   top.className = "flex items-center justify-between gap-3";
   top.append(
-    textNode("span", "text-sm font-black text-[var(--pb-brand-secondary)]", `Step ${currentStep} dari ${TOTAL_STEPS}`),
-    textNode("span", "text-sm font-semibold text-gray-500", STEP_META[currentStep - 1]?.title ?? "")
+    textNode("span", "text-xs font-black text-[var(--pb-brand-secondary)]", `Step ${currentStep} dari ${TOTAL_STEPS}`),
+    textNode("span", "text-xs font-semibold text-gray-500", STEP_META[currentStep - 1]?.title ?? "")
   );
 
   const progressTrack = document.createElement("section");
@@ -259,10 +259,10 @@ function createStepper(currentStep) {
     line.id = `slrc_car_form_stepper_item_${item.step}_line_section`;
     line.className = "flex items-center gap-2";
     const dot = document.createElement("span");
-    dot.className = "grid h-7 w-7 place-items-center rounded-full bg-white text-xs font-black shadow-sm";
+    dot.className = "grid h-7 w-7 place-items-center rounded-full bg-white text-[10px] font-black shadow-sm";
     dot.textContent = done ? "OK" : String(item.step);
-    line.append(dot, textNode("span", "text-sm font-black", item.title));
-    card.append(line, textNode("p", "text-xs font-semibold opacity-75", item.helper));
+    line.append(dot, textNode("span", "text-xs font-black", item.title));
+    card.append(line, textNode("p", "text-[10px] font-semibold opacity-75", item.helper));
     items.append(card);
   });
 
@@ -379,7 +379,7 @@ function createDocumentTypeToggle(value = "new") {
   section.id = "slrc_document_type_toggle_section";
   section.className = "grid min-w-0 gap-2 rounded-[1rem] border border-gray-100 bg-white/80 p-3";
 
-  const label = textNode("p", "text-sm font-bold text-gray-700", "Jenis mobil");
+  const label = textNode("p", "text-xs font-bold text-gray-700", "Jenis mobil");
   const input = document.createElement("input");
   input.id = "slrc_document_type_input";
   input.name = "document_type";
@@ -397,7 +397,7 @@ function createDocumentTypeToggle(value = "new") {
     [newButton, oldButton].forEach((button) => {
       const active = button.dataset.value === input.value;
       button.className = [
-        "min-h-11 rounded-[1rem] border px-3 py-2 text-sm font-black transition duration-150",
+        "min-h-11 rounded-[1rem] border px-3 py-2 text-xs font-black transition duration-150",
         active ? "border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] bg-[var(--pb-surface-muted)] text-[var(--pb-brand-secondary)] shadow-sm" : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50",
       ].join(" ");
     });
@@ -482,7 +482,7 @@ function syncModelSelect(select, brand, selectedValue = "") {
 
 function createNativeSelect({ id, name, label, helper }) {
   const wrap = document.createElement("label");
-  wrap.className = "grid min-w-0 gap-1.5 text-sm font-bold text-gray-700";
+  wrap.className = "grid min-w-0 gap-1.5 text-xs font-bold text-gray-700";
   const labelNode = document.createElement("span");
   labelNode.textContent = label;
   const select = document.createElement("select");
@@ -490,7 +490,7 @@ function createNativeSelect({ id, name, label, helper }) {
   select.name = name;
   select.className = fieldClass();
   const helperNode = document.createElement("span");
-  helperNode.className = "text-xs font-semibold text-gray-500";
+  helperNode.className = "text-[10px] font-semibold text-gray-500";
   helperNode.textContent = helper;
   wrap.append(labelNode, select, helperNode);
   return select;
@@ -508,7 +508,7 @@ function fieldGroup(id, title, iconName) {
   icon.className = "grid h-9 w-9 shrink-0 place-items-center rounded-2xl bg-[var(--pb-surface-muted)] text-[var(--pb-brand-secondary)]";
   icon.append(createIcon(iconName, { className: "h-4 w-4" }));
   const label = document.createElement("h3");
-  label.className = "text-sm font-black text-gray-950";
+  label.className = "text-xs font-black text-gray-950";
   label.textContent = title;
   header.append(icon, label);
 
@@ -655,7 +655,7 @@ function textNode(tagName, className, text) {
 }
 
 function fieldClass() {
-  return "min-h-11 min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-2.5 text-sm font-semibold text-[var(--pb-text)] outline-none transition duration-150 focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  return "min-h-11 min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-2.5 text-xs font-semibold text-[var(--pb-text)] outline-none transition duration-150 focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
 }
 
 function clampStep(step) {

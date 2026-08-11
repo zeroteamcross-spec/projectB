@@ -65,10 +65,10 @@ export function SellerTaskLauncher({ router = null } = {}) {
   const copy = document.createElement("div");
   copy.className = "grid min-w-0 gap-1";
   copy.append(
-    textNode("p", "text-[11px] font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", "Quick actions"),
-    textNode("h2", "text-xl font-black tracking-normal text-gray-950", "Task launcher"),
+    textNode("p", "text-[10px] font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", "Quick actions"),
+    textNode("h2", "text-lg font-black tracking-normal text-gray-950", "Task launcher"),
   );
-  const hint = textNode("p", "text-sm leading-6 text-gray-500", "Aksi utama seller, dibuat mudah ditekan di desktop dan mobile.");
+  const hint = textNode("p", "text-xs leading-6 text-gray-500", "Aksi utama seller, dibuat mudah ditekan di desktop dan mobile.");
   header.append(copy, hint);
 
   const grid = document.createElement("section");
@@ -90,13 +90,13 @@ export function SellerTaskLauncher({ router = null } = {}) {
       onClick: () => router?.navigate(task.route),
     });
     action.id = `slr_task_${task.key}_button`;
-    action.className = `inline-flex min-h-10 max-w-full items-center justify-center gap-2 break-words rounded-[var(--pb-radius-xl)] border px-4 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)] disabled:cursor-not-allowed disabled:opacity-55 ${task.buttonClass}`;
+    action.className = `inline-flex min-h-10 max-w-full items-center justify-center gap-2 break-words rounded-[var(--pb-radius-xl)] border px-4 py-2 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)] disabled:cursor-not-allowed disabled:opacity-55 ${task.buttonClass}`;
     action.prepend(createIcon(task.icon, { className: "h-4 w-4" }));
 
     card.append(
       iconWrap,
-      textNode("h3", "text-base font-black tracking-normal text-gray-950", task.title),
-      textNode("p", "min-h-[48px] text-sm leading-6 text-gray-600", task.description),
+      textNode("h3", "text-sm font-black tracking-normal text-gray-950", task.title),
+      textNode("p", "min-h-[48px] text-xs leading-6 text-gray-600", task.description),
       action,
     );
     grid.append(card);

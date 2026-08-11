@@ -16,19 +16,19 @@ export function PaymentStatusSummary({ transaction } = {}) {
   const copy = document.createElement("div");
   copy.className = "grid gap-2";
   const eyebrow = document.createElement("p");
-  eyebrow.className = `text-[11px] font-semibold uppercase tracking-[0.16em] ${statusText(transaction?.transaction_status)}`;
+  eyebrow.className = `text-[10px] font-semibold uppercase tracking-[0.16em] ${statusText(transaction?.transaction_status)}`;
   eyebrow.textContent = nextStepTitle(transaction?.transaction_status);
   const title = document.createElement("h1");
-  title.className = "break-words text-2xl font-bold tracking-normal text-gray-950 sm:text-3xl";
+  title.className = "break-words text-xl font-bold tracking-normal text-gray-950 sm:text-2xl";
   title.textContent = transaction?.transaction_code ?? `Transaksi #${transaction?.id ?? "-"}`;
   const body = document.createElement("p");
-  body.className = "text-sm leading-6 text-gray-600";
+  body.className = "text-xs leading-6 text-gray-600";
   body.textContent = statusCopy(transaction?.transaction_status);
   copy.append(eyebrow, title, body);
 
   const statusMeta = getTransactionStatusMeta(transaction?.transaction_status);
   const badge = Badge({ label: statusMeta.label, variant: statusMeta.variant });
-  badge.classList.add("justify-self-start", "px-3", "py-2", "text-sm", "sm:justify-self-end");
+  badge.classList.add("justify-self-start", "px-3", "py-2", "text-xs", "sm:justify-self-end");
   header.append(copy, badge);
 
   const grid = document.createElement("div");

@@ -6,7 +6,7 @@ export function ShowroomProfileSection({ showroom = null } = {}) {
   title.className = "block text-gray-950";
   title.textContent = showroom?.name ?? "Showroom";
   const address = document.createElement("p");
-  address.className = `text-sm ${tw.text.muted}`;
+  address.className = `text-xs ${tw.text.muted}`;
   address.textContent = showroom?.address ?? "Alamat belum tersedia";
   return Card([title, address]);
 }

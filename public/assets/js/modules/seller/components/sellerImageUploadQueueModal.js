@@ -23,10 +23,10 @@ export function SellerImageUploadQueueModal({
   const copy = document.createElement("div");
   copy.className = "min-w-0";
   const title = document.createElement("h2");
-  title.className = "text-lg font-black text-[var(--pb-text)] sm:text-xl";
+  title.className = "text-base font-black text-[var(--pb-text)] sm:text-lg";
   title.textContent = "Queue Upload";
   const helper = document.createElement("p");
-  helper.className = "mt-1 text-sm leading-6 text-[var(--pb-text-muted)]";
+  helper.className = "mt-1 text-xs leading-6 text-[var(--pb-text-muted)]";
   helper.textContent = "Upload berjalan berurutan per file dengan progress nyata dari browser.";
   copy.append(title, helper);
 
@@ -72,7 +72,7 @@ export function SellerImageUploadQueueModal({
     });
   } else {
     const empty = document.createElement("section");
-    empty.className = "grid min-h-36 place-items-center rounded-[var(--pb-radius-xl)] border border-dashed border-[var(--pb-border)] bg-[var(--pb-surface-muted)] px-4 text-center text-sm text-[var(--pb-text-muted)]";
+    empty.className = "grid min-h-36 place-items-center rounded-[var(--pb-radius-xl)] border border-dashed border-[var(--pb-border)] bg-[var(--pb-surface-muted)] px-4 text-center text-xs text-[var(--pb-text-muted)]";
     empty.textContent = "Belum ada file di queue.";
     list.append(empty);
   }
@@ -157,19 +157,19 @@ function queueItem(item, { uploading, onEdit, onRemove, onToggleCover }) {
   meta.className = "flex min-w-0 flex-wrap items-start justify-between gap-2";
   const copy = document.createElement("div");
   copy.className = "min-w-0";
-  copy.append(textNode("p", "truncate text-sm font-black text-[var(--pb-text)]", item.name), textNode("p", "text-xs font-semibold text-[var(--pb-text-muted)]", formatSize(item.size)));
+  copy.append(textNode("p", "truncate text-xs font-black text-[var(--pb-text)]", item.name), textNode("p", "text-[10px] font-semibold text-[var(--pb-text-muted)]", formatSize(item.size)));
   meta.append(copy, statusPill(item));
 
   const progress = Number(item.progress ?? 0);
   body.append(meta, progressBar(progress, item.status === "uploading"));
   if (item.error) {
-    body.append(textNode("p", "text-xs font-semibold text-[var(--pb-danger)]", item.error));
+    body.append(textNode("p", "text-[10px] font-semibold text-[var(--pb-danger)]", item.error));
   }
 
   const actions = document.createElement("section");
   actions.className = "flex flex-wrap items-center gap-2";
   const cover = document.createElement("label");
-  cover.className = "inline-flex min-h-10 items-center gap-2 rounded-lg border border-[var(--pb-border)] bg-[var(--pb-surface-muted)] px-3 text-xs font-bold text-[var(--pb-text-strong)]";
+  cover.className = "inline-flex min-h-10 items-center gap-2 rounded-lg border border-[var(--pb-border)] bg-[var(--pb-surface-muted)] px-3 text-[10px] font-bold text-[var(--pb-text-strong)]";
   const coverInput = document.createElement("input");
   coverInput.type = "checkbox";
   coverInput.checked = Boolean(item.isCover);
@@ -233,13 +233,13 @@ function canUpload(item) {
 function summaryMetric(label, value) {
   const item = document.createElement("section");
   item.className = "rounded-[var(--pb-radius-xl)] border border-[var(--pb-border)] bg-white/85 p-3";
-  item.append(textNode("p", "text-xs font-bold uppercase text-[var(--pb-text-muted)]", label), textNode("p", "mt-1 text-lg font-black text-[var(--pb-text)]", String(value)));
+  item.append(textNode("p", "text-[10px] font-bold uppercase text-[var(--pb-text-muted)]", label), textNode("p", "mt-1 text-base font-black text-[var(--pb-text)]", String(value)));
   return item;
 }
 
 function progressHeader(label, value) {
   const row = document.createElement("section");
-  row.className = "flex items-center justify-between gap-2 text-xs font-bold text-[var(--pb-text-strong)]";
+  row.className = "flex items-center justify-between gap-2 text-[10px] font-bold text-[var(--pb-text-strong)]";
   row.append(document.createTextNode(label), textNode("span", "text-[var(--pb-brand-secondary)]", value));
   return row;
 }
@@ -268,7 +268,7 @@ function statusPill(item) {
     invalid: "border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]",
   }[item.status] ?? "border-gray-200 bg-gray-50 text-gray-600";
   const pill = document.createElement("span");
-  pill.className = `inline-flex w-fit rounded-full border px-3 py-1 text-xs font-black ${tone}`;
+  pill.className = `inline-flex w-fit rounded-full border px-3 py-1 text-[10px] font-black ${tone}`;
   pill.textContent = item.status;
   return pill;
 }

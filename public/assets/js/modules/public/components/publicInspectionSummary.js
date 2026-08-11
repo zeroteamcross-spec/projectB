@@ -27,15 +27,15 @@ function header({ car, inspection, hasPublishedReport, itemCount }) {
   copy.className = "grid min-w-0 gap-1";
 
   const eyebrow = document.createElement("span");
-  eyebrow.className = "text-[11px] font-semibold uppercase tracking-normal text-[var(--pb-brand-secondary)]";
+  eyebrow.className = "text-[10px] font-semibold uppercase tracking-normal text-[var(--pb-brand-secondary)]";
   eyebrow.textContent = "Kondisi kendaraan";
 
   const title = document.createElement("h2");
-  title.className = "text-lg font-bold tracking-normal text-gray-950";
+  title.className = "text-base font-bold tracking-normal text-gray-950";
   title.textContent = "Laporan inspeksi";
 
   const body = document.createElement("p");
-  body.className = "text-sm leading-6 text-gray-600";
+  body.className = "text-xs leading-6 text-gray-600";
   body.textContent = hasPublishedReport
     ? `${itemCount} item inspeksi tersedia untuk unit ini.`
     : "Data inspeksi belum tersedia untuk listing ini.";
@@ -62,7 +62,7 @@ function summaryGrid(items, inspection) {
 
   if (inspection?.inspected_at) {
     const date = document.createElement("p");
-    date.className = "col-span-full text-xs font-semibold text-gray-500";
+    date.className = "col-span-full text-[10px] font-semibold text-gray-500";
     date.textContent = `Tanggal inspeksi: ${new Date(inspection.inspected_at).toLocaleDateString("id-ID")}`;
     grid.append(date);
   }
@@ -79,11 +79,11 @@ function metricCard(iconName, label, value, variant) {
   icon.append(createIcon(iconName, { className: "block h-4 w-4 leading-none" }));
 
   const number = document.createElement("strong");
-  number.className = "text-xl font-black leading-none text-gray-950";
+  number.className = "text-lg font-black leading-none text-gray-950";
   number.textContent = value;
 
   const caption = document.createElement("span");
-  caption.className = "text-xs font-semibold text-gray-500";
+  caption.className = "text-[10px] font-semibold text-gray-500";
   caption.textContent = label;
 
   card.append(icon, number, caption);
@@ -92,7 +92,7 @@ function metricCard(iconName, label, value, variant) {
 
 function notesBlock(inspection) {
   const notes = document.createElement("div");
-  notes.className = "grid gap-2 rounded-[22px] bg-gray-50 p-4 text-sm text-gray-700";
+  notes.className = "grid gap-2 rounded-[22px] bg-gray-50 p-4 text-xs text-gray-700";
   notes.append(
     summaryRow("Status laporan", reportLabel(inspection?.report_status)),
     summaryRow("Nomor laporan", inspection?.id ? `#${inspection.id}` : "-"),
@@ -111,7 +111,7 @@ function groupedItems(items) {
     box.className = "grid gap-2 rounded-[22px] border border-[var(--pb-border)] bg-white p-3";
 
     const title = document.createElement("h3");
-    title.className = "text-sm font-bold text-gray-950";
+    title.className = "text-xs font-bold text-gray-950";
     title.textContent = sectionLabel(group.name);
     box.append(title);
 
@@ -133,11 +133,11 @@ function inspectionItem(item) {
   copy.className = "grid min-w-0 gap-1";
 
   const title = document.createElement("p");
-  title.className = "break-words text-sm font-semibold text-gray-900";
+  title.className = "break-words text-xs font-semibold text-gray-900";
   title.textContent = item?.item_name_snapshot || item?.template?.item_name || "Item inspeksi";
 
   const note = document.createElement("p");
-  note.className = "break-words text-xs leading-5 text-gray-500";
+  note.className = "break-words text-[10px] leading-5 text-gray-500";
   note.textContent = item?.notes || item?.description || "Tidak ada catatan tambahan.";
 
   copy.append(title, note);
@@ -154,11 +154,11 @@ function emptyInspection(car) {
   icon.append(createIcon("clipboard", { className: "block h-5 w-5 leading-none" }));
 
   const title = document.createElement("h3");
-  title.className = "text-base font-bold text-gray-950";
+  title.className = "text-sm font-bold text-gray-950";
   title.textContent = "Data inspeksi belum tersedia";
 
   const body = document.createElement("p");
-  body.className = "text-sm leading-6 text-gray-600";
+  body.className = "text-xs leading-6 text-gray-600";
   body.textContent = car?.inspection_summary_status
     ? `Status ringkas listing: ${reportLabel(car.inspection_summary_status)}.`
     : "Seller belum mempublikasikan laporan inspeksi untuk unit ini.";

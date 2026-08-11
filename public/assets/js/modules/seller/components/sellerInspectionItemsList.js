@@ -47,15 +47,15 @@ function sectionCard(category, items, handlers) {
   const copy = document.createElement("div");
   copy.className = "min-w-0";
   const title = document.createElement("h2");
-  title.className = "text-base font-black text-[var(--pb-text)]";
+  title.className = "text-sm font-black text-[var(--pb-text)]";
   title.textContent = sectionLabel(category);
   const helper = document.createElement("p");
-  helper.className = "mt-1 text-sm text-[var(--pb-text-muted)]";
+  helper.className = "mt-1 text-xs text-[var(--pb-text-muted)]";
   helper.textContent = `${completed}/${items.length} item selesai`;
   copy.append(title, helper);
 
   const pill = document.createElement("span");
-  pill.className = "inline-flex w-fit items-center gap-2 rounded-full border border-white/80 bg-white px-3 py-1 text-xs font-bold text-[var(--pb-text-strong)] shadow-[var(--pb-shadow-soft)]";
+  pill.className = "inline-flex w-fit items-center gap-2 rounded-full border border-white/80 bg-white px-3 py-1 text-[10px] font-bold text-[var(--pb-text-strong)] shadow-[var(--pb-shadow-soft)]";
   pill.append(createIcon("clipboard", { className: "h-4 w-4 text-[var(--pb-brand-secondary)]" }), document.createTextNode(`${items.length} item`));
 
   header.append(copy, pill);
@@ -75,7 +75,7 @@ function itemCard(item, { busyItemId, onStatusChange, onNotesChange }) {
   name.textContent = item.item_name_snapshot || item.template?.item_name || "Item inspeksi";
 
   const description = document.createElement("p");
-  description.className = `mt-1 text-sm leading-6 ${tw.text.muted}`;
+  description.className = `mt-1 text-xs leading-6 ${tw.text.muted}`;
   description.textContent = item.description || "Tidak ada deskripsi tambahan.";
 
   const header = document.createElement("div");
@@ -116,7 +116,7 @@ function statusButtons(item, { busyItemId, onStatusChange }) {
     button.type = "button";
     button.disabled = isBusy;
     button.className = [
-      "inline-flex min-h-7 items-center justify-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-black transition",
+      "inline-flex min-h-7 items-center justify-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-black transition",
       active ? option.active : "border-gray-200 bg-gray-50 text-gray-600 hover:border-gray-300 hover:bg-white hover:text-gray-800",
       button.disabled ? "cursor-not-allowed opacity-60" : "",
     ].join(" ");
@@ -137,7 +137,7 @@ function notesPanel(item, onNotesChange) {
   const toggle = document.createElement("button");
   toggle.id = `slrinsp_notes_toggle_${safeId(item.template_id)}_button`;
   toggle.type = "button";
-  toggle.className = "inline-flex w-fit items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs font-bold text-gray-600 transition hover:border-gray-300 hover:bg-white hover:text-gray-800";
+  toggle.className = "inline-flex w-fit items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5 text-[10px] font-bold text-gray-600 transition hover:border-gray-300 hover:bg-white hover:text-gray-800";
   toggle.append(
     createIcon(hasNotes ? "edit" : "plus", { className: "h-3.5 w-3.5" }),
     document.createTextNode(hasNotes ? "Ubah catatan" : "Tambahkan catatan")
@@ -145,7 +145,7 @@ function notesPanel(item, onNotesChange) {
 
   const textarea = document.createElement("textarea");
   textarea.id = `slrinsp_notes_${safeId(item.template_id)}_input`;
-  textarea.className = "hidden min-h-[76px] w-full resize-y rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-white px-3 py-2 text-sm text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--pb-form-focus)_22%,transparent)]";
+  textarea.className = "hidden min-h-[76px] w-full resize-y rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-white px-3 py-2 text-xs text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--pb-form-focus)_22%,transparent)]";
   textarea.placeholder = "Tulis catatan singkat";
   textarea.value = item.notes ?? "";
   textarea.addEventListener("input", (event) => onNotesChange?.(item, event.target.value));

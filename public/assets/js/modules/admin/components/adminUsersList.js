@@ -59,7 +59,7 @@ export function AdminUsersList({
       { label: "Account", render: (user) => Badge(adminUserManagementService.statusMeta(user.account_status)) },
       { label: "Approval", render: (user) => Badge(adminUserManagementService.approvalMeta(user)) },
       { label: "Kontak", render: (user) => contactBlock(user) },
-      { label: "Dibuat", render: (user) => textBlock("whitespace-nowrap text-sm text-gray-600", formatDate(user.created_at)) },
+      { label: "Dibuat", render: (user) => textBlock("whitespace-nowrap text-xs text-gray-600", formatDate(user.created_at)) },
       { label: "Aksi", render: (user) => actionGroup({ user, selected: Number(selectedUserId) === Number(user.id), activeUserId, approvingUserId, onSelect, onApprove, onImpersonate, idScope: "desktop" }) },
     ],
     loading,
@@ -72,7 +72,6 @@ export function AdminUsersList({
     mobileCardBadges: (user) => [
       Badge(adminUserManagementService.statusMeta(user.account_status)),
       Badge(adminUserManagementService.approvalMeta(user)),
-      user.is_preview_seed ? Badge({ label: "Preview", variant: "default" }) : null,
     ],
     mobilePrimaryFields: (user) => [
       { label: "Role", value: user.role || "-" },
@@ -109,7 +108,7 @@ function userIdentity(user) {
   copy.className = "grid min-w-0 gap-1";
   copy.append(
     textBlock("break-words font-black text-gray-950", user.name || user.email || `User #${user.id}`),
-    textBlock("break-words text-sm text-gray-500", user.email || "-"),
+    textBlock("break-words text-xs text-gray-500", user.email || "-"),
   );
   wrap.append(avatar, copy);
   return wrap;
@@ -119,8 +118,8 @@ function contactBlock(user) {
   const wrap = document.createElement("div");
   wrap.className = "grid min-w-0 gap-1";
   wrap.append(
-    textBlock("break-words text-sm font-semibold text-gray-800", user.phone_number || "-"),
-    textBlock("break-words text-sm text-gray-500", user.showroom?.name || "-"),
+    textBlock("break-words text-xs font-semibold text-gray-800", user.phone_number || "-"),
+    textBlock("break-words text-xs text-gray-500", user.showroom?.name || "-"),
   );
   return wrap;
 }
@@ -140,9 +139,9 @@ function actionGroup({ user, selected, activeUserId, approvingUserId, onSelect, 
 
   if (adminUserManagementService.isPendingApproval(user)) {
     const approveButton = Button({
-      label: user.is_preview_seed ? "Preview" : approvingUserId === user.id ? "Proses..." : "Approve",
+      label: approvingUserId === user.id ? "Proses..." : "Approve",
       variant: "secondary",
-      disabled: Boolean(user.is_preview_seed) || approvingUserId !== null,
+      disabled: approvingUserId !== null,
       onClick: () => onApprove?.(user),
     });
     approveButton.id = `adusr_approve_button_${idScope}_${user.id}`;
@@ -152,9 +151,9 @@ function actionGroup({ user, selected, activeUserId, approvingUserId, onSelect, 
 
   const impersonationLabel = adminUserManagementService.impersonationLabel(user);
   const impersonateButton = Button({
-    label: user.is_preview_seed ? "Preview" : activeUserId === user.id ? "Masuk..." : `Login sebagai ${impersonationLabel}`,
+    label: activeUserId === user.id ? "Masuk..." : `Login sebagai ${impersonationLabel}`,
     variant: adminUserManagementService.isImpersonatable(user) ? "primary" : "secondary",
-    disabled: Boolean(user.is_preview_seed) || !adminUserManagementService.isImpersonatable(user) || activeUserId !== null,
+    disabled: !adminUserManagementService.isImpersonatable(user) || activeUserId !== null,
   });
   impersonateButton.id = `adusr_impersonate_button_${idScope}_${user.id}`;
   impersonateButton.onclick = () => onImpersonate?.(user);

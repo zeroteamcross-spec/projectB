@@ -264,13 +264,13 @@ function carSummary(transaction) {
   const section = document.createElement("section");
   section.className = `grid gap-3 ${tw.surface.raisedCard} p-5`;
   const title = document.createElement("h2");
-  title.className = "text-lg font-bold tracking-normal text-gray-950";
+  title.className = "text-base font-bold tracking-normal text-gray-950";
   title.textContent = "Mobil yang dibeli";
   const name = document.createElement("p");
-  name.className = "text-sm leading-6 text-gray-700";
+  name.className = "text-xs leading-6 text-gray-700";
   name.textContent = [transaction?.car?.brand_name, transaction?.car?.model_name].filter(Boolean).join(" ") || `Mobil #${transaction?.car_id ?? "-"}`;
   const seller = document.createElement("p");
-  seller.className = "text-sm text-gray-500";
+  seller.className = "text-xs text-gray-500";
   seller.textContent = transaction?.seller?.name ? `Seller: ${transaction.seller.name}` : "Seller terdaftar";
   section.append(title, name, seller);
   return section;
@@ -285,15 +285,15 @@ function paymentSuccessPanel(transaction) {
   const copy = document.createElement("div");
   copy.className = "grid gap-2";
   const title = document.createElement("h2");
-  title.className = "text-2xl font-bold tracking-normal text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
+  title.className = "text-xl font-bold tracking-normal text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
   title.textContent = isCompleted ? "Transaksi Selesai" : "Pembayaran Berhasil";
   const body = document.createElement("p");
-  body.className = "text-sm leading-6 text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
+  body.className = "text-xs leading-6 text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
   body.textContent = isCompleted
     ? "Buyer sudah menyelesaikan transaksi ini."
     : "Pembayaran Anda sudah diterima 100%. Transaksi sedang diproses oleh showroom/seller.";
   const detail = document.createElement("p");
-  detail.className = "text-sm leading-6 text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
+  detail.className = "text-xs leading-6 text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
   detail.textContent = isCompleted
     ? "Terima kasih, status akhir transaksi sudah tercatat."
     : "Tim seller akan menyiapkan dokumen dan proses serah terima kendaraan.";
@@ -329,17 +329,17 @@ function fulfillmentProgressPanel({ transaction, isFinishing = false, onFinish =
   eyebrow.className = tw.text.eyebrow;
   eyebrow.textContent = "Proses seller";
   const title = document.createElement("h2");
-  title.className = "text-lg font-bold tracking-normal text-gray-950";
+  title.className = "text-base font-bold tracking-normal text-gray-950";
   title.textContent = "Checklist penyelesaian";
   const body = document.createElement("p");
-  body.className = "text-sm leading-6 text-gray-600";
+  body.className = "text-xs leading-6 text-gray-600";
   body.textContent = isCompleted
     ? "Semua proses sudah selesai dan transaksi sudah ditutup."
     : "Buyer bisa menyelesaikan transaksi setelah seluruh checklist seller selesai.";
   copy.append(eyebrow, title, body);
 
   const progress = document.createElement("span");
-  progress.className = "inline-flex w-fit items-center rounded-full border border-[var(--pb-border)] bg-[var(--pb-surface-muted)] px-3 py-1 text-xs font-black text-[var(--pb-brand-secondary)]";
+  progress.className = "inline-flex w-fit items-center rounded-full border border-[var(--pb-border)] bg-[var(--pb-surface-muted)] px-3 py-1 text-[10px] font-black text-[var(--pb-brand-secondary)]";
   progress.textContent = `${doneCount}/${checklist.length} selesai`;
   header.append(copy, progress);
   section.append(header);
@@ -349,7 +349,7 @@ function fulfillmentProgressPanel({ transaction, isFinishing = false, onFinish =
   if (checklist.length) {
     checklist.forEach((item) => list.append(readOnlyChecklistItem(item)));
   } else {
-    list.append(textNode("p", "text-sm leading-6 text-gray-600", "Checklist belum tersedia dari seller."));
+    list.append(textNode("p", "text-xs leading-6 text-gray-600", "Checklist belum tersedia dari seller."));
   }
   section.append(list);
 
@@ -375,19 +375,19 @@ function readOnlyChecklistItem(item) {
   top.className = "flex min-w-0 items-start gap-3";
   const mark = document.createElement("span");
   mark.className = [
-    "mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs font-black",
+    "mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-black",
     item.is_completed ? "bg-[color-mix(in_srgb,var(--pb-success)_14%,white)] text-[color-mix(in_srgb,var(--pb-success)_84%,black)]" : "bg-gray-200 text-gray-500",
   ].join(" ");
   mark.textContent = item.is_completed ? "OK" : "-";
 
   const label = document.createElement("p");
-  label.className = "break-words text-sm font-black text-gray-950";
+  label.className = "break-words text-xs font-black text-gray-950";
   label.textContent = item.label ?? item.key;
   top.append(mark, label);
   row.append(top);
 
   if (item.notes) {
-    row.append(textNode("p", "break-words pl-8 text-sm leading-6 text-gray-600", item.notes));
+    row.append(textNode("p", "break-words pl-8 text-xs leading-6 text-gray-600", item.notes));
   }
 
   return row;
@@ -402,10 +402,10 @@ function handoverInstructionPanel() {
   eyebrow.className = tw.text.eyebrow;
   eyebrow.textContent = "Serah terima";
   const title = document.createElement("h2");
-  title.className = "text-lg font-bold tracking-normal text-gray-950";
+  title.className = "text-base font-bold tracking-normal text-gray-950";
   title.textContent = "Instruksi serah terima";
   const body = document.createElement("p");
-  body.className = "text-sm leading-6 text-gray-600";
+  body.className = "text-xs leading-6 text-gray-600";
   body.textContent = "Seller akan menghubungi buyer untuk jadwal serah terima, kesiapan dokumen, dan konfirmasi unit.";
 
   section.append(eyebrow, title, body);
@@ -423,10 +423,10 @@ function pendingPaymentGuidePanel(transaction) {
   eyebrow.className = tw.text.eyebrow;
   eyebrow.textContent = "Menunggu pembayaran";
   const title = document.createElement("h2");
-  title.className = "text-xl font-bold tracking-normal text-gray-950";
+  title.className = "text-lg font-bold tracking-normal text-gray-950";
   title.textContent = "Lanjutkan dari instruksi pembayaran di bawah";
   const body = document.createElement("p");
-  body.className = "text-sm leading-6 text-gray-700";
+  body.className = "text-xs leading-6 text-gray-700";
   body.textContent = "Status transaksi belum berubah karena pembayaran belum terkonfirmasi. Setelah membayar, halaman ini akan mengecek otomatis dan menampilkan notifikasi saat status berubah.";
   copy.append(eyebrow, title, body);
 
@@ -440,13 +440,13 @@ function pendingPaymentGuidePanel(transaction) {
     const item = document.createElement("section");
     item.className = "grid gap-2 rounded-2xl border border-white/70 bg-white/90 p-4 shadow-sm";
     const mark = document.createElement("span");
-    mark.className = "grid h-8 w-8 place-items-center rounded-full bg-[var(--pb-brand-primary)] text-sm font-black text-white";
+    mark.className = "grid h-8 w-8 place-items-center rounded-full bg-[var(--pb-brand-primary)] text-xs font-black text-white";
     mark.textContent = number;
     const itemTitle = document.createElement("h3");
-    itemTitle.className = "text-sm font-black text-gray-950";
+    itemTitle.className = "text-xs font-black text-gray-950";
     itemTitle.textContent = label;
     const itemBody = document.createElement("p");
-    itemBody.className = "text-sm leading-6 text-gray-600";
+    itemBody.className = "text-xs leading-6 text-gray-600";
     itemBody.textContent = description;
     item.append(mark, itemTitle, itemBody);
     steps.append(item);
@@ -463,10 +463,10 @@ function cancelTransactionPanel({ transaction, isCancelling = false, onCancel = 
   section.className = `grid gap-3 ${tw.surface.raisedCard} p-5`;
 
   const title = document.createElement("h2");
-  title.className = "text-lg font-bold tracking-normal text-gray-950";
+  title.className = "text-base font-bold tracking-normal text-gray-950";
   title.textContent = "Batalkan transaksi";
   const body = document.createElement("p");
-  body.className = "text-sm leading-6 text-gray-600";
+  body.className = "text-xs leading-6 text-gray-600";
   body.textContent = isDpPaid
     ? "Buyer bisa membatalkan sebelum pelunasan. Refund DP akan dipotong 10%, dan nomor rekening wajib diisi."
     : "Buyer bisa membatalkan selama pembayaran belum lunas.";
@@ -934,10 +934,10 @@ function paymentSuccessOverlay(onClose = null) {
   const copy = document.createElement("div");
   copy.className = "grid gap-2";
   const title = document.createElement("h2");
-  title.className = "text-3xl font-black tracking-tight text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
+  title.className = "text-2xl font-black tracking-tight text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
   title.textContent = "Pembayaran Berhasil";
   const body = document.createElement("p");
-  body.className = "text-sm leading-6 text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
+  body.className = "text-xs leading-6 text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
   body.textContent = "Transaksi Anda sudah dibayar.";
   copy.append(title, body);
 

@@ -77,11 +77,11 @@ function render(root, context, status) {
   header.className = "grid gap-2";
 
   const title = document.createElement("h1");
-  title.className = "text-2xl font-semibold text-[var(--pb-text-strong)]";
+  title.className = "text-xl font-semibold text-[var(--pb-text-strong)]";
   title.textContent = "Design Studio V2";
 
   const description = document.createElement("p");
-  description.className = "max-w-3xl text-sm leading-6 text-[var(--pb-text-muted)]";
+  description.className = "max-w-3xl text-xs leading-6 text-[var(--pb-text-muted)]";
   description.textContent = "Runtime shell Design Studio V2 untuk super admin. Draft, publish, rollback, dan registry write belum diaktifkan dari menu ini.";
 
   header.append(title, description);
@@ -104,7 +104,7 @@ function render(root, context, status) {
   });
 
   const state = document.createElement("pre");
-  state.className = "overflow-auto rounded-[var(--pb-radius-lg)] border border-[var(--pb-border)] bg-white p-4 text-xs leading-5 text-[var(--pb-text)] shadow-[var(--pb-shadow-soft)]";
+  state.className = "overflow-auto rounded-[var(--pb-radius-lg)] border border-[var(--pb-border)] bg-white p-4 text-[10px] leading-5 text-[var(--pb-text)] shadow-[var(--pb-shadow-soft)]";
   state.textContent = JSON.stringify({
     initialized: status.initialized,
     error: status.error,

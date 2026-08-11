@@ -24,16 +24,16 @@ export function AffiliateEligibleLedgerList({ ledgers = [] } = {}) {
     const left = document.createElement("div");
     left.className = "grid min-w-0 gap-1";
     left.append(
-      textBlock("text-base font-semibold text-gray-950", ledger.transactionCodeLabel),
-      textBlock(`text-sm ${tw.text.muted}`, ledger.carLabel),
-      textBlock(`text-sm ${tw.text.muted}`, ledger.ownerLabel),
+      textBlock("text-sm font-semibold text-gray-950", ledger.transactionCodeLabel),
+      textBlock(`text-xs ${tw.text.muted}`, ledger.carLabel),
+      textBlock(`text-xs ${tw.text.muted}`, ledger.ownerLabel),
     );
 
     const right = document.createElement("div");
     right.className = "grid min-w-0 gap-1 sm:max-w-[18rem] sm:text-right";
     right.append(
-      textBlock("text-lg font-bold text-gray-950", ledger.amountLabel),
-      textBlock(`text-sm ${tw.text.muted}`, formatDate(ledger.created_at)),
+      textBlock("text-base font-bold text-gray-950", ledger.amountLabel),
+      textBlock(`text-xs ${tw.text.muted}`, formatDate(ledger.created_at)),
     );
 
     const meta = document.createElement("div");
@@ -57,8 +57,8 @@ function infoRow(label, value) {
   const row = document.createElement("div");
   row.className = "grid min-w-0 gap-1 rounded-2xl bg-white/90 px-3 py-3 shadow-sm";
   row.append(
-    textBlock("break-words text-xs font-semibold uppercase tracking-normal text-gray-500", label),
-    textBlock("break-words text-sm font-medium text-gray-900", value),
+    textBlock("break-words text-[10px] font-semibold uppercase tracking-normal text-gray-500", label),
+    textBlock("break-words text-xs font-medium text-gray-900", value),
   );
   return row;
 }

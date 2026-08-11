@@ -167,8 +167,8 @@ function affiliateMobileHeader({ title, subtitle, actions }) {
   const copy = document.createElement("section");
   copy.className = "grid min-w-0 gap-0.5";
   copy.append(
-    textNode("p", "truncate text-sm font-bold text-[var(--pb-text-muted)]", subtitle || "Akun marketing"),
-    textNode("h1", "truncate text-xl font-black leading-tight tracking-normal text-[var(--pb-text-strong)]", title),
+    textNode("p", "truncate text-xs font-bold text-[var(--pb-text-muted)]", subtitle || "Akun marketing"),
+    textNode("h1", "truncate text-lg font-black leading-tight tracking-normal text-[var(--pb-text-strong)]", title),
   );
 
   const actionGroup = document.createElement("section");
@@ -192,7 +192,7 @@ function affiliateTopNavigation({ activePath, title, icon, actions }) {
   brand.className = "flex min-w-0 items-center gap-3 px-1";
   brand.append(
     iconBox(icon, "h-11 w-11 rounded-full bg-[linear-gradient(135deg,var(--pb-btn-primary-from),var(--pb-btn-primary-to))] text-white shadow-[var(--pb-shadow-soft)]"),
-    textNode("strong", "truncate text-base font-black text-[var(--pb-text)]", title),
+    textNode("strong", "truncate text-sm font-black text-[var(--pb-text)]", title),
   );
 
   const links = document.createElement("section");
@@ -222,8 +222,8 @@ function desktopNavLink(item, activePath, actions) {
   link.href = `#${item.path}`;
   link.id = `afacc_nav_desktop_${item.id}`;
   link.className = active
-    ? "inline-flex min-w-0 items-center justify-center gap-2 rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] px-3 py-2 text-sm font-black text-[var(--pb-brand-secondary)] no-underline shadow-[var(--pb-shadow-soft)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)] xl:px-4"
-    : "inline-flex min-w-0 items-center justify-center gap-2 rounded-full px-3 py-2 text-sm font-bold text-[var(--pb-text-muted)] no-underline transition hover:bg-[var(--pb-surface-muted)] hover:text-[var(--pb-text)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)] xl:px-4";
+    ? "inline-flex min-w-0 items-center justify-center gap-2 rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] px-3 py-2 text-xs font-black text-[var(--pb-brand-secondary)] no-underline shadow-[var(--pb-shadow-soft)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)] xl:px-4"
+    : "inline-flex min-w-0 items-center justify-center gap-2 rounded-full px-3 py-2 text-xs font-bold text-[var(--pb-text-muted)] no-underline transition hover:bg-[var(--pb-surface-muted)] hover:text-[var(--pb-text)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)] xl:px-4";
   if (active) {
     link.setAttribute("aria-current", "page");
   }
@@ -243,8 +243,8 @@ function profileButton({ actions, compact = false } = {}) {
   const button = document.createElement("button");
   button.type = "button";
   button.className = compact
-    ? "inline-flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white/92 text-sm font-black text-[var(--pb-brand-secondary)] shadow-[var(--pb-shadow-card)] ring-1 ring-white/70 transition hover:bg-white focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]"
-    : "inline-flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white text-sm font-black text-[var(--pb-brand-secondary)] shadow-[var(--pb-shadow-card)] ring-1 ring-[var(--pb-border)] transition hover:bg-[var(--pb-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+    ? "inline-flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white/92 text-xs font-black text-[var(--pb-brand-secondary)] shadow-[var(--pb-shadow-card)] ring-1 ring-white/70 transition hover:bg-white focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]"
+    : "inline-flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white text-xs font-black text-[var(--pb-brand-secondary)] shadow-[var(--pb-shadow-card)] ring-1 ring-[var(--pb-border)] transition hover:bg-[var(--pb-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]";
   button.setAttribute("aria-label", "Profil marketing");
   button.title = "Profil";
   button.addEventListener("click", () => actions?.navigate?.("/profile"));

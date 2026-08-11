@@ -30,7 +30,7 @@ function infoBlock(label, title, body) {
   wrap.className = "grid min-w-0 gap-1";
 
   const eyebrow = document.createElement("p");
-  eyebrow.className = "text-xs font-semibold uppercase tracking-wide text-gray-500";
+  eyebrow.className = "text-[10px] font-semibold uppercase tracking-wide text-gray-500";
   eyebrow.textContent = label;
 
   const heading = document.createElement("p");
@@ -38,7 +38,7 @@ function infoBlock(label, title, body) {
   heading.textContent = title;
 
   const copy = document.createElement("p");
-  copy.className = "break-words text-sm leading-6 text-gray-600";
+  copy.className = "break-words text-xs leading-6 text-gray-600";
   copy.textContent = body || "-";
 
   wrap.append(eyebrow, heading, copy);

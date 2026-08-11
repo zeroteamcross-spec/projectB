@@ -41,11 +41,11 @@ export function PublicCarCard({
   heading.className = "grid gap-0.5";
 
   const title = document.createElement("h2");
-  title.className = "line-clamp-2 break-words text-sm font-semibold leading-5 tracking-normal text-[var(--pb-text)]";
+  title.className = "line-clamp-2 break-words text-xs font-semibold leading-5 tracking-normal text-[var(--pb-text)]";
   title.textContent = carTitle(car);
 
   const subtitle = document.createElement("p");
-  subtitle.className = "line-clamp-1 break-words text-xs leading-4 text-[var(--pb-text-muted)]";
+  subtitle.className = "line-clamp-1 break-words text-[10px] leading-4 text-[var(--pb-text-muted)]";
   subtitle.textContent = [car.sub_model_name, car.location_name].filter(Boolean).join(" | ") || "Unit showroom";
   heading.append(title, subtitle);
 
@@ -65,19 +65,19 @@ export function PublicCarCard({
   priceRow.className = "flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5";
 
   const price = document.createElement("strong");
-  price.className = "break-words text-base font-black leading-none tracking-normal text-[var(--pb-brand-secondary)]";
+  price.className = "break-words text-sm font-black leading-none tracking-normal text-[var(--pb-brand-secondary)]";
   price.textContent = formatCurrency(effectivePrice(car));
   priceRow.append(price);
 
   if (hasPromo(car)) {
     const original = document.createElement("span");
-    original.className = "text-[11px] font-semibold leading-none text-[var(--pb-text-muted)] line-through";
+    original.className = "text-[10px] font-semibold leading-none text-[var(--pb-text-muted)] line-through";
     original.textContent = formatCurrency(car.price_cash);
     priceRow.append(original);
   }
 
   const hint = document.createElement("span");
-  hint.className = "line-clamp-1 break-words text-[11px] font-semibold leading-4 text-[var(--pb-text-muted)]";
+  hint.className = "line-clamp-1 break-words text-[10px] font-semibold leading-4 text-[var(--pb-text-muted)]";
   hint.textContent = lock.locked ? "Detail, gallery, dan konsultasi" : "Detail, gallery, inspeksi, dan transaksi";
   priceBlock.append(priceRow, hint);
 
@@ -90,7 +90,7 @@ export function PublicCarCard({
   );
 
   const action = document.createElement("span");
-  action.className = "inline-flex min-h-8 w-full items-center justify-center gap-1.5 rounded-[var(--pb-radius-lg)] border border-transparent bg-[linear-gradient(135deg,var(--pb-btn-primary-from),var(--pb-btn-primary-to))] px-3 py-1.5 text-xs font-semibold text-white shadow-[var(--pb-shadow-card)]";
+  action.className = "inline-flex min-h-8 w-full items-center justify-center gap-1.5 rounded-[var(--pb-radius-lg)] border border-transparent bg-[linear-gradient(135deg,var(--pb-btn-primary-from),var(--pb-btn-primary-to))] px-3 py-1.5 text-[10px] font-semibold text-white shadow-[var(--pb-shadow-card)]";
   action.append(createIcon("eye", { className: "block h-3.5 w-3.5 shrink-0 leading-none" }), document.createTextNode(lock.locked ? "Lihat Status" : "Lihat Detail"));
 
   body.append(heading, specs, priceBlock, footer, action);
@@ -198,11 +198,11 @@ function specItem(iconName, label, value) {
   textWrap.className = "grid min-w-0 gap-0.5";
 
   const caption = document.createElement("p");
-  caption.className = "text-[11px] font-medium text-[var(--pb-text-muted)]";
+  caption.className = "text-[10px] font-medium text-[var(--pb-text-muted)]";
   caption.textContent = label;
 
   const content = document.createElement("p");
-  content.className = "break-words text-xs font-bold text-[var(--pb-text)]";
+  content.className = "break-words text-[10px] font-bold text-[var(--pb-text)]";
   content.textContent = value;
 
   textWrap.append(caption, content);
@@ -212,7 +212,7 @@ function specItem(iconName, label, value) {
 
 function footerChip(iconName, label) {
   const chip = document.createElement("span");
-  chip.className = "inline-flex max-w-full min-w-0 items-center gap-1.5 rounded-full bg-[var(--pb-surface-muted)] px-2.5 py-1.5 text-[11px] font-semibold leading-none text-[var(--pb-text-muted)]";
+  chip.className = "inline-flex max-w-full min-w-0 items-center gap-1.5 rounded-full bg-[var(--pb-surface-muted)] px-2.5 py-1.5 text-[10px] font-semibold leading-none text-[var(--pb-text-muted)]";
   chip.append(createIcon(iconName, { className: "block h-3 w-3 shrink-0 leading-none" }), document.createTextNode(label));
   return chip;
 }

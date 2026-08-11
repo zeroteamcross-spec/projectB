@@ -104,15 +104,15 @@ function loginPanel({ config, isSubmitting, error, onSubmit }) {
   const header = document.createElement("header");
   header.className = "grid gap-1.5 text-center";
   const title = document.createElement("h1");
-  title.className = "text-2xl font-black tracking-[-0.03em] text-gray-950";
+  title.className = "text-xl font-black tracking-[-0.03em] text-gray-950";
   title.textContent = config.title;
   const subtitle = document.createElement("p");
-  subtitle.className = "text-sm leading-6 text-gray-600";
+  subtitle.className = "text-xs leading-6 text-gray-600";
   subtitle.textContent = config.subtitle;
   header.append(title, subtitle);
 
   const lockNote = document.createElement("p");
-  lockNote.className = "rounded-2xl bg-[var(--pb-surface-muted)] px-3 py-2 text-center text-sm leading-6 text-gray-600";
+  lockNote.className = "rounded-2xl bg-[var(--pb-surface-muted)] px-3 py-2 text-center text-xs leading-6 text-gray-600";
   lockNote.textContent = ``;
 
   section.append(iconWrap, header, lockNote, loginForm({ config, isSubmitting, error, onSubmit }));
@@ -130,7 +130,7 @@ function loginForm({ config, isSubmitting, error, onSubmit }) {
   if (error) {
     const message = document.createElement("p");
     message.id = `role_login_${config.slug}_error`;
-    message.className = "rounded-lg border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-3 py-2 text-sm font-medium text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
+    message.className = "rounded-lg border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-3 py-2 text-xs font-medium text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
     message.textContent = error;
     form.append(message);
   }
@@ -167,13 +167,13 @@ function activeSessionPanel({ config, router }) {
   const header = document.createElement("header");
   header.className = "grid gap-1";
   const eyebrow = document.createElement("p");
-  eyebrow.className = "text-xs font-black uppercase tracking-normal text-[var(--pb-brand-secondary)]";
+  eyebrow.className = "text-[10px] font-black uppercase tracking-normal text-[var(--pb-brand-secondary)]";
   eyebrow.textContent = "Sesi aktif";
   const title = document.createElement("h1");
-  title.className = "text-xl font-bold tracking-normal text-gray-950";
+  title.className = "text-lg font-bold tracking-normal text-gray-950";
   title.textContent = currentUser?.name ?? currentUser?.email ?? "Akun aktif";
   const body = document.createElement("p");
-  body.className = "text-sm leading-6 text-gray-600";
+  body.className = "text-xs leading-6 text-gray-600";
   body.textContent = currentRole === config.role
     ? `Anda sudah masuk sebagai ${config.label}.`
     : `Anda sedang masuk sebagai ${roleLabel(currentRole)}. Logout dari profil sebelum masuk sebagai ${config.label}.`;
@@ -193,7 +193,7 @@ function activeSessionPanel({ config, router }) {
 
 function field({ id, name, label, type = "text", placeholder = "" }) {
   const wrap = document.createElement("label");
-  wrap.className = "grid gap-1.5 text-sm font-semibold text-gray-700";
+  wrap.className = "grid gap-1.5 text-xs font-semibold text-gray-700";
   wrap.textContent = label;
 
   const input = document.createElement("input");
@@ -202,7 +202,7 @@ function field({ id, name, label, type = "text", placeholder = "" }) {
   input.type = type;
   input.required = true;
   input.placeholder = placeholder;
-  input.className = "min-h-11 min-w-0 w-full rounded-2xl border border-gray-200 bg-white/90 px-4 py-2.5 text-sm text-gray-950 outline-none transition duration-200 placeholder:text-[var(--pb-text-muted)] focus:border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] focus:bg-white focus:ring-4 focus:ring-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)]";
+  input.className = "min-h-11 min-w-0 w-full rounded-2xl border border-gray-200 bg-white/90 px-4 py-2.5 text-xs text-gray-950 outline-none transition duration-200 placeholder:text-[var(--pb-text-muted)] focus:border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] focus:bg-white focus:ring-4 focus:ring-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)]";
 
   wrap.append(input);
   return wrap;

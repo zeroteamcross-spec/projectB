@@ -78,9 +78,9 @@ function sellerHero({ router, summary = {}, notFound = false }) {
 
   copy.append(
     icon,
-    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", ""),
-    textNode("h1", "max-w-2xl text-3xl font-black leading-tight tracking-normal text-gray-950 sm:text-4xl", notFound ? "Halaman seller tidak ditemukan" : "Dashboard Seller"),
-    textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", ""),
+    textNode("p", "text-[10px] font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", ""),
+    textNode("h1", "max-w-2xl text-2xl font-black leading-tight tracking-normal text-gray-950 sm:text-3xl", notFound ? "Halaman seller tidak ditemukan" : "Dashboard Seller"),
+    textNode("p", "max-w-2xl text-xs leading-6 text-gray-600", ""),
   );
 
   const stats = document.createElement("section");
@@ -95,8 +95,8 @@ function sellerHero({ router, summary = {}, notFound = false }) {
     stat.id = `slr_hero_stat_${String(label).toLowerCase().replace(/\s+/g, "_")}_section`;
     stat.className = "rounded-[1.25rem] border border-white/80 bg-white/78 p-3 shadow-sm";
     stat.append(
-      textNode("p", "text-[11px] font-black uppercase tracking-[0.14em] text-gray-500", label),
-      textNode("p", "text-2xl font-black text-gray-950", String(value)),
+      textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label),
+      textNode("p", "text-xl font-black text-gray-950", String(value)),
     );
     stats.append(stat);
   });

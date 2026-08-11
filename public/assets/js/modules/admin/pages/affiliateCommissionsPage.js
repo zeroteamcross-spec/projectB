@@ -176,9 +176,9 @@ function hero(action, summary) {
   const copy = document.createElement("div");
   copy.className = "grid gap-2";
   copy.append(
-    textNode("p", "text-xs font-black uppercase tracking-[0.14em] text-[var(--pb-brand-secondary)]", "Marketing finance"),
-    textNode("h1", "text-3xl font-black text-gray-950", "Marketing Commissions"),
-    textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", "Kelola ledger komisi, status dibayar, dan pembuatan batch pembayaran marketing."),
+    textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-[var(--pb-brand-secondary)]", "Marketing finance"),
+    textNode("h1", "text-2xl font-black text-gray-950", "Marketing Commissions"),
+    textNode("p", "max-w-2xl text-xs leading-6 text-gray-600", "Kelola ledger komisi, status dibayar, dan pembuatan batch pembayaran marketing."),
   );
   const stats = document.createElement("div");
   stats.className = "grid gap-2 sm:grid-cols-3 lg:min-w-[480px]";
@@ -189,7 +189,7 @@ function hero(action, summary) {
   ].forEach(([label, value]) => {
     const card = document.createElement("section");
     card.className = "rounded-[var(--pb-radius-xl)] border border-[var(--pb-border)] bg-white px-4 py-3 shadow-sm";
-    card.append(textNode("p", "text-xs font-bold uppercase text-gray-500", label), textNode("p", "text-lg font-black text-gray-950", value));
+    card.append(textNode("p", "text-[10px] font-bold uppercase text-gray-500", label), textNode("p", "text-base font-black text-gray-950", value));
     stats.append(card);
   });
   const side = document.createElement("div");
@@ -240,7 +240,7 @@ function openSettlementModal({ ledgers, state, onSubmit }) {
   note.id = "adfc_settlement_note_input";
   note.className = `${reference.className} min-h-24`;
   note.placeholder = "Catatan pembayaran";
-  const summary = textNode("p", "text-sm font-semibold text-gray-800", `${ledgers.length} ledger | ${formatCurrency(total)}`);
+  const summary = textNode("p", "text-xs font-semibold text-gray-800", `${ledgers.length} ledger | ${formatCurrency(total)}`);
   const submit = Button({ label: state.isCreating ? "Memproses..." : "Buat batch pending", variant: "primary" });
   submit.id = "adfc_settlement_submit_button";
   submit.type = "submit";
@@ -268,7 +268,7 @@ function openSettlementModal({ ledgers, state, onSubmit }) {
 
 function input(placeholder, value = "") {
   const control = document.createElement("input");
-  control.className = "min-h-11 min-w-0 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-sm outline-none focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  control.className = "min-h-11 min-w-0 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-xs outline-none focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
   control.placeholder = placeholder;
   control.value = value;
   return control;

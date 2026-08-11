@@ -19,8 +19,8 @@ export function SellerShowroomPanel({ summary = {} } = {}) {
   const copy = document.createElement("div");
   copy.className = "grid min-w-0 gap-1";
   copy.append(
-    textNode("p", "text-[11px] font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", "Showroom readiness"),
-    textNode("h2", "break-words text-xl font-black tracking-normal text-gray-950", summary.showroomName ?? "Showroom"),
+    textNode("p", "text-[10px] font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", "Showroom readiness"),
+    textNode("h2", "break-words text-lg font-black tracking-normal text-gray-950", summary.showroomName ?? "Showroom"),
   );
 
   left.append(icon, copy);
@@ -34,7 +34,7 @@ export function SellerShowroomPanel({ summary = {} } = {}) {
 
   const text = textNode(
     "p",
-    "max-w-3xl text-sm leading-6 text-gray-600",
+    "max-w-3xl text-xs leading-6 text-gray-600",
     summary.showroomReady
       ? "Profil showroom sudah cukup untuk memulai pengelolaan listing dan transaksi seller."
       : "Lengkapi showroom sebelum UAT seller agar listing dan transaksi lebih mudah diverifikasi.",
@@ -52,8 +52,8 @@ export function SellerShowroomPanel({ summary = {} } = {}) {
     item.id = `slr_showroom_fact_${label.toLowerCase().replace(/\s+/g, "_")}_section`;
     item.className = "rounded-[1.25rem] border border-white/80 bg-white/74 p-3 shadow-sm";
     item.append(
-      textNode("p", "text-[11px] font-black uppercase tracking-[0.14em] text-gray-500", label),
-      textNode("p", "text-sm font-black text-gray-950", value),
+      textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label),
+      textNode("p", "text-xs font-black text-gray-950", value),
     );
     facts.append(item);
   });

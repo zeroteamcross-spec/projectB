@@ -261,9 +261,9 @@ function hero({ action, sliders }) {
   icon.append(createIcon("image", { className: "block h-5 w-5 leading-none" }));
   copy.append(
     icon,
-    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", "Admin slider"),
-    textNode("h1", "text-3xl font-black leading-tight tracking-normal text-gray-950 sm:text-4xl", "Manajemen Slider"),
-    textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", ""),
+    textNode("p", "text-[10px] font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", "Admin slider"),
+    textNode("h1", "text-2xl font-black leading-tight tracking-normal text-gray-950 sm:text-3xl", "Manajemen Slider"),
+    textNode("p", "max-w-2xl text-xs leading-6 text-gray-600", ""),
   );
 
   const stats = document.createElement("section");
@@ -275,7 +275,7 @@ function hero({ action, sliders }) {
   ].forEach(([label, value]) => {
     const card = document.createElement("section");
     card.className = "rounded-[1.25rem] border border-white/80 bg-white/78 p-3 shadow-sm";
-    card.append(textNode("p", "text-[11px] font-black uppercase tracking-[0.14em] text-gray-500", label), textNode("p", "text-2xl font-black text-gray-950", String(value)));
+    card.append(textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label), textNode("p", "text-xl font-black text-gray-950", String(value)));
     stats.append(card);
   });
   const side = document.createElement("section");
@@ -314,7 +314,7 @@ function filterBar({ query, sliders, onSubmit }) {
   chips.className = "flex flex-wrap gap-2 border-t border-white/60 pt-3";
   [`${sliders.length} slider`, `${sliders.filter((item) => item.is_active).length} aktif`, "HTML predefined"].forEach((text) => {
     const chip = document.createElement("span");
-    chip.className = "rounded-full border border-[var(--pb-border)] bg-[var(--pb-chip-bg)] px-4 py-2 text-sm font-semibold text-[var(--pb-chip-text)] shadow-sm";
+    chip.className = "rounded-full border border-[var(--pb-border)] bg-[var(--pb-chip-bg)] px-4 py-2 text-xs font-semibold text-[var(--pb-chip-text)] shadow-sm";
     chip.textContent = text;
     chips.append(chip);
   });
@@ -334,11 +334,11 @@ function sliderTable({ sliders, allSliders, loading, page, pageSize, totalItems,
     columns: [
       { label: "Preview", render: previewCell },
       { label: "Judul", render: titleCell },
-      { label: "Posisi", render: (slider) => textNode("span", "text-sm font-bold text-gray-800", positionLabel(slider.position_key)) },
+      { label: "Posisi", render: (slider) => textNode("span", "text-xs font-bold text-gray-800", positionLabel(slider.position_key)) },
       { label: "Status", render: statusCell },
-      { label: "Urutan", render: (slider) => textNode("span", "text-sm font-black text-gray-900", String(slider.sort_order ?? 0)) },
+      { label: "Urutan", render: (slider) => textNode("span", "text-xs font-black text-gray-900", String(slider.sort_order ?? 0)) },
       { label: "Jadwal", render: scheduleCell },
-      { label: "Animasi", render: (slider) => textNode("span", "text-sm font-semibold text-gray-700", slider.animation_key || "-") },
+      { label: "Animasi", render: (slider) => textNode("span", "text-xs font-semibold text-gray-700", slider.animation_key || "-") },
       { label: "Aksi", render: (slider) => actionCell(slider, allSliders, state, actions) },
     ],
     emptyTitle: "Belum ada slider",
@@ -387,8 +387,8 @@ function titleCell(slider) {
   const wrap = document.createElement("section");
   wrap.className = "grid min-w-0 gap-1";
   wrap.append(
-    textNode("p", "break-words text-sm font-black text-gray-950", slider.title || "-"),
-    textNode("p", "break-words text-xs font-semibold text-gray-500", slider.code || slider.template_key || "-"),
+    textNode("p", "break-words text-xs font-black text-gray-950", slider.title || "-"),
+    textNode("p", "break-words text-[10px] font-semibold text-gray-500", slider.code || slider.template_key || "-"),
   );
   return wrap;
 }
@@ -399,7 +399,7 @@ function statusCell(slider) {
 
 function scheduleCell(slider) {
   const wrap = document.createElement("section");
-  wrap.className = "grid gap-1 text-xs font-semibold text-gray-600";
+  wrap.className = "grid gap-1 text-[10px] font-semibold text-gray-600";
   wrap.append(textNode("span", "", slider.start_at ? `Mulai ${slider.start_at}` : "Mulai: langsung"), textNode("span", "", slider.end_at ? `Selesai ${slider.end_at}` : "Selesai: terbuka"));
   return wrap;
 }
@@ -480,7 +480,7 @@ function previewModal(slider, actions) {
     idPrefix: "adsl_preview",
     context: slider?.position_key === "buyer_home" ? "buyer" : "public",
     onNavigate: actions.closeModal,
-  }) ?? textNode("p", "text-sm text-gray-500", "Slider tidak ditemukan."));
+  }) ?? textNode("p", "text-xs text-gray-500", "Slider tidak ditemukan."));
   const close = Button({ label: "Tutup", variant: "secondary", onClick: actions.closeModal });
   close.type = "button";
   wrap.append(close);
@@ -587,7 +587,7 @@ function sliderForm({ slider, draftOverride = null, mode, saving, onUploadImage,
   });
 
   const notice = document.createElement("section");
-  notice.className = "rounded-[1.25rem] border border-[color-mix(in_srgb,var(--pb-warning)_26%,white)] bg-[color-mix(in_srgb,var(--pb-warning)_8%,white)] px-4 py-3 text-sm font-semibold leading-6 text-[color-mix(in_srgb,var(--pb-warning)_84%,black)]";
+  notice.className = "rounded-[1.25rem] border border-[color-mix(in_srgb,var(--pb-warning)_26%,white)] bg-[color-mix(in_srgb,var(--pb-warning)_8%,white)] px-4 py-3 text-xs font-semibold leading-6 text-[color-mix(in_srgb,var(--pb-warning)_84%,black)]";
   notice.textContent = "HTML slider dibatasi ke template predefined. Tidak ada input HTML custom, script, onclick, iframe, atau javascript URL.";
 
   const actions = document.createElement("section");
@@ -599,12 +599,12 @@ function sliderForm({ slider, draftOverride = null, mode, saving, onUploadImage,
   submit.prepend(createIcon("circleCheck", { className: "block h-4 w-4 leading-none" }));
   actions.append(cancel, submit);
 
-  const validationPanel = textNode("p", "hidden rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-warning)_26%,white)] bg-[color-mix(in_srgb,var(--pb-warning)_8%,white)] px-3 py-2 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-warning)_84%,black)]", "");
+  const validationPanel = textNode("p", "hidden rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-warning)_26%,white)] bg-[color-mix(in_srgb,var(--pb-warning)_8%,white)] px-3 py-2 text-xs font-semibold text-[color-mix(in_srgb,var(--pb-warning)_84%,black)]", "");
   const syncFormValidity = () => {
     const message = validateSliderPayload(collectPayload());
     validationPanel.className = message
-      ? "rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-warning)_26%,white)] bg-[color-mix(in_srgb,var(--pb-warning)_8%,white)] px-3 py-2 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-warning)_84%,black)]"
-      : "hidden rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-warning)_26%,white)] bg-[color-mix(in_srgb,var(--pb-warning)_8%,white)] px-3 py-2 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-warning)_84%,black)]";
+      ? "rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-warning)_26%,white)] bg-[color-mix(in_srgb,var(--pb-warning)_8%,white)] px-3 py-2 text-xs font-semibold text-[color-mix(in_srgb,var(--pb-warning)_84%,black)]"
+      : "hidden rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-warning)_26%,white)] bg-[color-mix(in_srgb,var(--pb-warning)_8%,white)] px-3 py-2 text-xs font-semibold text-[color-mix(in_srgb,var(--pb-warning)_84%,black)]";
     validationPanel.textContent = message;
     submit.disabled = Boolean(saving || message);
   };
@@ -638,8 +638,8 @@ function templatePreviewSection({ select, getDraft }) {
   section.className = "grid gap-4 rounded-[1.5rem] border border-[var(--pb-border)] bg-white/82 p-4 shadow-sm";
 
   section.append(
-    textNode("p", "text-sm font-black text-gray-950", "Pilih Template"),
-    textNode("p", "text-sm leading-6 text-gray-500", "Template bisa dipilih dari preview visual. Live preview di bawah mengikuti teks, gambar, CTA, dan animasi yang sedang diedit."),
+    textNode("p", "text-xs font-black text-gray-950", "Pilih Template"),
+    textNode("p", "text-xs leading-6 text-gray-500", "Template bisa dipilih dari preview visual. Live preview di bawah mengikuti teks, gambar, CTA, dan animasi yang sedang diedit."),
   );
 
   const grid = document.createElement("section");
@@ -682,8 +682,8 @@ function templatePreviewCard(option, active, onSelect) {
   const copy = document.createElement("section");
   copy.className = "grid min-w-0 gap-1 text-left";
   copy.append(
-    textNode("span", "text-sm font-black text-gray-950", option.label),
-    textNode("span", "text-xs font-semibold text-gray-500", templatePreviewDescription(option.value)),
+    textNode("span", "text-xs font-black text-gray-950", option.label),
+    textNode("span", "text-[10px] font-semibold text-gray-500", templatePreviewDescription(option.value)),
   );
 
   button.append(visual, copy);
@@ -771,7 +771,7 @@ function templatePreviewDescription(templateKey) {
 function renderTemplateLivePreview(host, slider) {
   if (!host) return;
   host.replaceChildren(
-    textNode("p", "text-sm font-black text-gray-950", "Live Preview"),
+    textNode("p", "text-xs font-black text-gray-950", "Live Preview"),
     SliderBanner({
       sliders: [slider],
       idPrefix: "adsl_live",
@@ -790,13 +790,13 @@ function uploadSection({ initialUrl, onUploaded, onUploadImage }) {
   renderUploadPreview(preview, initialUrl);
   const copy = document.createElement("section");
   copy.className = "grid min-w-0 gap-3";
-  copy.append(textNode("p", "text-sm font-black text-gray-950", "Upload Image"), textNode("p", "text-sm leading-6 text-gray-500", "Drag & drop atau pilih JPG, PNG, WebP. Maksimal 5MB."));
-  const status = textNode("p", "text-sm font-semibold text-gray-600", "");
+  copy.append(textNode("p", "text-xs font-black text-gray-950", "Upload Image"), textNode("p", "text-xs leading-6 text-gray-500", "Drag & drop atau pilih JPG, PNG, WebP. Maksimal 5MB."));
+  const status = textNode("p", "text-xs font-semibold text-gray-600", "");
   const input = document.createElement("input");
   input.id = "adsl_image_file_input";
   input.type = "file";
   input.accept = "image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp";
-  input.className = "min-h-11 min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-white px-3 py-2 text-sm font-semibold text-gray-700";
+  input.className = "min-h-11 min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-white px-3 py-2 text-xs font-semibold text-gray-700";
   const uploadFile = async (file) => {
     if (!file) return;
     try {
@@ -1032,7 +1032,7 @@ function scheduleLabel(slider) {
 
 function errorPanel(message) {
   const section = document.createElement("section");
-  section.className = "rounded-[1.25rem] border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
+  section.className = "rounded-[1.25rem] border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-xs font-semibold text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
   section.textContent = message;
   return section;
 }
@@ -1076,7 +1076,7 @@ function selectControl(id, name, value, options) {
 
 function checkboxControl(id, name, checked, label) {
   const wrap = document.createElement("label");
-  wrap.className = "inline-flex min-h-11 items-center gap-3 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-2 text-sm font-bold text-gray-700";
+  wrap.className = "inline-flex min-h-11 items-center gap-3 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-2 text-xs font-bold text-gray-700";
   const input = document.createElement("input");
   input.id = id;
   input.name = name;
@@ -1089,7 +1089,7 @@ function checkboxControl(id, name, checked, label) {
 
 function labelWrap(label, control) {
   const wrap = document.createElement("label");
-  wrap.className = "grid gap-1 text-sm font-semibold text-gray-700";
+  wrap.className = "grid gap-1 text-xs font-semibold text-gray-700";
   wrap.textContent = label;
   wrap.append(control);
   return wrap;
@@ -1110,7 +1110,7 @@ function iconBox(icon) {
 }
 
 function controlClassName() {
-  return "min-h-11 min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-2.5 text-sm text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  return "min-h-11 min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-2.5 text-xs text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
 }
 
 function normalizeImageUrl(url) {

@@ -20,7 +20,7 @@ export function SectionHeader({ title, description = "", action = null, designHo
 
   if (description) {
     const text = document.createElement("p");
-    text.className = `mt-2 max-w-2xl text-sm leading-7 ${tw.text.muted}`;
+    text.className = `mt-2 max-w-2xl text-xs leading-7 ${tw.text.muted}`;
     text.textContent = description;
     copy.append(text);
   }

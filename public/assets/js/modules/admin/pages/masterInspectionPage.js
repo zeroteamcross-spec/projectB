@@ -147,7 +147,7 @@ function render(root, context, state, actions) {
   if (state.error) {
     const error = document.createElement("section");
     error.id = "admstinsp_error_section";
-    error.className = "rounded-[1.25rem] border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
+    error.className = "rounded-[1.25rem] border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-xs font-semibold text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
     error.textContent = state.error;
     layout.append(error);
   }
@@ -182,9 +182,9 @@ function heroSection(templates, { onCreate } = {}) {
   icon.append(createIcon("clipboard", { className: "h-5 w-5" }));
   copy.append(
     icon,
-    textNode("p", "text-xs font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", "Admin Master"),
-    textNode("h1", "text-2xl font-black leading-tight tracking-normal text-gray-950 sm:text-3xl", "Master Inspection"),
-    textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", "Kelola definisi section dan item inspection canon. Seller tetap hanya memilih kondisi dan menambah catatan dari master ini."),
+    textNode("p", "text-[10px] font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", "Admin Master"),
+    textNode("h1", "text-xl font-black leading-tight tracking-normal text-gray-950 sm:text-2xl", "Master Inspection"),
+    textNode("p", "max-w-2xl text-xs leading-6 text-gray-600", "Kelola definisi section dan item inspection canon. Seller tetap hanya memilih kondisi dan menambah catatan dari master ini."),
   );
 
   const stats = document.createElement("section");
@@ -199,8 +199,8 @@ function heroSection(templates, { onCreate } = {}) {
     card.id = `admstinsp_hero_stat_${String(label).toLowerCase()}_section`;
     card.className = "rounded-[1rem] border border-white/80 bg-white/80 p-3 shadow-sm";
     card.append(
-      textNode("p", "text-[11px] font-black uppercase tracking-[0.12em] text-gray-500", label),
-      textNode("p", "text-2xl font-black text-gray-950", String(value)),
+      textNode("p", "text-[10px] font-black uppercase tracking-[0.12em] text-gray-500", label),
+      textNode("p", "text-xl font-black text-gray-950", String(value)),
     );
     stats.append(card);
   });
@@ -214,7 +214,7 @@ function heroSection(templates, { onCreate } = {}) {
     onClick: onCreate,
   });
   createButton.id = "admstinsp_create_button";
-  createButton.className = "inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-[color-mix(in_srgb,var(--pb-warning)_42%,white)] bg-[linear-gradient(135deg,#eab676,#eab676,#1e81b0)] px-5 text-sm font-black text-white shadow-[0_18px_45px_rgba(30,129,176,0.26)] transition hover:-translate-y-0.5 hover:shadow-[0_22px_52px_rgba(30,129,176,0.32)] focus:outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)]";
+  createButton.className = "inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-[color-mix(in_srgb,var(--pb-warning)_42%,white)] bg-[linear-gradient(135deg,#eab676,#eab676,#1e81b0)] px-5 text-xs font-black text-white shadow-[0_18px_45px_rgba(30,129,176,0.26)] transition hover:-translate-y-0.5 hover:shadow-[0_22px_52px_rgba(30,129,176,0.32)] focus:outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)]";
   createButton.prepend(createIcon("plus", { className: "h-4 w-4" }));
   side.append(stats, createButton);
 
@@ -272,7 +272,7 @@ function filterSection({ filters, templates, onSubmit }) {
     `${new Set(templates.map((template) => template.category_name)).size} section`,
   ].forEach((label) => {
     const chip = document.createElement("span");
-    chip.className = "rounded-full border border-[var(--pb-border)] bg-[var(--pb-chip-bg)] px-4 py-2 text-sm font-semibold text-[var(--pb-chip-text)]";
+    chip.className = "rounded-full border border-[var(--pb-border)] bg-[var(--pb-chip-bg)] px-4 py-2 text-xs font-semibold text-[var(--pb-chip-text)]";
     chip.textContent = label;
     chips.append(chip);
   });
@@ -347,7 +347,7 @@ function editorSection({ template, saving, onSave }) {
   description.id = "admstinsp_editor_description_input";
   description.value = template?.description ?? "";
   description.rows = 4;
-  description.className = "min-h-[112px] min-w-0 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-sm text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  description.className = "min-h-[112px] min-w-0 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-xs text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
   const sortOrder = inputField("admstinsp_editor_sort_order_input", String(template?.sort_order ?? 0), "Urutan");
   sortOrder.type = "number";
   sortOrder.min = "0";
@@ -358,7 +358,7 @@ function editorSection({ template, saving, onSave }) {
   active.checked = template?.is_active !== false;
   active.className = "h-4 w-4 rounded border-gray-300 text-[var(--pb-brand-secondary)] focus:ring-[color-mix(in_srgb,var(--pb-brand-primary)_45%,white)]";
   const activeWrap = document.createElement("label");
-  activeWrap.className = "flex items-center gap-2 rounded-xl border border-gray-100 bg-gray-50 px-3 py-3 text-sm font-bold text-gray-700";
+  activeWrap.className = "flex items-center gap-2 rounded-xl border border-gray-100 bg-gray-50 px-3 py-3 text-xs font-bold text-gray-700";
   activeWrap.append(active, document.createTextNode("Item aktif untuk flow seller"));
 
   const save = Button({ label: saving ? "Menyimpan..." : "Simpan Master", variant: "primary" });
@@ -381,7 +381,7 @@ function editorSection({ template, saving, onSave }) {
   });
 
   section.append(
-    textNode("p", "text-sm leading-6 text-gray-600", "Perubahan definisi master hanya memengaruhi draft baru. Report yang sudah tersimpan tetap memakai salinan item saat itu."),
+    textNode("p", "text-xs leading-6 text-gray-600", "Perubahan definisi master hanya memengaruhi draft baru. Report yang sudah tersimpan tetap memakai salinan item saat itu."),
     form,
   );
   return section;
@@ -497,7 +497,7 @@ function paginate(items, filters) {
 
 function labelWrap(label, control) {
   const wrap = document.createElement("label");
-  wrap.className = "grid gap-1 text-sm font-semibold text-gray-700";
+  wrap.className = "grid gap-1 text-xs font-semibold text-gray-700";
   wrap.textContent = label;
   wrap.append(control);
   return wrap;
@@ -569,8 +569,8 @@ function masterColumns({ onDetail, onEdit }) {
         wrap.id = `admstinsp_item_${template.id}_summary_section`;
         wrap.className = "grid min-w-0 gap-1";
         wrap.append(
-          textNode("p", "break-words text-sm font-black text-gray-950", template.item_name),
-          textNode("p", "line-clamp-2 text-xs font-semibold leading-5 text-gray-500", template.description || "Tanpa keterangan."),
+          textNode("p", "break-words text-xs font-black text-gray-950", template.item_name),
+          textNode("p", "line-clamp-2 text-[10px] font-semibold leading-5 text-gray-500", template.description || "Tanpa keterangan."),
         );
         return wrap;
       },
@@ -578,13 +578,13 @@ function masterColumns({ onDetail, onEdit }) {
     {
       label: "Section",
       key: "category_name",
-      render: (template) => textNode("span", "text-sm font-semibold text-gray-700", SECTION_LABELS[template.category_name] ?? template.category_name),
+      render: (template) => textNode("span", "text-xs font-semibold text-gray-700", SECTION_LABELS[template.category_name] ?? template.category_name),
     },
     {
       label: "Urutan",
       key: "sort_order",
       cellClassName: "px-4 py-4 align-top text-center",
-      render: (template) => textNode("span", "inline-flex min-w-10 justify-center rounded-full border border-[var(--pb-border)] bg-white px-3 py-1 text-xs font-black text-gray-700", String(template.sort_order ?? 0)),
+      render: (template) => textNode("span", "inline-flex min-w-10 justify-center rounded-full border border-[var(--pb-border)] bg-white px-3 py-1 text-[10px] font-black text-gray-700", String(template.sort_order ?? 0)),
     },
     {
       label: "Status",
@@ -646,8 +646,8 @@ function detailGrid(items = []) {
     item.id = `admstinsp_detail_${index}_section`;
     item.className = "grid gap-1 rounded-[1rem] border border-[var(--pb-border)] bg-[var(--pb-surface-inset)] p-3";
     item.append(
-      textNode("p", "text-[11px] font-black uppercase tracking-[0.14em] text-gray-500", label),
-      textNode("p", "break-words text-sm font-semibold text-gray-900", value),
+      textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label),
+      textNode("p", "break-words text-xs font-semibold text-gray-900", value),
     );
     grid.append(item);
   });
@@ -657,8 +657,8 @@ function detailGrid(items = []) {
 function statusBadge(isActive) {
   const badge = document.createElement("span");
   badge.className = isActive
-    ? "inline-flex w-fit rounded-full border border-[color-mix(in_srgb,var(--pb-success)_26%,white)] bg-[color-mix(in_srgb,var(--pb-success)_8%,white)] px-3 py-1 text-xs font-black text-[color-mix(in_srgb,var(--pb-success)_84%,black)]"
-    : "inline-flex w-fit rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-xs font-black text-gray-500";
+    ? "inline-flex w-fit rounded-full border border-[color-mix(in_srgb,var(--pb-success)_26%,white)] bg-[color-mix(in_srgb,var(--pb-success)_8%,white)] px-3 py-1 text-[10px] font-black text-[color-mix(in_srgb,var(--pb-success)_84%,black)]"
+    : "inline-flex w-fit rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-[10px] font-black text-gray-500";
   badge.textContent = isActive ? "Aktif" : "Nonaktif";
   return badge;
 }
@@ -675,14 +675,14 @@ function inputField(id, value, placeholder) {
   input.id = id;
   input.value = value;
   input.placeholder = placeholder;
-  input.className = "min-h-10 min-w-0 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-sm text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  input.className = "min-h-10 min-w-0 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-xs text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
   return input;
 }
 
 function selectField(id, value, options) {
   const select = document.createElement("select");
   select.id = id;
-  select.className = "min-h-10 min-w-0 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-sm text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  select.className = "min-h-10 min-w-0 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-xs text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
   options.forEach(([optionValue, label]) => {
     const option = document.createElement("option");
     option.value = optionValue;

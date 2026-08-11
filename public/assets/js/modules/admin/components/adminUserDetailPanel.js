@@ -35,9 +35,9 @@ export function AdminUserDetailPanel({
   const copy = document.createElement("div");
   copy.className = "grid min-w-0 gap-2";
   copy.append(
-    textBlock("text-[11px] font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", "User dossier"),
-    textBlock("text-xl font-black text-gray-950", user.name || user.email || `User #${user.id}`),
-    textBlock(`text-sm ${tw.text.muted}`, `${user.email || "-"} | ${user.role}`),
+    textBlock("text-[10px] font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", "User dossier"),
+    textBlock("text-lg font-black text-gray-950", user.name || user.email || `User #${user.id}`),
+    textBlock(`text-xs ${tw.text.muted}`, `${user.email || "-"} | ${user.role}`),
   );
 
   const badges = document.createElement("div");
@@ -46,9 +46,6 @@ export function AdminUserDetailPanel({
     Badge(adminUserManagementService.statusMeta(user.account_status)),
     Badge(adminUserManagementService.approvalMeta(user)),
   );
-  if (user.is_preview_seed) {
-    badges.append(Badge({ label: "Preview", variant: "default" }));
-  }
   copy.append(badges);
   heading.append(icon, copy);
 
@@ -71,9 +68,9 @@ export function AdminUserDetailPanel({
 
   if (adminUserManagementService.isPendingApproval(user)) {
     const approve = Button({
-      label: user.is_preview_seed ? "Preview approval" : approvingUserId === user.id ? "Memproses approval..." : "Approve seller",
+      label: approvingUserId === user.id ? "Memproses approval..." : "Approve seller",
       variant: "secondary",
-      disabled: Boolean(user.is_preview_seed) || approvingUserId !== null,
+      disabled: approvingUserId !== null,
       onClick: () => onApprove?.(user),
     });
     approve.id = `adusr_modal_approve_button_${user.id}`;
@@ -83,9 +80,9 @@ export function AdminUserDetailPanel({
 
   const impersonationLabel = adminUserManagementService.impersonationLabel(user);
   const impersonate = Button({
-    label: user.is_preview_seed ? "Preview impersonation" : activeUserId === user.id ? "Memproses..." : `Login sebagai ${impersonationLabel}`,
+    label: activeUserId === user.id ? "Memproses..." : `Login sebagai ${impersonationLabel}`,
     variant: adminUserManagementService.isImpersonatable(user) ? "primary" : "secondary",
-    disabled: Boolean(user.is_preview_seed) || !adminUserManagementService.isImpersonatable(user) || activeUserId !== null,
+    disabled: !adminUserManagementService.isImpersonatable(user) || activeUserId !== null,
   });
   impersonate.id = `adusr_modal_impersonate_button_${user.id}`;
   impersonate.onclick = () => onImpersonate?.(user);
@@ -95,9 +92,8 @@ export function AdminUserDetailPanel({
   }
 
   if (adminUserManagementService.isPendingApproval(user)) {
-    actions.append(textBlock("text-sm leading-6 text-[color-mix(in_srgb,var(--pb-warning)_84%,black)] sm:col-span-2", user.is_preview_seed
-      ? "Baris preview dipakai untuk menguji pagination dan disclosure table. Action bisnis dinonaktifkan pada data demo."
-      : "Approval seller akan mengubah akun menjadi active dan approved sebelum user dipakai normal di flow seller."));
+    actions.append(textBlock("text-xs leading-6 text-[color-mix(in_srgb,var(--pb-warning)_84%,black)] sm:col-span-2",
+      "Approval seller akan mengubah akun menjadi active dan approved sebelum user dipakai normal di flow seller."));
   }
 
   panel.append(heading, facts, actions);

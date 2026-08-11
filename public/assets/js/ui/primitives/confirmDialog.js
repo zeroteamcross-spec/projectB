@@ -51,15 +51,15 @@ export function confirmDialog({
     copy.id = "pb_confirm_dialog_copy_section";
     copy.className = "grid min-w-0 gap-1 pr-1";
     const heading = document.createElement("h3");
-    heading.className = "break-words text-sm font-black leading-5 text-gray-950";
+    heading.className = "break-words text-xs font-black leading-5 text-gray-950";
     heading.textContent = title;
     const text = document.createElement("p");
-    text.className = "break-words text-sm font-semibold leading-5 text-gray-600";
+    text.className = "break-words text-xs font-semibold leading-5 text-gray-600";
     text.textContent = message;
     copy.append(heading, text);
     if (description) {
       const note = document.createElement("p");
-      note.className = "break-words text-xs font-semibold leading-5 text-gray-500";
+      note.className = "break-words text-[10px] font-semibold leading-5 text-gray-500";
       note.textContent = description;
       copy.append(note);
     }

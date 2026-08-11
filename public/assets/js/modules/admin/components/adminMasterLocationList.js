@@ -50,7 +50,7 @@ export function AdminMasterLocationList({
     icon,
     columns: [
       { label: "Kota", render: (city) => cityCell(city) },
-      { label: "Provinsi", render: (city) => textBlock("text-sm font-semibold text-gray-700", city.province_name || "-") },
+      { label: "Provinsi", render: (city) => textBlock("text-xs font-semibold text-gray-700", city.province_name || "-") },
       { label: "Status", render: (city) => statusBadge(city.status) },
       { label: "Aksi", render: (city) => actionGroup({ city, onEdit, onToggleStatus, onDelete, idScope: "desktop" }) },
     ],
@@ -91,7 +91,7 @@ function cityCell(city) {
   copy.className = "grid min-w-0 gap-1";
   copy.append(
     textBlock("font-black text-gray-950", city.name),
-    textBlock("text-sm text-gray-500", city.slug || "-"),
+    textBlock("text-xs text-gray-500", city.slug || "-"),
   );
   wrap.append(icon, copy);
   return wrap;

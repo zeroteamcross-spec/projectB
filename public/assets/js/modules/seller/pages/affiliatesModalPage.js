@@ -307,7 +307,7 @@ function render(root, context, actions) {
   if (runtime.error && !modalOpen) {
     const error = document.createElement("p");
     error.id = "slraf_error_section";
-    error.className = "rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
+    error.className = "rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-xs font-semibold text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
     error.textContent = runtime.error;
     layout.append(error);
   }
@@ -515,9 +515,9 @@ function affiliatesHero({ counts, action }) {
   icon.append(createIcon("affiliate", { className: "h-5 w-5" }));
   copy.append(
     icon,
-    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", "Seller marketing desk"),
-    textNode("h1", "max-w-3xl text-3xl font-black leading-tight tracking-normal text-gray-950 sm:text-4xl", "Marketing"),
-    textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", "Kelola partner marketing, link referral, dan status performa."),
+    textNode("p", "text-[10px] font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", "Seller marketing desk"),
+    textNode("h1", "max-w-3xl text-2xl font-black leading-tight tracking-normal text-gray-950 sm:text-3xl", "Marketing"),
+    textNode("p", "max-w-2xl text-xs leading-6 text-gray-600", "Kelola partner marketing, link referral, dan status performa."),
   );
 
   const stats = document.createElement("section");
@@ -530,8 +530,8 @@ function affiliatesHero({ counts, action }) {
     const stat = document.createElement("section");
     stat.className = "rounded-[1.25rem] border border-white/80 bg-white/78 p-3 shadow-sm";
     stat.append(
-      textNode("p", "text-[11px] font-black uppercase tracking-[0.14em] text-gray-500", label),
-      textNode("p", "text-2xl font-black text-gray-950", String(value)),
+      textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label),
+      textNode("p", "text-xl font-black text-gray-950", String(value)),
     );
     stats.append(stat);
   });
@@ -566,8 +566,8 @@ function summaryCards({ affiliates, counts }) {
       summaryCardClass(index),
     ].join(" ");
     card.append(
-      textNode("p", "text-[11px] font-black uppercase tracking-[0.14em] text-gray-500", label),
-      textNode("p", "mt-2 text-2xl font-black text-gray-950", String(value)),
+      textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label),
+      textNode("p", "mt-2 text-xl font-black text-gray-950", String(value)),
     );
     section.append(card);
   });
@@ -582,7 +582,7 @@ function filterBar({ query, counts, onChange }) {
   section.dataset.ds = "seller.affiliates.filters";
 
   const searchWrap = document.createElement("label");
-  searchWrap.className = "grid min-w-0 gap-1.5 text-sm font-bold text-gray-700";
+  searchWrap.className = "grid min-w-0 gap-1.5 text-xs font-bold text-gray-700";
   searchWrap.textContent = "Cari marketing";
   const search = document.createElement("input");
   search.id = "slraf_search_input";
@@ -593,7 +593,7 @@ function filterBar({ query, counts, onChange }) {
   searchWrap.append(search);
 
   const statusWrap = document.createElement("label");
-  statusWrap.className = "grid min-w-0 gap-1.5 text-sm font-bold text-gray-700";
+  statusWrap.className = "grid min-w-0 gap-1.5 text-xs font-bold text-gray-700";
   statusWrap.textContent = "Status";
   const status = document.createElement("select");
   status.id = "slraf_status_filter";
@@ -631,15 +631,15 @@ function affiliateDetailPanel({ affiliate }) {
   section.className = "grid min-w-0 gap-4";
 
   if (!affiliate) {
-    section.append(textNode("p", "rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-warning)_26%,white)] bg-[color-mix(in_srgb,var(--pb-warning)_8%,white)] px-4 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-warning)_84%,black)]", "Marketing tidak ditemukan."));
+    section.append(textNode("p", "rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-warning)_26%,white)] bg-[color-mix(in_srgb,var(--pb-warning)_8%,white)] px-4 py-3 text-xs font-semibold text-[color-mix(in_srgb,var(--pb-warning)_84%,black)]", "Marketing tidak ditemukan."));
     return section;
   }
 
   const header = document.createElement("section");
   header.className = "grid gap-3 rounded-[1.5rem] border border-white/80 bg-[var(--pb-surface-inset)] p-4";
   header.append(
-    textNode("p", "text-2xl font-black text-gray-950", affiliate.user?.name || affiliate.name || `Marketing #${affiliate.id}`),
-    textNode("p", "break-words text-sm font-semibold text-gray-600", [affiliate.user?.email || affiliate.email, affiliate.phone_number || affiliate.user?.phone_number].filter(Boolean).join(" | ") || "Kontak belum lengkap"),
+    textNode("p", "text-xl font-black text-gray-950", affiliate.user?.name || affiliate.name || `Marketing #${affiliate.id}`),
+    textNode("p", "break-words text-xs font-semibold text-gray-600", [affiliate.user?.email || affiliate.email, affiliate.phone_number || affiliate.user?.phone_number].filter(Boolean).join(" | ") || "Kontak belum lengkap"),
     SellerAffiliateStatusBadge(affiliate.status),
   );
 
@@ -656,8 +656,8 @@ function affiliateDetailPanel({ affiliate }) {
     const card = document.createElement("section");
     card.className = "grid gap-1 rounded-[1.25rem] border border-[var(--pb-border)] bg-white/82 p-3";
     card.append(
-      textNode("p", "text-[11px] font-black uppercase tracking-[0.14em] text-gray-500", label),
-      textNode("p", "break-words text-sm font-semibold text-gray-900", value),
+      textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label),
+      textNode("p", "break-words text-xs font-semibold text-gray-900", value),
     );
     facts.append(card);
   });
@@ -850,7 +850,7 @@ function numberValue(value) {
 }
 
 function controlClassName() {
-  return "min-h-11 min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-2.5 text-sm font-semibold text-[var(--pb-text)] outline-none transition duration-150 placeholder:text-[var(--pb-text-muted)] focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  return "min-h-11 min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-2.5 text-xs font-semibold text-[var(--pb-text)] outline-none transition duration-150 placeholder:text-[var(--pb-text-muted)] focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
 }
 
 function textNode(tagName, className, text) {

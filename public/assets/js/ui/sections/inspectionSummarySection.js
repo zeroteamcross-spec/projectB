@@ -7,7 +7,7 @@ export function InspectionSummarySection({ summary = null } = {}) {
   title.textContent = "Ringkasan inspeksi";
 
   const text = document.createElement("p");
-  text.className = `text-sm ${tw.text.muted}`;
+  text.className = `text-xs ${tw.text.muted}`;
   text.textContent = summary?.report_status ?? "Belum ada ringkasan aktif.";
 
   return Card([title, text]);

@@ -71,10 +71,10 @@ function statusCard(transaction, statusMeta) {
   icon.className = "grid h-10 w-10 place-items-center rounded-2xl bg-[linear-gradient(135deg,#c53030,#1e81b0)] text-white shadow-[0_14px_34px_rgba(185,28,28,0.20)]";
   icon.append(createIcon("transaction", { className: "h-4 w-4" }));
   const title = document.createElement("h2");
-  title.className = "text-lg font-bold tracking-normal text-gray-950";
+  title.className = "text-base font-bold tracking-normal text-gray-950";
   title.textContent = transaction.transaction_code ?? `TRX #${transaction.id ?? "-"}`;
   const body = document.createElement("p");
-  body.className = "text-sm leading-6 text-gray-600";
+  body.className = "text-xs leading-6 text-gray-600";
   body.textContent = statusMeta.description;
   top.append(icon, title, body, AdminTransactionStatusBadge({ status: transaction.transaction_status }));
 
@@ -92,7 +92,7 @@ function paymentLogsCard(logs = []) {
   wrap.className = "grid gap-3";
 
   const heading = document.createElement("h2");
-  heading.className = "text-lg font-bold tracking-normal text-gray-950";
+  heading.className = "text-base font-bold tracking-normal text-gray-950";
   heading.textContent = "Riwayat pembayaran";
   wrap.append(heading);
 
@@ -114,7 +114,7 @@ function factsCard(title, rows = []) {
 
   if (title) {
     const heading = document.createElement("h2");
-    heading.className = "text-lg font-bold tracking-normal text-gray-950";
+    heading.className = "text-base font-bold tracking-normal text-gray-950";
     heading.textContent = title;
     card.append(heading);
   }
@@ -124,11 +124,11 @@ function factsCard(title, rows = []) {
     row.className = "flex flex-col gap-1 border-b border-[var(--pb-border)] pb-3 last:border-b-0 last:pb-0 sm:flex-row sm:items-start sm:justify-between sm:gap-3";
 
     const labelNode = document.createElement("span");
-    labelNode.className = "break-words text-sm text-gray-500";
+    labelNode.className = "break-words text-xs text-gray-500";
     labelNode.textContent = label;
 
     const valueNode = document.createElement("span");
-    valueNode.className = "break-words text-left text-sm font-semibold text-gray-900 sm:max-w-[65%] sm:text-right";
+    valueNode.className = "break-words text-left text-xs font-semibold text-gray-900 sm:max-w-[65%] sm:text-right";
     valueNode.textContent = value;
 
     row.append(labelNode, valueNode);

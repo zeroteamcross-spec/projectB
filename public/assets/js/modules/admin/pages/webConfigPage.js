@@ -117,13 +117,13 @@ function hero() {
   copy.className = "grid min-w-0 gap-2";
   copy.append(
     iconBox("settings"),
-    textNode("p", "text-xs font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", ""),
-    textNode("h1", "text-3xl font-black leading-tight text-gray-950", "Konfigurasi WEB"),
-    textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", ""),
+    textNode("p", "text-[10px] font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", ""),
+    textNode("h1", "text-2xl font-black leading-tight text-gray-950", "Konfigurasi WEB"),
+    textNode("p", "max-w-2xl text-xs leading-6 text-gray-600", ""),
   );
   const preview = document.createElement("section");
   preview.className = "grid min-w-[220px] gap-2 rounded-[1rem] border border-[var(--pb-border)] bg-white/82 p-4 shadow-sm";
-  preview.append(textNode("p", "text-xs font-black uppercase tracking-[0.14em] text-gray-500", "Preview saat ini"), textNode("p", "text-xl font-black text-gray-950", brandConfig.appName), textNode("p", "text-sm font-semibold text-gray-600", brandConfig.appTagline));
+  preview.append(textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", "Preview saat ini"), textNode("p", "text-lg font-black text-gray-950", brandConfig.appName), textNode("p", "text-xs font-semibold text-gray-600", brandConfig.appTagline));
   section.append(copy, preview);
   return section;
 }
@@ -278,17 +278,17 @@ function uploadDropzone({ input, preview, uploading, onFile }) {
 
   const body = document.createElement("section");
   body.className = "grid min-w-0 gap-3";
-  const title = textNode("p", "text-base font-black text-gray-950", uploading ? "Mengupload icon..." : "Upload Icon Web / Aplikasi");
-  const desc = textNode("p", "text-sm leading-6 text-gray-600", "Tarik file ke area ini atau pilih file SVG, PNG, JPG, atau WebP. Maksimal 2 MB, minimal 64x64 px untuk raster.");
+  const title = textNode("p", "text-sm font-black text-gray-950", uploading ? "Mengupload icon..." : "Upload Icon Web / Aplikasi");
+  const desc = textNode("p", "text-xs leading-6 text-gray-600", "Tarik file ke area ini atau pilih file SVG, PNG, JPG, atau WebP. Maksimal 2 MB, minimal 64x64 px untuk raster.");
   const actions = document.createElement("section");
   actions.className = "flex flex-wrap items-center gap-2";
   const choose = document.createElement("button");
   choose.type = "button";
-  choose.className = "inline-flex min-h-11 items-center justify-center gap-2 rounded-[1rem] bg-[var(--pb-brand-primary)] px-4 py-2 text-sm font-bold text-white shadow-[var(--pb-shadow-soft)] transition hover:brightness-105 focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)] disabled:cursor-not-allowed disabled:opacity-60";
+  choose.className = "inline-flex min-h-11 items-center justify-center gap-2 rounded-[1rem] bg-[var(--pb-brand-primary)] px-4 py-2 text-xs font-bold text-white shadow-[var(--pb-shadow-soft)] transition hover:brightness-105 focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)] disabled:cursor-not-allowed disabled:opacity-60";
   choose.disabled = Boolean(uploading);
   choose.append(createIcon("upload", { className: "block h-4 w-4 leading-none" }), document.createTextNode(uploading ? "Memproses..." : "Pilih File"));
   choose.addEventListener("click", () => input.click());
-  const hint = textNode("span", "text-xs font-bold uppercase tracking-[0.12em] text-[var(--pb-brand-secondary)]", "SVG supported");
+  const hint = textNode("span", "text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--pb-brand-secondary)]", "SVG supported");
   actions.append(choose, hint, input);
   body.append(title, desc, actions);
   section.append(preview, body);
@@ -324,14 +324,14 @@ function input(id, name, value, placeholder) {
 
 function labelWrap(label, control) {
   const wrap = document.createElement("label");
-  wrap.className = "grid gap-1 text-sm font-semibold text-gray-700";
+  wrap.className = "grid gap-1 text-xs font-semibold text-gray-700";
   wrap.textContent = label;
   wrap.append(control);
   return wrap;
 }
 
 function controlClassName() {
-  return "min-h-11 min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-2.5 text-sm text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  return "min-h-11 min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-2.5 text-xs text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
 }
 
 function iconBox(icon) {
@@ -343,14 +343,14 @@ function iconBox(icon) {
 
 function errorPanel(message) {
   const section = document.createElement("section");
-  section.className = "rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
+  section.className = "rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-xs font-semibold text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
   section.textContent = message;
   return section;
 }
 
 function successPanel(message) {
   const section = document.createElement("section");
-  section.className = "rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-success)_26%,white)] bg-[color-mix(in_srgb,var(--pb-success)_8%,white)] px-4 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
+  section.className = "rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-success)_26%,white)] bg-[color-mix(in_srgb,var(--pb-success)_8%,white)] px-4 py-3 text-xs font-semibold text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
   section.textContent = message;
   return section;
 }

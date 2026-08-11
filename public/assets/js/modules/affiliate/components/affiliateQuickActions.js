@@ -64,14 +64,14 @@ export function AffiliateQuickActions({
     title.textContent = item.title;
 
     const body = document.createElement("p");
-    body.className = `break-words text-sm leading-6 ${tw.text.muted}`;
+    body.className = `break-words text-xs leading-6 ${tw.text.muted}`;
     body.textContent = item.description;
 
     const actionWrap = document.createElement("div");
     actionWrap.className = "mt-2 flex min-w-0 flex-wrap items-center justify-between gap-3 border-t border-white/60 pt-4";
     item.action.classList?.add?.("w-full", "sm:w-auto");
     actionWrap.append(
-      textBlock("text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", "Action"),
+      textBlock("text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", "Action"),
       item.action,
     );
 

@@ -19,11 +19,11 @@ export function AffiliateIdentityPanel({
   eyebrow.textContent = "Identitas marketing";
 
   const title = document.createElement("h2");
-  title.className = "break-words text-xl font-bold text-gray-950";
+  title.className = "break-words text-lg font-bold text-gray-950";
   title.textContent = affiliate?.user?.name || affiliate?.name || "Marketing";
 
   const subtitle = document.createElement("p");
-  subtitle.className = `break-words text-sm ${tw.text.muted}`;
+  subtitle.className = `break-words text-xs ${tw.text.muted}`;
   subtitle.textContent = `${affiliate?.user?.email || affiliate?.email || "-"} | ${affiliate?.phone_number || affiliate?.user?.phone_number || "-"}`;
 
   const badges = document.createElement("div");

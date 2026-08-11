@@ -25,15 +25,15 @@ function render(root, context) {
   header.className = "grid gap-3 text-center";
 
   const eyebrow = document.createElement("p");
-  eyebrow.className = "text-xs font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]";
+  eyebrow.className = "text-[10px] font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]";
   eyebrow.textContent = "Login utama";
 
   const title = document.createElement("h1");
-  title.className = "text-3xl font-black tracking-[-0.04em] text-gray-950 sm:text-4xl";
+  title.className = "text-2xl font-black tracking-[-0.04em] text-gray-950 sm:text-3xl";
   title.textContent = "Pilih Google Login";
 
   const body = document.createElement("p");
-  body.className = "mx-auto max-w-2xl text-sm leading-7 text-gray-600 sm:text-base";
+  body.className = "mx-auto max-w-2xl text-xs leading-7 text-gray-600 sm:text-sm";
   body.textContent = "Gunakan halaman Google Login sesuai role akun. Login lama tetap tersedia hanya lewat URL manual untuk kebutuhan darurat.";
 
   header.append(eyebrow, title, body);
@@ -55,11 +55,11 @@ function roleCard(context, config) {
   card.className = "grid gap-4 rounded-[1.75rem] border border-white/80 bg-white/84 p-5 shadow-[0_24px_70px_rgba(15,23,42,0.12)] backdrop-blur-xl";
 
   const title = document.createElement("h2");
-  title.className = "text-xl font-black tracking-[-0.03em] text-gray-950";
+  title.className = "text-lg font-black tracking-[-0.03em] text-gray-950";
   title.textContent = config.label;
 
   const body = document.createElement("p");
-  body.className = "min-h-[3rem] text-sm leading-6 text-gray-600";
+  body.className = "min-h-[3rem] text-xs leading-6 text-gray-600";
   body.textContent = config.googleEnabled ? config.subtitle : "Marketing tetap menggunakan login user/password.";
 
   const button = Button({

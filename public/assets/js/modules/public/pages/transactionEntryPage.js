@@ -223,10 +223,10 @@ function heroCopy() {
   pill.className = tw.interactive.pillIdle;
   pill.textContent = "Buyer checkout";
   const title = document.createElement("h1");
-  title.className = "text-2xl font-bold tracking-normal text-gray-950";
+  title.className = "text-xl font-bold tracking-normal text-gray-950";
   title.textContent = "Booking Sekarang dengan data yang sudah dicek.";
   const body = document.createElement("p");
-  body.className = "text-sm leading-6 text-gray-600";
+  body.className = "text-xs leading-6 text-gray-600";
   body.textContent = "Form ini membuat transaksi awal dan sesi pembayaran dari endpoint payment yang sudah tersedia.";
   badgeRow.append(eyebrow, pill);
   // section.append(badgeRow, title, body, heroTrustRow());
@@ -245,10 +245,10 @@ function priceRow(car) {
   const row = document.createElement("div");
   row.className = `flex items-center justify-between gap-3 ${tw.surface.inset} shadow-sm`;
   const label = document.createElement("span");
-  label.className = "text-sm font-medium text-gray-500";
+  label.className = "text-xs font-medium text-gray-500";
   label.textContent = "Harga transaksi";
   const value = document.createElement("strong");
-  value.className = "text-2xl font-bold text-gray-950";
+  value.className = "text-xl font-bold text-gray-950";
   value.textContent = formatCurrency(effectivePrice(car));
   row.append(label, value);
   return row;
@@ -268,10 +268,10 @@ function nonBuyerGate({ user, onLogout }) {
   const section = document.createElement("section");
   section.className = `grid gap-4 ${tw.surface.warningPanel} p-5`;
   const title = document.createElement("h2");
-  title.className = "text-xl font-bold tracking-normal text-gray-950";
+  title.className = "text-lg font-bold tracking-normal text-gray-950";
   title.textContent = "Gunakan akun buyer";
   const body = document.createElement("p");
-  body.className = "text-sm leading-6 text-gray-600";
+  body.className = "text-xs leading-6 text-gray-600";
   body.textContent = `${user?.email ?? "Akun aktif"} bukan role buyer. Logout lalu masuk memakai akun buyer untuk melanjutkan transaksi.`;
   section.append(title, body, Button({ label: "Logout", variant: "secondary", onClick: onLogout }));
   return section;
@@ -279,7 +279,7 @@ function nonBuyerGate({ user, onLogout }) {
 
 function heroTrustRow() {
   const row = document.createElement("div");
-  row.className = "grid gap-2 border-t border-white/60 pt-4 text-sm text-gray-600 sm:grid-cols-3";
+  row.className = "grid gap-2 border-t border-white/60 pt-4 text-xs text-gray-600 sm:grid-cols-3";
   [
     "Data mobil aktif sudah dibawa dari detail page",
     "Payment session dibuat tanpa memutus funnel public",

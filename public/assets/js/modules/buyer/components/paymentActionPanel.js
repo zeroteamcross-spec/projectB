@@ -19,10 +19,10 @@ export function PaymentActionPanel({
   eyebrow.className = tw.text.eyebrow;
   eyebrow.textContent = "Action";
   const title = document.createElement("h2");
-  title.className = "text-lg font-bold tracking-normal text-gray-950";
+  title.className = "text-base font-bold tracking-normal text-gray-950";
   title.textContent = "Langkah berikutnya";
   const body = document.createElement("p");
-  body.className = "text-sm leading-6 text-gray-600";
+  body.className = "text-xs leading-6 text-gray-600";
   body.textContent = actionCopy(transaction);
   header.append(eyebrow, title, body);
 
@@ -64,7 +64,7 @@ export function PaymentActionPanel({
 
 function actionHint(transaction) {
   const box = document.createElement("div");
-  box.className = `${tw.surface.inset} text-sm leading-6 text-gray-600`;
+  box.className = `${tw.surface.inset} text-xs leading-6 text-gray-600`;
   box.textContent = isPaymentPaid(transaction)
     ? "Tim seller akan menyiapkan dokumen dan mengatur serah terima kendaraan."
     : canComplete(transaction)

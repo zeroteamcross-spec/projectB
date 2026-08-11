@@ -110,7 +110,7 @@ export function DataTable({
   } else {
     mobile.className = "grid gap-2 border-b border-[var(--pb-border)] bg-white/72 px-3 py-3 md:hidden";
     mobile.append(
-      textNode("p", "text-[11px] font-black uppercase tracking-[0.14em] text-gray-500", "Geser tabel untuk melihat semua kolom"),
+      textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", "Geser tabel untuk melihat semua kolom"),
     );
   }
 
@@ -122,7 +122,7 @@ export function DataTable({
 
   const table = document.createElement("table");
   table.className = [
-    "w-full border-collapse text-left text-sm",
+    "w-full border-collapse text-left text-xs",
     tableMinWidth,
     tableClassName,
   ].filter(Boolean).join(" ");
@@ -170,8 +170,8 @@ export function DataTablePagination({
   const meta = document.createElement("div");
   meta.className = "grid gap-1";
   meta.append(
-    textNode("p", "text-[11px] font-black uppercase tracking-[0.16em] text-gray-500", "Pagination"),
-    textNode("p", "text-sm font-semibold text-gray-700", buildPaginationLabel({ page, totalPages, totalItems, perPage, itemLabel })),
+    textNode("p", "text-[10px] font-black uppercase tracking-[0.16em] text-gray-500", "Pagination"),
+    textNode("p", "text-xs font-semibold text-gray-700", buildPaginationLabel({ page, totalPages, totalItems, perPage, itemLabel })),
   );
 
   const top = document.createElement("div");
@@ -179,9 +179,9 @@ export function DataTablePagination({
 
   const tools = document.createElement("div");
   tools.className = "flex flex-wrap items-center gap-2";
-  const sizeLabel = textNode("label", "inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.14em] text-gray-500", "Rows");
+  const sizeLabel = textNode("label", "inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.14em] text-gray-500", "Rows");
   const sizeSelect = document.createElement("select");
-  sizeSelect.className = "min-h-10 rounded-full border border-[var(--pb-border)] bg-white px-3 text-sm font-semibold text-gray-700 shadow-sm";
+  sizeSelect.className = "min-h-10 rounded-full border border-[var(--pb-border)] bg-white px-3 text-xs font-semibold text-gray-700 shadow-sm";
   if (inputIds.perPage) {
     sizeSelect.id = inputIds.perPage;
   }
@@ -211,7 +211,7 @@ export function DataTablePagination({
 
   buildPageWindow({ page, totalPages }).forEach((item) => {
     if (item === "...") {
-      controls.append(textNode("span", "px-1 text-sm font-bold text-[var(--pb-text-muted)]", "..."));
+      controls.append(textNode("span", "px-1 text-xs font-bold text-[var(--pb-text-muted)]", "..."));
       return;
     }
     const pageButton = createPaginationButton({
@@ -222,7 +222,7 @@ export function DataTablePagination({
         ? buttonIds.page(Number(item), Number(item) === Number(page))
         : "",
     });
-    pageButton.className = `inline-flex min-h-10 min-w-10 items-center justify-center rounded-full border px-3 text-sm font-semibold shadow-sm transition ${
+    pageButton.className = `inline-flex min-h-10 min-w-10 items-center justify-center rounded-full border px-3 text-xs font-semibold shadow-sm transition ${
       // Nomor halaman aktif memakai biru netral, bukan hijau tombol "Ya".
       // Pindah halaman tidak menyetujui apa pun.
       Number(item) === Number(page)
@@ -242,13 +242,13 @@ export function DataTablePagination({
 
   const jumpWrap = document.createElement("div");
   jumpWrap.className = "flex flex-wrap items-center gap-2";
-  const jumpLabel = textNode("label", "inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.14em] text-gray-500", "Jump");
+  const jumpLabel = textNode("label", "inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.14em] text-gray-500", "Jump");
   const jumpInput = document.createElement("input");
   jumpInput.type = "number";
   jumpInput.min = "1";
   jumpInput.max = String(Math.max(1, totalPages));
   jumpInput.value = String(page);
-  jumpInput.className = "min-h-10 w-20 rounded-full border border-[var(--pb-border)] bg-white px-3 text-sm font-semibold text-gray-700 shadow-sm";
+  jumpInput.className = "min-h-10 w-20 rounded-full border border-[var(--pb-border)] bg-white px-3 text-xs font-semibold text-gray-700 shadow-sm";
   if (inputIds.jump) {
     jumpInput.id = inputIds.jump;
   }
@@ -269,7 +269,7 @@ export function DataTablePagination({
 
 function createTableHead(columns) {
   const thead = document.createElement("thead");
-  thead.className = "bg-gray-50/80 text-[11px] font-black uppercase tracking-[0.14em] text-gray-500";
+  thead.className = "bg-gray-50/80 text-[10px] font-black uppercase tracking-[0.14em] text-gray-500";
 
   const row = document.createElement("tr");
   columns.forEach((column) => {
@@ -327,8 +327,8 @@ function createMobileCard({ rowKey, title, subtitle, badges, fields, actions, id
   const copy = document.createElement("div");
   copy.className = "grid gap-1";
   copy.append(
-    textNode("p", "break-words text-base font-black text-[var(--pb-text-strong)]", title),
-    textNode("p", "break-words text-sm text-gray-500", subtitle),
+    textNode("p", "break-words text-sm font-black text-[var(--pb-text-strong)]", title),
+    textNode("p", "break-words text-xs text-gray-500", subtitle),
   );
   top.append(copy);
 
@@ -348,8 +348,8 @@ function createMobileCard({ rowKey, title, subtitle, badges, fields, actions, id
       const row = document.createElement("div");
       row.className = "grid gap-1";
       row.append(
-        textNode("p", "text-[11px] font-black uppercase tracking-[0.14em] text-gray-500", label),
-        value instanceof Node ? value : textNode("p", "break-words text-sm font-semibold text-gray-900", value ?? "-"),
+        textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label),
+        value instanceof Node ? value : textNode("p", "break-words text-xs font-semibold text-gray-900", value ?? "-"),
       );
       facts.append(row);
     });
@@ -392,8 +392,8 @@ function createMobileDisclosureRow({
   const top = document.createElement("div");
   top.className = "grid gap-2";
   top.append(
-    textNode("p", "break-words text-base font-black text-[var(--pb-text-strong)]", title),
-    textNode("p", "break-words text-sm text-gray-500", subtitle),
+    textNode("p", "break-words text-sm font-black text-[var(--pb-text-strong)]", title),
+    textNode("p", "break-words text-xs text-gray-500", subtitle),
   );
   if (Array.isArray(badges) && badges.length) {
     const badgeWrap = document.createElement("div");
@@ -408,8 +408,8 @@ function createMobileDisclosureRow({
     const item = document.createElement("div");
     item.className = "flex items-start justify-between gap-3";
     item.append(
-      textNode("p", "text-[11px] font-black uppercase tracking-[0.14em] text-gray-500", label),
-      value instanceof Node ? value : textNode("p", "break-words text-sm font-semibold text-gray-900 text-right", value ?? "-"),
+      textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label),
+      value instanceof Node ? value : textNode("p", "break-words text-xs font-semibold text-gray-900 text-right", value ?? "-"),
     );
     primary.append(item);
   });
@@ -417,7 +417,7 @@ function createMobileDisclosureRow({
   const disclosure = document.createElement("details");
   disclosure.className = "rounded-[1.25rem] border border-dashed border-[var(--pb-border)] bg-white/70";
   const summary = document.createElement("summary");
-  summary.className = "flex cursor-pointer list-none items-center justify-between gap-3 px-3 py-3 text-sm font-semibold text-gray-700";
+  summary.className = "flex cursor-pointer list-none items-center justify-between gap-3 px-3 py-3 text-xs font-semibold text-gray-700";
   summary.append(
     textNode("span", "inline-flex items-center gap-2", buttonLabel),
     disclosureIcon(),
@@ -430,12 +430,12 @@ function createMobileDisclosureRow({
     const item = document.createElement("div");
     item.className = "grid gap-1";
     item.append(
-      textNode("p", "text-[11px] font-black uppercase tracking-[0.14em] text-gray-500", label),
-      value instanceof Node ? value : textNode("p", "break-words text-sm font-semibold text-gray-900", value ?? "-"),
+      textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label),
+      value instanceof Node ? value : textNode("p", "break-words text-xs font-semibold text-gray-900", value ?? "-"),
     );
     disclosureBody.append(item);
   });
-  disclosureBody.append(textNode("p", "text-xs font-semibold text-gray-500", closeLabel));
+  disclosureBody.append(textNode("p", "text-[10px] font-semibold text-gray-500", closeLabel));
   disclosure.append(disclosureBody);
 
   row.append(top, primary, disclosure);
@@ -478,7 +478,7 @@ function createTableLoadingState(columnCount) {
 function createPaginationButton({ label, disabled, onClick, id = "" }) {
   const button = document.createElement("button");
   button.type = "button";
-  button.className = "inline-flex min-h-10 items-center justify-center rounded-full border border-[var(--pb-border-strong)] bg-white/82 px-4 text-sm font-semibold text-gray-700 shadow-sm transition hover:-translate-y-0.5 hover:bg-white disabled:cursor-not-allowed disabled:opacity-45";
+  button.className = "inline-flex min-h-10 items-center justify-center rounded-full border border-[var(--pb-border-strong)] bg-white/82 px-4 text-xs font-semibold text-gray-700 shadow-sm transition hover:-translate-y-0.5 hover:bg-white disabled:cursor-not-allowed disabled:opacity-45";
   button.disabled = disabled;
   button.textContent = label;
   if (id) {
@@ -492,7 +492,7 @@ function createPaginationButton({ label, disabled, onClick, id = "" }) {
 
 function createPaginationSummaryPill(page, totalPages) {
   const pill = document.createElement("span");
-  pill.className = "inline-flex min-h-10 items-center rounded-full border border-[var(--pb-border)] bg-white px-4 text-sm font-bold text-gray-700 shadow-sm";
+  pill.className = "inline-flex min-h-10 items-center rounded-full border border-[var(--pb-border)] bg-white px-4 text-xs font-bold text-gray-700 shadow-sm";
   pill.textContent = `Page ${page} / ${totalPages}`;
   return pill;
 }
@@ -557,7 +557,7 @@ function clampPage(page, totalPages) {
 
 function disclosureIcon() {
   const icon = document.createElement("i");
-  icon.className = "fa-solid fa-chevron-down text-xs text-gray-500";
+  icon.className = "fa-solid fa-chevron-down text-[10px] text-gray-500";
   icon.setAttribute("aria-hidden", "true");
   return icon;
 }
@@ -566,8 +566,8 @@ function textWrap(title, subtitle) {
   const wrap = document.createElement("div");
   wrap.className = "grid min-w-0 gap-0.5";
   wrap.append(
-    textNode("p", "text-base font-black text-gray-950", title),
-    textNode("p", "text-sm text-gray-500", subtitle),
+    textNode("p", "text-sm font-black text-gray-950", title),
+    textNode("p", "text-xs text-gray-500", subtitle),
   );
   return wrap;
 }

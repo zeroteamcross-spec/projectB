@@ -86,13 +86,13 @@ function render(root, router) {
 
   const notice = document.createElement("p");
   notice.id = "slrc_notice_section";
-  notice.className = "rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-success)_26%,white)] bg-[color-mix(in_srgb,var(--pb-success)_8%,white)] px-4 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
+  notice.className = "rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-success)_26%,white)] bg-[color-mix(in_srgb,var(--pb-success)_8%,white)] px-4 py-3 text-xs font-semibold text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
   notice.textContent = runtime.notice;
   notice.hidden = !runtime.notice;
 
   const error = document.createElement("p");
   error.id = "slrc_error_section";
-  error.className = "rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
+  error.className = "rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-xs font-semibold text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
   error.textContent = runtime.error;
   error.hidden = !runtime.error || isForm;
 
@@ -264,9 +264,9 @@ function carsHero({ cars, filteredCars, isForm }) {
   icon.append(createIcon("car", { className: "h-5 w-5" }));
   copy.append(
     icon,
-    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", "Seller inventory"),
-    textNode("h1", "max-w-3xl text-3xl font-black leading-tight tracking-normal text-gray-950 sm:text-4xl", isForm ? "Form listing mobil" : "Katalog"),
-    textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", "")
+    textNode("p", "text-[10px] font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", "Seller inventory"),
+    textNode("h1", "max-w-3xl text-2xl font-black leading-tight tracking-normal text-gray-950 sm:text-3xl", isForm ? "Form listing mobil" : "Katalog"),
+    textNode("p", "max-w-2xl text-xs leading-6 text-gray-600", "")
   );
 
   const stats = document.createElement("section");
@@ -281,8 +281,8 @@ function carsHero({ cars, filteredCars, isForm }) {
     stat.id = `slrc_summary_${slugify(label)}_section`;
     stat.className = "rounded-[1.25rem] border border-white/80 bg-white/78 p-3 shadow-sm transition duration-150 hover:-translate-y-0.5 hover:shadow-md";
     stat.append(
-      textNode("p", "text-[11px] font-black uppercase tracking-[0.14em] text-gray-500", label),
-      textNode("p", "text-2xl font-black text-gray-950", String(value))
+      textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label),
+      textNode("p", "text-xl font-black text-gray-950", String(value))
     );
     stats.append(stat);
   });
@@ -299,13 +299,13 @@ function carsToolbar({ filters, isForm }) {
   section.dataset.ds = "seller.cars.toolbar";
 
   const searchWrap = document.createElement("label");
-  searchWrap.className = "grid min-w-0 gap-1.5 text-sm font-bold text-gray-700";
+  searchWrap.className = "grid min-w-0 gap-1.5 text-xs font-bold text-gray-700";
   searchWrap.textContent = "Cari mobil";
   const search = document.createElement("input");
   search.id = "slrc_search_input";
   search.value = filters.keyword ?? "";
   search.placeholder = "Brand, model, warna, lokasi";
-  search.className = "min-h-11 min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-2.5 text-sm font-semibold text-[var(--pb-text)] outline-none transition duration-150 placeholder:text-[var(--pb-text-muted)] focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  search.className = "min-h-11 min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-2.5 text-xs font-semibold text-[var(--pb-text)] outline-none transition duration-150 placeholder:text-[var(--pb-text-muted)] focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
   search.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
       setRuntime({ filters: { ...runtimeState().filters, keyword: search.value.trim() }, pagination: { ...runtimeState().pagination, page: 1 } });
@@ -314,11 +314,11 @@ function carsToolbar({ filters, isForm }) {
   searchWrap.append(search);
 
   const statusWrap = document.createElement("label");
-  statusWrap.className = "grid min-w-0 gap-1.5 text-sm font-bold text-gray-700";
+  statusWrap.className = "grid min-w-0 gap-1.5 text-xs font-bold text-gray-700";
   statusWrap.textContent = "Status";
   const status = document.createElement("select");
   status.id = "slrc_status_filter_input";
-  status.className = "min-h-11 min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-2.5 text-sm font-semibold text-[var(--pb-text)] outline-none transition duration-150 focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  status.className = "min-h-11 min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-2.5 text-xs font-semibold text-[var(--pb-text)] outline-none transition duration-150 focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
   [
     ["", "Semua"],
     ["draft", "Draft"],
@@ -504,16 +504,16 @@ function createCarsPagination({ page, pageSize, totalItems, totalPages }) {
   const meta = document.createElement("section");
   meta.className = "grid gap-1";
   meta.append(
-    textNode("p", "text-[11px] font-black uppercase tracking-[0.16em] text-gray-500", "Pagination"),
-    textNode("p", "text-sm font-semibold text-gray-700", paginationLabel({ page, pageSize, totalItems, totalPages }))
+    textNode("p", "text-[10px] font-black uppercase tracking-[0.16em] text-gray-500", "Pagination"),
+    textNode("p", "text-xs font-semibold text-gray-700", paginationLabel({ page, pageSize, totalItems, totalPages }))
   );
 
   const sizeWrap = document.createElement("label");
-  sizeWrap.className = "inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.14em] text-gray-500";
+  sizeWrap.className = "inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.14em] text-gray-500";
   sizeWrap.textContent = "Rows";
   const sizeSelect = document.createElement("select");
   sizeSelect.id = "slrc_rows_per_page_input";
-  sizeSelect.className = "min-h-10 rounded-full border border-[var(--pb-border)] bg-white px-3 text-sm font-semibold text-gray-700 shadow-sm";
+  sizeSelect.className = "min-h-10 rounded-full border border-[var(--pb-border)] bg-white px-3 text-xs font-semibold text-gray-700 shadow-sm";
   [10, 25, 50, 100].forEach((option) => {
     const node = document.createElement("option");
     node.value = String(option);
@@ -548,7 +548,7 @@ function createCarsPagination({ page, pageSize, totalItems, totalPages }) {
 
   pageWindow(page, totalPages).forEach((item) => {
     if (item === "...") {
-      controls.append(textNode("span", "px-1 text-sm font-bold text-[var(--pb-text-muted)]", "..."));
+      controls.append(textNode("span", "px-1 text-xs font-bold text-[var(--pb-text-muted)]", "..."));
       return;
     }
 
@@ -597,8 +597,8 @@ function paginationButton({ id, label, disabled = false, active = false, onClick
   button.disabled = disabled;
   button.textContent = label;
   button.className = active
-    ? "inline-flex min-h-10 min-w-10 items-center justify-center rounded-full border border-transparent bg-[var(--pb-brand-primary)] px-3 text-sm font-semibold text-white shadow-sm"
-    : "inline-flex min-h-10 min-w-10 items-center justify-center rounded-full border border-[var(--pb-border-strong)] bg-white/82 px-3 text-sm font-semibold text-gray-700 shadow-sm transition hover:-translate-y-0.5 hover:bg-white disabled:cursor-not-allowed disabled:opacity-45";
+    ? "inline-flex min-h-10 min-w-10 items-center justify-center rounded-full border border-transparent bg-[var(--pb-brand-primary)] px-3 text-xs font-semibold text-white shadow-sm"
+    : "inline-flex min-h-10 min-w-10 items-center justify-center rounded-full border border-[var(--pb-border-strong)] bg-white/82 px-3 text-xs font-semibold text-gray-700 shadow-sm transition hover:-translate-y-0.5 hover:bg-white disabled:cursor-not-allowed disabled:opacity-45";
   if (onClick) {
     button.addEventListener("click", onClick);
   }

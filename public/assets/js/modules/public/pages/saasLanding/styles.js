@@ -62,7 +62,7 @@ body.${KELAS_AKTIF}{background:#fdfdfc;overflow-x:clip}
   #saas_landing_root [data-navlinks]{display:none !important}
   #saas_landing_root [data-scrollhint]{display:none !important}
   #saas_landing_root [data-hero]{min-height:88vh !important;padding:56px 0 40px !important}
-  #saas_landing_root [data-heromono]{gap:10px 18px !important;font-size:11px !important;margin-top:30px !important}
+  #saas_landing_root [data-heromono]{gap:10px 18px !important;font-size:9.1px !important;margin-top:30px !important}
   #saas_landing_halaman,#saas_landing_listing,#saas_landing_marketing{padding:72px 0 20px !important}
   #saas_landing_daftar{padding:80px 0 72px !important}
   /* Tidak ada sisi kosong yang berarti di layar sempit, jadi lajur memenuhi

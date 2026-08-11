@@ -206,7 +206,7 @@ function navClassName(expanded = false) {
 function compactSidebarToggle(store) {
   const button = document.createElement("button");
   button.type = "button";
-  button.className = "mb-[var(--pb-space-lg)] hidden min-h-10 items-center justify-center gap-2 rounded-[var(--pb-radius-xl)] border border-[color-mix(in_srgb,var(--pb-shell-nav-text)_24%,transparent)] bg-[var(--pb-shell-nav-active)] px-3 py-2 text-sm font-semibold text-[var(--pb-shell-nav-text)] shadow-[var(--pb-shadow-soft)] transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,var(--pb-shell-nav-text)_40%,transparent)] md:inline-flex xl:hidden";
+  button.className = "mb-[var(--pb-space-lg)] hidden min-h-10 items-center justify-center gap-2 rounded-[var(--pb-radius-xl)] border border-[color-mix(in_srgb,var(--pb-shell-nav-text)_24%,transparent)] bg-[var(--pb-shell-nav-active)] px-3 py-2 text-xs font-semibold text-[var(--pb-shell-nav-text)] shadow-[var(--pb-shadow-soft)] transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,var(--pb-shell-nav-text)_40%,transparent)] md:inline-flex xl:hidden";
   button.addEventListener("click", () => uiStore.toggleSidebarCompactExpanded());
   syncCompactToggle(button, Boolean(store?.get("ui.sidebarCompactExpanded", false)));
   return button;
@@ -442,7 +442,7 @@ function renderSidebarAnchor(link, path, child = false, parent = false, activeOv
     anchor.addEventListener("click", () => options.onNavigate?.());
   }
   if (child) {
-    anchor.classList.add("text-sm", "opacity-90");
+    anchor.classList.add("text-xs", "opacity-90");
   }
   const label = document.createElement("span");
   label.className = options.mode === "drawer" || compactExpanded

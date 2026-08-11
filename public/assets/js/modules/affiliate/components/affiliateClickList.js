@@ -25,11 +25,11 @@ export function AffiliateClickList({ clicks = [] } = {}) {
     copy.className = "grid min-w-0 gap-1";
     copy.append(
       textBlock("font-semibold text-gray-950", click.sourceLabel),
-      textBlock(`text-sm ${tw.text.muted}`, `${click.targetLabel} | slug ${click.slugLabel}`),
+      textBlock(`text-xs ${tw.text.muted}`, `${click.targetLabel} | slug ${click.slugLabel}`),
     );
 
     const date = document.createElement("p");
-    date.className = "text-sm font-medium text-gray-500";
+    date.className = "text-xs font-medium text-gray-500";
     date.textContent = formatDate(click.clicked_at || click.created_at);
 
     top.append(copy, date);
@@ -37,8 +37,8 @@ export function AffiliateClickList({ clicks = [] } = {}) {
     const urlWrap = document.createElement("div");
     urlWrap.className = `grid min-w-0 gap-1 ${tw.surface.inset}`;
     urlWrap.append(
-      textBlock("text-xs font-semibold text-gray-500", "Landing URL"),
-      textBlock("break-all text-sm text-gray-700", click.landing_url || "Landing URL belum tersedia."),
+      textBlock("text-[10px] font-semibold text-gray-500", "Landing URL"),
+      textBlock("break-all text-xs text-gray-700", click.landing_url || "Landing URL belum tersedia."),
     );
 
     card.append(top, urlWrap);

@@ -31,7 +31,7 @@ function renderRoleGuardPage(config, context) {
   title.textContent = config.title ?? "Halaman ini membutuhkan role yang berbeda.";
 
   const body = document.createElement("p");
-  body.className = `max-w-2xl text-sm leading-6 md:text-base ${tw.text.muted}`;
+  body.className = `max-w-2xl text-xs leading-6 md:text-sm ${tw.text.muted}`;
   body.textContent = config.description ?? "Buka area yang sesuai dengan akun Anda untuk melanjutkan.";
 
   hero.append(eyebrow, title, body);

@@ -143,7 +143,7 @@ function pageHeader(actions, context) {
   const back = document.createElement("button");
   back.id = "shr_register_back_button";
   back.type = "button";
-  back.className = `inline-flex w-fit items-center gap-2 rounded-full px-3 py-1.5 text-sm font-semibold transition hover:brightness-95 ${tw.button.tidak}`;
+  back.className = `inline-flex w-fit items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold transition hover:brightness-95 ${tw.button.tidak}`;
   back.append(createIcon("chevronRight", { className: "block h-3.5 w-3.5 rotate-180 leading-none" }), document.createTextNode("Kembali ke beranda"));
   back.addEventListener("click", () => actions.goHome(context));
 
@@ -153,11 +153,11 @@ function pageHeader(actions, context) {
 
   const title = document.createElement("h1");
   // Judul dan body duduk di kanvas krem, bukan di atas video gelap seperti dulu.
-  title.className = "text-2xl font-black tracking-normal text-[var(--pb-text-strong)] sm:text-3xl";
+  title.className = "text-xl font-black tracking-normal text-[var(--pb-text-strong)] sm:text-2xl";
   title.textContent = "Daftarkan showroom Anda";
 
   const body = document.createElement("p");
-  body.className = "text-sm leading-6 text-[var(--pb-text-muted)]";
+  body.className = "text-xs leading-6 text-[var(--pb-text-muted)]";
   body.textContent = "Isi data pemilik dan showroom.";
 
   header.append(back, eyebrow, title, body);
@@ -204,7 +204,7 @@ function registerPanel(state, actions, context) {
 
   const slugPreview = document.createElement("p");
   slugPreview.id = "shr_register_slug_preview";
-  slugPreview.className = "-mt-1 break-all text-xs font-semibold text-[var(--pb-brand-secondary)]";
+  slugPreview.className = "-mt-1 break-all text-[10px] font-semibold text-[var(--pb-brand-secondary)]";
   const paintSlugPreview = (value) => {
     const normalized = normalizeSlug(value);
     slugPreview.textContent = normalized
@@ -329,7 +329,7 @@ function registerPanel(state, actions, context) {
   if (state.error) {
     const message = document.createElement("p");
     message.id = "shr_register_error_message";
-    message.className = "rounded-xl border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-3 py-2 text-sm font-medium text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
+    message.className = "rounded-xl border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-3 py-2 text-xs font-medium text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
     message.textContent = state.error;
     form.append(message);
   }
@@ -345,7 +345,7 @@ function registerPanel(state, actions, context) {
   form.append(submit);
 
   const helper = document.createElement("p");
-  helper.className = "text-sm leading-6 text-gray-600";
+  helper.className = "text-xs leading-6 text-gray-600";
   helper.textContent = "Sudah punya akun showroom?";
 
   const loginLink = document.createElement("button");
@@ -407,19 +407,19 @@ function successPanel(registered, actions, context) {
   section.className = "grid gap-4 rounded-[2rem] border border-white/75 bg-white/85 p-5 shadow-[0_30px_90px_rgba(15,23,42,0.14)] backdrop-blur-xl sm:p-6";
 
   const badge = document.createElement("span");
-  badge.className = "inline-flex w-fit items-center gap-2 rounded-full bg-[color-mix(in_srgb,var(--pb-success)_16%,white)] px-3 py-1.5 text-sm font-bold text-[var(--pb-success)]";
+  badge.className = "inline-flex w-fit items-center gap-2 rounded-full bg-[color-mix(in_srgb,var(--pb-success)_16%,white)] px-3 py-1.5 text-xs font-bold text-[var(--pb-success)]";
   badge.append(createIcon("shield", { className: "block h-4 w-4 leading-none" }), document.createTextNode("Pendaftaran diterima"));
 
   const title = document.createElement("h2");
-  title.className = "text-xl font-black tracking-normal text-gray-950";
+  title.className = "text-lg font-black tracking-normal text-gray-950";
   title.textContent = `${registered.showroomName} berhasil didaftarkan`;
 
   const body = document.createElement("p");
-  body.className = "text-sm leading-6 text-gray-600";
+  body.className = "text-xs leading-6 text-gray-600";
   body.textContent = "Akun Anda menunggu persetujuan admin. Anda sudah bisa masuk dan menyiapkan showroom, tetapi sebagian fitur baru terbuka penuh setelah disetujui.";
 
   const detail = document.createElement("div");
-  detail.className = "grid gap-2 rounded-2xl border border-gray-100 bg-gray-50 p-3 text-sm";
+  detail.className = "grid gap-2 rounded-2xl border border-gray-100 bg-gray-50 p-3 text-xs";
   detail.append(
     detailRow("Email masuk", registered.email),
     // Alias pendek, sama dengan yang dijanjikan landing page. Menuju halaman
@@ -441,7 +441,7 @@ function detailRow(label, value) {
   row.className = "grid gap-0.5";
 
   const caption = document.createElement("span");
-  caption.className = "text-xs font-semibold uppercase tracking-wide text-gray-500";
+  caption.className = "text-[10px] font-semibold uppercase tracking-wide text-gray-500";
   caption.textContent = label;
 
   const content = document.createElement("span");
@@ -457,7 +457,7 @@ function fieldGroup(title, children) {
   group.className = "grid gap-3 rounded-2xl border border-gray-100 bg-white/70 p-4";
 
   const legend = document.createElement("legend");
-  legend.className = "px-1 text-sm font-black text-gray-900";
+  legend.className = "px-1 text-xs font-black text-gray-900";
   legend.textContent = title;
 
   group.append(legend, ...children);
@@ -466,7 +466,7 @@ function fieldGroup(title, children) {
 
 function field({ id, name, label, type = "text", placeholder = "", required = true, value = "", hint = "", error = "" }) {
   const wrap = document.createElement("label");
-  wrap.className = "grid gap-1.5 text-sm font-semibold text-gray-700";
+  wrap.className = "grid gap-1.5 text-xs font-semibold text-gray-700";
   wrap.append(document.createTextNode(label));
 
   const input = document.createElement("input");
@@ -506,7 +506,7 @@ function field({ id, name, label, type = "text", placeholder = "", required = tr
  */
 function selectField({ id, name, label, placeholder = "", options = [], required = true, value = "", error = "" }) {
   const wrap = document.createElement("div");
-  wrap.className = "grid gap-1.5 text-sm font-semibold text-gray-700";
+  wrap.className = "grid gap-1.5 text-xs font-semibold text-gray-700";
 
   const labelNode = document.createElement("label");
   labelNode.htmlFor = id;
@@ -554,7 +554,7 @@ function selectField({ id, name, label, placeholder = "", options = [], required
 
     if (!filtered.length) {
       const empty = document.createElement("p");
-      empty.className = "px-3 py-2 text-sm font-medium text-[var(--pb-text-muted)]";
+      empty.className = "px-3 py-2 text-xs font-medium text-[var(--pb-text-muted)]";
       empty.textContent = "Tidak ada hasil.";
       panel.append(empty);
       return;
@@ -566,7 +566,7 @@ function selectField({ id, name, label, placeholder = "", options = [], required
       item.dataset.comboboxOption = option;
       item.setAttribute("role", "option");
       item.className = [
-        "block w-full rounded-xl px-3 py-2 text-left text-sm font-semibold transition",
+        "block w-full rounded-xl px-3 py-2 text-left text-xs font-semibold transition",
         index === highlighted ? "bg-[var(--pb-surface-muted)] text-[var(--pb-brand-secondary)]" : "text-gray-800 hover:bg-gray-50",
       ].join(" ");
       item.textContent = option;
@@ -652,7 +652,7 @@ function selectField({ id, name, label, placeholder = "", options = [], required
 
 function textareaField({ id, name, label, placeholder = "", required = true, value = "", error = "" }) {
   const wrap = document.createElement("label");
-  wrap.className = "grid gap-1.5 text-sm font-semibold text-gray-700";
+  wrap.className = "grid gap-1.5 text-xs font-semibold text-gray-700";
   wrap.append(document.createTextNode(label));
 
   const input = document.createElement("textarea");
@@ -673,7 +673,7 @@ function textareaField({ id, name, label, placeholder = "", required = true, val
 }
 
 function inputClassName(hasError) {
-  const base = "min-h-11 min-w-0 w-full rounded-2xl border bg-white/90 px-4 py-2.5 text-sm text-gray-950 outline-none transition duration-200 placeholder:text-[var(--pb-text-muted)] focus:bg-white focus:ring-4";
+  const base = "min-h-11 min-w-0 w-full rounded-2xl border bg-white/90 px-4 py-2.5 text-xs text-gray-950 outline-none transition duration-200 placeholder:text-[var(--pb-text-muted)] focus:bg-white focus:ring-4";
 
   return hasError
     ? `${base} border-[color-mix(in_srgb,var(--pb-danger)_42%,white)] focus:border-[color-mix(in_srgb,var(--pb-danger)_70%,white)] focus:ring-[color-mix(in_srgb,var(--pb-danger)_14%,white)]`
@@ -682,14 +682,14 @@ function inputClassName(hasError) {
 
 function hintNode(text) {
   const hint = document.createElement("span");
-  hint.className = "text-xs font-medium text-gray-500";
+  hint.className = "text-[10px] font-medium text-gray-500";
   hint.textContent = text;
   return hint;
 }
 
 function errorNode(text) {
   const node = document.createElement("span");
-  node.className = "text-xs font-semibold text-[var(--pb-danger)]";
+  node.className = "text-[10px] font-semibold text-[var(--pb-danger)]";
   node.textContent = text;
   return node;
 }

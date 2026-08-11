@@ -110,7 +110,7 @@ function buyerTopNavigation({ activePath, actions }) {
   brand.className = "flex min-w-0 items-center gap-3 px-1";
   brand.append(
     iconBox({ size: "h-11 w-11", className: "rounded-full bg-[var(--pb-brand-primary)] text-white shadow-[var(--pb-shadow-soft)]", icon: "user", iconSize: "h-5 w-5" }),
-    textNode("strong", "truncate text-base font-black text-[var(--pb-text)]", "Akun Buyer"),
+    textNode("strong", "truncate text-sm font-black text-[var(--pb-text)]", "Akun Buyer"),
   );
 
   const list = document.createElement("section");
@@ -139,10 +139,10 @@ function profileCopy(user) {
   const wrap = document.createElement("section");
   wrap.className = "grid min-w-0 gap-1";
   wrap.append(
-    textNode("p", "text-xs font-black uppercase tracking-normal text-[var(--pb-brand-secondary)]", "Akun Saya"),
-    textNode("h1", "break-words text-3xl font-black leading-tight text-[var(--pb-text)]", userName(user)),
-    textNode("p", "break-words text-sm font-semibold text-[var(--pb-text-muted)]", user.email || "-"),
-    textNode("p", "break-words text-sm font-semibold text-[var(--pb-text-muted)]", user.phone_number || user.phone || "-"),
+    textNode("p", "text-[10px] font-black uppercase tracking-normal text-[var(--pb-brand-secondary)]", "Akun Saya"),
+    textNode("h1", "break-words text-2xl font-black leading-tight text-[var(--pb-text)]", userName(user)),
+    textNode("p", "break-words text-xs font-semibold text-[var(--pb-text-muted)]", user.email || "-"),
+    textNode("p", "break-words text-xs font-semibold text-[var(--pb-text-muted)]", user.phone_number || user.phone || "-"),
   );
   return wrap;
 }
@@ -195,8 +195,8 @@ function securitySection(actions) {
   copy.className = "grid min-w-0 gap-2";
   copy.append(
     iconBox({ size: "h-12 w-12", className: "rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_10%,white)] text-[var(--pb-brand-secondary)]", icon: "lock", iconSize: "h-5 w-5" }),
-    textNode("h2", "text-xl font-black text-[var(--pb-text)]", "Keamanan Akun"),
-    textNode("p", "text-sm font-semibold leading-6 text-[var(--pb-text-muted)]", "Perbarui password secara berkala untuk menjaga keamanan akun Anda."),
+    textNode("h2", "text-lg font-black text-[var(--pb-text)]", "Keamanan Akun"),
+    textNode("p", "text-xs font-semibold leading-6 text-[var(--pb-text-muted)]", "Perbarui password secara berkala untuk menjaga keamanan akun Anda."),
   );
 
   const action = Button({ label: "Ubah Password", onClick: actions.openChangePassword, designHook: "shared.button.primary" });
@@ -364,34 +364,34 @@ function openChangePasswordModal() {
 
 function formInput(label, id, type, value, onChange, error, disabled) {
   const wrap = document.createElement("label");
-  wrap.className = "grid min-w-0 gap-1 text-sm font-bold text-[var(--pb-text-strong)]";
+  wrap.className = "grid min-w-0 gap-1 text-xs font-bold text-[var(--pb-text-strong)]";
   const input = document.createElement("input");
   input.id = id;
   input.type = type;
   input.value = value;
   input.disabled = disabled;
-  input.className = "min-h-11 w-full rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 text-sm font-semibold text-[var(--pb-text)] outline-none focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)] disabled:opacity-60";
+  input.className = "min-h-11 w-full rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 text-xs font-semibold text-[var(--pb-text)] outline-none focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)] disabled:opacity-60";
   input.addEventListener("input", () => onChange(input.value));
   wrap.append(textNode("span", "", label), input);
   if (error) {
-    wrap.append(textNode("span", "text-xs font-semibold text-[var(--pb-danger)]", error));
+    wrap.append(textNode("span", "text-[10px] font-semibold text-[var(--pb-danger)]", error));
   }
   return wrap;
 }
 
 function formTextarea(label, id, value, onChange, error, disabled) {
   const wrap = document.createElement("label");
-  wrap.className = "grid min-w-0 gap-1 text-sm font-bold text-[var(--pb-text-strong)]";
+  wrap.className = "grid min-w-0 gap-1 text-xs font-bold text-[var(--pb-text-strong)]";
   const input = document.createElement("textarea");
   input.id = id;
   input.value = value;
   input.disabled = disabled;
   input.rows = 3;
-  input.className = "min-h-24 w-full resize-y rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-sm font-semibold text-[var(--pb-text)] outline-none focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)] disabled:opacity-60";
+  input.className = "min-h-24 w-full resize-y rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-xs font-semibold text-[var(--pb-text)] outline-none focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)] disabled:opacity-60";
   input.addEventListener("input", () => onChange(input.value));
   wrap.append(textNode("span", "", label), input);
   if (error) {
-    wrap.append(textNode("span", "text-xs font-semibold text-[var(--pb-danger)]", error));
+    wrap.append(textNode("span", "text-[10px] font-semibold text-[var(--pb-danger)]", error));
   }
   return wrap;
 }
@@ -465,7 +465,7 @@ function resolveUser() {
 
 function avatarNode(user) {
   const wrap = document.createElement("span");
-  wrap.className = "inline-flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] text-2xl font-black text-[var(--pb-brand-secondary)] shadow-[var(--pb-shadow-card)] ring-1 ring-[var(--pb-border)]";
+  wrap.className = "inline-flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] text-xl font-black text-[var(--pb-brand-secondary)] shadow-[var(--pb-shadow-card)] ring-1 ring-[var(--pb-border)]";
   const src = user.avatar_url || user.photo_url || user.profile_photo_url || "";
   if (src) {
     const image = document.createElement("img");
@@ -522,8 +522,8 @@ function desktopNavLink(item, activePath, actions) {
     });
   }
   link.className = active
-    ? "inline-flex min-w-0 items-center justify-center gap-2 rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] px-4 py-2 text-sm font-black text-[var(--pb-brand-secondary)] no-underline shadow-[var(--pb-shadow-soft)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]"
-    : "inline-flex min-w-0 items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-bold text-[var(--pb-text-muted)] no-underline transition hover:bg-[var(--pb-surface-muted)] hover:text-[var(--pb-text)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)] disabled:cursor-not-allowed disabled:opacity-55";
+    ? "inline-flex min-w-0 items-center justify-center gap-2 rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] px-4 py-2 text-xs font-black text-[var(--pb-brand-secondary)] no-underline shadow-[var(--pb-shadow-soft)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]"
+    : "inline-flex min-w-0 items-center justify-center gap-2 rounded-full px-4 py-2 text-xs font-bold text-[var(--pb-text-muted)] no-underline transition hover:bg-[var(--pb-surface-muted)] hover:text-[var(--pb-text)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)] disabled:cursor-not-allowed disabled:opacity-55";
   if (active) {
     link.setAttribute("aria-current", "page");
   }
@@ -582,8 +582,8 @@ function textWrap(title, description) {
   const wrap = document.createElement("section");
   wrap.className = "grid min-w-0 gap-1";
   wrap.append(
-    textNode("span", "break-words text-sm font-black text-[var(--pb-text)]", title),
-    textNode("span", "break-words text-sm font-semibold text-[var(--pb-text-muted)]", description),
+    textNode("span", "break-words text-xs font-black text-[var(--pb-text)]", title),
+    textNode("span", "break-words text-xs font-semibold text-[var(--pb-text-muted)]", description),
   );
   return wrap;
 }

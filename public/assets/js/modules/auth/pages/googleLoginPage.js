@@ -177,7 +177,7 @@ function glassLoginHeader(config, options = {}) {
   title.textContent = "Selamat datang!";
 
   const subtitle = document.createElement("p");
-  subtitle.className = "text-sm font-medium leading-6 tracking-normal text-black sm:text-base sm:leading-7";
+  subtitle.className = "text-xs font-medium leading-6 tracking-normal text-black sm:text-sm sm:leading-7";
   subtitle.textContent = options.subtitle || "Masuk untuk melanjutkan dan nikmati pengalaman terbaik.";
 
   headerEl.append(title, subtitle);
@@ -191,7 +191,7 @@ function glassLoginActionContent(root, context, config, state, options = {}) {
 
   if (state.loading) {
     const loading = document.createElement("p");
-    loading.className = "rounded-[1.5rem] border border-white/75 bg-white/70 px-5 py-4 text-sm font-semibold text-[#717693] shadow-[0_18px_48px_rgba(23,105,143,0.10)] backdrop-blur";
+    loading.className = "rounded-[1.5rem] border border-white/75 bg-white/70 px-5 py-4 text-xs font-semibold text-[#717693] shadow-[0_18px_48px_rgba(23,105,143,0.10)] backdrop-blur";
     loading.textContent = "Memeriksa konfigurasi Google Login...";
     actionWrap.append(loading);
     fragment.append(actionWrap);
@@ -220,7 +220,7 @@ function glassLoginActionContent(root, context, config, state, options = {}) {
   button.id = `google_login_${config.slug}_button`;
   button.type = "button";
   button.disabled = state.submitting;
-  button.className = "inline-flex min-h-12 w-full items-center justify-center gap-3.5 rounded-[1rem] border border-white/60 bg-[linear-gradient(135deg,rgba(255,255,255,0.84),rgba(224,239,247,0.58))] px-4 text-sm font-black tracking-normal text-[#171a35] shadow-[inset_0_1px_0_rgba(255,255,255,0.88),0_14px_30px_rgba(23,105,143,0.13)] backdrop-blur transition duration-200 hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-4 focus:ring-[#e0eff7] disabled:cursor-wait disabled:opacity-70";
+  button.className = "inline-flex min-h-12 w-full items-center justify-center gap-3.5 rounded-[1rem] border border-white/60 bg-[linear-gradient(135deg,rgba(255,255,255,0.84),rgba(224,239,247,0.58))] px-4 text-xs font-black tracking-normal text-[#171a35] shadow-[inset_0_1px_0_rgba(255,255,255,0.88),0_14px_30px_rgba(23,105,143,0.13)] backdrop-blur transition duration-200 hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-4 focus:ring-[#e0eff7] disabled:cursor-wait disabled:opacity-70";
   button.append(googleGlyph(), document.createTextNode(state.submitting ? "Membuka Google..." : "Login dengan Google"));
   button.addEventListener("click", () => beginGoogleLogin(root, context, config, state, options));
 
@@ -242,7 +242,7 @@ function appendFooterLink(actionWrap, context, options) {
   const link = document.createElement("button");
   link.type = "button";
   link.id = "google_login_footer_link";
-  link.className = "text-sm font-bold text-[#4a4fb8] underline underline-offset-2";
+  link.className = "text-xs font-bold text-[#4a4fb8] underline underline-offset-2";
   link.textContent = options.footerLink.label || "Kembali";
   link.addEventListener("click", () => context.router.navigate(options.footerLink.path));
   actionWrap.append(link);
@@ -261,7 +261,7 @@ function googleGlyph() {
 
 function divider() {
   const wrap = document.createElement("div");
-  wrap.className = "grid grid-cols-[1fr_auto_1fr] items-center gap-4 text-sm font-medium text-[#b2b5cc]";
+  wrap.className = "grid grid-cols-[1fr_auto_1fr] items-center gap-4 text-xs font-medium text-[#b2b5cc]";
 
   const left = document.createElement("span");
   left.className = "h-px bg-[var(--pb-border)]";
@@ -311,16 +311,16 @@ function header(config) {
   headerEl.className = "grid gap-3";
 
   const eyebrow = document.createElement("p");
-  eyebrow.className = "text-xs font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]";
+  eyebrow.className = "text-[10px] font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]";
   eyebrow.textContent = "Google OAuth";
 
   const title = document.createElement("h1");
   title.id = `google_login_${config.slug}_title`;
-  title.className = "text-3xl font-black tracking-[-0.04em] text-gray-950 sm:text-4xl";
+  title.className = "text-2xl font-black tracking-[-0.04em] text-gray-950 sm:text-3xl";
   title.textContent = config.title;
 
   const subtitle = document.createElement("p");
-  subtitle.className = "max-w-xl text-sm leading-7 text-gray-600 sm:text-base";
+  subtitle.className = "max-w-xl text-xs leading-7 text-gray-600 sm:text-sm";
   subtitle.textContent = config.subtitle;
 
   headerEl.append(eyebrow, title, subtitle);
@@ -329,7 +329,7 @@ function header(config) {
 
 function rolePolicyCard(config) {
   const card = document.createElement("div");
-  card.className = "rounded-3xl border border-[var(--pb-border)] bg-[var(--pb-surface-muted)] p-4 text-sm leading-6 text-gray-700";
+  card.className = "rounded-3xl border border-[var(--pb-border)] bg-[var(--pb-surface-muted)] p-4 text-xs leading-6 text-gray-700";
   card.textContent = config.warning;
   return card;
 }
@@ -339,7 +339,7 @@ function actionContent(root, context, config, state) {
 
   if (state.loading) {
     const loading = document.createElement("p");
-    loading.className = "text-sm text-gray-600";
+    loading.className = "text-xs text-gray-600";
     loading.textContent = "Memeriksa konfigurasi Google Login...";
     fragment.append(loading);
     return fragment;
@@ -375,7 +375,7 @@ function actionContent(root, context, config, state) {
   button.classList.add("w-full", "justify-center", "shadow-[0_16px_34px_rgba(30,129,176,0.24)]");
 
   const note = document.createElement("p");
-  note.className = "text-xs leading-5 text-gray-500";
+  note.className = "text-[10px] leading-5 text-gray-500";
   note.textContent = "Credential Google diproses backend. Client secret tidak pernah dikirim ke frontend.";
 
   fragment.append(button, note);
@@ -403,8 +403,8 @@ async function beginGoogleLogin(root, context, config, state, options = {}) {
 function messageBox(message, type) {
   const box = document.createElement("p");
   box.className = type === "error"
-    ? "rounded-2xl border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]"
-    : "rounded-2xl border border-[color-mix(in_srgb,var(--pb-brand-primary)_14%,white)] bg-[color-mix(in_srgb,var(--pb-brand-primary)_8%,white)] px-4 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-brand-primary)_84%,black)]";
+    ? "rounded-2xl border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-xs font-semibold text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]"
+    : "rounded-2xl border border-[color-mix(in_srgb,var(--pb-brand-primary)_14%,white)] bg-[color-mix(in_srgb,var(--pb-brand-primary)_8%,white)] px-4 py-3 text-xs font-semibold text-[color-mix(in_srgb,var(--pb-brand-primary)_84%,black)]";
   box.textContent = message;
   return box;
 }

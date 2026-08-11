@@ -197,9 +197,9 @@ function showroomHero({ router, showroom, editing }) {
 
   copy.append(
     icon,
-    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", "Seller showroom profile"),
-    textNode("h1", "max-w-3xl text-3xl font-black leading-tight tracking-normal text-gray-950 sm:text-4xl", showroom?.name || "Showroom Saya"),
-    textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", "Kelola identitas showroom, kontak aktif, dan rekening pencairan seller dalam satu tempat.")
+    textNode("p", "text-[10px] font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", "Seller showroom profile"),
+    textNode("h1", "max-w-3xl text-2xl font-black leading-tight tracking-normal text-gray-950 sm:text-3xl", showroom?.name || "Showroom Saya"),
+    textNode("p", "max-w-2xl text-xs leading-6 text-gray-600", "Kelola identitas showroom, kontak aktif, dan rekening pencairan seller dalam satu tempat.")
   );
 
   const stats = document.createElement("section");
@@ -214,8 +214,8 @@ function showroomHero({ router, showroom, editing }) {
     stat.id = `slrsr_hero_stat_${slugify(label)}_section`;
     stat.className = "rounded-[1.25rem] border border-white/80 bg-white/78 p-3 shadow-sm transition duration-150 hover:-translate-y-0.5 hover:shadow-md";
     stat.append(
-      textNode("p", "text-[11px] font-black uppercase tracking-[0.14em] text-gray-500", label),
-      textNode("p", "text-xl font-black text-gray-950", value)
+      textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label),
+      textNode("p", "text-lg font-black text-gray-950", value)
     );
     stats.append(stat);
   });
@@ -234,7 +234,7 @@ function showroomHero({ router, showroom, editing }) {
   side.className = "grid gap-3";
   const status = document.createElement("section");
   status.id = "slrsr_mode_status_section";
-  status.className = "rounded-[1.25rem] border border-white/80 bg-white/78 px-4 py-3 text-sm font-bold text-gray-700 shadow-sm";
+  status.className = "rounded-[1.25rem] border border-white/80 bg-white/78 px-4 py-3 text-xs font-bold text-gray-700 shadow-sm";
   status.append(createIcon(editing ? "edit" : "eye", { className: "mr-2 h-4 w-4 text-[var(--pb-brand-secondary)]" }), document.createTextNode(editing ? "Mode edit showroom" : "Mode lihat showroom"));
   side.append(stats, status, dashboardButton);
 

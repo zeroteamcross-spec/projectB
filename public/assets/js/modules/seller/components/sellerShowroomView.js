@@ -48,13 +48,13 @@ export function SellerShowroomView({ showroom = null, onEdit = null } = {}) {
   const titleWrap = document.createElement("div");
   titleWrap.className = "grid min-w-0 gap-2";
   const eyebrow = document.createElement("p");
-  eyebrow.className = "text-xs font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]";
+  eyebrow.className = "text-[10px] font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]";
   eyebrow.textContent = "Showroom identity";
   const title = document.createElement("h2");
   title.className = `${tw.text.sectionTitle} break-words`;
   title.textContent = showroom.name || "Showroom";
   const subtitle = document.createElement("p");
-  subtitle.className = `max-w-2xl text-sm leading-6 ${tw.text.muted}`;
+  subtitle.className = `max-w-2xl text-xs leading-6 ${tw.text.muted}`;
   subtitle.textContent = "Profil showroom dan informasi rekening seller.";
   titleWrap.append(eyebrow, title, subtitle);
 
@@ -81,12 +81,12 @@ export function SellerShowroomView({ showroom = null, onEdit = null } = {}) {
     icon.className = "grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-[var(--pb-surface-muted)] text-[var(--pb-brand-secondary)]";
     icon.append(createIcon(field.icon, { className: "h-3.5 w-3.5" }));
     const label = document.createElement("dt");
-    label.className = `text-xs font-black uppercase tracking-[0.12em] ${tw.text.muted}`;
+    label.className = `text-[10px] font-black uppercase tracking-[0.12em] ${tw.text.muted}`;
     label.textContent = field.label;
     labelRow.append(icon, label);
 
     const value = document.createElement("dd");
-    value.className = "min-w-0 break-words text-sm font-bold leading-6 text-gray-950";
+    value.className = "min-w-0 break-words text-xs font-bold leading-6 text-gray-950";
     value.textContent = field.key === "public_url" ? showroomPublicUrl(showroom) || "-" : showroom[field.key] || "-";
 
     item.append(labelRow, value);

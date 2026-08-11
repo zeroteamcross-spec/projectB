@@ -111,7 +111,7 @@ function transactionIdentity(transaction) {
   copy.className = "grid min-w-0 gap-1";
   copy.append(
     textBlock("break-words font-black text-gray-950", transaction.transaction_code || `TRX #${transaction.id ?? "-"}`),
-    textBlock("break-words text-sm text-gray-500", carLabel(transaction)),
+    textBlock("break-words text-xs text-gray-500", carLabel(transaction)),
   );
   wrap.append(avatar, copy);
   return wrap;
@@ -123,7 +123,7 @@ function partyBlock(transaction) {
   wrap.append(
     iconLine("user", transaction.buyer?.name || "Buyer terdaftar"),
     iconLine("showroom", transaction.seller?.name || "Seller terdaftar"),
-    textBlock("break-words text-sm text-gray-500", transaction.showroom?.name || "-"),
+    textBlock("break-words text-xs text-gray-500", transaction.showroom?.name || "-"),
   );
   return wrap;
 }
@@ -134,8 +134,8 @@ function paymentBlock(transaction) {
   wrap.className = "grid min-w-0 gap-1";
   wrap.append(
     textBlock("font-black text-gray-950", formatCurrency(financials.total)),
-    textBlock("text-sm font-semibold text-gray-700", `${financials.dueNowLabel}: ${formatCurrency(financials.dueNow)}`),
-    textBlock("text-sm text-gray-500", `Sisa ${formatCurrency(financials.remaining)}`),
+    textBlock("text-xs font-semibold text-gray-700", `${financials.dueNowLabel}: ${formatCurrency(financials.dueNow)}`),
+    textBlock("text-xs text-gray-500", `Sisa ${formatCurrency(financials.remaining)}`),
   );
   return wrap;
 }
@@ -155,7 +155,7 @@ function timelineBlock(transaction) {
   wrap.className = "grid min-w-0 gap-1";
   wrap.append(
     iconLine("calendar", formatDate(transaction.created_at)),
-    textBlock("text-sm text-gray-500", transaction.paid_at ? `Paid ${formatDate(transaction.paid_at)}` : `Expires ${formatDate(transaction.expires_at)}`),
+    textBlock("text-xs text-gray-500", transaction.paid_at ? `Paid ${formatDate(transaction.paid_at)}` : `Expires ${formatDate(transaction.expires_at)}`),
   );
   return wrap;
 }
@@ -178,7 +178,7 @@ function actionGroup({ transaction, selected, onSelect, idScope = "desktop" }) {
 
 function iconLine(iconName, text) {
   const node = document.createElement("p");
-  node.className = "flex min-w-0 items-center gap-2 break-words text-sm font-semibold text-gray-800";
+  node.className = "flex min-w-0 items-center gap-2 break-words text-xs font-semibold text-gray-800";
   node.append(createIcon(iconName, { className: "h-3.5 w-3.5 shrink-0 text-[var(--pb-brand-secondary)]" }), document.createTextNode(text));
   return node;
 }

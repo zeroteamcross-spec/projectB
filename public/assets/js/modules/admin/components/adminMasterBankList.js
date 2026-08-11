@@ -50,7 +50,7 @@ export function AdminMasterBankList({
     icon,
     columns: [
       { label: "Bank", render: (bank) => bankCell(bank) },
-      { label: "Kode", render: (bank) => textBlock("text-sm font-black text-gray-900", bank.bank_code || "-") },
+      { label: "Kode", render: (bank) => textBlock("text-xs font-black text-gray-900", bank.bank_code || "-") },
       { label: "Status", render: (bank) => statusBadge(bank.status) },
       { label: "Aksi", render: (bank) => actionGroup({ bank, onEdit, onToggleStatus, onDelete, idScope: "desktop" }) },
     ],
@@ -89,7 +89,7 @@ function bankCell(bank) {
   copy.className = "grid min-w-0 gap-1";
   copy.append(
     textBlock("font-black text-gray-950", bank.bank_name),
-    textBlock("text-sm text-gray-500", bank.slug || "-"),
+    textBlock("text-xs text-gray-500", bank.slug || "-"),
   );
   wrap.append(copy);
   return wrap;

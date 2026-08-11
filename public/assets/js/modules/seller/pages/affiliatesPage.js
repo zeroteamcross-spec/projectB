@@ -359,10 +359,10 @@ function summaryCards(counts) {
     const card = Card();
     card.classList.add("grid", "gap-1");
     const title = document.createElement("p");
-    title.className = "text-sm font-medium text-gray-500";
+    title.className = "text-xs font-medium text-gray-500";
     title.textContent = label;
     const number = document.createElement("p");
-    number.className = "text-2xl font-bold text-gray-950";
+    number.className = "text-xl font-bold text-gray-950";
     number.textContent = value;
     card.append(title, number);
     section.append(card);

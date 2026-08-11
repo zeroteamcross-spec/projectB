@@ -43,7 +43,7 @@ export function SellerImageCard({
   overlay.className = "pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-2 bg-gradient-to-b from-black/45 to-transparent p-3";
 
   const orderPill = document.createElement("span");
-  orderPill.className = "inline-flex items-center gap-1 rounded-full bg-white/92 px-2.5 py-1 text-xs font-bold text-[var(--pb-text)] shadow-[var(--pb-shadow-soft)]";
+  orderPill.className = "inline-flex items-center gap-1 rounded-full bg-white/92 px-2.5 py-1 text-[10px] font-bold text-[var(--pb-text)] shadow-[var(--pb-shadow-soft)]";
   orderPill.append(createIcon("sort", { className: "h-3 w-3 text-[var(--pb-brand-secondary)]" }), document.createTextNode(`Urutan ${image.sort_order ?? index + 1}`));
 
   const coverPill = image.is_cover
@@ -58,10 +58,10 @@ export function SellerImageCard({
   const copy = document.createElement("div");
   copy.className = "min-w-0";
   const order = document.createElement("p");
-  order.className = "flex items-center gap-2 text-sm font-semibold text-[var(--pb-text)]";
+  order.className = "flex items-center gap-2 text-xs font-semibold text-[var(--pb-text)]";
   order.append(createIcon(image.is_cover ? "star" : "image", { className: `h-4 w-4 ${image.is_cover ? "text-[var(--pb-success)]" : "text-[var(--pb-brand-secondary)]"}` }), document.createTextNode(image.is_cover ? "Gambar cover aktif" : "Gambar gallery"));
   const file = document.createElement("p");
-  file.className = `mt-1 truncate text-xs ${tw.text.muted}`;
+  file.className = `mt-1 truncate text-[10px] ${tw.text.muted}`;
   file.title = image.file_name ?? "-";
   file.textContent = image.file_name ?? "-";
   copy.append(order, file);

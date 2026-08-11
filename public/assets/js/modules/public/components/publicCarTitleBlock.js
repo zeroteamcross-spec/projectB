@@ -18,15 +18,15 @@ export function PublicCarTitleBlock({ car } = {}) {
   }
 
   const eyebrow = document.createElement("span");
-  eyebrow.className = "text-[11px] font-semibold uppercase tracking-normal text-[var(--pb-brand-secondary)]";
+  eyebrow.className = "text-[10px] font-semibold uppercase tracking-normal text-[var(--pb-brand-secondary)]";
   eyebrow.textContent = "Detail mobil";
 
   const title = document.createElement("h1");
-  title.className = "text-2xl font-bold tracking-normal text-gray-950 xsm:text-1xl";
+  title.className = "text-xl font-bold tracking-normal text-gray-950 xsm:text-1xl";
   title.textContent = [car?.brand_name, car?.model_name, car?.sub_model_name].filter(Boolean).join(" ") || `Mobil #${car?.id ?? "-"}`;
 
   const meta = document.createElement("p");
-  meta.className = "text-sm leading-7 text-gray-600";
+  meta.className = "text-xs leading-7 text-gray-600";
   meta.textContent = [car?.year ? `Tahun ${car.year}` : "", car?.primary_color, car?.location_name].filter(Boolean).join(" | ") || "Lokasi dan warna belum tersedia";
 
   const micro = document.createElement("div");
@@ -50,11 +50,11 @@ function metaItem(label, value) {
   node.className = "rounded-2xl bg-gray-50 px-3 py-3";
 
   const caption = document.createElement("p");
-  caption.className = "text-[11px] font-medium uppercase tracking-normal text-gray-500";
+  caption.className = "text-[10px] font-medium uppercase tracking-normal text-gray-500";
   caption.textContent = label;
 
   const content = document.createElement("p");
-  content.className = "mt-1 text-sm font-semibold text-gray-900";
+  content.className = "mt-1 text-xs font-semibold text-gray-900";
   content.textContent = value;
 
   node.append(caption, content);

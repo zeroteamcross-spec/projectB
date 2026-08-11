@@ -48,13 +48,13 @@ export const designTokens = {
     elevated: "shadow-lg",
   },
   typography: {
-    appTitle: "text-xl font-bold tracking-normal",
-    pageTitle: "text-2xl font-bold tracking-normal md:text-3xl",
-    sectionTitle: "text-xl font-bold tracking-normal",
-    label: "text-sm font-medium",
-    eyebrow: "text-xs font-bold uppercase tracking-normal",
-    body: "text-sm leading-6",
-    caption: "text-xs font-medium",
+    appTitle: "text-lg font-bold tracking-normal",
+    pageTitle: "text-xl font-bold tracking-normal md:text-2xl",
+    sectionTitle: "text-lg font-bold tracking-normal",
+    label: "text-xs font-medium",
+    eyebrow: "text-[10px] font-bold uppercase tracking-normal",
+    body: "text-xs leading-6",
+    caption: "text-[10px] font-medium",
   },
 };
 

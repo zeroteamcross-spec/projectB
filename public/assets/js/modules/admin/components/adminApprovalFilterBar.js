@@ -15,8 +15,8 @@ export function AdminApprovalFilterBar({ filters = {}, counts = {}, onSubmit = n
   const copy = document.createElement("div");
   copy.className = "grid min-w-0 gap-1";
   copy.append(
-    textBlock("text-[11px] font-black uppercase tracking-[0.16em] text-[color-mix(in_srgb,var(--pb-brand-primary)_84%,black)]", "Approval filter"),
-    textBlock("text-sm leading-6 text-gray-600", "Saring approval queue supaya review seller dan account state lebih cepat diputuskan."),
+    textBlock("text-[10px] font-black uppercase tracking-[0.16em] text-[color-mix(in_srgb,var(--pb-brand-primary)_84%,black)]", "Approval filter"),
+    textBlock("text-xs leading-6 text-gray-600", "Saring approval queue supaya review seller dan account state lebih cepat diputuskan."),
   );
   heading.append(
     icon,

@@ -29,10 +29,10 @@ function render(root, context) {
   const header = document.createElement("div");
   header.className = "grid gap-2";
   const title = document.createElement("h1");
-  title.className = "text-2xl font-black tracking-normal text-gray-950";
+  title.className = "text-xl font-black tracking-normal text-gray-950";
   title.textContent = "Superadmin Dashboard";
   const subtitle = document.createElement("p");
-  subtitle.className = "max-w-3xl text-sm leading-6 text-[var(--pb-text-muted)]";
+  subtitle.className = "max-w-3xl text-xs leading-6 text-[var(--pb-text-muted)]";
   subtitle.textContent = "Dashboard khusus superadmin. Desain dan metrik detail bisa dilanjutkan di fase berikutnya.";
   header.append(title, subtitle);
 
@@ -75,10 +75,10 @@ function actionCard({ title, body, icon, label, onClick, id = "" }) {
   const copy = document.createElement("div");
   copy.className = "grid gap-1";
   const heading = document.createElement("h2");
-  heading.className = "text-lg font-black text-gray-950";
+  heading.className = "text-base font-black text-gray-950";
   heading.textContent = title;
   const description = document.createElement("p");
-  description.className = "text-sm leading-6 text-[var(--pb-text-muted)]";
+  description.className = "text-xs leading-6 text-[var(--pb-text-muted)]";
   description.textContent = body;
   copy.append(heading, description);
 

@@ -24,7 +24,7 @@ export function TransactionListSection({ transactions = [], onOpen = null } = {}
     title.className = "block text-gray-950";
     title.textContent = transaction.transaction_code ?? `Transaksi #${transaction.id}`;
     const amount = document.createElement("p");
-    amount.className = "text-sm text-gray-600";
+    amount.className = "text-xs text-gray-600";
     amount.textContent = formatCurrency(transaction.car_price ?? transaction.dp_amount);
     button.append(title, Badge({ label: transaction.transaction_status }), amount);
     card.append(button);

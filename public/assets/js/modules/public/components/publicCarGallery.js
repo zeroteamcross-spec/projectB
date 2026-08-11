@@ -70,16 +70,16 @@ function galleryCaption(car, count) {
   titleChip.className = "hidden min-w-0 max-w-full rounded-2xl border border-white/15 bg-[rgba(28,25,23,0.62)] px-3 py-2 text-white/95 backdrop-blur sm:max-w-[75%]";
 
   const title = document.createElement("p");
-  title.className = "break-words text-sm font-semibold";
+  title.className = "break-words text-xs font-semibold";
   title.textContent = carTitle(car);
 
   const meta = document.createElement("p");
-  meta.className = "truncate text-xs text-white/70";
+  meta.className = "truncate text-[10px] text-white/70";
   meta.textContent = [car?.location_name, car?.primary_color].filter(Boolean).join(" | ") || "Listing showroom";
   titleChip.append(title, meta);
 
   const countChip = document.createElement("div");
-  countChip.className = "inline-flex items-center gap-2 rounded-full border border-white/15 bg-[rgba(28,25,23,0.62)] px-3 py-1.5 text-xs font-semibold text-white backdrop-blur";
+  countChip.className = "inline-flex items-center gap-2 rounded-full border border-white/15 bg-[rgba(28,25,23,0.62)] px-3 py-1.5 text-[10px] font-semibold text-white backdrop-blur";
   countChip.append(createIcon("image", { className: "block h-3.5 w-3.5 leading-none" }), document.createTextNode(`${Math.max(count, 1)} foto`));
 
   floating.append(titleChip, countChip);

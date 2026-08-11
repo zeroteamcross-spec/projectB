@@ -146,25 +146,25 @@ function parentOptions(items, draft) {
 
 function inputField({ id, label, value = "", placeholder = "", type = "text" }) {
   const wrap = document.createElement("label");
-  wrap.className = "grid min-w-0 gap-1 text-sm font-semibold text-gray-700";
+  wrap.className = "grid min-w-0 gap-1 text-xs font-semibold text-gray-700";
   wrap.textContent = label;
   const input = document.createElement("input");
   input.id = id;
   input.type = type;
   input.value = value ?? "";
   input.placeholder = placeholder;
-  input.className = "min-h-10 w-full min-w-0 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-sm text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  input.className = "min-h-10 w-full min-w-0 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-xs text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
   wrap.append(input);
   return { wrap, input };
 }
 
 function selectField({ id, label, value = "", options = [] }) {
   const wrap = document.createElement("label");
-  wrap.className = "grid min-w-0 gap-1 text-sm font-semibold text-gray-700";
+  wrap.className = "grid min-w-0 gap-1 text-xs font-semibold text-gray-700";
   wrap.textContent = label;
   const input = document.createElement("select");
   input.id = id;
-  input.className = "min-h-10 w-full min-w-0 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-sm text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  input.className = "min-h-10 w-full min-w-0 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-xs text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
   replaceSelectOptions(input, options, value);
   wrap.append(input);
   return { wrap, input };
@@ -183,7 +183,7 @@ function replaceSelectOptions(input, options = [], value = "") {
 
 function checkboxField({ id, label, checked = false }) {
   const wrap = document.createElement("label");
-  wrap.className = "flex min-h-12 items-center gap-3 rounded-[1.1rem] border border-[var(--pb-border)] bg-white/80 px-3 py-2 text-sm font-bold text-gray-700";
+  wrap.className = "flex min-h-12 items-center gap-3 rounded-[1.1rem] border border-[var(--pb-border)] bg-white/80 px-3 py-2 text-xs font-bold text-gray-700";
   const input = document.createElement("input");
   input.id = id;
   input.type = "checkbox";
@@ -199,7 +199,7 @@ function iconSelectorField({ id, label, value = "" }) {
   let selectedValue = iconRegistry.includes(value) ? value : "sort";
   const wrap = document.createElement("section");
   wrap.id = "admst_sidebar_icon_selector_section";
-  wrap.className = "grid min-w-0 gap-2 text-sm font-semibold text-gray-700 sm:col-span-2";
+  wrap.className = "grid min-w-0 gap-2 text-xs font-semibold text-gray-700 sm:col-span-2";
 
   const title = document.createElement("p");
   title.textContent = label;
@@ -213,7 +213,7 @@ function iconSelectorField({ id, label, value = "" }) {
   const selectedIcon = document.createElement("span");
   selectedIcon.className = "grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-[var(--pb-surface-muted)] text-[var(--pb-brand-secondary)] ring-1 ring-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)]";
   selectedIcon.append(createIcon(selectedValue, { className: "h-5 w-5" }));
-  const selectedText = textNode("span", "truncate text-sm font-black text-gray-800", selectedValue);
+  const selectedText = textNode("span", "truncate text-xs font-black text-gray-800", selectedValue);
   selected.append(selectedIcon, selectedText);
 
   const input = document.createElement("input");
@@ -259,8 +259,8 @@ function iconPickerModal({ currentValue, onSelect }) {
   const copy = document.createElement("div");
   copy.className = "grid min-w-0 gap-0.5";
   copy.append(
-    textNode("p", "text-base font-black text-gray-950", "Pilih Icon"),
-    textNode("p", "text-sm font-semibold text-gray-500", "Font Awesome gratis yang tersedia di aplikasi."),
+    textNode("p", "text-sm font-black text-gray-950", "Pilih Icon"),
+    textNode("p", "text-xs font-semibold text-gray-500", "Font Awesome gratis yang tersedia di aplikasi."),
   );
   const close = Button({ label: "Tutup", variant: "secondary" });
   close.id = "admst_sidebar_icon_picker_close_button";
@@ -281,7 +281,7 @@ function iconPickerModal({ currentValue, onSelect }) {
       option.className = iconOptionClass(name === currentValue);
       option.append(
         createIcon(name, { className: "h-5 w-5" }),
-        textNode("span", "max-w-full truncate text-xs font-bold", name),
+        textNode("span", "max-w-full truncate text-[10px] font-bold", name),
       );
       option.addEventListener("click", () => {
         onSelect?.(name);

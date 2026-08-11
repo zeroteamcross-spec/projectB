@@ -19,17 +19,17 @@ export function SellerTransactionSummaryCards({ transactions = [] } = {}) {
 
   ITEMS.forEach((item, index) => {
     const eyebrow = document.createElement("p");
-    eyebrow.className = "text-[11px] font-black uppercase tracking-[0.14em] text-gray-500";
+    eyebrow.className = "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500";
     eyebrow.textContent = item.label;
 
     const value = document.createElement("strong");
-    value.className = "text-2xl font-black tracking-normal text-gray-950";
+    value.className = "text-xl font-black tracking-normal text-gray-950";
     value.textContent = item.key === "totalValue"
       ? formatCurrency(summary[item.key] ?? 0)
       : String(summary[item.key] ?? 0);
 
     const helper = document.createElement("p");
-    helper.className = "text-sm font-semibold text-gray-500";
+    helper.className = "text-xs font-semibold text-gray-500";
     helper.textContent = summaryHelper(item.key, summary);
 
     const card = document.createElement("section");

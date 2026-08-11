@@ -459,7 +459,7 @@ function render(root, context, state, actions, activePage = "brand") {
   if (state.error) {
     const error = document.createElement("section");
     error.id = "admst_error_section";
-    error.className = "rounded-[1.25rem] border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
+    error.className = "rounded-[1.25rem] border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-xs font-semibold text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
     error.textContent = state.error;
     layout.append(error);
   }
@@ -609,9 +609,9 @@ function masterHero({ action, pageType, brands = [], sidebarItems = [], banks = 
   icon.append(createIcon(isLocation ? "location" : isBank ? "bank" : isSidebar ? "sort" : "car", { className: "h-5 w-5" }));
   copy.append(
     icon,
-    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", isLocation ? "" : isBank ? "" : isSidebar ? "" : ""),
-    textNode("h1", "text-3xl font-black leading-tight tracking-normal text-gray-950 sm:text-4xl", isLocation ? "Master Lokasi" : isBank ? "Master Bank" : isSidebar ? "Master Sidebar" : "Master Brand"),
-    textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", isLocation
+    textNode("p", "text-[10px] font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", isLocation ? "" : isBank ? "" : isSidebar ? "" : ""),
+    textNode("h1", "text-2xl font-black leading-tight tracking-normal text-gray-950 sm:text-3xl", isLocation ? "Master Lokasi" : isBank ? "Master Bank" : isSidebar ? "Master Sidebar" : "Master Brand"),
+    textNode("p", "max-w-2xl text-xs leading-6 text-gray-600", isLocation
       ? ""
       : isBank
       ? ""
@@ -652,8 +652,8 @@ function masterHero({ action, pageType, brands = [], sidebarItems = [], banks = 
     card.id = `${isLocation ? "admstloc" : isBank ? "admstbk" : "admst"}_hero_stat_${String(label).toLowerCase()}_section`;
     card.className = "rounded-[1.25rem] border border-white/80 bg-white/78 p-3 shadow-sm";
     card.append(
-      textNode("p", "text-[11px] font-black uppercase tracking-[0.14em] text-gray-500", label),
-      textNode("p", "text-2xl font-black text-gray-950", String(value)),
+      textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label),
+      textNode("p", "text-xl font-black text-gray-950", String(value)),
     );
     stats.append(card);
   });
@@ -661,7 +661,7 @@ function masterHero({ action, pageType, brands = [], sidebarItems = [], banks = 
   const side = document.createElement("section");
   side.id = isLocation ? "admstloc_hero_actions_section" : isBank ? "admstbk_hero_actions_section" : "admst_hero_actions_section";
   side.className = "grid gap-3";
-  side.append(stats, action, textNode("p", "text-xs font-semibold text-gray-500", `master_key: ${master.master_key ?? "-"}`));
+  side.append(stats, action, textNode("p", "text-[10px] font-semibold text-gray-500", `master_key: ${master.master_key ?? "-"}`));
   grid.append(copy, side);
   section.append(grid);
   return section;
@@ -1110,7 +1110,7 @@ function filterChips(id, labels) {
   chips.className = "flex flex-wrap gap-2 border-t border-white/60 pt-3";
   labels.forEach((label) => {
     const chip = document.createElement("span");
-    chip.className = "rounded-full border border-[var(--pb-border)] bg-[var(--pb-chip-bg)] px-4 py-2 text-sm font-semibold text-[var(--pb-chip-text)] shadow-sm";
+    chip.className = "rounded-full border border-[var(--pb-border)] bg-[var(--pb-chip-bg)] px-4 py-2 text-xs font-semibold text-[var(--pb-chip-text)] shadow-sm";
     chip.textContent = label;
     chips.append(chip);
   });
@@ -1119,7 +1119,7 @@ function filterChips(id, labels) {
 
 function labelWrap(label, control) {
   const wrap = document.createElement("label");
-  wrap.className = "grid gap-1 text-sm font-semibold text-gray-700";
+  wrap.className = "grid gap-1 text-xs font-semibold text-gray-700";
   wrap.textContent = label;
   wrap.append(control);
   return wrap;
@@ -1130,14 +1130,14 @@ function inputField(id, value, placeholder) {
   input.id = id;
   input.value = value;
   input.placeholder = placeholder;
-  input.className = "min-h-10 min-w-0 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-sm text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  input.className = "min-h-10 min-w-0 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-xs text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
   return input;
 }
 
 function selectField(id, value, options) {
   const select = document.createElement("select");
   select.id = id;
-  select.className = "min-h-10 min-w-0 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-sm text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  select.className = "min-h-10 min-w-0 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-xs text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
   options.forEach(([optionValue, label]) => {
     const option = document.createElement("option");
     option.value = optionValue;

@@ -18,11 +18,11 @@ export function PublicStickyCta({ car, onStartTransaction = null, onConsult = nu
   copy.className = "min-w-0";
 
   const title = document.createElement("p");
-  title.className = "truncate text-sm font-semibold text-gray-900";
+  title.className = "truncate text-xs font-semibold text-gray-900";
   title.textContent = [car?.brand_name, car?.model_name].filter(Boolean).join(" ") || "Mobil pilihan";
 
   const price = document.createElement("p");
-  price.className = "text-xs font-medium text-[var(--pb-brand-secondary)]";
+  price.className = "text-[10px] font-medium text-[var(--pb-brand-secondary)]";
   price.textContent = car?.price_discount || car?.price_cash || car?.price_credit
     ? formatStickyPrice(car)
     : "Konsultasikan harga";
@@ -31,8 +31,8 @@ export function PublicStickyCta({ car, onStartTransaction = null, onConsult = nu
 
   const badge = document.createElement("span");
   badge.className = lock.locked
-    ? "rounded-full bg-gray-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-normal text-gray-700"
-    : "rounded-full bg-[color-mix(in_srgb,var(--pb-brand-accent)_28%,white)] px-3 py-1 text-[11px] font-semibold uppercase tracking-normal text-[var(--pb-brand-secondary)]";
+    ? "rounded-full bg-gray-100 px-3 py-1 text-[10px] font-semibold uppercase tracking-normal text-gray-700"
+    : "rounded-full bg-[color-mix(in_srgb,var(--pb-brand-accent)_28%,white)] px-3 py-1 text-[10px] font-semibold uppercase tracking-normal text-[var(--pb-brand-secondary)]";
   badge.textContent = lock.locked ? lock.label : "Ready";
 
   summary.append(copy, badge);

@@ -24,7 +24,7 @@ export function BuyerDesktopTopNav({
       icon: brandIcon,
       iconSize: "h-5 w-5",
     }),
-    textNode("strong", "truncate text-base font-black text-[var(--pb-text)]", brandLabel),
+    textNode("strong", "truncate text-sm font-black text-[var(--pb-text)]", brandLabel),
   );
 
   const links = document.createElement("section");
@@ -68,8 +68,8 @@ function desktopNavLink(item, activePath, onNavigate) {
   }
 
   link.className = active
-    ? "inline-flex min-w-0 items-center justify-center gap-2 rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] px-4 py-2 text-sm font-black text-[var(--pb-brand-secondary)] no-underline shadow-[var(--pb-shadow-soft)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]"
-    : "inline-flex min-w-0 items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-bold text-[var(--pb-text-muted)] no-underline transition hover:bg-[var(--pb-surface-muted)] hover:text-[var(--pb-text)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)] disabled:cursor-not-allowed disabled:opacity-55";
+    ? "inline-flex min-w-0 items-center justify-center gap-2 rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] px-4 py-2 text-xs font-black text-[var(--pb-brand-secondary)] no-underline shadow-[var(--pb-shadow-soft)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]"
+    : "inline-flex min-w-0 items-center justify-center gap-2 rounded-full px-4 py-2 text-xs font-bold text-[var(--pb-text-muted)] no-underline transition hover:bg-[var(--pb-surface-muted)] hover:text-[var(--pb-text)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)] disabled:cursor-not-allowed disabled:opacity-55";
 
   if (active) {
     link.setAttribute("aria-current", "page");
@@ -92,7 +92,7 @@ function desktopNavLink(item, activePath, onNavigate) {
 function buyerProfileAction({ user, onNavigate } = {}) {
   const button = document.createElement("button");
   button.type = "button";
-  button.className = "inline-flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] text-sm font-black text-[var(--pb-brand-secondary)] shadow-[var(--pb-shadow-card)] ring-1 ring-[var(--pb-border)] transition hover:bg-[var(--pb-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  button.className = "inline-flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] text-xs font-black text-[var(--pb-brand-secondary)] shadow-[var(--pb-shadow-card)] ring-1 ring-[var(--pb-border)] transition hover:bg-[var(--pb-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]";
   button.setAttribute("aria-label", "Profil Saya");
   button.title = "Profil Saya";
   button.addEventListener("click", () => onNavigate?.("/profile"));

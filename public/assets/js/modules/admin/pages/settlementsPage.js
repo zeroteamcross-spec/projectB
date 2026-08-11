@@ -192,9 +192,9 @@ function settlementsHero({ action, summary = {} }) {
 
   copy.append(
     icon,
-    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", ""),
-    textNode("h1", "max-w-2xl text-3xl font-black leading-tight tracking-normal text-gray-950 sm:text-4xl", "Admin Settlements"),
-    textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", ""),
+    textNode("p", "text-[10px] font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", ""),
+    textNode("h1", "max-w-2xl text-2xl font-black leading-tight tracking-normal text-gray-950 sm:text-3xl", "Admin Settlements"),
+    textNode("p", "max-w-2xl text-xs leading-6 text-gray-600", ""),
   );
 
   const stats = document.createElement("section");
@@ -209,8 +209,8 @@ function settlementsHero({ action, summary = {} }) {
     card.id = `adst_hero_stat_${String(label).toLowerCase()}_section`;
     card.className = "rounded-[1.25rem] border border-white/80 bg-white/78 p-3 shadow-sm";
     card.append(
-      textNode("p", "text-[11px] font-black uppercase tracking-[0.14em] text-gray-500", label),
-      textNode("p", "text-2xl font-black text-gray-950", String(value)),
+      textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label),
+      textNode("p", "text-xl font-black text-gray-950", String(value)),
     );
     stats.append(card);
   });
@@ -237,9 +237,9 @@ function settlementsSummary(summary = {}) {
       summaryCardTone(index),
     ].join(" ");
     card.append(
-      textNode("p", "text-[11px] font-black uppercase tracking-[0.14em] text-gray-500", item.label),
-      textNode("p", "break-words text-xl font-black text-gray-950", item.value),
-      textNode("p", "text-sm leading-6 text-gray-500", item.helper),
+      textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", item.label),
+      textNode("p", "break-words text-lg font-black text-gray-950", item.value),
+      textNode("p", "text-xs leading-6 text-gray-500", item.helper),
     );
     section.append(card);
   });
@@ -269,8 +269,8 @@ function settlementFilterBar(filters, summary, actions) {
   const copy = document.createElement("div");
   copy.className = "grid min-w-0 gap-1";
   copy.append(
-    textNode("p", "text-[11px] font-black uppercase tracking-[0.16em] text-[color-mix(in_srgb,var(--pb-brand-primary)_84%,black)]", "Settlement filter"),
-    textNode("p", "text-sm leading-6 text-gray-600", "Cari batch, marketing, referral code, atau catatan lalu saring status finalisasi."),
+    textNode("p", "text-[10px] font-black uppercase tracking-[0.16em] text-[color-mix(in_srgb,var(--pb-brand-primary)_84%,black)]", "Settlement filter"),
+    textNode("p", "text-xs leading-6 text-gray-600", "Cari batch, marketing, referral code, atau catatan lalu saring status finalisasi."),
   );
   heading.append(icon, copy);
 
@@ -283,7 +283,7 @@ function settlementFilterBar(filters, summary, actions) {
   keyword.name = "keyword";
   keyword.value = filters.keyword ?? "";
   keyword.placeholder = "Cari marketing, referral, batch, catatan";
-  keyword.className = "max-h-[50px] min-h-10 min-w-0 w-full rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-sm text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  keyword.className = "max-h-[50px] min-h-10 min-w-0 w-full rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-xs text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
 
   const status = document.createElement("select");
   status.id = "adst_status_input";
@@ -336,7 +336,7 @@ function settlementFilterBar(filters, summary, actions) {
     `${summary.cancelledBatches ?? 0} cancelled`,
   ].forEach((label) => {
     const chip = document.createElement("span");
-    chip.className = "max-w-full break-words rounded-full border border-[var(--pb-border)] bg-[var(--pb-chip-bg)] px-4 py-2 text-sm font-semibold text-[var(--pb-chip-text)] shadow-[var(--pb-shadow-soft)]";
+    chip.className = "max-w-full break-words rounded-full border border-[var(--pb-border)] bg-[var(--pb-chip-bg)] px-4 py-2 text-xs font-semibold text-[var(--pb-chip-text)] shadow-[var(--pb-shadow-soft)]";
     chip.textContent = label;
     chips.append(chip);
   });
@@ -347,7 +347,7 @@ function settlementFilterBar(filters, summary, actions) {
 
 function labelWrap(label, control) {
   const node = document.createElement("label");
-  node.className = "grid gap-1 text-sm font-medium text-[var(--pb-text-strong)]";
+  node.className = "grid gap-1 text-xs font-medium text-[var(--pb-text-strong)]";
   node.textContent = label;
   node.append(control);
   return node;
@@ -411,7 +411,7 @@ function renderSettlementDetailModal({ detail, selectedDetailId, fallback, query
   const settlement = detail || fallback;
   const content = settlement
     ? settlementDetailContent(settlement)
-    : textNode("p", "text-sm font-semibold text-gray-600", "Detail settlement sedang dimuat dari working preload.");
+    : textNode("p", "text-xs font-semibold text-gray-600", "Detail settlement sedang dimuat dari working preload.");
 
   openModal(content, {
     key: `admin-settlement-detail-${selectedDetailId}`,
@@ -454,13 +454,13 @@ function settlementDetailContent(settlement) {
 function detailSection(title, content) {
   const section = document.createElement("section");
   section.className = "grid min-w-0 gap-3";
-  section.append(textNode("h3", "text-base font-black text-gray-950", title), content);
+  section.append(textNode("h3", "text-sm font-black text-gray-950", title), content);
   return section;
 }
 
 function settlementItems(items) {
   if (!items.length) {
-    return textNode("p", "rounded-[var(--pb-radius-xl)] border border-[var(--pb-border)] bg-white/80 p-3 text-sm font-semibold text-gray-500", "Item ledger tidak tersedia di payload detail.");
+    return textNode("p", "rounded-[var(--pb-radius-xl)] border border-[var(--pb-border)] bg-white/80 p-3 text-xs font-semibold text-gray-500", "Item ledger tidak tersedia di payload detail.");
   }
 
   const list = document.createElement("div");
@@ -481,7 +481,7 @@ function settlementItems(items) {
 
 function settlementHistories(histories) {
   if (!histories.length) {
-    return textNode("p", "rounded-[var(--pb-radius-xl)] border border-[var(--pb-border)] bg-white/80 p-3 text-sm font-semibold text-gray-500", "History status belum tersedia.");
+    return textNode("p", "rounded-[var(--pb-radius-xl)] border border-[var(--pb-border)] bg-white/80 p-3 text-xs font-semibold text-gray-500", "History status belum tersedia.");
   }
 
   const list = document.createElement("div");
@@ -503,8 +503,8 @@ function detailRow(label, value) {
   const row = document.createElement("div");
   row.className = "grid min-w-0 gap-1";
   row.append(
-    textNode("p", "text-xs font-black uppercase tracking-normal text-gray-500", label),
-    textNode("p", "break-words text-sm font-semibold text-gray-900", String(value ?? "-")),
+    textNode("p", "text-[10px] font-black uppercase tracking-normal text-gray-500", label),
+    textNode("p", "break-words text-xs font-semibold text-gray-900", String(value ?? "-")),
   );
   return row;
 }

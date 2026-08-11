@@ -110,10 +110,10 @@ function render(root, state, actions) {
   const copy = document.createElement("div");
   copy.className = "grid gap-1";
   const title = document.createElement("h1");
-  title.className = "text-2xl font-black tracking-normal text-gray-950";
+  title.className = "text-xl font-black tracking-normal text-gray-950";
   title.textContent = "Migration Manager";
   const subtitle = document.createElement("p");
-  subtitle.className = "max-w-3xl text-sm leading-6 text-[var(--pb-text-muted)]";
+  subtitle.className = "max-w-3xl text-xs leading-6 text-[var(--pb-text-muted)]";
   subtitle.textContent = "Kelola file schema database yang belum pernah dijalankan. Fitur ini khusus superadmin.";
   copy.append(title, subtitle);
 
@@ -161,10 +161,10 @@ function statCard(label, value, iconName) {
   row.className = "flex items-center justify-between gap-3";
   const copy = document.createElement("div");
   const valueNode = document.createElement("div");
-  valueNode.className = "text-2xl font-black text-gray-950";
+  valueNode.className = "text-xl font-black text-gray-950";
   valueNode.textContent = String(value);
   const labelNode = document.createElement("div");
-  labelNode.className = "text-xs font-bold uppercase tracking-normal text-[var(--pb-text-muted)]";
+  labelNode.className = "text-[10px] font-bold uppercase tracking-normal text-[var(--pb-text-muted)]";
   labelNode.textContent = label;
   copy.append(valueNode, labelNode);
   const icon = document.createElement("span");
@@ -177,7 +177,7 @@ function statCard(label, value, iconName) {
 
 function alertBox(message) {
   const box = document.createElement("div");
-  box.className = "rounded-lg border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
+  box.className = "rounded-lg border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-xs font-semibold text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
   box.textContent = message;
   return box;
 }
@@ -186,13 +186,13 @@ function resultsPanel(results) {
   const panel = document.createElement("div");
   panel.className = "rounded-lg border border-[var(--pb-border)] bg-white p-4 shadow-sm";
   const title = document.createElement("h2");
-  title.className = "mb-3 text-base font-black text-gray-950";
+  title.className = "mb-3 text-sm font-black text-gray-950";
   title.textContent = "Hasil Eksekusi Terakhir";
   const list = document.createElement("div");
   list.className = "grid gap-2";
   list.append(...results.map((result) => {
     const item = document.createElement("div");
-    item.className = "flex flex-wrap items-center justify-between gap-2 rounded-md bg-gray-50 px-3 py-2 text-sm";
+    item.className = "flex flex-wrap items-center justify-between gap-2 rounded-md bg-gray-50 px-3 py-2 text-xs";
     const name = document.createElement("span");
     name.className = "font-semibold text-gray-800";
     name.textContent = result.name;
@@ -200,7 +200,7 @@ function resultsPanel(results) {
     item.append(name, status);
     if (result.message) {
       const message = document.createElement("p");
-      message.className = "basis-full text-xs text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
+      message.className = "basis-full text-[10px] text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
       message.textContent = result.message;
       item.append(message);
     }
@@ -215,7 +215,7 @@ function table(migrations, state, actions) {
   panel.className = "overflow-hidden rounded-lg border border-[var(--pb-border)] bg-white shadow-sm";
 
   const table = document.createElement("table");
-  table.className = "min-w-full divide-y divide-gray-200 text-sm";
+  table.className = "min-w-full divide-y divide-gray-200 text-xs";
   table.innerHTML = `
     <thead class="bg-gray-50">
       <tr>
@@ -254,7 +254,7 @@ function row(migration, state, actions) {
     cell(migration.name, "font-semibold text-gray-900"),
     cellNode(statusBadge(migration.status)),
     cell(migration.applied_at ?? "-", "text-gray-600"),
-    cell(shortChecksum(migration.checksum), "font-mono text-xs text-gray-500"),
+    cell(shortChecksum(migration.checksum), "font-mono text-[10px] text-gray-500"),
     actionCell(migration, state, actions)
   );
   return tr;
@@ -280,7 +280,7 @@ function actionCell(migration, state, actions) {
 
   if (migration.status !== "pending") {
     const text = document.createElement("span");
-    text.className = "text-xs font-semibold text-[var(--pb-text-muted)]";
+    text.className = "text-[10px] font-semibold text-[var(--pb-text-muted)]";
     text.textContent = "-";
     td.append(text);
     return td;
@@ -305,7 +305,7 @@ function statusBadge(status) {
       : status === "skipped"
         ? "bg-gray-50 text-gray-700 border-gray-200"
         : "bg-[color-mix(in_srgb,var(--pb-warning)_8%,white)] text-[color-mix(in_srgb,var(--pb-warning)_84%,black)] border-[color-mix(in_srgb,var(--pb-warning)_26%,white)]";
-  badge.className = `inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-black ${tone}`;
+  badge.className = `inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-black ${tone}`;
   badge.textContent = status;
   return badge;
 }

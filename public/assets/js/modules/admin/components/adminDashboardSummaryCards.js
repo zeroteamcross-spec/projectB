@@ -64,8 +64,8 @@ function summaryCard({ id, icon, label, value, note, tone, surface }) {
   const copy = document.createElement("div");
   copy.className = "grid gap-2";
   copy.append(
-    textBlock("text-[11px] font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", label),
-    textBlock("text-3xl font-black tracking-[-0.04em] text-gray-950", value),
+    textBlock("text-[10px] font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", label),
+    textBlock("text-2xl font-black tracking-[-0.04em] text-gray-950", value),
   );
 
   const iconWrap = document.createElement("div");
@@ -76,7 +76,7 @@ function summaryCard({ id, icon, label, value, note, tone, surface }) {
   card.append(
     glow,
     top,
-    textBlock(`relative mt-3 text-sm leading-6 ${tw.text.muted}`, note),
+    textBlock(`relative mt-3 text-xs leading-6 ${tw.text.muted}`, note),
   );
   return card;
 }

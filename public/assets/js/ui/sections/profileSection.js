@@ -7,7 +7,7 @@ export function ProfileSection({ user = null } = {}) {
   title.textContent = user?.name ?? "Guest";
 
   const detail = document.createElement("p");
-  detail.className = `text-sm ${tw.text.muted}`;
+  detail.className = `text-xs ${tw.text.muted}`;
   detail.textContent = user?.email ?? "Belum login";
 
   return Card([title, detail]);

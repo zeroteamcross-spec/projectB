@@ -61,7 +61,7 @@ export function NumericInput({
 
   if (helper) {
     const helperNode = document.createElement("span");
-    helperNode.className = "text-xs font-semibold text-gray-500";
+    helperNode.className = "text-[10px] font-semibold text-gray-500";
     helperNode.textContent = helper;
     wrap.append(helperNode);
   }

@@ -103,7 +103,7 @@ function settlementIdentity(settlement) {
   copy.className = "grid min-w-0 gap-1";
   copy.append(
     textBlock("font-black text-gray-950", `Batch #${settlement.id}`),
-    textBlock("text-sm text-gray-500", `Ledger ${settlement.ledger_count ?? 0}`),
+    textBlock("text-xs text-gray-500", `Ledger ${settlement.ledger_count ?? 0}`),
   );
   wrap.append(avatar, copy);
   return wrap;
@@ -114,7 +114,7 @@ function affiliateBlock(settlement) {
   wrap.className = "grid min-w-0 gap-1";
   wrap.append(
     iconLine("user", settlement.affiliateLabel || "-"),
-    textBlock("text-sm text-gray-500", settlement.affiliate?.referral_code || "-"),
+    textBlock("text-xs text-gray-500", settlement.affiliate?.referral_code || "-"),
   );
   return wrap;
 }
@@ -124,7 +124,7 @@ function amountBlock(settlement) {
   wrap.className = "grid min-w-0 gap-1";
   wrap.append(
     textBlock("font-black text-gray-950", settlement.requestedAmountLabel),
-    textBlock("text-sm text-gray-500", settlement.notes || "Tidak ada catatan"),
+    textBlock("text-xs text-gray-500", settlement.notes || "Tidak ada catatan"),
   );
   return wrap;
 }
@@ -144,7 +144,7 @@ function timelineBlock(settlement) {
   wrap.className = "grid min-w-0 gap-1";
   wrap.append(
     iconLine("calendar", formatDate(settlement.requested_at)),
-    textBlock("text-sm text-gray-500", settlement.settled_at
+    textBlock("text-xs text-gray-500", settlement.settled_at
       ? `Settled ${formatDate(settlement.settled_at)}`
       : settlement.cancelled_at
         ? `Cancelled ${formatDate(settlement.cancelled_at)}`
@@ -167,7 +167,7 @@ function actionGroup({ settlement, isUpdatingId, onView, onMarkSettled, onCancel
 
   if (settlement.status !== "pending") {
     const done = document.createElement("span");
-    done.className = "inline-flex min-h-10 items-center rounded-full border border-[var(--pb-border)] bg-white px-4 text-sm font-semibold text-gray-500 shadow-sm";
+    done.className = "inline-flex min-h-10 items-center rounded-full border border-[var(--pb-border)] bg-white px-4 text-xs font-semibold text-gray-500 shadow-sm";
     done.textContent = settlement.statusMeta?.label || "Selesai";
     actions.append(detail, done);
     return actions;
@@ -198,7 +198,7 @@ function actionGroup({ settlement, isUpdatingId, onView, onMarkSettled, onCancel
 
 function iconLine(iconName, text) {
   const node = document.createElement("p");
-  node.className = "flex min-w-0 items-center gap-2 break-words text-sm font-semibold text-gray-800";
+  node.className = "flex min-w-0 items-center gap-2 break-words text-xs font-semibold text-gray-800";
   node.append(createIcon(iconName, { className: "h-3.5 w-3.5 shrink-0 text-[var(--pb-brand-secondary)]" }), document.createTextNode(text));
   return node;
 }

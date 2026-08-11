@@ -82,7 +82,7 @@ export function PublicFilterBottomSheet({
     designHook: "shared.button.secondary",
   });
   resetButton.id = "pub_filter_reset_button";
-  resetButton.classList.add("w-full", "min-h-11", "px-4", "py-2", "text-sm");
+  resetButton.classList.add("w-full", "min-h-11", "px-4", "py-2", "text-xs");
 
   const applyButton = Button({
     label: "Terapkan",
@@ -100,7 +100,7 @@ export function PublicFilterBottomSheet({
     designHook: "shared.button.primary",
   });
   applyButton.id = "pub_filter_apply_button";
-  applyButton.classList.add("w-full", "min-h-11", "px-4", "py-2", "text-sm");
+  applyButton.classList.add("w-full", "min-h-11", "px-4", "py-2", "text-xs");
 
   actions.append(resetButton, applyButton);
   content.append(actions);
@@ -175,7 +175,7 @@ function filterGroup(title, options, filterName = "") {
   const section = document.createElement("section");
   section.className = "grid min-w-0 gap-3";
   const heading = document.createElement("h3");
-  heading.className = "text-sm font-black text-[var(--pb-text)]";
+  heading.className = "text-xs font-black text-[var(--pb-text)]";
   heading.textContent = title;
 
   const grid = document.createElement("section");
@@ -205,8 +205,8 @@ function filterGroup(title, options, filterName = "") {
 
 function optionButtonClassName(active) {
   return active
-    ? "inline-flex min-w-0 items-center gap-2 rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-brand-primary)_30%,var(--pb-border))] bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] px-3 py-2 text-sm font-black text-[var(--pb-brand-secondary)]"
-    : "inline-flex min-w-0 items-center gap-2 rounded-[1rem] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] px-3 py-2 text-sm font-bold text-[var(--pb-text-strong)] transition hover:bg-[var(--pb-surface-muted)]";
+    ? "inline-flex min-w-0 items-center gap-2 rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-brand-primary)_30%,var(--pb-border))] bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] px-3 py-2 text-xs font-black text-[var(--pb-brand-secondary)]"
+    : "inline-flex min-w-0 items-center gap-2 rounded-[1rem] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] px-3 py-2 text-xs font-bold text-[var(--pb-text-strong)] transition hover:bg-[var(--pb-surface-muted)]";
 }
 
 function syncMultiOptionButtons(siblings, activeValues) {

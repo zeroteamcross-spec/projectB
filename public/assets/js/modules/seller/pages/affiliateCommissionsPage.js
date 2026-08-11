@@ -290,9 +290,9 @@ function summaryCards(summary, globalRule) {
       summaryCardClass(index),
     ].join(" ");
     card.append(
-      textBlock("text-[11px] font-black uppercase tracking-[0.14em] text-gray-500", label),
-      textBlock("text-2xl font-black text-gray-950", value),
-      textBlock("text-sm leading-6 text-gray-600", note),
+      textBlock("text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label),
+      textBlock("text-xl font-black text-gray-950", value),
+      textBlock("text-xs leading-6 text-gray-600", note),
     );
     section.append(card);
   });
@@ -315,9 +315,9 @@ function commissionsHero({ summary, actions }) {
   icon.append(createIcon("commission", { className: "h-5 w-5" }));
   copy.append(
     icon,
-    textBlock("p", "text-xs font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", "Seller commission desk"),
-    textBlock("h1", "max-w-3xl text-3xl font-black leading-tight tracking-normal text-gray-950 sm:text-4xl", "Komisi Marketing"),
-    textBlock("p", "max-w-2xl text-sm leading-6 text-gray-600", "Pantau komisi dari referral affiliate, status pembayaran, dan riwayat performa."),
+    textBlock("p", "text-[10px] font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", "Seller commission desk"),
+    textBlock("h1", "max-w-3xl text-2xl font-black leading-tight tracking-normal text-gray-950 sm:text-3xl", "Komisi Marketing"),
+    textBlock("p", "max-w-2xl text-xs leading-6 text-gray-600", "Pantau komisi dari referral affiliate, status pembayaran, dan riwayat performa."),
   );
 
   const stats = document.createElement("section");
@@ -330,8 +330,8 @@ function commissionsHero({ summary, actions }) {
     const stat = document.createElement("section");
     stat.className = "rounded-[1.25rem] border border-white/80 bg-white/78 p-3 shadow-sm";
     stat.append(
-      textBlock("p", "text-[11px] font-black uppercase tracking-[0.14em] text-gray-500", label),
-      textBlock("p", "text-2xl font-black text-gray-950", String(value)),
+      textBlock("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label),
+      textBlock("p", "text-xl font-black text-gray-950", String(value)),
     );
     stats.append(stat);
   });
@@ -442,12 +442,12 @@ function priorityPanel() {
   top.className = "flex flex-wrap items-center gap-2";
   top.append(
     Badge({ label: "Prioritas aturan", variant: "info" }),
-    textBlock("text-sm font-semibold text-gray-900", "Aturan khusus per mobil selalu diprioritaskan"),
+    textBlock("text-xs font-semibold text-gray-900", "Aturan khusus per mobil selalu diprioritaskan"),
   );
 
   card.append(
     top,
-    textBlock(`text-sm ${tw.text.muted}`, sellerAffiliateCommissionService.priorityCopy()),
+    textBlock(`text-xs ${tw.text.muted}`, sellerAffiliateCommissionService.priorityCopy()),
   );
 
   return card;
@@ -671,8 +671,8 @@ function commissionDetailPanel({ rule, onEdit }) {
   const header = document.createElement("section");
   header.className = "grid gap-3 rounded-[1.5rem] border border-white/80 bg-[var(--pb-surface-inset)] p-4";
   header.append(
-    textBlock("p", "text-2xl font-black text-gray-950", sellerAffiliateCommissionService.carLabel(rule.car)),
-    textBlock("p", "text-sm font-semibold text-gray-600", "Aturan komisi ini berlaku untuk transaksi referral pada mobil terkait."),
+    textBlock("p", "text-xl font-black text-gray-950", sellerAffiliateCommissionService.carLabel(rule.car)),
+    textBlock("p", "text-xs font-semibold text-gray-600", "Aturan komisi ini berlaku untuk transaksi referral pada mobil terkait."),
     SellerCommissionRuleStatusBadge(rule.status),
   );
 
@@ -693,8 +693,8 @@ function commissionDetailPanel({ rule, onEdit }) {
     const item = document.createElement("section");
     item.className = "grid gap-1 rounded-[1.25rem] border border-[var(--pb-border)] bg-white/82 p-3";
     item.append(
-      textBlock("p", "text-[11px] font-black uppercase tracking-[0.14em] text-gray-500", label),
-      textBlock("p", "break-words text-sm font-semibold text-gray-900", value),
+      textBlock("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label),
+      textBlock("p", "break-words text-xs font-semibold text-gray-900", value),
     );
     facts.append(item);
   });
@@ -745,13 +745,13 @@ function summaryCardClass(index) {
 
 function fieldWrap(label) {
   const wrap = document.createElement("label");
-  wrap.className = "grid min-w-0 gap-1.5 text-sm font-bold text-gray-700";
+  wrap.className = "grid min-w-0 gap-1.5 text-xs font-bold text-gray-700";
   wrap.textContent = label;
   return wrap;
 }
 
 function controlClassName() {
-  return "min-h-11 min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-2.5 text-sm font-semibold text-[var(--pb-text)] outline-none transition duration-150 placeholder:text-[var(--pb-text-muted)] focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  return "min-h-11 min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-2.5 text-xs font-semibold text-[var(--pb-text)] outline-none transition duration-150 placeholder:text-[var(--pb-text-muted)] focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
 }
 
 function labelize(value) {

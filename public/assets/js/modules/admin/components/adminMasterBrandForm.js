@@ -55,8 +55,8 @@ export function AdminMasterBrandForm({
   const copy = document.createElement("div");
   copy.className = "grid gap-1";
   copy.append(
-    textNode("p", "text-[11px] font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", "Child models"),
-    textNode("p", "text-sm text-gray-600", "Model disimpan sebagai array di JSON payload brand."),
+    textNode("p", "text-[10px] font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", "Child models"),
+    textNode("p", "text-xs text-gray-600", "Model disimpan sebagai array di JSON payload brand."),
   );
 
   const addModel = Button({ label: "Tambah model", variant: "secondary" });
@@ -74,7 +74,7 @@ export function AdminMasterBrandForm({
     if (!draft.models.length) {
       const empty = document.createElement("section");
       empty.id = "admst_models_empty_section";
-      empty.className = "rounded-[1.25rem] border border-dashed border-[var(--pb-border)] bg-white/70 px-4 py-5 text-sm font-semibold text-gray-500";
+      empty.className = "rounded-[1.25rem] border border-dashed border-[var(--pb-border)] bg-white/70 px-4 py-5 text-xs font-semibold text-gray-500";
       empty.textContent = "Belum ada model. Tambahkan model agar brand siap dipakai di katalog.";
       modelRows.append(empty);
       return;
@@ -179,24 +179,24 @@ function readModelRows(modelRows) {
 
 function inputField({ id, label, value = "", placeholder = "" }) {
   const wrap = document.createElement("label");
-  wrap.className = "grid min-w-0 gap-1 text-sm font-semibold text-gray-700";
+  wrap.className = "grid min-w-0 gap-1 text-xs font-semibold text-gray-700";
   wrap.textContent = label;
   const input = document.createElement("input");
   input.id = id;
   input.value = value ?? "";
   input.placeholder = placeholder;
-  input.className = "min-h-10 w-full min-w-0 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-sm text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  input.className = "min-h-10 w-full min-w-0 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-xs text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
   wrap.append(input);
   return { wrap, input };
 }
 
 function selectField({ id, label, value = "", options = [] }) {
   const wrap = document.createElement("label");
-  wrap.className = "grid min-w-0 gap-1 text-sm font-semibold text-gray-700";
+  wrap.className = "grid min-w-0 gap-1 text-xs font-semibold text-gray-700";
   wrap.textContent = label;
   const input = document.createElement("select");
   input.id = id;
-  input.className = "min-h-10 w-full min-w-0 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-sm text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  input.className = "min-h-10 w-full min-w-0 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-xs text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
   options.forEach(([optionValue, labelText]) => {
     const option = document.createElement("option");
     option.value = optionValue;

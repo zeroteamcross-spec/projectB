@@ -31,24 +31,24 @@ export function AffiliateSettlementList({ settlements = [] } = {}) {
     const title = document.createElement("div");
     title.className = "flex min-w-0 flex-wrap items-center gap-2";
     title.append(
-      textBlock("text-base font-semibold text-gray-950", `Settlement #${settlement.id}`),
+      textBlock("text-sm font-semibold text-gray-950", `Settlement #${settlement.id}`),
       AffiliateSettlementStatusBadge({ status: settlement.status }),
     );
 
     left.append(
       title,
-      textBlock(`text-sm ${tw.text.muted}`, `${settlement.ledger_count} ledger | diminta ${formatDate(settlement.requested_at)}`),
+      textBlock(`text-xs ${tw.text.muted}`, `${settlement.ledger_count} ledger | diminta ${formatDate(settlement.requested_at)}`),
     );
 
     if (settlement.notes) {
-      left.append(textBlock(`text-sm ${tw.text.muted}`, settlement.notes));
+      left.append(textBlock(`text-xs ${tw.text.muted}`, settlement.notes));
     }
 
     const right = document.createElement("div");
     right.className = "grid min-w-0 gap-1 sm:max-w-[18rem] sm:text-right";
     right.append(
-      textBlock("text-lg font-bold text-gray-950", settlement.requestedAmountLabel),
-      textBlock(`text-sm ${tw.text.muted}`, settlement.settled_at ? `Settled ${formatDate(settlement.settled_at)}` : settlement.cancelled_at ? `Cancelled ${formatDate(settlement.cancelled_at)}` : "Menunggu settlement"),
+      textBlock("text-base font-bold text-gray-950", settlement.requestedAmountLabel),
+      textBlock(`text-xs ${tw.text.muted}`, settlement.settled_at ? `Settled ${formatDate(settlement.settled_at)}` : settlement.cancelled_at ? `Cancelled ${formatDate(settlement.cancelled_at)}` : "Menunggu settlement"),
     );
 
     top.append(left, right);

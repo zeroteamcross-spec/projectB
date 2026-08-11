@@ -102,8 +102,8 @@ function transactionBlock(transaction) {
   const copy = document.createElement("div");
   copy.className = "grid min-w-0 gap-1";
   copy.append(
-    textNode("p", "break-words text-sm font-black text-gray-950", transaction.transaction_code || `Transaksi #${transaction.id ?? "-"}`),
-    textNode("p", "break-words text-xs font-semibold text-gray-500", formatDate(transaction.created_at)),
+    textNode("p", "break-words text-xs font-black text-gray-950", transaction.transaction_code || `Transaksi #${transaction.id ?? "-"}`),
+    textNode("p", "break-words text-[10px] font-semibold text-gray-500", formatDate(transaction.created_at)),
   );
   wrap.append(avatar, copy);
   return wrap;
@@ -113,8 +113,8 @@ function carBlock(transaction) {
   const wrap = document.createElement("section");
   wrap.className = "grid min-w-0 gap-1";
   wrap.append(
-    textNode("p", "break-words text-sm font-black text-gray-950", carLabel(transaction)),
-    textNode("p", "break-words text-xs font-semibold text-gray-500", transaction?.car?.year ? `Tahun ${transaction.car.year}` : `Mobil #${transaction?.car_id ?? "-"}`),
+    textNode("p", "break-words text-xs font-black text-gray-950", carLabel(transaction)),
+    textNode("p", "break-words text-[10px] font-semibold text-gray-500", transaction?.car?.year ? `Tahun ${transaction.car.year}` : `Mobil #${transaction?.car_id ?? "-"}`),
   );
   return wrap;
 }
@@ -123,8 +123,8 @@ function buyerBlock(transaction) {
   const wrap = document.createElement("section");
   wrap.className = "grid min-w-0 gap-1";
   wrap.append(
-    textNode("p", "break-words text-sm font-black text-gray-950", transaction?.buyer?.name || "Buyer terdaftar"),
-    textNode("p", "break-words text-xs font-semibold text-gray-500", transaction?.buyer?.email || transaction?.buyer?.phone_number || "-"),
+    textNode("p", "break-words text-xs font-black text-gray-950", transaction?.buyer?.name || "Buyer terdaftar"),
+    textNode("p", "break-words text-[10px] font-semibold text-gray-500", transaction?.buyer?.email || transaction?.buyer?.phone_number || "-"),
   );
   return wrap;
 }
@@ -134,8 +134,8 @@ function valueBlock(transaction) {
   const wrap = document.createElement("section");
   wrap.className = "grid min-w-0 gap-1";
   wrap.append(
-    textNode("p", "text-sm font-black text-gray-950", formatCurrency(financials.total)),
-    textNode("p", "text-xs font-semibold text-gray-500", `Sisa ${formatCurrency(financials.remaining)}`),
+    textNode("p", "text-xs font-black text-gray-950", formatCurrency(financials.total)),
+    textNode("p", "text-[10px] font-semibold text-gray-500", `Sisa ${formatCurrency(financials.remaining)}`),
   );
   return wrap;
 }
@@ -145,8 +145,8 @@ function paymentBlock(transaction) {
   const wrap = document.createElement("section");
   wrap.className = "grid min-w-0 gap-1";
   wrap.append(
-    textNode("p", "text-sm font-black text-gray-950", sellerTransactionService.paymentTypeLabel(transaction.payment_type)),
-    textNode("p", "break-words text-xs font-semibold text-gray-500", `${financials.dueNowLabel}: ${formatCurrency(financials.dueNow)}`),
+    textNode("p", "text-xs font-black text-gray-950", sellerTransactionService.paymentTypeLabel(transaction.payment_type)),
+    textNode("p", "break-words text-[10px] font-semibold text-gray-500", `${financials.dueNowLabel}: ${formatCurrency(financials.dueNow)}`),
   );
   return wrap;
 }

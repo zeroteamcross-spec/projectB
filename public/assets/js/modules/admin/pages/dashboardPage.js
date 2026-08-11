@@ -146,15 +146,15 @@ function adminHero({ title, description, action }) {
   icon.append(createIcon("dashboard", { className: "h-6 w-6" }));
 
   const eyebrow = document.createElement("p");
-  eyebrow.className = "text-xs font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]";
+  eyebrow.className = "text-[10px] font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]";
   eyebrow.textContent = "";
 
   const heading = document.createElement("h1");
-  heading.className = "max-w-2xl text-3xl font-black leading-tight tracking-[-0.04em] text-gray-950 sm:text-4xl";
+  heading.className = "max-w-2xl text-2xl font-black leading-tight tracking-[-0.04em] text-gray-950 sm:text-3xl";
   heading.textContent = title;
 
   const body = document.createElement("p");
-  body.className = "max-w-xl text-sm leading-6 text-gray-600";
+  body.className = "max-w-xl text-xs leading-6 text-gray-600";
   body.textContent = description;
 
   copy.append(icon, eyebrow, heading, body);
@@ -179,8 +179,8 @@ function adminChartPanel({ summary, transactions = [], pendingUsers = [], cars =
   const copy = document.createElement("div");
   copy.className = "grid gap-1";
   copy.append(
-    textNode("p", "text-xs font-black uppercase tracking-[0.16em] text-[color-mix(in_srgb,var(--pb-brand-primary)_84%,black)]", "Grafik operasional"),
-    textNode("h2", "text-xl font-black tracking-[-0.03em] text-gray-950", "Ringkasan kondisi operasional"),
+    textNode("p", "text-[10px] font-black uppercase tracking-[0.16em] text-[color-mix(in_srgb,var(--pb-brand-primary)_84%,black)]", "Grafik operasional"),
+    textNode("h2", "text-lg font-black tracking-[-0.03em] text-gray-950", "Ringkasan kondisi operasional"),
   );
   header.append(icon, copy);
 
@@ -201,7 +201,7 @@ function adminChartPanel({ summary, transactions = [], pendingUsers = [], cars =
   side.id = "adm_dashboard_chart_side_panel";
   side.className = "grid content-between gap-4 rounded-[1.5rem] border border-white/80 bg-white/76 p-4 shadow-sm";
   side.append(
-    textNode("p", "text-sm leading-6 text-gray-600", "Grafik ini membaca beban operasional secara sekilas, tanpa perlu membuka halaman detailnya."),
+    textNode("p", "text-xs leading-6 text-gray-600", "Grafik ini membaca beban operasional secara sekilas, tanpa perlu membuka halaman detailnya."),
     metricPills([
       ["Attention", summary?.attentionTransactions ?? 0, "text-[color-mix(in_srgb,var(--pb-danger)_84%,black)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)]"],
       ["Published", summary?.publishedCars ?? 0, "text-[color-mix(in_srgb,var(--pb-success)_84%,black)] bg-[color-mix(in_srgb,var(--pb-success)_8%,white)]"],
@@ -216,7 +216,7 @@ function chartBar({ label, value, color, max }) {
   const row = document.createElement("div");
   row.className = "grid gap-2";
   const top = document.createElement("div");
-  top.className = "flex items-center justify-between gap-3 text-sm";
+  top.className = "flex items-center justify-between gap-3 text-xs";
   top.append(
     textNode("span", "font-bold text-gray-700", label),
     textNode("span", "font-black text-gray-950", String(value)),
@@ -238,8 +238,8 @@ function metricPills(items) {
     const pill = document.createElement("div");
     pill.className = `rounded-2xl px-4 py-3 ${className}`;
     pill.append(
-      textNode("p", "text-xs font-bold uppercase tracking-[0.12em]", label),
-      textNode("strong", "mt-1 block text-2xl font-black", String(value)),
+      textNode("p", "text-[10px] font-bold uppercase tracking-[0.12em]", label),
+      textNode("strong", "mt-1 block text-xl font-black", String(value)),
     );
     wrap.append(pill);
   });

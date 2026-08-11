@@ -25,7 +25,7 @@ export function SellerInspectionReportPanel({
   title.textContent = "Status inspeksi";
 
   const description = document.createElement("p");
-  description.className = `mt-1 text-sm leading-6 ${tw.text.muted}`;
+  description.className = `mt-1 text-xs leading-6 ${tw.text.muted}`;
   description.textContent = "Pilih kondisi item, simpan draft, lalu publish saat checklist lengkap.";
 
   const heading = document.createElement("div");
@@ -103,11 +103,11 @@ function stat(label, value) {
   node.className = "rounded-lg border border-gray-200 bg-gray-50 p-3";
 
   const caption = document.createElement("p");
-  caption.className = "text-xs font-semibold uppercase tracking-normal text-gray-500";
+  caption.className = "text-[10px] font-semibold uppercase tracking-normal text-gray-500";
   caption.textContent = label;
 
   const content = document.createElement("p");
-  content.className = "mt-1 text-xl font-bold tracking-normal text-gray-950";
+  content.className = "mt-1 text-lg font-bold tracking-normal text-gray-950";
   content.textContent = value;
 
   node.append(caption, content);
@@ -123,7 +123,7 @@ function progressBar(progress = {}) {
   wrap.className = "mt-4 grid gap-2";
 
   const label = document.createElement("div");
-  label.className = "flex items-center justify-between text-xs font-bold text-gray-600";
+  label.className = "flex items-center justify-between text-[10px] font-bold text-gray-600";
   label.append(document.createTextNode("Progress item"), document.createTextNode(`${completed}/${total}`));
 
   const track = document.createElement("div");
@@ -138,14 +138,14 @@ function progressBar(progress = {}) {
 
 function dirtyPill() {
   const pill = document.createElement("span");
-  pill.className = "inline-flex items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--pb-warning)_26%,white)] bg-[color-mix(in_srgb,var(--pb-warning)_8%,white)] px-3 py-2 text-xs font-bold text-[color-mix(in_srgb,var(--pb-warning)_84%,black)]";
+  pill.className = "inline-flex items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--pb-warning)_26%,white)] bg-[color-mix(in_srgb,var(--pb-warning)_8%,white)] px-3 py-2 text-[10px] font-bold text-[color-mix(in_srgb,var(--pb-warning)_84%,black)]";
   pill.textContent = "Belum disimpan";
   return pill;
 }
 
 function cleanPill() {
   const pill = document.createElement("span");
-  pill.className = "inline-flex items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--pb-success)_26%,white)] bg-[color-mix(in_srgb,var(--pb-success)_8%,white)] px-3 py-2 text-xs font-bold text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
+  pill.className = "inline-flex items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--pb-success)_26%,white)] bg-[color-mix(in_srgb,var(--pb-success)_8%,white)] px-3 py-2 text-[10px] font-bold text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
   pill.textContent = "Tersimpan";
   return pill;
 }

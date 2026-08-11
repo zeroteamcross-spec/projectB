@@ -89,17 +89,17 @@ function fulfillmentChecklistCard({
   const copy = document.createElement("div");
   copy.className = "grid gap-1";
   const title = document.createElement("h2");
-  title.className = "text-lg font-bold tracking-normal text-gray-950";
+  title.className = "text-base font-bold tracking-normal text-gray-950";
   title.textContent = "Proses Transaksi";
   const body = document.createElement("p");
-  body.className = "text-sm leading-6 text-gray-600";
+  body.className = "text-xs leading-6 text-gray-600";
   body.textContent = status === "completed"
     ? "Checklist sudah selesai dan buyer telah menyelesaikan transaksi."
     : "Centang item yang sudah beres agar buyer bisa menyelesaikan transaksi.";
   copy.append(title, body);
 
   const progress = document.createElement("span");
-  progress.className = "inline-flex w-fit items-center rounded-full border border-[var(--pb-border)] bg-[var(--pb-surface-muted)] px-3 py-1 text-xs font-black text-[var(--pb-brand-secondary)]";
+  progress.className = "inline-flex w-fit items-center rounded-full border border-[var(--pb-border)] bg-[var(--pb-surface-muted)] px-3 py-1 text-[10px] font-black text-[var(--pb-brand-secondary)]";
   progress.textContent = `${doneCount}/${checklist.length} selesai`;
   header.append(copy, progress);
   card.append(header);
@@ -148,12 +148,12 @@ function checklistItem({ item, draft, disabled, onToggle, onNote, onDate }) {
   content.className = "grid min-w-0 gap-2";
   const title = document.createElement("label");
   title.htmlFor = checkbox.id;
-  title.className = "break-words text-sm font-black text-gray-950";
+  title.className = "break-words text-xs font-black text-gray-950";
   title.textContent = item.label ?? item.key;
 
   if (item.key === "handover_schedule") {
     const dateWrap = document.createElement("label");
-    dateWrap.className = "grid min-w-0 gap-1 text-xs font-black uppercase tracking-normal text-gray-500";
+    dateWrap.className = "grid min-w-0 gap-1 text-[10px] font-black uppercase tracking-normal text-gray-500";
     dateWrap.textContent = "Tanggal serah terima";
 
     const dateInput = document.createElement("input");
@@ -161,7 +161,7 @@ function checklistItem({ item, draft, disabled, onToggle, onNote, onDate }) {
     dateInput.id = `slrtx_checklist_${item.key}_handover_date_input`;
     dateInput.value = draft?.handover_date ?? extractHandoverDate(draft?.notes ?? item.notes ?? "");
     dateInput.disabled = disabled;
-    dateInput.className = "min-h-11 min-w-0 rounded-[0.9rem] border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-800 outline-none transition focus:border-[color-mix(in_srgb,var(--pb-brand-primary)_45%,white)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)] disabled:bg-gray-100 disabled:text-gray-500";
+    dateInput.className = "min-h-11 min-w-0 rounded-[0.9rem] border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-800 outline-none transition focus:border-[color-mix(in_srgb,var(--pb-brand-primary)_45%,white)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)] disabled:bg-gray-100 disabled:text-gray-500";
     dateInput.addEventListener("change", () => onDate?.(item.key, dateInput.value));
     dateWrap.append(dateInput);
     content.append(title, dateWrap);
@@ -175,7 +175,7 @@ function checklistItem({ item, draft, disabled, onToggle, onNote, onDate }) {
   note.placeholder = "Catatan seller";
   note.disabled = disabled;
   note.rows = 2;
-  note.className = "min-w-0 resize-y rounded-[0.9rem] border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-800 outline-none transition placeholder:text-[var(--pb-text-muted)] focus:border-[color-mix(in_srgb,var(--pb-brand-primary)_45%,white)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)] disabled:bg-gray-100 disabled:text-gray-500";
+  note.className = "min-w-0 resize-y rounded-[0.9rem] border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-800 outline-none transition placeholder:text-[var(--pb-text-muted)] focus:border-[color-mix(in_srgb,var(--pb-brand-primary)_45%,white)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)] disabled:bg-gray-100 disabled:text-gray-500";
   note.addEventListener("input", () => onNote?.(item.key, note.value));
 
   content.append(note);
@@ -201,10 +201,10 @@ function statusCard(transaction, statusMeta, { isCancelling = false, onCancel = 
   const copy = document.createElement("div");
   copy.className = "grid gap-1";
   const title = document.createElement("h2");
-  title.className = "text-xl font-bold tracking-normal text-gray-950";
+  title.className = "text-lg font-bold tracking-normal text-gray-950";
   title.textContent = transaction.transaction_code ?? `Transaksi #${transaction.id ?? "-"}`;
   const body = document.createElement("p");
-  body.className = "text-sm leading-6 text-gray-600";
+  body.className = "text-xs leading-6 text-gray-600";
   body.textContent = statusMeta.description;
   copy.append(title, body);
 
@@ -269,7 +269,7 @@ function paymentLogsCard(logs = []) {
   wrap.className = "grid gap-3";
 
   const title = document.createElement("h2");
-  title.className = "text-lg font-bold tracking-normal text-gray-950";
+  title.className = "text-base font-bold tracking-normal text-gray-950";
   title.textContent = "Riwayat pembayaran";
   wrap.append(title);
 
@@ -291,7 +291,7 @@ function identityCard(title, rows = []) {
 
   if (title) {
     const heading = document.createElement("h2");
-    heading.className = "text-lg font-bold tracking-normal text-gray-950";
+    heading.className = "text-base font-bold tracking-normal text-gray-950";
     heading.textContent = title;
     card.append(heading);
   }
@@ -301,11 +301,11 @@ function identityCard(title, rows = []) {
     row.className = "grid gap-1 border-b border-gray-100 pb-3 last:border-b-0 last:pb-0 sm:grid-cols-[180px_minmax(0,1fr)] sm:items-start";
 
     const labelNode = document.createElement("span");
-    labelNode.className = "text-sm text-gray-500";
+    labelNode.className = "text-xs text-gray-500";
     labelNode.textContent = label;
 
     const valueNode = document.createElement("span");
-    valueNode.className = "break-words text-sm font-semibold text-gray-900 sm:text-right";
+    valueNode.className = "break-words text-xs font-semibold text-gray-900 sm:text-right";
     valueNode.textContent = value;
 
     row.append(labelNode, valueNode);

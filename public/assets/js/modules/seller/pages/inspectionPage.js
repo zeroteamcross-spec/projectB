@@ -118,9 +118,9 @@ function heroSection(overview, filteredCars, isHydrated) {
   icon.append(createIcon("clipboard", { className: "h-5 w-5" }));
   copy.append(
     icon,
-    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", "Seller inspection"),
-    textNode("h1", "max-w-3xl text-3xl font-black leading-tight tracking-normal text-gray-950 sm:text-4xl", "Inspeksi Kendaraan"),
-    textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", "Pantau readiness inspeksi semua listing, buka checklist dari data yang sudah dipreload, lalu simpan atau publish hasil inspeksi.")
+    textNode("p", "text-[10px] font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", "Seller inspection"),
+    textNode("h1", "max-w-3xl text-2xl font-black leading-tight tracking-normal text-gray-950 sm:text-3xl", "Inspeksi Kendaraan"),
+    textNode("p", "max-w-2xl text-xs leading-6 text-gray-600", "Pantau readiness inspeksi semua listing, buka checklist dari data yang sudah dipreload, lalu simpan atau publish hasil inspeksi.")
   );
 
   const stats = node("section", "slrinsp_summary_section", "grid gap-2 sm:grid-cols-2 lg:min-w-[560px] lg:grid-cols-4");
@@ -135,7 +135,7 @@ function heroSection(overview, filteredCars, isHydrated) {
 
   const status = textNode(
     "p",
-    isHydrated ? "text-xs font-bold text-[color-mix(in_srgb,var(--pb-success)_84%,black)]" : "text-xs font-bold text-[var(--pb-brand-secondary)]",
+    isHydrated ? "text-[10px] font-bold text-[color-mix(in_srgb,var(--pb-success)_84%,black)]" : "text-[10px] font-bold text-[var(--pb-brand-secondary)]",
     isHydrated ? "Data lengkap" : "Sedang dimuat"
   );
   status.id = "slrinsp_hydrate_status_section";
@@ -154,7 +154,7 @@ function toolbarSection(filters) {
   );
   section.dataset.ds = "seller.inspection.toolbar";
 
-  const searchWrap = node("section", "slrinsp_search_field_section", "grid min-w-0 gap-1.5 text-sm font-bold text-gray-700");
+  const searchWrap = node("section", "slrinsp_search_field_section", "grid min-w-0 gap-1.5 text-xs font-bold text-gray-700");
   const searchLabel = document.createElement("label");
   searchLabel.setAttribute("for", "slrinsp_search_input");
   searchLabel.textContent = "Cari mobil";
@@ -170,7 +170,7 @@ function toolbarSection(filters) {
   });
   searchWrap.append(searchLabel, search);
 
-  const statusWrap = node("section", "slrinsp_status_field_section", "grid min-w-0 gap-1.5 text-sm font-bold text-gray-700");
+  const statusWrap = node("section", "slrinsp_status_field_section", "grid min-w-0 gap-1.5 text-xs font-bold text-gray-700");
   const statusLabel = document.createElement("label");
   statusLabel.setAttribute("for", "slrinsp_status_filter_input");
   statusLabel.textContent = "Status inspeksi";
@@ -217,11 +217,11 @@ function carQueueSection({ cars, overview }) {
   const header = node("section", "slrinsp_queue_header_section", "flex min-w-0 flex-col gap-2 border-b border-gray-100 pb-4 sm:flex-row sm:items-end sm:justify-between");
   const copy = node("section", "slrinsp_queue_copy_section", "grid min-w-0 gap-1");
   copy.append(
-    textNode("p", "text-xs font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", "Data halaman"),
-    textNode("h2", "text-xl font-black tracking-normal text-gray-950", "Daftar inspeksi seller"),
-    textNode("p", "text-sm leading-6 text-gray-500", `${cars.length} mobil tersedia dari state halaman`)
+    textNode("p", "text-[10px] font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", "Data halaman"),
+    textNode("h2", "text-lg font-black tracking-normal text-gray-950", "Daftar inspeksi seller"),
+    textNode("p", "text-xs leading-6 text-gray-500", `${cars.length} mobil tersedia dari state halaman`)
   );
-  const refreshHint = textNode("p", "rounded-full border border-[color-mix(in_srgb,var(--pb-success)_14%,white)] bg-[color-mix(in_srgb,var(--pb-success)_8%,white)] px-3 py-1 text-xs font-bold text-[color-mix(in_srgb,var(--pb-success)_84%,black)]", "Hydrate background aktif");
+  const refreshHint = textNode("p", "rounded-full border border-[color-mix(in_srgb,var(--pb-success)_14%,white)] bg-[color-mix(in_srgb,var(--pb-success)_8%,white)] px-3 py-1 text-[10px] font-bold text-[color-mix(in_srgb,var(--pb-success)_84%,black)]", "Hydrate background aktif");
   header.append(copy, refreshHint);
   section.append(header);
 
@@ -246,8 +246,8 @@ function carInspectionCard(car, overview) {
   const header = node("section", `slrinsp_car_card_header_section_${cardId}`, "flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between");
   const copy = node("section", `slrinsp_car_card_copy_section_${cardId}`, "grid min-w-0 gap-1");
   copy.append(
-    textNode("h3", "break-words text-base font-black tracking-normal text-gray-950", carTitle(car)),
-    textNode("p", "break-words text-sm text-gray-500", [car.license_plate_number, car.location_name, car.transmission].filter(Boolean).join(" | ") || "Metadata mobil belum lengkap")
+    textNode("h3", "break-words text-sm font-black tracking-normal text-gray-950", carTitle(car)),
+    textNode("p", "break-words text-xs text-gray-500", [car.license_plate_number, car.location_name, car.transmission].filter(Boolean).join(" | ") || "Metadata mobil belum lengkap")
   );
   const badges = node("section", `slrinsp_car_card_badges_section_${cardId}`, "flex flex-wrap gap-2");
   badges.append(SellerInspectionStatusBadge({ status: car.inspection_summary_status ?? "not_checked", type: "summary" }));
@@ -256,7 +256,7 @@ function carInspectionCard(car, overview) {
   }
   header.append(copy, badges);
 
-  const details = node("section", `slrinsp_car_card_detail_section_${cardId}`, "grid gap-2 text-sm text-gray-600 sm:grid-cols-3");
+  const details = node("section", `slrinsp_car_card_detail_section_${cardId}`, "grid gap-2 text-xs text-gray-600 sm:grid-cols-3");
   details.append(
     miniMetric("Item", String(report?.items?.length ?? 0), cardId),
     miniMetric("Catatan", report?.summary_notes ? "Ada" : "Belum", cardId),
@@ -277,9 +277,9 @@ function masterSection(templates) {
   const section = node("section", "slrinsp_master_section", "grid min-w-0 content-start gap-4 rounded-[2rem] border border-white/80 bg-white/72 p-4 shadow-[0_22px_70px_rgba(15,23,42,0.08)] backdrop-blur-xl sm:p-5");
   section.dataset.ds = "seller.inspection.master";
   section.append(
-    textNode("p", "text-xs font-black uppercase tracking-[0.16em] text-[color-mix(in_srgb,var(--pb-brand-primary)_84%,black)]", "Master inspection"),
-    textNode("h2", "text-xl font-black tracking-normal text-gray-950", "Master paten aktif"),
-    textNode("p", "text-sm leading-6 text-gray-500", "Section dan item inspeksi berasal dari canon inspection, bukan dari input seller.")
+    textNode("p", "text-[10px] font-black uppercase tracking-[0.16em] text-[color-mix(in_srgb,var(--pb-brand-primary)_84%,black)]", "Master inspection"),
+    textNode("h2", "text-lg font-black tracking-normal text-gray-950", "Master paten aktif"),
+    textNode("p", "text-xs leading-6 text-gray-500", "Section dan item inspeksi berasal dari canon inspection, bukan dari input seller.")
   );
 
   const groups = groupTemplates(templates);
@@ -287,8 +287,8 @@ function masterSection(templates) {
   groups.forEach(([category, group], index) => {
     const item = node("section", `slrinsp_master_group_section_${slugify(category || index)}`, "rounded-[1.25rem] border border-gray-100 bg-white p-3");
     item.append(
-      textNode("h3", "text-sm font-black uppercase tracking-[0.12em] text-gray-600", categoryLabel(category)),
-      textNode("p", "mt-1 text-sm text-gray-500", `${group.length} item aktif`)
+      textNode("h3", "text-xs font-black uppercase tracking-[0.12em] text-gray-600", categoryLabel(category)),
+      textNode("p", "mt-1 text-xs text-gray-500", `${group.length} item aktif`)
     );
     list.append(item);
   });
@@ -329,9 +329,9 @@ function modalCarSummarySection(car, report) {
   const section = node("section", "slrinsp_modal_car_summary_section", "grid gap-3 rounded-[1.5rem] border border-[var(--pb-border)] bg-[var(--pb-surface-muted)] p-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-center");
   const copy = node("section", "slrinsp_modal_car_summary_copy_section", "grid min-w-0 gap-1");
   copy.append(
-    textNode("p", "text-xs font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", "Unit inspeksi"),
-    textNode("h3", "break-words text-lg font-black text-gray-950", carTitle(car)),
-    textNode("p", "break-words text-sm text-gray-600", [car.license_plate_number, car.registration_date, car.mileage_km ? `${car.mileage_km.toLocaleString("id-ID")} km` : ""].filter(Boolean).join(" | "))
+    textNode("p", "text-[10px] font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", "Unit inspeksi"),
+    textNode("h3", "break-words text-base font-black text-gray-950", carTitle(car)),
+    textNode("p", "break-words text-xs text-gray-600", [car.license_plate_number, car.registration_date, car.mileage_km ? `${car.mileage_km.toLocaleString("id-ID")} km` : ""].filter(Boolean).join(" | "))
   );
   const badges = node("section", "slrinsp_modal_car_summary_badges_section", "flex flex-wrap gap-2 md:justify-end");
   badges.append(SellerInspectionStatusBadge({ status: car.inspection_summary_status ?? "not_checked", type: "summary" }));
@@ -374,7 +374,7 @@ function reportFormSection({ car, report, templates, runtime }) {
   const summarySection = node("section", "slrinsp_report_summary_section", "grid gap-2 rounded-[1.5rem] border border-gray-100 bg-white p-4");
   const summaryLabel = document.createElement("label");
   summaryLabel.setAttribute("for", "slrinsp_summary_notes_input");
-  summaryLabel.className = "text-sm font-black text-gray-800";
+  summaryLabel.className = "text-xs font-black text-gray-800";
   summaryLabel.textContent = "Catatan ringkas";
   const summary = document.createElement("textarea");
   summary.id = "slrinsp_summary_notes_input";
@@ -410,8 +410,8 @@ function reportFormSection({ car, report, templates, runtime }) {
 function templateGroupSection(category, templates, report) {
   const section = node("section", `slrinsp_item_group_section_${slugify(category)}`, "grid gap-3 rounded-[1.5rem] border border-gray-100 bg-white p-4");
   section.append(
-    textNode("h3", "text-sm font-black uppercase tracking-[0.12em] text-gray-600", categoryLabel(category)),
-    textNode("p", "text-sm text-gray-500", `${templates.length} item master`)
+    textNode("h3", "text-xs font-black uppercase tracking-[0.12em] text-gray-600", categoryLabel(category)),
+    textNode("p", "text-xs text-gray-500", `${templates.length} item master`)
   );
 
   templates.forEach((template) => {
@@ -429,7 +429,7 @@ function templateItemSection(template, report) {
   section.dataset.templateId = String(template.id);
   const header = node("section", `slrinsp_item_header_section_${key}`, "grid gap-1 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start");
   header.append(
-    textNode("h4", "break-words text-sm font-black text-gray-950", template.item_name),
+    textNode("h4", "break-words text-xs font-black text-gray-950", template.item_name),
     SellerInspectionStatusBadge({ status: item?.result_status ?? "good", type: "item" })
   );
   const description = document.createElement("input");
@@ -442,7 +442,7 @@ function templateItemSection(template, report) {
   ITEM_STATUS_OPTIONS.forEach(([value, label]) => {
     const optionId = `slrinsp_item_status_input_${key}_${value}`;
     const labelNode = document.createElement("label");
-    labelNode.className = "flex min-w-0 cursor-pointer items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-bold text-gray-700 has-[:checked]:border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] has-[:checked]:bg-[var(--pb-surface-muted)] has-[:checked]:text-[var(--pb-brand-secondary)]";
+    labelNode.className = "flex min-w-0 cursor-pointer items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-bold text-gray-700 has-[:checked]:border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] has-[:checked]:bg-[var(--pb-surface-muted)] has-[:checked]:text-[var(--pb-brand-secondary)]";
     labelNode.setAttribute("for", optionId);
     const input = document.createElement("input");
     input.id = optionId;
@@ -457,7 +457,7 @@ function templateItemSection(template, report) {
 
   const notesLabel = document.createElement("label");
   notesLabel.setAttribute("for", `slrinsp_item_notes_input_${key}`);
-  notesLabel.className = "text-sm font-bold text-gray-700";
+  notesLabel.className = "text-xs font-bold text-gray-700";
   notesLabel.textContent = "Catatan item";
   const notes = document.createElement("textarea");
   notes.id = `slrinsp_item_notes_input_${key}`;
@@ -466,7 +466,7 @@ function templateItemSection(template, report) {
   notes.value = item?.notes ?? "";
   notes.placeholder = "Catatan khusus bila ada";
   notes.className = `${inputClass()} min-h-[76px] resize-y`;
-  section.append(header, textNode("p", "text-sm leading-6 text-gray-500", template.description ?? "Keterangan item master belum diisi."), description, statusWrap, notesLabel, notes);
+  section.append(header, textNode("p", "text-xs leading-6 text-gray-500", template.description ?? "Keterangan item master belum diisi."), description, statusWrap, notesLabel, notes);
   return section;
 }
 
@@ -479,8 +479,8 @@ function nonCanonItemsNoticeSection(report, templates) {
 
   const section = node("section", "slrinsp_non_canon_items_section", "grid gap-3 rounded-[1.5rem] border border-[color-mix(in_srgb,var(--pb-warning)_14%,white)] bg-[color-mix(in_srgb,var(--pb-warning)_8%,white)] p-4");
   section.append(
-    textNode("h3", "text-sm font-black uppercase tracking-[0.12em] text-[color-mix(in_srgb,var(--pb-warning)_84%,black)]", "Item non-master lama"),
-    textNode("p", "text-sm text-[color-mix(in_srgb,var(--pb-warning)_84%,black)]", `${items.length} item lama tidak termasuk master inspection paten dan tidak bisa diedit dari flow seller.`)
+    textNode("h3", "text-xs font-black uppercase tracking-[0.12em] text-[color-mix(in_srgb,var(--pb-warning)_84%,black)]", "Item non-master lama"),
+    textNode("p", "text-xs text-[color-mix(in_srgb,var(--pb-warning)_84%,black)]", `${items.length} item lama tidak termasuk master inspection paten dan tidak bisa diedit dari flow seller.`)
   );
 
   items.forEach((item) => {
@@ -495,9 +495,9 @@ function nonCanonItemSection(item) {
   const section = node("section", `slrinsp_non_canon_item_section_${key}`, "grid min-w-0 gap-2 rounded-[1.25rem] border border-[color-mix(in_srgb,var(--pb-warning)_14%,white)] bg-white/80 p-3");
   section.dataset.itemId = String(item.id);
   section.append(
-    textNode("h4", "break-words text-sm font-black text-gray-950", item.item_name_snapshot || item.template?.item_name || "Item non-master"),
+    textNode("h4", "break-words text-xs font-black text-gray-950", item.item_name_snapshot || item.template?.item_name || "Item non-master"),
     SellerInspectionStatusBadge({ status: item.result_status, type: "item" }),
-    textNode("p", "text-sm leading-6 text-gray-600", item.notes || item.description || "Tidak ada catatan.")
+    textNode("p", "text-xs leading-6 text-gray-600", item.notes || item.description || "Tidak ada catatan.")
   );
   return section;
 }
@@ -653,8 +653,8 @@ function messageSection(type, text) {
     "section",
     `slrinsp_${type}_section`,
     type === "notice"
-      ? "rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-success)_26%,white)] bg-[color-mix(in_srgb,var(--pb-success)_8%,white)] px-4 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-success)_84%,black)]"
-      : "rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]"
+      ? "rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-success)_26%,white)] bg-[color-mix(in_srgb,var(--pb-success)_8%,white)] px-4 py-3 text-xs font-semibold text-[color-mix(in_srgb,var(--pb-success)_84%,black)]"
+      : "rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-xs font-semibold text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]"
   );
   section.textContent = text;
   section.hidden = !text;
@@ -664,8 +664,8 @@ function messageSection(type, text) {
 function statSection(label, value) {
   const section = node("section", `slrinsp_summary_${slugify(label)}_section`, "rounded-[1.25rem] border border-white/80 bg-white/78 p-3 shadow-sm transition duration-150 hover:-translate-y-0.5 hover:shadow-md");
   section.append(
-    textNode("p", "text-[11px] font-black uppercase tracking-[0.14em] text-gray-500", label),
-    textNode("p", "text-2xl font-black text-gray-950", String(value))
+    textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label),
+    textNode("p", "text-xl font-black text-gray-950", String(value))
   );
   return section;
 }
@@ -673,8 +673,8 @@ function statSection(label, value) {
 function miniMetric(label, value, scope = "") {
   const section = node("section", `slrinsp_metric_${slugify(scope)}_${slugify(label)}_${slugify(value)}_section`, "rounded-xl border border-gray-100 bg-gray-50 px-3 py-2");
   section.append(
-    textNode("p", "text-[11px] font-black uppercase tracking-[0.12em] text-gray-500", label),
-    textNode("p", "mt-1 truncate text-sm font-black text-gray-900", value)
+    textNode("p", "text-[10px] font-black uppercase tracking-[0.12em] text-gray-500", label),
+    textNode("p", "mt-1 truncate text-xs font-black text-gray-900", value)
   );
   return section;
 }
@@ -779,7 +779,7 @@ function normalizeStatus(value) {
 }
 
 function inputClass() {
-  return "min-h-11 min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-2.5 text-sm font-semibold text-[var(--pb-text)] outline-none transition duration-150 placeholder:text-[var(--pb-text-muted)] focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  return "min-h-11 min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-2.5 text-xs font-semibold text-[var(--pb-text)] outline-none transition duration-150 placeholder:text-[var(--pb-text-muted)] focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
 }
 
 function textValue(formData, key) {

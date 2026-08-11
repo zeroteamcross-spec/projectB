@@ -20,9 +20,9 @@ export function SellerCommissionGlobalForm({
   const header = document.createElement("div");
   header.className = "grid gap-2";
   header.append(
-    textBlock("text-sm font-semibold text-gray-500", "Aturan komisi umum"),
-    textBlock("text-xl font-bold text-gray-950", "Atur komisi dasar seluruh mobil seller"),
-    textBlock(`text-sm ${tw.text.muted}`, sellerAffiliateCommissionService.priorityCopy()),
+    textBlock("text-xs font-semibold text-gray-500", "Aturan komisi umum"),
+    textBlock("text-lg font-bold text-gray-950", "Atur komisi dasar seluruh mobil seller"),
+    textBlock(`text-xs ${tw.text.muted}`, sellerAffiliateCommissionService.priorityCopy()),
   );
 
   const meta = document.createElement("div");
@@ -32,14 +32,14 @@ export function SellerCommissionGlobalForm({
     Badge(sellerAffiliateCommissionService.typeMeta(draft.commission_type)),
   );
   if (draft.created_at) {
-    meta.append(textBlock("text-xs font-medium text-gray-500", `Dibuat ${formatDate(draft.created_at)}`));
+    meta.append(textBlock("text-[10px] font-medium text-gray-500", `Dibuat ${formatDate(draft.created_at)}`));
   }
   header.append(meta);
   card.append(header);
 
   if (error) {
     const errorNode = document.createElement("div");
-    errorNode.className = "rounded-lg border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-sm font-medium text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
+    errorNode.className = "rounded-lg border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-xs font-medium text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
     errorNode.textContent = error;
     card.append(errorNode);
   }
@@ -80,7 +80,7 @@ export function SellerCommissionGlobalForm({
     valueInput.value = formatCommissionInput(parseCommissionValue(valueInput.value));
   });
 
-  const valueHint = textBlock(`text-sm ${tw.text.muted}`, draft.commission_type === "percent"
+  const valueHint = textBlock(`text-xs ${tw.text.muted}`, draft.commission_type === "percent"
     ? "Gunakan angka 0 sampai 100 untuk persen komisi."
     : "Gunakan nominal rupiah tetap yang berlaku untuk seluruh mobil seller.");
 

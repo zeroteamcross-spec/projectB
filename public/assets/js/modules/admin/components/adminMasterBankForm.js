@@ -23,8 +23,8 @@ export function AdminMasterBankForm({
   intro.id = "admstbk_form_intro_section";
   intro.className = "rounded-[1.5rem] border border-[var(--pb-border)] bg-[linear-gradient(135deg,rgba(250,244,237,0.94),rgba(234,244,249,0.82))] p-4";
   intro.append(
-    textNode("p", "text-xs font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", mode === "edit" ? "Edit bank" : "Create bank"),
-    textNode("p", "mt-1 text-sm font-semibold leading-6 text-gray-600", "Icon raster diproses menjadi PNG 96x96 px. SVG disimpan sebagai SVG fixed 96x96 yang tervalidasi."),
+    textNode("p", "text-[10px] font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", mode === "edit" ? "Edit bank" : "Create bank"),
+    textNode("p", "mt-1 text-xs font-semibold leading-6 text-gray-600", "Icon raster diproses menjadi PNG 96x96 px. SVG disimpan sebagai SVG fixed 96x96 yang tervalidasi."),
   );
 
   const fields = document.createElement("section");
@@ -50,14 +50,14 @@ export function AdminMasterBankForm({
   uploadCopy.id = "admstbk_icon_upload_copy_section";
   uploadCopy.className = "grid min-w-0 gap-3";
   uploadCopy.append(
-    textNode("p", "text-sm font-black text-gray-950", "Icon bank"),
-    textNode("p", "text-sm leading-6 text-gray-500", "Upload JPG, PNG, WebP, atau SVG. Raster minimal 64x64 px, maksimal 2 MB."),
+    textNode("p", "text-xs font-black text-gray-950", "Icon bank"),
+    textNode("p", "text-xs leading-6 text-gray-500", "Upload JPG, PNG, WebP, atau SVG. Raster minimal 64x64 px, maksimal 2 MB."),
   );
   const fileInput = document.createElement("input");
   fileInput.id = "admstbk_icon_file_input";
   fileInput.type = "file";
   fileInput.accept = "image/png,image/jpeg,image/webp,image/svg+xml,.svg";
-  fileInput.className = "min-h-11 min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-white px-3 py-2 text-sm font-semibold text-gray-700";
+  fileInput.className = "min-h-11 min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-white px-3 py-2 text-xs font-semibold text-gray-700";
   const iconPathInput = hiddenField("admstbk_icon_path_input", "icon_path", draft.icon_path);
   fileInput.addEventListener("change", async () => {
     const file = fileInput.files?.[0] ?? null;
@@ -73,10 +73,10 @@ export function AdminMasterBankForm({
     }
   });
   if (uploading) {
-    uploadCopy.append(textNode("p", "text-sm font-semibold text-[var(--pb-brand-secondary)]", "Mengupload icon..."));
+    uploadCopy.append(textNode("p", "text-xs font-semibold text-[var(--pb-brand-secondary)]", "Mengupload icon..."));
   }
   if (uploadError) {
-    uploadCopy.append(textNode("p", "rounded-xl border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-3 py-2 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]", uploadError));
+    uploadCopy.append(textNode("p", "rounded-xl border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-3 py-2 text-xs font-semibold text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]", uploadError));
   }
   uploadCopy.append(fileInput);
   iconSection.append(preview, uploadCopy);
@@ -142,26 +142,26 @@ function renderPreview(preview, bank) {
 
 function inputField(id, name, label, value, placeholder) {
   const wrap = document.createElement("label");
-  wrap.className = "grid gap-1 text-sm font-semibold text-gray-700";
+  wrap.className = "grid gap-1 text-xs font-semibold text-gray-700";
   wrap.textContent = label;
   const input = document.createElement("input");
   input.id = id;
   input.name = name;
   input.value = value ?? "";
   input.placeholder = placeholder;
-  input.className = "min-h-11 min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-2.5 text-sm text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  input.className = "min-h-11 min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-2.5 text-xs text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
   wrap.append(input);
   return { wrap, input };
 }
 
 function selectField(id, name, label, value, options) {
   const wrap = document.createElement("label");
-  wrap.className = "grid gap-1 text-sm font-semibold text-gray-700";
+  wrap.className = "grid gap-1 text-xs font-semibold text-gray-700";
   wrap.textContent = label;
   const select = document.createElement("select");
   select.id = id;
   select.name = name;
-  select.className = "min-h-11 min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-2.5 text-sm text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  select.className = "min-h-11 min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-2.5 text-xs text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
   options.forEach(([optionValue, optionLabel]) => {
     const option = document.createElement("option");
     option.value = optionValue;

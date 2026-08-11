@@ -124,10 +124,10 @@ function render(root, router, params) {
 
     const heading = document.createElement("div");
     const itemTitle = document.createElement("h2");
-    itemTitle.className = "text-xl font-bold tracking-normal text-gray-950";
+    itemTitle.className = "text-lg font-bold tracking-normal text-gray-950";
     itemTitle.textContent = "Item inspeksi";
     const helper = document.createElement("p");
-    helper.className = "mt-1 text-sm text-gray-500";
+    helper.className = "mt-1 text-xs text-gray-500";
     helper.textContent = "Pilih kondisi langsung di setiap item. Catatan bersifat opsional.";
     heading.append(itemTitle, helper);
 
@@ -413,7 +413,7 @@ function message(color, text) {
   const palette = color === "green"
     ? "border-[color-mix(in_srgb,var(--pb-success)_26%,white)] bg-[color-mix(in_srgb,var(--pb-success)_8%,white)] text-[color-mix(in_srgb,var(--pb-success)_84%,black)]"
     : "border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
-  node.className = `mb-4 rounded-lg border px-3 py-2 text-sm font-medium ${palette}`;
+  node.className = `mb-4 rounded-lg border px-3 py-2 text-xs font-medium ${palette}`;
   node.textContent = text;
   node.hidden = !text;
   return node;

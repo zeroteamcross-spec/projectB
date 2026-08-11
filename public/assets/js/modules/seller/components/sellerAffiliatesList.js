@@ -93,8 +93,8 @@ function affiliateColumns({ copyingAffiliateId, togglingAffiliateId, onDetail, o
         wrap.id = `slraf_affiliate_identity_${affiliate.id}_section`;
         wrap.className = "grid min-w-0 gap-1";
         wrap.append(
-          textNode("p", "break-words text-sm font-black text-gray-950", affiliateName(affiliate)),
-          textNode("p", "break-words text-xs font-semibold leading-5 text-gray-500", affiliateContact(affiliate)),
+          textNode("p", "break-words text-xs font-black text-gray-950", affiliateName(affiliate)),
+          textNode("p", "break-words text-[10px] font-semibold leading-5 text-gray-500", affiliateContact(affiliate)),
         );
         return wrap;
       },
@@ -112,12 +112,12 @@ function affiliateColumns({ copyingAffiliateId, togglingAffiliateId, onDetail, o
     {
       label: "Performa",
       key: "performance",
-      render: (affiliate) => textNode("span", "text-sm font-semibold text-gray-700", performanceText(affiliate)),
+      render: (affiliate) => textNode("span", "text-xs font-semibold text-gray-700", performanceText(affiliate)),
     },
     {
       label: "Komisi",
       key: "commission",
-      render: (affiliate) => textNode("span", "text-sm font-black text-gray-950", commissionText(affiliate)),
+      render: (affiliate) => textNode("span", "text-xs font-black text-gray-950", commissionText(affiliate)),
     },
     {
       label: "Aksi",
@@ -186,8 +186,8 @@ function landingBlock(affiliate, compact = false) {
   wrap.id = `slraf_affiliate_landing_${affiliate.id}_section`;
   wrap.className = "grid min-w-0 gap-1";
   wrap.append(
-    textNode("p", "break-words text-sm font-black text-gray-950", affiliate.referral_code || "-"),
-    textNode("p", `${compact ? "break-words" : "max-w-[260px] truncate"} text-xs font-semibold text-gray-500`, sellerAffiliateService.landingUrl(affiliate.referral_code) || "-"),
+    textNode("p", "break-words text-xs font-black text-gray-950", affiliate.referral_code || "-"),
+    textNode("p", `${compact ? "break-words" : "max-w-[260px] truncate"} text-[10px] font-semibold text-gray-500`, sellerAffiliateService.landingUrl(affiliate.referral_code) || "-"),
   );
   return wrap;
 }

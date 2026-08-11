@@ -50,7 +50,7 @@ export function AdminMasterBrandList({
     icon,
     columns: [
       { label: "Brand", render: (brand) => brandCell(brand) },
-      { label: "Model", render: (brand) => textBlock("text-sm font-semibold text-gray-800", `${brand.models?.length ?? 0} model`) },
+      { label: "Model", render: (brand) => textBlock("text-xs font-semibold text-gray-800", `${brand.models?.length ?? 0} model`) },
       { label: "Status", render: (brand) => statusBadge(brand.status) },
       { label: "Payload", render: (brand) => payloadCell(brand) },
       { label: "Aksi", render: (brand) => actionGroup({ brand, onEdit, onToggleStatus, onDelete, idScope: "desktop" }) },
@@ -94,7 +94,7 @@ function brandCell(brand) {
   copy.className = "grid min-w-0 gap-1";
   copy.append(
     textBlock("font-black text-gray-950", brand.name),
-    textBlock("text-sm text-gray-500", brand.slug || "-"),
+    textBlock("text-xs text-gray-500", brand.slug || "-"),
   );
   wrap.append(icon, copy);
   return wrap;
@@ -104,8 +104,8 @@ function payloadCell(brand) {
   const wrap = document.createElement("div");
   wrap.className = "grid min-w-0 gap-1";
   wrap.append(
-    textBlock("text-sm font-semibold text-gray-800", brand.description || "Tidak ada deskripsi"),
-    textBlock("text-xs text-gray-500", "models[] disimpan di JSON brand"),
+    textBlock("text-xs font-semibold text-gray-800", brand.description || "Tidak ada deskripsi"),
+    textBlock("text-[10px] text-gray-500", "models[] disimpan di JSON brand"),
   );
   return wrap;
 }

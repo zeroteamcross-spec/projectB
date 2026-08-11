@@ -15,8 +15,8 @@ export function AdminTransactionsFilterBar({ filters = {}, counts = {}, onSubmit
   const copy = document.createElement("div");
   copy.className = "grid min-w-0 gap-1";
   copy.append(
-    textBlock("text-[11px] font-black uppercase tracking-[0.16em] text-[color-mix(in_srgb,var(--pb-brand-primary)_84%,black)]", "Transaction filter"),
-    textBlock("text-sm leading-6 text-gray-600", "Saring status, payment type, dan keyword supaya review transaksi tetap cepat dibaca."),
+    textBlock("text-[10px] font-black uppercase tracking-[0.16em] text-[color-mix(in_srgb,var(--pb-brand-primary)_84%,black)]", "Transaction filter"),
+    textBlock("text-xs leading-6 text-gray-600", "Saring status, payment type, dan keyword supaya review transaksi tetap cepat dibaca."),
   );
   header.append(
     icon,

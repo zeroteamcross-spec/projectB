@@ -83,8 +83,8 @@ function buyerMobileHeader({ actions }) {
   const copy = document.createElement("section");
   copy.className = "grid min-w-0 flex-1 gap-0.5";
   copy.append(
-    textNode("p", "text-sm font-bold text-[var(--pb-text-muted)]", "Buyer Center"),
-    textNode("h1", "truncate text-xl font-black leading-tight tracking-normal text-[var(--pb-text-strong)]", "Katalog Mobil"),
+    textNode("p", "text-xs font-bold text-[var(--pb-text-muted)]", "Buyer Center"),
+    textNode("h1", "truncate text-lg font-black leading-tight tracking-normal text-[var(--pb-text-strong)]", "Katalog Mobil"),
   );
 
   const actionsWrap = document.createElement("section");
@@ -102,7 +102,7 @@ function buyerProfileAction({ actions }) {
   const user = authStore.user() ?? {};
   const button = document.createElement("button");
   button.type = "button";
-  button.className = "inline-flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] text-sm font-black text-[var(--pb-brand-secondary)] shadow-[var(--pb-shadow-card)] ring-1 ring-[var(--pb-border)] transition hover:bg-[var(--pb-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  button.className = "inline-flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] text-xs font-black text-[var(--pb-brand-secondary)] shadow-[var(--pb-shadow-card)] ring-1 ring-[var(--pb-border)] transition hover:bg-[var(--pb-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]";
   button.setAttribute("aria-label", "Buka profil buyer");
   button.title = "Profil";
   button.addEventListener("click", () => actions.navigate("/profile"));

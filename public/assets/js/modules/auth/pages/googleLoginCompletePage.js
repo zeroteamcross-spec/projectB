@@ -130,15 +130,15 @@ function header() {
   headerEl.className = "grid gap-2";
 
   const eyebrow = document.createElement("p");
-  eyebrow.className = "text-xs font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]";
+  eyebrow.className = "text-[10px] font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]";
   eyebrow.textContent = "Google profile completion";
 
   const title = document.createElement("h1");
-  title.className = "text-3xl font-black tracking-[-0.04em] text-gray-950";
+  title.className = "text-2xl font-black tracking-[-0.04em] text-gray-950";
   title.textContent = "Lengkapi Data Google Login";
 
   const body = document.createElement("p");
-  body.className = "text-sm leading-7 text-gray-600";
+  body.className = "text-xs leading-7 text-gray-600";
   body.textContent = "Showroom wajib melengkapi WhatsApp format 62 dan data showroom sebelum proses approval admin.";
 
   headerEl.append(eyebrow, title, body);
@@ -159,7 +159,7 @@ function completionForm(root, context, state) {
   );
 
   const hint = document.createElement("p");
-  hint.className = "rounded-2xl bg-[var(--pb-surface-muted)] px-4 py-3 text-sm leading-6 text-gray-700";
+  hint.className = "rounded-2xl bg-[var(--pb-surface-muted)] px-4 py-3 text-xs leading-6 text-gray-700";
   hint.textContent = "Nomor WhatsApp wajib diawali 62 dan hanya angka. Contoh: 6281234567890.";
   form.append(hint);
 
@@ -224,7 +224,7 @@ function donePanel(context, done) {
 
 function field({ name, label, value = "", placeholder = "", required = false, readonly = false }) {
   const wrap = document.createElement("label");
-  wrap.className = "grid gap-1.5 text-sm font-semibold text-gray-700";
+  wrap.className = "grid gap-1.5 text-xs font-semibold text-gray-700";
   wrap.textContent = label;
 
   const input = document.createElement("input");
@@ -233,7 +233,7 @@ function field({ name, label, value = "", placeholder = "", required = false, re
   input.placeholder = placeholder;
   input.required = required;
   input.readOnly = readonly;
-  input.className = "min-h-11 w-full rounded-2xl border border-gray-200 bg-white/90 px-4 py-2.5 text-sm text-gray-950 outline-none transition placeholder:text-[var(--pb-text-muted)] focus:border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] focus:ring-4 focus:ring-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)] read-only:bg-gray-50 read-only:text-gray-500";
+  input.className = "min-h-11 w-full rounded-2xl border border-gray-200 bg-white/90 px-4 py-2.5 text-xs text-gray-950 outline-none transition placeholder:text-[var(--pb-text-muted)] focus:border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] focus:ring-4 focus:ring-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)] read-only:bg-gray-50 read-only:text-gray-500";
 
   wrap.append(input);
   return wrap;
@@ -241,7 +241,7 @@ function field({ name, label, value = "", placeholder = "", required = false, re
 
 function text(value) {
   const paragraph = document.createElement("p");
-  paragraph.className = "text-sm leading-6 text-gray-600";
+  paragraph.className = "text-xs leading-6 text-gray-600";
   paragraph.textContent = value;
   return paragraph;
 }
@@ -253,7 +253,7 @@ function messageBox(message, type) {
     warning: "border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] bg-[var(--pb-surface-muted)] text-[var(--pb-brand-secondary)]",
     info: "border-[color-mix(in_srgb,var(--pb-brand-primary)_14%,white)] bg-[color-mix(in_srgb,var(--pb-brand-primary)_8%,white)] text-[color-mix(in_srgb,var(--pb-brand-primary)_84%,black)]",
   };
-  box.className = `rounded-2xl border px-4 py-3 text-sm font-semibold leading-6 ${classes[type] ?? classes.info}`;
+  box.className = `rounded-2xl border px-4 py-3 text-xs font-semibold leading-6 ${classes[type] ?? classes.info}`;
   box.textContent = message;
   return box;
 }
@@ -281,19 +281,19 @@ function pendingApprovalPanel(context, state, root, startPolling) {
   pulseContainer.append(pulseOuter, pulseInner);
 
   const title = document.createElement("h2");
-  title.className = "text-2xl font-black tracking-tight text-gray-900";
+  title.className = "text-xl font-black tracking-tight text-gray-900";
   title.textContent = "Menunggu Persetujuan Admin";
 
   const user = authStore.user() || {};
   const emailStr = user.email ? ` (${user.email})` : "";
 
   const infoBox = document.createElement("div");
-  infoBox.className = "grid gap-3 rounded-2xl border border-[var(--pb-border)] bg-[var(--pb-surface-muted)] p-5 text-sm leading-relaxed text-gray-700 max-w-md";
+  infoBox.className = "grid gap-3 rounded-2xl border border-[var(--pb-border)] bg-[var(--pb-surface-muted)] p-5 text-xs leading-relaxed text-gray-700 max-w-md";
   infoBox.innerHTML = `
     <p class="font-semibold text-gray-900">Halo, ${user.name || "Seller"}!</p>
     <p>Akun Anda${emailStr} berhasil didaftarkan dan data showroom telah disimpan.</p>
     <p>Saat ini pendaftaran Anda sedang dalam antrean verifikasi oleh Administrator.</p>
-    <p class="text-xs font-semibold text-[var(--pb-brand-secondary)] flex items-center justify-center gap-1.5 mt-1 animate-pulse">
+    <p class="text-[10px] font-semibold text-[var(--pb-brand-secondary)] flex items-center justify-center gap-1.5 mt-1 animate-pulse">
       <span class="h-2 w-2 rounded-full bg-[var(--pb-brand-primary)]"></span>
       Mengecek persetujuan secara otomatis...
     </p>

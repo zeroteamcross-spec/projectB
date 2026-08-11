@@ -31,13 +31,13 @@ export function SellerImageUploadPanel({
   title.className = tw.text.sectionTitle;
   title.textContent = "Upload gambar";
   const helper = document.createElement("p");
-  helper.className = `mt-1 text-sm leading-6 ${tw.text.muted}`;
+  helper.className = `mt-1 text-xs leading-6 ${tw.text.muted}`;
   helper.textContent = "Pilih satu atau beberapa foto mobil. JPG, PNG, atau WebP sampai 5 MB per gambar.";
   titleCopy.append(title, helper);
   titleRow.append(iconWrap, titleCopy);
 
   const errorNode = document.createElement("p");
-  errorNode.className = "rounded-lg border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-3 py-2 text-sm font-medium text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
+  errorNode.className = "rounded-lg border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-3 py-2 text-xs font-medium text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
   errorNode.textContent = error;
   errorNode.hidden = !error;
 
@@ -50,7 +50,7 @@ export function SellerImageUploadPanel({
   input.type = "file";
   input.accept = "image/*";
   input.multiple = true;
-  input.className = `${tw.form.control} max-h-none cursor-pointer file:mr-3 file:rounded-lg file:border-0 file:bg-[var(--pb-btn-secondary-bg)] file:px-3 file:py-2 file:text-sm file:font-semibold file:text-[var(--pb-btn-secondary-text)]`;
+  input.className = `${tw.form.control} max-h-none cursor-pointer file:mr-3 file:rounded-lg file:border-0 file:bg-[var(--pb-btn-secondary-bg)] file:px-3 file:py-2 file:text-xs file:font-semibold file:text-[var(--pb-btn-secondary-text)]`;
   input.addEventListener("change", () => {
     onFilesChange?.(input.files ?? []);
     input.value = "";
@@ -59,7 +59,7 @@ export function SellerImageUploadPanel({
 
   const checklist = document.createElement("section");
   checklist.id = "slri_upload_guidance_section";
-  checklist.className = "grid gap-2 text-sm text-[var(--pb-text-strong)]";
+  checklist.className = "grid gap-2 text-xs text-[var(--pb-text-strong)]";
   checklist.append(
     guidanceItem("camera", "Gunakan foto eksterior/interior yang terang."),
     guidanceItem("star", "Tandai salah satu foto sebagai cover bila perlu."),

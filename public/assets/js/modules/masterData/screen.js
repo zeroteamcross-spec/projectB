@@ -7,9 +7,9 @@ export function masterDataScreen({ params }) {
   const root = document.createElement("section");
   root.className = "grid gap-4";
   const title = document.createElement("h1");
-  title.className = "text-2xl font-bold tracking-normal text-gray-950";
+  title.className = "text-xl font-bold tracking-normal text-gray-950";
   const output = document.createElement("pre");
-  output.className = "overflow-auto rounded-lg border border-gray-200 bg-white p-4 text-sm text-gray-700 shadow-card";
+  output.className = "overflow-auto rounded-lg border border-gray-200 bg-white p-4 text-xs text-gray-700 shadow-card";
 
   title.textContent = `Master Data: ${masterKey}`;
   output.textContent = "Memuat data...";

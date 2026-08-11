@@ -47,7 +47,7 @@ export function SellerSummaryCards({ summary = {} } = {}) {
     const top = document.createElement("div");
     top.className = "flex min-w-0 items-center justify-between gap-3";
 
-    const label = textNode("p", "text-[11px] font-black uppercase tracking-[0.14em] text-gray-500", item.label);
+    const label = textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", item.label);
     const icon = document.createElement("span");
     icon.className = "grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-white/78 text-[var(--pb-brand-secondary)] ring-1 ring-white/80";
     icon.append(createIcon(item.icon, { className: "h-4 w-4" }));
@@ -55,8 +55,8 @@ export function SellerSummaryCards({ summary = {} } = {}) {
 
     card.append(
       top,
-      textNode("p", "text-3xl font-black tracking-normal text-gray-950", item.value(summary)),
-      textNode("p", "text-sm leading-6 text-gray-600", item.note(summary)),
+      textNode("p", "text-2xl font-black tracking-normal text-gray-950", item.value(summary)),
+      textNode("p", "text-xs leading-6 text-gray-600", item.note(summary)),
     );
     grid.append(card);
   });

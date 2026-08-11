@@ -32,11 +32,11 @@ export function SellerCommissionOverrideForm({
   const header = document.createElement("div");
   header.className = "grid gap-2";
   header.append(
-    textBlock("text-sm font-semibold text-gray-500", mode === "edit" ? "Detail aturan khusus" : "Aturan komisi per mobil"),
-    textBlock("text-xl font-bold text-gray-950", mode === "edit"
+    textBlock("text-xs font-semibold text-gray-500", mode === "edit" ? "Detail aturan khusus" : "Aturan komisi per mobil"),
+    textBlock("text-lg font-bold text-gray-950", mode === "edit"
       ? sellerAffiliateCommissionService.carLabel(rule?.car)
       : "Buat aturan untuk mobil tertentu"),
-    textBlock(`text-sm ${tw.text.muted}`, "Gunakan aturan khusus jika mobil tertentu butuh komisi berbeda dari aturan umum seller."),
+    textBlock(`text-xs ${tw.text.muted}`, "Gunakan aturan khusus jika mobil tertentu butuh komisi berbeda dari aturan umum seller."),
   );
 
   if (mode === "edit" && rule) {
@@ -45,7 +45,7 @@ export function SellerCommissionOverrideForm({
     badges.append(
       SellerCommissionRuleStatusBadge(rule.status),
       Badge(sellerAffiliateCommissionService.typeMeta(rule.commission_type)),
-      textBlock("text-xs font-medium text-gray-500", `Diupdate ${formatDate(rule.updated_at || rule.created_at)}`),
+      textBlock("text-[10px] font-medium text-gray-500", `Diupdate ${formatDate(rule.updated_at || rule.created_at)}`),
     );
     header.append(badges);
   }
@@ -136,7 +136,7 @@ export function SellerCommissionOverrideForm({
 
   const hint = document.createElement("div");
   hint.className = tw.surface.inset;
-  hint.append(textBlock(`text-sm ${tw.text.muted}`, "Jika aturan khusus nonaktif, perhitungan komisi akan kembali memakai aturan umum seller bila aktif."));
+  hint.append(textBlock(`text-xs ${tw.text.muted}`, "Jika aturan khusus nonaktif, perhitungan komisi akan kembali memakai aturan umum seller bila aktif."));
 
   form.append(carField, typeField, valueField, statusField, hint);
 

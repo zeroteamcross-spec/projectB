@@ -59,8 +59,8 @@ export function AdminMasterSidebarList({
     columns: [
       { label: "Menu", render: (item) => menuCell(item) },
       { label: "Role", render: (item) => pill(item.role) },
-      { label: "Parent", render: (item) => textBlock("text-sm font-semibold text-gray-800", item.parent_key || "-") },
-      { label: "Urutan", render: (item) => textBlock("text-sm font-black text-gray-950", String(item.order ?? 0)) },
+      { label: "Parent", render: (item) => textBlock("text-xs font-semibold text-gray-800", item.parent_key || "-") },
+      { label: "Urutan", render: (item) => textBlock("text-xs font-black text-gray-950", String(item.order ?? 0)) },
       { label: "Status", render: (item) => statusGroup(item) },
       { label: "Aksi", render: (item) => actionGroup({ item, onEdit, onToggleVisible, onDelete, idScope: "desktop" }) },
     ],
@@ -108,8 +108,8 @@ function reorderBoard({ items = [], onReorder = null }) {
   const copy = document.createElement("div");
   copy.className = "grid gap-1";
   copy.append(
-    textBlock("text-[11px] font-black uppercase tracking-[0.16em] text-[color-mix(in_srgb,var(--pb-brand-primary)_84%,black)]", "Drag & drop ordering"),
-    textBlock("text-sm font-semibold text-gray-700", "Geser kartu menu untuk mengubah urutan role yang sedang dipilih."),
+    textBlock("text-[10px] font-black uppercase tracking-[0.16em] text-[color-mix(in_srgb,var(--pb-brand-primary)_84%,black)]", "Drag & drop ordering"),
+    textBlock("text-xs font-semibold text-gray-700", "Geser kartu menu untuk mengubah urutan role yang sedang dipilih."),
   );
   const controls = document.createElement("div");
   controls.className = "flex flex-wrap items-center gap-2";
@@ -133,7 +133,7 @@ function reorderBoard({ items = [], onReorder = null }) {
   if (!items.length) {
     const empty = document.createElement("section");
     empty.id = "admst_sidebar_reorder_empty_section";
-    empty.className = "rounded-[1.25rem] border border-dashed border-[var(--pb-border)] bg-white/70 px-4 py-5 text-sm font-semibold text-gray-500";
+    empty.className = "rounded-[1.25rem] border border-dashed border-[var(--pb-border)] bg-white/70 px-4 py-5 text-xs font-semibold text-gray-500";
     empty.textContent = "Pilih role Admin, Seller, atau Marketing untuk mengatur urutan menu.";
     list.append(empty);
     section.append(head, list);
@@ -154,14 +154,14 @@ function reorderBoard({ items = [], onReorder = null }) {
     const copy = document.createElement("span");
     copy.className = "grid min-w-0 gap-0.5";
     const title = document.createElement("span");
-    title.className = "truncate text-sm font-black text-gray-950";
+    title.className = "truncate text-xs font-black text-gray-950";
     title.textContent = item.label;
     const route = document.createElement("span");
-    route.className = "truncate text-xs font-semibold text-gray-500";
+    route.className = "truncate text-[10px] font-semibold text-gray-500";
     route.textContent = item.route || item.key;
     copy.append(title, route);
     const order = document.createElement("span");
-    order.className = "rounded-full border border-[var(--pb-border)] bg-white px-3 py-1 text-xs font-black text-gray-600";
+    order.className = "rounded-full border border-[var(--pb-border)] bg-white px-3 py-1 text-[10px] font-black text-gray-600";
     order.textContent = `#${index + 1}`;
     card.append(handle, copy, order);
 
@@ -218,8 +218,8 @@ function menuCell(item) {
   copy.className = "grid min-w-0 gap-1";
   copy.append(
     textBlock("font-black text-gray-950", item.label),
-    textBlock("text-sm text-gray-500", item.route || "Parent menu"),
-    textBlock("text-xs font-semibold text-[var(--pb-text-muted)]", item.key),
+    textBlock("text-xs text-gray-500", item.route || "Parent menu"),
+    textBlock("text-[10px] font-semibold text-[var(--pb-text-muted)]", item.key),
   );
   wrap.append(icon, copy);
   return wrap;
@@ -272,7 +272,7 @@ function activeBadge(item) {
 
 function pill(label) {
   const node = document.createElement("span");
-  node.className = "inline-flex w-fit items-center rounded-full border border-[var(--pb-border)] bg-white/80 px-3 py-1 text-xs font-black uppercase tracking-[0.12em] text-gray-600";
+  node.className = "inline-flex w-fit items-center rounded-full border border-[var(--pb-border)] bg-white/80 px-3 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-gray-600";
   node.textContent = label ?? "-";
   return node;
 }

@@ -126,7 +126,7 @@ function sectionBlock(titleText, descriptionText, content) {
   title.className = tw.text.sectionTitle;
   title.textContent = titleText;
   const description = document.createElement("p");
-  description.className = "break-words text-sm font-semibold leading-6 text-[var(--pb-text-muted)]";
+  description.className = "break-words text-xs font-semibold leading-6 text-[var(--pb-text-muted)]";
   description.textContent = descriptionText;
   header.append(title, description);
 

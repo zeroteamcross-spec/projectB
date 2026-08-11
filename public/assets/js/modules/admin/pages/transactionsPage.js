@@ -160,7 +160,7 @@ function render(root, context, state, actions) {
 
   if (state.error) {
     const error = document.createElement("div");
-    error.className = "rounded-lg border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-sm font-medium text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
+    error.className = "rounded-lg border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-xs font-medium text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
     error.textContent = state.error;
     main.append(error);
   }
@@ -218,9 +218,9 @@ function transactionsHero({ action, counts = {} }) {
 
   copy.append(
     icon,
-    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", ""),
-    textNode("h1", "max-w-2xl text-3xl font-black leading-tight tracking-normal text-gray-950 sm:text-4xl", "Transaksi Admin"),
-    textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", ""),
+    textNode("p", "text-[10px] font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", ""),
+    textNode("h1", "max-w-2xl text-2xl font-black leading-tight tracking-normal text-gray-950 sm:text-3xl", "Transaksi Admin"),
+    textNode("p", "max-w-2xl text-xs leading-6 text-gray-600", ""),
   );
 
   const stats = document.createElement("section");
@@ -235,8 +235,8 @@ function transactionsHero({ action, counts = {} }) {
     card.id = `adtr_hero_stat_${String(label).toLowerCase()}_section`;
     card.className = "rounded-[1.25rem] border border-white/80 bg-white/78 p-3 shadow-sm";
     card.append(
-      textNode("p", "text-[11px] font-black uppercase tracking-[0.14em] text-gray-500", label),
-      textNode("p", "text-2xl font-black text-gray-950", String(value)),
+      textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label),
+      textNode("p", "text-xl font-black text-gray-950", String(value)),
     );
     stats.append(card);
   });

@@ -57,8 +57,8 @@ function commissionColumns({ onDetail, onEdit }) {
         const wrap = document.createElement("section");
         wrap.className = "grid min-w-0 gap-1";
         wrap.append(
-          textNode("p", "break-words text-sm font-black text-gray-950", "Semua marketing seller"),
-          textNode("p", "break-words text-xs font-semibold leading-5 text-gray-500", "Aturan berlaku untuk referral marketing seller ini"),
+          textNode("p", "break-words text-xs font-black text-gray-950", "Semua marketing seller"),
+          textNode("p", "break-words text-[10px] font-semibold leading-5 text-gray-500", "Aturan berlaku untuk referral marketing seller ini"),
         );
         return wrap;
       },
@@ -71,8 +71,8 @@ function commissionColumns({ onDetail, onEdit }) {
         wrap.id = `slrafc_rule_car_${rule.id}_section`;
         wrap.className = "grid min-w-0 gap-1";
         wrap.append(
-          textNode("p", "break-words text-sm font-black text-gray-950", sellerAffiliateCommissionService.carLabel(rule.car)),
-          textNode("p", "break-words text-xs font-semibold leading-5 text-gray-500", rule.car?.listing_status ? `Listing ${rule.car.listing_status}` : "Mobil seller"),
+          textNode("p", "break-words text-xs font-black text-gray-950", sellerAffiliateCommissionService.carLabel(rule.car)),
+          textNode("p", "break-words text-[10px] font-semibold leading-5 text-gray-500", rule.car?.listing_status ? `Listing ${rule.car.listing_status}` : "Mobil seller"),
         );
         return wrap;
       },
@@ -80,7 +80,7 @@ function commissionColumns({ onDetail, onEdit }) {
     {
       label: "Nilai Transaksi",
       key: "transaction_value",
-      render: (rule) => textNode("span", "text-sm font-semibold text-gray-700", rule.car?.price_cash ? formatCurrency(rule.car.price_cash) : "-"),
+      render: (rule) => textNode("span", "text-xs font-semibold text-gray-700", rule.car?.price_cash ? formatCurrency(rule.car.price_cash) : "-"),
     },
     {
       label: "Komisi",
@@ -89,8 +89,8 @@ function commissionColumns({ onDetail, onEdit }) {
         const wrap = document.createElement("section");
         wrap.className = "grid gap-1";
         wrap.append(
-          textNode("p", "text-sm font-black text-gray-950", sellerAffiliateCommissionService.formatValue(rule)),
-          textNode("p", "text-xs font-semibold text-gray-500", labelize(rule.commission_type)),
+          textNode("p", "text-xs font-black text-gray-950", sellerAffiliateCommissionService.formatValue(rule)),
+          textNode("p", "text-[10px] font-semibold text-gray-500", labelize(rule.commission_type)),
         );
         return wrap;
       },
@@ -103,7 +103,7 @@ function commissionColumns({ onDetail, onEdit }) {
     {
       label: "Tanggal",
       key: "updated_at",
-      render: (rule) => textNode("span", "text-sm font-semibold text-gray-700", formatDate(rule.updated_at || rule.created_at)),
+      render: (rule) => textNode("span", "text-xs font-semibold text-gray-700", formatDate(rule.updated_at || rule.created_at)),
     },
     {
       label: "Aksi",

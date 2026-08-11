@@ -20,7 +20,7 @@ export function PublicSearchFilterBar({
   onOpenFilter = null,
 } = {}) {
   const section = document.createElement("section");
-  section.className = "relative z-30 grid gap-1 rounded-[24px] border border-white/70 bg-white/95 p-2.5 text-xs shadow-card backdrop-blur sm:p-4 sm:text-sm xl:grid-cols-[minmax(0,1fr)_280px] sm:items-start";
+  section.className = "relative z-30 grid gap-1 rounded-[24px] border border-white/70 bg-white/95 p-2.5 text-[10px] shadow-card backdrop-blur sm:p-4 sm:text-xs xl:grid-cols-[minmax(0,1fr)_280px] sm:items-start";
   applyDesignHook(section, "catalog.search.bar");
 
   const form = document.createElement("form");
@@ -38,7 +38,7 @@ export function PublicSearchFilterBar({
   input.type = "search";
   input.value = filters.keyword ?? "";
   input.placeholder = "Cari mobil impian Anda...";
-  input.className = "min-w-0 flex-1 bg-transparent pr-1 text-sm text-[var(--pb-text-strong)] outline-none placeholder:text-sm placeholder:text-[var(--pb-text-muted)]";
+  input.className = "min-w-0 flex-1 bg-transparent pr-1 text-xs text-[var(--pb-text-strong)] outline-none placeholder:text-xs placeholder:text-[var(--pb-text-muted)]";
   applyDesignHook(input, "catalog.search.input");
 
   const submit = document.createElement("button");
@@ -66,7 +66,7 @@ export function PublicSearchFilterBar({
 
 function actionRow({ activeFilterCount, quickFilter, onQuickFilter, onOpenFilter }) {
   const row = document.createElement("div");
-  row.className = "relative z-40 flex shrink-0 items-center gap-1 overflow-visible text-xs";
+  row.className = "relative z-40 flex shrink-0 items-center gap-1 overflow-visible text-[10px]";
   applyDesignHook(row, "catalog.filter.toolbar");
   row.style.fontSize = "12px";
 
@@ -77,7 +77,7 @@ function actionRow({ activeFilterCount, quickFilter, onQuickFilter, onOpenFilter
     designHook: "shared.button.secondary",
   });
   filterButton.setAttribute("aria-label", activeFilterCount > 0 ? `Filter, ${activeFilterCount} aktif` : "Filter");
-  filterButton.classList.add("h-7", "w-7", "min-h-0", "justify-center", "rounded-[var(--pb-radius-lg)]", "p-0", "text-xs", "sm:h-8", "sm:w-8");
+  filterButton.classList.add("h-7", "w-7", "min-h-0", "justify-center", "rounded-[var(--pb-radius-lg)]", "p-0", "text-[10px]", "sm:h-8", "sm:w-8");
   filterButton.prepend(createIcon("filter", { className: "h-4 w-4" }));
 
   const sortWrap = document.createElement("div");
@@ -99,8 +99,8 @@ function actionRow({ activeFilterCount, quickFilter, onQuickFilter, onOpenFilter
     const item = document.createElement("button");
     item.type = "button";
     item.className = option.value === quickFilter
-      ? "flex w-full items-center justify-between rounded-[var(--pb-radius-xl)] bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] px-3 py-2 text-left text-xs font-semibold text-[var(--pb-brand-secondary)]"
-      : "flex w-full items-center justify-between rounded-[var(--pb-radius-xl)] px-3 py-2 text-left text-xs font-medium text-[var(--pb-text-muted)] hover:bg-[var(--pb-surface-muted)]";
+      ? "flex w-full items-center justify-between rounded-[var(--pb-radius-xl)] bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] px-3 py-2 text-left text-[10px] font-semibold text-[var(--pb-brand-secondary)]"
+      : "flex w-full items-center justify-between rounded-[var(--pb-radius-xl)] px-3 py-2 text-left text-[10px] font-medium text-[var(--pb-text-muted)] hover:bg-[var(--pb-surface-muted)]";
     item.textContent = option.label;
     item.addEventListener("click", () => {
       menu.classList.add("hidden");
@@ -134,7 +134,7 @@ function locationSelector({ filters, options, onSearch }) {
   // wrap.className = "grid gap-2 rounded-[var(--pb-radius-xl)] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] px-4 py-3 shadow-[var(--pb-shadow-soft)]";
   //
   // const label = document.createElement("span");
-  // label.className = "text-[11px] font-semibold uppercase tracking-normal text-[var(--pb-text-muted)]";
+  // label.className = "text-[10px] font-semibold uppercase tracking-normal text-[var(--pb-text-muted)]";
   // label.textContent = "Lokasi";
   //
   // const row = document.createElement("div");
@@ -146,7 +146,7 @@ function locationSelector({ filters, options, onSearch }) {
   //
   // const select = document.createElement("select");
   // select.name = "location_name";
-  // select.className = "min-w-0 flex-1 bg-transparent text-sm font-semibold text-[var(--pb-text-strong)] outline-none";
+  // select.className = "min-w-0 flex-1 bg-transparent text-xs font-semibold text-[var(--pb-text-strong)] outline-none";
   // withEmptyOption(options.locations ?? [], "Pilih lokasi").forEach((option) => {
   //   const item = document.createElement("option");
   //   item.value = option.value;

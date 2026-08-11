@@ -102,7 +102,7 @@ function renderBanner(host, state) {
   const actor = impersonation.actor ?? state.auth.actor ?? null;
   const target = impersonation.target ?? state.auth.user ?? null;
   const panel = document.createElement("div");
-  panel.className = "mt-3 flex min-w-0 flex-col gap-3 rounded-2xl border border-[color-mix(in_srgb,var(--pb-warning)_42%,white)] bg-[color-mix(in_srgb,var(--pb-warning)_8%,white)] px-4 py-3 text-sm text-[color-mix(in_srgb,var(--pb-warning)_84%,black)] shadow-sm md:flex-row md:items-center md:justify-between";
+  panel.className = "mt-3 flex min-w-0 flex-col gap-3 rounded-2xl border border-[color-mix(in_srgb,var(--pb-warning)_42%,white)] bg-[color-mix(in_srgb,var(--pb-warning)_8%,white)] px-4 py-3 text-xs text-[color-mix(in_srgb,var(--pb-warning)_84%,black)] shadow-sm md:flex-row md:items-center md:justify-between";
 
   const copy = document.createElement("div");
   copy.className = "grid min-w-0 gap-1";
@@ -143,7 +143,7 @@ function renderBanner(host, state) {
 function profileButton(store) {
   const button = document.createElement("button");
   button.type = "button";
-  button.className = "inline-flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[var(--pb-border)] bg-[var(--pb-surface-card)] text-sm font-black text-[var(--pb-brand-secondary)] shadow-[var(--pb-shadow-soft)] transition hover:bg-[var(--pb-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)] disabled:cursor-not-allowed disabled:opacity-55";
+  button.className = "inline-flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[var(--pb-border)] bg-[var(--pb-surface-card)] text-xs font-black text-[var(--pb-brand-secondary)] shadow-[var(--pb-shadow-soft)] transition hover:bg-[var(--pb-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)] disabled:cursor-not-allowed disabled:opacity-55";
   button.setAttribute("aria-label", "Profil pengguna");
   button.title = "Profil";
   applyDesignHook(button, "shared.button.secondary");

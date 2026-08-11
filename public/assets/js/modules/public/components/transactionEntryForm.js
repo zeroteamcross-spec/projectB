@@ -20,10 +20,10 @@ export function TransactionEntryForm({
   eyebrow.className = tw.text.eyebrow;
   eyebrow.textContent = "Payment setup";
   const title = document.createElement("h2");
-  title.className = "text-xl font-bold tracking-normal text-gray-950";
+  title.className = "text-lg font-bold tracking-normal text-gray-950";
   title.textContent = "Booking Sekarang";
   const body = document.createElement("p");
-  body.className = "text-sm leading-6 text-gray-600";
+  body.className = "text-xs leading-6 text-gray-600";
   body.textContent = "Bayar Booking Fee untuk mengunci unit ini. Sesi pembayaran dibuat setelah form dikirim.";
   header.append(eyebrow, title, body);
 
@@ -82,16 +82,16 @@ function bookingFeeBlock(car) {
   wrap.className = "grid gap-1 rounded-2xl border border-[color-mix(in_srgb,var(--pb-brand-primary)_24%,white)] bg-[color-mix(in_srgb,var(--pb-brand-primary)_8%,white)] px-4 py-3";
 
   const label = document.createElement("span");
-  label.className = "text-xs font-bold uppercase tracking-wide text-[var(--pb-brand-secondary)]";
+  label.className = "text-[10px] font-bold uppercase tracking-wide text-[var(--pb-brand-secondary)]";
   label.textContent = "Booking Fee";
 
   const value = document.createElement("strong");
   value.id = "pubtrx_booking_fee_value";
-  value.className = "text-2xl font-black leading-tight text-[var(--pb-text)]";
+  value.className = "text-xl font-black leading-tight text-[var(--pb-text)]";
   value.textContent = nominal > 0 ? formatCurrency(nominal) : "Belum ditentukan showroom";
 
   const hint = document.createElement("span");
-  hint.className = "text-xs font-medium text-gray-600";
+  hint.className = "text-[10px] font-medium text-gray-600";
   hint.textContent = nominal > 0
     ? "Nominal ditentukan showroom dan tidak dapat diubah. Sisa pembayaran diselesaikan langsung dengan showroom."
     : "Showroom belum menetapkan Booking Fee untuk unit ini, sehingga transaksi belum bisa dibuat.";
@@ -105,7 +105,7 @@ function paymentMethodBlock(value, onChange) {
   wrap.className = "grid gap-3";
 
   const label = document.createElement("span");
-  label.className = "text-sm font-bold text-gray-800";
+  label.className = "text-xs font-bold text-gray-800";
   label.textContent = "Metode pembayaran";
 
   const grid = document.createElement("div");
@@ -135,11 +135,11 @@ function radioCard(name, value, title, body, currentValue, onChange) {
   input.addEventListener("change", () => onChange?.({ [name]: value }));
 
   const strong = document.createElement("strong");
-  strong.className = "text-base text-gray-950";
+  strong.className = "text-sm text-gray-950";
   strong.textContent = title;
 
   const text = document.createElement("span");
-  text.className = "text-xs text-gray-500";
+  text.className = "text-[10px] text-gray-500";
   text.textContent = body;
 
   label.append(input, strong, text);
@@ -150,10 +150,10 @@ function carPriceHint(car) {
   const box = document.createElement("div");
   box.className = `${tw.surface.inset} grid gap-2 shadow-sm`;
   const label = document.createElement("p");
-  label.className = "text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]";
+  label.className = "text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]";
   label.textContent = "Harga transaksi";
   const value = document.createElement("p");
-  value.className = "text-2xl font-bold text-gray-950";
+  value.className = "text-xl font-bold text-gray-950";
   value.textContent = formatCurrency(effectivePrice(car));
   box.append(label, value);
   return box;
@@ -161,7 +161,7 @@ function carPriceHint(car) {
 
 function instructionStrip() {
   const strip = document.createElement("div");
-  strip.className = "grid gap-2 border-t border-white/60 pt-4 text-sm text-gray-600";
+  strip.className = "grid gap-2 border-t border-white/60 pt-4 text-xs text-gray-600";
   [
     "Pilih DP bila ingin membuat sesi pembayaran uang muka terlebih dahulu.",
     "Setelah submit, buyer langsung mendapat transaction record dan payment session awal.",

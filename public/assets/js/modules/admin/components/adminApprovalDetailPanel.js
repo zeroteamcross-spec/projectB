@@ -44,9 +44,9 @@ export function AdminApprovalDetailPanel({
   const copy = document.createElement("div");
   copy.className = "grid min-w-0 gap-2";
   copy.append(
-    textBlock("text-[11px] font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", "Approval dossier"),
-    textBlock("text-xl font-black text-gray-950", user.name || user.email || `User #${user.id}`),
-    textBlock(`text-sm ${tw.text.muted}`, `${user.email || "-"} | ${user.role || "-"}`),
+    textBlock("text-[10px] font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", "Approval dossier"),
+    textBlock("text-lg font-black text-gray-950", user.name || user.email || `User #${user.id}`),
+    textBlock(`text-xs ${tw.text.muted}`, `${user.email || "-"} | ${user.role || "-"}`),
   );
 
   const badges = document.createElement("div");
@@ -92,7 +92,7 @@ export function AdminApprovalDetailPanel({
     approve.prepend(createIcon("sparkles", { className: "h-4 w-4" }));
     actions.append(approve);
   } else {
-    actions.append(textBlock("text-sm text-[color-mix(in_srgb,var(--pb-success)_84%,black)]", "Approval sudah diproses. User ini tidak lagi membutuhkan tindakan approval dasar."));
+    actions.append(textBlock("text-xs text-[color-mix(in_srgb,var(--pb-success)_84%,black)]", "Approval sudah diproses. User ini tidak lagi membutuhkan tindakan approval dasar."));
   }
 
   const management = Button({
@@ -105,7 +105,7 @@ export function AdminApprovalDetailPanel({
   actions.append(management);
 
   if (adminApprovalQueueService.isApprovable(user)) {
-    const note = textBlock("text-sm leading-6 text-[color-mix(in_srgb,var(--pb-warning)_84%,black)] sm:col-span-2", meta.description);
+    const note = textBlock("text-xs leading-6 text-[color-mix(in_srgb,var(--pb-warning)_84%,black)] sm:col-span-2", meta.description);
     actions.append(note);
   }
 

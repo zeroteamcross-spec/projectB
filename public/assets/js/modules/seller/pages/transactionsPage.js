@@ -330,9 +330,9 @@ function transactionsHero({ transactions, filteredTransactions, onDashboard }) {
   icon.append(createIcon("transaction", { className: "block h-5 w-5 leading-none" }));
   copy.append(
     icon,
-    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", "Seller transaction desk"),
-    textNode("h1", "max-w-3xl text-3xl font-black leading-tight tracking-normal text-gray-950 sm:text-4xl", "Transaksi"),
-    textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", "Pantau transaksi mobil, status pembayaran, dan progres penjualan."),
+    textNode("p", "text-[10px] font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", "Seller transaction desk"),
+    textNode("h1", "max-w-3xl text-2xl font-black leading-tight tracking-normal text-gray-950 sm:text-3xl", "Transaksi"),
+    textNode("p", "max-w-2xl text-xs leading-6 text-gray-600", "Pantau transaksi mobil, status pembayaran, dan progres penjualan."),
   );
 
   const side = document.createElement("section");
@@ -347,8 +347,8 @@ function transactionsHero({ transactions, filteredTransactions, onDashboard }) {
     const card = document.createElement("section");
     card.className = "rounded-[1.25rem] border border-white/80 bg-white/78 p-3 shadow-sm";
     card.append(
-      textNode("p", "text-[11px] font-black uppercase tracking-[0.14em] text-gray-500", label),
-      textNode("p", "break-words text-2xl font-black text-gray-950", String(value)),
+      textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label),
+      textNode("p", "break-words text-xl font-black text-gray-950", String(value)),
     );
     stats.append(card);
   });
@@ -540,7 +540,7 @@ function uniqueValues(values = []) {
 
 function controlWrap(label) {
   const wrap = document.createElement("label");
-  wrap.className = "grid min-w-0 gap-1.5 text-sm font-bold text-gray-700";
+  wrap.className = "grid min-w-0 gap-1.5 text-xs font-bold text-gray-700";
   wrap.textContent = label;
   return wrap;
 }
@@ -554,7 +554,7 @@ function optionNode(value, label, selected = false) {
 }
 
 function controlClassName() {
-  return "min-h-11 min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-2.5 text-sm font-semibold text-[var(--pb-text)] outline-none transition duration-150 placeholder:text-[var(--pb-text-muted)] focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  return "min-h-11 min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-2.5 text-xs font-semibold text-[var(--pb-text)] outline-none transition duration-150 placeholder:text-[var(--pb-text-muted)] focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
 }
 
 function textNode(tagName, className, text) {

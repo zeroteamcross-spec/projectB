@@ -34,11 +34,11 @@ export function AffiliateActivityPanel({ affiliate = null } = {}) {
       label.textContent = `${ledger.entry_type} | ${formatCurrency(ledger.amount)}`;
 
       const date = document.createElement("p");
-      date.className = "text-sm text-gray-500";
+      date.className = "text-xs text-gray-500";
       date.textContent = formatDate(ledger.created_at);
 
       const notes = document.createElement("p");
-      notes.className = "break-words text-sm leading-6 text-gray-600";
+      notes.className = "break-words text-xs leading-6 text-gray-600";
       notes.textContent = ledger.notes || (ledger.transaction_id ? `Terkait transaksi #${ledger.transaction_id}` : "Belum ada catatan tambahan.");
 
       heading.append(label, date);

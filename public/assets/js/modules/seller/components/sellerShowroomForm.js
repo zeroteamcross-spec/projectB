@@ -12,20 +12,20 @@ export function SellerShowroomForm({ showroom = null, saving = false, error = ""
   header.id = "slrsr_form_header_section";
   header.className = "grid gap-2 border-b border-gray-100 pb-5";
   const eyebrow = document.createElement("p");
-  eyebrow.className = "text-xs font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]";
+  eyebrow.className = "text-[10px] font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]";
   eyebrow.textContent = showroom ? "Edit showroom" : "Setup showroom";
   const title = document.createElement("h2");
   title.className = tw.text.sectionTitle;
   title.textContent = showroom ? "Edit showroom" : "Buat showroom";
 
   const helper = document.createElement("p");
-  helper.className = `max-w-2xl text-sm leading-6 ${tw.text.muted}`;
+  helper.className = `max-w-2xl text-xs leading-6 ${tw.text.muted}`;
   helper.textContent = "Isi data utama showroom dan rekening seller untuk kebutuhan transaksi.";
   header.append(eyebrow, title, helper);
 
   const errorNode = document.createElement("p");
   errorNode.id = "slrsr_error_section";
-  errorNode.className = "rounded-[1.25rem] border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
+  errorNode.className = "rounded-[1.25rem] border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-xs font-semibold text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
   errorNode.textContent = error;
   errorNode.hidden = !error;
 
@@ -79,7 +79,7 @@ function fieldGroup(id, title, iconName) {
   icon.className = "grid h-9 w-9 shrink-0 place-items-center rounded-2xl bg-[var(--pb-surface-muted)] text-[var(--pb-brand-secondary)]";
   icon.append(createIcon(iconName, { className: "h-4 w-4" }));
   const label = document.createElement("h3");
-  label.className = "text-sm font-black text-gray-950";
+  label.className = "text-xs font-black text-gray-950";
   label.textContent = title;
   header.append(icon, label);
 
@@ -92,14 +92,14 @@ function fieldGroup(id, title, iconName) {
 
 function inputField({ id, name, label, value = "", placeholder = "" }) {
   const wrap = document.createElement("label");
-  wrap.className = "grid min-w-0 gap-1.5 text-sm font-bold text-gray-700";
+  wrap.className = "grid min-w-0 gap-1.5 text-xs font-bold text-gray-700";
   wrap.textContent = label;
   const input = document.createElement("input");
   input.id = id;
   input.name = name;
   input.value = value ?? "";
   input.placeholder = placeholder;
-  input.className = "min-h-11 min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-2.5 text-sm font-semibold text-[var(--pb-text)] outline-none transition duration-150 placeholder:text-[var(--pb-text-muted)] focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  input.className = "min-h-11 min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-2.5 text-xs font-semibold text-[var(--pb-text)] outline-none transition duration-150 placeholder:text-[var(--pb-text-muted)] focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
   wrap.append(input);
   return wrap;
 }
@@ -110,7 +110,7 @@ function bankSelectField({ id, name, label, value = "", banks = [] }) {
 
   const wrap = document.createElement("section");
   wrap.id = "slrsr_bank_type_field_section";
-  wrap.className = "relative grid min-w-0 gap-1.5 text-sm font-bold text-gray-700";
+  wrap.className = "relative grid min-w-0 gap-1.5 text-xs font-bold text-gray-700";
 
   const labelNode = document.createElement("label");
   labelNode.htmlFor = id;
@@ -125,7 +125,7 @@ function bankSelectField({ id, name, label, value = "", banks = [] }) {
   const button = document.createElement("button");
   button.id = "slrsr_bank_type_button";
   button.type = "button";
-  button.className = "flex min-h-11 min-w-0 items-center justify-between gap-3 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-left text-sm font-semibold text-[var(--pb-text)] outline-none transition duration-150 focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  button.className = "flex min-h-11 min-w-0 items-center justify-between gap-3 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-left text-xs font-semibold text-[var(--pb-text)] outline-none transition duration-150 focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
 
   const menu = document.createElement("section");
   menu.id = "slrsr_bank_type_menu_section";
@@ -162,7 +162,7 @@ function bankSelectField({ id, name, label, value = "", banks = [] }) {
   if (!normalizedBanks.length) {
     const empty = document.createElement("section");
     empty.id = "slrsr_bank_type_empty_section";
-    empty.className = "rounded-xl bg-gray-50 px-3 py-2 text-sm font-semibold text-gray-500";
+    empty.className = "rounded-xl bg-gray-50 px-3 py-2 text-xs font-semibold text-gray-500";
     empty.textContent = "Master Bank belum tersedia.";
     menu.append(empty);
   }
@@ -172,16 +172,16 @@ function bankSelectField({ id, name, label, value = "", banks = [] }) {
     option.id = `slrsr_bank_type_option_${slugify(bank.slug || bank.id || bank.bank_code)}_button`;
     option.type = "button";
     option.className = bank.slug === selectedBank?.slug
-      ? "flex w-full min-w-0 items-center gap-3 rounded-xl bg-[var(--pb-surface-muted)] px-3 py-2 text-left text-sm font-black text-[var(--pb-brand-secondary)]"
-      : "flex w-full min-w-0 items-center gap-3 rounded-xl px-3 py-2 text-left text-sm font-semibold text-gray-700 transition hover:bg-gray-50";
+      ? "flex w-full min-w-0 items-center gap-3 rounded-xl bg-[var(--pb-surface-muted)] px-3 py-2 text-left text-xs font-black text-[var(--pb-brand-secondary)]"
+      : "flex w-full min-w-0 items-center gap-3 rounded-xl px-3 py-2 text-left text-xs font-semibold text-gray-700 transition hover:bg-gray-50";
     option.append(bankChoiceContent(bank));
     option.addEventListener("click", () => {
       selectedBank = bank;
       input.value = bank.slug;
       [...menu.querySelectorAll("button")].forEach((node) => {
-        node.className = "flex w-full min-w-0 items-center gap-3 rounded-xl px-3 py-2 text-left text-sm font-semibold text-gray-700 transition hover:bg-gray-50";
+        node.className = "flex w-full min-w-0 items-center gap-3 rounded-xl px-3 py-2 text-left text-xs font-semibold text-gray-700 transition hover:bg-gray-50";
       });
-      option.className = "flex w-full min-w-0 items-center gap-3 rounded-xl bg-[var(--pb-surface-muted)] px-3 py-2 text-left text-sm font-black text-[var(--pb-brand-secondary)]";
+      option.className = "flex w-full min-w-0 items-center gap-3 rounded-xl bg-[var(--pb-surface-muted)] px-3 py-2 text-left text-xs font-black text-[var(--pb-brand-secondary)]";
       syncButton();
       closeMenu();
     });
@@ -213,7 +213,7 @@ function bankChoiceContent(bank, fallbackLabel = "") {
   name.className = "min-w-0 truncate";
   name.textContent = bank?.bank_name || fallbackLabel;
   const code = document.createElement("span");
-  code.className = "text-xs font-semibold text-gray-500";
+  code.className = "text-[10px] font-semibold text-gray-500";
   code.textContent = bank?.bank_code ? `Kode ${bank.bank_code}` : "Pilih dari Master Bank";
   copy.append(name, code);
   content.append(icon, copy);
@@ -236,7 +236,7 @@ function findSelectedBank(banks = [], value = "") {
 
 function textareaField({ id, name, label, value = "", placeholder = "" }) {
   const wrap = document.createElement("label");
-  wrap.className = "grid min-w-0 gap-1.5 text-sm font-bold text-gray-700";
+  wrap.className = "grid min-w-0 gap-1.5 text-xs font-bold text-gray-700";
   wrap.textContent = label;
   const textarea = document.createElement("textarea");
   textarea.id = id;
@@ -244,7 +244,7 @@ function textareaField({ id, name, label, value = "", placeholder = "" }) {
   textarea.value = value ?? "";
   textarea.placeholder = placeholder;
   textarea.rows = 4;
-  textarea.className = "min-h-28 min-w-0 resize-y rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-3 text-sm font-semibold leading-6 text-[var(--pb-text)] outline-none transition duration-150 placeholder:text-[var(--pb-text-muted)] focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  textarea.className = "min-h-28 min-w-0 resize-y rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-3 text-xs font-semibold leading-6 text-[var(--pb-text)] outline-none transition duration-150 placeholder:text-[var(--pb-text-muted)] focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
   wrap.append(textarea);
   return wrap;
 }

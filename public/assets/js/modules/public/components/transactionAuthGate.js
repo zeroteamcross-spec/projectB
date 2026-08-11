@@ -18,10 +18,10 @@ export function TransactionAuthGate({
   eyebrow.className = tw.text.eyebrow;
   eyebrow.textContent = "Akun akses";
   const title = document.createElement("h2");
-  title.className = "text-xl font-bold tracking-normal text-gray-950";
+  title.className = "text-lg font-bold tracking-normal text-gray-950";
   title.textContent = "Masuk";
   const body = document.createElement("p");
-  body.className = "text-sm leading-6 text-gray-600";
+  body.className = "text-xs leading-6 text-gray-600";
   body.textContent = "Transaksi membutuhkan akun aktif agar pesanan dan pembayaran tercatat aman.";
   header.append(eyebrow, title, body);
 
@@ -67,10 +67,10 @@ function loginForm({ isSubmitting, onLogin }) {
   button.id = "google_login_buyer_button";
   button.type = "button";
   button.disabled = isSubmitting;
-  button.className = "inline-flex min-h-12 w-full items-center justify-center gap-3 rounded-[1rem] border border-white/60 bg-[linear-gradient(135deg,rgba(255,255,255,0.84),rgba(224,239,247,0.58))] px-4 text-sm font-black tracking-normal text-[#171a35] shadow-[inset_0_1px_0_rgba(255,255,255,0.88),0_14px_30px_rgba(23,105,143,0.13)] backdrop-blur transition duration-200 hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-4 focus:ring-[#e0eff7] disabled:cursor-wait disabled:opacity-70";
+  button.className = "inline-flex min-h-12 w-full items-center justify-center gap-3 rounded-[1rem] border border-white/60 bg-[linear-gradient(135deg,rgba(255,255,255,0.84),rgba(224,239,247,0.58))] px-4 text-xs font-black tracking-normal text-[#171a35] shadow-[inset_0_1px_0_rgba(255,255,255,0.88),0_14px_30px_rgba(23,105,143,0.13)] backdrop-blur transition duration-200 hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-4 focus:ring-[#e0eff7] disabled:cursor-wait disabled:opacity-70";
 
   const icon = document.createElement("span");
-  icon.className = "grid h-5 w-5 shrink-0 place-items-center text-lg font-black leading-none";
+  icon.className = "grid h-5 w-5 shrink-0 place-items-center text-base font-black leading-none";
   icon.textContent = "G";
   icon.style.background = "conic-gradient(from -45deg,#4285f4 0 25%,#34a853 0 50%,#fbbc05 0 75%,#ea4335 0 100%)";
   icon.style.setProperty("-webkit-background-clip", "text");
@@ -87,7 +87,7 @@ function loginForm({ isSubmitting, onLogin }) {
   });
 
   const note = document.createElement("p");
-  note.className = "text-xs leading-5 text-gray-500 text-center mt-2";
+  note.className = "text-[10px] leading-5 text-gray-500 text-center mt-2";
   note.textContent = "";
 
   form.append(button, note);
@@ -146,7 +146,7 @@ function submitButton(label, disabled = false) {
 
 function helperStrip() {
   const strip = document.createElement("div");
-  strip.className = "grid gap-2 border-t border-white/60 pt-4 text-sm text-gray-600";
+  strip.className = "grid gap-2 border-t border-white/60 pt-4 text-xs text-gray-600";
   [
     "",
     "",

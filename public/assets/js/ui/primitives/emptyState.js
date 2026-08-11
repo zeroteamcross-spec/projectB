@@ -10,17 +10,17 @@ export function EmptyState({ title = "Data belum tersedia", description = "", ac
   glow.className = "pointer-events-none absolute left-1/2 top-0 h-24 w-36 -translate-x-1/2 rounded-full bg-gradient-to-br from-[color-mix(in_srgb,var(--pb-brand-accent)_45%,white)] via-transparent to-transparent blur-2xl";
 
   const eyebrow = document.createElement("p");
-  eyebrow.className = "text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]";
+  eyebrow.className = "text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]";
   eyebrow.textContent = "Status";
 
   const heading = document.createElement("strong");
-  heading.className = "mt-2 block text-base text-gray-800";
+  heading.className = "mt-2 block text-sm text-gray-800";
   heading.textContent = title;
   node.append(glow, eyebrow, heading);
 
   if (description) {
     const text = document.createElement("p");
-    text.className = "mt-2 text-sm leading-6";
+    text.className = "mt-2 text-xs leading-6";
     text.textContent = description;
     node.append(text);
   }

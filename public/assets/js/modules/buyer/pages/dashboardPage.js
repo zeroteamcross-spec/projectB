@@ -230,8 +230,8 @@ function buyerTopNavigation({ activePath, actions }) {
   const brandCopy = document.createElement("section");
   brandCopy.className = "grid min-w-0 gap-0.5";
   brandCopy.append(
-    textNode("strong", "truncate text-base font-black text-[var(--pb-text)]", "Premium Buyer"),
-    textNode("span", "truncate text-sm font-bold text-[var(--pb-brand-secondary)]", `Halo, ${buyerName(user)}`),
+    textNode("strong", "truncate text-sm font-black text-[var(--pb-text)]", "Premium Buyer"),
+    textNode("span", "truncate text-xs font-bold text-[var(--pb-brand-secondary)]", `Halo, ${buyerName(user)}`),
   );
   brand.append(
     iconBox({ size: "h-11 w-11", className: "bg-[linear-gradient(135deg,var(--pb-btn-primary-from),var(--pb-btn-primary-to))] text-white shadow-[var(--pb-shadow-soft)]", icon: "car", iconSize: "h-5 w-5" }),
@@ -290,9 +290,9 @@ function buyerHero({ cars, notFound, actions }) {
   const copy = document.createElement("section");
   copy.className = "relative z-10 grid max-w-[300px] gap-4 md:max-w-[430px] md:gap-5";
   copy.append(
-    textNode("p", "inline-flex w-fit rounded-full border border-[color-mix(in_srgb,var(--pb-brand-primary)_20%,var(--pb-border))] bg-[color-mix(in_srgb,var(--pb-brand-primary)_8%,white)] px-4 py-2 text-xs font-black text-[var(--pb-brand-secondary)] shadow-[var(--pb-shadow-soft)]", "Temukan Sekarang"),
-    textNode("h1", "break-words text-4xl font-black leading-[1.08] tracking-normal text-[var(--pb-text)] md:text-5xl", notFound ? "HALAMAN TIDAK DITEMUKAN" : "MILIKI MOBIL IMPIAN ANDA"),
-    textNode("p", "max-w-[25rem] text-sm font-semibold leading-6 text-[var(--pb-text-muted)] md:text-base", "Kualitas terbaik, pilihan premium untuk setiap perjalanan."),
+    textNode("p", "inline-flex w-fit rounded-full border border-[color-mix(in_srgb,var(--pb-brand-primary)_20%,var(--pb-border))] bg-[color-mix(in_srgb,var(--pb-brand-primary)_8%,white)] px-4 py-2 text-[10px] font-black text-[var(--pb-brand-secondary)] shadow-[var(--pb-shadow-soft)]", "Temukan Sekarang"),
+    textNode("h1", "break-words text-3xl font-black leading-[1.08] tracking-normal text-[var(--pb-text)] md:text-4xl", notFound ? "HALAMAN TIDAK DITEMUKAN" : "MILIKI MOBIL IMPIAN ANDA"),
+    textNode("p", "max-w-[25rem] text-xs font-semibold leading-6 text-[var(--pb-text-muted)] md:text-sm", "Kualitas terbaik, pilihan premium untuk setiap perjalanan."),
   );
 
   const cta = Button({ label: "Lihat Koleksi", onClick: actions.openCatalog, designHook: "shared.button.primary" });
@@ -389,10 +389,10 @@ function buyerCategoryMenu({ activePath, actions }) {
         CATEGORY_ICON_STYLES[index % CATEGORY_ICON_STYLES.length],
       ].join(" "),
       icon: item.icon,
-      iconSize: "text-[30px]",
+      iconSize: "text-[24.9px]",
     });
 
-    button.append(icon, textNode("span", "max-w-full truncate text-sm font-semibold text-[var(--pb-text-strong)]", item.label));
+    button.append(icon, textNode("span", "max-w-full truncate text-xs font-semibold text-[var(--pb-text-strong)]", item.label));
     section.append(grid);
     grid.append(button);
   });
@@ -418,8 +418,8 @@ function latestTransactionsSection({ transactions, actions }) {
     columns: [
       { label: "Transaksi", render: (transaction) => transactionIdentity(transaction) },
       { label: "Mobil", render: (transaction) => transactionCar(transaction) },
-      { label: "Tanggal", render: (transaction) => textNode("span", "text-sm font-semibold text-[var(--pb-text-strong)]", formatDate(transaction.created_at)) },
-      { label: "Nilai", render: (transaction) => textNode("span", "text-sm font-black text-[var(--pb-text-strong)]", formatCurrency(transaction.car_price ?? transaction.dp_amount ?? 0)) },
+      { label: "Tanggal", render: (transaction) => textNode("span", "text-xs font-semibold text-[var(--pb-text-strong)]", formatDate(transaction.created_at)) },
+      { label: "Nilai", render: (transaction) => textNode("span", "text-xs font-black text-[var(--pb-text-strong)]", formatCurrency(transaction.car_price ?? transaction.dp_amount ?? 0)) },
       { label: "Status", render: (transaction) => transactionStatusBadge(transaction.transaction_status) },
       { label: "Aksi", render: (transaction) => transactionAction(transaction, actions) },
     ],
@@ -490,8 +490,8 @@ function recommendationsToolbar({ count, actions }) {
   copy.className = "grid min-w-0 gap-1";
   // copy.className = "";
   copy.append(
-    textNode("h2", "break-words text-sm font-bold tracking-normal text-[var(--pb-text-strong)]", "Mobil Favorit Saya"),
-    // textNode("p", "text-sm font-medium text-white/70", count ? `${count} rekomendasi tersedia` : "Rekomendasi akan muncul di sini"),
+    textNode("h2", "break-words text-xs font-bold tracking-normal text-[var(--pb-text-strong)]", "Mobil Favorit Saya"),
+    // textNode("p", "text-xs font-medium text-white/70", count ? `${count} rekomendasi tersedia` : "Rekomendasi akan muncul di sini"),
   );
 
   const action = "";
@@ -511,18 +511,18 @@ function creditPromoBanner(actions) {
   const copy = document.createElement("section");
   copy.className = "relative z-10 grid min-w-0 gap-2";
   copy.append(
-    textNode("p", "text-sm font-black uppercase text-[var(--pb-brand-secondary)]", "PROMO TERBATAS"),
-    textNode("h2", "break-words text-2xl font-black tracking-normal text-[var(--pb-text)]", "Kredit Mobil Lebih Mudah"),
-    textNode("p", "text-sm font-semibold text-[var(--pb-text-muted)]", "Bunga mulai dari"),
+    textNode("p", "text-xs font-black uppercase text-[var(--pb-brand-secondary)]", "PROMO TERBATAS"),
+    textNode("h2", "break-words text-xl font-black tracking-normal text-[var(--pb-text)]", "Kredit Mobil Lebih Mudah"),
+    textNode("p", "text-xs font-semibold text-[var(--pb-text-muted)]", "Bunga mulai dari"),
   );
 
   const rate = document.createElement("section");
   rate.className = "flex min-w-0 flex-wrap items-end gap-2";
   rate.append(
-    textNode("strong", "text-5xl font-black leading-none text-[var(--pb-brand-secondary)] md:text-6xl", "2,49%*"),
-    textNode("span", "pb-1 text-sm font-bold text-[var(--pb-text-strong)]", "per tahun"),
+    textNode("strong", "text-4xl font-black leading-none text-[var(--pb-brand-secondary)] md:text-5xl", "2,49%*"),
+    textNode("span", "pb-1 text-xs font-bold text-[var(--pb-text-strong)]", "per tahun"),
   );
-  copy.append(rate, textNode("p", "text-xs font-semibold text-[var(--pb-text-muted)]", "*S&K Berlaku"));
+  copy.append(rate, textNode("p", "text-[10px] font-semibold text-[var(--pb-text-muted)]", "*S&K Berlaku"));
 
   const visual = document.createElement("section");
   visual.className = "relative z-10 hidden min-w-0 md:block";
@@ -537,7 +537,7 @@ function creditPromoBanner(actions) {
   benefit.className = "relative z-10 grid min-w-0 gap-3";
   ["Proses Cepat", "DP Ringan", "Tenor Hingga 7 Tahun"].forEach((item) => {
     const row = document.createElement("section");
-    row.className = "flex min-w-0 items-center gap-3 text-sm font-semibold text-[var(--pb-text-strong)]";
+    row.className = "flex min-w-0 items-center gap-3 text-xs font-semibold text-[var(--pb-text-strong)]";
     row.append(
       iconBox({ size: "h-7 w-7", className: "rounded-full text-[var(--pb-brand-secondary)]", icon: "circleCheck", iconSize: "h-4 w-4" }),
       textNode("span", "min-w-0 break-words", item),
@@ -777,7 +777,7 @@ function refreshRecommendations(root, cars, actions, uiState) {
 function filterGroup(title, options) {
   const section = document.createElement("section");
   section.className = "grid min-w-0 gap-3";
-  section.append(textNode("h3", "text-sm font-black text-[var(--pb-text)]", title));
+  section.append(textNode("h3", "text-xs font-black text-[var(--pb-text)]", title));
 
   const grid = document.createElement("section");
   grid.className = "grid grid-cols-2 gap-2 sm:grid-cols-3";
@@ -934,7 +934,7 @@ function resolveBuyerUser() {
 function avatarNode(user) {
   const src = user?.avatar_url ?? user?.photo_url ?? user?.profile_photo_url ?? "";
   const wrap = document.createElement("span");
-  wrap.className = "inline-flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] text-base font-black text-[var(--pb-brand-secondary)] shadow-[var(--pb-shadow-card)] ring-1 ring-[var(--pb-border)]";
+  wrap.className = "inline-flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] text-sm font-black text-[var(--pb-brand-secondary)] shadow-[var(--pb-shadow-card)] ring-1 ring-[var(--pb-border)]";
 
   if (src) {
     const image = document.createElement("img");
@@ -957,8 +957,8 @@ function buyerProfileAction({ user, actions, compact = false } = {}) {
   const button = document.createElement("button");
   button.type = "button";
   button.className = compact
-    ? "inline-flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] text-sm font-black text-[var(--pb-brand-secondary)] shadow-[var(--pb-shadow-card)] ring-1 ring-[var(--pb-border)] transition hover:bg-[var(--pb-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]"
-    : "inline-flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] text-sm font-black text-[var(--pb-brand-secondary)] shadow-[var(--pb-shadow-card)] ring-1 ring-[var(--pb-border)] transition hover:bg-[var(--pb-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+    ? "inline-flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] text-xs font-black text-[var(--pb-brand-secondary)] shadow-[var(--pb-shadow-card)] ring-1 ring-[var(--pb-border)] transition hover:bg-[var(--pb-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]"
+    : "inline-flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] text-xs font-black text-[var(--pb-brand-secondary)] shadow-[var(--pb-shadow-card)] ring-1 ring-[var(--pb-border)] transition hover:bg-[var(--pb-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]";
   button.setAttribute("aria-label", "Buka profil buyer");
   button.title = "Profil";
   button.addEventListener("click", () => actions?.navigate?.("/profile"));
@@ -986,7 +986,7 @@ function greetingBlock(user) {
   wrap.className = "grid min-w-0 gap-0.5";
 
   const greeting = document.createElement("h1");
-  greeting.className = "truncate text-xl font-black leading-tight tracking-normal text-[var(--pb-text-strong)]";
+  greeting.className = "truncate text-lg font-black leading-tight tracking-normal text-[var(--pb-text-strong)]";
   greeting.textContent = ` ${name}`;
 
   wrap.append(greeting, textNode("p", "truncate text-[5] font-semibold text-[var(--pb-text-muted)]", "Selamat datang kembali!"));
@@ -1040,8 +1040,8 @@ function transactionIdentity(transaction) {
   const wrap = document.createElement("section");
   wrap.className = "grid min-w-0 gap-1";
   wrap.append(
-    textNode("p", "break-words text-sm font-black text-[var(--pb-text-strong)]", transaction.transaction_code || `Transaksi #${transaction.id ?? "-"}`),
-    textNode("p", "break-words text-xs font-semibold text-[var(--pb-text-muted)]", transaction.payment_type ? paymentTypeLabel(transaction.payment_type) : "Pembelian mobil"),
+    textNode("p", "break-words text-xs font-black text-[var(--pb-text-strong)]", transaction.transaction_code || `Transaksi #${transaction.id ?? "-"}`),
+    textNode("p", "break-words text-[10px] font-semibold text-[var(--pb-text-muted)]", transaction.payment_type ? paymentTypeLabel(transaction.payment_type) : "Pembelian mobil"),
   );
   return wrap;
 }
@@ -1050,8 +1050,8 @@ function transactionCar(transaction) {
   const wrap = document.createElement("section");
   wrap.className = "grid min-w-0 gap-1";
   wrap.append(
-    textNode("p", "break-words text-sm font-black text-[var(--pb-text-strong)]", transactionCarLabel(transaction)),
-    textNode("p", "break-words text-xs font-semibold text-[var(--pb-text-muted)]", transaction.car?.year ? `Tahun ${transaction.car.year}` : `Mobil #${transaction.car_id ?? "-"}`),
+    textNode("p", "break-words text-xs font-black text-[var(--pb-text-strong)]", transactionCarLabel(transaction)),
+    textNode("p", "break-words text-[10px] font-semibold text-[var(--pb-text-muted)]", transaction.car?.year ? `Tahun ${transaction.car.year}` : `Mobil #${transaction.car_id ?? "-"}`),
   );
   return wrap;
 }
@@ -1110,11 +1110,11 @@ function navIcon(icon, active) {
 
 function desktopNavClassName({ active, disabled }) {
   if (disabled) {
-    return "inline-flex min-w-0 items-center justify-center gap-2 rounded-full border border-transparent px-4 py-2 text-sm font-bold text-[var(--pb-text-muted)] opacity-55";
+    return "inline-flex min-w-0 items-center justify-center gap-2 rounded-full border border-transparent px-4 py-2 text-xs font-bold text-[var(--pb-text-muted)] opacity-55";
   }
   return active
-    ? "inline-flex min-w-0 items-center justify-center gap-2 rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] px-4 py-2 text-sm font-black text-[var(--pb-brand-secondary)] no-underline shadow-[var(--pb-shadow-soft)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]"
-    : "inline-flex min-w-0 items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-bold text-[var(--pb-text-muted)] no-underline transition hover:bg-[var(--pb-surface-muted)] hover:text-[var(--pb-text)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+    ? "inline-flex min-w-0 items-center justify-center gap-2 rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] px-4 py-2 text-xs font-black text-[var(--pb-brand-secondary)] no-underline shadow-[var(--pb-shadow-soft)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]"
+    : "inline-flex min-w-0 items-center justify-center gap-2 rounded-full px-4 py-2 text-xs font-bold text-[var(--pb-text-muted)] no-underline transition hover:bg-[var(--pb-surface-muted)] hover:text-[var(--pb-text)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]";
 }
 
 function isActiveNav(item, activePath) {
@@ -1134,7 +1134,7 @@ function isActiveNav(item, activePath) {
 function sectionTextButton(label, onClick) {
   const button = document.createElement("button");
   button.type = "button";
-  button.className = "inline-flex min-h-9 items-center justify-center gap-2 rounded-full px-2 text-sm font-black text-[var(--pb-brand-secondary)] transition hover:bg-[color-mix(in_srgb,var(--pb-brand-primary)_10%,transparent)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  button.className = "inline-flex min-h-9 items-center justify-center gap-2 rounded-full px-2 text-xs font-black text-[var(--pb-brand-secondary)] transition hover:bg-[color-mix(in_srgb,var(--pb-brand-primary)_10%,transparent)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]";
   button.textContent = label;
   button.addEventListener("click", onClick);
   button.append(createIcon("arrowRight", { className: "block h-3.5 w-3.5 leading-none" }));
@@ -1145,7 +1145,7 @@ function cardDetailButton(car, actions) {
   const button = document.createElement("button");
   button.id = `byr_car_${car.id ?? "unknown"}_detail_button`;
   button.type = "button";
-  button.className = "inline-flex min-h-8 shrink-0 items-center justify-center rounded-full px-3 text-xs font-black text-[var(--pb-brand-secondary)] transition hover:bg-[color-mix(in_srgb,var(--pb-brand-primary)_10%,transparent)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  button.className = "inline-flex min-h-8 shrink-0 items-center justify-center rounded-full px-3 text-[10px] font-black text-[var(--pb-brand-secondary)] transition hover:bg-[color-mix(in_srgb,var(--pb-brand-primary)_10%,transparent)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]";
   button.textContent = "Detail";
   button.addEventListener("click", () => actions.openCar(car));
   return button;
@@ -1164,8 +1164,8 @@ function isPremiumCar(car) {
 
 function optionButtonClassName(active) {
   return active
-    ? "inline-flex min-w-0 items-center gap-2 rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-brand-primary)_30%,var(--pb-border))] bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] px-3 py-2 text-sm font-black text-[var(--pb-brand-secondary)]"
-    : "inline-flex min-w-0 items-center gap-2 rounded-[1rem] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] px-3 py-2 text-sm font-bold text-[var(--pb-text-strong)] transition hover:bg-[var(--pb-surface-muted)]";
+    ? "inline-flex min-w-0 items-center gap-2 rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-brand-primary)_30%,var(--pb-border))] bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] px-3 py-2 text-xs font-black text-[var(--pb-brand-secondary)]"
+    : "inline-flex min-w-0 items-center gap-2 rounded-[1rem] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] px-3 py-2 text-xs font-bold text-[var(--pb-text-strong)] transition hover:bg-[var(--pb-surface-muted)]";
 }
 
 function syncOptionButtons(activeButton, siblings) {
@@ -1189,13 +1189,13 @@ function syncMultiOptionButtons(siblings, activeValues) {
 function detailCard(title, rows = []) {
   const card = document.createElement("section");
   card.className = "grid gap-3 rounded-[1.5rem] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] p-4 shadow-sm";
-  card.append(textNode("h3", "text-base font-black text-[var(--pb-text)]", title));
+  card.append(textNode("h3", "text-sm font-black text-[var(--pb-text)]", title));
   rows.forEach(([label, value]) => {
     const row = document.createElement("section");
     row.className = "grid gap-1 border-b border-[var(--pb-border)] pb-3 last:border-b-0 last:pb-0 sm:grid-cols-[160px_minmax(0,1fr)]";
     row.append(
-      textNode("p", "text-sm font-semibold text-[var(--pb-text-muted)]", label),
-      textNode("p", "break-words text-sm font-bold text-[var(--pb-text)] sm:text-right", value),
+      textNode("p", "text-xs font-semibold text-[var(--pb-text-muted)]", label),
+      textNode("p", "break-words text-xs font-bold text-[var(--pb-text)] sm:text-right", value),
     );
     card.append(row);
   });

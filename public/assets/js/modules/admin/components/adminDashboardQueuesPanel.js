@@ -154,8 +154,8 @@ function sectionHeader(title, description, onClick, buttonLabel, iconName, butto
   const copy = document.createElement("div");
   copy.className = "grid gap-1";
   copy.append(
-    textBlock("text-base font-black text-gray-950", title),
-    textBlock(`text-sm ${tw.text.muted}`, description),
+    textBlock("text-sm font-black text-gray-950", title),
+    textBlock(`text-xs ${tw.text.muted}`, description),
   );
 
   const titleGroup = document.createElement("div");

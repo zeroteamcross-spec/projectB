@@ -45,10 +45,10 @@ export function GalleryLightbox({
   const copy = document.createElement("div");
   copy.className = "min-w-0";
   const titleNode = document.createElement("h2");
-  titleNode.className = "truncate text-base font-bold tracking-tight text-white sm:text-lg";
+  titleNode.className = "truncate text-sm font-bold tracking-tight text-white sm:text-base";
   titleNode.textContent = title;
   const counter = document.createElement("p");
-  counter.className = "mt-0.5 text-xs font-semibold text-white/60";
+  counter.className = "mt-0.5 text-[10px] font-semibold text-white/60";
   copy.append(titleNode, counter);
 
   // Toolbar Controls (Play, Zoom In, Zoom Out, Zoom Reset, Fullscreen, Close)
@@ -106,7 +106,7 @@ export function GalleryLightbox({
   close.className = "inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/10 text-white shadow-lg transition hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/45 ml-1";
   close.setAttribute("aria-label", "Tutup preview galeri");
   const closeIcon = document.createElement("i");
-  closeIcon.className = "fa-solid fa-xmark text-base";
+  closeIcon.className = "fa-solid fa-xmark text-sm";
   close.replaceChildren(closeIcon);
 
   toolbar.append(playBtn, zoomOutBtn, zoomInBtn, zoomResetBtn, fullscreenBtn, close);
@@ -145,8 +145,8 @@ export function GalleryLightbox({
   info.className = "flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between";
   const captionWrap = document.createElement("div");
   captionWrap.className = "min-w-0";
-  const captionTitle = textNode("p", "truncate text-sm font-bold text-white");
-  const captionMeta = textNode("p", "text-xs font-semibold text-white/50");
+  const captionTitle = textNode("p", "truncate text-xs font-bold text-white");
+  const captionMeta = textNode("p", "text-[10px] font-semibold text-white/50");
   captionWrap.append(captionTitle, captionMeta);
 
   const badges = document.createElement("div");

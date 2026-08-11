@@ -175,7 +175,7 @@ function render(root, router, params, queueApi) {
     : "Gambar Mobil";
 
   const notice = document.createElement("p");
-  notice.className = "mb-4 rounded-lg border border-[color-mix(in_srgb,var(--pb-success)_26%,white)] bg-[color-mix(in_srgb,var(--pb-success)_8%,white)] px-3 py-2 text-sm font-medium text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
+  notice.className = "mb-4 rounded-lg border border-[color-mix(in_srgb,var(--pb-success)_26%,white)] bg-[color-mix(in_srgb,var(--pb-success)_8%,white)] px-3 py-2 text-xs font-medium text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
   notice.textContent = runtime.notice;
   notice.hidden = !runtime.notice;
 
@@ -291,10 +291,10 @@ function summaryMetric({ icon, label, value, tone }) {
   const copy = document.createElement("div");
   copy.className = "min-w-0";
   const title = document.createElement("p");
-  title.className = "text-xs font-semibold uppercase text-[var(--pb-text-muted)]";
+  title.className = "text-[10px] font-semibold uppercase text-[var(--pb-text-muted)]";
   title.textContent = label;
   const text = document.createElement("p");
-  text.className = "truncate text-sm font-bold text-[var(--pb-text)]";
+  text.className = "truncate text-xs font-bold text-[var(--pb-text)]";
   text.textContent = value;
   copy.append(title, text);
 
@@ -310,10 +310,10 @@ function galleryTogglePanel({ images = [], showGallery = false, onToggle = null 
   const copy = document.createElement("div");
   copy.className = "min-w-0";
   const title = document.createElement("h2");
-  title.className = "text-base font-black text-[var(--pb-text)]";
+  title.className = "text-sm font-black text-[var(--pb-text)]";
   title.textContent = "Galeri mobil";
   const helper = document.createElement("p");
-  helper.className = "mt-1 text-sm text-[var(--pb-text-muted)]";
+  helper.className = "mt-1 text-xs text-[var(--pb-text-muted)]";
   helper.textContent = `${images.length} gambar tersimpan`;
   copy.append(title, helper);
 
@@ -728,7 +728,7 @@ function imageEditorControls(editorState, onChange) {
 
   const ratio = document.createElement("select");
   ratio.id = "slri_editor_ratio_input";
-  ratio.className = "min-h-10 rounded-xl border border-[var(--pb-form-border)] bg-white px-3 text-sm font-semibold";
+  ratio.className = "min-h-10 rounded-xl border border-[var(--pb-form-border)] bg-white px-3 text-xs font-semibold";
   [
     ["free", "Bebas"],
     ["1:1", "1:1"],
@@ -867,7 +867,7 @@ function editedFileName(name) {
 
 function labelWrap(label, control) {
   const wrap = document.createElement("label");
-  wrap.className = "grid gap-1 text-sm font-bold text-gray-700";
+  wrap.className = "grid gap-1 text-xs font-bold text-gray-700";
   wrap.textContent = label;
   wrap.append(control);
   return wrap;

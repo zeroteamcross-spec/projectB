@@ -32,7 +32,7 @@ export function SellerInspectionItemForm({
   title.textContent = mode === "edit" ? "Update inspection item" : "Tambah inspection item";
 
   const errorNode = document.createElement("p");
-  errorNode.className = "rounded-lg border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-3 py-2 text-sm font-medium text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
+  errorNode.className = "rounded-lg border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-3 py-2 text-xs font-medium text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
   errorNode.textContent = error;
   errorNode.hidden = !error;
 
@@ -47,7 +47,7 @@ export function SellerInspectionItemForm({
     );
   } else {
     const itemName = document.createElement("p");
-    itemName.className = "rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm font-semibold text-gray-900";
+    itemName.className = "rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-semibold text-gray-900";
     itemName.textContent = item?.item_name_snapshot ?? item?.template?.item_name ?? "Item inspeksi";
     const wrap = document.createElement("div");
     wrap.className = tw.form.label;

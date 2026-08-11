@@ -41,16 +41,16 @@ function NotificationPageItem({ item, marking = false, onNavigate = null, onChan
   const titleRow = document.createElement("section");
   titleRow.className = "flex min-w-0 flex-wrap items-center gap-2";
   const title = document.createElement("h2");
-  title.className = "min-w-0 break-words text-base font-black leading-tight tracking-normal text-[var(--pb-text)]";
+  title.className = "min-w-0 break-words text-sm font-black leading-tight tracking-normal text-[var(--pb-text)]";
   title.textContent = item.title || "Notifikasi";
   titleRow.append(title, statusBadge(item.isRead));
 
   const body = document.createElement("p");
-  body.className = "break-words text-sm font-semibold leading-6 text-[var(--pb-text-muted)]";
+  body.className = "break-words text-xs font-semibold leading-6 text-[var(--pb-text-muted)]";
   body.textContent = item.body || "Aktivitas baru tersedia.";
 
   const meta = document.createElement("section");
-  meta.className = "flex min-w-0 flex-wrap items-center gap-2 text-xs font-bold text-[var(--pb-text-muted)]";
+  meta.className = "flex min-w-0 flex-wrap items-center gap-2 text-[10px] font-bold text-[var(--pb-text-muted)]";
   meta.append(textNode("span", relativeTime(item.createdAt)), typeBadge(item));
 
   content.append(titleRow, body, meta);
@@ -91,15 +91,15 @@ function itemClassName({ read, variant }) {
 function statusBadge(read) {
   const badge = document.createElement("span");
   badge.className = read
-    ? "inline-flex rounded-full bg-[var(--pb-badge-neutral-bg)] px-2.5 py-1 text-[11px] font-black text-[var(--pb-text-strong)]"
-    : "inline-flex rounded-full bg-[color-mix(in_srgb,var(--pb-danger)_12%,white)] px-2.5 py-1 text-[11px] font-black text-[var(--pb-danger)]";
+    ? "inline-flex rounded-full bg-[var(--pb-badge-neutral-bg)] px-2.5 py-1 text-[10px] font-black text-[var(--pb-text-strong)]"
+    : "inline-flex rounded-full bg-[color-mix(in_srgb,var(--pb-danger)_12%,white)] px-2.5 py-1 text-[10px] font-black text-[var(--pb-danger)]";
   badge.textContent = read ? "Dibaca" : "Belum dibaca";
   return badge;
 }
 
 function typeBadge(item) {
   const badge = document.createElement("span");
-  badge.className = "inline-flex rounded-full border border-[var(--pb-border)] bg-[var(--pb-surface-muted)] px-2 py-0.5 text-[11px] font-bold text-[var(--pb-text-strong)]";
+  badge.className = "inline-flex rounded-full border border-[var(--pb-border)] bg-[var(--pb-surface-muted)] px-2 py-0.5 text-[10px] font-bold text-[var(--pb-text-strong)]";
   badge.textContent = String(item.type ?? "system_message").replace(/_/g, " ");
   return badge;
 }

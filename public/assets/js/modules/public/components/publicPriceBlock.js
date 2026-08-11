@@ -6,19 +6,19 @@ export function PublicPriceBlock({ car } = {}) {
   section.className = "grid gap-4 rounded-[24px] border border-white/75 bg-white/95 p-5 shadow-card backdrop-blur";
 
   const label = document.createElement("p");
-  label.className = "text-[11px] font-semibold uppercase tracking-normal text-[var(--pb-brand-secondary)]";
+  label.className = "text-[10px] font-semibold uppercase tracking-normal text-[var(--pb-brand-secondary)]";
   label.textContent = hasPromo(car) ? "Harga promo" : "Harga cash";
 
   const primary = document.createElement("strong");
-  primary.className = "break-words text-2xl font-bold tracking-normal text-gray-950";
+  primary.className = "break-words text-xl font-bold tracking-normal text-gray-950";
   primary.textContent = formatCurrency(effectivePrice(car));
 
   const assist = document.createElement("p");
-  assist.className = "text-sm leading-6 text-gray-600";
+  assist.className = "text-xs leading-6 text-gray-600";
   assist.textContent = "Harga ditampilkan sebagai acuan utama sebelum Anda lanjut ke transaksi atau konsultasi.";
 
   const rows = document.createElement("div");
-  rows.className = "grid gap-2 rounded-[22px] bg-gray-50 p-4 text-sm";
+  rows.className = "grid gap-2 rounded-[22px] bg-gray-50 p-4 text-xs";
 
   if (hasPromo(car)) {
     rows.append(priceRow("Harga cash", formatCurrency(car.price_cash), true));

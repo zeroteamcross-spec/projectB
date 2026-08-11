@@ -40,9 +40,9 @@ export function SellerAffiliateForm({
   const headerCopy = document.createElement("div");
   headerCopy.className = "grid gap-2";
   headerCopy.append(
-    textBlock("text-sm font-semibold text-gray-500", mode === "edit" ? "Edit marketing" : "Marketing baru"),
-    textBlock("text-xl font-bold text-gray-950", mode === "edit" ? (draft.user?.name || draft.name || "Marketing") : "Buat marketing seller"),
-    textBlock(`text-sm ${tw.text.muted}`, mode === "edit"
+    textBlock("text-xs font-semibold text-gray-500", mode === "edit" ? "Edit marketing" : "Marketing baru"),
+    textBlock("text-lg font-bold text-gray-950", mode === "edit" ? (draft.user?.name || draft.name || "Marketing") : "Buat marketing seller"),
+    textBlock(`text-xs ${tw.text.muted}`, mode === "edit"
       ? "Perbarui username/email login, slug, nomor WhatsApp, status, atau isi password baru untuk reset akses login affiliate."
       : "Tambahkan affiliate dengan username/email login, password, slug unik global, dan nomor WhatsApp yang dipakai di landing."),
   );
@@ -63,7 +63,7 @@ export function SellerAffiliateForm({
     badges.className = "flex flex-wrap items-center gap-2";
     badges.append(
       SellerAffiliateStatusBadge(draft.status),
-      textBlock("text-xs font-medium text-gray-500", `Dibuat ${formatDate(draft.created_at)}`),
+      textBlock("text-[10px] font-medium text-gray-500", `Dibuat ${formatDate(draft.created_at)}`),
     );
     header.append(badges);
   }
@@ -153,7 +153,7 @@ export function SellerAffiliateForm({
   form.append(statusField);
 
   const slugHint = document.createElement("div");
-  slugHint.className = `grid gap-1 rounded-lg px-3 py-3 text-sm ${slugState?.is_available ? "border border-[color-mix(in_srgb,var(--pb-success)_26%,white)] bg-[color-mix(in_srgb,var(--pb-success)_8%,white)] text-[color-mix(in_srgb,var(--pb-success)_84%,black)]" : "border border-gray-200 bg-gray-50 text-gray-600"}`;
+  slugHint.className = `grid gap-1 rounded-lg px-3 py-3 text-xs ${slugState?.is_available ? "border border-[color-mix(in_srgb,var(--pb-success)_26%,white)] bg-[color-mix(in_srgb,var(--pb-success)_8%,white)] text-[color-mix(in_srgb,var(--pb-success)_84%,black)]" : "border border-gray-200 bg-gray-50 text-gray-600"}`;
   slugHint.append(
     textBlock("font-semibold", checkingSlug ? "Memeriksa slug..." : "Validasi slug"),
     textBlock("", slugState?.message || sellerAffiliateService.slugHelper(draft.referral_code)),
@@ -204,8 +204,8 @@ export function SellerAffiliateForm({
     const landing = document.createElement("div");
     landing.className = `grid gap-3 ${tw.surface.inset}`;
     landing.append(
-      textBlock("text-xs font-semibold text-gray-500", "Link landing affiliate"),
-      textBlock("break-all text-sm font-medium text-gray-900", sellerAffiliateService.landingUrl(draft.referral_code)),
+      textBlock("text-[10px] font-semibold text-gray-500", "Link landing affiliate"),
+      textBlock("break-all text-xs font-medium text-gray-900", sellerAffiliateService.landingUrl(draft.referral_code)),
     );
 
     const landingActions = document.createElement("div");

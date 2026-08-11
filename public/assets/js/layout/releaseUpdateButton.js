@@ -12,7 +12,7 @@ export function createReleaseUpdateButton(store) {
     "hidden h-12 min-w-12 items-center justify-center gap-2 rounded-full",
     "border border-[color-mix(in_srgb,var(--pb-brand-primary)_34%,white)]",
     "bg-[linear-gradient(135deg,var(--pb-btn-primary-from),var(--pb-btn-primary-to))]",
-    "px-4 text-sm font-black text-white shadow-[var(--pb-shadow-elevated)]",
+    "px-4 text-xs font-black text-white shadow-[var(--pb-shadow-elevated)]",
     "transition hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]",
     "md:bottom-6 md:right-6",
   ].join(" ");
@@ -49,13 +49,13 @@ function openReleaseModal(store) {
   const latestVersion = store?.get("app.release.latestVersion", null);
   const appliedVersion = store?.get("app.release.appliedVersion", null);
   const body = document.createElement("div");
-  body.className = "grid gap-4 text-sm leading-6 text-[var(--pb-text-muted)]";
+  body.className = "grid gap-4 text-xs leading-6 text-[var(--pb-text-muted)]";
 
   const message = document.createElement("p");
   message.textContent = "Versi aplikasi terbaru sudah tersedia. Setelah dimuat ulang, browser akan mengambil file aplikasi terbaru dari server.";
 
   const detail = document.createElement("div");
-  detail.className = "rounded-lg border border-[var(--pb-border)] bg-gray-50 px-4 py-3 text-xs leading-5 text-gray-700";
+  detail.className = "rounded-lg border border-[var(--pb-border)] bg-gray-50 px-4 py-3 text-[10px] leading-5 text-gray-700";
   detail.textContent = [
     latestVersion ? `Versi terbaru: ${latestVersion}` : "",
     appliedVersion ? `Versi sebelumnya: ${appliedVersion}` : "",

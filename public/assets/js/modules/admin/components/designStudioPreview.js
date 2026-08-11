@@ -46,10 +46,10 @@ function previewHeader(config) {
   const copy = document.createElement("div");
   copy.className = "grid min-w-0";
   const title = document.createElement("strong");
-  title.className = "truncate text-sm font-bold text-[var(--pb-text)]";
+  title.className = "truncate text-xs font-bold text-[var(--pb-text)]";
   title.textContent = config?.brand?.appName ?? "BeliMobil";
   const subtitle = document.createElement("span");
-  subtitle.className = "truncate text-xs text-[var(--pb-text-muted)]";
+  subtitle.className = "truncate text-[10px] text-[var(--pb-text-muted)]";
   subtitle.textContent = config?.brand?.tagline ?? "Jual beli mobil terpercaya";
   copy.append(title, subtitle);
 
@@ -61,7 +61,7 @@ function previewHeader(config) {
   bar.append(brand, actions);
 
   const caption = document.createElement("div");
-  caption.className = "px-4 py-3 text-xs text-[var(--pb-text-muted)]";
+  caption.className = "px-4 py-3 text-[10px] text-[var(--pb-text-muted)]";
   caption.textContent = "Shell preview";
 
   shell.append(bar, caption);
@@ -79,9 +79,9 @@ function previewLanding() {
   applyDesignHook(hero, "catalog.hero.banner");
   hero.innerHTML = `
     <div class="grid gap-2">
-      <span class="inline-flex w-fit rounded-full bg-white/15 px-3 py-1 text-[11px] font-semibold uppercase text-white/90">Mega sale</span>
-      <h3 class="text-xl font-bold">Landing public snippet</h3>
-      <p class="text-sm text-white/80">Hero, search, chip, dan CTA mengikuti konfigurasi baru.</p>
+      <span class="inline-flex w-fit rounded-full bg-white/15 px-3 py-1 text-[10px] font-semibold uppercase text-white/90">Mega sale</span>
+      <h3 class="text-lg font-bold">Landing public snippet</h3>
+      <p class="text-xs text-white/80">Hero, search, chip, dan CTA mengikuti konfigurasi baru.</p>
     </div>
   `;
 
@@ -91,7 +91,7 @@ function previewLanding() {
   search.innerHTML = `
     <div class="flex items-center gap-2">
       <div class="grid h-10 w-10 shrink-0 place-items-center rounded-[var(--pb-radius-xl)] bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] text-[var(--pb-brand-primary)]">⌕</div>
-      <div class="min-w-0 flex-1 text-sm text-[var(--pb-text-muted)]">Cari mobil impian Anda...</div>
+      <div class="min-w-0 flex-1 text-xs text-[var(--pb-text-muted)]">Cari mobil impian Anda...</div>
       <div class="grid h-10 w-10 shrink-0 place-items-center rounded-[var(--pb-radius-xl)] bg-[linear-gradient(135deg,var(--pb-btn-primary-from),var(--pb-btn-primary-to))] text-white">⌕</div>
     </div>
   `;
@@ -118,7 +118,7 @@ function previewControls() {
   heading.className = "grid gap-1";
   heading.innerHTML = `
     <span class="${tw.text.eyebrow}">Controls</span>
-    <h3 class="text-lg font-bold text-[var(--pb-text)]">Buttons, badge, and input</h3>
+    <h3 class="text-base font-bold text-[var(--pb-text)]">Buttons, badge, and input</h3>
   `;
 
   const row = document.createElement("div");
@@ -161,7 +161,7 @@ function previewInternal() {
   heading.className = "grid gap-1";
   heading.innerHTML = `
     <span class="${tw.text.eyebrow}">Internal Snippet</span>
-    <h3 class="text-lg font-bold text-[var(--pb-text)]">Dashboard / operational tone</h3>
+    <h3 class="text-base font-bold text-[var(--pb-text)]">Dashboard / operational tone</h3>
   `;
 
   const stats = document.createElement("div");
@@ -171,10 +171,10 @@ function previewInternal() {
     stat.className = `${stat.className} grid gap-1`;
     applyDesignHook(stat, "seller.dashboard.summary");
     const value = document.createElement("strong");
-    value.className = "text-xl font-bold text-[var(--pb-brand-secondary)]";
+    value.className = "text-lg font-bold text-[var(--pb-brand-secondary)]";
     value.textContent = item.split(" ")[0];
     const label = document.createElement("span");
-    label.className = "text-sm text-[var(--pb-text-muted)]";
+    label.className = "text-xs text-[var(--pb-text-muted)]";
     label.textContent = item.split(" ").slice(1).join(" ");
     stat.append(value, label);
     stats.append(stat);
@@ -187,7 +187,7 @@ function previewInternal() {
   listItem.innerHTML = `
     <div class="grid gap-1 min-w-0">
       <strong class="break-words text-[var(--pb-text)]">Queue approval seller</strong>
-      <span class="break-words text-sm text-[var(--pb-text-muted)]">List/detail dan selected state ikut tone shell.</span>
+      <span class="break-words text-xs text-[var(--pb-text-muted)]">List/detail dan selected state ikut tone shell.</span>
     </div>
   `;
 
@@ -214,7 +214,7 @@ function errorPanel() {
   panel.className = tw.alert.error;
   applyDesignHook(panel, "shared.state.error");
   panel.innerHTML = `
-    <strong class="block text-sm font-bold">Hydrate error preview</strong>
+    <strong class="block text-xs font-bold">Hydrate error preview</strong>
     <p class="${tw.alert.errorMeta} mt-1">Kegagalan route atau save akan mengikuti tone error panel ini.</p>
   `;
   return panel;

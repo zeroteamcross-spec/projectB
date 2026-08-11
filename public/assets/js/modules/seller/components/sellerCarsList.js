@@ -71,8 +71,8 @@ function carColumns({ onEdit, onArchive, onImages, onInspection }) {
         wrap.id = `slrc_car_identity_${car.id}_section`;
         wrap.className = "grid min-w-0 gap-1";
         wrap.append(
-          textNode("p", "break-words text-sm font-black text-gray-950", carTitle(car)),
-          textNode("p", "break-words text-xs font-semibold leading-5 text-gray-500", carMeta(car)),
+          textNode("p", "break-words text-xs font-black text-gray-950", carTitle(car)),
+          textNode("p", "break-words text-[10px] font-semibold leading-5 text-gray-500", carMeta(car)),
         );
         return wrap;
       },
@@ -94,17 +94,17 @@ function carColumns({ onEdit, onArchive, onImages, onInspection }) {
     {
       label: "Harga",
       key: "price",
-      render: (car) => textNode("span", "text-sm font-black text-gray-950", formatCurrency(car.price_discount || car.price_cash || 0)),
+      render: (car) => textNode("span", "text-xs font-black text-gray-950", formatCurrency(car.price_discount || car.price_cash || 0)),
     },
     {
       label: "Mileage",
       key: "mileage_km",
-      render: (car) => textNode("span", "text-sm font-semibold text-gray-700", `${Number(car.mileage_km ?? 0).toLocaleString("id-ID")} km`),
+      render: (car) => textNode("span", "text-xs font-semibold text-gray-700", `${Number(car.mileage_km ?? 0).toLocaleString("id-ID")} km`),
     },
     {
       label: "Lokasi",
       key: "location_name",
-      render: (car) => textNode("span", "break-words text-sm font-semibold text-gray-700", car.location_name || "-"),
+      render: (car) => textNode("span", "break-words text-xs font-semibold text-gray-700", car.location_name || "-"),
     },
     {
       label: "Aksi",

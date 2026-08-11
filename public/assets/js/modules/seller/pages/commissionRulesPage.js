@@ -194,10 +194,10 @@ function summaryCards(counts) {
     const card = Card();
     card.classList.add("grid", "gap-1");
     const title = document.createElement("p");
-    title.className = "text-sm font-medium text-gray-500";
+    title.className = "text-xs font-medium text-gray-500";
     title.textContent = label;
     const number = document.createElement("p");
-    number.className = "text-2xl font-bold text-gray-950";
+    number.className = "text-xl font-bold text-gray-950";
     number.textContent = value;
     card.append(title, number);
     section.append(card);
@@ -211,11 +211,11 @@ function priorityPanel() {
   card.classList.add("grid", "gap-2");
 
   const title = document.createElement("h2");
-  title.className = "text-lg font-bold text-gray-950";
+  title.className = "text-base font-bold text-gray-950";
   title.textContent = "Priority rule";
 
   const body = document.createElement("p");
-  body.className = "text-sm leading-6 text-gray-600";
+  body.className = "text-xs leading-6 text-gray-600";
   body.textContent = sellerCommissionRuleService.priorityCopy();
 
   card.append(title, body);

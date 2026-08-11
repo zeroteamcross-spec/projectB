@@ -123,10 +123,10 @@ function header(state, actions) {
   const copy = document.createElement("div");
   copy.className = "grid gap-1";
   const title = document.createElement("h1");
-  title.className = "text-2xl font-black tracking-normal text-gray-950";
+  title.className = "text-xl font-black tracking-normal text-gray-950";
   title.textContent = "Release Version Manager";
   const subtitle = document.createElement("p");
-  subtitle.className = "max-w-3xl text-sm leading-6 text-[var(--pb-text-muted)]";
+  subtitle.className = "max-w-3xl text-xs leading-6 text-[var(--pb-text-muted)]";
   subtitle.textContent = "Kelola versi release dan bump resource setelah upload selesai diverifikasi. Fitur ini khusus superadmin.";
   copy.append(title, subtitle);
   wrap.append(copy, Button({
@@ -153,13 +153,13 @@ function bumpPanel(state, actions) {
   const panel = document.createElement("div");
   panel.className = "rounded-lg border border-[var(--pb-border)] bg-white p-4 shadow-sm";
   const title = document.createElement("h2");
-  title.className = "mb-3 text-base font-black text-gray-950";
+  title.className = "mb-3 text-sm font-black text-gray-950";
   title.textContent = "Bump Versi Resource";
 
   const row = document.createElement("div");
   row.className = "grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto]";
   const input = document.createElement("input");
-  input.className = "min-h-11 rounded-lg border border-[var(--pb-border)] px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  input.className = "min-h-11 rounded-lg border border-[var(--pb-border)] px-3 text-xs focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]";
   input.value = state.resourceName;
   input.placeholder = "app";
   input.addEventListener("input", (event) => actions.setResourceName(event.target.value));
@@ -172,7 +172,7 @@ function bumpPanel(state, actions) {
   }));
 
   const note = document.createElement("p");
-  note.className = "mt-3 text-xs leading-5 text-[var(--pb-text-muted)]";
+  note.className = "mt-3 text-[10px] leading-5 text-[var(--pb-text-muted)]";
   note.textContent = "Jangan bump sebelum file release selesai di-upload dan dicek di server.";
   panel.append(title, row, note);
   return panel;
@@ -182,7 +182,7 @@ function versionsTable(versions, loading, actions) {
   const panel = document.createElement("div");
   panel.className = "overflow-hidden rounded-lg border border-[var(--pb-border)] bg-white shadow-sm";
   const table = document.createElement("table");
-  table.className = "min-w-full divide-y divide-gray-200 text-sm";
+  table.className = "min-w-full divide-y divide-gray-200 text-xs";
   table.innerHTML = `
     <thead class="bg-gray-50">
       <tr>
@@ -242,10 +242,10 @@ function card(label, value, iconName) {
   row.className = "flex items-center justify-between gap-3";
   const copy = document.createElement("div");
   const labelNode = document.createElement("div");
-  labelNode.className = "text-xs font-bold uppercase tracking-normal text-[var(--pb-text-muted)]";
+  labelNode.className = "text-[10px] font-bold uppercase tracking-normal text-[var(--pb-text-muted)]";
   labelNode.textContent = label;
   const valueNode = document.createElement("div");
-  valueNode.className = "mt-1 break-words text-lg font-black text-gray-950";
+  valueNode.className = "mt-1 break-words text-base font-black text-gray-950";
   valueNode.textContent = String(value);
   copy.append(labelNode, valueNode);
   const icon = document.createElement("span");
@@ -265,7 +265,7 @@ function cell(text, className = "") {
 
 function errorBox(message) {
   const box = document.createElement("div");
-  box.className = "rounded-lg border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
+  box.className = "rounded-lg border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-xs font-semibold text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
   box.textContent = message;
   return box;
 }

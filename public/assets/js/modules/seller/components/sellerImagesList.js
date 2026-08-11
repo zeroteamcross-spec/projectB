@@ -23,15 +23,15 @@ export function SellerImagesList({
   const copy = document.createElement("div");
   copy.className = "min-w-0";
   const title = document.createElement("h2");
-  title.className = "flex items-center gap-2 text-lg font-bold text-[var(--pb-text)]";
+  title.className = "flex items-center gap-2 text-base font-bold text-[var(--pb-text)]";
   title.append(createIcon("image", { className: "h-5 w-5 text-[var(--pb-brand-secondary)]" }), document.createTextNode("Galeri mobil"));
   const helper = document.createElement("p");
-  helper.className = "mt-1 text-sm text-[var(--pb-text-muted)]";
+  helper.className = "mt-1 text-xs text-[var(--pb-text-muted)]";
   helper.textContent = images.length ? "Cover diberi penanda khusus. Gunakan preview untuk mengecek kualitas foto." : "Belum ada gambar untuk mobil ini.";
   copy.append(title, helper);
 
   const count = document.createElement("span");
-  count.className = "w-fit rounded-full border border-[var(--pb-border)] bg-[var(--pb-surface-muted)] px-3 py-1 text-xs font-semibold text-[var(--pb-text-strong)]";
+  count.className = "w-fit rounded-full border border-[var(--pb-border)] bg-[var(--pb-surface-muted)] px-3 py-1 text-[10px] font-semibold text-[var(--pb-text-strong)]";
   count.textContent = `${images.length} gambar`;
   header.append(copy, count);
   section.append(header);

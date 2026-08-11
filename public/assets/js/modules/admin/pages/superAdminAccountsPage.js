@@ -68,11 +68,11 @@ function render(root, context, state) {
 
   const judul = document.createElement("h1");
   judul.id = "sadm_accounts_title";
-  judul.className = "text-2xl font-black tracking-normal text-gray-950";
+  judul.className = "text-xl font-black tracking-normal text-gray-950";
   judul.textContent = "Buat Akun";
 
   const sub = document.createElement("p");
-  sub.className = "max-w-3xl text-sm leading-6 text-[var(--pb-text-muted)]";
+  sub.className = "max-w-3xl text-xs leading-6 text-[var(--pb-text-muted)]";
   sub.textContent = "Akun yang dibuat di sini langsung aktif dan tidak perlu melewati antrean approval.";
 
   header.append(judul, sub);
@@ -115,11 +115,11 @@ function panelBerhasil(state) {
   panel.className = "grid gap-1 rounded-[1.25rem] border border-[color-mix(in_srgb,var(--pb-success)_26%,white)] bg-[color-mix(in_srgb,var(--pb-success)_8%,white)] px-4 py-3";
 
   const judul = document.createElement("p");
-  judul.className = "text-sm font-black text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
+  judul.className = "text-xs font-black text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
   judul.textContent = state.berhasil.pesan;
 
   const rinci = document.createElement("p");
-  rinci.className = "break-words text-sm text-[var(--pb-text-muted)]";
+  rinci.className = "break-words text-xs text-[var(--pb-text-muted)]";
   rinci.textContent = `${state.berhasil.nama} — ${state.berhasil.email}`;
 
   panel.append(judul, rinci);
@@ -129,7 +129,7 @@ function panelBerhasil(state) {
 function panelError(pesan) {
   const panel = document.createElement("p");
   panel.id = "sadm_accounts_error_panel";
-  panel.className = "rounded-[1.25rem] border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
+  panel.className = "rounded-[1.25rem] border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-xs font-semibold text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
   panel.textContent = pesan;
   return panel;
 }
@@ -146,7 +146,7 @@ function kartuForm(id, judulTeks, ikon, kolom, tombol) {
   bulat.className = "inline-flex h-11 w-11 items-center justify-center rounded-full bg-gray-100 text-gray-800";
   bulat.append(createIcon(ikon, { className: "h-5 w-5" }));
   const judul = document.createElement("h2");
-  judul.className = "text-lg font-black text-gray-950";
+  judul.className = "text-base font-black text-gray-950";
   judul.textContent = judulTeks;
   kepala.append(bulat, judul);
 
@@ -252,7 +252,7 @@ function bungkus(field, state, kunci) {
   const wrap = document.createElement("div");
   wrap.className = "grid gap-1";
   const nota = document.createElement("p");
-  nota.className = "text-xs font-semibold text-[var(--pb-danger)]";
+  nota.className = "text-[10px] font-semibold text-[var(--pb-danger)]";
   nota.textContent = pesan;
   wrap.append(field, nota);
   return wrap;
