@@ -1,4 +1,5 @@
 import { defaultLoginPath, googleLoginPathForRole } from "../config/authUxConfig.js";
+import { roleForCurrentHost } from "./roleHosts.js";
 
 const PUBLIC_ROLE = "public";
 const SUPER_VIEWER_ROLE = "admin";
@@ -163,24 +164,53 @@ function homeForRole(role) {
 }
 
 function authLandingPath(requiredRole, fromPath) {
-  const path = requiredRole === PUBLIC_ROLE ? defaultLoginPath("buyer") : googleLoginPathForRole(requiredRole);
+  const path = requiredRole === PUBLIC_ROLE ? defaultLoginPath("buyer") : loginPathForRole(requiredRole);
   const query = new URLSearchParams();
   query.set("from", fromPath);
   return `${path}?${query.toString()}`;
 }
 
-function googleLoginPathForCurrentHost() {
-  const host = String(window.location.hostname || "").toLowerCase();
+/**
+ * Host khusus peran memakai form email dan password langsung, bukan pemilih
+ * Google. Alamat seperti admin.carlynk.id sudah menyatakan siapa yang dituju,
+ * jadi menampilkan pemilih peran di sana hanya menambah satu langkah.
+ *
+ * Di host umum perilakunya tidak berubah.
+ */
+function loginPathForRole(requiredRole) {
+  return roleForCurrentHost() === roleSlug(requiredRole)
+    ? `/login/${roleSlug(requiredRole)}`
+    : googleLoginPathForRole(requiredRole);
+}
 
-  if (host === "admin.garasi-mobil.com") {
+/**
+ * Peran di peta host memakai nama pendek; affiliate_admin adalah "affiliate",
+ * dan super_admin ikut host admin.
+ */
+function roleSlug(role) {
+  if (role === "affiliate_admin") {
+    return "affiliate";
+  }
+
+  if (role === SUPER_ADMIN_ROLE) {
+    return "admin";
+  }
+
+  return role;
+}
+
+function googleLoginPathForCurrentHost() {
+  const peran = roleForCurrentHost();
+
+  if (peran === "admin") {
     return "/google-login/admin";
   }
 
-  if (host === "showroom.garasi-mobil.com") {
+  if (peran === "seller") {
     return "/google-login/seller";
   }
 
-  if (host === "marketing.garasi-mobil.com") {
+  if (peran === "affiliate") {
     return "/login/affiliate";
   }
 

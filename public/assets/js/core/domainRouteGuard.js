@@ -11,19 +11,7 @@
  * melakukan apa pun -- itu yang membuat localhost dan preview tidak terganggu.
  */
 
-function petaHost() {
-  const peta = (typeof window !== "undefined" && window.__PROJECTB_ROLE_HOSTS__) || {};
-  const bersih = {};
-
-  Object.keys(peta).forEach((peran) => {
-    const host = normalizeHost(peta[peran]);
-    if (host) {
-      bersih[peran] = host;
-    }
-  });
-
-  return bersih;
-}
+import { normalizeHost, roleHosts as petaHost } from "./roleHosts.js";
 
 function hostUntukPeran(peta, peran) {
   return peta[peran] || peta.default || null;
@@ -217,6 +205,3 @@ function hashPath(hash) {
   return normalized === "/" ? "/" : normalized.replace(/\/$/, "");
 }
 
-function normalizeHost(host) {
-  return String(host || "").toLowerCase().split(":", 1)[0];
-}
