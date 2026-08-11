@@ -111,6 +111,7 @@ function createAdminMasterPage(pageType = "brand") {
         message: "Yakin mau hapus brand ini?",
         confirmLabel: "Hapus",
         key: `admst-delete-brand-${brand.id}`,
+        hideClose: true,
       });
       if (!confirmed) {
         return;
@@ -167,6 +168,7 @@ function createAdminMasterPage(pageType = "brand") {
         message: childCount ? "Yakin mau hapus menu ini dan pindahkan child-nya?" : "Yakin mau hapus menu ini?",
         confirmLabel: "Hapus",
         key: `admst-delete-sidebar-${item.id}`,
+        hideClose: true,
       });
       if (!confirmed) {
         return;
@@ -282,6 +284,7 @@ function createAdminMasterPage(pageType = "brand") {
         message: "Yakin mau hapus bank ini?",
         confirmLabel: "Hapus",
         key: `admstbk-delete-bank-${bank.id}`,
+        hideClose: true,
       });
       if (!confirmed) {
         return;
@@ -337,6 +340,7 @@ function createAdminMasterPage(pageType = "brand") {
         message: "Yakin mau hapus kota ini?",
         confirmLabel: "Hapus",
         key: `admstloc-delete-city-${city.id}`,
+        hideClose: true,
       });
       if (!confirmed) {
         return;
@@ -816,18 +820,21 @@ function masterSidebarFilterBar({ filters, items, onSubmit }) {
 }
 
 function openBrandModal({ mode, brand, brands, actions }) {
-  openModal(applyDesignHook(AdminMasterBrandForm({
+  const content = applyDesignHook(AdminMasterBrandForm({
     brand,
     mode,
+    actionsInBody: false,
     onSubmit: (nextBrand) => actions.saveBrand(nextBrand, brands),
     onDelete: (targetBrand) => actions.deleteBrand(targetBrand, brands),
     onCancel: () => closeModal(),
-  }), "admin.master.brand.form"), {
+  }), "admin.master.brand.form");
+  openModal(content, {
     key: `admst-brand-${mode}-${brand?.id ?? "new"}`,
     title: mode === "edit" ? "Edit Brand" : "Tambah Brand",
     description: "Brand dan model disimpan dalam payload JSON master cars.brands.",
     size: "xl",
     footer: null,
+    headerActions: () => content.modalHeaderActions?.(),
     panelId: "admst_brand_modal_section",
     headerId: "admst_brand_modal_header_section",
     bodyId: "admst_brand_modal_body_section",
@@ -836,19 +843,22 @@ function openBrandModal({ mode, brand, brands, actions }) {
 }
 
 function openSidebarModal({ mode, item, items, actions }) {
-  openModal(applyDesignHook(AdminMasterSidebarForm({
+  const content = applyDesignHook(AdminMasterSidebarForm({
     item,
     items,
     mode,
+    actionsInBody: false,
     onSubmit: (nextItem) => actions.saveSidebarItem(nextItem, items),
     onDelete: (targetItem) => actions.deleteSidebarItem(targetItem, items),
     onCancel: () => closeModal(),
-  }), "admin.master.sidebar.form"), {
+  }), "admin.master.sidebar.form");
+  openModal(content, {
     key: `admst-sidebar-${mode}-${item?.id ?? "new"}`,
     title: mode === "edit" ? "Edit Menu Sidebar" : "Tambah Menu Sidebar",
     description: "Struktur sidebar disimpan sebagai payload JSON master app.sidebar.",
     size: "xl",
     footer: null,
+    headerActions: () => content.modalHeaderActions?.(),
     panelId: "admst_sidebar_modal_section",
     headerId: "admst_sidebar_modal_header_section",
     bodyId: "admst_sidebar_modal_body_section",
@@ -857,9 +867,10 @@ function openSidebarModal({ mode, item, items, actions }) {
 }
 
 function openBankModal({ mode, bank, banks, actions, state }) {
-  openModal(applyDesignHook(AdminMasterBankForm({
+  const content = applyDesignHook(AdminMasterBankForm({
     bank,
     mode,
+    actionsInBody: false,
     saving: state.saving,
     uploading: state.uploading,
     uploadError: state.uploadError,
@@ -867,12 +878,14 @@ function openBankModal({ mode, bank, banks, actions, state }) {
     onSubmit: (nextBank) => actions.saveBank(nextBank, banks),
     onDelete: (targetBank) => actions.deleteBank(targetBank, banks),
     onCancel: () => closeModal(),
-  }), "admin.master.bank.form"), {
+  }), "admin.master.bank.form");
+  openModal(content, {
     key: `admstbk-bank-${mode}-${bank?.id ?? "new"}`,
     title: mode === "edit" ? "Edit Bank" : "Tambah Bank",
     description: "Data bank disimpan dalam payload JSON master payments.banks.",
     size: "xl",
     footer: null,
+    headerActions: () => content.modalHeaderActions?.(),
     panelId: "admstbk_bank_modal_section",
     headerId: "admstbk_bank_modal_header_section",
     bodyId: "admstbk_bank_modal_body_section",
@@ -881,19 +894,22 @@ function openBankModal({ mode, bank, banks, actions, state }) {
 }
 
 function openLocationModal({ mode, city, cities, actions, state }) {
-  openModal(applyDesignHook(AdminMasterLocationForm({
+  const content = applyDesignHook(AdminMasterLocationForm({
     city,
     mode,
+    actionsInBody: false,
     saving: state.saving,
     onSubmit: (nextCity) => actions.saveCity(nextCity, cities),
     onDelete: (targetCity) => actions.deleteCity(targetCity, cities),
     onCancel: () => closeModal(),
-  }), "admin.master.location.form"), {
+  }), "admin.master.location.form");
+  openModal(content, {
     key: `admstloc-city-${mode}-${city?.id ?? "new"}`,
     title: mode === "edit" ? "Edit Kota" : "Tambah Kota",
     description: "Data kota disimpan dalam payload JSON master locations.cities.",
     size: "xl",
     footer: null,
+    headerActions: () => content.modalHeaderActions?.(),
     panelId: "admstloc_city_modal_section",
     headerId: "admstloc_city_modal_header_section",
     bodyId: "admstloc_city_modal_body_section",

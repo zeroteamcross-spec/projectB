@@ -1,6 +1,7 @@
 import { Button } from "../../../ui/primitives/button.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 import { adminMasterService } from "../services/adminMasterService.js";
+import { ModalHeaderActions } from "../../../ui/composites/modalHeaderFormActions.js";
 
 export function AdminMasterBankForm({
   bank = null,
@@ -12,6 +13,7 @@ export function AdminMasterBankForm({
   onSubmit = null,
   onDelete = null,
   onCancel = null,
+  actionsInBody = true,
 } = {}) {
   const draft = bank ? { ...bank } : adminMasterService.createEmptyBank();
   const form = document.createElement("form");
@@ -107,7 +109,13 @@ export function AdminMasterBankForm({
   right.append(cancel, submit);
   actions.append(left, right);
 
-  form.append(intro, fields, iconSection, iconPathInput, actions);
+  if (actionsInBody) {
+    form.append(intro, fields, iconSection, iconPathInput, actions);
+  } else {
+    submit.setAttribute("form", form.id);
+    form.append(intro, fields, iconSection, iconPathInput);
+    sectionHeaderActions(form, [left.firstElementChild, submit, cancel]);
+  }
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     const formData = new FormData(form);
@@ -124,6 +132,10 @@ export function AdminMasterBankForm({
   });
 
   return form;
+
+  function sectionHeaderActions(owner, children) {
+    owner.modalHeaderActions = () => ModalHeaderActions({ children });
+  }
 }
 
 function renderPreview(preview, bank) {

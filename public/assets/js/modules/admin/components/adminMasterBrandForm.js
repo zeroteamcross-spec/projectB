@@ -1,6 +1,7 @@
 import { Button } from "../../../ui/primitives/button.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 import { adminMasterService } from "../services/adminMasterService.js";
+import { ModalHeaderActions } from "../../../ui/composites/modalHeaderFormActions.js";
 
 export function AdminMasterBrandForm({
   brand = null,
@@ -8,6 +9,7 @@ export function AdminMasterBrandForm({
   onSubmit = null,
   onDelete = null,
   onCancel = null,
+  actionsInBody = true,
 } = {}) {
   const draft = cloneBrand(brand);
   const section = document.createElement("section");
@@ -63,7 +65,10 @@ export function AdminMasterBrandForm({
   addModel.id = "admst_add_model_button";
   addModel.type = "button";
   addModel.prepend(createIcon("sparkles", { className: "h-4 w-4" }));
-  modelsHeader.append(copy, addModel);
+  modelsHeader.append(copy);
+  if (actionsInBody) {
+    modelsHeader.append(addModel);
+  }
 
   const modelRows = document.createElement("section");
   modelRows.id = "admst_model_rows_section";
@@ -117,7 +122,13 @@ export function AdminMasterBrandForm({
   submit.prepend(createIcon("sparkles", { className: "h-4 w-4" }));
   actions.append(cancel, submit);
 
-  form.append(fields, modelsSection, actions);
+  if (actionsInBody) {
+    form.append(fields, modelsSection, actions);
+  } else {
+    submit.setAttribute("form", form.id);
+    form.append(fields, modelsSection);
+    section.modalHeaderActions = () => ModalHeaderActions({ children: [addModel, ...(mode === "edit" ? [actions.firstElementChild] : []), submit, cancel] });
+  }
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     onSubmit?.({

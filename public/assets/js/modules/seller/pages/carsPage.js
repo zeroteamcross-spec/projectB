@@ -141,7 +141,10 @@ function openCarFormModal({ runtime, brandOptions, cityOptions }) {
     cityOptions,
     step: runtime.formStep ?? 1,
     showNavigation: false,
-    onStepChange: (formStep) => setRuntime({ formStep }),
+    onStepChange: (formStep) => {
+      setRuntime({ formStep });
+      requestAnimationFrame(() => document.querySelector("#slrc_car_form_modal_body_section")?.scrollTo({ top: 0, left: 0, behavior: "auto" }));
+    },
     onCancel: () => setRuntime({ mode: "list", selectedCar: null, form: null, error: "", formStep: 1 }),
     onChange: (form) => setFormState(form),
     onSubmit: (payload) => saveCar(payload),
@@ -681,6 +684,7 @@ function emptyCarForm() {
     key_count: null,
     stock: 1,
     price_cash: null,
+    dp_amount: null,
     price_discount: null,
     price_credit: null,
     youtube_url: null,
@@ -714,6 +718,7 @@ function carToForm(car) {
     key_count: car?.key_count ?? null,
     stock: car?.stock ?? 1,
     price_cash: car?.price_cash ?? null,
+    dp_amount: car?.dp_amount ?? null,
     price_discount: car?.price_discount ?? null,
     price_credit: car?.price_credit ?? null,
     youtube_url: car?.youtube_url ?? null,

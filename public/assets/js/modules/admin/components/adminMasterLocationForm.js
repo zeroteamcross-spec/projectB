@@ -1,6 +1,7 @@
 import { Button } from "../../../ui/primitives/button.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 import { adminMasterService } from "../services/adminMasterService.js";
+import { ModalHeaderActions } from "../../../ui/composites/modalHeaderFormActions.js";
 
 export function AdminMasterLocationForm({
   city = null,
@@ -9,6 +10,7 @@ export function AdminMasterLocationForm({
   onSubmit = null,
   onDelete = null,
   onCancel = null,
+  actionsInBody = true,
 } = {}) {
   const draft = city ? { ...city } : adminMasterService.createEmptyCity();
   const form = document.createElement("form");
@@ -62,7 +64,13 @@ export function AdminMasterLocationForm({
   right.append(cancel, submit);
   actions.append(left, right);
 
-  form.append(intro, fields, actions);
+  if (actionsInBody) {
+    form.append(intro, fields, actions);
+  } else {
+    submit.setAttribute("form", form.id);
+    form.append(intro, fields);
+    form.modalHeaderActions = () => ModalHeaderActions({ children: [left.firstElementChild, submit, cancel] });
+  }
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     const formData = new FormData(form);

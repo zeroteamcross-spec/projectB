@@ -16,6 +16,7 @@ import { BUYER_MOBILE_FOOTER_ITEMS, BuyerMobileFooterNav } from "../../buyer/com
 import { AffiliateAccountLayout, affiliateAccountActions } from "../../affiliate/components/affiliateAccountShell.js";
 import { publicContextService } from "../../public/services/publicContextService.js";
 import { ModalHeaderFormActions } from "../../../ui/composites/modalHeaderFormActions.js";
+import { ModalHeaderActions } from "../../../ui/composites/modalHeaderFormActions.js";
 
 const PROFILE_MODAL_KEY = "profile-edit-modal";
 const PASSWORD_MODAL_KEY = "profile-password-modal";
@@ -627,6 +628,7 @@ function openEditProfileModal(profile, onSaved) {
 
   const renderModal = () => {
     const form = document.createElement("form");
+    form.id = "profile_password_form";
     form.id = "profile_edit_form";
     form.className = "grid min-w-0 gap-4";
     const cancelEdit = () => {
@@ -734,14 +736,19 @@ function openChangePasswordModal() {
       }
     });
 
+    const cancel = Button({ label: "Batal", variant: "secondary", disabled: saving, onClick: () => { mounted = false; closeModal({ notify: false }); } });
+    cancel.id = "profile_password_cancel_button";
+    cancel.type = "button";
+    const submit = Button({ label: saving ? "Menyimpan..." : "Simpan Password", variant: "primary", disabled: saving });
+    submit.id = "profile_password_submit_button";
+    submit.type = "submit";
+    submit.setAttribute("form", form.id);
+    submit.prepend(createIcon("circleCheck", { className: "h-4 w-4" }));
+
     form.append(
       formInput("Password lama", "profile_current_password_input", "password", draft.current_password, (value) => { draft.current_password = value; }, errors.current_password, saving),
       formInput("Password baru", "profile_new_password_input", "password", draft.new_password, (value) => { draft.new_password = value; }, errors.new_password, saving),
       formInput("Konfirmasi password baru", "profile_new_password_confirmation_input", "password", draft.new_password_confirmation, (value) => { draft.new_password_confirmation = value; }, errors.new_password_confirmation, saving),
-      modalActions(saving, saving ? "Menyimpan..." : "Simpan Password", () => {
-        mounted = false;
-        closeModal({ notify: false });
-      }),
     );
 
     openModal(form, {
@@ -754,6 +761,7 @@ function openChangePasswordModal() {
       headerId: "profile_password_modal_header",
       bodyId: "profile_password_modal_body",
       closeButtonId: "profile_password_modal_close_button",
+      headerActions: () => ModalHeaderActions({ children: [cancel, submit] }),
     });
   };
 
@@ -775,9 +783,6 @@ function openLogoutConfirmModal() {
       iconBox("unlock", "h-11 w-11 rounded-full bg-[color-mix(in_srgb,var(--pb-danger)_12%,white)] text-[var(--pb-danger)]"),
       textWrap("Keluar dari akun?", "Anda akan keluar dari sesi saat ini dan perlu login kembali untuk mengakses akun."),
     );
-
-    const actions = document.createElement("section");
-    actions.className = "flex flex-col-reverse gap-2 border-t border-[var(--pb-border)] pt-4 sm:flex-row sm:justify-end";
 
     const cancel = Button({
       label: "Batal",
@@ -811,8 +816,7 @@ function openLogoutConfirmModal() {
     confirm.id = "profile_logout_confirm_button";
     confirm.prepend(createIcon("unlock", { className: "block h-4 w-4 leading-none" }));
 
-    actions.append(cancel, confirm);
-    content.append(message, actions);
+    content.append(message);
 
     openModal(content, {
       key: LOGOUT_MODAL_KEY,
@@ -824,6 +828,7 @@ function openLogoutConfirmModal() {
       headerId: "profile_logout_confirm_modal_header",
       bodyId: "profile_logout_confirm_modal_body",
       closeButtonId: "profile_logout_confirm_modal_close_button",
+      headerActions: () => ModalHeaderActions({ children: [cancel, confirm] }),
     });
   };
 

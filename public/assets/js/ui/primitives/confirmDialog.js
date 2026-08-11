@@ -10,6 +10,7 @@ export function confirmDialog({
   cancelLabel = "Batal",
   tone = "danger",
   key = "shared-confirm-dialog",
+  hideClose = false,
 } = {}) {
   return new Promise((resolve) => {
     let settled = false;
@@ -81,7 +82,10 @@ export function confirmDialog({
     confirm.prepend(createIcon(tone === "danger" ? "trash" : "circleCheck", { className: "h-4 w-4" }));
     actions.append(cancel, confirm);
 
-    content.append(card, actions);
+    content.append(card);
+    if (!hideClose) {
+      content.append(actions);
+    }
 
     openModal(content, {
       key,
@@ -92,6 +96,7 @@ export function confirmDialog({
       panelId: "pb_confirm_dialog_panel_section",
       bodyId: "pb_confirm_dialog_modal_body_section",
       closeButtonId: "pb_confirm_dialog_close_button",
+      headerActions: hideClose ? () => actions : null,
       panelClassName: "max-w-md border-white/90 bg-[linear-gradient(135deg,rgba(255,255,255,0.98),rgba(250,244,237,0.92),rgba(234,244,249,0.86))]",
       onClose: () => settle(false),
     });

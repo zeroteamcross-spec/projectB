@@ -34,7 +34,7 @@ import { createIcon } from "./iconRegistry.js";
  * setinggi 15px di dalam kotak 90px, jadi terlihat kecil justru karena
  * kotaknya besar.
  */
-export const KELAS_GAMBAR_LOGO = "block h-auto w-auto max-h-16 max-w-full object-contain";
+export const KELAS_GAMBAR_LOGO = "block h-auto w-auto max-h-12 max-w-[200px] object-contain";
 
 export function renderBrandLockup(mark, teks = [], {
   markClass = "",

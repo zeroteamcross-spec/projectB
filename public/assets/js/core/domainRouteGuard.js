@@ -61,7 +61,7 @@ export function enforceDomainRoute({ locationRef = window.location } = {}) {
     // bukan dibiarkan tampil di alamat admin. Tanpa aturan ini seorang seller
     // yang mengetik admin.carlynk.id akan berkeliling seluruh aplikasi dari
     // alamat yang bukan haknya.
-    if (!isAdminPath(path) && !isAdminLoginPath(path)) {
+    if (!isAdminPath(path) && !isAdminLoginPath(path) && !isSharedAuthenticatedPath(path)) {
       locationRef.replace(`${locationRef.protocol}//${peta.default}${locationRef.pathname}${locationRef.search}${locationRef.hash}`);
       return true;
     }
@@ -118,6 +118,13 @@ function isAdminPath(path) {
 
 function isAdminLoginPath(path) {
   return path === "/login/admin" || path === "/google-login/admin";
+}
+
+function isSharedAuthenticatedPath(path) {
+  return path === "/profile"
+    || path.startsWith("/profile/")
+    || path === "/notifications"
+    || path.startsWith("/notifications/");
 }
 
 function defaultPathForHost(peta, host) {
@@ -204,4 +211,3 @@ function hashPath(hash) {
 
   return normalized === "/" ? "/" : normalized.replace(/\/$/, "");
 }
-

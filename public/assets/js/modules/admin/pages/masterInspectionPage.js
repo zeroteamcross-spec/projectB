@@ -2,6 +2,7 @@ import { createPageLifecycle } from "../../../core/lifecycle.js";
 import { inspectionsResource } from "../../../resources/inspectionsResource.js";
 import { appStore } from "../../../state/store.js";
 import { Button } from "../../../ui/primitives/button.js";
+import { ModalHeaderActions } from "../../../ui/composites/modalHeaderFormActions.js";
 import { DataTable, DataTablePagination } from "../../../ui/composites/dataTable.js";
 import { openModal, closeModal } from "../../../ui/primitives/modal.js";
 import { showToast } from "../../../ui/primitives/toast.js";
@@ -367,13 +368,17 @@ function editorSection({ template, saving, onSave }) {
   save.disabled = saving;
   save.prepend(createIcon("edit", { className: "h-4 w-4" }));
 
+  const cancel = Button({ label: "Batal", variant: "secondary", disabled: saving, onClick: () => closeModal({ notify: false }) });
+  cancel.id = "admstinsp_cancel_template_button";
+  cancel.type = "button";
+  save.setAttribute("form", form.id);
+
   form.append(
     labelWrap("Section", sectionInput),
     labelWrap("Nama item", itemName),
     labelWrap("Keterangan", description),
     labelWrap("Urutan", sortOrder),
     activeWrap,
-    save,
   );
   form.addEventListener("submit", (event) => {
     event.preventDefault();
@@ -384,6 +389,7 @@ function editorSection({ template, saving, onSave }) {
     textNode("p", "text-xs leading-6 text-gray-600", "Perubahan definisi master hanya memengaruhi draft baru. Report yang sudah tersimpan tetap memakai salinan item saat itu."),
     form,
   );
+  section.modalHeaderActions = () => ModalHeaderActions({ children: [cancel, save] });
   return section;
 }
 
@@ -504,16 +510,18 @@ function labelWrap(label, control) {
 }
 
 function openTemplateModal({ mode, template, saving, actions }) {
-  openModal(editorSection({
+  const content = editorSection({
     template,
     saving,
     onSave: actions.saveTemplate,
-  }), {
+  });
+  openModal(content, {
     key: `admstinsp-template-${mode}-${template?.id ?? "new"}`,
     title: mode === "edit" ? "Edit item master" : "Buat item master",
     description: "Kelola definisi canon master inspection dari modal.",
     size: "lg",
     footer: null,
+    headerActions: () => content.modalHeaderActions?.(),
     panelId: mode === "edit" ? "admstinsp_edit_modal_panel_section" : "admstinsp_create_modal_panel_section",
     headerId: mode === "edit" ? "admstinsp_edit_modal_header_section" : "admstinsp_create_modal_header_section",
     bodyId: mode === "edit" ? "admstinsp_edit_modal_body_section" : "admstinsp_create_modal_body_section",
@@ -525,6 +533,19 @@ function openDetailModal(template, actions) {
   const section = document.createElement("section");
   section.id = "admstinsp_detail_modal_section";
   section.className = "grid gap-4";
+  const edit = actionButton({
+    id: `admstinsp_detail_edit_button_${template.id}`,
+    label: "Edit",
+    icon: "edit",
+    variant: "primary",
+    onClick: () => actions.openEditTemplate(template),
+  });
+  const close = Button({ label: "", variant: "secondary", onClick: () => closeModal({ notify: false }) });
+  close.id = "admstinsp_detail_close_button";
+  close.type = "button";
+  close.title = "Tutup";
+  close.setAttribute("aria-label", "Tutup");
+  close.append(createIcon("circleXmark", { className: "h-4 w-4" }));
   section.append(
     detailGrid([
       ["Section", SECTION_LABELS[template.category_name] ?? template.category_name],
@@ -535,15 +556,6 @@ function openDetailModal(template, actions) {
       ["Dibuat", template.created_at || "-"],
       ["Diperbarui", template.updated_at || "-"],
     ]),
-    modalActionBar([
-      actionButton({
-        id: `admstinsp_detail_edit_button_${template.id}`,
-        label: "Edit",
-        icon: "edit",
-        variant: "primary",
-        onClick: () => actions.openEditTemplate(template),
-      }),
-    ], "admstinsp_detail_actions_section"),
   );
 
   openModal(section, {
@@ -552,6 +564,7 @@ function openDetailModal(template, actions) {
     description: "Informasi lengkap item master inspection.",
     size: "lg",
     footer: null,
+    headerActions: () => ModalHeaderActions({ children: [edit, close] }),
     panelId: "admstinsp_detail_modal_panel_section",
     headerId: "admstinsp_detail_modal_header_section",
     bodyId: "admstinsp_detail_modal_body_section",
