@@ -81,7 +81,6 @@ export class PublicShell {
 
     renderBrandLockup(mark, [copy], {
       markClass: PUBLIC_MARK_CLASS,
-      imageClass: "block h-10 w-auto max-w-[10rem] object-contain",
       iconName: publicLogoIcon(),
     });
 
@@ -130,7 +129,6 @@ export class PublicShell {
     this.brandSubtitleNode && (this.brandSubtitleNode.textContent = brandConfig.appTagline || "Showroom mobil pilihan");
     renderBrandLockup(this.brandMarkNode, [this.brandCopyNode], {
       markClass: PUBLIC_MARK_CLASS,
-      imageClass: "block h-10 w-auto max-w-[10rem] object-contain",
       iconName: publicLogoIcon(),
     });
     this.actionLink.href = target;

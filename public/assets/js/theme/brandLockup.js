@@ -22,9 +22,18 @@ import { createIcon } from "./iconRegistry.js";
  * @param {HTMLElement} mark  Wadah lambang.
  * @param {Array<HTMLElement|null>} teks  Simpul teks yang disembunyikan saat ada logo.
  */
+/**
+ * Tinggi logo di header. Lebarnya ikut rasio gambar, dibatasi max-w supaya
+ * logo yang sangat memanjang tidak mendorong isi header lainnya.
+ *
+ * Header ikut meninggi mengikuti angka ini -- itu memang konsekuensinya, bukan
+ * efek samping yang terlewat.
+ */
+export const KELAS_GAMBAR_LOGO = "block h-[60px] w-auto max-w-[12rem] object-contain";
+
 export function renderBrandLockup(mark, teks = [], {
   markClass = "",
-  imageClass = "block h-10 w-auto max-w-[10rem] object-contain",
+  imageClass = KELAS_GAMBAR_LOGO,
   iconName = null,
   iconClass = "block h-5 w-5 leading-none",
 } = {}) {

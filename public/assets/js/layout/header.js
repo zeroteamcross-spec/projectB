@@ -86,7 +86,6 @@ function renderBrand(mark, title) {
 
   renderBrandLockup(mark, [title], {
     markClass: tw.layout.shellMark,
-    imageClass: "block h-10 w-auto max-w-[10rem] object-contain",
     iconClass: "h-5 w-5",
   });
 }
