@@ -526,11 +526,10 @@ function openTemplateModal({ mode, template, saving, actions }) {
     title: mode === "edit" ? "Edit item master" : "Buat item master",
     description: "Kelola definisi canon master inspection dari modal.",
     size: "lg",
-    footer: null,
     panelId: mode === "edit" ? "admstinsp_edit_modal_panel_section" : "admstinsp_create_modal_panel_section",
     headerId: mode === "edit" ? "admstinsp_edit_modal_header_section" : "admstinsp_create_modal_header_section",
     bodyId: mode === "edit" ? "admstinsp_edit_modal_body_section" : "admstinsp_create_modal_body_section",
-    headerActions: () => aksiModalDari(isi),
+    footerNode: () => aksiModalDari(isi),
   });
 }
 

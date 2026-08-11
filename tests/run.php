@@ -34,6 +34,7 @@ $tests = [
     Tests\Unit\RoleLabelTest::class,
     Tests\Unit\ThemeBootstrapTest::class,
     Tests\Unit\RoleLoginAccessTest::class,
+    Tests\Unit\ModalFooterTest::class,
 ];
 
 $passed = 0;

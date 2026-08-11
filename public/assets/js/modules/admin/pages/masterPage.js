@@ -830,14 +830,13 @@ function openBrandModal({ mode, brand, brands, actions }) {
     title: mode === "edit" ? "Edit Brand" : "Tambah Brand",
     description: "Brand dan model disimpan dalam payload JSON master cars.brands.",
     size: "xl",
-    footer: null,
     panelId: "admst_brand_modal_section",
     headerId: "admst_brand_modal_header_section",
     bodyId: "admst_brand_modal_body_section",
     // Aksi formnya naik ke header dan menggantikan tombol Tutup. Modal ini
     // memakai seluruh tinggi layar, jadi tombol simpan yang tinggal di dasar
     // form hanya bisa dijangkau setelah menggulir melewati daftar model.
-    headerActions: () => aksiModalDari(isi),
+    footerNode: () => aksiModalDari(isi),
   });
 }
 
@@ -856,11 +855,10 @@ function openSidebarModal({ mode, item, items, actions }) {
     title: mode === "edit" ? "Edit Menu Sidebar" : "Tambah Menu Sidebar",
     description: "Struktur sidebar disimpan sebagai payload JSON master app.sidebar.",
     size: "xl",
-    footer: null,
     panelId: "admst_sidebar_modal_section",
     headerId: "admst_sidebar_modal_header_section",
     bodyId: "admst_sidebar_modal_body_section",
-    headerActions: () => aksiModalDari(isi),
+    footerNode: () => aksiModalDari(isi),
   });
 }
 
@@ -882,11 +880,10 @@ function openBankModal({ mode, bank, banks, actions, state }) {
     title: mode === "edit" ? "Edit Bank" : "Tambah Bank",
     description: "Data bank disimpan dalam payload JSON master payments.banks.",
     size: "xl",
-    footer: null,
     panelId: "admstbk_bank_modal_section",
     headerId: "admstbk_bank_modal_header_section",
     bodyId: "admstbk_bank_modal_body_section",
-    headerActions: () => aksiModalDari(isi),
+    footerNode: () => aksiModalDari(isi),
   });
 }
 
@@ -905,11 +902,10 @@ function openLocationModal({ mode, city, cities, actions, state }) {
     title: mode === "edit" ? "Edit Kota" : "Tambah Kota",
     description: "Data kota disimpan dalam payload JSON master locations.cities.",
     size: "xl",
-    footer: null,
     panelId: "admstloc_city_modal_section",
     headerId: "admstloc_city_modal_header_section",
     bodyId: "admstloc_city_modal_body_section",
-    headerActions: () => aksiModalDari(isi),
+    footerNode: () => aksiModalDari(isi),
   });
 }
 

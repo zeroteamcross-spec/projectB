@@ -242,7 +242,13 @@ export function openModal(content, options = {}) {
     title: options.title ?? "",
     description: options.description ?? "",
     size: options.size ?? "md",
-    footer: options.footer ?? "default",
+    // `??` di sini dulu membatalkan maksud pemanggilnya: syncModalFooter
+    // membuang footer hanya kalau nilainya persis null, sementara `null ??
+    // "default"` menghasilkan "default". Jadi 31 pemanggil yang menulis
+    // `footer: null` tetap mendapat footer bawaan lengkap dengan tombol Tutup,
+    // dan tidak ada yang error -- footernya cuma muncul di tempat yang sudah
+    // punya tombolnya sendiri.
+    footer: options.footer === null ? null : (options.footer ?? "default"),
     closeLabel: options.closeLabel ?? "Tutup",
     closeButtonId: options.closeButtonId ?? "",
     hideClose: Boolean(options.hideClose),
