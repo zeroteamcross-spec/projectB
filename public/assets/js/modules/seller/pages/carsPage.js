@@ -190,7 +190,11 @@ function createCarFormFooter(runtime) {
     label: "Kembali",
     variant: "secondary",
     disabled: saving || currentStep === 1,
-    onClick: () => dispatchCarFormEvent("seller-car-form:previous"),
+    onClick: () => {
+      scrollCarFormModalToTop();
+      dispatchCarFormEvent("seller-car-form:previous");
+      requestAnimationFrame(scrollCarFormModalToTop);
+    },
   });
   back.id = "slrc_car_form_back_button";
   back.prepend(createIcon("arrowLeft", { className: "h-4 w-4" }));
@@ -199,7 +203,11 @@ function createCarFormFooter(runtime) {
   const next = Button({
     label: "Lanjut",
     disabled: saving,
-    onClick: () => dispatchCarFormEvent("seller-car-form:next"),
+    onClick: () => {
+      scrollCarFormModalToTop();
+      dispatchCarFormEvent("seller-car-form:next");
+      requestAnimationFrame(scrollCarFormModalToTop);
+    },
   });
   next.id = "slrc_car_form_next_button";
   next.append(createIcon("arrowRight", { className: "h-4 w-4" }));
@@ -221,6 +229,10 @@ function createCarFormFooter(runtime) {
 
 function dispatchCarFormEvent(name) {
   document.querySelector("#slrc_car_form_section")?.dispatchEvent(new Event(name));
+}
+
+function scrollCarFormModalToTop() {
+  document.querySelector("#slrc_car_form_modal_body_section")?.scrollTo({ top: 0, left: 0, behavior: "auto" });
 }
 
 function setFooterButtonVisibility(button, visible) {
