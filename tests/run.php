@@ -33,6 +33,7 @@ $tests = [
     Tests\Unit\AuthCookieTest::class,
     Tests\Unit\RoleLabelTest::class,
     Tests\Unit\ThemeBootstrapTest::class,
+    Tests\Unit\RoleLoginAccessTest::class,
 ];
 
 $passed = 0;

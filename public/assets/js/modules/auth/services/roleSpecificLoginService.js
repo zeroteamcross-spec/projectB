@@ -26,6 +26,14 @@ const ROLE_CONFIG = Object.freeze({
   },
   seller: {
     role: "seller",
+    // Marketing boleh masuk lewat pintu ini juga. Akun marketing dibuat oleh
+    // showroom-nya di #/seller/affiliates, jadi keduanya datang dari satu
+    // tempat dan wajar berbagi satu halaman login.
+    //
+    // Ini hanya soal pintu masuk, bukan hak akses: peran tetap datang dari
+    // server, dan roleGuard yang menentukan halaman mana yang boleh dibuka.
+    // Marketing yang masuk di sini tetap marketing.
+    acceptedRoles: ["seller", "affiliate_admin"],
     slug: "seller",
     label: "Showroom",
     title: "Login Showroom",
@@ -115,9 +123,23 @@ function acceptedRoles(config) {
     : [config.role];
 }
 
+/**
+ * Tujuan setelah login ditentukan peran akun yang benar-benar masuk, bukan
+ * peran yang dijanjikan judul halamannya.
+ *
+ * Satu halaman login bisa menerima lebih dari satu peran -- lihat
+ * acceptedRoles. Kalau tujuannya diambil dari config.home begitu saja,
+ * marketing yang masuk lewat /login/seller akan dikirim ke /seller, ditolak
+ * roleGuard, lalu dipantulkan lagi ke halaman login. Terlihat seperti login
+ * yang gagal, padahal sesinya sudah jadi.
+ */
 function homeForAuthenticatedRole(role, config) {
   if (role === "super_admin") {
     return "/super-admin";
+  }
+
+  if (role && role !== config.role) {
+    return roleSpecificLoginService.configForRole(role).home;
   }
 
   return config.home;
