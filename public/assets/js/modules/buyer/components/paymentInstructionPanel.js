@@ -155,11 +155,11 @@ function walletPanel({ method, qrCodeUrl, deeplinkUrl, isDownloadingQr = false, 
 
   if (qrCodeUrl) {
     const qrWrap = document.createElement("div");
-    qrWrap.className = "grid gap-3 rounded-[1.25rem] border border-white/70 bg-white/95 p-4 shadow-sm";
+    qrWrap.className = "grid gap-3 rounded-[1.25rem] border border-[var(--pb-card-border)] bg-white/95 p-4 shadow-sm";
     const image = document.createElement("img");
     image.src = qrCodeUrl;
     image.alt = method === "gopay" ? "QR pembayaran GoPay" : "QR pembayaran QRIS";
-    image.className = "mx-auto h-auto w-full max-w-[280px] rounded-2xl border border-gray-100 bg-white object-contain";
+    image.className = "mx-auto h-auto w-full max-w-[280px] rounded-2xl border border-[var(--pb-card-border)] bg-white object-contain";
     qrWrap.append(image);
     section.append(qrWrap);
   } else {

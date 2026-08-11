@@ -134,7 +134,7 @@ function fulfillmentChecklistCard({
 
 function checklistItem({ item, draft, disabled, onToggle, onNote, onDate }) {
   const row = document.createElement("section");
-  row.className = "grid gap-3 rounded-[1rem] border border-gray-100 bg-gray-50/70 p-3 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-start";
+  row.className = "grid gap-3 rounded-[1rem] border border-[var(--pb-card-border)] bg-gray-50/70 p-3 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-start";
 
   const checkbox = document.createElement("input");
   checkbox.type = "checkbox";
@@ -298,7 +298,7 @@ function identityCard(title, rows = []) {
 
   rows.forEach(([label, value]) => {
     const row = document.createElement("div");
-    row.className = "grid gap-1 border-b border-gray-100 pb-3 last:border-b-0 last:pb-0 sm:grid-cols-[180px_minmax(0,1fr)] sm:items-start";
+    row.className = "grid gap-1 border-b border-[var(--pb-card-border)] pb-3 last:border-b-0 last:pb-0 sm:grid-cols-[180px_minmax(0,1fr)] sm:items-start";
 
     const labelNode = document.createElement("span");
     labelNode.className = "text-xs text-gray-500";

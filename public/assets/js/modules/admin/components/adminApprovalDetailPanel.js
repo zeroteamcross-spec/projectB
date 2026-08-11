@@ -38,7 +38,7 @@ export function AdminApprovalDetailPanel({
   const meta = adminApprovalQueueService.approvalMeta(user);
 
   const heading = document.createElement("div");
-  heading.className = "grid gap-4 rounded-[1.5rem] border border-white/80 bg-white/72 p-4 shadow-sm sm:grid-cols-[auto_minmax(0,1fr)] sm:items-start";
+  heading.className = "grid gap-4 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white/72 p-4 shadow-sm sm:grid-cols-[auto_minmax(0,1fr)] sm:items-start";
   const icon = document.createElement("span");
   icon.className = "grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#1e81b0,#1e81b0)] text-white shadow-[0_14px_34px_rgba(30,129,176,0.22)]";
   icon.append(createIcon("user", { className: "h-5 w-5" }));
@@ -64,7 +64,7 @@ export function AdminApprovalDetailPanel({
   );
 
   const facts = document.createElement("div");
-  facts.className = `grid gap-2 ${tw.surface.insetGrid} border border-white/80 bg-white/60 sm:grid-cols-2`;
+  facts.className = `grid gap-2 ${tw.surface.insetGrid} border border-[var(--pb-card-border)] bg-white/60 sm:grid-cols-2`;
   [
     ["User ID", String(user.id)],
     ["Telepon", user.phone_number || "-"],
@@ -80,7 +80,7 @@ export function AdminApprovalDetailPanel({
   }
 
   const actions = document.createElement("div");
-  actions.className = "grid gap-2 rounded-[1.5rem] border border-white/80 bg-white/74 p-4 shadow-sm sm:grid-cols-2";
+  actions.className = "grid gap-2 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white/74 p-4 shadow-sm sm:grid-cols-2";
 
   if (adminApprovalQueueService.isApprovable(user)) {
     const approve = Button({
@@ -116,7 +116,7 @@ export function AdminApprovalDetailPanel({
 
 function infoRow(label, value) {
   const row = document.createElement("div");
-  row.className = "flex flex-col gap-1 rounded-2xl border border-white/80 bg-white/90 px-3 py-3 shadow-sm";
+  row.className = "flex flex-col gap-1 rounded-2xl border border-[var(--pb-card-border)] bg-white/90 px-3 py-3 shadow-sm";
   row.append(
     textBlock("text-gray-500", label),
     textBlock("font-semibold text-gray-900 sm:text-right", value),

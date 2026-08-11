@@ -328,7 +328,7 @@ function commissionsHero({ summary, actions }) {
     ["Aktif", summary.activeOverrides],
   ].forEach(([label, value]) => {
     const stat = document.createElement("section");
-    stat.className = "rounded-[1.25rem] border border-white/80 bg-white/78 p-3 shadow-sm";
+    stat.className = "rounded-[1.25rem] border border-[var(--pb-card-border)] bg-white/78 p-3 shadow-sm";
     stat.append(
       textBlock("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label),
       textBlock("p", "text-xl font-black text-gray-950", String(value)),
@@ -363,7 +363,7 @@ function heroActions(actions) {
 function filterBar({ query, overrides, onChange }) {
   const section = document.createElement("section");
   section.id = "slrafc_filter_section";
-  section.className = "grid gap-3 rounded-[1.5rem] border border-white/80 bg-white/80 p-4 shadow-[0_18px_55px_rgba(15,23,42,0.07)] backdrop-blur-xl lg:grid-cols-[minmax(0,1fr)_180px_180px_180px] lg:items-end";
+  section.className = "grid gap-3 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white/80 p-4 shadow-[0_18px_55px_rgba(15,23,42,0.07)] backdrop-blur-xl lg:grid-cols-[minmax(0,1fr)_180px_180px_180px] lg:items-end";
   section.dataset.ds = "seller.commissions.filters";
 
   const searchWrap = fieldWrap("Cari komisi");
@@ -669,7 +669,7 @@ function commissionDetailPanel({ rule, onEdit }) {
   section.className = "grid min-w-0 gap-4";
 
   const header = document.createElement("section");
-  header.className = "grid gap-3 rounded-[1.5rem] border border-white/80 bg-[var(--pb-surface-inset)] p-4";
+  header.className = "grid gap-3 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-[var(--pb-surface-inset)] p-4";
   header.append(
     textBlock("p", "text-xl font-black text-gray-950", sellerAffiliateCommissionService.carLabel(rule.car)),
     textBlock("p", "text-xs font-semibold text-gray-600", "Aturan komisi ini berlaku untuk transaksi referral pada mobil terkait."),

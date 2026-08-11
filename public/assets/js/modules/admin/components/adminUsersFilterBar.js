@@ -5,7 +5,7 @@ import { createIcon } from "../../../theme/iconRegistry.js";
 export function AdminUsersFilterBar({ filters = {}, counts = {}, onSubmit = null } = {}) {
   const form = document.createElement("form");
   form.id = "adusr_filter_section";
-  form.className = `grid min-w-0 gap-4 ${tw.section.toolbar} border-white/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.94),rgba(234,244,249,0.72),rgba(250,244,237,0.70))] lg:grid-cols-[minmax(0,1.2fr)_180px_220px_auto]`;
+  form.className = `grid min-w-0 gap-4 ${tw.section.toolbar} border-[var(--pb-card-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.94),rgba(234,244,249,0.72),rgba(250,244,237,0.70))] lg:grid-cols-[minmax(0,1.2fr)_180px_220px_auto]`;
 
   const heading = document.createElement("div");
   heading.className = "flex min-w-0 items-start gap-3 lg:col-span-4";

@@ -51,9 +51,16 @@ function syncModalHeader(panel, modal) {
   // changes: same X button as always.
   const customActions = modalRuntime.get(modal.key)?.headerActions;
   const resolvedCustomActions = typeof customActions === "function" ? customActions() : customActions;
-  const rightSlot = resolvedCustomActions instanceof Node ? resolvedCustomActions : defaultCloseButton(header, modal);
+  // hideClose untuk modal yang tombol aksinya sudah ada di badan dan tidak
+  // punya apa pun untuk ditaruh di header -- dialog konfirmasi misalnya, yang
+  // Batal-nya sudah jelas terlihat tanpa perlu tanda silang di pojok.
+  const rightSlot = resolvedCustomActions instanceof Node
+    ? resolvedCustomActions
+    : modal.hideClose
+      ? null
+      : defaultCloseButton(header, modal);
 
-  header.replaceChildren(copy, rightSlot);
+  header.replaceChildren(...[copy, rightSlot].filter(Boolean));
   if (!existing) {
     panel.prepend(header);
   }
@@ -238,6 +245,7 @@ export function openModal(content, options = {}) {
     footer: options.footer ?? "default",
     closeLabel: options.closeLabel ?? "Tutup",
     closeButtonId: options.closeButtonId ?? "",
+    hideClose: Boolean(options.hideClose),
     panelId: options.panelId ?? "",
     bodyId: options.bodyId ?? "",
     headerId: options.headerId ?? "",

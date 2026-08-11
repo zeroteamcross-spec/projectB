@@ -161,7 +161,7 @@ function carPriceHint(car) {
 
 function instructionStrip() {
   const strip = document.createElement("div");
-  strip.className = "grid gap-2 border-t border-white/60 pt-4 text-xs text-gray-600";
+  strip.className = "grid gap-2 border-t border-[var(--pb-card-border)] pt-4 text-xs text-gray-600";
   [
     "Pilih DP bila ingin membuat sesi pembayaran uang muka terlebih dahulu.",
     "Setelah submit, buyer langsung mendapat transaction record dan payment session awal.",

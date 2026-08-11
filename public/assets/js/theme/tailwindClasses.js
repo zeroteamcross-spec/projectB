@@ -11,7 +11,19 @@ export const tw = {
   },
   layout: {
     shell: "min-h-screen grid min-w-0 grid-cols-1 overflow-x-clip md:grid-cols-[80px_minmax(0,1fr)] xl:grid-cols-[272px_minmax(0,1fr)]",
-    sidebar: "hidden min-w-0 bg-[linear-gradient(180deg,var(--pb-shell-sidebar-start),var(--pb-shell-sidebar-end))] px-3 py-4 text-[var(--pb-shell-nav-text)] shadow-[var(--pb-shadow-elevated)] md:sticky md:top-0 md:block md:h-screen md:overflow-y-auto md:py-6 xl:px-6",
+    // Sidebar kaca. Tiga lapis bertumpuk dalam satu background:
+    //
+    //   1. kilau diagonal dari kiri atas -- putih pekat lalu memudar habis di
+    //      tengah, itu yang membuat permukaannya terbaca sebagai kaca dan
+    //      bukan sekadar warna transparan;
+    //   2. sorotan lembut di sudut kiri atas, supaya kilaunya punya sumber;
+    //   3. warna dasarnya sendiri, ditipiskan lewat color-mix.
+    //
+    // Warnanya tetap ditipiskan meski di belakangnya hanya kanvas polos. Kaca
+    // yang benar-benar tembus butuh sesuatu di belakangnya; yang dikejar di
+    // sini kesan permukaannya, dan itu datang dari kilau plus garis tepi tipis,
+    // bukan dari transparansinya.
+    sidebar: "hidden min-w-0 border-r border-white/15 bg-[linear-gradient(135deg,rgba(255,255,255,0.26),rgba(255,255,255,0.06)_34%,rgba(255,255,255,0)_58%),radial-gradient(120%_80%_at_0%_0%,rgba(255,255,255,0.20),transparent_60%),linear-gradient(170deg,color-mix(in_srgb,var(--pb-shell-sidebar-start)_88%,transparent),color-mix(in_srgb,var(--pb-shell-sidebar-end)_94%,transparent))] px-3 py-4 text-[var(--pb-shell-nav-text)] shadow-[0_24px_80px_rgba(15,23,42,0.32)] backdrop-blur-2xl md:sticky md:top-0 md:block md:h-screen md:overflow-y-auto md:py-6 xl:px-6",
     brand: "text-lg font-bold tracking-normal text-white",
     sidebarBrandBlock: "mb-[var(--pb-space-xl)] grid gap-1",
     sidebarTagline: "text-[10px] font-medium text-white/70",
@@ -48,9 +60,9 @@ export const tw = {
     gradientBrand: "bg-[linear-gradient(90deg,var(--pb-brand-secondary),var(--pb-brand-accent),var(--pb-brand-primary))] bg-clip-text text-transparent",
   },
   surface: {
-    card: "rounded-[var(--pb-radius-xl)] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] p-4 shadow-[var(--pb-shadow-card)] backdrop-blur",
-    raisedCard: "p-[10px] rounded-[var(--pb-radius-2xl)] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] shadow-[var(--pb-shadow-card)] backdrop-blur",
-    mutedCard: "rounded-[var(--pb-radius-xl)] border border-[var(--pb-border)] bg-[var(--pb-surface-muted)] p-3",
+    card: "rounded-[var(--pb-radius-xl)] border border-[var(--pb-card-border)] bg-[var(--pb-surface-card)] p-4 shadow-[var(--pb-shadow-card)] backdrop-blur",
+    raisedCard: "p-[10px] rounded-[var(--pb-radius-2xl)] border border-[var(--pb-card-border)] bg-[var(--pb-surface-card)] shadow-[var(--pb-shadow-card)] backdrop-blur",
+    mutedCard: "rounded-[var(--pb-radius-xl)] border border-[var(--pb-card-border)] bg-[var(--pb-surface-muted)] p-3",
     inset: "rounded-[var(--pb-radius-xl)] bg-[var(--pb-surface-inset)] p-3",
     insetGrid: "rounded-[var(--pb-radius-xl)] bg-[var(--pb-surface-inset)] p-3 text-xs",
     accentPanel: "rounded-[var(--pb-radius-xl)] border border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] bg-[var(--pb-surface-panel)] p-4 shadow-[var(--pb-shadow-card)] backdrop-blur",
@@ -113,7 +125,7 @@ export const tw = {
   },
   modal: {
     root: "fixed inset-0 z-[80] grid place-items-center bg-[var(--pb-overlay)] p-3 backdrop-blur-sm sm:p-4",
-    panel: "flex max-h-[min(92vh,820px)] w-full max-w-lg min-w-0 flex-col overflow-hidden rounded-[1.75rem] border border-white/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(250,244,237,0.90),rgba(234,244,249,0.82))] shadow-[0_28px_90px_rgba(15,23,42,0.24)] backdrop-blur-xl animate-[pbModalIn_180ms_cubic-bezier(0.22,1,0.36,1)]",
+    panel: "flex max-h-[min(92vh,820px)] w-full max-w-lg min-w-0 flex-col overflow-hidden rounded-[1.75rem] border border-[var(--pb-card-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(250,244,237,0.90),rgba(234,244,249,0.82))] shadow-[0_28px_90px_rgba(15,23,42,0.24)] backdrop-blur-xl animate-[pbModalIn_180ms_cubic-bezier(0.22,1,0.36,1)]",
   },
   toast: {
     base: "pointer-events-auto relative grid w-full min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-3 overflow-hidden rounded-[1.25rem] border px-4 py-4 text-left shadow-[0_22px_70px_rgba(15,23,42,0.16)] backdrop-blur-xl animate-[pbModalIn_180ms_cubic-bezier(0.22,1,0.36,1)]",

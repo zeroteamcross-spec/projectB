@@ -99,7 +99,7 @@ export function AdminMasterSidebarList({
 function reorderBoard({ items = [], onReorder = null }) {
   const section = document.createElement("section");
   section.id = "admst_sidebar_reorder_section";
-  section.className = "grid gap-3 rounded-[1.5rem] border border-white/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.95),rgba(236,246,239,0.78),rgba(250,244,237,0.78))] p-4 shadow-[var(--pb-shadow-card)]";
+  section.className = "grid gap-3 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.95),rgba(236,246,239,0.78),rgba(250,244,237,0.78))] p-4 shadow-[var(--pb-shadow-card)]";
   section.dataset.ds = "admin.master.sidebar.reorder";
   let visible = false;
 
@@ -147,7 +147,7 @@ function reorderBoard({ items = [], onReorder = null }) {
     card.type = "button";
     card.draggable = true;
     card.dataset.itemId = item.id;
-    card.className = "grid cursor-grab grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-[1.15rem] border border-white/80 bg-white/88 px-3 py-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md active:cursor-grabbing";
+    card.className = "grid cursor-grab grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-[1.15rem] border border-[var(--pb-card-border)] bg-white/88 px-3 py-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md active:cursor-grabbing";
     const handle = document.createElement("span");
     handle.className = "grid h-9 w-9 place-items-center rounded-xl bg-[color-mix(in_srgb,var(--pb-brand-primary)_8%,white)] text-[color-mix(in_srgb,var(--pb-brand-primary)_84%,black)] ring-1 ring-[color-mix(in_srgb,var(--pb-brand-primary)_14%,white)]";
     handle.append(createIcon("sort", { className: "h-4 w-4" }));

@@ -345,7 +345,7 @@ function transactionsHero({ transactions, filteredTransactions, onDashboard }) {
     ["Nilai", formatCurrency(summary.totalValue)],
   ].forEach(([label, value]) => {
     const card = document.createElement("section");
-    card.className = "rounded-[1.25rem] border border-white/80 bg-white/78 p-3 shadow-sm";
+    card.className = "rounded-[1.25rem] border border-[var(--pb-card-border)] bg-white/78 p-3 shadow-sm";
     card.append(
       textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label),
       textNode("p", "break-words text-xl font-black text-gray-950", String(value)),
@@ -374,7 +374,7 @@ function transactionsFilterBar({ query, transactions, onChange }) {
   const paymentTypes = uniqueValues(transactions.map((transaction) => transaction.payment_type));
   const section = document.createElement("section");
   section.id = "slrtx_filter_section";
-  section.className = "grid gap-3 rounded-[1.5rem] border border-white/80 bg-white/80 p-4 shadow-[0_18px_55px_rgba(15,23,42,0.07)] backdrop-blur-xl md:grid-cols-[minmax(0,1fr)_190px_170px_170px] md:items-end";
+  section.className = "grid gap-3 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white/80 p-4 shadow-[0_18px_55px_rgba(15,23,42,0.07)] backdrop-blur-xl md:grid-cols-[minmax(0,1fr)_190px_170px_170px] md:items-end";
   section.dataset.ds = "seller.transactions.filters";
 
   const searchWrap = controlWrap("Cari transaksi");

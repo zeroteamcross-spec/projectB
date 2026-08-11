@@ -42,7 +42,7 @@ export function SellerImageUploadPanel({
   errorNode.hidden = !error;
 
   const label = document.createElement("label");
-  label.className = `${tw.form.label} rounded-[var(--pb-radius-xl)] border border-white/80 bg-white/80 p-3 shadow-[var(--pb-shadow-soft)]`;
+  label.className = `${tw.form.label} rounded-[var(--pb-radius-xl)] border border-[var(--pb-card-border)] bg-white/80 p-3 shadow-[var(--pb-shadow-soft)]`;
   label.append(document.createTextNode("Pilih gambar"));
   const input = document.createElement("input");
   input.id = "slri_upload_image_input";

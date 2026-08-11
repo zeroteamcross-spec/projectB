@@ -4,7 +4,7 @@ import { getListingLockStatus } from "../../../utils/transactionStatus.js";
 
 export function PublicStickyCta({ car, onStartTransaction = null, onConsult = null } = {}) {
   const bar = document.createElement("div");
-  bar.className = "fixed inset-x-0 bottom-0 z-20 border-t border-white/70 bg-white/95 px-4 py-3 shadow-card backdrop-blur sm:hidden";
+  bar.className = "fixed inset-x-0 bottom-0 z-20 border-t border-[var(--pb-card-border)] bg-white/95 px-4 py-3 shadow-card backdrop-blur sm:hidden";
   applyDesignHook(bar, "public.car_detail.sticky_cta");
   const lock = getListingLockStatus({ car });
 

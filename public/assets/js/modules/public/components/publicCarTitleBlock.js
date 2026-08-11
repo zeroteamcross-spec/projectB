@@ -3,7 +3,7 @@ import { getListingStatusMeta } from "../../../utils/transactionStatus.js";
 
 export function PublicCarTitleBlock({ car } = {}) {
   const section = document.createElement("section");
-  section.className = "grid gap-4 rounded-[28px] border border-white/75 bg-white/95 p-5 shadow-card backdrop-blur";
+  section.className = "grid gap-4 rounded-[28px] border border-[var(--pb-card-border)] bg-white/95 p-5 shadow-card backdrop-blur";
 
   const statusRow = document.createElement("div");
   statusRow.className = "flex flex-wrap items-center gap-2";

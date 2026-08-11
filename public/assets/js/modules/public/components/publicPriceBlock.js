@@ -3,7 +3,7 @@ import { tw } from "../../../theme/tailwindClasses.js";
 
 export function PublicPriceBlock({ car } = {}) {
   const section = document.createElement("section");
-  section.className = "grid gap-4 rounded-[24px] border border-white/75 bg-white/95 p-5 shadow-card backdrop-blur";
+  section.className = "grid gap-4 rounded-[24px] border border-[var(--pb-card-border)] bg-white/95 p-5 shadow-card backdrop-blur";
 
   const label = document.createElement("p");
   label.className = "text-[10px] font-semibold uppercase tracking-normal text-[var(--pb-brand-secondary)]";

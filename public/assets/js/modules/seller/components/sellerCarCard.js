@@ -9,7 +9,7 @@ export function SellerCarCard({ car, onEdit = null, onArchive = null, onImages =
   const cardId = car?.id ?? "unknown";
   const section = document.createElement("section");
   section.id = `slrc_car_card_${cardId}_section`;
-  section.className = "group grid min-w-0 gap-4 overflow-hidden rounded-[1.5rem] border border-gray-100 bg-white/90 p-4 shadow-[0_18px_55px_rgba(15,23,42,0.08)] backdrop-blur-xl transition duration-150 hover:-translate-y-0.5 hover:border-[var(--pb-border)] hover:shadow-[0_24px_70px_rgba(15,23,42,0.11)] sm:p-5";
+  section.className = "group grid min-w-0 gap-4 overflow-hidden rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white/90 p-4 shadow-[0_18px_55px_rgba(15,23,42,0.08)] backdrop-blur-xl transition duration-150 hover:-translate-y-0.5 hover:border-[var(--pb-border)] hover:shadow-[0_24px_70px_rgba(15,23,42,0.11)] sm:p-5";
   section.dataset.ds = "seller.cars.card";
 
   const top = document.createElement("section");
@@ -61,7 +61,7 @@ export function SellerCarCard({ car, onEdit = null, onArchive = null, onImages =
 
   const actions = document.createElement("section");
   actions.id = `slrc_car_card_actions_${cardId}_section`;
-  actions.className = "grid gap-2 border-t border-gray-100 pt-4 sm:flex sm:flex-wrap sm:justify-end";
+  actions.className = "grid gap-2 border-t border-[var(--pb-card-border)] pt-4 sm:flex sm:flex-wrap sm:justify-end";
 
   const edit = Button({ label: "Edit", variant: "secondary", onClick: () => onEdit?.(car) });
   edit.id = `slrc_edit_car_button_${cardId}`;
@@ -91,7 +91,7 @@ export function SellerCarCard({ car, onEdit = null, onArchive = null, onImages =
 function factNode(id, label, value, iconName) {
   const node = document.createElement("section");
   node.id = id;
-  node.className = "flex min-w-0 items-center gap-3 rounded-[1rem] border border-gray-100 bg-gray-50/80 px-3 py-2.5";
+  node.className = "flex min-w-0 items-center gap-3 rounded-[1rem] border border-[var(--pb-card-border)] bg-gray-50/80 px-3 py-2.5";
   const icon = document.createElement("span");
   icon.className = "grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-white text-[var(--pb-brand-secondary)] shadow-sm";
   icon.append(createIcon(iconName, { className: "h-3.5 w-3.5" }));

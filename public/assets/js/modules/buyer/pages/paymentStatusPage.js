@@ -369,7 +369,7 @@ function fulfillmentProgressPanel({ transaction, isFinishing = false, onFinish =
 
 function readOnlyChecklistItem(item) {
   const row = document.createElement("section");
-  row.className = "grid gap-2 rounded-[1rem] border border-gray-100 bg-gray-50/70 p-3";
+  row.className = "grid gap-2 rounded-[1rem] border border-[var(--pb-card-border)] bg-gray-50/70 p-3";
 
   const top = document.createElement("div");
   top.className = "flex min-w-0 items-start gap-3";
@@ -438,7 +438,7 @@ function pendingPaymentGuidePanel(transaction) {
     ["3", "Tunggu konfirmasi", "Halaman akan refresh otomatis; gunakan refresh manual hanya jika perlu."],
   ].forEach(([number, label, description]) => {
     const item = document.createElement("section");
-    item.className = "grid gap-2 rounded-2xl border border-white/70 bg-white/90 p-4 shadow-sm";
+    item.className = "grid gap-2 rounded-2xl border border-[var(--pb-card-border)] bg-white/90 p-4 shadow-sm";
     const mark = document.createElement("span");
     mark.className = "grid h-8 w-8 place-items-center rounded-full bg-[var(--pb-brand-primary)] text-xs font-black text-white";
     mark.textContent = number;

@@ -14,7 +14,7 @@ export function AdminDashboardTransactionsPanel({ transactions = [], onOpenTrans
   section.className = "grid gap-1";
 
   const header = document.createElement("div");
-  header.className = "bg-white flex flex-col gap-4 rounded-[1.5rem] border border-white/80 bg-white/72 p-4 shadow-[0_16px_45px_rgba(15,23,42,0.06)] backdrop-blur md:flex-row md:items-center md:justify-between";
+  header.className = "bg-white flex flex-col gap-4 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white/72 p-4 shadow-[0_16px_45px_rgba(15,23,42,0.06)] backdrop-blur md:flex-row md:items-center md:justify-between";
   const titleWrap = document.createElement("div");
   titleWrap.className = "flex min-w-0 items-center gap-3";
   const iconWrap = document.createElement("div");

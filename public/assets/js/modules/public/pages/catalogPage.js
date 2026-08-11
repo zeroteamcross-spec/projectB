@@ -733,7 +733,7 @@ function loadMoreSection({ canLoadMore, isLoadingMore, onLoadMore }) {
 function statsPanel({ count, meta, affiliate }) {
   const panel = "";
   // const panel = document.createElement("section");
-  // panel.className = "grid grid-cols-2 gap-px overflow-hidden rounded-[22px] border border-white/70 bg-white/96 shadow-card sm:grid-cols-4";
+  // panel.className = "grid grid-cols-2 gap-px overflow-hidden rounded-[22px] border border-[var(--pb-card-border)] bg-white/96 shadow-card sm:grid-cols-4";
   // applyDesignHook(panel, "catalog.stats.panel");
   // panel.append(
   //   compactStat(String(meta?.total ?? count ?? 0), "Mobil Tersedia", "text-[var(--pb-brand-secondary)]"),

@@ -3,6 +3,7 @@ import { appStore } from "../../../state/store.js";
 import { Button } from "../../../ui/primitives/button.js";
 import { confirmDialog } from "../../../ui/primitives/confirmDialog.js";
 import { openModal, closeModal } from "../../../ui/primitives/modal.js";
+import { aksiModalDari } from "../../../ui/composites/modalHeaderFormActions.js";
 import { showToast } from "../../../ui/primitives/toast.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 import { applyDesignHook } from "../../../theme/designStudioHooks.js";
@@ -650,7 +651,7 @@ function masterHero({ action, pageType, brands = [], sidebarItems = [], banks = 
   statItems.forEach(([label, value]) => {
     const card = document.createElement("section");
     card.id = `${isLocation ? "admstloc" : isBank ? "admstbk" : "admst"}_hero_stat_${String(label).toLowerCase()}_section`;
-    card.className = "rounded-[1.25rem] border border-white/80 bg-white/78 p-3 shadow-sm";
+    card.className = "rounded-[1.25rem] border border-[var(--pb-card-border)] bg-white/78 p-3 shadow-sm";
     card.append(
       textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label),
       textNode("p", "text-xl font-black text-gray-950", String(value)),
@@ -816,13 +817,15 @@ function masterSidebarFilterBar({ filters, items, onSubmit }) {
 }
 
 function openBrandModal({ mode, brand, brands, actions }) {
-  openModal(applyDesignHook(AdminMasterBrandForm({
+  const isi = applyDesignHook(AdminMasterBrandForm({
     brand,
     mode,
     onSubmit: (nextBrand) => actions.saveBrand(nextBrand, brands),
     onDelete: (targetBrand) => actions.deleteBrand(targetBrand, brands),
     onCancel: () => closeModal(),
-  }), "admin.master.brand.form"), {
+  }), "admin.master.brand.form");
+
+  openModal(isi, {
     key: `admst-brand-${mode}-${brand?.id ?? "new"}`,
     title: mode === "edit" ? "Edit Brand" : "Tambah Brand",
     description: "Brand dan model disimpan dalam payload JSON master cars.brands.",
@@ -831,19 +834,24 @@ function openBrandModal({ mode, brand, brands, actions }) {
     panelId: "admst_brand_modal_section",
     headerId: "admst_brand_modal_header_section",
     bodyId: "admst_brand_modal_body_section",
-    closeButtonId: "admst_brand_modal_close_button",
+    // Aksi formnya naik ke header dan menggantikan tombol Tutup. Modal ini
+    // memakai seluruh tinggi layar, jadi tombol simpan yang tinggal di dasar
+    // form hanya bisa dijangkau setelah menggulir melewati daftar model.
+    headerActions: () => aksiModalDari(isi),
   });
 }
 
 function openSidebarModal({ mode, item, items, actions }) {
-  openModal(applyDesignHook(AdminMasterSidebarForm({
+  const isi = applyDesignHook(AdminMasterSidebarForm({
     item,
     items,
     mode,
     onSubmit: (nextItem) => actions.saveSidebarItem(nextItem, items),
     onDelete: (targetItem) => actions.deleteSidebarItem(targetItem, items),
     onCancel: () => closeModal(),
-  }), "admin.master.sidebar.form"), {
+  }), "admin.master.sidebar.form");
+
+  openModal(isi, {
     key: `admst-sidebar-${mode}-${item?.id ?? "new"}`,
     title: mode === "edit" ? "Edit Menu Sidebar" : "Tambah Menu Sidebar",
     description: "Struktur sidebar disimpan sebagai payload JSON master app.sidebar.",
@@ -852,12 +860,12 @@ function openSidebarModal({ mode, item, items, actions }) {
     panelId: "admst_sidebar_modal_section",
     headerId: "admst_sidebar_modal_header_section",
     bodyId: "admst_sidebar_modal_body_section",
-    closeButtonId: "admst_sidebar_modal_close_button",
+    headerActions: () => aksiModalDari(isi),
   });
 }
 
 function openBankModal({ mode, bank, banks, actions, state }) {
-  openModal(applyDesignHook(AdminMasterBankForm({
+  const isi = applyDesignHook(AdminMasterBankForm({
     bank,
     mode,
     saving: state.saving,
@@ -867,7 +875,9 @@ function openBankModal({ mode, bank, banks, actions, state }) {
     onSubmit: (nextBank) => actions.saveBank(nextBank, banks),
     onDelete: (targetBank) => actions.deleteBank(targetBank, banks),
     onCancel: () => closeModal(),
-  }), "admin.master.bank.form"), {
+  }), "admin.master.bank.form");
+
+  openModal(isi, {
     key: `admstbk-bank-${mode}-${bank?.id ?? "new"}`,
     title: mode === "edit" ? "Edit Bank" : "Tambah Bank",
     description: "Data bank disimpan dalam payload JSON master payments.banks.",
@@ -876,19 +886,21 @@ function openBankModal({ mode, bank, banks, actions, state }) {
     panelId: "admstbk_bank_modal_section",
     headerId: "admstbk_bank_modal_header_section",
     bodyId: "admstbk_bank_modal_body_section",
-    closeButtonId: "admstbk_bank_modal_close_button",
+    headerActions: () => aksiModalDari(isi),
   });
 }
 
 function openLocationModal({ mode, city, cities, actions, state }) {
-  openModal(applyDesignHook(AdminMasterLocationForm({
+  const isi = applyDesignHook(AdminMasterLocationForm({
     city,
     mode,
     saving: state.saving,
     onSubmit: (nextCity) => actions.saveCity(nextCity, cities),
     onDelete: (targetCity) => actions.deleteCity(targetCity, cities),
     onCancel: () => closeModal(),
-  }), "admin.master.location.form"), {
+  }), "admin.master.location.form");
+
+  openModal(isi, {
     key: `admstloc-city-${mode}-${city?.id ?? "new"}`,
     title: mode === "edit" ? "Edit Kota" : "Tambah Kota",
     description: "Data kota disimpan dalam payload JSON master locations.cities.",
@@ -897,7 +909,7 @@ function openLocationModal({ mode, city, cities, actions, state }) {
     panelId: "admstloc_city_modal_section",
     headerId: "admstloc_city_modal_header_section",
     bodyId: "admstloc_city_modal_body_section",
-    closeButtonId: "admstloc_city_modal_close_button",
+    headerActions: () => aksiModalDari(isi),
   });
 }
 
@@ -1084,7 +1096,7 @@ function paginate(items, filters) {
 function baseFilterSection(id, designHook) {
   const section = document.createElement("section");
   section.id = id;
-  section.className = "grid gap-4 rounded-[1.5rem] border border-white/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.94),rgba(234,244,249,0.72),rgba(250,244,237,0.72))] p-4 shadow-[var(--pb-shadow-card)] backdrop-blur-xl";
+  section.className = "grid gap-4 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.94),rgba(234,244,249,0.72),rgba(250,244,237,0.72))] p-4 shadow-[var(--pb-shadow-card)] backdrop-blur-xl";
   section.dataset.ds = designHook;
   return section;
 }
@@ -1107,7 +1119,7 @@ function filterActions({ idPrefix, onReset }) {
 function filterChips(id, labels) {
   const chips = document.createElement("section");
   chips.id = id;
-  chips.className = "flex flex-wrap gap-2 border-t border-white/60 pt-3";
+  chips.className = "flex flex-wrap gap-2 border-t border-[var(--pb-card-border)] pt-3";
   labels.forEach((label) => {
     const chip = document.createElement("span");
     chip.className = "rounded-full border border-[var(--pb-border)] bg-[var(--pb-chip-bg)] px-4 py-2 text-xs font-semibold text-[var(--pb-chip-text)] shadow-sm";

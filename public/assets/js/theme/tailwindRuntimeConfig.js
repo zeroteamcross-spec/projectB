@@ -28,6 +28,11 @@
       textMuted: "#6f665e",
       border: "#e7dccd",
       borderStrong: "#d8c9b4",
+      // Border khusus card. Dipisah dari `border` yang bernuansa krem: krem di
+      // atas kanvas putih nyaris tidak terbaca sebagai garis, sehingga card
+      // terlihat mengambang tanpa tepi. Abu-abu netral memberi tepi yang
+      // terlihat tanpa mengubah border kolom isian, yang memang sengaja lembut.
+      cardBorder: "#d7dae0",
       overlay: "rgba(28, 25, 23, 0.55)",
       success: "#15803d",
       warning: "#b45309",
@@ -311,6 +316,7 @@
       "--pb-text-muted": theme.colors.textMuted,
       "--pb-border": theme.colors.border,
       "--pb-border-strong": theme.colors.borderStrong,
+      "--pb-card-border": theme.colors.cardBorder ?? theme.colors.borderStrong,
       "--pb-overlay": theme.colors.overlay,
       "--pb-success": theme.colors.success,
       "--pb-warning": theme.colors.warning,

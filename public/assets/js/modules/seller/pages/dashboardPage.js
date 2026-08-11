@@ -93,7 +93,7 @@ function sellerHero({ router, summary = {}, notFound = false }) {
   ].forEach(([label, value]) => {
     const stat = document.createElement("section");
     stat.id = `slr_hero_stat_${String(label).toLowerCase().replace(/\s+/g, "_")}_section`;
-    stat.className = "rounded-[1.25rem] border border-white/80 bg-white/78 p-3 shadow-sm";
+    stat.className = "rounded-[1.25rem] border border-[var(--pb-card-border)] bg-white/78 p-3 shadow-sm";
     stat.append(
       textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label),
       textNode("p", "text-xl font-black text-gray-950", String(value)),

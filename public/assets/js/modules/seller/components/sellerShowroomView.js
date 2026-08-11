@@ -38,12 +38,12 @@ export function SellerShowroomView({ showroom = null, onEdit = null } = {}) {
 
   const section = document.createElement("section");
   section.id = "slrsr_view_section";
-  section.className = "grid gap-5 rounded-[2rem] border border-white/80 bg-white/86 p-5 shadow-[0_22px_70px_rgba(15,23,42,0.09)] backdrop-blur-xl transition duration-150 sm:p-6";
+  section.className = "grid gap-5 rounded-[2rem] border border-[var(--pb-card-border)] bg-white/86 p-5 shadow-[0_22px_70px_rgba(15,23,42,0.09)] backdrop-blur-xl transition duration-150 sm:p-6";
   section.dataset.ds = "seller.showroom.view";
 
   const header = document.createElement("section");
   header.id = "slrsr_view_header_section";
-  header.className = "flex flex-col gap-3 border-b border-gray-100 pb-5 sm:flex-row sm:items-start sm:justify-between";
+  header.className = "flex flex-col gap-3 border-b border-[var(--pb-card-border)] pb-5 sm:flex-row sm:items-start sm:justify-between";
 
   const titleWrap = document.createElement("div");
   titleWrap.className = "grid min-w-0 gap-2";
@@ -73,7 +73,7 @@ export function SellerShowroomView({ showroom = null, onEdit = null } = {}) {
   FIELDS.forEach((field) => {
     const item = document.createElement("section");
     item.id = `slrsr_fact_${field.key}_section`;
-    item.className = `${field.wide ? "sm:col-span-2 xl:col-span-2" : ""} grid gap-2 rounded-[1.25rem] border border-gray-100 bg-[linear-gradient(135deg,rgba(249,250,251,0.95),rgba(255,255,255,0.88))] px-4 py-4 shadow-sm transition duration-150 hover:-translate-y-0.5 hover:border-[var(--pb-border)] hover:shadow-md`;
+    item.className = `${field.wide ? "sm:col-span-2 xl:col-span-2" : ""} grid gap-2 rounded-[1.25rem] border border-[var(--pb-card-border)] bg-[linear-gradient(135deg,rgba(249,250,251,0.95),rgba(255,255,255,0.88))] px-4 py-4 shadow-sm transition duration-150 hover:-translate-y-0.5 hover:border-[var(--pb-border)] hover:shadow-md`;
 
     const labelRow = document.createElement("div");
     labelRow.className = "flex items-center gap-2";

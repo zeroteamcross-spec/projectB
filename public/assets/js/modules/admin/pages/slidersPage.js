@@ -274,7 +274,7 @@ function hero({ action, sliders }) {
     ["Public", sliders.filter((item) => item.position_key === "public_home" || item.position_key === "landing_hero").length],
   ].forEach(([label, value]) => {
     const card = document.createElement("section");
-    card.className = "rounded-[1.25rem] border border-white/80 bg-white/78 p-3 shadow-sm";
+    card.className = "rounded-[1.25rem] border border-[var(--pb-card-border)] bg-white/78 p-3 shadow-sm";
     card.append(textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label), textNode("p", "text-xl font-black text-gray-950", String(value)));
     stats.append(card);
   });
@@ -289,7 +289,7 @@ function hero({ action, sliders }) {
 function filterBar({ query, sliders, onSubmit }) {
   const section = document.createElement("section");
   section.id = "adsl_filter_section";
-  section.className = "grid gap-4 rounded-[1.5rem] border border-white/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.94),rgba(234,244,249,0.72),rgba(250,244,237,0.72))] p-4 shadow-[var(--pb-shadow-card)]";
+  section.className = "grid gap-4 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.94),rgba(234,244,249,0.72),rgba(250,244,237,0.72))] p-4 shadow-[var(--pb-shadow-card)]";
   section.dataset.ds = "admin.sliders.filters";
   const form = document.createElement("form");
   form.id = "adsl_filter_form";
@@ -311,7 +311,7 @@ function filterBar({ query, sliders, onSubmit }) {
     onSubmit?.({ keyword: keyword.value.trim(), position: position.value, status: status.value });
   });
   const chips = document.createElement("section");
-  chips.className = "flex flex-wrap gap-2 border-t border-white/60 pt-3";
+  chips.className = "flex flex-wrap gap-2 border-t border-[var(--pb-card-border)] pt-3";
   [`${sliders.length} slider`, `${sliders.filter((item) => item.is_active).length} aktif`, "HTML predefined"].forEach((text) => {
     const chip = document.createElement("span");
     chip.className = "rounded-full border border-[var(--pb-border)] bg-[var(--pb-chip-bg)] px-4 py-2 text-xs font-semibold text-[var(--pb-chip-text)] shadow-sm";
@@ -370,7 +370,7 @@ function sliderTable({ sliders, allSliders, loading, page, pageSize, totalItems,
 
 function previewCell(slider) {
   const wrap = document.createElement("section");
-  wrap.className = "grid h-16 w-24 place-items-center overflow-hidden rounded-xl border border-gray-100 bg-gray-50";
+  wrap.className = "grid h-16 w-24 place-items-center overflow-hidden rounded-xl border border-[var(--pb-card-border)] bg-gray-50";
   if (slider.image_url) {
     const image = document.createElement("img");
     image.src = normalizeImageUrl(slider.image_url);
@@ -591,7 +591,7 @@ function sliderForm({ slider, draftOverride = null, mode, saving, onUploadImage,
   notice.textContent = "HTML slider dibatasi ke template predefined. Tidak ada input HTML custom, script, onclick, iframe, atau javascript URL.";
 
   const actions = document.createElement("section");
-  actions.className = "flex flex-col-reverse gap-2 border-t border-gray-100 pt-4 sm:flex-row sm:justify-end";
+  actions.className = "flex flex-col-reverse gap-2 border-t border-[var(--pb-card-border)] pt-4 sm:flex-row sm:justify-end";
   const cancel = Button({ label: "Batal", variant: "secondary", disabled: saving, onClick: onCancel });
   cancel.type = "button";
   const submit = Button({ label: saving ? "Menyimpan..." : "Simpan Slider", disabled: saving });
@@ -676,7 +676,7 @@ function templatePreviewCard(option, active, onSelect) {
   button.addEventListener("click", onSelect);
 
   const visual = document.createElement("section");
-  visual.className = `h-28 overflow-hidden rounded-[1rem] border border-white/80 ${templatePreviewVisualClass(option.value)}`;
+  visual.className = `h-28 overflow-hidden rounded-[1rem] border border-[var(--pb-card-border)] ${templatePreviewVisualClass(option.value)}`;
   visual.append(templatePreviewMock(option.value));
 
   const copy = document.createElement("section");
@@ -734,7 +734,7 @@ function templatePreviewMock(templateKey) {
 
   if (templateKey === "glassmorphism") {
     const glass = document.createElement("span");
-    glass.className = "absolute inset-x-4 bottom-4 top-4 rounded-xl border border-white/70 bg-white/42 backdrop-blur";
+    glass.className = "absolute inset-x-4 bottom-4 top-4 rounded-xl border border-[var(--pb-card-border)] bg-white/42 backdrop-blur";
     mock.append(glass);
     image.className = "absolute bottom-5 right-5 grid h-12 w-16 place-items-center rounded-xl bg-white/72 text-[var(--pb-brand-secondary)] shadow-sm";
   }

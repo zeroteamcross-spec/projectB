@@ -68,7 +68,7 @@ export function AffiliateQuickActions({
     body.textContent = item.description;
 
     const actionWrap = document.createElement("div");
-    actionWrap.className = "mt-2 flex min-w-0 flex-wrap items-center justify-between gap-3 border-t border-white/60 pt-4";
+    actionWrap.className = "mt-2 flex min-w-0 flex-wrap items-center justify-between gap-3 border-t border-[var(--pb-card-border)] pt-4";
     item.action.classList?.add?.("w-full", "sm:w-auto");
     actionWrap.append(
       textBlock("text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", "Action"),

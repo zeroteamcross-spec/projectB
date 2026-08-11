@@ -167,7 +167,7 @@ function pageHeader(actions, context) {
 function registerPanel(state, actions, context) {
   const section = document.createElement("section");
   section.id = "shr_register_section";
-  section.className = "grid gap-4 rounded-[2rem] border border-white/75 bg-white/85 p-5 shadow-[0_30px_90px_rgba(15,23,42,0.14)] backdrop-blur-xl sm:p-6";
+  section.className = "grid gap-4 rounded-[2rem] border border-[var(--pb-card-border)] bg-white/85 p-5 shadow-[0_30px_90px_rgba(15,23,42,0.14)] backdrop-blur-xl sm:p-6";
 
   const form = document.createElement("form");
   form.id = "shr_register_form";
@@ -416,7 +416,7 @@ function registerPanel(state, actions, context) {
 function successPanel(registered, actions, context) {
   const section = document.createElement("section");
   section.id = "shr_register_success_section";
-  section.className = "grid gap-4 rounded-[2rem] border border-white/75 bg-white/85 p-5 shadow-[0_30px_90px_rgba(15,23,42,0.14)] backdrop-blur-xl sm:p-6";
+  section.className = "grid gap-4 rounded-[2rem] border border-[var(--pb-card-border)] bg-white/85 p-5 shadow-[0_30px_90px_rgba(15,23,42,0.14)] backdrop-blur-xl sm:p-6";
 
   const badge = document.createElement("span");
   badge.className = "inline-flex w-fit items-center gap-2 rounded-full bg-[color-mix(in_srgb,var(--pb-success)_16%,white)] px-3 py-1.5 text-xs font-bold text-[var(--pb-success)]";
@@ -431,7 +431,7 @@ function successPanel(registered, actions, context) {
   body.textContent = "Akun Anda menunggu persetujuan admin. Anda sudah bisa masuk dan menyiapkan showroom, tetapi sebagian fitur baru terbuka penuh setelah disetujui.";
 
   const detail = document.createElement("div");
-  detail.className = "grid gap-2 rounded-2xl border border-gray-100 bg-gray-50 p-3 text-xs";
+  detail.className = "grid gap-2 rounded-2xl border border-[var(--pb-card-border)] bg-gray-50 p-3 text-xs";
   detail.append(
     detailRow("Email masuk", registered.email),
     // Alias pendek, sama dengan yang dijanjikan landing page. Menuju halaman
@@ -466,7 +466,7 @@ function detailRow(label, value) {
 
 function fieldGroup(title, children) {
   const group = document.createElement("fieldset");
-  group.className = "grid gap-3 rounded-2xl border border-gray-100 bg-white/70 p-4";
+  group.className = "grid gap-3 rounded-2xl border border-[var(--pb-card-border)] bg-white/70 p-4";
 
   const legend = document.createElement("legend");
   legend.className = "px-1 text-xs font-black text-gray-900";
@@ -550,7 +550,7 @@ function selectField({ id, name, label, placeholder = "", options = [], required
   const panel = document.createElement("div");
   panel.id = `${id}_listbox`;
   panel.setAttribute("role", "listbox");
-  panel.className = "modal-scrollbar absolute inset-x-0 top-[calc(100%+0.4rem)] z-30 max-h-56 overflow-y-auto rounded-2xl border border-gray-100 bg-white p-1.5 shadow-[0_20px_45px_rgba(15,23,42,0.16)]";
+  panel.className = "modal-scrollbar absolute inset-x-0 top-[calc(100%+0.4rem)] z-30 max-h-56 overflow-y-auto rounded-2xl border border-[var(--pb-card-border)] bg-white p-1.5 shadow-[0_20px_45px_rgba(15,23,42,0.16)]";
   panel.hidden = true;
 
   let filtered = options.slice();

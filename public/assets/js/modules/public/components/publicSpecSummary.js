@@ -31,7 +31,7 @@ export function PublicSpecSummary({ car } = {}) {
 
 function specItem(label, value) {
   const node = document.createElement("div");
-  node.className = "rounded-[24px] border border-white/75 bg-white/95 p-4 shadow-card backdrop-blur";
+  node.className = "rounded-[24px] border border-[var(--pb-card-border)] bg-white/95 p-4 shadow-card backdrop-blur";
 
   const caption = document.createElement("p");
   caption.className = "text-[10px] font-medium text-gray-500";

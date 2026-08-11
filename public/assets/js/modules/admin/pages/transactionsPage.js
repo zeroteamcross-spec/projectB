@@ -233,7 +233,7 @@ function transactionsHero({ action, counts = {} }) {
   ].forEach(([label, value]) => {
     const card = document.createElement("section");
     card.id = `adtr_hero_stat_${String(label).toLowerCase()}_section`;
-    card.className = "rounded-[1.25rem] border border-white/80 bg-white/78 p-3 shadow-sm";
+    card.className = "rounded-[1.25rem] border border-[var(--pb-card-border)] bg-white/78 p-3 shadow-sm";
     card.append(
       textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label),
       textNode("p", "text-xl font-black text-gray-950", String(value)),

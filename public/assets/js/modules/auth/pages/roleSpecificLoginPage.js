@@ -95,7 +95,7 @@ function backToLandingButton(router) {
 function loginPanel({ config, isSubmitting, error, onSubmit }) {
   const section = document.createElement("section");
   section.id = `role_login_${config.slug}_panel`;
-  section.className = "relative grid gap-5 overflow-hidden rounded-[2rem] border border-white/75 bg-white/80 p-5 shadow-[0_30px_90px_rgba(15,23,42,0.14)] backdrop-blur-xl transition duration-300 sm:p-6";
+  section.className = "relative grid gap-5 overflow-hidden rounded-[2rem] border border-[var(--pb-card-border)] bg-white/80 p-5 shadow-[0_30px_90px_rgba(15,23,42,0.14)] backdrop-blur-xl transition duration-300 sm:p-6";
 
   const iconWrap = document.createElement("div");
   iconWrap.className = "mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-[linear-gradient(135deg,var(--pb-brand-primary),var(--pb-brand-accent))] text-white shadow-[0_16px_40px_rgba(30,129,176,0.28)]";
@@ -162,7 +162,7 @@ function activeSessionPanel({ config, router }) {
   const currentRole = authStore.role();
   const section = document.createElement("section");
   section.id = `role_login_${config.slug}_active_session`;
-  section.className = "grid gap-4 rounded-[2rem] border border-white/75 bg-white/80 p-5 shadow-[0_30px_90px_rgba(15,23,42,0.14)] backdrop-blur-xl sm:p-6";
+  section.className = "grid gap-4 rounded-[2rem] border border-[var(--pb-card-border)] bg-white/80 p-5 shadow-[0_30px_90px_rgba(15,23,42,0.14)] backdrop-blur-xl sm:p-6";
 
   const header = document.createElement("header");
   header.className = "grid gap-1";

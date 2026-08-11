@@ -150,7 +150,7 @@ function toolbarSection(filters) {
   const section = node(
     "section",
     "slrinsp_toolbar_section",
-    "grid gap-3 rounded-[1.5rem] border border-white/80 bg-white/80 p-4 shadow-[0_18px_55px_rgba(15,23,42,0.07)] backdrop-blur-xl md:grid-cols-[minmax(0,1fr)_210px_auto] md:items-end"
+    "grid gap-3 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white/80 p-4 shadow-[0_18px_55px_rgba(15,23,42,0.07)] backdrop-blur-xl md:grid-cols-[minmax(0,1fr)_210px_auto] md:items-end"
   );
   section.dataset.ds = "seller.inspection.toolbar";
 
@@ -212,9 +212,9 @@ function workspaceSection({ overview, cars }) {
 }
 
 function carQueueSection({ cars, overview }) {
-  const section = node("section", "slrinsp_queue_section", "grid min-w-0 gap-4 rounded-[2rem] border border-white/80 bg-white/72 p-4 shadow-[0_22px_70px_rgba(15,23,42,0.08)] backdrop-blur-xl sm:p-5");
+  const section = node("section", "slrinsp_queue_section", "grid min-w-0 gap-4 rounded-[2rem] border border-[var(--pb-card-border)] bg-white/72 p-4 shadow-[0_22px_70px_rgba(15,23,42,0.08)] backdrop-blur-xl sm:p-5");
   section.dataset.ds = "seller.inspection.queue";
-  const header = node("section", "slrinsp_queue_header_section", "flex min-w-0 flex-col gap-2 border-b border-gray-100 pb-4 sm:flex-row sm:items-end sm:justify-between");
+  const header = node("section", "slrinsp_queue_header_section", "flex min-w-0 flex-col gap-2 border-b border-[var(--pb-card-border)] pb-4 sm:flex-row sm:items-end sm:justify-between");
   const copy = node("section", "slrinsp_queue_copy_section", "grid min-w-0 gap-1");
   copy.append(
     textNode("p", "text-[10px] font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", "Data halaman"),
@@ -242,7 +242,7 @@ function carQueueSection({ cars, overview }) {
 function carInspectionCard(car, overview) {
   const cardId = slugify(car.id);
   const report = reportForCar(overview, car.id);
-  const section = node("section", `slrinsp_car_card_section_${cardId}`, "grid min-w-0 gap-4 rounded-[1.5rem] border border-gray-100 bg-white p-4 shadow-sm transition duration-150 hover:-translate-y-0.5 hover:shadow-md");
+  const section = node("section", `slrinsp_car_card_section_${cardId}`, "grid min-w-0 gap-4 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white p-4 shadow-sm transition duration-150 hover:-translate-y-0.5 hover:shadow-md");
   const header = node("section", `slrinsp_car_card_header_section_${cardId}`, "flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between");
   const copy = node("section", `slrinsp_car_card_copy_section_${cardId}`, "grid min-w-0 gap-1");
   copy.append(
@@ -274,7 +274,7 @@ function carInspectionCard(car, overview) {
 }
 
 function masterSection(templates) {
-  const section = node("section", "slrinsp_master_section", "grid min-w-0 content-start gap-4 rounded-[2rem] border border-white/80 bg-white/72 p-4 shadow-[0_22px_70px_rgba(15,23,42,0.08)] backdrop-blur-xl sm:p-5");
+  const section = node("section", "slrinsp_master_section", "grid min-w-0 content-start gap-4 rounded-[2rem] border border-[var(--pb-card-border)] bg-white/72 p-4 shadow-[0_22px_70px_rgba(15,23,42,0.08)] backdrop-blur-xl sm:p-5");
   section.dataset.ds = "seller.inspection.master";
   section.append(
     textNode("p", "text-[10px] font-black uppercase tracking-[0.16em] text-[color-mix(in_srgb,var(--pb-brand-primary)_84%,black)]", "Master inspection"),
@@ -285,7 +285,7 @@ function masterSection(templates) {
   const groups = groupTemplates(templates);
   const list = node("section", "slrinsp_master_group_list_section", "grid min-w-0 gap-3");
   groups.forEach(([category, group], index) => {
-    const item = node("section", `slrinsp_master_group_section_${slugify(category || index)}`, "rounded-[1.25rem] border border-gray-100 bg-white p-3");
+    const item = node("section", `slrinsp_master_group_section_${slugify(category || index)}`, "rounded-[1.25rem] border border-[var(--pb-card-border)] bg-white p-3");
     item.append(
       textNode("h3", "text-xs font-black uppercase tracking-[0.12em] text-gray-600", categoryLabel(category)),
       textNode("p", "mt-1 text-xs text-gray-500", `${group.length} item aktif`)
@@ -371,7 +371,7 @@ function reportFormSection({ car, report, templates, runtime }) {
     saveReportForm(car, report, templates, false);
   });
 
-  const summarySection = node("section", "slrinsp_report_summary_section", "grid gap-2 rounded-[1.5rem] border border-gray-100 bg-white p-4");
+  const summarySection = node("section", "slrinsp_report_summary_section", "grid gap-2 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white p-4");
   const summaryLabel = document.createElement("label");
   summaryLabel.setAttribute("for", "slrinsp_summary_notes_input");
   summaryLabel.className = "text-xs font-black text-gray-800";
@@ -391,7 +391,7 @@ function reportFormSection({ car, report, templates, runtime }) {
   });
   itemsSection.append(nonCanonItemsNoticeSection(report, templates));
 
-  const actions = node("section", "slrinsp_report_actions_section", "grid gap-2 border-t border-gray-100 pt-4 sm:flex sm:flex-wrap sm:justify-end");
+  const actions = node("section", "slrinsp_report_actions_section", "grid gap-2 border-t border-[var(--pb-card-border)] pt-4 sm:flex sm:flex-wrap sm:justify-end");
   const close = Button({ label: "Tutup", variant: "secondary", onClick: () => closeModal() });
   close.id = "slrinsp_report_close_button";
   const save = Button({ label: runtime.saving ? "Menyimpan..." : "Simpan checklist", disabled: runtime.saving || runtime.publishing });
@@ -408,7 +408,7 @@ function reportFormSection({ car, report, templates, runtime }) {
 }
 
 function templateGroupSection(category, templates, report) {
-  const section = node("section", `slrinsp_item_group_section_${slugify(category)}`, "grid gap-3 rounded-[1.5rem] border border-gray-100 bg-white p-4");
+  const section = node("section", `slrinsp_item_group_section_${slugify(category)}`, "grid gap-3 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white p-4");
   section.append(
     textNode("h3", "text-xs font-black uppercase tracking-[0.12em] text-gray-600", categoryLabel(category)),
     textNode("p", "text-xs text-gray-500", `${templates.length} item master`)
@@ -424,7 +424,7 @@ function templateGroupSection(category, templates, report) {
 function templateItemSection(template, report) {
   const item = (report.items ?? []).find((entry) => Number(entry.template_id) === Number(template.id));
   const key = slugify(template.id);
-  const section = node("section", `slrinsp_item_section_${key}`, "grid min-w-0 gap-3 rounded-[1.25rem] border border-gray-100 bg-gray-50/80 p-3");
+  const section = node("section", `slrinsp_item_section_${key}`, "grid min-w-0 gap-3 rounded-[1.25rem] border border-[var(--pb-card-border)] bg-gray-50/80 p-3");
   section.dataset.itemId = item?.id ? String(item.id) : "";
   section.dataset.templateId = String(template.id);
   const header = node("section", `slrinsp_item_header_section_${key}`, "grid gap-1 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start");
@@ -643,7 +643,7 @@ function closeInspectionModal() {
 }
 
 function loadingSection() {
-  const section = node("section", "slrinsp_loading_section", "rounded-[2rem] border border-white/80 bg-white/72 p-4 shadow-[0_22px_70px_rgba(15,23,42,0.08)] backdrop-blur-xl");
+  const section = node("section", "slrinsp_loading_section", "rounded-[2rem] border border-[var(--pb-card-border)] bg-white/72 p-4 shadow-[0_22px_70px_rgba(15,23,42,0.08)] backdrop-blur-xl");
   section.append(Skeleton({ lines: 8 }));
   return section;
 }
@@ -662,7 +662,7 @@ function messageSection(type, text) {
 }
 
 function statSection(label, value) {
-  const section = node("section", `slrinsp_summary_${slugify(label)}_section`, "rounded-[1.25rem] border border-white/80 bg-white/78 p-3 shadow-sm transition duration-150 hover:-translate-y-0.5 hover:shadow-md");
+  const section = node("section", `slrinsp_summary_${slugify(label)}_section`, "rounded-[1.25rem] border border-[var(--pb-card-border)] bg-white/78 p-3 shadow-sm transition duration-150 hover:-translate-y-0.5 hover:shadow-md");
   section.append(
     textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label),
     textNode("p", "text-xl font-black text-gray-950", String(value))
@@ -671,7 +671,7 @@ function statSection(label, value) {
 }
 
 function miniMetric(label, value, scope = "") {
-  const section = node("section", `slrinsp_metric_${slugify(scope)}_${slugify(label)}_${slugify(value)}_section`, "rounded-xl border border-gray-100 bg-gray-50 px-3 py-2");
+  const section = node("section", `slrinsp_metric_${slugify(scope)}_${slugify(label)}_${slugify(value)}_section`, "rounded-xl border border-[var(--pb-card-border)] bg-gray-50 px-3 py-2");
   section.append(
     textNode("p", "text-[10px] font-black uppercase tracking-[0.12em] text-gray-500", label),
     textNode("p", "mt-1 truncate text-xs font-black text-gray-900", value)

@@ -20,7 +20,7 @@ export function PublicSearchFilterBar({
   onOpenFilter = null,
 } = {}) {
   const section = document.createElement("section");
-  section.className = "relative z-30 grid gap-1 rounded-[24px] border border-white/70 bg-white/95 p-2.5 text-[10px] shadow-card backdrop-blur sm:p-4 sm:text-xs xl:grid-cols-[minmax(0,1fr)_280px] sm:items-start";
+  section.className = "relative z-30 grid gap-1 rounded-[24px] border border-[var(--pb-card-border)] bg-white/95 p-2.5 text-[10px] shadow-card backdrop-blur sm:p-4 sm:text-xs xl:grid-cols-[minmax(0,1fr)_280px] sm:items-start";
   applyDesignHook(section, "catalog.search.bar");
 
   const form = document.createElement("form");

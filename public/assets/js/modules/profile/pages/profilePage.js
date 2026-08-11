@@ -668,7 +668,11 @@ function openEditProfileModal(profile, onSaved) {
 
     form.append(
       formInput("Nama lengkap", "profile_name_input", "text", draft.name, (value) => { draft.name = value; }, errors.name, saving),
-      formInput("Email", "profile_email_input", "email", draft.email, (value) => { draft.email = value; }, errors.email, saving),
+      // Email dikunci. Ia dipakai sebagai identitas login dan ditautkan ke akun
+      // Google, jadi mengubahnya di sini akan memutus jalan masuk pemiliknya
+      // sendiri. Nilainya tetap ikut terkirim supaya payload-nya tidak berubah
+      // bentuk, tapi isinya selalu sama dengan yang tersimpan.
+      formInput("Email", "profile_email_input", "email", draft.email, (value) => { draft.email = value; }, errors.email, true, "Email tidak dapat diubah."),
       formInput("Nomor HP", "profile_phone_input", "text", draft.phone_number, (value) => { draft.phone_number = value; }, errors.phone_number, saving),
       formTextarea("Alamat", "profile_address_input", draft.address, (value) => { draft.address = value; }, errors.address, saving),
     );
@@ -868,7 +872,7 @@ function logoutRedirectHash(role) {
   return "#/";
 }
 
-function formInput(label, id, type, value, onChange, error, disabled) {
+function formInput(label, id, type, value, onChange, error, disabled, hint = "") {
   const wrap = document.createElement("label");
   wrap.className = "grid min-w-0 gap-1 text-xs font-bold text-[var(--pb-text-strong)]";
   const input = document.createElement("input");
@@ -876,9 +880,12 @@ function formInput(label, id, type, value, onChange, error, disabled) {
   input.type = type;
   input.value = value;
   input.disabled = disabled;
-  input.className = "min-h-11 w-full rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 text-xs font-semibold text-[var(--pb-text)] outline-none focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)] disabled:opacity-60";
+  input.className = "min-h-11 w-full rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 text-xs font-semibold text-[var(--pb-text)] outline-none focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)] disabled:cursor-not-allowed disabled:bg-[var(--pb-surface-muted)] disabled:opacity-70";
   input.addEventListener("input", () => onChange(input.value));
   wrap.append(textNode("span", "", label), input);
+  if (hint) {
+    wrap.append(textNode("span", "text-[10px] font-semibold text-[var(--pb-text-muted)]", hint));
+  }
   if (error) {
     wrap.append(textNode("span", "text-[10px] font-semibold text-[var(--pb-danger)]", error));
   }

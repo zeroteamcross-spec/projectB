@@ -172,7 +172,7 @@ function render(root, context, state, actions) {
 
 function hero(action, summary) {
   const section = document.createElement("section");
-  section.className = "grid gap-4 rounded-[var(--pb-radius-2xl)] border border-white/80 bg-white/88 p-5 shadow-[var(--pb-shadow-card)] lg:grid-cols-[minmax(0,1fr)_auto]";
+  section.className = "grid gap-4 rounded-[var(--pb-radius-2xl)] border border-[var(--pb-card-border)] bg-white/88 p-5 shadow-[var(--pb-shadow-card)] lg:grid-cols-[minmax(0,1fr)_auto]";
   const copy = document.createElement("div");
   copy.className = "grid gap-2";
   copy.append(
@@ -201,7 +201,7 @@ function hero(action, summary) {
 
 function filters(query, actions) {
   const form = document.createElement("form");
-  form.className = "grid gap-3 rounded-[var(--pb-radius-2xl)] border border-white/80 bg-white/86 p-4 shadow-[var(--pb-shadow-card)] md:grid-cols-[minmax(0,1fr)_220px_auto]";
+  form.className = "grid gap-3 rounded-[var(--pb-radius-2xl)] border border-[var(--pb-card-border)] bg-white/86 p-4 shadow-[var(--pb-shadow-card)] md:grid-cols-[minmax(0,1fr)_220px_auto]";
   const keyword = input("Cari marketing, transaksi, mobil", query.keyword);
   const status = document.createElement("select");
   status.className = keyword.className;

@@ -282,7 +282,7 @@ function summaryPanel({ images = [], car = null } = {}) {
 
 function summaryMetric({ icon, label, value, tone }) {
   const item = document.createElement("div");
-  item.className = "flex min-w-0 items-center gap-3 rounded-[var(--pb-radius-xl)] border border-white/70 bg-white/70 p-3 shadow-[var(--pb-shadow-soft)]";
+  item.className = "flex min-w-0 items-center gap-3 rounded-[var(--pb-radius-xl)] border border-[var(--pb-card-border)] bg-white/70 p-3 shadow-[var(--pb-shadow-soft)]";
 
   const iconWrap = document.createElement("span");
   iconWrap.className = `grid h-10 w-10 shrink-0 place-items-center rounded-[var(--pb-radius-xl)] bg-white ${tone}`;

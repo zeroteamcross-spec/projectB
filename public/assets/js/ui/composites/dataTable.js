@@ -35,7 +35,7 @@ export function DataTable({
     shell.id = shellId;
   }
   shell.className = [
-    "overflow-hidden rounded-[1.75rem] border border-white/80 bg-white/86 shadow-[0_22px_70px_rgba(15,23,42,0.09)] backdrop-blur-xl",
+    "overflow-hidden rounded-[1.75rem] border border-[var(--pb-card-border)] bg-white/86 shadow-[0_22px_70px_rgba(15,23,42,0.09)] backdrop-blur-xl",
     shellClassName,
   ].filter(Boolean).join(" ");
 
@@ -318,7 +318,7 @@ function createMobileCard({ rowKey, title, subtitle, badges, fields, actions, id
   if (id) {
     card.id = id;
   }
-  card.className = "grid gap-4 rounded-[1.5rem] border border-white/80 bg-white/88 p-4 shadow-sm";
+  card.className = "grid gap-4 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white/88 p-4 shadow-sm";
   card.dataset.rowKey = String(rowKey);
 
   const top = document.createElement("div");
@@ -343,7 +343,7 @@ function createMobileCard({ rowKey, title, subtitle, badges, fields, actions, id
 
   if (Array.isArray(fields) && fields.length) {
     const facts = document.createElement("div");
-    facts.className = "grid gap-2 rounded-[1.25rem] border border-white/80 bg-[var(--pb-surface-inset)] p-3";
+    facts.className = "grid gap-2 rounded-[1.25rem] border border-[var(--pb-card-border)] bg-[var(--pb-surface-inset)] p-3";
     fields.forEach(({ label, value }) => {
       const row = document.createElement("div");
       row.className = "grid gap-1";
@@ -386,7 +386,7 @@ function createMobileDisclosureRow({
   if (id) {
     row.id = id;
   }
-  row.className = "grid gap-3 rounded-[1.5rem] border border-white/80 bg-white/90 p-4 shadow-sm";
+  row.className = "grid gap-3 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white/90 p-4 shadow-sm";
   row.dataset.rowKey = String(rowKey);
 
   const top = document.createElement("div");
@@ -403,7 +403,7 @@ function createMobileDisclosureRow({
   }
 
   const primary = document.createElement("div");
-  primary.className = "grid gap-2 rounded-[1.25rem] border border-white/80 bg-[var(--pb-surface-inset)] p-3";
+  primary.className = "grid gap-2 rounded-[1.25rem] border border-[var(--pb-card-border)] bg-[var(--pb-surface-inset)] p-3";
   primaryFields.forEach(({ label, value }) => {
     const item = document.createElement("div");
     item.className = "flex items-start justify-between gap-3";
@@ -460,7 +460,7 @@ function createTableLoadingState(columnCount) {
 
   for (let index = 0; index < 4; index += 1) {
     const row = document.createElement("div");
-    row.className = "grid gap-3 rounded-[1.25rem] border border-white/80 bg-white/75 p-4 shadow-sm";
+    row.className = "grid gap-3 rounded-[1.25rem] border border-[var(--pb-card-border)] bg-white/75 p-4 shadow-sm";
     row.style.gridTemplateColumns = `repeat(${Math.max(2, Math.min(columnCount, 5))}, minmax(0, 1fr))`;
 
     for (let cellIndex = 0; cellIndex < Math.max(2, Math.min(columnCount, 5)); cellIndex += 1) {

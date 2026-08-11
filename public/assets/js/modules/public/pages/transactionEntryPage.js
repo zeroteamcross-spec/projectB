@@ -279,7 +279,7 @@ function nonBuyerGate({ user, onLogout }) {
 
 function heroTrustRow() {
   const row = document.createElement("div");
-  row.className = "grid gap-2 border-t border-white/60 pt-4 text-xs text-gray-600 sm:grid-cols-3";
+  row.className = "grid gap-2 border-t border-[var(--pb-card-border)] pt-4 text-xs text-gray-600 sm:grid-cols-3";
   [
     "Data mobil aktif sudah dibawa dari detail page",
     "Payment session dibuat tanpa memutus funnel public",

@@ -1,4 +1,5 @@
 import { Button } from "../../../ui/primitives/button.js";
+import { titipkanAksiModal } from "../../../ui/composites/modalHeaderFormActions.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 import { adminMasterService } from "../services/adminMasterService.js";
 
@@ -48,7 +49,7 @@ export function AdminMasterBrandForm({
 
   const modelsSection = document.createElement("section");
   modelsSection.id = "admst_models_section";
-  modelsSection.className = "grid gap-3 rounded-[1.5rem] border border-white/80 bg-white/78 p-4 shadow-sm";
+  modelsSection.className = "grid gap-3 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white/78 p-4 shadow-sm";
 
   const modelsHeader = document.createElement("div");
   modelsHeader.className = "flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between";
@@ -63,7 +64,9 @@ export function AdminMasterBrandForm({
   addModel.id = "admst_add_model_button";
   addModel.type = "button";
   addModel.prepend(createIcon("sparkles", { className: "h-4 w-4" }));
-  modelsHeader.append(copy, addModel);
+  // addModel ikut pindah ke header modal bersama aksi lainnya, jadi di sini
+  // hanya keterangannya yang tersisa.
+  modelsHeader.append(copy);
 
   const modelRows = document.createElement("section");
   modelRows.id = "admst_model_rows_section";
@@ -98,11 +101,13 @@ export function AdminMasterBrandForm({
 
   const actions = document.createElement("section");
   actions.id = "admst_brand_form_actions_section";
-  actions.className = "flex flex-wrap justify-end gap-2 border-t border-[var(--pb-border)] pt-4";
+  actions.className = "flex shrink-0 flex-wrap items-center justify-end gap-2";
 
   const cancel = Button({ label: "Batal", variant: "secondary", onClick: () => onCancel?.() });
   cancel.id = "admst_cancel_brand_form_button";
   cancel.type = "button";
+
+  actions.append(addModel);
 
   if (mode === "edit") {
     const remove = Button({ label: "Hapus brand", variant: "secondary", onClick: () => onDelete?.(draft) });
@@ -114,10 +119,13 @@ export function AdminMasterBrandForm({
   const submit = Button({ label: mode === "edit" ? "Simpan perubahan" : "Simpan brand", variant: "primary" });
   submit.id = "admst_save_brand_button";
   submit.type = "submit";
+  // Tombolnya berada di luar <form> karena tayang di header modal, jadi
+  // formnya ditunjuk lewat atribut form, bukan lewat hubungan induk-anak.
+  submit.setAttribute("form", form.id);
   submit.prepend(createIcon("sparkles", { className: "h-4 w-4" }));
   actions.append(cancel, submit);
 
-  form.append(fields, modelsSection, actions);
+  form.append(fields, modelsSection);
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     onSubmit?.({
@@ -131,7 +139,7 @@ export function AdminMasterBrandForm({
   });
 
   section.append(form);
-  return section;
+  return titipkanAksiModal(section, actions);
 }
 
 function modelRow({ model, index, onRemove }) {

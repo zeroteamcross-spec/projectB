@@ -1,4 +1,5 @@
 import { Button } from "../../../ui/primitives/button.js";
+import { titipkanAksiModal } from "../../../ui/composites/modalHeaderFormActions.js";
 import { createIcon, iconRegistry } from "../../../theme/iconRegistry.js";
 import { adminMasterService } from "../services/adminMasterService.js";
 
@@ -71,7 +72,7 @@ export function AdminMasterSidebarForm({
 
   const flags = document.createElement("section");
   flags.id = "admst_sidebar_flags_section";
-  flags.className = "grid gap-3 rounded-[1.5rem] border border-white/80 bg-white/78 p-4 shadow-sm sm:grid-cols-3";
+  flags.className = "grid gap-3 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white/78 p-4 shadow-sm sm:grid-cols-3";
   const isParent = checkboxField({
     id: "admst_sidebar_is_parent_input",
     label: "Parent menu",
@@ -91,7 +92,7 @@ export function AdminMasterSidebarForm({
 
   const actions = document.createElement("section");
   actions.id = "admst_sidebar_form_actions_section";
-  actions.className = "flex flex-wrap justify-end gap-2 border-t border-[var(--pb-border)] pt-4";
+  actions.className = "flex shrink-0 flex-wrap items-center justify-end gap-2";
 
   const cancel = Button({ label: "Batal", variant: "secondary", onClick: () => onCancel?.() });
   cancel.id = "admst_cancel_sidebar_form_button";
@@ -107,10 +108,13 @@ export function AdminMasterSidebarForm({
   const submit = Button({ label: mode === "edit" ? "Simpan perubahan" : "Simpan menu", variant: "primary" });
   submit.id = "admst_save_sidebar_button";
   submit.type = "submit";
+  // Tayang di header modal, jadi di luar <form>. Formnya ditunjuk lewat
+  // atribut form, bukan lewat hubungan induk-anak.
+  submit.setAttribute("form", form.id);
   submit.prepend(createIcon("sparkles", { className: "h-4 w-4" }));
   actions.append(cancel, submit);
 
-  form.append(fields, flags, actions);
+  form.append(fields, flags);
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     const nextLabel = label.input.value.trim();
@@ -132,7 +136,7 @@ export function AdminMasterSidebarForm({
   });
 
   section.append(form);
-  return section;
+  return titipkanAksiModal(section, actions);
 }
 
 function parentOptions(items, draft) {
@@ -251,7 +255,7 @@ function iconPickerModal({ currentValue, onSelect }) {
 
   const panel = document.createElement("section");
   panel.id = "admst_sidebar_icon_picker_panel_section";
-  panel.className = "grid max-h-[82vh] w-full max-w-3xl overflow-hidden rounded-[1.5rem] border border-white/80 bg-white shadow-[0_28px_90px_rgba(15,23,42,0.24)]";
+  panel.className = "grid max-h-[82vh] w-full max-w-3xl overflow-hidden rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white shadow-[0_28px_90px_rgba(15,23,42,0.24)]";
 
   const head = document.createElement("section");
   head.id = "admst_sidebar_icon_picker_header_section";

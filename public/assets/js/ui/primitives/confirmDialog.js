@@ -91,7 +91,9 @@ export function confirmDialog({
       footer: null,
       panelId: "pb_confirm_dialog_panel_section",
       bodyId: "pb_confirm_dialog_modal_body_section",
-      closeButtonId: "pb_confirm_dialog_close_button",
+      // Batal dan tombol konfirmasinya sudah terpampang di badan dialog, jadi
+      // tanda silang di pojok cuma jalan ketiga untuk hal yang sama.
+      hideClose: true,
       panelClassName: "max-w-md border-white/90 bg-[linear-gradient(135deg,rgba(255,255,255,0.98),rgba(250,244,237,0.92),rgba(234,244,249,0.86))]",
       onClose: () => settle(false),
     });

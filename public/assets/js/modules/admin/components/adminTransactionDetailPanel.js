@@ -141,7 +141,7 @@ function factsCard(title, rows = []) {
 function detailSection(id) {
   const card = Card([], { variant: "raised" });
   card.id = id;
-  card.classList.add("grid", "gap-3", "border-white/80", "bg-white/86", "shadow-[0_18px_50px_rgba(15,23,42,0.08)]");
+  card.classList.add("grid", "gap-3", "border-[var(--pb-card-border)]", "bg-white/86", "shadow-[0_18px_50px_rgba(15,23,42,0.08)]");
   return card;
 }
 

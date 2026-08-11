@@ -101,7 +101,7 @@ function render(root, context, state, startPolling) {
   panel.className = "mx-auto grid min-h-[calc(100vh-4rem)] max-w-2xl items-center";
 
   const card = document.createElement("div");
-  card.className = "grid gap-5 rounded-[2rem] border border-white/80 bg-white/86 p-5 shadow-[0_34px_100px_rgba(15,23,42,0.14)] backdrop-blur-xl sm:p-8";
+  card.className = "grid gap-5 rounded-[2rem] border border-[var(--pb-card-border)] bg-white/86 p-5 shadow-[0_34px_100px_rgba(15,23,42,0.14)] backdrop-blur-xl sm:p-8";
 
   if (!isPendingApproval) {
     card.append(header());

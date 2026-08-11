@@ -1,6 +1,26 @@
 import { Button } from "../primitives/button.js";
 
 /**
+ * Menitipkan baris aksi sebuah form ke simpul yang dikembalikannya, supaya
+ * modal bisa memasangnya di header menggantikan tombol Tutup.
+ *
+ * Tombolnya tetap dirakit di dalam komponen form -- di sanalah draft dan
+ * keadaan saving berada, dan memindahkannya keluar berarti membocorkan isi
+ * perut form ke pemanggilnya. Yang berpindah hanya tempat tayangnya.
+ *
+ * Properti pada simpul DOM sudah jadi kebiasaan di berkas-berkas ini; `dispose`
+ * dititipkan dengan cara yang sama di sidebar dan header.
+ */
+export function titipkanAksiModal(node, actions) {
+  node.modalHeaderActions = actions;
+  return node;
+}
+
+export function aksiModalDari(node) {
+  return node?.modalHeaderActions ?? null;
+}
+
+/**
  * Batal + Simpan pair meant to replace a modal's default close (X) button,
  * via modal.js's `headerActions` option — so the actions stay visible without
  * scrolling down through a long form, instead of being buried at the bottom.

@@ -528,7 +528,7 @@ function affiliatesHero({ counts, action }) {
     ["Nonaktif", counts.inactive],
   ].forEach(([label, value], index) => {
     const stat = document.createElement("section");
-    stat.className = "rounded-[1.25rem] border border-white/80 bg-white/78 p-3 shadow-sm";
+    stat.className = "rounded-[1.25rem] border border-[var(--pb-card-border)] bg-white/78 p-3 shadow-sm";
     stat.append(
       textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label),
       textNode("p", "text-xl font-black text-gray-950", String(value)),
@@ -578,7 +578,7 @@ function summaryCards({ affiliates, counts }) {
 function filterBar({ query, counts, onChange }) {
   const section = document.createElement("section");
   section.id = "slraf_filter_section";
-  section.className = "grid gap-3 rounded-[1.5rem] border border-white/80 bg-white/80 p-4 shadow-[0_18px_55px_rgba(15,23,42,0.07)] backdrop-blur-xl md:grid-cols-[minmax(0,1fr)_190px] md:items-end";
+  section.className = "grid gap-3 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white/80 p-4 shadow-[0_18px_55px_rgba(15,23,42,0.07)] backdrop-blur-xl md:grid-cols-[minmax(0,1fr)_190px] md:items-end";
   section.dataset.ds = "seller.affiliates.filters";
 
   const searchWrap = document.createElement("label");
@@ -636,7 +636,7 @@ function affiliateDetailPanel({ affiliate }) {
   }
 
   const header = document.createElement("section");
-  header.className = "grid gap-3 rounded-[1.5rem] border border-white/80 bg-[var(--pb-surface-inset)] p-4";
+  header.className = "grid gap-3 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-[var(--pb-surface-inset)] p-4";
   header.append(
     textNode("p", "text-xl font-black text-gray-950", affiliate.user?.name || affiliate.name || `Marketing #${affiliate.id}`),
     textNode("p", "break-words text-xs font-semibold text-gray-600", [affiliate.user?.email || affiliate.email, affiliate.phone_number || affiliate.user?.phone_number].filter(Boolean).join(" | ") || "Kontak belum lengkap"),

@@ -5,12 +5,12 @@ import { createIcon } from "../../../theme/iconRegistry.js";
 export function SellerShowroomForm({ showroom = null, saving = false, error = "", bankOptions = [], onSubmit = null } = {}) {
   const form = document.createElement("form");
   form.id = "slrsr_form_section";
-  form.className = "grid gap-5 rounded-[1.5rem] border border-gray-100 bg-white p-4 shadow-sm transition duration-150 sm:p-5";
+  form.className = "grid gap-5 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white p-4 shadow-sm transition duration-150 sm:p-5";
   form.dataset.ds = "seller.showroom.form";
 
   const header = document.createElement("section");
   header.id = "slrsr_form_header_section";
-  header.className = "grid gap-2 border-b border-gray-100 pb-5";
+  header.className = "grid gap-2 border-b border-[var(--pb-card-border)] pb-5";
   const eyebrow = document.createElement("p");
   eyebrow.className = "text-[10px] font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]";
   eyebrow.textContent = showroom ? "Edit showroom" : "Setup showroom";
@@ -70,7 +70,7 @@ export function SellerShowroomForm({ showroom = null, saving = false, error = ""
 function fieldGroup(id, title, iconName) {
   const section = document.createElement("section");
   section.id = id;
-  section.className = "grid min-w-0 gap-4 rounded-[1.25rem] border border-gray-100 bg-[linear-gradient(135deg,rgba(249,250,251,0.95),rgba(255,255,255,0.9))] p-4 shadow-sm transition duration-150 hover:border-[var(--pb-border)]";
+  section.className = "grid min-w-0 gap-4 rounded-[1.25rem] border border-[var(--pb-card-border)] bg-[linear-gradient(135deg,rgba(249,250,251,0.95),rgba(255,255,255,0.9))] p-4 shadow-sm transition duration-150 hover:border-[var(--pb-border)]";
 
   const header = document.createElement("section");
   header.id = `${id}_header`;
@@ -129,7 +129,7 @@ function bankSelectField({ id, name, label, value = "", banks = [] }) {
 
   const menu = document.createElement("section");
   menu.id = "slrsr_bank_type_menu_section";
-  menu.className = "absolute left-0 right-0 top-full z-20 mt-2 hidden max-h-72 overflow-y-auto rounded-[1rem] border border-gray-100 bg-white p-2 shadow-[0_18px_50px_rgba(15,23,42,0.16)]";
+  menu.className = "absolute left-0 right-0 top-full z-20 mt-2 hidden max-h-72 overflow-y-auto rounded-[1rem] border border-[var(--pb-card-border)] bg-white p-2 shadow-[0_18px_50px_rgba(15,23,42,0.16)]";
 
   const syncButton = () => {
     button.replaceChildren(bankChoiceContent(selectedBank, "Pilih bank dari master"));

@@ -2,7 +2,7 @@ import { tw } from "../theme/tailwindClasses.js";
 
 export function Skeleton({ lines = 1 } = {}) {
   const wrap = document.createElement("div");
-  wrap.className = `${tw.skeleton.wrap} rounded-3xl border border-white/70 bg-white/90 p-4 shadow-card backdrop-blur`;
+  wrap.className = `${tw.skeleton.wrap} rounded-3xl border border-[var(--pb-card-border)] bg-white/90 p-4 shadow-card backdrop-blur`;
 
   for (let index = 0; index < lines; index += 1) {
     const line = document.createElement("div");

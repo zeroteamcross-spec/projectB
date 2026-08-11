@@ -1,4 +1,5 @@
 import { Button } from "../../../ui/primitives/button.js";
+import { titipkanAksiModal } from "../../../ui/composites/modalHeaderFormActions.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 import { adminMasterService } from "../services/adminMasterService.js";
 
@@ -41,7 +42,7 @@ export function AdminMasterBankForm({
 
   const iconSection = document.createElement("section");
   iconSection.id = "admstbk_icon_upload_section";
-  iconSection.className = "grid gap-4 rounded-[1.5rem] border border-gray-100 bg-gray-50/80 p-4 md:grid-cols-[auto_minmax(0,1fr)] md:items-center";
+  iconSection.className = "grid gap-4 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-gray-50/80 p-4 md:grid-cols-[auto_minmax(0,1fr)] md:items-center";
   const preview = document.createElement("section");
   preview.id = "admstbk_icon_preview_section";
   preview.className = "grid h-24 w-24 place-items-center overflow-hidden rounded-[1.5rem] border border-[var(--pb-border)] bg-white text-[var(--pb-brand-secondary)] shadow-sm";
@@ -83,7 +84,7 @@ export function AdminMasterBankForm({
 
   const actions = document.createElement("section");
   actions.id = "admstbk_form_actions_section";
-  actions.className = "flex flex-col-reverse gap-2 border-t border-gray-100 pt-4 sm:flex-row sm:items-center sm:justify-between";
+  actions.className = "flex shrink-0 flex-wrap items-center justify-end gap-2";
   const left = document.createElement("section");
   left.id = "admstbk_form_destructive_actions_section";
   const right = document.createElement("section");
@@ -103,11 +104,13 @@ export function AdminMasterBankForm({
   const submit = Button({ label: saving ? "Menyimpan..." : "Simpan Bank", disabled: saving || uploading });
   submit.id = "admstbk_save_bank_button";
   submit.type = "submit";
+  // Tayang di header modal, jadi di luar <form>.
+  submit.setAttribute("form", form.id);
   submit.prepend(createIcon("circleCheck", { className: "h-4 w-4" }));
   right.append(cancel, submit);
   actions.append(left, right);
 
-  form.append(intro, fields, iconSection, iconPathInput, actions);
+  form.append(intro, fields, iconSection, iconPathInput);
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     const formData = new FormData(form);
@@ -123,7 +126,7 @@ export function AdminMasterBankForm({
     });
   });
 
-  return form;
+  return titipkanAksiModal(form, actions);
 }
 
 function renderPreview(preview, bank) {

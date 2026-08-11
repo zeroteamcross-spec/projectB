@@ -270,7 +270,7 @@ function carsHero({ cars, filteredCars, isForm }) {
   ].forEach(([label, value]) => {
     const stat = document.createElement("section");
     stat.id = `adcars_summary_${slugify(label)}_section`;
-    stat.className = "rounded-[1.25rem] border border-white/80 bg-white/78 p-3 shadow-sm transition duration-150 hover:-translate-y-0.5 hover:shadow-md";
+    stat.className = "rounded-[1.25rem] border border-[var(--pb-card-border)] bg-white/78 p-3 shadow-sm transition duration-150 hover:-translate-y-0.5 hover:shadow-md";
     stat.append(
       textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label),
       textNode("p", "text-xl font-black text-gray-950", String(value))
@@ -286,7 +286,7 @@ function carsHero({ cars, filteredCars, isForm }) {
 function carsToolbar({ filters, isForm }) {
   const section = document.createElement("section");
   section.id = "adcars_toolbar_section";
-  section.className = "grid gap-3 rounded-[1.5rem] border border-white/80 bg-white/80 p-4 shadow-[0_18px_55px_rgba(15,23,42,0.07)] backdrop-blur-xl md:grid-cols-[minmax(0,1fr)_180px_auto] md:items-end";
+  section.className = "grid gap-3 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white/80 p-4 shadow-[0_18px_55px_rgba(15,23,42,0.07)] backdrop-blur-xl md:grid-cols-[minmax(0,1fr)_180px_auto] md:items-end";
   section.dataset.ds = "admin.cars.toolbar";
 
   const searchWrap = document.createElement("label");

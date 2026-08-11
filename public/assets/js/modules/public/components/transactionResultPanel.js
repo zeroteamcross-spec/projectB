@@ -122,7 +122,7 @@ function paymentInstructionSummary(details) {
     const image = document.createElement("img");
     image.src = details.qrCodeUrl;
     image.alt = details.method === "gopay" ? "QR pembayaran GoPay" : "QR pembayaran QRIS";
-    image.className = "mx-auto h-auto w-full max-w-[220px] rounded-2xl border border-gray-100 bg-white object-contain";
+    image.className = "mx-auto h-auto w-full max-w-[220px] rounded-2xl border border-[var(--pb-card-border)] bg-white object-contain";
     box.append(image);
   }
 

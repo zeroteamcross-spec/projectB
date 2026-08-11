@@ -108,7 +108,7 @@ function render(root, context, config, state, getBackgroundVideoLayer = null, op
 
   const panel = document.createElement("div");
   panel.id = `google_login_${config.slug}_panel`;
-  panel.className = "grid gap-6 overflow-hidden rounded-[2rem] border border-white/80 bg-white/82 p-5 shadow-[0_34px_100px_rgba(15,23,42,0.14)] backdrop-blur-xl sm:p-8 lg:grid-cols-[1.1fr_0.9fr]";
+  panel.className = "grid gap-6 overflow-hidden rounded-[2rem] border border-[var(--pb-card-border)] bg-white/82 p-5 shadow-[0_34px_100px_rgba(15,23,42,0.14)] backdrop-blur-xl sm:p-8 lg:grid-cols-[1.1fr_0.9fr]";
 
   const hero = document.createElement("div");
   hero.className = "grid content-center gap-5";
@@ -148,7 +148,7 @@ function renderGlassLogin(root, context, config, state, getBackgroundVideoLayer,
 
 function appIcon() {
   const wrap = document.createElement("div");
-  wrap.className = " hidden grid h-16 w-16 place-items-center rounded-[1.15rem] border border-white/70 bg-[linear-gradient(145deg,rgba(255,255,255,0.84),rgba(203,210,230,0.54))] shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_16px_34px_rgba(23,105,143,0.16)] backdrop-blur-xl";
+  wrap.className = " hidden grid h-16 w-16 place-items-center rounded-[1.15rem] border border-[var(--pb-card-border)] bg-[linear-gradient(145deg,rgba(255,255,255,0.84),rgba(203,210,230,0.54))] shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_16px_34px_rgba(23,105,143,0.16)] backdrop-blur-xl";
 
   const mark = document.createElement("span");
   mark.className = "relative block h-8 w-8";
@@ -191,7 +191,7 @@ function glassLoginActionContent(root, context, config, state, options = {}) {
 
   if (state.loading) {
     const loading = document.createElement("p");
-    loading.className = "rounded-[1.5rem] border border-white/75 bg-white/70 px-5 py-4 text-xs font-semibold text-[#717693] shadow-[0_18px_48px_rgba(23,105,143,0.10)] backdrop-blur";
+    loading.className = "rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white/70 px-5 py-4 text-xs font-semibold text-[#717693] shadow-[0_18px_48px_rgba(23,105,143,0.10)] backdrop-blur";
     loading.textContent = "Memeriksa konfigurasi Google Login...";
     actionWrap.append(loading);
     fragment.append(actionWrap);
@@ -220,7 +220,7 @@ function glassLoginActionContent(root, context, config, state, options = {}) {
   button.id = `google_login_${config.slug}_button`;
   button.type = "button";
   button.disabled = state.submitting;
-  button.className = "inline-flex min-h-12 w-full items-center justify-center gap-3.5 rounded-[1rem] border border-white/60 bg-[linear-gradient(135deg,rgba(255,255,255,0.84),rgba(224,239,247,0.58))] px-4 text-xs font-black tracking-normal text-[#171a35] shadow-[inset_0_1px_0_rgba(255,255,255,0.88),0_14px_30px_rgba(23,105,143,0.13)] backdrop-blur transition duration-200 hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-4 focus:ring-[#e0eff7] disabled:cursor-wait disabled:opacity-70";
+  button.className = "inline-flex min-h-12 w-full items-center justify-center gap-3.5 rounded-[1rem] border border-[var(--pb-card-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.84),rgba(224,239,247,0.58))] px-4 text-xs font-black tracking-normal text-[#171a35] shadow-[inset_0_1px_0_rgba(255,255,255,0.88),0_14px_30px_rgba(23,105,143,0.13)] backdrop-blur transition duration-200 hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-4 focus:ring-[#e0eff7] disabled:cursor-wait disabled:opacity-70";
   button.append(googleGlyph(), document.createTextNode(state.submitting ? "Membuka Google..." : "Login dengan Google"));
   button.addEventListener("click", () => beginGoogleLogin(root, context, config, state, options));
 

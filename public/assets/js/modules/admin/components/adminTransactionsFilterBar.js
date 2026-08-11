@@ -5,7 +5,7 @@ import { createIcon } from "../../../theme/iconRegistry.js";
 export function AdminTransactionsFilterBar({ filters = {}, counts = {}, onSubmit = null } = {}) {
   const card = document.createElement("section");
   card.id = "adtr_filter_section";
-  card.className = `grid min-w-0 gap-4 ${tw.section.toolbar} border-white/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.94),rgba(234,244,249,0.72),rgba(250,244,237,0.72))]`;
+  card.className = `grid min-w-0 gap-4 ${tw.section.toolbar} border-[var(--pb-card-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.94),rgba(234,244,249,0.72),rgba(250,244,237,0.72))]`;
 
   const header = document.createElement("div");
   header.className = "flex min-w-0 items-start gap-3";
@@ -112,7 +112,7 @@ function buildOptions(select, selected, options) {
 function countsRow(counts) {
   const wrap = document.createElement("section");
   wrap.id = "adtr_filter_counts_section";
-  wrap.className = "flex flex-wrap gap-2 border-t border-white/60 pt-4";
+  wrap.className = "flex flex-wrap gap-2 border-t border-[var(--pb-card-border)] pt-4";
 
   [
     ["Total", counts.total ?? 0],

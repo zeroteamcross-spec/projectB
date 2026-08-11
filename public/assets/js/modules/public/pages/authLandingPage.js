@@ -161,7 +161,7 @@ function render(root, context, state, getBackgroundVideoLayer = null) {
 function redirectingNotice(roleLabel) {
   const section = document.createElement("section");
   section.id = "hr_auth_redirecting_section";
-  section.className = "grid gap-2 rounded-[1.5rem] border border-white/70 bg-white/85 px-5 py-6 text-center shadow-[0_24px_70px_rgba(15,23,42,0.12)] backdrop-blur-xl";
+  section.className = "grid gap-2 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white/85 px-5 py-6 text-center shadow-[0_24px_70px_rgba(15,23,42,0.12)] backdrop-blur-xl";
 
   const title = document.createElement("p");
   title.className = "text-xs font-black text-gray-900";
@@ -192,7 +192,7 @@ function brandAnchor({ requestedPath }) {
   section.hidden = !SHOW_AUTH_DEBUG_SECTIONS;
   section.setAttribute("aria-hidden", String(!SHOW_AUTH_DEBUG_SECTIONS));
   section.className = SHOW_AUTH_DEBUG_SECTIONS
-    ? "relative overflow-hidden rounded-[2rem] border border-white/70 bg-white/70 p-6 shadow-[0_24px_80px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-8"
+    ? "relative overflow-hidden rounded-[2rem] border border-[var(--pb-card-border)] bg-white/70 p-6 shadow-[0_24px_80px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-8"
     : "hidden";
 
   const glow = document.createElement("div");
@@ -219,7 +219,7 @@ function brandAnchor({ requestedPath }) {
   rail.className = "flex flex-wrap gap-2 text-[10px] font-semibold text-gray-600";
   ["Cepat", "Aman", "Ringkas"].forEach((item, index) => {
     const pill = document.createElement("span");
-    pill.className = "rounded-full border border-white/80 bg-white/75 px-3 py-1 shadow-sm";
+    pill.className = "rounded-full border border-[var(--pb-card-border)] bg-white/75 px-3 py-1 shadow-sm";
     pill.textContent = item;
     pill.id = `hr_auth_brand_pill_${index + 1}`;
     rail.append(pill);
@@ -243,7 +243,7 @@ function roleChooser({ selectedRole, onChange }) {
     button.type = "button";
     button.className = option.role === selectedRole
       ? "group grid gap-3 rounded-[1.35rem] border border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] bg-white/90 p-4 text-left shadow-[0_18px_45px_rgba(30,129,176,0.16)] ring-2 ring-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)] transition duration-200 hover:-translate-y-0.5"
-      : "group grid gap-3 rounded-[1.35rem] border border-white/70 bg-white/65 p-4 text-left shadow-sm backdrop-blur transition duration-200 hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-[0_18px_45px_rgba(15,23,42,0.08)]";
+      : "group grid gap-3 rounded-[1.35rem] border border-[var(--pb-card-border)] bg-white/65 p-4 text-left shadow-sm backdrop-blur transition duration-200 hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-[0_18px_45px_rgba(15,23,42,0.08)]";
     button.addEventListener("click", () => onChange(option.role));
 
     const top = document.createElement("div");
@@ -297,7 +297,7 @@ function authPanel({
 
   const section = document.createElement("section");
   section.id = "hr_auth_panel_section";
-  section.className = "relative grid gap-5 overflow-hidden rounded-[2rem] border border-white/75 bg-white/80 p-5 shadow-[0_30px_90px_rgba(15,23,42,0.14)] backdrop-blur-xl transition duration-300 sm:p-6";
+  section.className = "relative grid gap-5 overflow-hidden rounded-[2rem] border border-[var(--pb-card-border)] bg-white/80 p-5 shadow-[0_30px_90px_rgba(15,23,42,0.14)] backdrop-blur-xl transition duration-300 sm:p-6";
 
   const header = document.createElement("div");
   header.className = "grid gap-1.5";
@@ -353,7 +353,7 @@ function authPanel({
 
 function authModeTabs({ activeMode, onModeChange }) {
   const tabs = document.createElement("div");
-  tabs.className = "grid grid-cols-2 gap-1 rounded-2xl border border-gray-100 bg-gray-100/80 p-1";
+  tabs.className = "grid grid-cols-2 gap-1 rounded-2xl border border-[var(--pb-card-border)] bg-gray-100/80 p-1";
   tabs.append(
     authModeButton("login", "Masuk", activeMode, onModeChange),
     authModeButton("register", "Daftar", activeMode, onModeChange),

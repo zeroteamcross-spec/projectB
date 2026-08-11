@@ -55,7 +55,7 @@ function sectionCard(category, items, handlers) {
   copy.append(title, helper);
 
   const pill = document.createElement("span");
-  pill.className = "inline-flex w-fit items-center gap-2 rounded-full border border-white/80 bg-white px-3 py-1 text-[10px] font-bold text-[var(--pb-text-strong)] shadow-[var(--pb-shadow-soft)]";
+  pill.className = "inline-flex w-fit items-center gap-2 rounded-full border border-[var(--pb-card-border)] bg-white px-3 py-1 text-[10px] font-bold text-[var(--pb-text-strong)] shadow-[var(--pb-shadow-soft)]";
   pill.append(createIcon("clipboard", { className: "h-4 w-4 text-[var(--pb-brand-secondary)]" }), document.createTextNode(`${items.length} item`));
 
   header.append(copy, pill);

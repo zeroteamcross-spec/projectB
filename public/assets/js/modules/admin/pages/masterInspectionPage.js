@@ -4,6 +4,7 @@ import { appStore } from "../../../state/store.js";
 import { Button } from "../../../ui/primitives/button.js";
 import { DataTable, DataTablePagination } from "../../../ui/composites/dataTable.js";
 import { openModal, closeModal } from "../../../ui/primitives/modal.js";
+import { aksiModalDari, titipkanAksiModal } from "../../../ui/composites/modalHeaderFormActions.js";
 import { showToast } from "../../../ui/primitives/toast.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 
@@ -197,7 +198,7 @@ function heroSection(templates, { onCreate } = {}) {
   ].forEach(([label, value]) => {
     const card = document.createElement("section");
     card.id = `admstinsp_hero_stat_${String(label).toLowerCase()}_section`;
-    card.className = "rounded-[1rem] border border-white/80 bg-white/80 p-3 shadow-sm";
+    card.className = "rounded-[1rem] border border-[var(--pb-card-border)] bg-white/80 p-3 shadow-sm";
     card.append(
       textNode("p", "text-[10px] font-black uppercase tracking-[0.12em] text-gray-500", label),
       textNode("p", "text-xl font-black text-gray-950", String(value)),
@@ -225,7 +226,7 @@ function heroSection(templates, { onCreate } = {}) {
 function filterSection({ filters, templates, onSubmit }) {
   const section = document.createElement("section");
   section.id = "admstinsp_filter_section";
-  section.className = "grid gap-3 rounded-[1.25rem] border border-white/80 bg-white/88 p-4 shadow-[var(--pb-shadow-card)]";
+  section.className = "grid gap-3 rounded-[1.25rem] border border-[var(--pb-card-border)] bg-white/88 p-4 shadow-[var(--pb-shadow-card)]";
 
   const form = document.createElement("form");
   form.id = "admstinsp_filter_form_section";
@@ -265,7 +266,7 @@ function filterSection({ filters, templates, onSubmit }) {
 
   const chips = document.createElement("section");
   chips.id = "admstinsp_filter_chips_section";
-  chips.className = "flex flex-wrap gap-2 border-t border-gray-100 pt-3";
+  chips.className = "flex flex-wrap gap-2 border-t border-[var(--pb-card-border)] pt-3";
   [
     `${templates.length} item master`,
     `${templates.filter((template) => template.is_active).length} aktif`,
@@ -358,14 +359,25 @@ function editorSection({ template, saving, onSave }) {
   active.checked = template?.is_active !== false;
   active.className = "h-4 w-4 rounded border-gray-300 text-[var(--pb-brand-secondary)] focus:ring-[color-mix(in_srgb,var(--pb-brand-primary)_45%,white)]";
   const activeWrap = document.createElement("label");
-  activeWrap.className = "flex items-center gap-2 rounded-xl border border-gray-100 bg-gray-50 px-3 py-3 text-xs font-bold text-gray-700";
+  activeWrap.className = "flex items-center gap-2 rounded-xl border border-[var(--pb-card-border)] bg-gray-50 px-3 py-3 text-xs font-bold text-gray-700";
   activeWrap.append(active, document.createTextNode("Item aktif untuk flow showroom"));
 
   const save = Button({ label: saving ? "Menyimpan..." : "Simpan Master", variant: "primary" });
   save.id = "admstinsp_save_template_button";
   save.type = "submit";
   save.disabled = saving;
+  // Tayang di header modal, jadi di luar <form>.
+  save.setAttribute("form", form.id);
   save.prepend(createIcon("edit", { className: "h-4 w-4" }));
+
+  const cancel = Button({ label: "Batal", variant: "secondary", disabled: saving, onClick: () => closeModal() });
+  cancel.id = "admstinsp_cancel_template_button";
+  cancel.type = "button";
+
+  const aksi = document.createElement("section");
+  aksi.id = "admstinsp_editor_actions_section";
+  aksi.className = "flex shrink-0 flex-wrap items-center justify-end gap-2";
+  aksi.append(cancel, save);
 
   form.append(
     labelWrap("Section", sectionInput),
@@ -373,7 +385,6 @@ function editorSection({ template, saving, onSave }) {
     labelWrap("Keterangan", description),
     labelWrap("Urutan", sortOrder),
     activeWrap,
-    save,
   );
   form.addEventListener("submit", (event) => {
     event.preventDefault();
@@ -384,7 +395,7 @@ function editorSection({ template, saving, onSave }) {
     textNode("p", "text-xs leading-6 text-gray-600", "Perubahan definisi master hanya memengaruhi draft baru. Report yang sudah tersimpan tetap memakai salinan item saat itu."),
     form,
   );
-  return section;
+  return titipkanAksiModal(section, aksi);
 }
 
 function getTemplates() {
@@ -504,11 +515,13 @@ function labelWrap(label, control) {
 }
 
 function openTemplateModal({ mode, template, saving, actions }) {
-  openModal(editorSection({
+  const isi = editorSection({
     template,
     saving,
     onSave: actions.saveTemplate,
-  }), {
+  });
+
+  openModal(isi, {
     key: `admstinsp-template-${mode}-${template?.id ?? "new"}`,
     title: mode === "edit" ? "Edit item master" : "Buat item master",
     description: "Kelola definisi canon master inspection dari modal.",
@@ -517,7 +530,7 @@ function openTemplateModal({ mode, template, saving, actions }) {
     panelId: mode === "edit" ? "admstinsp_edit_modal_panel_section" : "admstinsp_create_modal_panel_section",
     headerId: mode === "edit" ? "admstinsp_edit_modal_header_section" : "admstinsp_create_modal_header_section",
     bodyId: mode === "edit" ? "admstinsp_edit_modal_body_section" : "admstinsp_create_modal_body_section",
-    closeButtonId: mode === "edit" ? "admstinsp_edit_modal_close_button" : "admstinsp_create_modal_close_button",
+    headerActions: () => aksiModalDari(isi),
   });
 }
 

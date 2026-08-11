@@ -203,7 +203,7 @@ export function SellerCarForm({
 function formHeader(car) {
   const header = document.createElement("section");
   header.id = "slrc_car_form_header_section";
-  header.className = "grid gap-3 border-b border-gray-100 pb-4 sm:flex sm:items-start sm:justify-between";
+  header.className = "grid gap-3 border-b border-[var(--pb-card-border)] pb-4 sm:flex sm:items-start sm:justify-between";
 
   const copyWrap = document.createElement("section");
   copyWrap.id = "slrc_car_form_header_copy_section";
@@ -236,7 +236,7 @@ function formHeader(car) {
 function createStepper(currentStep) {
   const section = document.createElement("section");
   section.id = "slrc_car_form_stepper_section";
-  section.className = "sticky top-0 z-20 grid gap-3 rounded-2xl border border-white/80 bg-white/95 p-3 shadow-[0_16px_40px_rgba(15,23,42,0.12)] backdrop-blur-xl";
+  section.className = "sticky top-0 z-20 grid gap-3 rounded-2xl border border-[var(--pb-card-border)] bg-white/95 p-3 shadow-[0_16px_40px_rgba(15,23,42,0.12)] backdrop-blur-xl";
 
   const top = document.createElement("section");
   top.id = "slrc_car_form_stepper_summary_section";
@@ -265,7 +265,7 @@ function createStepper(currentStep) {
     card.id = `slrc_car_form_stepper_item_${item.step}_section`;
     card.className = [
       "grid gap-1 rounded-2xl border p-3 transition duration-150",
-      active ? "border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] bg-[var(--pb-surface-muted)] text-[var(--pb-brand-secondary)] shadow-sm" : "border-gray-100 bg-white text-gray-600",
+      active ? "border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] bg-[var(--pb-surface-muted)] text-[var(--pb-brand-secondary)] shadow-sm" : "border-[var(--pb-card-border)] bg-white text-gray-600",
       done ? "border-[color-mix(in_srgb,var(--pb-brand-primary)_26%,white)] bg-[color-mix(in_srgb,var(--pb-brand-primary)_8%,white)] text-[color-mix(in_srgb,var(--pb-brand-primary)_84%,black)]" : "",
     ].join(" ");
     const line = document.createElement("section");
@@ -295,7 +295,7 @@ function createStepPanel(step, currentStep) {
 function createNavigation({ currentStep, saving, onCancel, onPrevious, onNext }) {
   const section = document.createElement("section");
   section.id = "slrc_car_form_navigation_section";
-  section.className = "flex flex-col-reverse gap-3 border-t border-gray-100 pt-4 sm:flex-row sm:items-center sm:justify-between";
+  section.className = "flex flex-col-reverse gap-3 border-t border-[var(--pb-card-border)] pt-4 sm:flex-row sm:items-center sm:justify-between";
 
   const cancel = Button({ label: "Batal", variant: "secondary", disabled: saving, onClick: onCancel });
   cancel.id = "slrc_cancel_car_button";
@@ -390,7 +390,7 @@ function showValidation(node, message) {
 function createDocumentTypeToggle(value = "new") {
   const section = document.createElement("section");
   section.id = "slrc_document_type_toggle_section";
-  section.className = "grid min-w-0 gap-2 rounded-[1rem] border border-gray-100 bg-white/80 p-3";
+  section.className = "grid min-w-0 gap-2 rounded-[1rem] border border-[var(--pb-card-border)] bg-white/80 p-3";
 
   const label = textNode("p", "text-xs font-bold text-gray-700", "Jenis mobil");
   const input = document.createElement("input");
@@ -512,7 +512,7 @@ function createNativeSelect({ id, name, label, helper }) {
 function fieldGroup(id, title, iconName) {
   const section = document.createElement("section");
   section.id = id;
-  section.className = "grid gap-4 rounded-[1.5rem] border border-gray-100 bg-[linear-gradient(135deg,rgba(249,250,251,0.96),rgba(255,255,255,0.92))] p-4 shadow-sm transition duration-150 hover:border-[var(--pb-border)]";
+  section.className = "grid gap-4 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-[linear-gradient(135deg,rgba(249,250,251,0.96),rgba(255,255,255,0.92))] p-4 shadow-sm transition duration-150 hover:border-[var(--pb-border)]";
 
   const header = document.createElement("section");
   header.id = `${id}_header`;

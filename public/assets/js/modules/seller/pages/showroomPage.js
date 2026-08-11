@@ -212,7 +212,7 @@ function showroomHero({ router, showroom, editing }) {
   ].forEach(([label, value]) => {
     const stat = document.createElement("section");
     stat.id = `slrsr_hero_stat_${slugify(label)}_section`;
-    stat.className = "rounded-[1.25rem] border border-white/80 bg-white/78 p-3 shadow-sm transition duration-150 hover:-translate-y-0.5 hover:shadow-md";
+    stat.className = "rounded-[1.25rem] border border-[var(--pb-card-border)] bg-white/78 p-3 shadow-sm transition duration-150 hover:-translate-y-0.5 hover:shadow-md";
     stat.append(
       textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label),
       textNode("p", "text-lg font-black text-gray-950", value)
@@ -234,7 +234,7 @@ function showroomHero({ router, showroom, editing }) {
   side.className = "grid gap-3";
   const status = document.createElement("section");
   status.id = "slrsr_mode_status_section";
-  status.className = "rounded-[1.25rem] border border-white/80 bg-white/78 px-4 py-3 text-xs font-bold text-gray-700 shadow-sm";
+  status.className = "rounded-[1.25rem] border border-[var(--pb-card-border)] bg-white/78 px-4 py-3 text-xs font-bold text-gray-700 shadow-sm";
   status.append(createIcon(editing ? "edit" : "eye", { className: "mr-2 h-4 w-4 text-[var(--pb-brand-secondary)]" }), document.createTextNode(editing ? "Mode edit showroom" : "Mode lihat showroom"));
   side.append(stats, status, dashboardButton);
 

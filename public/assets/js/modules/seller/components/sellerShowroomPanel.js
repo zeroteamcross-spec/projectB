@@ -4,7 +4,7 @@ import { createIcon } from "../../../theme/iconRegistry.js";
 export function SellerShowroomPanel({ summary = {} } = {}) {
   const section = document.createElement("section");
   section.id = "slr_showroom_panel_section";
-  section.className = "grid min-w-0 gap-4 rounded-[1.75rem] border border-white/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.92),rgba(234,244,249,0.76),rgba(250,244,237,0.70))] p-4 shadow-[0_18px_52px_rgba(15,23,42,0.08)] backdrop-blur-xl transition-shadow duration-150 sm:p-5";
+  section.className = "grid min-w-0 gap-4 rounded-[1.75rem] border border-[var(--pb-card-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.92),rgba(234,244,249,0.76),rgba(250,244,237,0.70))] p-4 shadow-[0_18px_52px_rgba(15,23,42,0.08)] backdrop-blur-xl transition-shadow duration-150 sm:p-5";
 
   const header = document.createElement("div");
   header.className = "flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between";
@@ -50,7 +50,7 @@ export function SellerShowroomPanel({ summary = {} } = {}) {
   ].forEach(([label, value]) => {
     const item = document.createElement("section");
     item.id = `slr_showroom_fact_${label.toLowerCase().replace(/\s+/g, "_")}_section`;
-    item.className = "rounded-[1.25rem] border border-white/80 bg-white/74 p-3 shadow-sm";
+    item.className = "rounded-[1.25rem] border border-[var(--pb-card-border)] bg-white/74 p-3 shadow-sm";
     item.append(
       textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label),
       textNode("p", "text-xs font-black text-gray-950", value),

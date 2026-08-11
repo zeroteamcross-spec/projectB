@@ -166,7 +166,7 @@ function adminHero({ title, description, action }) {
 function adminChartPanel({ summary, transactions = [], pendingUsers = [], cars = [] }) {
   const section = document.createElement("section");
   section.id = "adm_dashboard_chart_section";
-  section.className = "grid gap-4 rounded-[2rem] border border-white/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.92),rgba(234,244,249,0.78),rgba(250,244,237,0.72))] p-5 shadow-[0_22px_70px_rgba(15,23,42,0.09)] backdrop-blur-xl lg:grid-cols-[minmax(0,1fr)_320px]";
+  section.className = "grid gap-4 rounded-[2rem] border border-[var(--pb-card-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.92),rgba(234,244,249,0.78),rgba(250,244,237,0.72))] p-5 shadow-[0_22px_70px_rgba(15,23,42,0.09)] backdrop-blur-xl lg:grid-cols-[minmax(0,1fr)_320px]";
 
   const main = document.createElement("div");
   main.className = "grid gap-5";
@@ -199,7 +199,7 @@ function adminChartPanel({ summary, transactions = [], pendingUsers = [], cars =
 
   const side = document.createElement("div");
   side.id = "adm_dashboard_chart_side_panel";
-  side.className = "grid content-between gap-4 rounded-[1.5rem] border border-white/80 bg-white/76 p-4 shadow-sm";
+  side.className = "grid content-between gap-4 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white/76 p-4 shadow-sm";
   side.append(
     textNode("p", "text-xs leading-6 text-gray-600", "Grafik ini membaca beban operasional secara sekilas, tanpa perlu membuka halaman detailnya."),
     metricPills([

@@ -211,7 +211,7 @@ function backButton(context) {
 
 function desktopCta({ car, context }) {
   const section = document.createElement("section");
-  section.className = "hidden gap-4 rounded-[28px] border border-white/75 bg-white/95 p-5 shadow-card backdrop-blur sm:grid";
+  section.className = "hidden gap-4 rounded-[28px] border border-[var(--pb-card-border)] bg-white/95 p-5 shadow-card backdrop-blur sm:grid";
   applyDesignHook(section, "public.car_detail.cta_panel");
   const lock = getListingLockStatus({ car });
 
@@ -248,7 +248,7 @@ function desktopCta({ car, context }) {
 
 function descriptionSection(car) {
   const section = document.createElement("section");
-  section.className = "grid gap-3 rounded-[28px] border border-white/75 bg-white/95 p-5 shadow-card backdrop-blur";
+  section.className = "grid gap-3 rounded-[28px] border border-[var(--pb-card-border)] bg-white/95 p-5 shadow-card backdrop-blur";
   applyDesignHook(section, "public.car_detail.description");
 
   const eyebrow = document.createElement("span");

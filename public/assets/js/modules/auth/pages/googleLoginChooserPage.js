@@ -52,7 +52,7 @@ function render(root, context) {
 function roleCard(context, config) {
   const card = document.createElement("article");
   card.id = `google_login_chooser_${config.slug}_card`;
-  card.className = "grid gap-4 rounded-[1.75rem] border border-white/80 bg-white/84 p-5 shadow-[0_24px_70px_rgba(15,23,42,0.12)] backdrop-blur-xl";
+  card.className = "grid gap-4 rounded-[1.75rem] border border-[var(--pb-card-border)] bg-white/84 p-5 shadow-[0_24px_70px_rgba(15,23,42,0.12)] backdrop-blur-xl";
 
   const title = document.createElement("h2");
   title.className = "text-lg font-black tracking-[-0.03em] text-gray-950";

@@ -3,7 +3,7 @@ import { createIcon } from "../../../theme/iconRegistry.js";
 
 export function PublicInspectionSummary({ car, inspection } = {}) {
   const section = document.createElement("section");
-  section.className = "grid gap-4 rounded-[28px] border border-white/75 bg-white/95 p-5 shadow-card backdrop-blur";
+  section.className = "grid gap-4 rounded-[28px] border border-[var(--pb-card-border)] bg-white/95 p-5 shadow-card backdrop-blur";
 
   const items = Array.isArray(inspection?.items) ? inspection.items : [];
   const hasPublishedReport = Boolean(inspection?.id) && ["published", "completed"].includes(String(inspection?.report_status ?? "").toLowerCase());

@@ -1,4 +1,5 @@
 import { Button } from "../../../ui/primitives/button.js";
+import { titipkanAksiModal } from "../../../ui/composites/modalHeaderFormActions.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 import { adminMasterService } from "../services/adminMasterService.js";
 
@@ -38,7 +39,7 @@ export function AdminMasterLocationForm({
 
   const actions = document.createElement("section");
   actions.id = "admstloc_form_actions_section";
-  actions.className = "flex flex-col-reverse gap-2 border-t border-gray-100 pt-4 sm:flex-row sm:items-center sm:justify-between";
+  actions.className = "flex shrink-0 flex-wrap items-center justify-end gap-2";
   const left = document.createElement("section");
   left.id = "admstloc_form_destructive_actions_section";
   const right = document.createElement("section");
@@ -58,11 +59,13 @@ export function AdminMasterLocationForm({
   const submit = Button({ label: saving ? "Menyimpan..." : "Simpan Lokasi", disabled: saving });
   submit.id = "admstloc_save_city_button";
   submit.type = "submit";
+  // Tayang di header modal, jadi di luar <form>.
+  submit.setAttribute("form", form.id);
   submit.prepend(createIcon("circleCheck", { className: "h-4 w-4" }));
   right.append(cancel, submit);
   actions.append(left, right);
 
-  form.append(intro, fields, actions);
+  form.append(intro, fields);
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     const formData = new FormData(form);
@@ -78,7 +81,7 @@ export function AdminMasterLocationForm({
     });
   });
 
-  return form;
+  return titipkanAksiModal(form, actions);
 }
 
 function inputField(id, name, label, value, placeholder) {

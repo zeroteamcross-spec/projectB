@@ -109,7 +109,7 @@ function render(root, context, state, actions) {
 
 function hero() {
   const section = document.createElement("section");
-  section.className = "grid gap-4 rounded-[1.5rem] border border-white/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(250,244,237,0.86))] p-5 shadow-[var(--pb-shadow-card)] lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center";
+  section.className = "grid gap-4 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(250,244,237,0.86))] p-5 shadow-[var(--pb-shadow-card)] lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center";
   const copy = document.createElement("section");
   copy.className = "grid min-w-0 gap-2";
   copy.append(

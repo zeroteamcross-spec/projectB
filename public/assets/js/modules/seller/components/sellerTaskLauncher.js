@@ -61,7 +61,7 @@ export function SellerTaskLauncher({ router = null } = {}) {
 
   const header = document.createElement("section");
   header.id = "slr_tasks_header_section";
-  header.className = "flex min-w-0 flex-col gap-2 rounded-[1.5rem] border border-white/80 bg-white/78 p-4 shadow-[0_16px_45px_rgba(15,23,42,0.06)] backdrop-blur sm:flex-row sm:items-center sm:justify-between";
+  header.className = "flex min-w-0 flex-col gap-2 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white/78 p-4 shadow-[0_16px_45px_rgba(15,23,42,0.06)] backdrop-blur sm:flex-row sm:items-center sm:justify-between";
   const copy = document.createElement("div");
   copy.className = "grid min-w-0 gap-1";
   copy.append(
@@ -78,7 +78,7 @@ export function SellerTaskLauncher({ router = null } = {}) {
   TASKS.forEach((task) => {
     const card = document.createElement("section");
     card.id = `slr_task_${task.key}_section`;
-    card.className = "grid min-w-0 gap-4 rounded-[1.5rem] border border-white/80 bg-white/86 p-4 shadow-[0_16px_45px_rgba(15,23,42,0.06)] backdrop-blur transition duration-150 hover:-translate-y-0.5 hover:shadow-[0_20px_56px_rgba(15,23,42,0.09)]";
+    card.className = "grid min-w-0 gap-4 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white/86 p-4 shadow-[0_16px_45px_rgba(15,23,42,0.06)] backdrop-blur transition duration-150 hover:-translate-y-0.5 hover:shadow-[0_20px_56px_rgba(15,23,42,0.09)]";
 
     const iconWrap = document.createElement("div");
     iconWrap.className = `grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br ${task.accent} text-white shadow-[0_14px_34px_rgba(15,23,42,0.12)]`;
