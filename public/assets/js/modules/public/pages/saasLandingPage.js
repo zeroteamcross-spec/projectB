@@ -24,7 +24,9 @@ export function SaasLandingPage() {
       root = document.createElement("div");
       root.id = "saas_landing_root";
       root.className = "relative w-full";
-      root.style.background = "#FAF4ED";
+      // Nyaris putih, bukan putih murni: kartu-kartu di halaman ini putih,
+      // dan di atas kanvas putih penuh batasnya hilang.
+      root.style.background = "#FDFDFC";
       root.innerHTML = landingMarkup({
         namaMerek: brandConfig.appName,
         tagline: brandConfig.appTagline,

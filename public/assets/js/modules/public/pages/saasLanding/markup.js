@@ -21,7 +21,7 @@ export function landingMarkup({ namaMerek, tagline, tautanWhatsapp, alamatEtalas
   const merek = escapeHtml(namaMerek);
 
   return `
-<div style="position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(70% 55% at 18% 8%,rgba(30,129,176,.14),transparent 62%),radial-gradient(60% 50% at 88% 22%,rgba(234,182,118,.20),transparent 60%),linear-gradient(180deg,#ffffff,#faf4ed 55%,#f5ece1)"></div>
+<div style="position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(70% 55% at 18% 8%,rgba(30,129,176,.10),transparent 62%),radial-gradient(60% 50% at 88% 22%,rgba(234,182,118,.12),transparent 60%),linear-gradient(180deg,#ffffff,#fdfdfc 55%,#fbfaf8)"></div>
 
 <div style="position:relative;z-index:2">
 
@@ -75,7 +75,7 @@ export function landingMarkup({ namaMerek, tagline, tautanWhatsapp, alamatEtalas
 </div>
 
 <div data-pita="" style="position:relative;border-top:1px solid rgba(28,25,23,.07);border-bottom:1px solid rgba(28,25,23,.07);overflow:hidden">
-  <div style="position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(90deg,#faf4ed,transparent 14%,transparent 86%,#faf4ed)"></div>
+  <div style="position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(90deg,#fdfdfc,transparent 14%,transparent 86%,#fdfdfc)"></div>
   <div style="display:flex;width:max-content;animation:tick 38s linear infinite">
     <div style="display:flex;align-items:center;gap:40px;padding:18px 40px 18px 0;font-family:'JetBrains Mono',monospace;font-size:12.5px;color:#1c1917;white-space:nowrap"><span>HALAMAN SHOWROOM SENDIRI</span><span style="color:#1e81b0">/</span><span>KELOLA LISTING SENDIRI</span><span style="color:#1e81b0">/</span><span>MARKETING SENDIRI</span><span style="color:#1e81b0">/</span><span>DAFTAR GRATIS</span><span style="color:#1e81b0">/</span></div>
     <div style="display:flex;align-items:center;gap:40px;padding:18px 40px 18px 0;font-family:'JetBrains Mono',monospace;font-size:12.5px;color:#1c1917;white-space:nowrap"><span>HALAMAN SHOWROOM SENDIRI</span><span style="color:#1e81b0">/</span><span>KELOLA LISTING SENDIRI</span><span style="color:#1e81b0">/</span><span>MARKETING SENDIRI</span><span style="color:#1e81b0">/</span><span>DAFTAR GRATIS</span><span style="color:#1e81b0">/</span></div>

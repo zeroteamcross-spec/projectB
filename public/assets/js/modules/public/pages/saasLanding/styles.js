@@ -23,7 +23,7 @@ const HOST_FONT = ["https://fonts.googleapis.com", "https://fonts.gstatic.com"];
 const CSS = `
 #saas_landing_root, #saas_landing_root *{box-sizing:border-box}
 html.${KELAS_AKTIF}{scroll-behavior:smooth}
-body.${KELAS_AKTIF}{background:#faf4ed;overflow-x:clip}
+body.${KELAS_AKTIF}{background:#fdfdfc;overflow-x:clip}
 #saas_landing_root{color:#1c1917;font-family:"DM Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 #saas_landing_root a{color:#1e81b0;text-decoration:none}
 #saas_landing_root a:hover{color:#17698f}
