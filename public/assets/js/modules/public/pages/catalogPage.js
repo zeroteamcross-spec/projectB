@@ -1,4 +1,5 @@
 import { createPageLifecycle } from "../../../core/lifecycle.js";
+import { normalizeHost, roleHosts } from "../../../core/roleHosts.js";
 import { appStore } from "../../../state/store.js";
 import { canUseFavorites, favoritesStore } from "../../../state/favoritesStore.js";
 import { Button } from "../../../ui/primitives/button.js";
@@ -478,7 +479,7 @@ function sliderHashPath(url) {
       return parsed.hash.slice(1);
     }
 
-    if (parsed.origin === window.location.origin || parsed.hostname.endsWith("garasi-mobil.com")) {
+    if (parsed.origin === window.location.origin || hostMilikAplikasi(parsed.hostname)) {
       return parsed.pathname.replace(/\/$/, "") || "/";
     }
   } catch (error) {
@@ -486,6 +487,30 @@ function sliderHashPath(url) {
   }
 
   return "";
+}
+
+/**
+ * Alamat CTA dianggap milik aplikasi sendiri kalau host-nya ada di peta host
+ * peran, atau merupakan subdomain dari host utama -- misalnya admin.carlynk.id.
+ *
+ * Petanya datang dari konfigurasi. Sebelumnya garasi-mobil.com dipatok keras di
+ * sini, jadi pemeriksaan ini berhenti mengenali apa pun begitu domainnya
+ * berganti, dan CTA ke domain sendiri diperlakukan sebagai tautan luar.
+ */
+function hostMilikAplikasi(hostname) {
+  const host = normalizeHost(hostname);
+  const peta = roleHosts();
+  const utama = peta.default;
+
+  if (!host) {
+    return false;
+  }
+
+  if (Object.keys(peta).some((peran) => peta[peran] === host)) {
+    return true;
+  }
+
+  return Boolean(utama) && host.endsWith(`.${utama}`);
 }
 
 function normalizeSliderPayload(payload) {

@@ -42,7 +42,7 @@ export function createRoleGuard({ auth } = {}) {
 
       return {
         type: "redirect",
-        path: googleLoginPathForCurrentHost(),
+        path: loginPathForCurrentHost(),
         meta: {
           currentRole,
           blockedRouteName: route.name,
@@ -199,20 +199,25 @@ function roleSlug(role) {
   return role;
 }
 
-function googleLoginPathForCurrentHost() {
+/**
+ * Peran yang punya host sendiri dan punya halaman /login/<slug>. Dipakai untuk
+ * menjaga agar peta host yang salah tulis tidak menghasilkan rute mati.
+ */
+const HOST_LOGIN_SLUGS = ["admin", "seller", "affiliate"];
+
+/**
+ * Halaman login yang benar untuk host yang sedang dibuka.
+ *
+ * Host khusus peran memakai form email dan password, sejalan dengan
+ * loginPathForRole. Host umum tidak menyatakan peran apa pun, jadi di sana
+ * pengunjung yang belum login diperlakukan sebagai calon pembeli.
+ *
+ * Sebelumnya peta host yang sama ditulis ulang di publicShell.js dengan
+ * garasi-mobil.com dipatok keras. Akibatnya tombol Login di admin.carlynk.id
+ * tidak mengenali host-nya sendiri dan jatuh ke pemilih peran.
+ */
+export function loginPathForCurrentHost() {
   const peran = roleForCurrentHost();
 
-  if (peran === "admin") {
-    return "/google-login/admin";
-  }
-
-  if (peran === "seller") {
-    return "/google-login/seller";
-  }
-
-  if (peran === "affiliate") {
-    return "/login/affiliate";
-  }
-
-  return "/google-login/buyer";
+  return HOST_LOGIN_SLUGS.includes(peran) ? `/login/${peran}` : defaultLoginPath("buyer");
 }

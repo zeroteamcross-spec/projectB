@@ -5,7 +5,7 @@ import { RouteHydrateAlert } from "../ui/composites/routeHydrateAlert.js";
 import { tw } from "../theme/tailwindClasses.js";
 import { applyDesignHook } from "../theme/designStudioHooks.js";
 import { renderImpersonationBanner as mountImpersonationBanner } from "./impersonationBanner.js";
-import { defaultLoginHash } from "../config/authUxConfig.js";
+import { loginPathForCurrentHost } from "../core/roleGuard.js";
 import { BuyerMobileFooterNav } from "../modules/buyer/components/buyerMobileFooterNav.js";
 
 /**
@@ -227,26 +227,13 @@ function loginHashForShowroomRoute() {
   return cocok ? `#/s/${cocok[1]}/login` : null;
 }
 
+/**
+ * Peta host-nya ada di roleGuard, bukan di sini. Berkas ini dulu menyimpan
+ * salinannya sendiri yang dipatok ke garasi-mobil.com, jadi begitu domainnya
+ * berganti tombol Login berhenti mengenali host mana pun.
+ */
 function loginHashForCurrentHost() {
-  const host = String(window.location.hostname || "").toLowerCase();
-
-  if (host === "admin.garasi-mobil.com") {
-    return "#/google-login/admin";
-  }
-
-  if (host === "showroom.garasi-mobil.com") {
-    return "#/google-login/seller";
-  }
-
-  if (host === "marketing.garasi-mobil.com") {
-    return "#/login/affiliate";
-  }
-
-  if (host === "garasi-mobil.com") {
-    return "#/google-login/buyer";
-  }
-
-  return defaultLoginHash();
+  return `#${loginPathForCurrentHost()}`;
 }
 
 PublicShell.prototype.renderImpersonationBanner = function renderImpersonationBanner() {
