@@ -33,10 +33,3 @@ export function ModalHeaderFormActions({
   wrap.append(cancel, submit);
   return wrap;
 }
-
-export function ModalHeaderActions({ children = [] } = {}) {
-  const wrap = document.createElement("div");
-  wrap.className = "flex max-w-full flex-wrap items-center justify-end gap-2";
-  wrap.append(...children.filter(Boolean));
-  return wrap;
-}

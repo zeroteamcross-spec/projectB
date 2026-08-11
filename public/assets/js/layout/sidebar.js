@@ -276,7 +276,7 @@ function compactToggleLabel(collapsed = false) {
 }
 
 function drawerSidebarClassName() {
-  return "h-full w-[min(82vw,292px)] min-w-0 overflow-y-auto border-r border-white/15 bg-[linear-gradient(160deg,rgba(11,31,58,0.94),rgba(22,38,74,0.86))] px-5 py-5 text-[var(--pb-shell-nav-text)] shadow-[0_26px_80px_rgba(15,23,42,0.28)] backdrop-blur-2xl";
+  return "h-full w-[min(82vw,292px)] min-w-0 overflow-y-auto bg-[linear-gradient(180deg,var(--pb-shell-sidebar-start),var(--pb-shell-sidebar-end))] px-5 py-5 text-[var(--pb-shell-nav-text)] shadow-[var(--pb-shadow-elevated)]";
 }
 
 function renderLinks(nav, store, options = {}) {

@@ -1,7 +1,6 @@
 import { Button } from "../../../ui/primitives/button.js";
 import { createIcon, iconRegistry } from "../../../theme/iconRegistry.js";
 import { adminMasterService } from "../services/adminMasterService.js";
-import { ModalHeaderActions } from "../../../ui/composites/modalHeaderFormActions.js";
 
 export function AdminMasterSidebarForm({
   item = null,
@@ -10,7 +9,6 @@ export function AdminMasterSidebarForm({
   onSubmit = null,
   onDelete = null,
   onCancel = null,
-  actionsInBody = true,
 } = {}) {
   const draft = cloneItem(item);
   const section = document.createElement("section");
@@ -112,13 +110,7 @@ export function AdminMasterSidebarForm({
   submit.prepend(createIcon("sparkles", { className: "h-4 w-4" }));
   actions.append(cancel, submit);
 
-  if (actionsInBody) {
-    form.append(fields, flags, actions);
-  } else {
-    submit.setAttribute("form", form.id);
-    form.append(fields, flags);
-    section.modalHeaderActions = () => ModalHeaderActions({ children: [ ...(mode === "edit" ? [actions.firstElementChild] : []), submit, cancel] });
-  }
+  form.append(fields, flags, actions);
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     const nextLabel = label.input.value.trim();

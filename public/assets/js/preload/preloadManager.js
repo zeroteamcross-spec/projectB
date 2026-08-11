@@ -23,7 +23,10 @@ export class PreloadManager {
 
   async hydrateRoute(route, context) {
     const items = route.preload?.working ?? [];
-    await Promise.allSettled(items.map((item) => this.loadWorking(route.workingStateKey, item, context)));
+
+    for (const item of items) {
+      await this.loadWorking(route.workingStateKey, item, context);
+    }
   }
 
   async loadSnapshot(role, item) {

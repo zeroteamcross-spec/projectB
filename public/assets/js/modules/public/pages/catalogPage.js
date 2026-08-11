@@ -135,15 +135,8 @@ function render(root, context, flags) {
   const invalidShowroomRoute = isShowroomRoute && publicContextService.invalidSlug() === showroomSlug;
   const activeContext = affiliate || showroom;
   const catalogState = publicCatalogState.get();
-  const scopedCatalog = publicCatalogService.cachedList({
-    page: catalogState.page,
-    limit: catalogState.limit,
-    filters: catalogState.filters,
-    affiliateSlug,
-    showroomSlug,
-  });
   const snapshot = publicCatalogState.snapshotCatalog({ cars: [], meta: {} });
-  const working = publicCatalogState.workingCatalog(scopedCatalog ?? ((!isAffiliateRoute && !isShowroomRoute) ? snapshot : { cars: [], meta: {} }));
+  const working = publicCatalogState.workingCatalog(snapshot);
   const workingHydratedAt = appStore.get("working.publicCatalog.catalog.hydratedAt", 0) ?? 0;
   const meta = working?.meta ?? snapshot?.meta ?? {};
   const filters = catalogState.filters ?? {};
@@ -156,7 +149,7 @@ function render(root, context, flags) {
   const useBackgroundVideo = isLandingRoute(context);
   const slidersBeforeRender = resolvePublicSliders();
 
-  if ((isAffiliateRoute || isShowroomRoute) && !(invalidAffiliateRoute || invalidShowroomRoute) && (!contextReady || (!workingHydratedAt && !scopedCatalog))) {
+  if (isAffiliateRoute && !invalidAffiliateRoute && (!contextReady || !workingHydratedAt)) {
     disposeSliderBanners(root);
     root.replaceChildren(loadingFrame(
       filters,

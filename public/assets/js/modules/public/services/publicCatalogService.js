@@ -3,9 +3,6 @@ import { imagesResource } from "../../../resources/imagesResource.js";
 import { inspectionsResource } from "../../../resources/inspectionsResource.js";
 import { publicContextService } from "./publicContextService.js";
 
-const catalogCache = new Map();
-const CATALOG_CACHE_TTL = 120000;
-
 export const publicCatalogService = {
   async list({ page = 1, limit = 12, filters = {}, affiliateSlug = "", showroomSlug = "" } = {}, options = {}) {
     let affiliateSellerUserId = null;
@@ -29,7 +26,9 @@ export const publicCatalogService = {
       showroomSellerUserId = context.sellerUserId;
     }
 
-    const cleanFilters = normalizeCatalogFilters(filters);
+    const cleanFilters = Object.fromEntries(
+      Object.entries(filters).filter(([key, value]) => key !== "brand_names" && value !== "" && value !== null && value !== undefined)
+    );
 
     const scopedFilters = {
       page,
@@ -42,29 +41,10 @@ export const publicCatalogService = {
       scopedFilters.seller_user_id = affiliateSellerUserId || showroomSellerUserId;
     }
 
-    const request = { page: Number(page), limit: Number(limit), filters: cleanFilters, affiliateSlug: String(affiliateSlug ?? ""), showroomSlug: String(showroomSlug ?? "") };
-    const cacheKey = JSON.stringify({ ...request, sellerUserId: Number(affiliateSellerUserId || showroomSellerUserId || 0) });
-    const cached = catalogCache.get(cacheKey);
-    if (cached && Date.now() - cached.fetchedAt < CATALOG_CACHE_TTL) {
-      return cached.data;
-    }
-
-    const data = await carsResource.list(
+    return carsResource.list(
       (affiliateSellerUserId || showroomSellerUserId) ? scopedFilters : publicContextService.applyCatalogFilters(scopedFilters),
       options
     );
-    catalogCache.set(cacheKey, { data, fetchedAt: Date.now(), request });
-    return data;
-  },
-
-  cachedList({ page = 1, limit = 12, filters = {}, affiliateSlug = "", showroomSlug = "" } = {}) {
-    const request = { page: Number(page), limit: Number(limit), filters: normalizeCatalogFilters(filters), affiliateSlug: String(affiliateSlug ?? ""), showroomSlug: String(showroomSlug ?? "") };
-    for (const entry of catalogCache.values()) {
-      if (entry.request && JSON.stringify(entry.request) === JSON.stringify(request) && Date.now() - entry.fetchedAt < CATALOG_CACHE_TTL) {
-        return entry.data;
-      }
-    }
-    return null;
   },
 
   async detail(carId, options = {}) {
@@ -126,9 +106,3 @@ export const publicCatalogService = {
     };
   },
 };
-
-function normalizeCatalogFilters(filters = {}) {
-  return Object.fromEntries(
-    Object.entries(filters).filter(([key, value]) => key !== "brand_names" && value !== "" && value !== null && value !== undefined),
-  );
-}
