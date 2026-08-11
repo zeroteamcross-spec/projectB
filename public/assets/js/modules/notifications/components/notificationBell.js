@@ -391,7 +391,7 @@ function ensureNotificationStyles() {
       display: flex;
       flex-direction: column;
       overflow: visible;
-      border: 1.5px solid #2563eb;
+      border: 1.5px solid #1e81b0;
       border-right-width: 6px;
       border-radius: 28px;
       background: #ffffff;
@@ -431,8 +431,8 @@ function ensureNotificationStyles() {
       right: 36px;
       width: 28px;
       height: 28px;
-      border-left: 1.5px solid #2563eb;
-      border-top: 1.5px solid #2563eb;
+      border-left: 1.5px solid #1e81b0;
+      border-top: 1.5px solid #1e81b0;
       background: #ffffff;
       transform: rotate(45deg);
     }
@@ -543,23 +543,25 @@ function ensureNotificationStyles() {
     }
 
     .pb-notification-icon--red {
-      background: #fee2e2;
-      color: #ef4444;
+      background: #f7e3e3;
+      color: #c53030;
     }
 
     .pb-notification-icon--blue {
-      background: #dbeafe;
-      color: #2563eb;
+      background: #e0eff7;
+      color: #1e81b0;
     }
 
     .pb-notification-icon--green {
-      background: #dcfce7;
-      color: #22c55e;
+      background: #e3f0e7;
+      color: #15803d;
     }
 
+    /* Palet baru tidak punya ungu. Nada keempat ini dipetakan ke peach, warna
+       kedua, supaya masih terbaca beda dari merah/biru/hijau di sebelahnya. */
     .pb-notification-icon--purple {
-      background: #f3e8ff;
-      color: #9333ea;
+      background: #f7ead9;
+      color: #b45309;
     }
 
     .pb-notification-icon__svg {
@@ -620,8 +622,8 @@ function ensureNotificationStyles() {
       align-items: center;
       justify-content: center;
       border-radius: 999px;
-      background: #dbeafe;
-      color: #2563eb;
+      background: #e0eff7;
+      color: #1e81b0;
     }
 
     .pb-notification-popover__state h3,
@@ -680,7 +682,7 @@ function ensureNotificationStyles() {
       flex-shrink: 0;
       align-items: center;
       justify-content: center;
-      color: #2563eb;
+      color: #1e81b0;
       line-height: 1;
     }
 

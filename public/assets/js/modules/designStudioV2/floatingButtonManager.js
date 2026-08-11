@@ -53,7 +53,7 @@ export function createFloatingButtonManager({ documentRef, onOpenEditMode = null
             active = !active;
             if (active) {
                 button.textContent = 'Close';
-                button.style.background = '#dc2626';
+                button.style.background = '#b91c1c';
             } else {
                 button.textContent = 'Edit';
                 button.style.background = '#111827';

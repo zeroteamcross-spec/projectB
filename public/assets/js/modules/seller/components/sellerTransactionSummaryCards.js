@@ -60,9 +60,9 @@ function summaryHelper(key, summary) {
 
 function summaryCardClass(index) {
   return [
-    "border-orange-100/90 bg-[linear-gradient(135deg,rgba(255,237,213,0.98),rgba(255,247,237,0.92),rgba(255,255,255,0.84))]",
-    "border-amber-100/90 bg-[linear-gradient(135deg,rgba(254,243,199,0.98),rgba(255,251,235,0.92),rgba(255,255,255,0.84))]",
-    "border-emerald-100/90 bg-[linear-gradient(135deg,rgba(209,250,229,0.98),rgba(236,253,245,0.92),rgba(255,255,255,0.84))]",
-    "border-sky-100/90 bg-[linear-gradient(135deg,rgba(186,230,253,0.90),rgba(240,249,255,0.94),rgba(255,255,255,0.84))]",
+    "border-[var(--pb-border)] bg-[linear-gradient(135deg,rgba(245,236,225,0.98),rgba(250,244,237,0.92),rgba(255,255,255,0.84))]",
+    "border-[color-mix(in_srgb,var(--pb-warning)_14%,white)] bg-[linear-gradient(135deg,rgba(245,236,225,0.98),rgba(250,244,237,0.92),rgba(255,255,255,0.84))]",
+    "border-[color-mix(in_srgb,var(--pb-success)_14%,white)] bg-[linear-gradient(135deg,rgba(209,250,229,0.98),rgba(236,246,239,0.92),rgba(255,255,255,0.84))]",
+    "border-[color-mix(in_srgb,var(--pb-brand-primary)_14%,white)] bg-[linear-gradient(135deg,rgba(186,230,253,0.90),rgba(234,244,249,0.94),rgba(255,255,255,0.84))]",
   ][index % 4];
 }

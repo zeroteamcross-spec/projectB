@@ -19,7 +19,7 @@ export function AdminTransactionsList({
   onPerPageChange = null,
 } = {}) {
   const icon = document.createElement("span");
-  icon.className = "grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#fb7185,#f97316)] text-white shadow-[0_14px_34px_rgba(244,63,94,0.22)]";
+  icon.className = "grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#c53030,#1e81b0)] text-white shadow-[0_14px_34px_rgba(185,28,28,0.22)]";
   icon.append(createIcon("transaction", { className: "h-4 w-4" }));
 
   const pagination = DataTablePagination({
@@ -94,7 +94,7 @@ export function AdminTransactionsList({
     mobileDisclosureCloseLabel: "Tutup detail kolom",
     tableMinWidth: "min-w-[1120px]",
     rowClassName: (transaction) => Number(selectedTransactionId) === Number(transaction.id)
-      ? "bg-orange-50/70 ring-1 ring-inset ring-orange-200/80"
+      ? "bg-[var(--pb-surface-muted)] ring-1 ring-inset ring-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)]"
       : "bg-white/55",
     getRowKey: (transaction) => transaction.id,
     pagination,
@@ -105,7 +105,7 @@ function transactionIdentity(transaction) {
   const wrap = document.createElement("div");
   wrap.className = "flex min-w-0 items-start gap-3";
   const avatar = document.createElement("span");
-  avatar.className = "grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#fff7ed,#fdf2f8)] text-rose-700 ring-1 ring-orange-100";
+  avatar.className = "grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#faf4ed,#f5ece1)] text-[color-mix(in_srgb,var(--pb-danger)_84%,black)] ring-1 ring-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)]";
   avatar.append(createIcon("transaction", { className: "h-4 w-4" }));
   const copy = document.createElement("div");
   copy.className = "grid min-w-0 gap-1";
@@ -179,7 +179,7 @@ function actionGroup({ transaction, selected, onSelect, idScope = "desktop" }) {
 function iconLine(iconName, text) {
   const node = document.createElement("p");
   node.className = "flex min-w-0 items-center gap-2 break-words text-sm font-semibold text-gray-800";
-  node.append(createIcon(iconName, { className: "h-3.5 w-3.5 shrink-0 text-orange-600" }), document.createTextNode(text));
+  node.append(createIcon(iconName, { className: "h-3.5 w-3.5 shrink-0 text-[var(--pb-brand-secondary)]" }), document.createTextNode(text));
   return node;
 }
 

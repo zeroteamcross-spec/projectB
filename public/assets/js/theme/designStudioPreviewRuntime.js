@@ -100,8 +100,8 @@ function renderStyle() {
   const selector = activeTarget ? `[data-ds="${cssEscape(activeTarget)}"]` : "";
   const css = selector ? [
     `${selector}{${styleDeclarations(activeStyles)}}`,
-    `${selector}{outline:2px dashed #2563eb!important;outline-offset:4px!important;}`,
-    `${selector}::after{content:attr(data-ds);position:absolute;z-index:2147483640;display:inline-block;background:#2563eb;color:#fff;font:700 11px/1.2 system-ui;padding:4px 6px;border-radius:6px;}`,
+    `${selector}{outline:2px dashed #1e81b0!important;outline-offset:4px!important;}`,
+    `${selector}::after{content:attr(data-ds);position:absolute;z-index:2147483640;display:inline-block;background:#1e81b0;color:#fff;font:700 11px/1.2 system-ui;padding:4px 6px;border-radius:6px;}`,
   ].join("\n") : "";
   node.textContent = css;
 }

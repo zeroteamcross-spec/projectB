@@ -1,6 +1,21 @@
 const STYLE_ID = "pb-background-video-style";
 const DEFAULT_SRC = "assets/images/bg-vid.mp4";
 
+/**
+ * Saklar tunggal untuk latar video.
+ *
+ * Sedang dimatikan karena desain baru meminta latar putih polos. Seluruh mesin
+ * videonya sengaja dibiarkan utuh — pemuatan malas, penanganan error, jeda saat
+ * tab tidak aktif — supaya menghidupkannya lagi cukup mengubah baris ini ke
+ * true, tanpa menyentuh delapan halaman yang memanggilnya.
+ *
+ * Saat mati: sumber video tidak pernah dipasang (tidak ada unduhan mp4 sama
+ * sekali), lapisan fallback dipaksa putih, dan overlay gelap milik tiap halaman
+ * diabaikan supaya putihnya tidak keruh.
+ */
+const BACKGROUND_VIDEO_ENABLED = false;
+const DISABLED_FALLBACK_CLASS = "bg-white";
+
 export function createBackgroundVideoLayer({
   src = DEFAULT_SRC,
   id = "",
@@ -19,7 +34,8 @@ export function createBackgroundVideoLayer({
   root.setAttribute("aria-hidden", "true");
 
   const fallback = document.createElement("span");
-  fallback.className = ["pb-background-video__fallback", fallbackClassName].filter(Boolean).join(" ");
+  const fallbackAktif = BACKGROUND_VIDEO_ENABLED ? fallbackClassName : DISABLED_FALLBACK_CLASS;
+  fallback.className = ["pb-background-video__fallback", fallbackAktif].filter(Boolean).join(" ");
   root.append(fallback);
 
   const video = document.createElement("video");
@@ -36,7 +52,8 @@ export function createBackgroundVideoLayer({
   video.setAttribute("aria-hidden", "true");
 
   const overlay = document.createElement("span");
-  overlay.className = ["pb-background-video__overlay", overlayClassName].filter(Boolean).join(" ");
+  const overlayAktif = BACKGROUND_VIDEO_ENABLED ? overlayClassName : "";
+  overlay.className = ["pb-background-video__overlay", overlayAktif].filter(Boolean).join(" ");
 
   const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
   let disposed = false;
@@ -58,7 +75,7 @@ export function createBackgroundVideoLayer({
   };
 
   const attachSource = () => {
-    if (disposed || prefersReducedMotion) {
+    if (disposed || prefersReducedMotion || !BACKGROUND_VIDEO_ENABLED) {
       return;
     }
     if (!video.querySelector("source")) {
@@ -76,7 +93,11 @@ export function createBackgroundVideoLayer({
 
   root.append(video, overlay);
 
-  if (prefersReducedMotion) {
+  if (!BACKGROUND_VIDEO_ENABLED) {
+    // Menandai seperti reduced-motion: media disembunyikan CSS, hanya lapisan
+    // putih yang tampak, dan tidak ada penjadwalan pemuatan sama sekali.
+    root.classList.add("is-reduced-motion");
+  } else if (prefersReducedMotion) {
     root.classList.add("is-reduced-motion");
   } else if (typeof window.requestIdleCallback === "function") {
     idleHandle = window.requestIdleCallback(attachSource, { timeout: 1200 });
@@ -168,12 +189,16 @@ function ensureBackgroundVideoStyles() {
       opacity: 0;
     }
 
+    ${BACKGROUND_VIDEO_ENABLED ? `
+    /* Hanya berlaku saat video menyala: teks dipaksa putih supaya terbaca di
+       atas rekaman yang gelap. Dengan latar putih aturan ini justru membuat
+       teks hilang, jadi tidak ikut ditulis saat videonya dimatikan. */
     .pb-bgv-buyer-content {
       --pb-text: #ffffff;
       --pb-text-strong: #ffffff;
       --pb-text-muted: rgba(255, 255, 255, 0.78);
       --pb-page-bg: transparent;
-    }
+    }` : ""}
 
     .pb-bgv-buyer-content [class*="bg-[var(--pb-surface-card)]"],
     .pb-bgv-buyer-content [class*="bg-[var(--pb-surface-muted)]"],

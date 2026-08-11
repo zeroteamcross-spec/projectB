@@ -18,7 +18,7 @@ export function PublicCarTitleBlock({ car } = {}) {
   }
 
   const eyebrow = document.createElement("span");
-  eyebrow.className = "text-[11px] font-semibold uppercase tracking-normal text-orange-600";
+  eyebrow.className = "text-[11px] font-semibold uppercase tracking-normal text-[var(--pb-brand-secondary)]";
   eyebrow.textContent = "Detail mobil";
 
   const title = document.createElement("h1");

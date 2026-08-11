@@ -1,7 +1,7 @@
 import { normalizeElementName } from './elementCollector.js';
 
 const ELEMENT_BUTTON_CLASS = 'ds-v2-element-button';
-const HOVER_OUTLINE = '0 0 0 2px rgba(37, 99, 235, 0.45)';
+const HOVER_OUTLINE = '0 0 0 2px rgba(30,129,176, 0.45)';
 
 function applyElementButtonStyle(button) {
     Object.assign(button.style, {

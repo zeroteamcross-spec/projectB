@@ -42,7 +42,7 @@ export function DataTable({
   if (title || subtitle || icon) {
     const head = document.createElement("div");
     head.className = [
-      "flex flex-col gap-4 border-b border-[var(--pb-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.94),rgba(255,247,237,0.76))] px-4 py-4 sm:px-5",
+      "flex flex-col gap-4 border-b border-[var(--pb-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.94),rgba(250,244,237,0.76))] px-4 py-4 sm:px-5",
       headClassName,
     ].filter(Boolean).join(" ");
 
@@ -165,7 +165,7 @@ export function DataTablePagination({
   }
 
   const wrap = document.createElement("div");
-  wrap.className = "grid gap-3 rounded-[1.35rem] border border-orange-100/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(255,247,237,0.90),rgba(239,246,255,0.82))] p-3 shadow-sm sm:p-4";
+  wrap.className = "grid gap-3 rounded-[1.35rem] border border-[var(--pb-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(250,244,237,0.90),rgba(234,244,249,0.82))] p-3 shadow-sm sm:p-4";
 
   const meta = document.createElement("div");
   meta.className = "grid gap-1";
@@ -223,8 +223,10 @@ export function DataTablePagination({
         : "",
     });
     pageButton.className = `inline-flex min-h-10 min-w-10 items-center justify-center rounded-full border px-3 text-sm font-semibold shadow-sm transition ${
+      // Nomor halaman aktif memakai biru netral, bukan hijau tombol "Ya".
+      // Pindah halaman tidak menyetujui apa pun.
       Number(item) === Number(page)
-        ? "border-transparent bg-[linear-gradient(135deg,var(--pb-btn-primary-from),var(--pb-btn-primary-to))] text-white"
+        ? "border-transparent bg-[var(--pb-brand-primary)] text-white"
         : "border-[var(--pb-border-strong)] bg-white/82 text-gray-700 hover:-translate-y-0.5 hover:bg-white"
     }`;
     pageButton.disabled = Number(item) === Number(page);
@@ -290,7 +292,7 @@ function createTableBody({ columns, rows, rowClassName, getRowKey }) {
       ? rowClassName(row, index)
       : rowClassName;
     tr.className = [
-      "group border-b border-[var(--pb-border)] transition duration-150 last:border-b-0 hover:bg-orange-50/45",
+      "group border-b border-[var(--pb-border)] transition duration-150 last:border-b-0 hover:bg-[var(--pb-surface-muted)]",
       classes || "bg-white/55",
     ].filter(Boolean).join(" ");
 

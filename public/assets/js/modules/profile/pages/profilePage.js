@@ -293,7 +293,7 @@ function buyerSecurityCard(actions) {
   action.prepend(createIcon("lock", { className: "block h-4 w-4 leading-none" }));
   card.append(copy, action);
   if (blocked) {
-    card.append(textNode("p", "text-sm font-semibold leading-6 text-amber-700 md:col-span-2", "Password akun marketing tidak dapat diubah saat admin sedang login sebagai marketing."));
+    card.append(textNode("p", "text-sm font-semibold leading-6 text-[color-mix(in_srgb,var(--pb-warning)_84%,black)] md:col-span-2", "Password akun marketing tidak dapat diubah saat admin sedang login sebagai marketing."));
   }
   return card;
 }
@@ -542,7 +542,7 @@ function detailPanel(profile, actions) {
   panel.append(actionBar);
 
   if (blocked) {
-    panel.append(textNode("p", "rounded-[1rem] border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold leading-6 text-amber-800", "Anda sedang login sebagai marketing melalui akun admin. Perubahan profil dan password diblokir untuk menjaga keamanan akun target."));
+    panel.append(textNode("p", "rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-warning)_26%,white)] bg-[color-mix(in_srgb,var(--pb-warning)_8%,white)] px-4 py-3 text-sm font-semibold leading-6 text-[color-mix(in_srgb,var(--pb-warning)_84%,black)]", "Anda sedang login sebagai marketing melalui akun admin. Perubahan profil dan password diblokir untuk menjaga keamanan akun target."));
   }
 
   panel.append(

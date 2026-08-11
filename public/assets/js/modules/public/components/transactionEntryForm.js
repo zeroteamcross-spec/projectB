@@ -150,7 +150,7 @@ function carPriceHint(car) {
   const box = document.createElement("div");
   box.className = `${tw.surface.inset} grid gap-2 shadow-sm`;
   const label = document.createElement("p");
-  label.className = "text-[11px] font-semibold uppercase tracking-[0.16em] text-orange-700";
+  label.className = "text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]";
   label.textContent = "Harga transaksi";
   const value = document.createElement("p");
   value.className = "text-2xl font-bold text-gray-950";
@@ -167,7 +167,7 @@ function instructionStrip() {
     "Setelah submit, buyer langsung mendapat transaction record dan payment session awal.",
   ].forEach((copy) => {
     const item = document.createElement("p");
-    item.className = "rounded-2xl bg-orange-50/70 px-3 py-2";
+    item.className = "rounded-2xl bg-[var(--pb-surface-muted)] px-3 py-2";
     item.textContent = copy;
     strip.append(item);
   });

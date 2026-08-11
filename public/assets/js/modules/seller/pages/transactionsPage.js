@@ -317,7 +317,7 @@ function transactionsHero({ transactions, filteredTransactions, onDashboard }) {
   const summary = transactionSummary(transactions);
   const section = document.createElement("section");
   section.id = "slrtx_header";
-  section.className = "relative overflow-hidden rounded-[2rem] border border-orange-100/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(255,247,237,0.84),rgba(240,253,250,0.72))] p-5 shadow-[0_24px_80px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6 lg:p-7";
+  section.className = "relative overflow-hidden rounded-[2rem] border border-[var(--pb-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(250,244,237,0.84),rgba(234,244,249,0.72))] p-5 shadow-[0_24px_80px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6 lg:p-7";
   section.dataset.ds = "seller.transactions.hero";
 
   const layout = document.createElement("section");
@@ -326,11 +326,11 @@ function transactionsHero({ transactions, filteredTransactions, onDashboard }) {
   const copy = document.createElement("section");
   copy.className = "grid min-w-0 gap-3";
   const icon = document.createElement("span");
-  icon.className = "inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,var(--pb-btn-primary-from),var(--pb-btn-primary-to))] text-white leading-none shadow-[0_16px_40px_rgba(249,115,22,0.22)]";
+  icon.className = "inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,var(--pb-btn-primary-from),var(--pb-btn-primary-to))] text-white leading-none shadow-[0_16px_40px_rgba(30,129,176,0.22)]";
   icon.append(createIcon("transaction", { className: "block h-5 w-5 leading-none" }));
   copy.append(
     icon,
-    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-orange-700", "Seller transaction desk"),
+    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", "Seller transaction desk"),
     textNode("h1", "max-w-3xl text-3xl font-black leading-tight tracking-normal text-gray-950 sm:text-4xl", "Transaksi"),
     textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", "Pantau transaksi mobil, status pembayaran, dan progres penjualan."),
   );

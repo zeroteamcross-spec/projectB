@@ -16,11 +16,11 @@ export function RouteHydrateAlert({ error = null, onDismiss = null } = {}) {
   copy.className = "grid gap-1";
 
   const eyebrow = document.createElement("p");
-  eyebrow.className = "text-[11px] font-semibold uppercase tracking-[0.16em] text-red-700";
+  eyebrow.className = "text-[11px] font-semibold uppercase tracking-[0.16em] text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
   eyebrow.textContent = "Route hydrate";
 
   const title = document.createElement("strong");
-  title.className = "text-sm font-semibold text-red-900";
+  title.className = "text-sm font-semibold text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
   title.textContent = "Hydrate route gagal";
 
   const path = document.createElement("p");
@@ -30,7 +30,7 @@ export function RouteHydrateAlert({ error = null, onDismiss = null } = {}) {
     : "Route aktif gagal dihydrate.";
 
   const message = document.createElement("p");
-  message.className = "text-sm text-red-700/90";
+  message.className = "text-sm text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
   message.textContent = error.message || "Terjadi kegagalan saat menyiapkan data page.";
 
   copy.append(eyebrow, title, path, message);

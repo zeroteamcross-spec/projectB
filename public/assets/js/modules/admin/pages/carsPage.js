@@ -240,7 +240,7 @@ function carFormModalSignature(runtime) {
 function carsHero({ cars, filteredCars, isForm }) {
   const section = document.createElement("section");
   section.id = "adcars_hero_section";
-  section.className = "relative overflow-hidden rounded-[2rem] border border-orange-100/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(255,247,237,0.84),rgba(240,253,250,0.72))] p-5 shadow-[0_24px_80px_rgba(15,23,42,0.10)] backdrop-blur-xl transition-shadow duration-150 sm:p-6 lg:p-7";
+  section.className = "relative overflow-hidden rounded-[2rem] border border-[var(--pb-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(250,244,237,0.84),rgba(234,244,249,0.72))] p-5 shadow-[0_24px_80px_rgba(15,23,42,0.10)] backdrop-blur-xl transition-shadow duration-150 sm:p-6 lg:p-7";
   section.dataset.ds = "admin.cars.hero";
 
   const layout = document.createElement("section");
@@ -251,11 +251,11 @@ function carsHero({ cars, filteredCars, isForm }) {
   copy.id = "adcars_hero_copy_section";
   copy.className = "grid min-w-0 gap-3";
   const icon = document.createElement("span");
-  icon.className = "grid h-12 w-12 place-items-center rounded-2xl bg-[linear-gradient(135deg,#f97316,#14b8a6)] text-white shadow-[0_16px_40px_rgba(249,115,22,0.22)]";
+  icon.className = "grid h-12 w-12 place-items-center rounded-2xl bg-[linear-gradient(135deg,#1e81b0,#1e81b0)] text-white shadow-[0_16px_40px_rgba(30,129,176,0.22)]";
   icon.append(createIcon("car", { className: "h-5 w-5" }));
   copy.append(
     icon,
-    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-orange-700", ""),
+    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", ""),
     textNode("h1", "max-w-3xl text-3xl font-black leading-tight tracking-normal text-gray-950 sm:text-4xl", isForm ? "Form listing mobil" : "Katalog Mobil"),
     textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", "")
   );
@@ -472,7 +472,7 @@ function adminSellerSelector(runtime) {
 
   const section = document.createElement("section");
   section.id = "adcars_seller_selector_section";
-  section.className = "grid gap-2 rounded-[1rem] border border-orange-100 bg-orange-50/70 p-4";
+  section.className = "grid gap-2 rounded-[1rem] border border-[var(--pb-border)] bg-[var(--pb-surface-muted)] p-4";
 
   const label = document.createElement("label");
   label.className = "grid gap-1.5 text-sm font-bold text-gray-700";
@@ -509,7 +509,7 @@ function adminSellerSelector(runtime) {
   });
 
   const helper = document.createElement("p");
-  helper.className = "text-xs font-semibold leading-5 text-orange-800";
+  helper.className = "text-xs font-semibold leading-5 text-[var(--pb-brand-secondary)]";
   helper.textContent = "Wajib dipilih agar listing admin tercatat sebagai milik seller/showroom yang benar.";
 
   label.append(select);
@@ -604,7 +604,7 @@ function paginate(items = [], pagination = {}) {
 function createCarsPagination({ page, pageSize, totalItems, totalPages }) {
   const section = document.createElement("section");
   section.id = "adcars_pagination_section";
-  section.className = "grid gap-3 rounded-[1.35rem] border border-orange-100/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(255,247,237,0.90),rgba(239,246,255,0.82))] p-3 shadow-sm sm:p-4";
+  section.className = "grid gap-3 rounded-[1.35rem] border border-[var(--pb-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(250,244,237,0.90),rgba(234,244,249,0.82))] p-3 shadow-sm sm:p-4";
 
   const top = document.createElement("section");
   top.className = "flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between";
@@ -705,7 +705,7 @@ function paginationButton({ id, label, disabled = false, active = false, onClick
   button.disabled = disabled;
   button.textContent = label;
   button.className = active
-    ? "inline-flex min-h-10 min-w-10 items-center justify-center rounded-full border border-transparent bg-[linear-gradient(135deg,var(--pb-btn-primary-from),var(--pb-btn-primary-to))] px-3 text-sm font-semibold text-white shadow-sm"
+    ? "inline-flex min-h-10 min-w-10 items-center justify-center rounded-full border border-transparent bg-[var(--pb-brand-primary)] px-3 text-sm font-semibold text-white shadow-sm"
     : "inline-flex min-h-10 min-w-10 items-center justify-center rounded-full border border-[var(--pb-border-strong)] bg-white/82 px-3 text-sm font-semibold text-gray-700 shadow-sm transition hover:-translate-y-0.5 hover:bg-white disabled:cursor-not-allowed disabled:opacity-45";
   if (onClick) {
     button.addEventListener("click", onClick);
@@ -836,8 +836,8 @@ function carToForm(car) {
 function message(color, text) {
   const node = document.createElement("p");
   const palette = color === "green"
-    ? "border-green-200 bg-green-50 text-green-700"
-    : "border-red-200 bg-red-50 text-red-700";
+    ? "border-[color-mix(in_srgb,var(--pb-success)_26%,white)] bg-[color-mix(in_srgb,var(--pb-success)_8%,white)] text-[color-mix(in_srgb,var(--pb-success)_84%,black)]"
+    : "border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
   node.className = `rounded-[1rem] border px-4 py-3 text-sm font-semibold ${palette}`;
   node.textContent = text ?? "";
   node.hidden = !text;

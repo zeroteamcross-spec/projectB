@@ -101,14 +101,17 @@ export async function mulaiPanggung(akar) {
 
   const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 160);
 
-  scene.add(new THREE.HemisphereLight(0xFFD3A8, 0x0A0908, 0.28));
-  const key = new THREE.DirectionalLight(0xFFF3E6, 1.1);
+  // Pencahayaan mengikuti palet terang: langit krem dari atas, pantulan krem
+  // dari bawah, rim biru primary menggantikan rim oranye lama, dan lampu bawah
+  // peach yang lembut supaya bodi mobil tidak terlihat datar di latar putih.
+  scene.add(new THREE.HemisphereLight(0xFFF6EC, 0xE7DCCD, 0.85));
+  const key = new THREE.DirectionalLight(0xFFFFFF, 1.25);
   key.position.set(5, 8, 6);
   scene.add(key);
-  const rim = new THREE.DirectionalLight(0xFF6B1A, 1.6);
+  const rim = new THREE.DirectionalLight(0x1E81B0, 1.4);
   rim.position.set(-7, 3.2, -6);
   scene.add(rim);
-  const under = new THREE.PointLight(0xFF8A3D, 2.2, 9);
+  const under = new THREE.PointLight(0xEAB676, 1.4, 9);
   under.position.set(0, -0.2, 0);
   scene.add(under);
 
@@ -129,7 +132,7 @@ export async function mulaiPanggung(akar) {
 
   const lantai = new THREE.Mesh(
     new THREE.CircleGeometry(9, 64),
-    new THREE.MeshStandardMaterial({ color: 0x171412, roughness: 0.55, metalness: 0.35, transparent: true, opacity: 0.55 }),
+    new THREE.MeshStandardMaterial({ color: 0xE7DCCD, roughness: 0.55, metalness: 0.35, transparent: true, opacity: 0.55 }),
   );
   lantai.rotation.x = -Math.PI / 2;
   lantai.position.y = -0.004;
@@ -140,7 +143,7 @@ export async function mulaiPanggung(akar) {
     new THREE.CircleGeometry(10, 48),
     new THREE.MeshBasicMaterial({
       map: teksturBayangan(THREE),
-      color: 0xFF9A50,
+      color: 0xEAB676,
       transparent: true,
       opacity: 0.07,
       depthWrite: false,
@@ -163,7 +166,7 @@ export async function mulaiPanggung(akar) {
   geometriDebu.setAttribute("position", new THREE.BufferAttribute(posisi, 3));
   const debu = new THREE.Points(
     geometriDebu,
-    new THREE.PointsMaterial({ color: 0xFFC79A, size: 0.022, transparent: true, opacity: 0.22, depthWrite: false }),
+    new THREE.PointsMaterial({ color: 0x1E81B0, size: 0.022, transparent: true, opacity: 0.16, depthWrite: false }),
   );
   scene.add(debu);
 
@@ -535,16 +538,18 @@ function lingkunganStudio(THREE, renderer) {
   c.height = 512;
   const g = c.getContext("2d");
 
+  // Studio terang: lantai krem, langit putih ke krem. Dulu keduanya nyaris
+  // hitam karena landing bertema gelap.
   const tanah = g.createLinearGradient(0, 256, 0, 512);
-  tanah.addColorStop(0, "#1A1613");
-  tanah.addColorStop(1, "#070605");
+  tanah.addColorStop(0, "#F5ECE1");
+  tanah.addColorStop(1, "#E7DCCD");
   g.fillStyle = tanah;
   g.fillRect(0, 0, 1024, 512);
 
   const langit = g.createLinearGradient(0, 0, 0, 258);
-  langit.addColorStop(0, "#4A3B31");
-  langit.addColorStop(0.5, "#241D18");
-  langit.addColorStop(1, "#12100E");
+  langit.addColorStop(0, "#FFFFFF");
+  langit.addColorStop(0.5, "#FAF4ED");
+  langit.addColorStop(1, "#F5ECE1");
   g.fillStyle = langit;
   g.fillRect(0, 0, 1024, 258);
 

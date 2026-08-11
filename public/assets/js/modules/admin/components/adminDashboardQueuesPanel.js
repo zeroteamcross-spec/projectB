@@ -29,7 +29,7 @@ export function AdminDashboardQueuesPanel({
 function pendingApprovalsCard(users, onClick) {
   const card = Card([], { variant: "raised" });
   card.id = "adm_dashboard_pending_card";
-  card.className = "grid gap-4 rounded-[1.6rem] border border-amber-100/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.9),rgba(255,251,235,0.72))] p-5 shadow-[0_18px_55px_rgba(15,23,42,0.08)] backdrop-blur transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_26px_70px_rgba(15,23,42,0.12)]";
+  card.className = "grid gap-4 rounded-[1.6rem] border border-[color-mix(in_srgb,var(--pb-warning)_14%,white)] bg-[linear-gradient(135deg,rgba(255,255,255,0.9),rgba(250,244,237,0.72))] p-5 shadow-[0_18px_55px_rgba(15,23,42,0.08)] backdrop-blur transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_26px_70px_rgba(15,23,42,0.12)]";
   card.append(sectionHeader("Pending approvals", "Seller yang masih menunggu verifikasi admin.", onClick, "Buka user management", "bell", "adm_dashboard_pending_open_button"));
 
   if (!users.length) {
@@ -47,7 +47,7 @@ function pendingApprovalsCard(users, onClick) {
 function carsSummaryCard(cars, onClick) {
   const card = Card([], { variant: "raised" });
   card.id = "adm_dashboard_cars_card";
-  card.className = "grid gap-4 rounded-[1.6rem] border border-emerald-100/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.9),rgba(236,253,245,0.72))] p-5 shadow-[0_18px_55px_rgba(15,23,42,0.08)] backdrop-blur transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_26px_70px_rgba(15,23,42,0.12)]";
+  card.className = "grid gap-4 rounded-[1.6rem] border border-[color-mix(in_srgb,var(--pb-success)_14%,white)] bg-[linear-gradient(135deg,rgba(255,255,255,0.9),rgba(236,246,239,0.72))] p-5 shadow-[0_18px_55px_rgba(15,23,42,0.08)] backdrop-blur transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_26px_70px_rgba(15,23,42,0.12)]";
   card.append(sectionHeader("Cars snapshot", "Ringkasan listing mobil terbaru untuk screening awal admin.", onClick, "Masuk user management", "car", "adm_dashboard_cars_open_button"));
 
   if (!cars.length) {
@@ -64,7 +64,7 @@ function carsSummaryCard(cars, onClick) {
 
 function pendingTable(users) {
   const icon = document.createElement("span");
-  icon.className = "grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#f59e0b,#f97316)] text-white shadow-[0_14px_34px_rgba(245,158,11,0.22)]";
+  icon.className = "grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#eab676,#1e81b0)] text-white shadow-[0_14px_34px_rgba(234,182,118,0.22)]";
   icon.append(createIcon("bell", { className: "h-4 w-4" }));
   return DataTable({
     shellId: "adm_dashboard_pending_table_card",
@@ -95,13 +95,13 @@ function pendingTable(users) {
     tableMinWidth: "min-w-[560px]",
     rowClassName: () => "bg-white/55",
     getRowKey: (user) => user.id,
-    shellClassName: "border-amber-100/80",
+    shellClassName: "border-[color-mix(in_srgb,var(--pb-warning)_14%,white)]",
   });
 }
 
 function carsTable(cars) {
   const icon = document.createElement("span");
-  icon.className = "grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#10b981,#14b8a6)] text-white shadow-[0_14px_34px_rgba(16,185,129,0.22)]";
+  icon.className = "grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#1a9a49,#1e81b0)] text-white shadow-[0_14px_34px_rgba(26,154,73,0.22)]";
   icon.append(createIcon("car", { className: "h-4 w-4" }));
   return DataTable({
     shellId: "adm_dashboard_cars_table_card",
@@ -139,7 +139,7 @@ function carsTable(cars) {
     tableMinWidth: "min-w-[640px]",
     rowClassName: () => "bg-white/55",
     getRowKey: (car) => car.id,
-    shellClassName: "border-emerald-100/80",
+    shellClassName: "border-[color-mix(in_srgb,var(--pb-success)_14%,white)]",
   });
 }
 
@@ -148,7 +148,7 @@ function sectionHeader(title, description, onClick, buttonLabel, iconName, butto
   wrap.className = "flex flex-col gap-3 md:flex-row md:items-start md:justify-between";
 
   const iconWrap = document.createElement("div");
-  iconWrap.className = "grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-white text-orange-700 shadow-sm";
+  iconWrap.className = "grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-white text-[var(--pb-brand-secondary)] shadow-sm";
   iconWrap.append(createIcon(iconName, { className: "h-5 w-5" }));
 
   const copy = document.createElement("div");

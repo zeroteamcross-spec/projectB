@@ -737,9 +737,9 @@ function fallbackCarImageUrl() {
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560">
       <defs>
         <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
-          <stop offset="0" stop-color="#fff7ed"/>
+          <stop offset="0" stop-color="#faf4ed"/>
           <stop offset="0.55" stop-color="#ffffff"/>
-          <stop offset="1" stop-color="#fed7aa"/>
+          <stop offset="1" stop-color="#efe3d5"/>
         </linearGradient>
         <linearGradient id="car" x1="0" x2="1">
           <stop offset="0" stop-color="#111827"/>
@@ -747,12 +747,12 @@ function fallbackCarImageUrl() {
         </linearGradient>
       </defs>
       <rect width="960" height="560" fill="url(#bg)"/>
-      <path d="M0 424 C170 368 332 430 512 382 C692 335 798 360 960 310 L960 560 L0 560 Z" fill="#ffedd5"/>
+      <path d="M0 424 C170 368 332 430 512 382 C692 335 798 360 960 310 L960 560 L0 560 Z" fill="#f5ece1"/>
       <g transform="translate(125 150)">
         <path d="M112 230 C144 148 208 102 318 96 L462 96 C564 99 630 150 678 230 L724 244 C754 252 774 278 774 309 L774 346 L694 346 C687 298 648 263 600 263 C552 263 512 298 505 346 L290 346 C283 298 243 263 195 263 C147 263 107 298 100 346 L40 346 L40 305 C40 268 70 237 105 234 Z" fill="url(#car)"/>
-        <path d="M214 130 L322 130 L306 214 L132 214 C156 170 177 144 214 130 Z" fill="#e0f2fe" opacity="0.86"/>
-        <path d="M348 130 L456 130 C516 132 558 158 598 214 L334 214 Z" fill="#e0f2fe" opacity="0.78"/>
-        <path d="M82 255 L166 255" stroke="#fb923c" stroke-width="16" stroke-linecap="round"/>
+        <path d="M214 130 L322 130 L306 214 L132 214 C156 170 177 144 214 130 Z" fill="#e0eff7" opacity="0.86"/>
+        <path d="M348 130 L456 130 C516 132 558 158 598 214 L334 214 Z" fill="#e0eff7" opacity="0.78"/>
+        <path d="M82 255 L166 255" stroke="#eab676" stroke-width="16" stroke-linecap="round"/>
         <circle cx="195" cy="354" r="60" fill="#111827"/>
         <circle cx="195" cy="354" r="30" fill="#f8fafc"/>
         <circle cx="600" cy="354" r="60" fill="#111827"/>

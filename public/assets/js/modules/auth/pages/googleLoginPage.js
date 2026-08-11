@@ -5,7 +5,7 @@ import { showToast } from "../../../ui/primitives/toast.js";
 import { authUxConfig, defaultLoginPath } from "../../../config/authUxConfig.js";
 import { googleLoginService } from "../services/googleLoginService.js";
 
-const PAGE_BG = "bg-[radial-gradient(circle_at_10%_0%,color-mix(in_srgb,var(--pb-brand-primary)_18%,transparent),transparent_34%),radial-gradient(circle_at_90%_8%,color-mix(in_srgb,var(--pb-brand-accent)_16%,transparent),transparent_30%),linear-gradient(135deg,#f7fbf9,#fff7ed_52%,#eef7f3)]";
+const PAGE_BG = "bg-[radial-gradient(circle_at_10%_0%,color-mix(in_srgb,var(--pb-brand-primary)_18%,transparent),transparent_34%),radial-gradient(circle_at_90%_8%,color-mix(in_srgb,var(--pb-brand-accent)_16%,transparent),transparent_30%),linear-gradient(135deg,#f7fbf9,#faf4ed_52%,#eaf4f9)]";
 const BUYER_FALLBACK_BG = "bg-[radial-gradient(circle_at_20%_4%,rgba(207,211,255,0.42),transparent_30%),radial-gradient(circle_at_92%_88%,rgba(210,216,255,0.72),transparent_34%),linear-gradient(180deg,#fbfbff_0%,#ffffff_42%,#f2f4ff_100%)]";
 
 /**
@@ -132,7 +132,7 @@ function renderGlassLogin(root, context, config, state, getBackgroundVideoLayer,
   topWave.className = "hidden pointer-events-none absolute -left-20 top-28 h-44 w-[calc(100%+10rem)] rounded-[50%] bg-white/70 blur-sm";
 
   const bottomWave = document.createElement("span");
-  bottomWave.className = "hidden pointer-events-none absolute -bottom-24 left-1/2 h-72 w-[150%] -translate-x-1/2 rounded-[50%] bg-[#dfe3ff]/70 blur-[1px]";
+  bottomWave.className = "hidden pointer-events-none absolute -bottom-24 left-1/2 h-72 w-[150%] -translate-x-1/2 rounded-[50%] bg-[#e0eff7]/70 blur-[1px]";
 
   const bottomWaveDeep = document.createElement("span");
   bottomWaveDeep.className = "hidden pointer-events-none absolute -bottom-36 left-0 h-52 w-[120%] rounded-[50%] bg-[#cdd3ff]/60";
@@ -148,7 +148,7 @@ function renderGlassLogin(root, context, config, state, getBackgroundVideoLayer,
 
 function appIcon() {
   const wrap = document.createElement("div");
-  wrap.className = " hidden grid h-16 w-16 place-items-center rounded-[1.15rem] border border-white/70 bg-[linear-gradient(145deg,rgba(255,255,255,0.84),rgba(203,210,230,0.54))] shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_16px_34px_rgba(84,92,170,0.16)] backdrop-blur-xl";
+  wrap.className = " hidden grid h-16 w-16 place-items-center rounded-[1.15rem] border border-white/70 bg-[linear-gradient(145deg,rgba(255,255,255,0.84),rgba(203,210,230,0.54))] shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_16px_34px_rgba(23,105,143,0.16)] backdrop-blur-xl";
 
   const mark = document.createElement("span");
   mark.className = "relative block h-8 w-8";
@@ -191,7 +191,7 @@ function glassLoginActionContent(root, context, config, state, options = {}) {
 
   if (state.loading) {
     const loading = document.createElement("p");
-    loading.className = "rounded-[1.5rem] border border-white/75 bg-white/70 px-5 py-4 text-sm font-semibold text-[#717693] shadow-[0_18px_48px_rgba(84,92,170,0.10)] backdrop-blur";
+    loading.className = "rounded-[1.5rem] border border-white/75 bg-white/70 px-5 py-4 text-sm font-semibold text-[#717693] shadow-[0_18px_48px_rgba(23,105,143,0.10)] backdrop-blur";
     loading.textContent = "Memeriksa konfigurasi Google Login...";
     actionWrap.append(loading);
     fragment.append(actionWrap);
@@ -220,7 +220,7 @@ function glassLoginActionContent(root, context, config, state, options = {}) {
   button.id = `google_login_${config.slug}_button`;
   button.type = "button";
   button.disabled = state.submitting;
-  button.className = "inline-flex min-h-12 w-full items-center justify-center gap-3.5 rounded-[1rem] border border-white/60 bg-[linear-gradient(135deg,rgba(255,255,255,0.84),rgba(216,222,236,0.58))] px-4 text-sm font-black tracking-normal text-[#171a35] shadow-[inset_0_1px_0_rgba(255,255,255,0.88),0_14px_30px_rgba(84,92,170,0.13)] backdrop-blur transition duration-200 hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-4 focus:ring-[#dfe3ff] disabled:cursor-wait disabled:opacity-70";
+  button.className = "inline-flex min-h-12 w-full items-center justify-center gap-3.5 rounded-[1rem] border border-white/60 bg-[linear-gradient(135deg,rgba(255,255,255,0.84),rgba(224,239,247,0.58))] px-4 text-sm font-black tracking-normal text-[#171a35] shadow-[inset_0_1px_0_rgba(255,255,255,0.88),0_14px_30px_rgba(23,105,143,0.13)] backdrop-blur transition duration-200 hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-4 focus:ring-[#e0eff7] disabled:cursor-wait disabled:opacity-70";
   button.append(googleGlyph(), document.createTextNode(state.submitting ? "Membuka Google..." : "Login dengan Google"));
   button.addEventListener("click", () => beginGoogleLogin(root, context, config, state, options));
 
@@ -264,11 +264,11 @@ function divider() {
   wrap.className = "grid grid-cols-[1fr_auto_1fr] items-center gap-4 text-sm font-medium text-[#b2b5cc]";
 
   const left = document.createElement("span");
-  left.className = "h-px bg-[#dfe2ee]";
+  left.className = "h-px bg-[var(--pb-border)]";
   const text = document.createElement("span");
   text.textContent = "";
   const right = document.createElement("span");
-  right.className = "h-px bg-[#dfe2ee]";
+  right.className = "h-px bg-[var(--pb-border)]";
 
   wrap.append(left, text, right);
   return wrap;
@@ -311,7 +311,7 @@ function header(config) {
   headerEl.className = "grid gap-3";
 
   const eyebrow = document.createElement("p");
-  eyebrow.className = "text-xs font-black uppercase tracking-[0.18em] text-orange-700";
+  eyebrow.className = "text-xs font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]";
   eyebrow.textContent = "Google OAuth";
 
   const title = document.createElement("h1");
@@ -329,7 +329,7 @@ function header(config) {
 
 function rolePolicyCard(config) {
   const card = document.createElement("div");
-  card.className = "rounded-3xl border border-orange-100 bg-orange-50/80 p-4 text-sm leading-6 text-gray-700";
+  card.className = "rounded-3xl border border-[var(--pb-border)] bg-[var(--pb-surface-muted)] p-4 text-sm leading-6 text-gray-700";
   card.textContent = config.warning;
   return card;
 }
@@ -372,7 +372,7 @@ function actionContent(root, context, config, state) {
     onClick: () => beginGoogleLogin(root, context, config, state),
   });
   button.id = `google_login_${config.slug}_button`;
-  button.classList.add("w-full", "justify-center", "shadow-[0_16px_34px_rgba(234,88,12,0.24)]");
+  button.classList.add("w-full", "justify-center", "shadow-[0_16px_34px_rgba(30,129,176,0.24)]");
 
   const note = document.createElement("p");
   note.className = "text-xs leading-5 text-gray-500";
@@ -403,8 +403,8 @@ async function beginGoogleLogin(root, context, config, state, options = {}) {
 function messageBox(message, type) {
   const box = document.createElement("p");
   box.className = type === "error"
-    ? "rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700"
-    : "rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm font-semibold text-blue-800";
+    ? "rounded-2xl border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]"
+    : "rounded-2xl border border-[color-mix(in_srgb,var(--pb-brand-primary)_14%,white)] bg-[color-mix(in_srgb,var(--pb-brand-primary)_8%,white)] px-4 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-brand-primary)_84%,black)]";
   box.textContent = message;
   return box;
 }

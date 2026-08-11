@@ -12,7 +12,7 @@ export function SellerShowroomForm({ showroom = null, saving = false, error = ""
   header.id = "slrsr_form_header_section";
   header.className = "grid gap-2 border-b border-gray-100 pb-5";
   const eyebrow = document.createElement("p");
-  eyebrow.className = "text-xs font-black uppercase tracking-[0.18em] text-orange-700";
+  eyebrow.className = "text-xs font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]";
   eyebrow.textContent = showroom ? "Edit showroom" : "Setup showroom";
   const title = document.createElement("h2");
   title.className = tw.text.sectionTitle;
@@ -25,7 +25,7 @@ export function SellerShowroomForm({ showroom = null, saving = false, error = ""
 
   const errorNode = document.createElement("p");
   errorNode.id = "slrsr_error_section";
-  errorNode.className = "rounded-[1.25rem] border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700";
+  errorNode.className = "rounded-[1.25rem] border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
   errorNode.textContent = error;
   errorNode.hidden = !error;
 
@@ -70,13 +70,13 @@ export function SellerShowroomForm({ showroom = null, saving = false, error = ""
 function fieldGroup(id, title, iconName) {
   const section = document.createElement("section");
   section.id = id;
-  section.className = "grid min-w-0 gap-4 rounded-[1.25rem] border border-gray-100 bg-[linear-gradient(135deg,rgba(249,250,251,0.95),rgba(255,255,255,0.9))] p-4 shadow-sm transition duration-150 hover:border-orange-100";
+  section.className = "grid min-w-0 gap-4 rounded-[1.25rem] border border-gray-100 bg-[linear-gradient(135deg,rgba(249,250,251,0.95),rgba(255,255,255,0.9))] p-4 shadow-sm transition duration-150 hover:border-[var(--pb-border)]";
 
   const header = document.createElement("section");
   header.id = `${id}_header`;
   header.className = "flex items-center gap-3";
   const icon = document.createElement("span");
-  icon.className = "grid h-9 w-9 shrink-0 place-items-center rounded-2xl bg-orange-50 text-orange-600";
+  icon.className = "grid h-9 w-9 shrink-0 place-items-center rounded-2xl bg-[var(--pb-surface-muted)] text-[var(--pb-brand-secondary)]";
   icon.append(createIcon(iconName, { className: "h-4 w-4" }));
   const label = document.createElement("h3");
   label.className = "text-sm font-black text-gray-950";
@@ -172,7 +172,7 @@ function bankSelectField({ id, name, label, value = "", banks = [] }) {
     option.id = `slrsr_bank_type_option_${slugify(bank.slug || bank.id || bank.bank_code)}_button`;
     option.type = "button";
     option.className = bank.slug === selectedBank?.slug
-      ? "flex w-full min-w-0 items-center gap-3 rounded-xl bg-orange-50 px-3 py-2 text-left text-sm font-black text-orange-800"
+      ? "flex w-full min-w-0 items-center gap-3 rounded-xl bg-[var(--pb-surface-muted)] px-3 py-2 text-left text-sm font-black text-[var(--pb-brand-secondary)]"
       : "flex w-full min-w-0 items-center gap-3 rounded-xl px-3 py-2 text-left text-sm font-semibold text-gray-700 transition hover:bg-gray-50";
     option.append(bankChoiceContent(bank));
     option.addEventListener("click", () => {
@@ -181,7 +181,7 @@ function bankSelectField({ id, name, label, value = "", banks = [] }) {
       [...menu.querySelectorAll("button")].forEach((node) => {
         node.className = "flex w-full min-w-0 items-center gap-3 rounded-xl px-3 py-2 text-left text-sm font-semibold text-gray-700 transition hover:bg-gray-50";
       });
-      option.className = "flex w-full min-w-0 items-center gap-3 rounded-xl bg-orange-50 px-3 py-2 text-left text-sm font-black text-orange-800";
+      option.className = "flex w-full min-w-0 items-center gap-3 rounded-xl bg-[var(--pb-surface-muted)] px-3 py-2 text-left text-sm font-black text-[var(--pb-brand-secondary)]";
       syncButton();
       closeMenu();
     });
@@ -196,7 +196,7 @@ function bankSelectField({ id, name, label, value = "", banks = [] }) {
 function bankChoiceContent(bank, fallbackLabel = "") {
   const content = document.createDocumentFragment();
   const icon = document.createElement("span");
-  icon.className = "grid h-8 w-8 shrink-0 place-items-center overflow-hidden rounded-xl border border-orange-100 bg-white text-orange-600";
+  icon.className = "grid h-8 w-8 shrink-0 place-items-center overflow-hidden rounded-xl border border-[var(--pb-border)] bg-white text-[var(--pb-brand-secondary)]";
   if (bank?.icon_path) {
     const image = document.createElement("img");
     image.src = bank.icon_path;

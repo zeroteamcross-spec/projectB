@@ -58,12 +58,12 @@ export function createSelectionOverlayManager({ documentRef = null, root = null,
         }
 
         if (!selectedOverlay) {
-            selectedOverlay = createOverlay(documentRef, SELECTED_CLASS, '#2563eb');
+            selectedOverlay = createOverlay(documentRef, SELECTED_CLASS, '#1e81b0');
             overlayRoot.appendChild(selectedOverlay);
         }
 
         if (!hoverOverlay) {
-            hoverOverlay = createOverlay(documentRef, HOVER_CLASS, '#f59e0b');
+            hoverOverlay = createOverlay(documentRef, HOVER_CLASS, '#eab676');
             overlayRoot.appendChild(hoverOverlay);
         }
 
@@ -130,7 +130,7 @@ export function createSelectionOverlayManager({ documentRef = null, root = null,
             Object.assign(borderEl.style, {
                 position: 'fixed',
                 pointerEvents: 'none',
-                border: '2px dashed #3b82f6',
+                border: '2px dashed #1e81b0',
                 borderRadius: '4px',
                 boxSizing: 'border-box',
                 zIndex: '810',
@@ -145,7 +145,7 @@ export function createSelectionOverlayManager({ documentRef = null, root = null,
             Object.assign(pencilEl.style, {
                 position: 'fixed',
                 zIndex: '830',
-                background: '#2563eb',
+                background: '#1e81b0',
                 color: '#ffffff',
                 border: 'none',
                 borderRadius: '4px',
@@ -156,7 +156,7 @@ export function createSelectionOverlayManager({ documentRef = null, root = null,
                 justifyContent: 'center',
                 cursor: 'pointer',
                 fontSize: '11px',
-                boxShadow: '0 2px 6px rgba(37, 99, 235, 0.3)',
+                boxShadow: '0 2px 6px rgba(30,129,176, 0.3)',
                 padding: '0',
                 lineHeight: '1',
             });

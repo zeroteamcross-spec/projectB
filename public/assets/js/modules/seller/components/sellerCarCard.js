@@ -9,7 +9,7 @@ export function SellerCarCard({ car, onEdit = null, onArchive = null, onImages =
   const cardId = car?.id ?? "unknown";
   const section = document.createElement("section");
   section.id = `slrc_car_card_${cardId}_section`;
-  section.className = "group grid min-w-0 gap-4 overflow-hidden rounded-[1.5rem] border border-gray-100 bg-white/90 p-4 shadow-[0_18px_55px_rgba(15,23,42,0.08)] backdrop-blur-xl transition duration-150 hover:-translate-y-0.5 hover:border-orange-100 hover:shadow-[0_24px_70px_rgba(15,23,42,0.11)] sm:p-5";
+  section.className = "group grid min-w-0 gap-4 overflow-hidden rounded-[1.5rem] border border-gray-100 bg-white/90 p-4 shadow-[0_18px_55px_rgba(15,23,42,0.08)] backdrop-blur-xl transition duration-150 hover:-translate-y-0.5 hover:border-[var(--pb-border)] hover:shadow-[0_24px_70px_rgba(15,23,42,0.11)] sm:p-5";
   section.dataset.ds = "seller.cars.card";
 
   const top = document.createElement("section");
@@ -21,7 +21,7 @@ export function SellerCarCard({ car, onEdit = null, onArchive = null, onImages =
   identity.className = "flex min-w-0 gap-3";
 
   const icon = document.createElement("span");
-  icon.className = "grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#f97316,#14b8a6)] text-white shadow-[0_14px_34px_rgba(249,115,22,0.18)]";
+  icon.className = "grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#1e81b0,#1e81b0)] text-white shadow-[0_14px_34px_rgba(30,129,176,0.18)]";
   icon.append(createIcon("car", { className: "h-5 w-5" }));
 
   const copy = document.createElement("section");
@@ -93,7 +93,7 @@ function factNode(id, label, value, iconName) {
   node.id = id;
   node.className = "flex min-w-0 items-center gap-3 rounded-[1rem] border border-gray-100 bg-gray-50/80 px-3 py-2.5";
   const icon = document.createElement("span");
-  icon.className = "grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-white text-orange-600 shadow-sm";
+  icon.className = "grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-white text-[var(--pb-brand-secondary)] shadow-sm";
   icon.append(createIcon(iconName, { className: "h-3.5 w-3.5" }));
   const copy = document.createElement("span");
   copy.className = "grid min-w-0";

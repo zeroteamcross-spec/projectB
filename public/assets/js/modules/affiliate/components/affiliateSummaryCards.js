@@ -9,7 +9,7 @@ export function AffiliateSummaryCards({ items = [] } = {}) {
     card.classList.add("grid", "min-w-0", "gap-2", "overflow-hidden", "p-5");
 
     const label = document.createElement("p");
-    label.className = "break-words text-[11px] font-semibold uppercase tracking-normal text-orange-700";
+    label.className = "break-words text-[11px] font-semibold uppercase tracking-normal text-[var(--pb-brand-secondary)]";
     label.textContent = item.label;
 
     const value = document.createElement("p");

@@ -6,7 +6,7 @@ import { createIcon } from "../../../theme/iconRegistry.js";
 import { tw } from "../../../theme/tailwindClasses.js";
 import { adminMasterService } from "../../admin/services/adminMasterService.js";
 
-const SHOWROOM_REGISTER_FALLBACK = "bg-[radial-gradient(circle_at_12%_10%,color-mix(in_srgb,var(--pb-brand-primary)_18%,transparent),transparent_32%),radial-gradient(circle_at_88%_18%,color-mix(in_srgb,var(--pb-brand-accent)_16%,transparent),transparent_30%),linear-gradient(135deg,#fffaf4,#f8fafc_44%,#eef7f3)]";
+const SHOWROOM_REGISTER_FALLBACK = "bg-[radial-gradient(circle_at_12%_10%,color-mix(in_srgb,var(--pb-brand-primary)_18%,transparent),transparent_32%),radial-gradient(circle_at_88%_18%,color-mix(in_srgb,var(--pb-brand-accent)_16%,transparent),transparent_30%),linear-gradient(135deg,#faf4ed,#f8fafc_44%,#eaf4f9)]";
 
 const SLUG_MIN_LENGTH = 3;
 const SLUG_MAX_LENGTH = 80;
@@ -143,7 +143,7 @@ function pageHeader(actions, context) {
   const back = document.createElement("button");
   back.id = "shr_register_back_button";
   back.type = "button";
-  back.className = "inline-flex w-fit items-center gap-2 rounded-full border border-white/70 bg-white/80 px-3 py-1.5 text-sm font-semibold text-gray-700 transition hover:bg-white";
+  back.className = `inline-flex w-fit items-center gap-2 rounded-full px-3 py-1.5 text-sm font-semibold transition hover:brightness-95 ${tw.button.tidak}`;
   back.append(createIcon("chevronRight", { className: "block h-3.5 w-3.5 rotate-180 leading-none" }), document.createTextNode("Kembali ke beranda"));
   back.addEventListener("click", () => actions.goHome(context));
 
@@ -152,11 +152,12 @@ function pageHeader(actions, context) {
   eyebrow.textContent = "Pendaftaran showroom";
 
   const title = document.createElement("h1");
-  title.className = "text-2xl font-black tracking-normal text-white sm:text-3xl";
+  // Judul dan body duduk di kanvas krem, bukan di atas video gelap seperti dulu.
+  title.className = "text-2xl font-black tracking-normal text-[var(--pb-text-strong)] sm:text-3xl";
   title.textContent = "Daftarkan showroom Anda";
 
   const body = document.createElement("p");
-  body.className = "text-sm leading-6 text-white";
+  body.className = "text-sm leading-6 text-[var(--pb-text-muted)]";
   body.textContent = "Isi data pemilik dan showroom.";
 
   header.append(back, eyebrow, title, body);
@@ -328,7 +329,7 @@ function registerPanel(state, actions, context) {
   if (state.error) {
     const message = document.createElement("p");
     message.id = "shr_register_error_message";
-    message.className = "rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700";
+    message.className = "rounded-xl border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-3 py-2 text-sm font-medium text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
     message.textContent = state.error;
     form.append(message);
   }
@@ -340,7 +341,7 @@ function registerPanel(state, actions, context) {
   });
   submit.id = "shr_register_submit_button";
   submit.type = "submit";
-  submit.classList.add("w-full", "shadow-[0_16px_34px_rgba(234,88,12,0.24)]", "transition", "duration-200");
+  submit.classList.add("w-full", "shadow-[0_16px_34px_rgba(30,129,176,0.24)]", "transition", "duration-200");
   form.append(submit);
 
   const helper = document.createElement("p");
@@ -566,7 +567,7 @@ function selectField({ id, name, label, placeholder = "", options = [], required
       item.setAttribute("role", "option");
       item.className = [
         "block w-full rounded-xl px-3 py-2 text-left text-sm font-semibold transition",
-        index === highlighted ? "bg-orange-50 text-orange-700" : "text-gray-800 hover:bg-gray-50",
+        index === highlighted ? "bg-[var(--pb-surface-muted)] text-[var(--pb-brand-secondary)]" : "text-gray-800 hover:bg-gray-50",
       ].join(" ");
       item.textContent = option;
       // mousedown (bukan click) supaya terjadi sebelum blur input menutup panel.
@@ -675,8 +676,8 @@ function inputClassName(hasError) {
   const base = "min-h-11 min-w-0 w-full rounded-2xl border bg-white/90 px-4 py-2.5 text-sm text-gray-950 outline-none transition duration-200 placeholder:text-gray-400 focus:bg-white focus:ring-4";
 
   return hasError
-    ? `${base} border-red-300 focus:border-red-400 focus:ring-red-100`
-    : `${base} border-gray-200 focus:border-orange-300 focus:ring-orange-100`;
+    ? `${base} border-[color-mix(in_srgb,var(--pb-danger)_42%,white)] focus:border-[color-mix(in_srgb,var(--pb-danger)_70%,white)] focus:ring-[color-mix(in_srgb,var(--pb-danger)_14%,white)]`
+    : `${base} border-gray-200 focus:border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] focus:ring-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)]`;
 }
 
 function hintNode(text) {
@@ -688,7 +689,7 @@ function hintNode(text) {
 
 function errorNode(text) {
   const node = document.createElement("span");
-  node.className = "text-xs font-semibold text-red-600";
+  node.className = "text-xs font-semibold text-[var(--pb-danger)]";
   node.textContent = text;
   return node;
 }

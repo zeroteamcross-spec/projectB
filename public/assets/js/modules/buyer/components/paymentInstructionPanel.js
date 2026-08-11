@@ -53,7 +53,7 @@ export function PaymentInstructionPanel({
   }
 
   const steps = document.createElement("ol");
-  steps.className = "grid list-decimal gap-2 rounded-3xl bg-orange-50/40 p-4 pl-6 text-sm leading-6 text-gray-700 sm:pl-9";
+  steps.className = "grid list-decimal gap-2 rounded-3xl bg-[var(--pb-surface-muted)] p-4 pl-6 text-sm leading-6 text-gray-700 sm:pl-9";
   instructionSteps(method, {
     hasQr: Boolean(qrCodeUrl),
     hasDeeplink: Boolean(deeplinkUrl),
@@ -83,7 +83,7 @@ export function PaymentInstructionPanel({
   section.append(facts);
 
   const note = document.createElement("p");
-  note.className = "rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-800";
+  note.className = "rounded-2xl border border-[color-mix(in_srgb,var(--pb-warning)_26%,white)] bg-[color-mix(in_srgb,var(--pb-warning)_8%,white)] px-4 py-3 text-sm leading-6 text-[color-mix(in_srgb,var(--pb-warning)_84%,black)]";
   note.textContent = instructionExpired
     ? "Sesi pembayaran sudah melewati batas waktu yang tercatat. Jangan gunakan QR atau instruksi lama sebagai jalur aktif."
     : noteCopy(method, { hasQr: Boolean(qrCodeUrl), hasDeeplink: Boolean(deeplinkUrl), hasVa: Boolean(paymentData.va_number) });
@@ -164,7 +164,7 @@ function walletPanel({ method, qrCodeUrl, deeplinkUrl, isDownloadingQr = false, 
     section.append(qrWrap);
   } else {
     const unavailable = document.createElement("p");
-    unavailable.className = "rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700";
+    unavailable.className = "rounded-2xl border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-sm leading-6 text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
     unavailable.textContent = method === "gopay"
       ? "QR GoPay belum tersedia dari provider. Gunakan tombol buka aplikasi jika tersedia."
       : "QRIS belum tersedia dari provider. Coba refresh status, tetapi jangan buat transaksi baru jika sesi ini masih valid.";
@@ -228,7 +228,7 @@ function noteCopy(method, { hasQr = false, hasDeeplink = false, hasVa = false } 
 
 function expiredInstructionPanel() {
   const section = document.createElement("section");
-  section.className = "grid gap-2 rounded-[1.25rem] border border-red-200 bg-red-50 px-4 py-4 text-red-800";
+  section.className = "grid gap-2 rounded-[1.25rem] border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-4 text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
   const title = document.createElement("h3");
   title.className = "text-base font-black";
   title.textContent = "Sesi pembayaran kadaluarsa";

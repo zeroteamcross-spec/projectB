@@ -6,7 +6,7 @@ import { showToast } from "../../../ui/primitives/toast.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 import { roleSpecificLoginService } from "../services/roleSpecificLoginService.js";
 
-const AUTH_FALLBACK = "bg-[radial-gradient(circle_at_12%_10%,color-mix(in_srgb,var(--pb-brand-primary)_18%,transparent),transparent_32%),radial-gradient(circle_at_88%_18%,color-mix(in_srgb,var(--pb-brand-accent)_16%,transparent),transparent_30%),linear-gradient(135deg,#fffaf4,#f8fafc_44%,#eef7f3)]";
+const AUTH_FALLBACK = "bg-[radial-gradient(circle_at_12%_10%,color-mix(in_srgb,var(--pb-brand-primary)_18%,transparent),transparent_32%),radial-gradient(circle_at_88%_18%,color-mix(in_srgb,var(--pb-brand-accent)_16%,transparent),transparent_30%),linear-gradient(135deg,#faf4ed,#f8fafc_44%,#eaf4f9)]";
 
 export function RoleSpecificLoginPage({ roleSlug } = {}) {
   let root = null;
@@ -98,7 +98,7 @@ function loginPanel({ config, isSubmitting, error, onSubmit }) {
   section.className = "relative grid gap-5 overflow-hidden rounded-[2rem] border border-white/75 bg-white/80 p-5 shadow-[0_30px_90px_rgba(15,23,42,0.14)] backdrop-blur-xl transition duration-300 sm:p-6";
 
   const iconWrap = document.createElement("div");
-  iconWrap.className = "mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-[linear-gradient(135deg,var(--pb-brand-primary),var(--pb-brand-accent))] text-white shadow-[0_16px_40px_rgba(234,88,12,0.28)]";
+  iconWrap.className = "mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-[linear-gradient(135deg,var(--pb-brand-primary),var(--pb-brand-accent))] text-white shadow-[0_16px_40px_rgba(30,129,176,0.28)]";
   iconWrap.append(createIcon(config.icon, { className: "h-6 w-6" }));
 
   const header = document.createElement("header");
@@ -112,7 +112,7 @@ function loginPanel({ config, isSubmitting, error, onSubmit }) {
   header.append(title, subtitle);
 
   const lockNote = document.createElement("p");
-  lockNote.className = "rounded-2xl bg-orange-50/80 px-3 py-2 text-center text-sm leading-6 text-gray-600";
+  lockNote.className = "rounded-2xl bg-[var(--pb-surface-muted)] px-3 py-2 text-center text-sm leading-6 text-gray-600";
   lockNote.textContent = ``;
 
   section.append(iconWrap, header, lockNote, loginForm({ config, isSubmitting, error, onSubmit }));
@@ -130,7 +130,7 @@ function loginForm({ config, isSubmitting, error, onSubmit }) {
   if (error) {
     const message = document.createElement("p");
     message.id = `role_login_${config.slug}_error`;
-    message.className = "rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700";
+    message.className = "rounded-lg border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-3 py-2 text-sm font-medium text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
     message.textContent = error;
     form.append(message);
   }
@@ -142,7 +142,7 @@ function loginForm({ config, isSubmitting, error, onSubmit }) {
   });
   submit.id = `role_login_${config.slug}_submit_button`;
   submit.type = "submit";
-  submit.classList.add("w-full", "shadow-[0_16px_34px_rgba(234,88,12,0.24)]", "transition", "duration-200", "hover:-translate-y-0.5", "active:translate-y-0");
+  submit.classList.add("w-full", "shadow-[0_16px_34px_rgba(30,129,176,0.24)]", "transition", "duration-200", "hover:-translate-y-0.5", "active:translate-y-0");
   form.append(submit);
 
   form.addEventListener("submit", (event) => {
@@ -167,7 +167,7 @@ function activeSessionPanel({ config, router }) {
   const header = document.createElement("header");
   header.className = "grid gap-1";
   const eyebrow = document.createElement("p");
-  eyebrow.className = "text-xs font-black uppercase tracking-normal text-orange-700";
+  eyebrow.className = "text-xs font-black uppercase tracking-normal text-[var(--pb-brand-secondary)]";
   eyebrow.textContent = "Sesi aktif";
   const title = document.createElement("h1");
   title.className = "text-xl font-bold tracking-normal text-gray-950";
@@ -202,7 +202,7 @@ function field({ id, name, label, type = "text", placeholder = "" }) {
   input.type = type;
   input.required = true;
   input.placeholder = placeholder;
-  input.className = "min-h-11 min-w-0 w-full rounded-2xl border border-gray-200 bg-white/90 px-4 py-2.5 text-sm text-gray-950 outline-none transition duration-200 placeholder:text-gray-400 focus:border-orange-300 focus:bg-white focus:ring-4 focus:ring-orange-100";
+  input.className = "min-h-11 min-w-0 w-full rounded-2xl border border-gray-200 bg-white/90 px-4 py-2.5 text-sm text-gray-950 outline-none transition duration-200 placeholder:text-gray-400 focus:border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] focus:bg-white focus:ring-4 focus:ring-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)]";
 
   wrap.append(input);
   return wrap;

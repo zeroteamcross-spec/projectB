@@ -182,7 +182,7 @@ function setRuntime(patch = {}) {
 function showroomHero({ router, showroom, editing }) {
   const section = document.createElement("section");
   section.id = "slrsr_hero_section";
-  section.className = "relative overflow-hidden rounded-[2rem] border border-orange-100/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(255,247,237,0.84),rgba(240,253,250,0.72))] p-5 shadow-[0_24px_80px_rgba(15,23,42,0.10)] backdrop-blur-xl transition-shadow duration-150 sm:p-6 lg:p-7";
+  section.className = "relative overflow-hidden rounded-[2rem] border border-[var(--pb-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(250,244,237,0.84),rgba(234,244,249,0.72))] p-5 shadow-[0_24px_80px_rgba(15,23,42,0.10)] backdrop-blur-xl transition-shadow duration-150 sm:p-6 lg:p-7";
   section.dataset.ds = "seller.showroom.hero";
 
   const layout = document.createElement("div");
@@ -192,12 +192,12 @@ function showroomHero({ router, showroom, editing }) {
   copy.className = "grid min-w-0 gap-3";
 
   const icon = document.createElement("div");
-  icon.className = "grid h-12 w-12 place-items-center rounded-2xl bg-[linear-gradient(135deg,#f97316,#14b8a6)] text-white shadow-[0_16px_40px_rgba(249,115,22,0.22)]";
+  icon.className = "grid h-12 w-12 place-items-center rounded-2xl bg-[linear-gradient(135deg,#1e81b0,#1e81b0)] text-white shadow-[0_16px_40px_rgba(30,129,176,0.22)]";
   icon.append(createIcon("showroom", { className: "h-5 w-5" }));
 
   copy.append(
     icon,
-    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-orange-700", "Seller showroom profile"),
+    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", "Seller showroom profile"),
     textNode("h1", "max-w-3xl text-3xl font-black leading-tight tracking-normal text-gray-950 sm:text-4xl", showroom?.name || "Showroom Saya"),
     textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", "Kelola identitas showroom, kontak aktif, dan rekening pencairan seller dalam satu tempat.")
   );
@@ -235,7 +235,7 @@ function showroomHero({ router, showroom, editing }) {
   const status = document.createElement("section");
   status.id = "slrsr_mode_status_section";
   status.className = "rounded-[1.25rem] border border-white/80 bg-white/78 px-4 py-3 text-sm font-bold text-gray-700 shadow-sm";
-  status.append(createIcon(editing ? "edit" : "eye", { className: "mr-2 h-4 w-4 text-orange-600" }), document.createTextNode(editing ? "Mode edit showroom" : "Mode lihat showroom"));
+  status.append(createIcon(editing ? "edit" : "eye", { className: "mr-2 h-4 w-4 text-[var(--pb-brand-secondary)]" }), document.createTextNode(editing ? "Mode edit showroom" : "Mode lihat showroom"));
   side.append(stats, status, dashboardButton);
 
   layout.append(copy, side);

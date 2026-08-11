@@ -176,7 +176,7 @@ function hero(action, summary) {
   const copy = document.createElement("div");
   copy.className = "grid gap-2";
   copy.append(
-    textNode("p", "text-xs font-black uppercase tracking-[0.14em] text-orange-700", "Marketing finance"),
+    textNode("p", "text-xs font-black uppercase tracking-[0.14em] text-[var(--pb-brand-secondary)]", "Marketing finance"),
     textNode("h1", "text-3xl font-black text-gray-950", "Marketing Commissions"),
     textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", "Kelola ledger komisi, status dibayar, dan pembuatan batch pembayaran marketing."),
   );

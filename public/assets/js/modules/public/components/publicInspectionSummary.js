@@ -27,7 +27,7 @@ function header({ car, inspection, hasPublishedReport, itemCount }) {
   copy.className = "grid min-w-0 gap-1";
 
   const eyebrow = document.createElement("span");
-  eyebrow.className = "text-[11px] font-semibold uppercase tracking-normal text-orange-600";
+  eyebrow.className = "text-[11px] font-semibold uppercase tracking-normal text-[var(--pb-brand-secondary)]";
   eyebrow.textContent = "Kondisi kendaraan";
 
   const title = document.createElement("h2");

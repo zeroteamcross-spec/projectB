@@ -178,7 +178,7 @@ function render(root, context, state, actions) {
 function settlementsHero({ action, summary = {} }) {
   const section = document.createElement("section");
   section.id = "adst_hero_section";
-  section.className = "relative overflow-hidden rounded-[2rem] border border-orange-100/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.95),rgba(255,247,237,0.86),rgba(240,253,250,0.74))] p-5 shadow-[0_24px_80px_rgba(15,23,42,0.10)] backdrop-blur-xl transition-shadow duration-150 sm:p-6 lg:p-7";
+  section.className = "relative overflow-hidden rounded-[2rem] border border-[var(--pb-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.95),rgba(250,244,237,0.86),rgba(234,244,249,0.74))] p-5 shadow-[0_24px_80px_rgba(15,23,42,0.10)] backdrop-blur-xl transition-shadow duration-150 sm:p-6 lg:p-7";
 
   const layout = document.createElement("div");
   layout.className = "relative grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end";
@@ -187,12 +187,12 @@ function settlementsHero({ action, summary = {} }) {
   copy.className = "grid min-w-0 gap-3";
 
   const icon = document.createElement("div");
-  icon.className = "grid h-12 w-12 place-items-center rounded-2xl bg-[linear-gradient(135deg,#14b8a6,#f97316)] text-white shadow-[0_16px_40px_rgba(20,184,166,0.20)]";
+  icon.className = "grid h-12 w-12 place-items-center rounded-2xl bg-[linear-gradient(135deg,#1e81b0,#1e81b0)] text-white shadow-[0_16px_40px_rgba(30,129,176,0.20)]";
   icon.append(createIcon("commission", { className: "h-5 w-5" }));
 
   copy.append(
     icon,
-    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-orange-700", ""),
+    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", ""),
     textNode("h1", "max-w-2xl text-3xl font-black leading-tight tracking-normal text-gray-950 sm:text-4xl", "Admin Settlements"),
     textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", ""),
   );
@@ -249,27 +249,27 @@ function settlementsSummary(summary = {}) {
 
 function summaryCardTone(index) {
   return [
-    "border-orange-100/80 bg-[linear-gradient(135deg,rgba(255,247,237,0.92),rgba(255,255,255,0.86))]",
-    "border-amber-100/80 bg-[linear-gradient(135deg,rgba(254,243,199,0.78),rgba(255,255,255,0.86))]",
-    "border-teal-100/80 bg-[linear-gradient(135deg,rgba(204,251,241,0.72),rgba(255,255,255,0.86))]",
-    "border-sky-100/80 bg-[linear-gradient(135deg,rgba(219,234,254,0.78),rgba(255,255,255,0.86))]",
+    "border-[var(--pb-border)] bg-[linear-gradient(135deg,rgba(250,244,237,0.92),rgba(255,255,255,0.86))]",
+    "border-[color-mix(in_srgb,var(--pb-warning)_14%,white)] bg-[linear-gradient(135deg,rgba(245,236,225,0.78),rgba(255,255,255,0.86))]",
+    "border-[color-mix(in_srgb,var(--pb-brand-primary)_14%,white)] bg-[linear-gradient(135deg,rgba(214,236,246,0.72),rgba(255,255,255,0.86))]",
+    "border-[color-mix(in_srgb,var(--pb-brand-primary)_14%,white)] bg-[linear-gradient(135deg,rgba(224,239,247,0.78),rgba(255,255,255,0.86))]",
   ][index % 4];
 }
 
 function settlementFilterBar(filters, summary, actions) {
   const section = document.createElement("section");
   section.id = "adst_filter_section";
-  section.className = "grid min-w-0 gap-4 rounded-[var(--pb-radius-2xl)] border border-white/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.94),rgba(239,246,255,0.72),rgba(255,247,237,0.72))] p-3 shadow-[var(--pb-shadow-card)] backdrop-blur-xl transition-shadow duration-150 xl:p-4";
+  section.className = "grid min-w-0 gap-4 rounded-[var(--pb-radius-2xl)] border border-white/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.94),rgba(234,244,249,0.72),rgba(250,244,237,0.72))] p-3 shadow-[var(--pb-shadow-card)] backdrop-blur-xl transition-shadow duration-150 xl:p-4";
 
   const heading = document.createElement("div");
   heading.className = "flex min-w-0 items-start gap-3";
   const icon = document.createElement("span");
-  icon.className = "grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#2563eb,#06b6d4)] text-white shadow-[0_14px_34px_rgba(37,99,235,0.20)]";
+  icon.className = "grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#1e81b0,#1e81b0)] text-white shadow-[0_14px_34px_rgba(30,129,176,0.20)]";
   icon.append(createIcon("filter", { className: "h-4 w-4" }));
   const copy = document.createElement("div");
   copy.className = "grid min-w-0 gap-1";
   copy.append(
-    textNode("p", "text-[11px] font-black uppercase tracking-[0.16em] text-blue-700", "Settlement filter"),
+    textNode("p", "text-[11px] font-black uppercase tracking-[0.16em] text-[color-mix(in_srgb,var(--pb-brand-primary)_84%,black)]", "Settlement filter"),
     textNode("p", "text-sm leading-6 text-gray-600", "Cari batch, marketing, referral code, atau catatan lalu saring status finalisasi."),
   );
   heading.append(icon, copy);

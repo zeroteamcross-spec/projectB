@@ -18,9 +18,9 @@ export function AdminMasterLocationForm({
 
   const intro = document.createElement("section");
   intro.id = "admstloc_form_intro_section";
-  intro.className = "rounded-[1.5rem] border border-orange-100 bg-[linear-gradient(135deg,rgba(255,247,237,0.94),rgba(240,253,250,0.82))] p-4";
+  intro.className = "rounded-[1.5rem] border border-[var(--pb-border)] bg-[linear-gradient(135deg,rgba(250,244,237,0.94),rgba(234,244,249,0.82))] p-4";
   intro.append(
-    textNode("p", "text-xs font-black uppercase tracking-[0.16em] text-orange-700", mode === "edit" ? "Edit lokasi" : "Create lokasi"),
+    textNode("p", "text-xs font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", mode === "edit" ? "Edit lokasi" : "Create lokasi"),
     textNode("p", "mt-1 text-sm font-semibold leading-6 text-gray-600", "Field provinsi bersifat opsional agar master ini siap diperluas ke tingkat provinsi tanpa mengubah schema payload."),
   );
 

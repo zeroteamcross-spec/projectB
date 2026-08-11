@@ -39,7 +39,7 @@ export function SellerCommissionGlobalForm({
 
   if (error) {
     const errorNode = document.createElement("div");
-    errorNode.className = "rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700";
+    errorNode.className = "rounded-lg border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-sm font-medium text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
     errorNode.textContent = error;
     card.append(errorNode);
   }

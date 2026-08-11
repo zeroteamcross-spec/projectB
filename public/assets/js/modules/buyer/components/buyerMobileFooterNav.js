@@ -274,7 +274,7 @@ function ensureFooterStyles() {
       background: linear-gradient(135deg, var(--pb-btn-primary-from), var(--pb-btn-primary-to));
       color: #fff;
       font-size: 1.75rem;
-      box-shadow: 0 18px 34px rgba(249, 115, 22, 0.34);
+      box-shadow: 0 18px 34px rgba(30,129,176, 0.34);
       outline: 8px solid rgba(255, 255, 255, 0.95);
     }
 
@@ -343,7 +343,7 @@ function ensureFooterStyles() {
       width: 2.75rem;
       height: 2.75rem;
       font-size: 1.42rem;
-      box-shadow: 0 14px 26px rgba(249, 115, 22, 0.3);
+      box-shadow: 0 14px 26px rgba(30,129,176, 0.3);
       outline: 6px solid rgba(255, 255, 255, 0.95);
     }
 

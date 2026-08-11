@@ -55,7 +55,7 @@ export function AdminMasterBrandForm({
   const copy = document.createElement("div");
   copy.className = "grid gap-1";
   copy.append(
-    textNode("p", "text-[11px] font-black uppercase tracking-[0.16em] text-orange-700", "Child models"),
+    textNode("p", "text-[11px] font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", "Child models"),
     textNode("p", "text-sm text-gray-600", "Model disimpan sebagai array di JSON payload brand."),
   );
 

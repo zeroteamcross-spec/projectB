@@ -212,7 +212,7 @@ function desktopCta({ car, context }) {
   const lock = getListingLockStatus({ car });
 
   const eyebrow = document.createElement("span");
-  eyebrow.className = "text-[11px] font-semibold uppercase tracking-normal text-orange-600";
+  eyebrow.className = "text-[11px] font-semibold uppercase tracking-normal text-[var(--pb-brand-secondary)]";
   eyebrow.textContent = "Lanjutkan minat";
 
   const title = document.createElement("h2");
@@ -248,7 +248,7 @@ function descriptionSection(car) {
   applyDesignHook(section, "public.car_detail.description");
 
   const eyebrow = document.createElement("span");
-  eyebrow.className = "text-[11px] font-semibold uppercase tracking-normal text-orange-600";
+  eyebrow.className = "text-[11px] font-semibold uppercase tracking-normal text-[var(--pb-brand-secondary)]";
   eyebrow.textContent = "Catatan listing";
 
   const title = document.createElement("h2");

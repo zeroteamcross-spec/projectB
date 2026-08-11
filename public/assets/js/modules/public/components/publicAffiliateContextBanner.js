@@ -8,11 +8,11 @@ export function PublicAffiliateContextBanner({ affiliate = null, onClear = null 
   }
 
   const section = document.createElement("section");
-  section.className = "hidden relative grid gap-3 overflow-hidden rounded-[24px] border border-orange-200/70 bg-white/96 p-4 shadow-card";
+  section.className = "hidden relative grid gap-3 overflow-hidden rounded-[24px] border border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] bg-white/96 p-4 shadow-card";
   applyDesignHook(section, "public.affiliate.banner");
 
   const glow = document.createElement("div");
-  glow.className = "hidden absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(251,146,60,0.18),transparent_35%),linear-gradient(135deg,rgba(255,247,237,0.92),rgba(255,255,255,0.98))]";
+  glow.className = "hidden absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(251,146,60,0.18),transparent_35%),linear-gradient(135deg,rgba(250,244,237,0.92),rgba(255,255,255,0.98))]";
 
   const top = document.createElement("div");
   top.className = "relative flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between";
@@ -21,7 +21,7 @@ export function PublicAffiliateContextBanner({ affiliate = null, onClear = null 
   copy.className = "grid min-w-0 gap-1";
 
   const eyebrow = document.createElement("p");
-  eyebrow.className = "inline-flex w-fit rounded-full bg-orange-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-normal text-orange-700";
+  eyebrow.className = "inline-flex w-fit rounded-full bg-[color-mix(in_srgb,var(--pb-brand-accent)_28%,white)] px-3 py-1 text-[11px] font-semibold uppercase tracking-normal text-[var(--pb-brand-secondary)]";
   eyebrow.textContent = "Context marketing aktif";
 
   const title = document.createElement("h2");

@@ -18,7 +18,7 @@ export function AdminDashboardTransactionsPanel({ transactions = [], onOpenTrans
   const titleWrap = document.createElement("div");
   titleWrap.className = "flex min-w-0 items-center gap-3";
   const iconWrap = document.createElement("div");
-  iconWrap.className = "grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-rose-100 text-rose-700";
+  iconWrap.className = "grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[color-mix(in_srgb,var(--pb-danger)_14%,white)] text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
   iconWrap.append(createIcon("transaction", { className: "h-5 w-5" }));
   titleWrap.append(iconWrap, textBlock(tw.text.sectionTitle, "Transaksi terbaru"));
   const focusButton = Button({
@@ -47,7 +47,7 @@ export function AdminDashboardTransactionsPanel({ transactions = [], onOpenTrans
 
 function transactionsTable(transactions) {
   const icon = document.createElement("span");
-  icon.className = "grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#fb7185,#f97316)] text-white shadow-[0_14px_34px_rgba(244,63,94,0.22)]";
+  icon.className = "grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#c53030,#1e81b0)] text-white shadow-[0_14px_34px_rgba(185,28,28,0.22)]";
   icon.append(createIcon("transaction", { className: "h-4 w-4" }));
 
   return DataTable({

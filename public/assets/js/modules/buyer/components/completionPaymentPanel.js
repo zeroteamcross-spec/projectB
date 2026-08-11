@@ -134,7 +134,7 @@ function resultBox(transaction) {
   box.className = `grid gap-4 ${tw.surface.successInset} shadow-sm`;
 
   const title = document.createElement("strong");
-  title.className = "text-base text-green-900";
+  title.className = "text-base text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
   title.textContent = "Sesi pelunasan dibuat";
 
   const detailsState = resolvePaymentArtifacts(transaction);
@@ -157,7 +157,7 @@ function resultBox(transaction) {
     box.append(virtualAccountBox(virtualAccount));
   } else {
     const note = document.createElement("p");
-    note.className = "rounded-2xl border border-green-200 bg-white px-4 py-3 text-sm leading-6 text-green-900";
+    note.className = "rounded-2xl border border-[color-mix(in_srgb,var(--pb-success)_26%,white)] bg-white px-4 py-3 text-sm leading-6 text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
     note.textContent = detailsState.method === "gopay"
       ? "Gunakan halaman status pembayaran buyer untuk membuka aplikasi GoPay, melihat QR, dan cek status."
       : "Gunakan halaman status pembayaran buyer untuk melihat QRIS, mengunduh QR, dan cek status.";
@@ -176,7 +176,7 @@ function resultBox(transaction) {
   }
 
   const note = document.createElement("p");
-  note.className = "text-sm leading-6 text-green-900";
+  note.className = "text-sm leading-6 text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
   note.textContent = "Setelah membayar, kembali ke halaman ini. Status akan dicek otomatis; Refresh status tetap tersedia sebagai fallback.";
   box.append(note);
 

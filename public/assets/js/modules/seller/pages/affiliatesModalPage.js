@@ -307,7 +307,7 @@ function render(root, context, actions) {
   if (runtime.error && !modalOpen) {
     const error = document.createElement("p");
     error.id = "slraf_error_section";
-    error.className = "rounded-[1rem] border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700";
+    error.className = "rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
     error.textContent = runtime.error;
     layout.append(error);
   }
@@ -502,7 +502,7 @@ function seedAffiliateDraft(mode, affiliate) {
 function affiliatesHero({ counts, action }) {
   const section = document.createElement("section");
   section.id = "slraf_header";
-  section.className = "relative overflow-hidden rounded-[2rem] border border-orange-100/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(255,247,237,0.84),rgba(240,253,250,0.72))] p-5 shadow-[0_24px_80px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6 lg:p-7";
+  section.className = "relative overflow-hidden rounded-[2rem] border border-[var(--pb-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(250,244,237,0.84),rgba(234,244,249,0.72))] p-5 shadow-[0_24px_80px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6 lg:p-7";
   section.dataset.ds = "seller.affiliates.hero";
 
   const layout = document.createElement("section");
@@ -511,11 +511,11 @@ function affiliatesHero({ counts, action }) {
   const copy = document.createElement("section");
   copy.className = "grid min-w-0 gap-3";
   const icon = document.createElement("span");
-  icon.className = "grid h-12 w-12 place-items-center rounded-2xl bg-[linear-gradient(135deg,#f97316,#14b8a6)] text-white shadow-[0_16px_40px_rgba(249,115,22,0.22)]";
+  icon.className = "grid h-12 w-12 place-items-center rounded-2xl bg-[linear-gradient(135deg,#1e81b0,#1e81b0)] text-white shadow-[0_16px_40px_rgba(30,129,176,0.22)]";
   icon.append(createIcon("affiliate", { className: "h-5 w-5" }));
   copy.append(
     icon,
-    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-orange-700", "Seller marketing desk"),
+    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", "Seller marketing desk"),
     textNode("h1", "max-w-3xl text-3xl font-black leading-tight tracking-normal text-gray-950 sm:text-4xl", "Marketing"),
     textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", "Kelola partner marketing, link referral, dan status performa."),
   );
@@ -618,10 +618,10 @@ function filterBar({ query, counts, onChange }) {
 
 function summaryCardClass(index) {
   return [
-    "border-orange-100/80 bg-[linear-gradient(135deg,rgba(255,247,237,0.96),rgba(255,255,255,0.88))]",
-    "border-emerald-100/80 bg-[linear-gradient(135deg,rgba(236,253,245,0.96),rgba(255,255,255,0.88))]",
-    "border-sky-100/80 bg-[linear-gradient(135deg,rgba(240,249,255,0.96),rgba(255,255,255,0.88))]",
-    "border-violet-100/80 bg-[linear-gradient(135deg,rgba(245,243,255,0.96),rgba(255,255,255,0.88))]",
+    "border-[var(--pb-border)] bg-[linear-gradient(135deg,rgba(250,244,237,0.96),rgba(255,255,255,0.88))]",
+    "border-[color-mix(in_srgb,var(--pb-success)_14%,white)] bg-[linear-gradient(135deg,rgba(236,246,239,0.96),rgba(255,255,255,0.88))]",
+    "border-[color-mix(in_srgb,var(--pb-brand-primary)_14%,white)] bg-[linear-gradient(135deg,rgba(234,244,249,0.96),rgba(255,255,255,0.88))]",
+    "border-[color-mix(in_srgb,var(--pb-brand-primary)_14%,white)] bg-[linear-gradient(135deg,rgba(234,244,249,0.96),rgba(255,255,255,0.88))]",
   ][index % 4];
 }
 
@@ -631,7 +631,7 @@ function affiliateDetailPanel({ affiliate }) {
   section.className = "grid min-w-0 gap-4";
 
   if (!affiliate) {
-    section.append(textNode("p", "rounded-[1rem] border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-700", "Marketing tidak ditemukan di working set halaman."));
+    section.append(textNode("p", "rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-warning)_26%,white)] bg-[color-mix(in_srgb,var(--pb-warning)_8%,white)] px-4 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-warning)_84%,black)]", "Marketing tidak ditemukan di working set halaman."));
     return section;
   }
 

@@ -5,17 +5,17 @@ import { createIcon } from "../../../theme/iconRegistry.js";
 export function AdminTransactionsFilterBar({ filters = {}, counts = {}, onSubmit = null } = {}) {
   const card = document.createElement("section");
   card.id = "adtr_filter_section";
-  card.className = `grid min-w-0 gap-4 ${tw.section.toolbar} border-white/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.94),rgba(239,246,255,0.72),rgba(255,247,237,0.72))]`;
+  card.className = `grid min-w-0 gap-4 ${tw.section.toolbar} border-white/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.94),rgba(234,244,249,0.72),rgba(250,244,237,0.72))]`;
 
   const header = document.createElement("div");
   header.className = "flex min-w-0 items-start gap-3";
   const icon = document.createElement("span");
-  icon.className = "grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#2563eb,#06b6d4)] text-white shadow-[0_14px_34px_rgba(37,99,235,0.20)]";
+  icon.className = "grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#1e81b0,#1e81b0)] text-white shadow-[0_14px_34px_rgba(30,129,176,0.20)]";
   icon.append(createIcon("filter", { className: "h-4 w-4" }));
   const copy = document.createElement("div");
   copy.className = "grid min-w-0 gap-1";
   copy.append(
-    textBlock("text-[11px] font-black uppercase tracking-[0.16em] text-blue-700", "Transaction filter"),
+    textBlock("text-[11px] font-black uppercase tracking-[0.16em] text-[color-mix(in_srgb,var(--pb-brand-primary)_84%,black)]", "Transaction filter"),
     textBlock("text-sm leading-6 text-gray-600", "Saring status, payment type, dan keyword supaya review transaksi tetap cepat dibaca."),
   );
   header.append(

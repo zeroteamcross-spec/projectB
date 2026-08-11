@@ -49,7 +49,7 @@ export function SellerSummaryCards({ summary = {} } = {}) {
 
     const label = textNode("p", "text-[11px] font-black uppercase tracking-[0.14em] text-gray-500", item.label);
     const icon = document.createElement("span");
-    icon.className = "grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-white/78 text-orange-700 ring-1 ring-white/80";
+    icon.className = "grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-white/78 text-[var(--pb-brand-secondary)] ring-1 ring-white/80";
     icon.append(createIcon(item.icon, { className: "h-4 w-4" }));
     top.append(label, icon);
 
@@ -66,10 +66,10 @@ export function SellerSummaryCards({ summary = {} } = {}) {
 
 function summaryTone(index) {
   return [
-    "border-orange-100/80 bg-[linear-gradient(135deg,rgba(255,247,237,0.94),rgba(255,255,255,0.88))]",
-    "border-teal-100/80 bg-[linear-gradient(135deg,rgba(204,251,241,0.76),rgba(255,255,255,0.88))]",
-    "border-sky-100/80 bg-[linear-gradient(135deg,rgba(219,234,254,0.78),rgba(255,255,255,0.88))]",
-    "border-amber-100/80 bg-[linear-gradient(135deg,rgba(254,243,199,0.78),rgba(255,255,255,0.88))]",
+    "border-[var(--pb-border)] bg-[linear-gradient(135deg,rgba(250,244,237,0.94),rgba(255,255,255,0.88))]",
+    "border-[color-mix(in_srgb,var(--pb-brand-primary)_14%,white)] bg-[linear-gradient(135deg,rgba(214,236,246,0.76),rgba(255,255,255,0.88))]",
+    "border-[color-mix(in_srgb,var(--pb-brand-primary)_14%,white)] bg-[linear-gradient(135deg,rgba(224,239,247,0.78),rgba(255,255,255,0.88))]",
+    "border-[color-mix(in_srgb,var(--pb-warning)_14%,white)] bg-[linear-gradient(135deg,rgba(245,236,225,0.78),rgba(255,255,255,0.88))]",
   ][index % 4];
 }
 

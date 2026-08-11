@@ -14,8 +14,8 @@ export function AdminDashboardSummaryCards({ summary } = {}) {
       label: "User aktif tersaji",
       value: String(summary?.totalUsers ?? 0),
       note: `${summary?.recentUsers ?? 0} user baru dalam 7 hari terakhir dari snapshot dashboard.`,
-      tone: "from-sky-500 to-cyan-500",
-      surface: "bg-[linear-gradient(135deg,rgba(255,255,255,0.94),rgba(224,242,254,0.82))] border-sky-100/90",
+      tone: "from-[var(--pb-brand-primary)] to-[var(--pb-brand-primary)]",
+      surface: "bg-[linear-gradient(135deg,rgba(255,255,255,0.94),rgba(224,242,254,0.82))] border-[color-mix(in_srgb,var(--pb-brand-primary)_14%,white)]",
     },
     {
       id: "approvals",
@@ -23,8 +23,8 @@ export function AdminDashboardSummaryCards({ summary } = {}) {
       label: "Pending approvals",
       value: String(summary?.pendingApprovals ?? 0),
       note: "Seller yang masih menunggu keputusan approval admin.",
-      tone: "from-orange-500 to-amber-500",
-      surface: "bg-[linear-gradient(135deg,rgba(255,255,255,0.94),rgba(255,237,213,0.86))] border-orange-100/90",
+      tone: "from-[var(--pb-brand-primary)] to-[var(--pb-warning)]",
+      surface: "bg-[linear-gradient(135deg,rgba(255,255,255,0.94),rgba(245,236,225,0.86))] border-[var(--pb-border)]",
     },
     {
       id: "transactions",
@@ -32,8 +32,8 @@ export function AdminDashboardSummaryCards({ summary } = {}) {
       label: "Transaksi perlu perhatian",
       value: String(summary?.attentionTransactions ?? 0),
       note: `${summary?.totalTransactions ?? 0} transaksi terbaru tersedia untuk monitoring awal.`,
-      tone: "from-rose-500 to-pink-500",
-      surface: "bg-[linear-gradient(135deg,rgba(255,255,255,0.94),rgba(255,228,230,0.82))] border-rose-100/90",
+      tone: "from-[var(--pb-danger)] to-[var(--pb-brand-primary)]",
+      surface: "bg-[linear-gradient(135deg,rgba(255,255,255,0.94),rgba(255,228,230,0.82))] border-[color-mix(in_srgb,var(--pb-danger)_14%,white)]",
     },
     {
       id: "cars",
@@ -41,8 +41,8 @@ export function AdminDashboardSummaryCards({ summary } = {}) {
       label: "Mobil tersaji",
       value: String(summary?.totalCars ?? 0),
       note: `${summary?.publishedCars ?? 0} mobil published pada snapshot awal admin.`,
-      tone: "from-emerald-500 to-teal-500",
-      surface: "bg-[linear-gradient(135deg,rgba(255,255,255,0.94),rgba(209,250,229,0.76))] border-emerald-100/90",
+      tone: "from-[var(--pb-success)] to-[var(--pb-brand-primary)]",
+      surface: "bg-[linear-gradient(135deg,rgba(255,255,255,0.94),rgba(209,250,229,0.76))] border-[color-mix(in_srgb,var(--pb-success)_14%,white)]",
     },
   ];
 
@@ -64,7 +64,7 @@ function summaryCard({ id, icon, label, value, note, tone, surface }) {
   const copy = document.createElement("div");
   copy.className = "grid gap-2";
   copy.append(
-    textBlock("text-[11px] font-black uppercase tracking-[0.16em] text-orange-700", label),
+    textBlock("text-[11px] font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", label),
     textBlock("text-3xl font-black tracking-[-0.04em] text-gray-950", value),
   );
 

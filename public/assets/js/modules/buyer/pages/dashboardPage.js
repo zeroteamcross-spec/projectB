@@ -285,7 +285,7 @@ function buyerHero({ cars, notFound, actions }) {
   section.dataset.ds = "buyer.dashboard.hero";
 
   const showroom = document.createElement("span");
-  showroom.className = "pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.94)_0%,rgba(255,255,255,0.70)_42%,rgba(255,255,255,0.28)_100%),radial-gradient(circle_at_75%_18%,rgba(255,255,255,0.92),transparent_28%),linear-gradient(120deg,transparent_0%,rgba(249,115,22,0.10)_100%)]";
+  showroom.className = "pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.94)_0%,rgba(255,255,255,0.70)_42%,rgba(255,255,255,0.28)_100%),radial-gradient(circle_at_75%_18%,rgba(255,255,255,0.92),transparent_28%),linear-gradient(120deg,transparent_0%,rgba(30,129,176,0.10)_100%)]";
 
   const copy = document.createElement("section");
   copy.className = "relative z-10 grid max-w-[300px] gap-4 md:max-w-[430px] md:gap-5";
@@ -419,7 +419,7 @@ function latestTransactionsSection({ transactions, actions }) {
       { label: "Transaksi", render: (transaction) => transactionIdentity(transaction) },
       { label: "Mobil", render: (transaction) => transactionCar(transaction) },
       { label: "Tanggal", render: (transaction) => textNode("span", "text-sm font-semibold text-[var(--pb-text-strong)]", formatDate(transaction.created_at)) },
-      { label: "Nilai", render: (transaction) => textNode("span", "text-sm font-black text-white", formatCurrency(transaction.car_price ?? transaction.dp_amount ?? 0)) },
+      { label: "Nilai", render: (transaction) => textNode("span", "text-sm font-black text-[var(--pb-text-strong)]", formatCurrency(transaction.car_price ?? transaction.dp_amount ?? 0)) },
       { label: "Status", render: (transaction) => transactionStatusBadge(transaction.transaction_status) },
       { label: "Aksi", render: (transaction) => transactionAction(transaction, actions) },
     ],
@@ -490,7 +490,7 @@ function recommendationsToolbar({ count, actions }) {
   copy.className = "grid min-w-0 gap-1";
   // copy.className = "";
   copy.append(
-    textNode("h2", "break-words text-sm font-bold tracking-normal text-white", "Mobil Favorit Saya"),
+    textNode("h2", "break-words text-sm font-bold tracking-normal text-[var(--pb-text-strong)]", "Mobil Favorit Saya"),
     // textNode("p", "text-sm font-medium text-white/70", count ? `${count} rekomendasi tersedia` : "Rekomendasi akan muncul di sini"),
   );
 
@@ -530,7 +530,7 @@ function creditPromoBanner(actions) {
   image.src = fallbackCarImageUrl();
   image.alt = "Promo kredit mobil";
   image.loading = "lazy";
-  image.className = "block w-full object-contain drop-shadow-[0_20px_28px_rgba(249,115,22,0.20)]";
+  image.className = "block w-full object-contain drop-shadow-[0_20px_28px_rgba(30,129,176,0.20)]";
   visual.append(image);
 
   const benefit = document.createElement("section");
@@ -986,10 +986,10 @@ function greetingBlock(user) {
   wrap.className = "grid min-w-0 gap-0.5";
 
   const greeting = document.createElement("h1");
-  greeting.className = "truncate text-xl font-black leading-tight tracking-normal text-white";
+  greeting.className = "truncate text-xl font-black leading-tight tracking-normal text-[var(--pb-text-strong)]";
   greeting.textContent = ` ${name}`;
 
-  wrap.append(greeting, textNode("p", "truncate text-[5] font-semibold text-white/75", "Selamat datang kembali!"));
+  wrap.append(greeting, textNode("p", "truncate text-[5] font-semibold text-[var(--pb-text-muted)]", "Selamat datang kembali!"));
   return wrap;
 }
 
@@ -1040,7 +1040,7 @@ function transactionIdentity(transaction) {
   const wrap = document.createElement("section");
   wrap.className = "grid min-w-0 gap-1";
   wrap.append(
-    textNode("p", "break-words text-sm font-black text-white", transaction.transaction_code || `Transaksi #${transaction.id ?? "-"}`),
+    textNode("p", "break-words text-sm font-black text-[var(--pb-text-strong)]", transaction.transaction_code || `Transaksi #${transaction.id ?? "-"}`),
     textNode("p", "break-words text-xs font-semibold text-[var(--pb-text-muted)]", transaction.payment_type ? paymentTypeLabel(transaction.payment_type) : "Pembelian mobil"),
   );
   return wrap;
@@ -1050,7 +1050,7 @@ function transactionCar(transaction) {
   const wrap = document.createElement("section");
   wrap.className = "grid min-w-0 gap-1";
   wrap.append(
-    textNode("p", "break-words text-sm font-black text-white", transactionCarLabel(transaction)),
+    textNode("p", "break-words text-sm font-black text-[var(--pb-text-strong)]", transactionCarLabel(transaction)),
     textNode("p", "break-words text-xs font-semibold text-[var(--pb-text-muted)]", transaction.car?.year ? `Tahun ${transaction.car.year}` : `Mobil #${transaction.car_id ?? "-"}`),
   );
   return wrap;
@@ -1256,9 +1256,9 @@ function fallbackCarImageUrl() {
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560">
       <defs>
         <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
-          <stop offset="0" stop-color="#fff7ed"/>
+          <stop offset="0" stop-color="#faf4ed"/>
           <stop offset="0.52" stop-color="#ffffff"/>
-          <stop offset="1" stop-color="#fed7aa"/>
+          <stop offset="1" stop-color="#efe3d5"/>
         </linearGradient>
         <linearGradient id="car" x1="0" x2="1">
           <stop offset="0" stop-color="#111827"/>
@@ -1270,13 +1270,13 @@ function fallbackCarImageUrl() {
         </filter>
       </defs>
       <rect width="960" height="560" fill="url(#bg)"/>
-      <path d="M0 420 C180 360 330 430 510 380 C690 330 790 360 960 308 L960 560 L0 560 Z" fill="#ffedd5"/>
+      <path d="M0 420 C180 360 330 430 510 380 C690 330 790 360 960 308 L960 560 L0 560 Z" fill="#f5ece1"/>
       <g filter="url(#shadow)" transform="translate(130 150)">
         <path d="M110 230 C142 148 207 102 317 96 L462 96 C563 99 628 150 676 230 L724 244 C753 252 773 278 773 309 L773 346 L694 346 C687 298 647 263 599 263 C551 263 511 298 504 346 L289 346 C282 298 242 263 194 263 C146 263 106 298 99 346 L38 346 L38 305 C38 268 67 237 104 234 Z" fill="url(#car)"/>
-        <path d="M213 129 L321 129 L305 214 L130 214 C154 169 176 143 213 129 Z" fill="#e0f2fe" opacity="0.86"/>
-        <path d="M347 129 L454 129 C514 131 557 158 596 214 L332 214 Z" fill="#e0f2fe" opacity="0.78"/>
-        <path d="M80 255 L166 255" stroke="#fb923c" stroke-width="16" stroke-linecap="round"/>
-        <path d="M650 255 L730 255" stroke="#fed7aa" stroke-width="16" stroke-linecap="round"/>
+        <path d="M213 129 L321 129 L305 214 L130 214 C154 169 176 143 213 129 Z" fill="#e0eff7" opacity="0.86"/>
+        <path d="M347 129 L454 129 C514 131 557 158 596 214 L332 214 Z" fill="#e0eff7" opacity="0.78"/>
+        <path d="M80 255 L166 255" stroke="#eab676" stroke-width="16" stroke-linecap="round"/>
+        <path d="M650 255 L730 255" stroke="#efe3d5" stroke-width="16" stroke-linecap="round"/>
         <circle cx="194" cy="354" r="60" fill="#111827"/>
         <circle cx="194" cy="354" r="30" fill="#f8fafc"/>
         <circle cx="599" cy="354" r="60" fill="#111827"/>

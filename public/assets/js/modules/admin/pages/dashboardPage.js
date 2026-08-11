@@ -71,11 +71,13 @@ function render(root, context, notFound, animation = {}) {
 
   const approvalButton = Button({
     label: "Approval queue",
+    // Pindah halaman, bukan menyetujui apa pun -- jadi biru netral.
+    variant: "netral",
     onClick: () => context.router?.navigate("/admin/approvals"),
     designHook: "shared.button.primary",
   });
   approvalButton.id = "adm_dashboard_approval_queue_button";
-  approvalButton.classList.add("shadow-[0_16px_40px_rgba(234,88,12,0.22)]", "transition", "duration-200", "hover:-translate-y-0.5");
+  approvalButton.classList.add("shadow-[0_16px_40px_rgba(30,129,176,0.22)]", "transition", "duration-200", "hover:-translate-y-0.5");
 
   const content = [
     adminHero({
@@ -128,10 +130,10 @@ function render(root, context, notFound, animation = {}) {
 function adminHero({ title, description, action }) {
   const section = document.createElement("section");
   section.id = "adm_dashboard_hero_section";
-  section.className = "relative overflow-hidden rounded-[2rem] border border-orange-100/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.92),rgba(255,247,237,0.86),rgba(240,253,250,0.72))] p-5 shadow-[0_24px_80px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6 lg:p-7";
+  section.className = "relative overflow-hidden rounded-[2rem] border border-[var(--pb-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.92),rgba(250,244,237,0.86),rgba(234,244,249,0.72))] p-5 shadow-[0_24px_80px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6 lg:p-7";
 
   const glow = document.createElement("div");
-  glow.className = "pointer-events-none absolute -right-14 -top-16 h-44 w-44 rounded-full bg-orange-300/25 blur-3xl";
+  glow.className = "pointer-events-none absolute -right-14 -top-16 h-44 w-44 rounded-full bg-[color-mix(in_srgb,var(--pb-brand-accent)_45%,white)] blur-3xl";
 
   const layout = document.createElement("div");
   layout.className = "relative grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end";
@@ -140,11 +142,11 @@ function adminHero({ title, description, action }) {
   copy.className = "grid min-w-0 gap-3";
 
   const icon = document.createElement("div");
-  icon.className = "grid h-12 w-12 place-items-center rounded-2xl bg-[linear-gradient(135deg,var(--pb-brand-secondary),var(--pb-brand-accent))] text-white shadow-[0_16px_40px_rgba(234,88,12,0.24)]";
+  icon.className = "grid h-12 w-12 place-items-center rounded-2xl bg-[linear-gradient(135deg,var(--pb-brand-secondary),var(--pb-brand-accent))] text-white shadow-[0_16px_40px_rgba(30,129,176,0.24)]";
   icon.append(createIcon("dashboard", { className: "h-6 w-6" }));
 
   const eyebrow = document.createElement("p");
-  eyebrow.className = "text-xs font-black uppercase tracking-[0.18em] text-orange-700";
+  eyebrow.className = "text-xs font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]";
   eyebrow.textContent = "";
 
   const heading = document.createElement("h1");
@@ -164,7 +166,7 @@ function adminHero({ title, description, action }) {
 function adminChartPanel({ summary, transactions = [], pendingUsers = [], cars = [] }) {
   const section = document.createElement("section");
   section.id = "adm_dashboard_chart_section";
-  section.className = "grid gap-4 rounded-[2rem] border border-white/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.92),rgba(239,246,255,0.78),rgba(255,247,237,0.72))] p-5 shadow-[0_22px_70px_rgba(15,23,42,0.09)] backdrop-blur-xl lg:grid-cols-[minmax(0,1fr)_320px]";
+  section.className = "grid gap-4 rounded-[2rem] border border-white/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.92),rgba(234,244,249,0.78),rgba(250,244,237,0.72))] p-5 shadow-[0_22px_70px_rgba(15,23,42,0.09)] backdrop-blur-xl lg:grid-cols-[minmax(0,1fr)_320px]";
 
   const main = document.createElement("div");
   main.className = "grid gap-5";
@@ -172,12 +174,12 @@ function adminChartPanel({ summary, transactions = [], pendingUsers = [], cars =
   const header = document.createElement("div");
   header.className = "flex min-w-0 items-center gap-3";
   const icon = document.createElement("div");
-  icon.className = "grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#2563eb,#06b6d4)] text-white shadow-[0_14px_34px_rgba(37,99,235,0.22)]";
+  icon.className = "grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#1e81b0,#1e81b0)] text-white shadow-[0_14px_34px_rgba(30,129,176,0.22)]";
   icon.append(createIcon("sort", { className: "h-5 w-5" }));
   const copy = document.createElement("div");
   copy.className = "grid gap-1";
   copy.append(
-    textNode("p", "text-xs font-black uppercase tracking-[0.16em] text-blue-700", "Grafik operasional"),
+    textNode("p", "text-xs font-black uppercase tracking-[0.16em] text-[color-mix(in_srgb,var(--pb-brand-primary)_84%,black)]", "Grafik operasional"),
     textNode("h2", "text-xl font-black tracking-[-0.03em] text-gray-950", "Health snapshot dashboard"),
   );
   header.append(icon, copy);
@@ -185,10 +187,10 @@ function adminChartPanel({ summary, transactions = [], pendingUsers = [], cars =
   const bars = document.createElement("div");
   bars.className = "grid gap-3";
   [
-    ["User", summary?.totalUsers ?? 0, "bg-sky-500"],
-    ["Approval", summary?.pendingApprovals ?? pendingUsers.length, "bg-orange-500"],
-    ["Transaksi", summary?.totalTransactions ?? transactions.length, "bg-rose-500"],
-    ["Mobil", summary?.totalCars ?? cars.length, "bg-emerald-500"],
+    ["User", summary?.totalUsers ?? 0, "bg-[var(--pb-brand-primary)]"],
+    ["Approval", summary?.pendingApprovals ?? pendingUsers.length, "bg-[var(--pb-brand-primary)]"],
+    ["Transaksi", summary?.totalTransactions ?? transactions.length, "bg-[var(--pb-danger)]"],
+    ["Mobil", summary?.totalCars ?? cars.length, "bg-[var(--pb-success)]"],
   ].forEach(([label, value, color], index, all) => {
     bars.append(chartBar({ label, value, color, max: Math.max(1, ...all.map((item) => Number(item[1] ?? 0))) }));
   });
@@ -201,8 +203,8 @@ function adminChartPanel({ summary, transactions = [], pendingUsers = [], cars =
   side.append(
     textNode("p", "text-sm leading-6 text-gray-600", "Grafik ini memakai snapshot cepat dashboard untuk membaca beban operasional tanpa membuka modul detail."),
     metricPills([
-      ["Attention", summary?.attentionTransactions ?? 0, "text-rose-700 bg-rose-50"],
-      ["Published", summary?.publishedCars ?? 0, "text-emerald-700 bg-emerald-50"],
+      ["Attention", summary?.attentionTransactions ?? 0, "text-[color-mix(in_srgb,var(--pb-danger)_84%,black)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)]"],
+      ["Published", summary?.publishedCars ?? 0, "text-[color-mix(in_srgb,var(--pb-success)_84%,black)] bg-[color-mix(in_srgb,var(--pb-success)_8%,white)]"],
     ]),
   );
 

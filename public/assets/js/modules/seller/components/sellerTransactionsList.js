@@ -19,7 +19,7 @@ export function SellerTransactionsList({
   onPerPageChange = null,
 } = {}) {
   const icon = document.createElement("span");
-  icon.className = "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,var(--pb-btn-primary-from),var(--pb-btn-primary-to))] text-white leading-none shadow-[0_14px_34px_rgba(249,115,22,0.22)]";
+  icon.className = "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,var(--pb-btn-primary-from),var(--pb-btn-primary-to))] text-white leading-none shadow-[0_14px_34px_rgba(30,129,176,0.22)]";
   icon.append(createIcon("transaction", { className: "block h-4 w-4 leading-none" }));
 
   const pagination = totalItems > perPage
@@ -70,7 +70,7 @@ export function SellerTransactionsList({
     tableMinWidth: "min-w-[1120px]",
     getRowKey: (transaction) => transaction.id,
     rowClassName: (transaction) => Number(selectedTransactionId) === Number(transaction.id)
-      ? "bg-orange-50/70 ring-1 ring-inset ring-orange-200/80"
+      ? "bg-[var(--pb-surface-muted)] ring-1 ring-inset ring-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)]"
       : "bg-white/55",
     mobileCardId: (transaction) => `slrtx_mobile_row_${transaction.id}_section`,
     mobileCardTitle: (transaction) => transaction.transaction_code || `Transaksi #${transaction.id ?? "-"}`,

@@ -157,7 +157,7 @@ function carMeta(car) {
 
 function tableIcon() {
   const icon = document.createElement("span");
-  icon.className = "grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-orange-100 text-orange-700";
+  icon.className = "grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[color-mix(in_srgb,var(--pb-brand-accent)_28%,white)] text-[var(--pb-brand-secondary)]";
   icon.append(createIcon("table", { className: "h-4 w-4" }));
   return icon;
 }

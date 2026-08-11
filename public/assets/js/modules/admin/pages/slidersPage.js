@@ -250,18 +250,18 @@ function render(root, context, state, actions) {
 function hero({ action, sliders }) {
   const section = document.createElement("section");
   section.id = "adsl_hero_section";
-  section.className = "relative overflow-hidden rounded-[2rem] border border-orange-100/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.95),rgba(255,247,237,0.88),rgba(240,253,250,0.76))] p-5 shadow-[0_24px_80px_rgba(15,23,42,0.10)] sm:p-6 lg:p-7";
+  section.className = "relative overflow-hidden rounded-[2rem] border border-[var(--pb-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.95),rgba(250,244,237,0.88),rgba(234,244,249,0.76))] p-5 shadow-[0_24px_80px_rgba(15,23,42,0.10)] sm:p-6 lg:p-7";
 
   const layout = document.createElement("section");
   layout.className = "grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end";
   const copy = document.createElement("section");
   copy.className = "grid min-w-0 gap-3";
   const icon = document.createElement("span");
-  icon.className = "grid h-12 w-12 place-items-center rounded-2xl bg-[linear-gradient(135deg,var(--pb-brand-secondary),var(--pb-brand-accent))] text-white shadow-[0_16px_40px_rgba(234,88,12,0.24)]";
+  icon.className = "grid h-12 w-12 place-items-center rounded-2xl bg-[linear-gradient(135deg,var(--pb-brand-secondary),var(--pb-brand-accent))] text-white shadow-[0_16px_40px_rgba(30,129,176,0.24)]";
   icon.append(createIcon("image", { className: "block h-5 w-5 leading-none" }));
   copy.append(
     icon,
-    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-orange-700", "Admin slider"),
+    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", "Admin slider"),
     textNode("h1", "text-3xl font-black leading-tight tracking-normal text-gray-950 sm:text-4xl", "Manajemen Slider"),
     textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", ""),
   );
@@ -289,7 +289,7 @@ function hero({ action, sliders }) {
 function filterBar({ query, sliders, onSubmit }) {
   const section = document.createElement("section");
   section.id = "adsl_filter_section";
-  section.className = "grid gap-4 rounded-[1.5rem] border border-white/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.94),rgba(239,246,255,0.72),rgba(255,247,237,0.72))] p-4 shadow-[var(--pb-shadow-card)]";
+  section.className = "grid gap-4 rounded-[1.5rem] border border-white/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.94),rgba(234,244,249,0.72),rgba(250,244,237,0.72))] p-4 shadow-[var(--pb-shadow-card)]";
   section.dataset.ds = "admin.sliders.filters";
   const form = document.createElement("form");
   form.id = "adsl_filter_form";
@@ -587,7 +587,7 @@ function sliderForm({ slider, draftOverride = null, mode, saving, onUploadImage,
   });
 
   const notice = document.createElement("section");
-  notice.className = "rounded-[1.25rem] border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold leading-6 text-amber-800";
+  notice.className = "rounded-[1.25rem] border border-[color-mix(in_srgb,var(--pb-warning)_26%,white)] bg-[color-mix(in_srgb,var(--pb-warning)_8%,white)] px-4 py-3 text-sm font-semibold leading-6 text-[color-mix(in_srgb,var(--pb-warning)_84%,black)]";
   notice.textContent = "HTML slider dibatasi ke template predefined. Tidak ada input HTML custom, script, onclick, iframe, atau javascript URL.";
 
   const actions = document.createElement("section");
@@ -599,12 +599,12 @@ function sliderForm({ slider, draftOverride = null, mode, saving, onUploadImage,
   submit.prepend(createIcon("circleCheck", { className: "block h-4 w-4 leading-none" }));
   actions.append(cancel, submit);
 
-  const validationPanel = textNode("p", "hidden rounded-[1rem] border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-semibold text-amber-800", "");
+  const validationPanel = textNode("p", "hidden rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-warning)_26%,white)] bg-[color-mix(in_srgb,var(--pb-warning)_8%,white)] px-3 py-2 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-warning)_84%,black)]", "");
   const syncFormValidity = () => {
     const message = validateSliderPayload(collectPayload());
     validationPanel.className = message
-      ? "rounded-[1rem] border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-semibold text-amber-800"
-      : "hidden rounded-[1rem] border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-semibold text-amber-800";
+      ? "rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-warning)_26%,white)] bg-[color-mix(in_srgb,var(--pb-warning)_8%,white)] px-3 py-2 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-warning)_84%,black)]"
+      : "hidden rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-warning)_26%,white)] bg-[color-mix(in_srgb,var(--pb-warning)_8%,white)] px-3 py-2 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-warning)_84%,black)]";
     validationPanel.textContent = message;
     submit.disabled = Boolean(saving || message);
   };
@@ -697,13 +697,13 @@ function syncTemplatePreviewCard(card, active) {
 
 function templatePreviewCardClassName(active) {
   return active
-    ? "grid min-w-0 gap-3 rounded-[1.25rem] border border-orange-300 bg-orange-50/86 p-3 text-left shadow-[0_14px_34px_rgba(249,115,22,0.16)] ring-2 ring-orange-200 transition"
-    : "grid min-w-0 gap-3 rounded-[1.25rem] border border-[var(--pb-border)] bg-white p-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-orange-200 hover:shadow-md";
+    ? "grid min-w-0 gap-3 rounded-[1.25rem] border border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] bg-[var(--pb-surface-muted)] p-3 text-left shadow-[0_14px_34px_rgba(30,129,176,0.16)] ring-2 ring-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)] transition"
+    : "grid min-w-0 gap-3 rounded-[1.25rem] border border-[var(--pb-border)] bg-white p-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] hover:shadow-md";
 }
 
 function templatePreviewVisualClass(templateKey) {
   if (templateKey === "glassmorphism") {
-    return "bg-[linear-gradient(135deg,#f8fafc,#ffedd5,#dbeafe)]";
+    return "bg-[linear-gradient(135deg,#f8fafc,#f5ece1,#e0eff7)]";
   }
   if (templateKey === "minimal_product") {
     return "bg-white";
@@ -711,7 +711,7 @@ function templatePreviewVisualClass(templateKey) {
   if (templateKey === "full_image") {
     return "bg-[linear-gradient(135deg,#111827,#334155)]";
   }
-  return "bg-[linear-gradient(135deg,#fb923c,#ef4444,#111827)]";
+  return "bg-[linear-gradient(135deg,#eab676,#c53030,#111827)]";
 }
 
 function templatePreviewMock(templateKey) {
@@ -725,7 +725,7 @@ function templatePreviewMock(templateKey) {
   const lines = document.createElement("section");
   lines.className = "relative z-10 grid max-w-[72%] gap-2";
   const pill = document.createElement("span");
-  pill.className = templateKey === "minimal_product" ? "h-4 w-20 rounded-full bg-orange-100" : "h-4 w-20 rounded-full bg-white/30";
+  pill.className = templateKey === "minimal_product" ? "h-4 w-20 rounded-full bg-[color-mix(in_srgb,var(--pb-brand-accent)_28%,white)]" : "h-4 w-20 rounded-full bg-white/30";
   const title = document.createElement("span");
   title.className = templateKey === "minimal_product" ? "h-5 w-28 rounded-full bg-gray-900" : "h-5 w-28 rounded-full bg-white/78";
   const body = document.createElement("span");
@@ -736,11 +736,11 @@ function templatePreviewMock(templateKey) {
     const glass = document.createElement("span");
     glass.className = "absolute inset-x-4 bottom-4 top-4 rounded-xl border border-white/70 bg-white/42 backdrop-blur";
     mock.append(glass);
-    image.className = "absolute bottom-5 right-5 grid h-12 w-16 place-items-center rounded-xl bg-white/72 text-orange-700 shadow-sm";
+    image.className = "absolute bottom-5 right-5 grid h-12 w-16 place-items-center rounded-xl bg-white/72 text-[var(--pb-brand-secondary)] shadow-sm";
   }
 
   if (templateKey === "minimal_product") {
-    image.className = "absolute inset-y-3 right-3 grid w-[42%] place-items-center rounded-xl bg-orange-50 text-orange-700 shadow-sm";
+    image.className = "absolute inset-y-3 right-3 grid w-[42%] place-items-center rounded-xl bg-[var(--pb-surface-muted)] text-[var(--pb-brand-secondary)] shadow-sm";
   }
 
   if (templateKey === "full_image") {
@@ -784,9 +784,9 @@ function renderTemplateLivePreview(host, slider) {
 function uploadSection({ initialUrl, onUploaded, onUploadImage }) {
   const section = document.createElement("section");
   section.id = "adsl_upload_section";
-  section.className = "grid gap-4 rounded-[1.5rem] border border-dashed border-orange-200 bg-orange-50/50 p-4 md:grid-cols-[160px_minmax(0,1fr)] md:items-center";
+  section.className = "grid gap-4 rounded-[1.5rem] border border-dashed border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] bg-[var(--pb-surface-muted)] p-4 md:grid-cols-[160px_minmax(0,1fr)] md:items-center";
   const preview = document.createElement("section");
-  preview.className = "grid aspect-[16/10] w-full place-items-center overflow-hidden rounded-[1.25rem] border border-white bg-white text-orange-700 shadow-sm";
+  preview.className = "grid aspect-[16/10] w-full place-items-center overflow-hidden rounded-[1.25rem] border border-white bg-white text-[var(--pb-brand-secondary)] shadow-sm";
   renderUploadPreview(preview, initialUrl);
   const copy = document.createElement("section");
   copy.className = "grid min-w-0 gap-3";
@@ -817,12 +817,12 @@ function uploadSection({ initialUrl, onUploaded, onUploadImage }) {
   input.addEventListener("change", () => uploadFile(input.files?.[0] ?? null));
   section.addEventListener("dragover", (event) => {
     event.preventDefault();
-    section.classList.add("bg-orange-100");
+    section.classList.add("bg-[color-mix(in_srgb,var(--pb-brand-accent)_28%,white)]");
   });
-  section.addEventListener("dragleave", () => section.classList.remove("bg-orange-100"));
+  section.addEventListener("dragleave", () => section.classList.remove("bg-[color-mix(in_srgb,var(--pb-brand-accent)_28%,white)]"));
   section.addEventListener("drop", (event) => {
     event.preventDefault();
-    section.classList.remove("bg-orange-100");
+    section.classList.remove("bg-[color-mix(in_srgb,var(--pb-brand-accent)_28%,white)]");
     uploadFile(event.dataTransfer?.files?.[0] ?? null);
   });
   copy.append(input, status);
@@ -1032,7 +1032,7 @@ function scheduleLabel(slider) {
 
 function errorPanel(message) {
   const section = document.createElement("section");
-  section.className = "rounded-[1.25rem] border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700";
+  section.className = "rounded-[1.25rem] border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
   section.textContent = message;
   return section;
 }

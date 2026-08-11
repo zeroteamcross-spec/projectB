@@ -5,17 +5,17 @@ import { createIcon } from "../../../theme/iconRegistry.js";
 export function AdminApprovalFilterBar({ filters = {}, counts = {}, onSubmit = null } = {}) {
   const form = document.createElement("form");
   form.id = "adpv_filter_section";
-  form.className = `grid gap-4 ${tw.section.toolbar} border-white/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.94),rgba(239,246,255,0.72),rgba(255,247,237,0.70))] lg:grid-cols-[minmax(0,1.2fr)_180px_220px_auto]`;
+  form.className = `grid gap-4 ${tw.section.toolbar} border-white/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.94),rgba(234,244,249,0.72),rgba(250,244,237,0.70))] lg:grid-cols-[minmax(0,1.2fr)_180px_220px_auto]`;
 
   const heading = document.createElement("div");
   heading.className = "flex min-w-0 items-start gap-3 lg:col-span-4";
   const icon = document.createElement("span");
-  icon.className = "grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#2563eb,#06b6d4)] text-white shadow-[0_14px_34px_rgba(37,99,235,0.20)]";
+  icon.className = "grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#1e81b0,#1e81b0)] text-white shadow-[0_14px_34px_rgba(30,129,176,0.20)]";
   icon.append(createIcon("filter", { className: "h-4 w-4" }));
   const copy = document.createElement("div");
   copy.className = "grid min-w-0 gap-1";
   copy.append(
-    textBlock("text-[11px] font-black uppercase tracking-[0.16em] text-blue-700", "Approval filter"),
+    textBlock("text-[11px] font-black uppercase tracking-[0.16em] text-[color-mix(in_srgb,var(--pb-brand-primary)_84%,black)]", "Approval filter"),
     textBlock("text-sm leading-6 text-gray-600", "Saring approval queue supaya review seller dan account state lebih cepat diputuskan."),
   );
   heading.append(

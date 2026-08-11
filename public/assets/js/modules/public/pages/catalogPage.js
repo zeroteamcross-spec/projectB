@@ -305,7 +305,7 @@ function heroSection(notFound) {
 
   const promo = document.createElement("div");
   promo.id = "byr_credit_promo_banner";
-  promo.className = "relative max-w-full overflow-hidden rounded-[28px] bg-gradient-to-br from-orange-500 via-red-500 to-red-700 p-4 text-white shadow-card sm:p-6 xl:p-7";
+  promo.className = "relative max-w-full overflow-hidden rounded-[28px] bg-gradient-to-br from-[var(--pb-brand-primary)] via-[var(--pb-danger)] to-[color-mix(in_srgb,var(--pb-danger)_84%,black)] p-4 text-white shadow-card sm:p-6 xl:p-7";
   applyDesignHook(promo, "catalog.hero.banner");
 
   const overlay = document.createElement("div");
@@ -318,7 +318,7 @@ function heroSection(notFound) {
   copy.className = "grid gap-3";
 
   const eyebrow = document.createElement("p");
-  eyebrow.className = "inline-flex w-fit max-w-full items-center gap-2 rounded-full bg-white/16 px-3 py-1 text-[11px] font-semibold uppercase tracking-normal text-orange-100";
+  eyebrow.className = "inline-flex w-fit max-w-full items-center gap-2 rounded-full bg-white/16 px-3 py-1 text-[11px] font-semibold uppercase tracking-normal text-[var(--pb-brand-accent)]";
   const eyebrowIcon = document.createElement("span");
   eyebrowIcon.className = "inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/15";
   eyebrowIcon.append(createIcon("bolt", { className: "block h-3 w-3 leading-none" }));
@@ -508,18 +508,20 @@ function catalogToolbar(count, meta, affiliate = null) {
   // copy.className = "grid min-w-0 gap-1";
 
   const title = document.createElement("h2");
-  title.className = "break-words text-sm font-bold tracking-normal text-white";
+  // Teks ini duduk langsung di atas kanvas halaman, bukan di atas kartu
+  // berwarna. Dulu putih karena latarnya video gelap; sekarang kanvasnya krem.
+  title.className = "break-words text-sm font-bold tracking-normal text-[var(--pb-text-strong)]";
   title.textContent = affiliate?.showroom?.name
     ? `Mobil Pilihan ${affiliate.showroom.name}`
     : "Mobil Pilihan Terbaik";
 
   const summary = document.createElement("p");
-  summary.className = "text-sm font-medium text-white/70";
+  summary.className = "text-sm font-medium text-[var(--pb-text-muted)]";
   // summary.textContent = `${count} tampil${meta?.total ? ` dari ${meta.total}` : ""}`;
 
   const action = document.createElement("a");
   action.href = publicContextService.catalogPath();
-  action.className = "hidden inline-flex w-fit items-center gap-1 text-sm font-semibold text-orange-200 no-underline";
+  action.className = "hidden inline-flex w-fit items-center gap-1 text-sm font-semibold text-[var(--pb-brand-accent)] no-underline";
   action.textContent = "Semua >";
 
   copy.append(title, summary);
@@ -664,7 +666,7 @@ function loadMoreSection({ canLoadMore, isLoadingMore, onLoadMore }) {
 
   if (!canLoadMore) {
     const end = document.createElement("p");
-    end.className = "text-sm text-white/70";
+    end.className = "text-sm text-[var(--pb-text-muted)]";
     end.textContent = "Semua mobil yang cocok sudah ditampilkan.";
     wrap.append(end, trustMarks());
     return wrap;
@@ -736,7 +738,7 @@ function metaCount(value) {
 
 function trustMarks() {
   const row = document.createElement("div");
-  row.className = "flex flex-wrap items-center justify-center gap-4 text-xs font-medium text-white/75";
+  row.className = "flex flex-wrap items-center justify-center gap-4 text-xs font-medium text-[var(--pb-text-muted)]";
 
   ["Inspeksi jelas", "Harga terarah", "Support cepat"].forEach((item) => {
     const pill = document.createElement("span");
@@ -951,10 +953,10 @@ function greetingBlock(user) {
   wrap.className = "grid min-w-0 gap-0.5";
 
   const greeting = document.createElement("h1");
-  greeting.className = "truncate text-xl font-black leading-tight tracking-normal text-white";
+  greeting.className = "truncate text-xl font-black leading-tight tracking-normal text-[var(--pb-text-strong)]";
   greeting.textContent = ` ${name}`;
 
-  wrap.append(greeting, textNode("p", "truncate text-[5] font-semibold text-white/75", "Selamat datang kembali!"));
+  wrap.append(greeting, textNode("p", "truncate text-[5] font-semibold text-[var(--pb-text-muted)]", "Selamat datang kembali!"));
   return wrap;
 }
 

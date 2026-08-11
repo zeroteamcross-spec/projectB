@@ -3,7 +3,7 @@ export function PublicSellerSummary({ car } = {}) {
   section.className = "hidden grid gap-4 rounded-[28px] border border-white/75 bg-white/95 p-5 shadow-card backdrop-blur";
 
   const eyebrow = document.createElement("span");
-  eyebrow.className = "text-[11px] font-semibold uppercase tracking-normal text-orange-600";
+  eyebrow.className = "text-[11px] font-semibold uppercase tracking-normal text-[var(--pb-brand-secondary)]";
   eyebrow.textContent = "Showroom";
 
   const title = document.createElement("h2");

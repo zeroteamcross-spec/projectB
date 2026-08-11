@@ -21,9 +21,9 @@ export function AdminMasterBankForm({
 
   const intro = document.createElement("section");
   intro.id = "admstbk_form_intro_section";
-  intro.className = "rounded-[1.5rem] border border-orange-100 bg-[linear-gradient(135deg,rgba(255,247,237,0.94),rgba(240,253,250,0.82))] p-4";
+  intro.className = "rounded-[1.5rem] border border-[var(--pb-border)] bg-[linear-gradient(135deg,rgba(250,244,237,0.94),rgba(234,244,249,0.82))] p-4";
   intro.append(
-    textNode("p", "text-xs font-black uppercase tracking-[0.16em] text-orange-700", mode === "edit" ? "Edit bank" : "Create bank"),
+    textNode("p", "text-xs font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", mode === "edit" ? "Edit bank" : "Create bank"),
     textNode("p", "mt-1 text-sm font-semibold leading-6 text-gray-600", "Icon raster diproses menjadi PNG 96x96 px. SVG disimpan sebagai SVG fixed 96x96 yang tervalidasi."),
   );
 
@@ -44,7 +44,7 @@ export function AdminMasterBankForm({
   iconSection.className = "grid gap-4 rounded-[1.5rem] border border-gray-100 bg-gray-50/80 p-4 md:grid-cols-[auto_minmax(0,1fr)] md:items-center";
   const preview = document.createElement("section");
   preview.id = "admstbk_icon_preview_section";
-  preview.className = "grid h-24 w-24 place-items-center overflow-hidden rounded-[1.5rem] border border-orange-100 bg-white text-orange-700 shadow-sm";
+  preview.className = "grid h-24 w-24 place-items-center overflow-hidden rounded-[1.5rem] border border-[var(--pb-border)] bg-white text-[var(--pb-brand-secondary)] shadow-sm";
   renderPreview(preview, draft);
   const uploadCopy = document.createElement("section");
   uploadCopy.id = "admstbk_icon_upload_copy_section";
@@ -73,10 +73,10 @@ export function AdminMasterBankForm({
     }
   });
   if (uploading) {
-    uploadCopy.append(textNode("p", "text-sm font-semibold text-orange-700", "Mengupload icon..."));
+    uploadCopy.append(textNode("p", "text-sm font-semibold text-[var(--pb-brand-secondary)]", "Mengupload icon..."));
   }
   if (uploadError) {
-    uploadCopy.append(textNode("p", "rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700", uploadError));
+    uploadCopy.append(textNode("p", "rounded-xl border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-3 py-2 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]", uploadError));
   }
   uploadCopy.append(fileInput);
   iconSection.append(preview, uploadCopy);

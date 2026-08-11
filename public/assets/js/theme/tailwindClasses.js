@@ -74,9 +74,21 @@ export const tw = {
   },
   button: {
     base: "inline-flex min-h-3 max-w-full items-center justify-center gap-2 break-words rounded-[var(--pb-radius-xl)] border px-4 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)] disabled:cursor-not-allowed disabled:opacity-55",
+    // Tiga peran tombol, dipakai seragam di seluruh aplikasi:
+    //   ya     - hijau, aksi yang memajukan sesuatu (simpan, daftar, masuk,
+    //            lanjut, approve, selesaikan, booking)
+    //   tidak  - merah, aksi yang membatalkan/menutup/menghapus (batal, tutup,
+    //            kembali, hapus, archive, retur, tolak, logout)
+    //   netral - biru primary, navigasi biasa yang bukan keduanya (detail,
+    //            foto, inspeksi, copy link, buka landing)
+    // `primary`/`secondary`/`danger` dipertahankan sebagai alias supaya ratusan
+    // pemanggil lama tidak perlu disunting satu per satu.
+    ya: "border-transparent bg-[linear-gradient(135deg,var(--pb-btn-primary-from),var(--pb-btn-primary-to))] text-white shadow-[var(--pb-shadow-card)] hover:brightness-95",
+    tidak: "border-transparent bg-[var(--pb-danger)] text-white shadow-[var(--pb-shadow-soft)] hover:brightness-95",
+    netral: "border-transparent bg-[var(--pb-brand-primary)] text-white shadow-[var(--pb-shadow-soft)] hover:brightness-95",
     primary: "border-transparent bg-[linear-gradient(135deg,var(--pb-btn-primary-from),var(--pb-btn-primary-to))] text-white shadow-[var(--pb-shadow-card)] hover:brightness-95",
-    secondary: "border-[var(--pb-border-strong)] bg-[var(--pb-btn-secondary-bg)] text-[var(--pb-btn-secondary-text)] hover:bg-[color-mix(in_srgb,var(--pb-btn-secondary-bg)_85%,black)]",
-    danger: "border-[var(--pb-danger)] bg-[var(--pb-danger)] text-white hover:brightness-95",
+    secondary: "border-transparent bg-[var(--pb-brand-primary)] text-white shadow-[var(--pb-shadow-soft)] hover:brightness-95",
+    danger: "border-transparent bg-[var(--pb-danger)] text-white shadow-[var(--pb-shadow-soft)] hover:brightness-95",
     ghost: "border-transparent bg-transparent text-[var(--pb-btn-ghost-text)] hover:bg-[color-mix(in_srgb,var(--pb-brand-primary)_10%,transparent)]",
   },
   badge: {
@@ -101,7 +113,7 @@ export const tw = {
   },
   modal: {
     root: "fixed inset-0 z-[80] grid place-items-center bg-[var(--pb-overlay)] p-3 backdrop-blur-sm sm:p-4",
-    panel: "flex max-h-[min(92vh,820px)] w-full max-w-lg min-w-0 flex-col overflow-hidden rounded-[1.75rem] border border-white/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(255,247,237,0.90),rgba(240,253,250,0.82))] shadow-[0_28px_90px_rgba(15,23,42,0.24)] backdrop-blur-xl animate-[pbModalIn_180ms_cubic-bezier(0.22,1,0.36,1)]",
+    panel: "flex max-h-[min(92vh,820px)] w-full max-w-lg min-w-0 flex-col overflow-hidden rounded-[1.75rem] border border-white/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(250,244,237,0.90),rgba(234,244,249,0.82))] shadow-[0_28px_90px_rgba(15,23,42,0.24)] backdrop-blur-xl animate-[pbModalIn_180ms_cubic-bezier(0.22,1,0.36,1)]",
   },
   toast: {
     base: "pointer-events-auto relative grid w-full min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-3 overflow-hidden rounded-[1.25rem] border px-4 py-4 text-left shadow-[0_22px_70px_rgba(15,23,42,0.16)] backdrop-blur-xl animate-[pbModalIn_180ms_cubic-bezier(0.22,1,0.36,1)]",

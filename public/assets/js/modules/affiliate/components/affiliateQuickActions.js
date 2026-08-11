@@ -71,7 +71,7 @@ export function AffiliateQuickActions({
     actionWrap.className = "mt-2 flex min-w-0 flex-wrap items-center justify-between gap-3 border-t border-white/60 pt-4";
     item.action.classList?.add?.("w-full", "sm:w-auto");
     actionWrap.append(
-      textBlock("text-[11px] font-semibold uppercase tracking-[0.16em] text-orange-700", "Action"),
+      textBlock("text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", "Action"),
       item.action,
     );
 

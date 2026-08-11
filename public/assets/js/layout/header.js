@@ -102,7 +102,7 @@ function renderBanner(host, state) {
   const actor = impersonation.actor ?? state.auth.actor ?? null;
   const target = impersonation.target ?? state.auth.user ?? null;
   const panel = document.createElement("div");
-  panel.className = "mt-3 flex min-w-0 flex-col gap-3 rounded-2xl border border-amber-300 bg-amber-50/95 px-4 py-3 text-sm text-amber-900 shadow-sm md:flex-row md:items-center md:justify-between";
+  panel.className = "mt-3 flex min-w-0 flex-col gap-3 rounded-2xl border border-[color-mix(in_srgb,var(--pb-warning)_42%,white)] bg-[color-mix(in_srgb,var(--pb-warning)_8%,white)] px-4 py-3 text-sm text-[color-mix(in_srgb,var(--pb-warning)_84%,black)] shadow-sm md:flex-row md:items-center md:justify-between";
 
   const copy = document.createElement("div");
   copy.className = "grid min-w-0 gap-1";
@@ -112,7 +112,7 @@ function renderBanner(host, state) {
   title.textContent = `Sedang act-as ${target?.name ?? target?.email ?? "user target"}`;
 
   const text = document.createElement("span");
-  text.className = "break-words text-amber-800";
+  text.className = "break-words text-[color-mix(in_srgb,var(--pb-warning)_84%,black)]";
   text.textContent = `Admin asli: ${actor?.name ?? actor?.email ?? "admin"}${impersonation.expires_at ? ` | berakhir ${impersonation.expires_at}` : ""}`;
 
   const button = document.createElement("button");

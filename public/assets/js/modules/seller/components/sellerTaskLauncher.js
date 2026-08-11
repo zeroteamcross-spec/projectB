@@ -8,8 +8,9 @@ const TASKS = [
     description: "Nama, kontak, alamat, dan rekening seller siap dipakai.",
     route: "/seller/showroom",
     icon: "showroom",
-    accent: "from-orange-500 to-amber-500",
-    buttonClass: "border-transparent bg-[linear-gradient(135deg,#f97316,#f59e0b)] text-white shadow-[0_14px_34px_rgba(249,115,22,0.20)] hover:brightness-95",
+    accent: "from-[var(--pb-brand-primary)] to-[var(--pb-warning)]",
+    // Semua tombol di sini cuma pindah halaman, jadi seragam biru netral.
+    buttonClass: "border-transparent bg-[var(--pb-brand-primary)] text-white shadow-[0_14px_34px_rgba(30,129,176,0.20)] hover:brightness-95",
   },
   {
     key: "cars",
@@ -17,8 +18,9 @@ const TASKS = [
     description: "Listing, harga, status publikasi, foto, dan inspeksi.",
     route: "/seller/cars",
     icon: "car",
-    accent: "from-teal-500 to-cyan-500",
-    buttonClass: "border-transparent bg-[linear-gradient(135deg,#14b8a6,#06b6d4)] text-white shadow-[0_14px_34px_rgba(20,184,166,0.20)] hover:brightness-95",
+    accent: "from-[var(--pb-brand-primary)] to-[var(--pb-brand-primary)]",
+    // Semua tombol di sini cuma pindah halaman, jadi seragam biru netral.
+    buttonClass: "border-transparent bg-[var(--pb-brand-primary)] text-white shadow-[0_14px_34px_rgba(30,129,176,0.20)] hover:brightness-95",
   },
   {
     key: "transactions",
@@ -26,8 +28,9 @@ const TASKS = [
     description: "Buyer yang perlu follow up dari showroom.",
     route: "/seller/transactions",
     icon: "transaction",
-    accent: "from-rose-500 to-orange-500",
-    buttonClass: "border-transparent bg-[linear-gradient(135deg,#f43f5e,#f97316)] text-white shadow-[0_14px_34px_rgba(244,63,94,0.18)] hover:brightness-95",
+    accent: "from-[var(--pb-danger)] to-[var(--pb-brand-secondary)]",
+    // Semua tombol di sini cuma pindah halaman, jadi seragam biru netral.
+    buttonClass: "border-transparent bg-[var(--pb-brand-primary)] text-white shadow-[0_14px_34px_rgba(30,129,176,0.20)] hover:brightness-95",
   },
   {
     key: "affiliates",
@@ -35,8 +38,9 @@ const TASKS = [
     description: "Slug marketing, nomor WhatsApp, dan landing seller.",
     route: "/seller/affiliates",
     icon: "affiliate",
-    accent: "from-blue-500 to-cyan-500",
-    buttonClass: "border-transparent bg-[linear-gradient(135deg,#2563eb,#06b6d4)] text-white shadow-[0_14px_34px_rgba(37,99,235,0.18)] hover:brightness-95",
+    accent: "from-[var(--pb-brand-primary)] to-[var(--pb-brand-primary)]",
+    // Semua tombol di sini cuma pindah halaman, jadi seragam biru netral.
+    buttonClass: "border-transparent bg-[var(--pb-brand-primary)] text-white shadow-[0_14px_34px_rgba(30,129,176,0.20)] hover:brightness-95",
   },
   {
     key: "commissions",
@@ -44,8 +48,9 @@ const TASKS = [
     description: "Rule global dan override per mobil untuk affiliate.",
     route: "/seller/affiliate-commissions",
     icon: "commission",
-    accent: "from-emerald-500 to-teal-500",
-    buttonClass: "border-transparent bg-[linear-gradient(135deg,#10b981,#14b8a6)] text-white shadow-[0_14px_34px_rgba(16,185,129,0.18)] hover:brightness-95",
+    accent: "from-[var(--pb-success)] to-[var(--pb-brand-primary)]",
+    // Semua tombol di sini cuma pindah halaman, jadi seragam biru netral.
+    buttonClass: "border-transparent bg-[var(--pb-brand-primary)] text-white shadow-[0_14px_34px_rgba(30,129,176,0.20)] hover:brightness-95",
   },
 ];
 
@@ -60,7 +65,7 @@ export function SellerTaskLauncher({ router = null } = {}) {
   const copy = document.createElement("div");
   copy.className = "grid min-w-0 gap-1";
   copy.append(
-    textNode("p", "text-[11px] font-black uppercase tracking-[0.16em] text-orange-700", "Quick actions"),
+    textNode("p", "text-[11px] font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", "Quick actions"),
     textNode("h2", "text-xl font-black tracking-normal text-gray-950", "Task launcher"),
   );
   const hint = textNode("p", "text-sm leading-6 text-gray-500", "Aksi utama seller, dibuat mudah ditekan di desktop dan mobile.");

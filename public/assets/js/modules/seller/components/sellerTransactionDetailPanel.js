@@ -99,7 +99,7 @@ function fulfillmentChecklistCard({
   copy.append(title, body);
 
   const progress = document.createElement("span");
-  progress.className = "inline-flex w-fit items-center rounded-full border border-orange-100 bg-orange-50 px-3 py-1 text-xs font-black text-orange-700";
+  progress.className = "inline-flex w-fit items-center rounded-full border border-[var(--pb-border)] bg-[var(--pb-surface-muted)] px-3 py-1 text-xs font-black text-[var(--pb-brand-secondary)]";
   progress.textContent = `${doneCount}/${checklist.length} selesai`;
   header.append(copy, progress);
   card.append(header);
@@ -126,7 +126,7 @@ function fulfillmentChecklistCard({
     designHook: "shared.button.primary",
   });
   action.id = "slrtx_save_checklist_button";
-  action.classList.add("sticky", "bottom-3", "z-10", "w-full", "shadow-[0_16px_42px_rgba(249,115,22,0.28)]", "sm:w-fit", "sm:justify-self-end");
+  action.classList.add("sticky", "bottom-3", "z-10", "w-full", "shadow-[0_16px_42px_rgba(30,129,176,0.28)]", "sm:w-fit", "sm:justify-self-end");
   card.append(action);
 
   return card;
@@ -141,7 +141,7 @@ function checklistItem({ item, draft, disabled, onToggle, onNote, onDate }) {
   checkbox.id = `slrtx_checklist_${item.key}`;
   checkbox.checked = Boolean(draft?.is_completed);
   checkbox.disabled = disabled;
-  checkbox.className = "mt-1 h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500";
+  checkbox.className = "mt-1 h-4 w-4 rounded border-gray-300 text-[var(--pb-brand-secondary)] focus:ring-[color-mix(in_srgb,var(--pb-brand-primary)_45%,white)]";
   checkbox.addEventListener("change", () => onToggle?.(item.key, checkbox.checked));
 
   const content = document.createElement("div");
@@ -161,7 +161,7 @@ function checklistItem({ item, draft, disabled, onToggle, onNote, onDate }) {
     dateInput.id = `slrtx_checklist_${item.key}_handover_date_input`;
     dateInput.value = draft?.handover_date ?? extractHandoverDate(draft?.notes ?? item.notes ?? "");
     dateInput.disabled = disabled;
-    dateInput.className = "min-h-11 min-w-0 rounded-[0.9rem] border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-800 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100 disabled:bg-gray-100 disabled:text-gray-500";
+    dateInput.className = "min-h-11 min-w-0 rounded-[0.9rem] border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-800 outline-none transition focus:border-[color-mix(in_srgb,var(--pb-brand-primary)_45%,white)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)] disabled:bg-gray-100 disabled:text-gray-500";
     dateInput.addEventListener("change", () => onDate?.(item.key, dateInput.value));
     dateWrap.append(dateInput);
     content.append(title, dateWrap);
@@ -175,7 +175,7 @@ function checklistItem({ item, draft, disabled, onToggle, onNote, onDate }) {
   note.placeholder = "Catatan seller";
   note.disabled = disabled;
   note.rows = 2;
-  note.className = "min-w-0 resize-y rounded-[0.9rem] border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-800 outline-none transition placeholder:text-gray-400 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 disabled:bg-gray-100 disabled:text-gray-500";
+  note.className = "min-w-0 resize-y rounded-[0.9rem] border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-800 outline-none transition placeholder:text-gray-400 focus:border-[color-mix(in_srgb,var(--pb-brand-primary)_45%,white)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)] disabled:bg-gray-100 disabled:text-gray-500";
   note.addEventListener("input", () => onNote?.(item.key, note.value));
 
   content.append(note);

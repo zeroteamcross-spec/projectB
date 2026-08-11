@@ -3,11 +3,13 @@ export function PublicSpecSummary({ car } = {}) {
   section.className = "grid gap-4";
 
   const eyebrow = document.createElement("span");
-  eyebrow.className = "text-[11px] font-semibold uppercase tracking-normal text-white";
+  // Bagian ini berdiri di kanvas halaman, bukan di kartu berwarna, jadi teksnya
+  // ikut warna teks tema -- dulu putih karena latarnya video gelap.
+  eyebrow.className = "text-[11px] font-semibold uppercase tracking-normal text-[var(--pb-text-muted)]";
   eyebrow.textContent = "Ringkasan mobil";
 
   const title = document.createElement("h2");
-  title.className = "text-lg font-bold tracking-normal text-white";
+  title.className = "text-lg font-bold tracking-normal text-[var(--pb-text-strong)]";
   title.textContent = "Ringkasan spesifikasi";
 
   const grid = document.createElement("div");

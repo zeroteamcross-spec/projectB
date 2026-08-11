@@ -16,7 +16,7 @@ export function AdminAffiliateLedgerList({
   onPerPageChange = null,
 } = {}) {
   const icon = document.createElement("span");
-  icon.className = "grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#0f766e,#f97316)] text-white";
+  icon.className = "grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#17698f,#1e81b0)] text-white";
   icon.append(createIcon("commission", { className: "h-4 w-4" }));
 
   const pagination = DataTablePagination({

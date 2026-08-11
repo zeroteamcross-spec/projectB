@@ -34,7 +34,7 @@ const ROLE_OPTIONS = [
 ];
 
 const SHOW_AUTH_DEBUG_SECTIONS = false;
-const AUTH_FALLBACK = "bg-[radial-gradient(circle_at_12%_10%,color-mix(in_srgb,var(--pb-brand-primary)_18%,transparent),transparent_32%),radial-gradient(circle_at_88%_18%,color-mix(in_srgb,var(--pb-brand-accent)_16%,transparent),transparent_30%),linear-gradient(135deg,#fffaf4,#f8fafc_44%,#eef7f3)]";
+const AUTH_FALLBACK = "bg-[radial-gradient(circle_at_12%_10%,color-mix(in_srgb,var(--pb-brand-primary)_18%,transparent),transparent_32%),radial-gradient(circle_at_88%_18%,color-mix(in_srgb,var(--pb-brand-accent)_16%,transparent),transparent_30%),linear-gradient(135deg,#faf4ed,#f8fafc_44%,#eaf4f9)]";
 
 export function AuthLandingPage() {
   let root = null;
@@ -184,7 +184,7 @@ function backToLandingButton(router) {
     onClick: () => router.navigate("/"),
   });
   button.id = "hr_auth_back_landing_button";
-  button.classList.add("justify-self-start", "rounded-full", "bg-green/75", "px-4", "shadow-sm", "backdrop-blur", "transition", "duration-200", "hover:-translate-y-0.5");
+  button.classList.add("justify-self-start", "rounded-full", "px-4", "shadow-sm", "backdrop-blur", "transition", "duration-200", "hover:-translate-y-0.5");
   return button;
 }
 
@@ -204,7 +204,7 @@ function brandAnchor({ requestedPath }) {
   content.className = "relative grid max-w-xl gap-5";
 
   const mark = document.createElement("div");
-  mark.className = "grid h-14 w-14 place-items-center rounded-2xl bg-[linear-gradient(135deg,var(--pb-brand-primary),var(--pb-brand-accent))] text-lg font-black text-white shadow-[0_16px_40px_rgba(234,88,12,0.28)] transition duration-200 hover:scale-[1.02]";
+  mark.className = "grid h-14 w-14 place-items-center rounded-2xl bg-[linear-gradient(135deg,var(--pb-brand-primary),var(--pb-brand-accent))] text-lg font-black text-white shadow-[0_16px_40px_rgba(30,129,176,0.28)] transition duration-200 hover:scale-[1.02]";
   mark.textContent = "BM";
 
   const title = document.createElement("h1");
@@ -244,7 +244,7 @@ function roleChooser({ selectedRole, onChange }) {
     button.id = `hr_auth_role_${option.role}_button`;
     button.type = "button";
     button.className = option.role === selectedRole
-      ? "group grid gap-3 rounded-[1.35rem] border border-orange-200 bg-white/90 p-4 text-left shadow-[0_18px_45px_rgba(234,88,12,0.16)] ring-2 ring-orange-100 transition duration-200 hover:-translate-y-0.5"
+      ? "group grid gap-3 rounded-[1.35rem] border border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] bg-white/90 p-4 text-left shadow-[0_18px_45px_rgba(30,129,176,0.16)] ring-2 ring-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)] transition duration-200 hover:-translate-y-0.5"
       : "group grid gap-3 rounded-[1.35rem] border border-white/70 bg-white/65 p-4 text-left shadow-sm backdrop-blur transition duration-200 hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-[0_18px_45px_rgba(15,23,42,0.08)]";
     button.addEventListener("click", () => onChange(option.role));
 
@@ -271,7 +271,7 @@ function roleChooser({ selectedRole, onChange }) {
 
     const status = document.createElement("span");
     status.className = option.role === selectedRole
-      ? "w-fit rounded-full bg-orange-100 px-2.5 py-1 text-[11px] font-bold text-orange-700"
+      ? "w-fit rounded-full bg-[color-mix(in_srgb,var(--pb-brand-accent)_28%,white)] px-2.5 py-1 text-[11px] font-bold text-[var(--pb-brand-secondary)]"
       : "w-fit rounded-full bg-white/70 px-2.5 py-1 text-[11px] font-semibold text-gray-500";
     status.textContent = option.role === selectedRole ? "Aktif" : "Pilih";
 
@@ -327,7 +327,7 @@ function authPanel({
     const registerPath = publicAuthLandingService.registerPathForRole(selectedRole);
     const note = document.createElement("p");
     note.id = `hr_auth_${selectedRole}_no_register_note`;
-    note.className = "rounded-2xl bg-orange-50/80 px-3 py-2 text-sm leading-6 text-gray-600";
+    note.className = "rounded-2xl bg-[var(--pb-surface-muted)] px-3 py-2 text-sm leading-6 text-gray-600";
 
     if (registerPath) {
       note.append(document.createTextNode("Belum punya showroom? Pendaftaran ada di halaman terpisah."));
@@ -385,7 +385,7 @@ function loginForm({ selectedRole, isSubmitting, error, onSubmit }) {
 
   if (error) {
     const message = document.createElement("p");
-    message.className = "rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700";
+    message.className = "rounded-lg border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-3 py-2 text-sm font-medium text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
     message.textContent = error;
     form.append(message);
   }
@@ -397,7 +397,7 @@ function loginForm({ selectedRole, isSubmitting, error, onSubmit }) {
   });
   submit.id = `hr_auth_login_${selectedRole}_submit_button`;
   submit.type = "submit";
-  submit.classList.add("w-full", "shadow-[0_16px_34px_rgba(234,88,12,0.24)]", "transition", "duration-200", "hover:-translate-y-0.5", "active:translate-y-0");
+  submit.classList.add("w-full", "shadow-[0_16px_34px_rgba(30,129,176,0.24)]", "transition", "duration-200", "hover:-translate-y-0.5", "active:translate-y-0");
   form.append(submit);
 
   form.addEventListener("submit", (event) => {
@@ -432,7 +432,7 @@ function registerForm({ selectedRole, isSubmitting, error, onSubmit }) {
 
   if (error) {
     const message = document.createElement("p");
-    message.className = "rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700";
+    message.className = "rounded-lg border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-3 py-2 text-sm font-medium text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
     message.textContent = error;
     form.append(message);
   }
@@ -444,7 +444,7 @@ function registerForm({ selectedRole, isSubmitting, error, onSubmit }) {
   });
   submit.id = `hr_auth_register_${selectedRole}_submit_button`;
   submit.type = "submit";
-  submit.classList.add("w-full", "shadow-[0_16px_34px_rgba(234,88,12,0.24)]", "transition", "duration-200", "hover:-translate-y-0.5", "active:translate-y-0");
+  submit.classList.add("w-full", "shadow-[0_16px_34px_rgba(30,129,176,0.24)]", "transition", "duration-200", "hover:-translate-y-0.5", "active:translate-y-0");
   form.append(submit);
 
   const helper = document.createElement("p");
@@ -490,7 +490,7 @@ function field({ id, name, label, type = "text", placeholder = "", required = tr
   input.type = type;
   input.required = required;
   input.placeholder = placeholder;
-  input.className = "min-h-11 min-w-0 w-full rounded-2xl border border-gray-200 bg-white/90 px-4 py-2.5 text-sm text-gray-950 outline-none transition duration-200 placeholder:text-gray-400 focus:border-orange-300 focus:bg-white focus:ring-4 focus:ring-orange-100";
+  input.className = "min-h-11 min-w-0 w-full rounded-2xl border border-gray-200 bg-white/90 px-4 py-2.5 text-sm text-gray-950 outline-none transition duration-200 placeholder:text-gray-400 focus:border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] focus:bg-white focus:ring-4 focus:ring-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)]";
 
   wrap.append(input);
   return wrap;
@@ -507,7 +507,7 @@ function textareaField({ id, name, label, placeholder = "", required = true }) {
   input.required = required;
   input.placeholder = placeholder;
   input.rows = 3;
-  input.className = "min-h-24 min-w-0 w-full resize-y rounded-2xl border border-gray-200 bg-white/90 px-4 py-2.5 text-sm text-gray-950 outline-none transition duration-200 placeholder:text-gray-400 focus:border-orange-300 focus:bg-white focus:ring-4 focus:ring-orange-100";
+  input.className = "min-h-24 min-w-0 w-full resize-y rounded-2xl border border-gray-200 bg-white/90 px-4 py-2.5 text-sm text-gray-950 outline-none transition duration-200 placeholder:text-gray-400 focus:border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] focus:bg-white focus:ring-4 focus:ring-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)]";
 
   wrap.append(input);
   return wrap;

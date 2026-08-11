@@ -153,7 +153,7 @@ export function SellerAffiliateForm({
   form.append(statusField);
 
   const slugHint = document.createElement("div");
-  slugHint.className = `grid gap-1 rounded-lg px-3 py-3 text-sm ${slugState?.is_available ? "border border-emerald-200 bg-emerald-50 text-emerald-700" : "border border-gray-200 bg-gray-50 text-gray-600"}`;
+  slugHint.className = `grid gap-1 rounded-lg px-3 py-3 text-sm ${slugState?.is_available ? "border border-[color-mix(in_srgb,var(--pb-success)_26%,white)] bg-[color-mix(in_srgb,var(--pb-success)_8%,white)] text-[color-mix(in_srgb,var(--pb-success)_84%,black)]" : "border border-gray-200 bg-gray-50 text-gray-600"}`;
   slugHint.append(
     textBlock("font-semibold", checkingSlug ? "Memeriksa slug..." : "Validasi slug"),
     textBlock("", slugState?.message || sellerAffiliateService.slugHelper(draft.referral_code)),

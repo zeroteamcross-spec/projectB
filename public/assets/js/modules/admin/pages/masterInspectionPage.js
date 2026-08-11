@@ -147,7 +147,7 @@ function render(root, context, state, actions) {
   if (state.error) {
     const error = document.createElement("section");
     error.id = "admstinsp_error_section";
-    error.className = "rounded-[1.25rem] border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700";
+    error.className = "rounded-[1.25rem] border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
     error.textContent = state.error;
     layout.append(error);
   }
@@ -172,17 +172,17 @@ function heroSection(templates, { onCreate } = {}) {
   const sections = new Set(templates.map((template) => template.category_name));
   const section = document.createElement("section");
   section.id = "admstinsp_hero_section";
-  section.className = "grid gap-4 rounded-[1.5rem] border border-orange-100/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(255,247,237,0.88),rgba(240,253,250,0.72))] p-5 shadow-[var(--pb-shadow-card)] sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end";
+  section.className = "grid gap-4 rounded-[1.5rem] border border-[var(--pb-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(250,244,237,0.88),rgba(234,244,249,0.72))] p-5 shadow-[var(--pb-shadow-card)] sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end";
 
   const copy = document.createElement("section");
   copy.id = "admstinsp_hero_copy_section";
   copy.className = "grid min-w-0 gap-2";
   const icon = document.createElement("div");
-  icon.className = "grid h-11 w-11 place-items-center rounded-2xl bg-[linear-gradient(135deg,#f97316,#0f766e)] text-white shadow-sm";
+  icon.className = "grid h-11 w-11 place-items-center rounded-2xl bg-[linear-gradient(135deg,#1e81b0,#17698f)] text-white shadow-sm";
   icon.append(createIcon("clipboard", { className: "h-5 w-5" }));
   copy.append(
     icon,
-    textNode("p", "text-xs font-black uppercase tracking-[0.16em] text-orange-700", "Admin Master"),
+    textNode("p", "text-xs font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", "Admin Master"),
     textNode("h1", "text-2xl font-black leading-tight tracking-normal text-gray-950 sm:text-3xl", "Master Inspection"),
     textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", "Kelola definisi section dan item inspection canon. Seller tetap hanya memilih kondisi dan menambah catatan dari master ini."),
   );
@@ -214,7 +214,7 @@ function heroSection(templates, { onCreate } = {}) {
     onClick: onCreate,
   });
   createButton.id = "admstinsp_create_button";
-  createButton.className = "inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-amber-300 bg-[linear-gradient(135deg,#facc15,#fb923c,#14b8a6)] px-5 text-sm font-black text-white shadow-[0_18px_45px_rgba(249,115,22,0.26)] transition hover:-translate-y-0.5 hover:shadow-[0_22px_52px_rgba(249,115,22,0.32)] focus:outline-none focus:ring-2 focus:ring-orange-300";
+  createButton.className = "inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-[color-mix(in_srgb,var(--pb-warning)_42%,white)] bg-[linear-gradient(135deg,#eab676,#eab676,#1e81b0)] px-5 text-sm font-black text-white shadow-[0_18px_45px_rgba(30,129,176,0.26)] transition hover:-translate-y-0.5 hover:shadow-[0_22px_52px_rgba(30,129,176,0.32)] focus:outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)]";
   createButton.prepend(createIcon("plus", { className: "h-4 w-4" }));
   side.append(stats, createButton);
 
@@ -356,7 +356,7 @@ function editorSection({ template, saving, onSave }) {
   active.id = "admstinsp_editor_active_input";
   active.type = "checkbox";
   active.checked = template?.is_active !== false;
-  active.className = "h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500";
+  active.className = "h-4 w-4 rounded border-gray-300 text-[var(--pb-brand-secondary)] focus:ring-[color-mix(in_srgb,var(--pb-brand-primary)_45%,white)]";
   const activeWrap = document.createElement("label");
   activeWrap.className = "flex items-center gap-2 rounded-xl border border-gray-100 bg-gray-50 px-3 py-3 text-sm font-bold text-gray-700";
   activeWrap.append(active, document.createTextNode("Item aktif untuk flow seller"));
@@ -657,7 +657,7 @@ function detailGrid(items = []) {
 function statusBadge(isActive) {
   const badge = document.createElement("span");
   badge.className = isActive
-    ? "inline-flex w-fit rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-700"
+    ? "inline-flex w-fit rounded-full border border-[color-mix(in_srgb,var(--pb-success)_26%,white)] bg-[color-mix(in_srgb,var(--pb-success)_8%,white)] px-3 py-1 text-xs font-black text-[color-mix(in_srgb,var(--pb-success)_84%,black)]"
     : "inline-flex w-fit rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-xs font-black text-gray-500";
   badge.textContent = isActive ? "Aktif" : "Nonaktif";
   return badge;
@@ -665,7 +665,7 @@ function statusBadge(isActive) {
 
 function tableIcon() {
   const icon = document.createElement("span");
-  icon.className = "grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-orange-100 text-orange-700";
+  icon.className = "grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[color-mix(in_srgb,var(--pb-brand-accent)_28%,white)] text-[var(--pb-brand-secondary)]";
   icon.append(createIcon("table", { className: "h-4 w-4" }));
   return icon;
 }

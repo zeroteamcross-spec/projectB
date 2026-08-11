@@ -76,7 +76,7 @@ export function confirmDialog({
     confirm.className = [
       confirm.className,
       "min-h-11 rounded-full px-5",
-      tone === "danger" ? "shadow-[0_16px_40px_rgba(220,38,38,0.20)]" : "",
+      tone === "danger" ? "shadow-[0_16px_40px_rgba(185,28,28,0.20)]" : "",
     ].filter(Boolean).join(" ");
     confirm.prepend(createIcon(tone === "danger" ? "trash" : "circleCheck", { className: "h-4 w-4" }));
     actions.append(cancel, confirm);
@@ -92,7 +92,7 @@ export function confirmDialog({
       panelId: "pb_confirm_dialog_panel_section",
       bodyId: "pb_confirm_dialog_modal_body_section",
       closeButtonId: "pb_confirm_dialog_close_button",
-      panelClassName: "max-w-md border-white/90 bg-[linear-gradient(135deg,rgba(255,255,255,0.98),rgba(255,247,237,0.92),rgba(239,246,255,0.86))]",
+      panelClassName: "max-w-md border-white/90 bg-[linear-gradient(135deg,rgba(255,255,255,0.98),rgba(250,244,237,0.92),rgba(234,244,249,0.86))]",
       onClose: () => settle(false),
     });
   });
@@ -101,16 +101,16 @@ export function confirmDialog({
 function toneClass(tone) {
   if (tone === "danger") {
     return {
-      shell: "border-red-100/90 bg-[linear-gradient(135deg,rgba(255,255,255,0.98),rgba(254,242,242,0.96),rgba(255,247,237,0.88))]",
-      accent: "bg-red-500",
-      icon: "border-red-100 text-red-600",
+      shell: "border-[color-mix(in_srgb,var(--pb-danger)_14%,white)] bg-[linear-gradient(135deg,rgba(255,255,255,0.98),rgba(251,238,238,0.96),rgba(250,244,237,0.88))]",
+      accent: "bg-[var(--pb-danger)]",
+      icon: "border-[color-mix(in_srgb,var(--pb-danger)_14%,white)] text-[var(--pb-danger)]",
     };
   }
 
   return {
-    shell: "border-sky-100/90 bg-[linear-gradient(135deg,rgba(255,255,255,0.98),rgba(239,246,255,0.96),rgba(240,253,250,0.84))]",
-    accent: "bg-sky-500",
-    icon: "border-sky-100 text-sky-600",
+    shell: "border-[color-mix(in_srgb,var(--pb-brand-primary)_14%,white)] bg-[linear-gradient(135deg,rgba(255,255,255,0.98),rgba(234,244,249,0.96),rgba(234,244,249,0.84))]",
+    accent: "bg-[var(--pb-brand-primary)]",
+    icon: "border-[color-mix(in_srgb,var(--pb-brand-primary)_14%,white)] text-[var(--pb-brand-primary)]",
   };
 }
 

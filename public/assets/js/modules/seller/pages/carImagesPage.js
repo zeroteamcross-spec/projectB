@@ -175,7 +175,7 @@ function render(root, router, params, queueApi) {
     : "Gambar Mobil";
 
   const notice = document.createElement("p");
-  notice.className = "mb-4 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm font-medium text-green-700";
+  notice.className = "mb-4 rounded-lg border border-[color-mix(in_srgb,var(--pb-success)_26%,white)] bg-[color-mix(in_srgb,var(--pb-success)_8%,white)] px-3 py-2 text-sm font-medium text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
   notice.textContent = runtime.notice;
   notice.hidden = !runtime.notice;
 

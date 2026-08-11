@@ -411,8 +411,8 @@ function patchSellerCarCollections(carId, status) {
 function message(color, text) {
   const node = document.createElement("p");
   const palette = color === "green"
-    ? "border-green-200 bg-green-50 text-green-700"
-    : "border-red-200 bg-red-50 text-red-700";
+    ? "border-[color-mix(in_srgb,var(--pb-success)_26%,white)] bg-[color-mix(in_srgb,var(--pb-success)_8%,white)] text-[color-mix(in_srgb,var(--pb-success)_84%,black)]"
+    : "border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
   node.className = `mb-4 rounded-lg border px-3 py-2 text-sm font-medium ${palette}`;
   node.textContent = text;
   node.hidden = !text;

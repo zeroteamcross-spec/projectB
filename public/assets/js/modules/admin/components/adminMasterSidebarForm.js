@@ -188,7 +188,7 @@ function checkboxField({ id, label, checked = false }) {
   input.id = id;
   input.type = "checkbox";
   input.checked = Boolean(checked);
-  input.className = "h-4 w-4 rounded border-[var(--pb-border)] text-orange-600 focus:ring-orange-500";
+  input.className = "h-4 w-4 rounded border-[var(--pb-border)] text-[var(--pb-brand-secondary)] focus:ring-[color-mix(in_srgb,var(--pb-brand-primary)_45%,white)]";
   const text = document.createElement("span");
   text.textContent = label;
   wrap.append(input, text);
@@ -211,7 +211,7 @@ function iconSelectorField({ id, label, value = "" }) {
   const selected = document.createElement("div");
   selected.className = "flex min-w-0 items-center gap-3";
   const selectedIcon = document.createElement("span");
-  selectedIcon.className = "grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-orange-50 text-orange-700 ring-1 ring-orange-100";
+  selectedIcon.className = "grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-[var(--pb-surface-muted)] text-[var(--pb-brand-secondary)] ring-1 ring-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)]";
   selectedIcon.append(createIcon(selectedValue, { className: "h-5 w-5" }));
   const selectedText = textNode("span", "truncate text-sm font-black text-gray-800", selectedValue);
   selected.append(selectedIcon, selectedText);
@@ -255,7 +255,7 @@ function iconPickerModal({ currentValue, onSelect }) {
 
   const head = document.createElement("section");
   head.id = "admst_sidebar_icon_picker_header_section";
-  head.className = "flex items-center justify-between gap-3 border-b border-[var(--pb-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(255,247,237,0.90))] px-4 py-3";
+  head.className = "flex items-center justify-between gap-3 border-b border-[var(--pb-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(250,244,237,0.90))] px-4 py-3";
   const copy = document.createElement("div");
   copy.className = "grid min-w-0 gap-0.5";
   copy.append(
@@ -308,7 +308,7 @@ function iconOptionClass(active) {
   return [
     "grid min-h-20 min-w-0 place-items-center gap-1 rounded-[1rem] border px-2 py-2 text-center transition",
     active
-      ? "border-orange-300 bg-orange-50 text-orange-800 shadow-sm"
+      ? "border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] bg-[var(--pb-surface-muted)] text-[var(--pb-brand-secondary)] shadow-sm"
       : "border-[var(--pb-border)] bg-white/82 text-gray-600 hover:-translate-y-0.5 hover:bg-white",
   ].join(" ");
 }

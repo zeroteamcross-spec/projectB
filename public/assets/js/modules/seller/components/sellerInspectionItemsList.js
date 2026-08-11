@@ -4,9 +4,9 @@ import { tw } from "../../../ui/theme/tailwindClasses.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 
 const STATUS_OPTIONS = [
-  { value: "good", label: "Baik", icon: "circleCheck", active: "border-emerald-300 bg-emerald-50 text-emerald-700 shadow-sm" },
-  { value: "fair", label: "Kurang baik", icon: "triangleWarning", active: "border-amber-300 bg-amber-50 text-amber-700 shadow-sm" },
-  { value: "bad", label: "Tidak baik", icon: "circleXmark", active: "border-red-300 bg-red-50 text-red-700 shadow-sm" },
+  { value: "good", label: "Baik", icon: "circleCheck", active: "border-[color-mix(in_srgb,var(--pb-success)_42%,white)] bg-[color-mix(in_srgb,var(--pb-success)_8%,white)] text-[color-mix(in_srgb,var(--pb-success)_84%,black)] shadow-sm" },
+  { value: "fair", label: "Kurang baik", icon: "triangleWarning", active: "border-[color-mix(in_srgb,var(--pb-warning)_42%,white)] bg-[color-mix(in_srgb,var(--pb-warning)_8%,white)] text-[color-mix(in_srgb,var(--pb-warning)_84%,black)] shadow-sm" },
+  { value: "bad", label: "Tidak baik", icon: "circleXmark", active: "border-[color-mix(in_srgb,var(--pb-danger)_42%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] text-[color-mix(in_srgb,var(--pb-danger)_84%,black)] shadow-sm" },
   { value: "not_available", label: "Tidak tersedia", icon: "eyeSlash", active: "border-slate-300 bg-slate-100 text-slate-700 shadow-sm" },
 ];
 

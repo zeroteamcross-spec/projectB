@@ -7,7 +7,7 @@ import { apiClient } from "../../../core/apiClient.js";
 import { authStore } from "../../../state/authStore.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 
-const PAGE_BG = "bg-[radial-gradient(circle_at_18%_10%,color-mix(in_srgb,var(--pb-brand-primary)_16%,transparent),transparent_34%),linear-gradient(135deg,#f8fafc,#fff7ed_50%,#eef7f3)]";
+const PAGE_BG = "bg-[radial-gradient(circle_at_18%_10%,color-mix(in_srgb,var(--pb-brand-primary)_16%,transparent),transparent_34%),linear-gradient(135deg,#f8fafc,#faf4ed_50%,#eaf4f9)]";
 
 export function GoogleLoginCompletePage() {
   let root = null;
@@ -130,7 +130,7 @@ function header() {
   headerEl.className = "grid gap-2";
 
   const eyebrow = document.createElement("p");
-  eyebrow.className = "text-xs font-black uppercase tracking-[0.18em] text-orange-700";
+  eyebrow.className = "text-xs font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]";
   eyebrow.textContent = "Google profile completion";
 
   const title = document.createElement("h1");
@@ -159,7 +159,7 @@ function completionForm(root, context, state) {
   );
 
   const hint = document.createElement("p");
-  hint.className = "rounded-2xl bg-orange-50 px-4 py-3 text-sm leading-6 text-gray-700";
+  hint.className = "rounded-2xl bg-[var(--pb-surface-muted)] px-4 py-3 text-sm leading-6 text-gray-700";
   hint.textContent = "Nomor WhatsApp wajib diawali 62 dan hanya angka. Contoh: 6281234567890.";
   form.append(hint);
 
@@ -233,7 +233,7 @@ function field({ name, label, value = "", placeholder = "", required = false, re
   input.placeholder = placeholder;
   input.required = required;
   input.readOnly = readonly;
-  input.className = "min-h-11 w-full rounded-2xl border border-gray-200 bg-white/90 px-4 py-2.5 text-sm text-gray-950 outline-none transition placeholder:text-gray-400 focus:border-orange-300 focus:ring-4 focus:ring-orange-100 read-only:bg-gray-50 read-only:text-gray-500";
+  input.className = "min-h-11 w-full rounded-2xl border border-gray-200 bg-white/90 px-4 py-2.5 text-sm text-gray-950 outline-none transition placeholder:text-gray-400 focus:border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] focus:ring-4 focus:ring-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)] read-only:bg-gray-50 read-only:text-gray-500";
 
   wrap.append(input);
   return wrap;
@@ -249,9 +249,9 @@ function text(value) {
 function messageBox(message, type) {
   const box = document.createElement("p");
   const classes = {
-    error: "border-red-200 bg-red-50 text-red-700",
-    warning: "border-orange-200 bg-orange-50 text-orange-800",
-    info: "border-blue-100 bg-blue-50 text-blue-800",
+    error: "border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]",
+    warning: "border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] bg-[var(--pb-surface-muted)] text-[var(--pb-brand-secondary)]",
+    info: "border-[color-mix(in_srgb,var(--pb-brand-primary)_14%,white)] bg-[color-mix(in_srgb,var(--pb-brand-primary)_8%,white)] text-[color-mix(in_srgb,var(--pb-brand-primary)_84%,black)]",
   };
   box.className = `rounded-2xl border px-4 py-3 text-sm font-semibold leading-6 ${classes[type] ?? classes.info}`;
   box.textContent = message;
@@ -272,10 +272,10 @@ function pendingApprovalPanel(context, state, root, startPolling) {
   pulseContainer.className = "relative flex h-24 w-24 items-center justify-center";
 
   const pulseOuter = document.createElement("div");
-  pulseOuter.className = "absolute inset-0 animate-ping rounded-full bg-orange-500/20";
+  pulseOuter.className = "absolute inset-0 animate-ping rounded-full bg-[var(--pb-brand-primary)]";
 
   const pulseInner = document.createElement("div");
-  pulseInner.className = "relative flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-orange-500 to-red-600 text-white shadow-[0_8px_30px_rgba(234,88,12,0.3)]";
+  pulseInner.className = "relative flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-[var(--pb-brand-primary)] to-[var(--pb-danger)] text-white shadow-[0_8px_30px_rgba(30,129,176,0.3)]";
   pulseInner.append(createIcon("clock", { className: "block h-9 w-9 leading-none animate-pulse" }));
 
   pulseContainer.append(pulseOuter, pulseInner);
@@ -288,13 +288,13 @@ function pendingApprovalPanel(context, state, root, startPolling) {
   const emailStr = user.email ? ` (${user.email})` : "";
 
   const infoBox = document.createElement("div");
-  infoBox.className = "grid gap-3 rounded-2xl border border-orange-100 bg-orange-50/50 p-5 text-sm leading-relaxed text-gray-700 max-w-md";
+  infoBox.className = "grid gap-3 rounded-2xl border border-[var(--pb-border)] bg-[var(--pb-surface-muted)] p-5 text-sm leading-relaxed text-gray-700 max-w-md";
   infoBox.innerHTML = `
     <p class="font-semibold text-gray-900">Halo, ${user.name || "Seller"}!</p>
     <p>Akun Anda${emailStr} berhasil didaftarkan dan data showroom telah disimpan.</p>
     <p>Saat ini pendaftaran Anda sedang dalam antrean verifikasi oleh Administrator.</p>
-    <p class="text-xs font-semibold text-orange-700 flex items-center justify-center gap-1.5 mt-1 animate-pulse">
-      <span class="h-2 w-2 rounded-full bg-orange-600"></span>
+    <p class="text-xs font-semibold text-[var(--pb-brand-secondary)] flex items-center justify-center gap-1.5 mt-1 animate-pulse">
+      <span class="h-2 w-2 rounded-full bg-[var(--pb-brand-primary)]"></span>
       Mengecek persetujuan secara otomatis...
     </p>
   `;

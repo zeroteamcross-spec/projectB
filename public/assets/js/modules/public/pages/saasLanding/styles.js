@@ -18,11 +18,11 @@ const URL_FONT = "https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700
 const CSS = `
 #saas_landing_root, #saas_landing_root *{box-sizing:border-box}
 html.${KELAS_AKTIF}{scroll-behavior:smooth}
-body.${KELAS_AKTIF}{background:#0C0A09;overflow-x:clip}
-#saas_landing_root{color:#FFFFFF;font-family:"DM Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-#saas_landing_root a{color:#FF6B1A;text-decoration:none}
-#saas_landing_root a:hover{color:#FFA24B}
-#saas_landing_root ::selection{background:#FF6B1A;color:#0C0A09}
+body.${KELAS_AKTIF}{background:#faf4ed;overflow-x:clip}
+#saas_landing_root{color:#1c1917;font-family:"DM Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+#saas_landing_root a{color:#1e81b0;text-decoration:none}
+#saas_landing_root a:hover{color:#17698f}
+#saas_landing_root ::selection{background:#1e81b0;color:#ffffff}
 
 /* --- Tata letak lajur -------------------------------------------------
    Semua bagian isi memakai model yang sama dengan showcase 01/02/03: satu
@@ -35,18 +35,18 @@ body.${KELAS_AKTIF}{background:#0C0A09;overflow-x:clip}
 #saas_landing_root [data-kolom]{width:min(600px,100%);display:grid;gap:30px;align-content:start}
 
 /* Panel teks. Latar bagian dibuat tembus pandang, jadi keterbacaan teks
-   ditopang panel ini, bukan lagi blok #0C0A09 penuh selebar layar. */
+   ditopang panel ini, bukan lagi blok #faf4ed penuh selebar layar. */
 #saas_landing_root [data-panel]{
-  background:rgba(12,10,9,.62);
+  background:rgba(255,255,255,.62);
   -webkit-backdrop-filter:blur(18px);
   backdrop-filter:blur(18px);
-  border:1px solid rgba(255,255,255,.09);
+  border:1px solid rgba(28,25,23,.09);
   border-radius:24px;
   padding:34px 32px 36px;
-  box-shadow:0 30px 80px rgba(0,0,0,.45);
+  box-shadow:0 30px 80px rgba(28,25,23,.12);
 }
-#saas_landing_root [data-pita]{background:rgba(12,10,9,.62);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
-#saas_landing_root [data-kaki]{background:rgba(10,8,7,.78);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}
+#saas_landing_root [data-pita]{background:rgba(255,255,255,.62);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+#saas_landing_root [data-kaki]{background:rgba(255,255,255,.78);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}
 
 @keyframes pulseRing{0%{transform:scale(.9);opacity:.6}100%{transform:scale(2.2);opacity:0}}
 @keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
@@ -67,7 +67,7 @@ body.${KELAS_AKTIF}{background:#0C0A09;overflow-x:clip}
      lebar dan panel dibuat lebih pekat agar teks tetap terbaca di atas mobil. */
   #saas_landing_root [data-lajur]{justify-content:center !important}
   #saas_landing_root [data-kolom]{width:100% !important}
-  #saas_landing_root [data-panel]{background:rgba(12,10,9,.82) !important;padding:26px 22px 28px !important}
+  #saas_landing_root [data-panel]{background:rgba(255,255,255,.82) !important;padding:26px 22px 28px !important}
 }
 `;
 

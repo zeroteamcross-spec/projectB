@@ -6,7 +6,7 @@ export function PublicPriceBlock({ car } = {}) {
   section.className = "grid gap-4 rounded-[24px] border border-white/75 bg-white/95 p-5 shadow-card backdrop-blur";
 
   const label = document.createElement("p");
-  label.className = "text-[11px] font-semibold uppercase tracking-normal text-orange-600";
+  label.className = "text-[11px] font-semibold uppercase tracking-normal text-[var(--pb-brand-secondary)]";
   label.textContent = hasPromo(car) ? "Harga promo" : "Harga cash";
 
   const primary = document.createElement("strong");

@@ -16,7 +16,7 @@ export function AdminMasterLocationList({
   onPerPageChange = null,
 } = {}) {
   const icon = document.createElement("span");
-  icon.className = "grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#f97316,#14b8a6)] text-white shadow-[0_14px_34px_rgba(249,115,22,0.20)]";
+  icon.className = "grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#1e81b0,#1e81b0)] text-white shadow-[0_14px_34px_rgba(30,129,176,0.20)]";
   icon.append(createIcon("location", { className: "h-4 w-4" }));
 
   const pagination = DataTablePagination({
@@ -85,7 +85,7 @@ function cityCell(city) {
   const wrap = document.createElement("div");
   wrap.className = "flex min-w-0 items-start gap-3";
   const icon = document.createElement("span");
-  icon.className = "grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-orange-100 bg-[linear-gradient(135deg,#fff7ed,#ecfeff)] text-orange-700 shadow-sm ring-1 ring-white";
+  icon.className = "grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-[var(--pb-border)] bg-[linear-gradient(135deg,#faf4ed,#eaf4f9)] text-[var(--pb-brand-secondary)] shadow-sm ring-1 ring-white";
   icon.append(createIcon("location", { className: "h-4 w-4" }));
   const copy = document.createElement("div");
   copy.className = "grid min-w-0 gap-1";

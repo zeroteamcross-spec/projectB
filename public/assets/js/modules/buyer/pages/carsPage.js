@@ -83,8 +83,8 @@ function buyerMobileHeader({ actions }) {
   const copy = document.createElement("section");
   copy.className = "grid min-w-0 flex-1 gap-0.5";
   copy.append(
-    textNode("p", "text-sm font-bold text-white/75", "Buyer Center"),
-    textNode("h1", "truncate text-xl font-black leading-tight tracking-normal text-white", "Katalog Mobil"),
+    textNode("p", "text-sm font-bold text-[var(--pb-text-muted)]", "Buyer Center"),
+    textNode("h1", "truncate text-xl font-black leading-tight tracking-normal text-[var(--pb-text-strong)]", "Katalog Mobil"),
   );
 
   const actionsWrap = document.createElement("section");

@@ -93,13 +93,13 @@ export function SellerCarForm({
 
   const errorNode = document.createElement("p");
   errorNode.id = "slrc_car_form_error_section";
-  errorNode.className = "rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700";
+  errorNode.className = "rounded-lg border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-3 py-2 text-sm font-medium text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
   errorNode.textContent = error;
   errorNode.hidden = !error;
 
   const validationNode = document.createElement("p");
   validationNode.id = "slrc_car_form_validation_section";
-  validationNode.className = "rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-semibold text-amber-800";
+  validationNode.className = "rounded-lg border border-[color-mix(in_srgb,var(--pb-warning)_26%,white)] bg-[color-mix(in_srgb,var(--pb-warning)_8%,white)] px-3 py-2 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-warning)_84%,black)]";
   validationNode.hidden = true;
 
   const step1 = createStepPanel(1, currentStep);
@@ -197,7 +197,7 @@ function formHeader(car) {
   copyWrap.className = "flex min-w-0 items-start gap-3";
   setElementVisibility(copyWrap, false);
   const icon = document.createElement("span");
-  icon.className = "grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#f97316,#14b8a6)] text-white shadow-[0_14px_34px_rgba(249,115,22,0.18)]";
+  icon.className = "grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#1e81b0,#1e81b0)] text-white shadow-[0_14px_34px_rgba(30,129,176,0.18)]";
   icon.append(createIcon("car", { className: "h-5 w-5" }));
 
   const copy = document.createElement("section");
@@ -214,7 +214,7 @@ function formHeader(car) {
 
   const badge = document.createElement("section");
   badge.id = "slrc_car_form_progress_summary_section";
-  badge.className = "rounded-2xl border border-orange-100 bg-orange-50 px-3 py-2 text-xs font-black uppercase tracking-[0.12em] text-orange-700";
+  badge.className = "rounded-2xl border border-[var(--pb-border)] bg-[var(--pb-surface-muted)] px-3 py-2 text-xs font-black uppercase tracking-[0.12em] text-[var(--pb-brand-secondary)]";
   badge.textContent = "3 step";
   header.append(copyWrap, badge);
   return header;
@@ -229,7 +229,7 @@ function createStepper(currentStep) {
   top.id = "slrc_car_form_stepper_summary_section";
   top.className = "flex items-center justify-between gap-3";
   top.append(
-    textNode("span", "text-sm font-black text-orange-700", `Step ${currentStep} dari ${TOTAL_STEPS}`),
+    textNode("span", "text-sm font-black text-[var(--pb-brand-secondary)]", `Step ${currentStep} dari ${TOTAL_STEPS}`),
     textNode("span", "text-sm font-semibold text-gray-500", STEP_META[currentStep - 1]?.title ?? "")
   );
 
@@ -238,7 +238,7 @@ function createStepper(currentStep) {
   progressTrack.className = "h-2 overflow-hidden rounded-full bg-gray-100";
   const progress = document.createElement("section");
   progress.id = "slrc_car_form_stepper_progress_fill_section";
-  progress.className = "h-full rounded-full bg-[linear-gradient(90deg,#f97316,#14b8a6)] transition-all duration-200";
+  progress.className = "h-full rounded-full bg-[linear-gradient(90deg,#1e81b0,#1e81b0)] transition-all duration-200";
   progress.style.width = `${(currentStep / TOTAL_STEPS) * 100}%`;
   progressTrack.append(progress);
 
@@ -252,8 +252,8 @@ function createStepper(currentStep) {
     card.id = `slrc_car_form_stepper_item_${item.step}_section`;
     card.className = [
       "grid gap-1 rounded-2xl border p-3 transition duration-150",
-      active ? "border-orange-200 bg-orange-50 text-orange-800 shadow-sm" : "border-gray-100 bg-white text-gray-600",
-      done ? "border-teal-200 bg-teal-50 text-teal-700" : "",
+      active ? "border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] bg-[var(--pb-surface-muted)] text-[var(--pb-brand-secondary)] shadow-sm" : "border-gray-100 bg-white text-gray-600",
+      done ? "border-[color-mix(in_srgb,var(--pb-brand-primary)_26%,white)] bg-[color-mix(in_srgb,var(--pb-brand-primary)_8%,white)] text-[color-mix(in_srgb,var(--pb-brand-primary)_84%,black)]" : "",
     ].join(" ");
     const line = document.createElement("section");
     line.id = `slrc_car_form_stepper_item_${item.step}_line_section`;
@@ -398,7 +398,7 @@ function createDocumentTypeToggle(value = "new") {
       const active = button.dataset.value === input.value;
       button.className = [
         "min-h-11 rounded-[1rem] border px-3 py-2 text-sm font-black transition duration-150",
-        active ? "border-orange-200 bg-orange-50 text-orange-700 shadow-sm" : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50",
+        active ? "border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] bg-[var(--pb-surface-muted)] text-[var(--pb-brand-secondary)] shadow-sm" : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50",
       ].join(" ");
     });
   };
@@ -499,13 +499,13 @@ function createNativeSelect({ id, name, label, helper }) {
 function fieldGroup(id, title, iconName) {
   const section = document.createElement("section");
   section.id = id;
-  section.className = "grid gap-4 rounded-[1.5rem] border border-gray-100 bg-[linear-gradient(135deg,rgba(249,250,251,0.96),rgba(255,255,255,0.92))] p-4 shadow-sm transition duration-150 hover:border-orange-100";
+  section.className = "grid gap-4 rounded-[1.5rem] border border-gray-100 bg-[linear-gradient(135deg,rgba(249,250,251,0.96),rgba(255,255,255,0.92))] p-4 shadow-sm transition duration-150 hover:border-[var(--pb-border)]";
 
   const header = document.createElement("section");
   header.id = `${id}_header`;
   header.className = "flex min-w-0 items-center gap-3";
   const icon = document.createElement("span");
-  icon.className = "grid h-9 w-9 shrink-0 place-items-center rounded-2xl bg-orange-50 text-orange-600";
+  icon.className = "grid h-9 w-9 shrink-0 place-items-center rounded-2xl bg-[var(--pb-surface-muted)] text-[var(--pb-brand-secondary)]";
   icon.append(createIcon(iconName, { className: "h-4 w-4" }));
   const label = document.createElement("h3");
   label.className = "text-sm font-black text-gray-950";

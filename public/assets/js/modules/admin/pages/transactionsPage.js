@@ -160,7 +160,7 @@ function render(root, context, state, actions) {
 
   if (state.error) {
     const error = document.createElement("div");
-    error.className = "rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700";
+    error.className = "rounded-lg border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-sm font-medium text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
     error.textContent = state.error;
     main.append(error);
   }
@@ -204,7 +204,7 @@ function render(root, context, state, actions) {
 function transactionsHero({ action, counts = {} }) {
   const section = document.createElement("section");
   section.id = "adtr_hero_section";
-  section.className = "relative overflow-hidden rounded-[2rem] border border-orange-100/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.95),rgba(255,247,237,0.86),rgba(239,246,255,0.72))] p-5 shadow-[0_24px_80px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6 lg:p-7";
+  section.className = "relative overflow-hidden rounded-[2rem] border border-[var(--pb-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.95),rgba(250,244,237,0.86),rgba(234,244,249,0.72))] p-5 shadow-[0_24px_80px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6 lg:p-7";
 
   const layout = document.createElement("div");
   layout.className = "relative grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end";
@@ -213,12 +213,12 @@ function transactionsHero({ action, counts = {} }) {
   copy.className = "grid min-w-0 gap-3";
 
   const icon = document.createElement("div");
-  icon.className = "grid h-12 w-12 place-items-center rounded-2xl bg-[linear-gradient(135deg,#fb7185,#f97316)] text-white shadow-[0_16px_40px_rgba(244,63,94,0.22)]";
+  icon.className = "grid h-12 w-12 place-items-center rounded-2xl bg-[linear-gradient(135deg,#c53030,#1e81b0)] text-white shadow-[0_16px_40px_rgba(185,28,28,0.22)]";
   icon.append(createIcon("transaction", { className: "h-5 w-5" }));
 
   copy.append(
     icon,
-    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-orange-700", ""),
+    textNode("p", "text-xs font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", ""),
     textNode("h1", "max-w-2xl text-3xl font-black leading-tight tracking-normal text-gray-950 sm:text-4xl", "Transaksi Admin"),
     textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", ""),
   );

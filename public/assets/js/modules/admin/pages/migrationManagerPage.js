@@ -177,7 +177,7 @@ function statCard(label, value, iconName) {
 
 function alertBox(message) {
   const box = document.createElement("div");
-  box.className = "rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700";
+  box.className = "rounded-lg border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
   box.textContent = message;
   return box;
 }
@@ -200,7 +200,7 @@ function resultsPanel(results) {
     item.append(name, status);
     if (result.message) {
       const message = document.createElement("p");
-      message.className = "basis-full text-xs text-red-700";
+      message.className = "basis-full text-xs text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
       message.textContent = result.message;
       item.append(message);
     }
@@ -299,12 +299,12 @@ function actionCell(migration, state, actions) {
 function statusBadge(status) {
   const badge = document.createElement("span");
   const tone = status === "applied"
-    ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+    ? "bg-[color-mix(in_srgb,var(--pb-success)_8%,white)] text-[color-mix(in_srgb,var(--pb-success)_84%,black)] border-[color-mix(in_srgb,var(--pb-success)_26%,white)]"
     : status === "failed"
-      ? "bg-red-50 text-red-700 border-red-200"
+      ? "bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] text-[color-mix(in_srgb,var(--pb-danger)_84%,black)] border-[color-mix(in_srgb,var(--pb-danger)_26%,white)]"
       : status === "skipped"
         ? "bg-gray-50 text-gray-700 border-gray-200"
-        : "bg-amber-50 text-amber-700 border-amber-200";
+        : "bg-[color-mix(in_srgb,var(--pb-warning)_8%,white)] text-[color-mix(in_srgb,var(--pb-warning)_84%,black)] border-[color-mix(in_srgb,var(--pb-warning)_26%,white)]";
   badge.className = `inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-black ${tone}`;
   badge.textContent = status;
   return badge;

@@ -68,7 +68,7 @@ function statusCard(transaction, statusMeta) {
   const top = document.createElement("div");
   top.className = "flex flex-col gap-3";
   const icon = document.createElement("span");
-  icon.className = "grid h-10 w-10 place-items-center rounded-2xl bg-[linear-gradient(135deg,#fb7185,#f97316)] text-white shadow-[0_14px_34px_rgba(244,63,94,0.20)]";
+  icon.className = "grid h-10 w-10 place-items-center rounded-2xl bg-[linear-gradient(135deg,#c53030,#1e81b0)] text-white shadow-[0_14px_34px_rgba(185,28,28,0.20)]";
   icon.append(createIcon("transaction", { className: "h-4 w-4" }));
   const title = document.createElement("h2");
   title.className = "text-lg font-bold tracking-normal text-gray-950";
@@ -121,7 +121,7 @@ function factsCard(title, rows = []) {
 
   rows.forEach(([label, value]) => {
     const row = document.createElement("div");
-    row.className = "flex flex-col gap-1 border-b border-orange-100/70 pb-3 last:border-b-0 last:pb-0 sm:flex-row sm:items-start sm:justify-between sm:gap-3";
+    row.className = "flex flex-col gap-1 border-b border-[var(--pb-border)] pb-3 last:border-b-0 last:pb-0 sm:flex-row sm:items-start sm:justify-between sm:gap-3";
 
     const labelNode = document.createElement("span");
     labelNode.className = "break-words text-sm text-gray-500";

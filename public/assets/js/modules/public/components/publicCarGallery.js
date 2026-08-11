@@ -127,10 +127,10 @@ function imageUrl(image) {
 function fallbackCarImageUrl() {
   const svg = `
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 620">
-      <rect width="960" height="620" rx="48" fill="#fff7ed"/>
-      <path d="M188 420h584c22 0 40 18 40 40v28H148v-28c0-22 18-40 40-40Z" fill="#fb923c"/>
-      <path d="M318 315h288c38 0 74 18 96 49l40 56H248l70-105Z" fill="#fdba74"/>
-      <path d="M354 336h226c28 0 54 13 70 36l15 21H302l52-57Z" fill="#fff7ed"/>
+      <rect width="960" height="620" rx="48" fill="#faf4ed"/>
+      <path d="M188 420h584c22 0 40 18 40 40v28H148v-28c0-22 18-40 40-40Z" fill="#eab676"/>
+      <path d="M318 315h288c38 0 74 18 96 49l40 56H248l70-105Z" fill="#eab676"/>
+      <path d="M354 336h226c28 0 54 13 70 36l15 21H302l52-57Z" fill="#faf4ed"/>
       <circle cx="312" cy="488" r="54" fill="#111827"/>
       <circle cx="312" cy="488" r="24" fill="#f9fafb"/>
       <circle cx="660" cy="488" r="54" fill="#111827"/>

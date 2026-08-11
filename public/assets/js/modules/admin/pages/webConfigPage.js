@@ -112,12 +112,12 @@ function render(root, context, state, actions) {
 
 function hero() {
   const section = document.createElement("section");
-  section.className = "grid gap-4 rounded-[1.5rem] border border-white/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(240,253,250,0.78),rgba(255,247,237,0.78))] p-5 shadow-[var(--pb-shadow-card)] lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center";
+  section.className = "grid gap-4 rounded-[1.5rem] border border-white/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(234,244,249,0.78),rgba(250,244,237,0.78))] p-5 shadow-[var(--pb-shadow-card)] lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center";
   const copy = document.createElement("section");
   copy.className = "grid min-w-0 gap-2";
   copy.append(
     iconBox("settings"),
-    textNode("p", "text-xs font-black uppercase tracking-[0.16em] text-orange-700", ""),
+    textNode("p", "text-xs font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", ""),
     textNode("h1", "text-3xl font-black leading-tight text-gray-950", "Konfigurasi WEB"),
     textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", ""),
   );
@@ -274,7 +274,7 @@ function renderIconPreview(preview, url) {
 
 function uploadDropzone({ input, preview, uploading, onFile }) {
   const section = document.createElement("section");
-  section.className = "grid gap-4 rounded-[1.5rem] border border-dashed border-orange-200 bg-[linear-gradient(135deg,rgba(255,247,237,0.85),rgba(255,255,255,0.96),rgba(240,253,250,0.82))] p-4 shadow-sm md:grid-cols-[112px_minmax(0,1fr)] md:items-center";
+  section.className = "grid gap-4 rounded-[1.5rem] border border-dashed border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] bg-[linear-gradient(135deg,rgba(250,244,237,0.85),rgba(255,255,255,0.96),rgba(234,244,249,0.82))] p-4 shadow-sm md:grid-cols-[112px_minmax(0,1fr)] md:items-center";
 
   const body = document.createElement("section");
   body.className = "grid min-w-0 gap-3";
@@ -288,14 +288,14 @@ function uploadDropzone({ input, preview, uploading, onFile }) {
   choose.disabled = Boolean(uploading);
   choose.append(createIcon("upload", { className: "block h-4 w-4 leading-none" }), document.createTextNode(uploading ? "Memproses..." : "Pilih File"));
   choose.addEventListener("click", () => input.click());
-  const hint = textNode("span", "text-xs font-bold uppercase tracking-[0.12em] text-orange-700", "SVG supported");
+  const hint = textNode("span", "text-xs font-bold uppercase tracking-[0.12em] text-[var(--pb-brand-secondary)]", "SVG supported");
   actions.append(choose, hint, input);
   body.append(title, desc, actions);
   section.append(preview, body);
 
   const setDrag = (active) => {
-    section.classList.toggle("border-orange-400", active);
-    section.classList.toggle("bg-orange-50", active);
+    section.classList.toggle("border-[color-mix(in_srgb,var(--pb-brand-primary)_45%,white)]", active);
+    section.classList.toggle("bg-[var(--pb-surface-muted)]", active);
   };
   section.addEventListener("dragover", (event) => {
     event.preventDefault();
@@ -343,14 +343,14 @@ function iconBox(icon) {
 
 function errorPanel(message) {
   const section = document.createElement("section");
-  section.className = "rounded-[1rem] border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700";
+  section.className = "rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
   section.textContent = message;
   return section;
 }
 
 function successPanel(message) {
   const section = document.createElement("section");
-  section.className = "rounded-[1rem] border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700";
+  section.className = "rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-success)_26%,white)] bg-[color-mix(in_srgb,var(--pb-success)_8%,white)] px-4 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
   section.textContent = message;
   return section;
 }

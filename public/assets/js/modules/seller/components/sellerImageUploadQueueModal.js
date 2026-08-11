@@ -163,7 +163,7 @@ function queueItem(item, { uploading, onEdit, onRemove, onToggleCover }) {
   const progress = Number(item.progress ?? 0);
   body.append(meta, progressBar(progress, item.status === "uploading"));
   if (item.error) {
-    body.append(textNode("p", "text-xs font-semibold text-red-600", item.error));
+    body.append(textNode("p", "text-xs font-semibold text-[var(--pb-danger)]", item.error));
   }
 
   const actions = document.createElement("section");
@@ -260,12 +260,12 @@ function progressBar(value, active = false) {
 function statusPill(item) {
   const tone = {
     queued: "border-gray-200 bg-gray-50 text-gray-600",
-    editing: "border-amber-200 bg-amber-50 text-amber-700",
-    ready: "border-emerald-200 bg-emerald-50 text-emerald-700",
-    uploading: "border-blue-200 bg-blue-50 text-blue-700",
-    success: "border-emerald-200 bg-emerald-50 text-emerald-700",
-    failed: "border-red-200 bg-red-50 text-red-700",
-    invalid: "border-red-200 bg-red-50 text-red-700",
+    editing: "border-[color-mix(in_srgb,var(--pb-warning)_26%,white)] bg-[color-mix(in_srgb,var(--pb-warning)_8%,white)] text-[color-mix(in_srgb,var(--pb-warning)_84%,black)]",
+    ready: "border-[color-mix(in_srgb,var(--pb-success)_26%,white)] bg-[color-mix(in_srgb,var(--pb-success)_8%,white)] text-[color-mix(in_srgb,var(--pb-success)_84%,black)]",
+    uploading: "border-[color-mix(in_srgb,var(--pb-brand-primary)_26%,white)] bg-[color-mix(in_srgb,var(--pb-brand-primary)_8%,white)] text-[color-mix(in_srgb,var(--pb-brand-primary)_84%,black)]",
+    success: "border-[color-mix(in_srgb,var(--pb-success)_26%,white)] bg-[color-mix(in_srgb,var(--pb-success)_8%,white)] text-[color-mix(in_srgb,var(--pb-success)_84%,black)]",
+    failed: "border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]",
+    invalid: "border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]",
   }[item.status] ?? "border-gray-200 bg-gray-50 text-gray-600";
   const pill = document.createElement("span");
   pill.className = `inline-flex w-fit rounded-full border px-3 py-1 text-xs font-black ${tone}`;

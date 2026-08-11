@@ -287,7 +287,7 @@ function heroTrustRow() {
     "Affiliate context tetap ikut bila sedang aktif",
   ].forEach((copy) => {
     const item = document.createElement("p");
-    item.className = "break-words rounded-2xl bg-orange-50/70 px-3 py-2";
+    item.className = "break-words rounded-2xl bg-[var(--pb-surface-muted)] px-3 py-2";
     item.textContent = copy;
     row.append(item);
   });

@@ -18,7 +18,7 @@ export function SellerShowroomView({ showroom = null, onEdit = null } = {}) {
   if (!showroom) {
     const wrap = document.createElement("section");
     wrap.id = "slrsr_empty_section";
-    wrap.className = "grid gap-4 rounded-[2rem] border border-dashed border-orange-200 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(255,247,237,0.78))] p-5 shadow-[var(--pb-shadow-card)] sm:p-6";
+    wrap.className = "grid gap-4 rounded-[2rem] border border-dashed border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(250,244,237,0.78))] p-5 shadow-[var(--pb-shadow-card)] sm:p-6";
     const action = document.createElement("section");
     action.id = "slrsr_empty_actions_section";
     action.className = "flex justify-center";
@@ -48,7 +48,7 @@ export function SellerShowroomView({ showroom = null, onEdit = null } = {}) {
   const titleWrap = document.createElement("div");
   titleWrap.className = "grid min-w-0 gap-2";
   const eyebrow = document.createElement("p");
-  eyebrow.className = "text-xs font-black uppercase tracking-[0.18em] text-orange-700";
+  eyebrow.className = "text-xs font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]";
   eyebrow.textContent = "Showroom identity";
   const title = document.createElement("h2");
   title.className = `${tw.text.sectionTitle} break-words`;
@@ -73,12 +73,12 @@ export function SellerShowroomView({ showroom = null, onEdit = null } = {}) {
   FIELDS.forEach((field) => {
     const item = document.createElement("section");
     item.id = `slrsr_fact_${field.key}_section`;
-    item.className = `${field.wide ? "sm:col-span-2 xl:col-span-2" : ""} grid gap-2 rounded-[1.25rem] border border-gray-100 bg-[linear-gradient(135deg,rgba(249,250,251,0.95),rgba(255,255,255,0.88))] px-4 py-4 shadow-sm transition duration-150 hover:-translate-y-0.5 hover:border-orange-100 hover:shadow-md`;
+    item.className = `${field.wide ? "sm:col-span-2 xl:col-span-2" : ""} grid gap-2 rounded-[1.25rem] border border-gray-100 bg-[linear-gradient(135deg,rgba(249,250,251,0.95),rgba(255,255,255,0.88))] px-4 py-4 shadow-sm transition duration-150 hover:-translate-y-0.5 hover:border-[var(--pb-border)] hover:shadow-md`;
 
     const labelRow = document.createElement("div");
     labelRow.className = "flex items-center gap-2";
     const icon = document.createElement("span");
-    icon.className = "grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-orange-50 text-orange-600";
+    icon.className = "grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-[var(--pb-surface-muted)] text-[var(--pb-brand-secondary)]";
     icon.append(createIcon(field.icon, { className: "h-3.5 w-3.5" }));
     const label = document.createElement("dt");
     label.className = `text-xs font-black uppercase tracking-[0.12em] ${tw.text.muted}`;

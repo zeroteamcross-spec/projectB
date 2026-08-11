@@ -19,7 +19,7 @@ export function AdminSettlementList({
   onPerPageChange = null,
 } = {}) {
   const icon = document.createElement("span");
-  icon.className = "grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#14b8a6,#f97316)] text-white shadow-[0_14px_34px_rgba(20,184,166,0.20)]";
+  icon.className = "grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#1e81b0,#1e81b0)] text-white shadow-[0_14px_34px_rgba(30,129,176,0.20)]";
   icon.append(createIcon("commission", { className: "h-4 w-4" }));
 
   const pagination = DataTablePagination({
@@ -97,7 +97,7 @@ function settlementIdentity(settlement) {
   const wrap = document.createElement("div");
   wrap.className = "flex min-w-0 items-start gap-3";
   const avatar = document.createElement("span");
-  avatar.className = "grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#ecfeff,#fff7ed)] text-teal-700 ring-1 ring-teal-100";
+  avatar.className = "grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#eaf4f9,#faf4ed)] text-[color-mix(in_srgb,var(--pb-brand-primary)_84%,black)] ring-1 ring-[color-mix(in_srgb,var(--pb-brand-primary)_14%,white)]";
   avatar.append(createIcon("commission", { className: "h-4 w-4" }));
   const copy = document.createElement("div");
   copy.className = "grid min-w-0 gap-1";
@@ -199,7 +199,7 @@ function actionGroup({ settlement, isUpdatingId, onView, onMarkSettled, onCancel
 function iconLine(iconName, text) {
   const node = document.createElement("p");
   node.className = "flex min-w-0 items-center gap-2 break-words text-sm font-semibold text-gray-800";
-  node.append(createIcon(iconName, { className: "h-3.5 w-3.5 shrink-0 text-orange-600" }), document.createTextNode(text));
+  node.append(createIcon(iconName, { className: "h-3.5 w-3.5 shrink-0 text-[var(--pb-brand-secondary)]" }), document.createTextNode(text));
   return node;
 }
 

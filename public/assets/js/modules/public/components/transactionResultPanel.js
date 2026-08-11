@@ -14,7 +14,7 @@ export function TransactionResultPanel({ transaction, onOpenDashboard = null, on
   const header = document.createElement("div");
   header.className = "grid gap-1";
   const eyebrow = document.createElement("p");
-  eyebrow.className = "text-[11px] font-semibold uppercase tracking-[0.16em] text-green-700";
+  eyebrow.className = "text-[11px] font-semibold uppercase tracking-[0.16em] text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
   eyebrow.textContent = "Transaksi dibuat";
   const title = document.createElement("h2");
   title.className = "text-2xl font-bold tracking-normal text-gray-950";
@@ -45,7 +45,7 @@ export function TransactionResultPanel({ transaction, onOpenDashboard = null, on
   const instructions = paymentInstructionSummary(paymentDetails);
 
   const actions = document.createElement("div");
-  actions.className = "grid gap-2 border-t border-green-200/70 pt-4";
+  actions.className = "grid gap-2 border-t border-[color-mix(in_srgb,var(--pb-success)_26%,white)] pt-4";
 
   if (transaction?.payment_session?.redirect_url) {
     const link = document.createElement("a");
@@ -107,7 +107,7 @@ function normalize(value) {
 
 function paymentInstructionSummary(details) {
   const box = document.createElement("section");
-  box.className = "grid gap-3 rounded-[1.5rem] border border-green-200/70 bg-white/80 px-4 py-4";
+  box.className = "grid gap-3 rounded-[1.5rem] border border-[color-mix(in_srgb,var(--pb-success)_26%,white)] bg-white/80 px-4 py-4";
 
   const title = document.createElement("h3");
   title.className = "text-sm font-bold text-gray-950";

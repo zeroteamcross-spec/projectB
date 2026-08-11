@@ -280,14 +280,14 @@ function fallbackCarImageUrl() {
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 620">
       <defs>
         <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
-          <stop offset="0" stop-color="#fff7ed"/>
+          <stop offset="0" stop-color="#faf4ed"/>
           <stop offset="1" stop-color="#e5e7eb"/>
         </linearGradient>
       </defs>
       <rect width="960" height="620" rx="48" fill="url(#bg)"/>
-      <path d="M230 370h500c34 0 62 28 62 62v18H168v-18c0-34 28-62 62-62Z" fill="#fb923c"/>
-      <path d="M302 282h258c40 0 78 19 102 51l28 37H250l52-88Z" fill="#fdba74"/>
-      <path d="M335 302h205c29 0 57 14 75 38l11 15H292l43-53Z" fill="#fff7ed"/>
+      <path d="M230 370h500c34 0 62 28 62 62v18H168v-18c0-34 28-62 62-62Z" fill="#eab676"/>
+      <path d="M302 282h258c40 0 78 19 102 51l28 37H250l52-88Z" fill="#eab676"/>
+      <path d="M335 302h205c29 0 57 14 75 38l11 15H292l43-53Z" fill="#faf4ed"/>
       <circle cx="302" cy="454" r="48" fill="#111827"/>
       <circle cx="302" cy="454" r="22" fill="#f9fafb"/>
       <circle cx="658" cy="454" r="48" fill="#111827"/>

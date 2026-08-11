@@ -138,14 +138,14 @@ function progressBar(progress = {}) {
 
 function dirtyPill() {
   const pill = document.createElement("span");
-  pill.className = "inline-flex items-center justify-center rounded-full border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-bold text-amber-700";
+  pill.className = "inline-flex items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--pb-warning)_26%,white)] bg-[color-mix(in_srgb,var(--pb-warning)_8%,white)] px-3 py-2 text-xs font-bold text-[color-mix(in_srgb,var(--pb-warning)_84%,black)]";
   pill.textContent = "Belum disimpan";
   return pill;
 }
 
 function cleanPill() {
   const pill = document.createElement("span");
-  pill.className = "inline-flex items-center justify-center rounded-full border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700";
+  pill.className = "inline-flex items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--pb-success)_26%,white)] bg-[color-mix(in_srgb,var(--pb-success)_8%,white)] px-3 py-2 text-xs font-bold text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
   pill.textContent = "Tersimpan";
   return pill;
 }

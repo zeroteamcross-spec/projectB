@@ -155,7 +155,7 @@ export function createEditorPanel({ documentRef = null, resizeManager = null, sh
         Object.assign(resetBtn.style, {
             border: 'none',
             background: 'transparent',
-            color: '#dc2626',
+            color: '#b91c1c',
             fontSize: '11px',
             fontWeight: '600',
             cursor: 'pointer',
@@ -164,7 +164,7 @@ export function createEditorPanel({ documentRef = null, resizeManager = null, sh
             transition: 'background 0.2s',
         });
         resetBtn.addEventListener('mouseenter', () => {
-            resetBtn.style.background = '#fee2e2';
+            resetBtn.style.background = '#f7e3e3';
         });
         resetBtn.addEventListener('mouseleave', () => {
             resetBtn.style.background = 'transparent';
@@ -196,10 +196,10 @@ export function createEditorPanel({ documentRef = null, resizeManager = null, sh
                 padding: '10px 0',
                 border: 'none',
                 background: activeBreakpoint === bp ? '#ffffff' : '#f9fafb',
-                borderBottom: activeBreakpoint === bp ? '2px solid #2563eb' : 'none',
+                borderBottom: activeBreakpoint === bp ? '2px solid #1e81b0' : 'none',
                 fontWeight: activeBreakpoint === bp ? '600' : '400',
                 cursor: 'pointer',
-                color: activeBreakpoint === bp ? '#2563eb' : '#4b5563',
+                color: activeBreakpoint === bp ? '#1e81b0' : '#4b5563',
                 fontSize: '13px',
             });
             tab.addEventListener('click', () => {
@@ -342,8 +342,8 @@ export function createEditorPanel({ documentRef = null, resizeManager = null, sh
         Object.assign(saveDraftBtn.style, {
             padding: '10px 16px',
             background: '#ffffff',
-            color: '#2563eb',
-            border: '1px solid #2563eb',
+            color: '#1e81b0',
+            border: '1px solid #1e81b0',
             borderRadius: '6px',
             fontWeight: '600',
             cursor: 'pointer',
@@ -361,7 +361,7 @@ export function createEditorPanel({ documentRef = null, resizeManager = null, sh
         publishBtn.textContent = 'Publish Layout';
         Object.assign(publishBtn.style, {
             padding: '10px 16px',
-            background: '#2563eb',
+            background: '#1e81b0',
             color: '#ffffff',
             border: 'none',
             borderRadius: '6px',
@@ -369,7 +369,7 @@ export function createEditorPanel({ documentRef = null, resizeManager = null, sh
             cursor: 'pointer',
             fontSize: '13px',
             textAlign: 'center',
-            boxShadow: '0 2px 4px rgba(37, 99, 235, 0.2)',
+            boxShadow: '0 2px 4px rgba(30,129,176, 0.2)',
         });
         publishBtn.addEventListener('click', () => {
             if (typeof onPublish === 'function') {

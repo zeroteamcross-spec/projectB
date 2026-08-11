@@ -2,7 +2,7 @@ import { createPageLifecycle } from "../../../core/lifecycle.js";
 import { Button } from "../../../ui/primitives/button.js";
 import { googleLoginService } from "../services/googleLoginService.js";
 
-const PAGE_BG = "bg-[radial-gradient(circle_at_8%_6%,color-mix(in_srgb,var(--pb-brand-primary)_16%,transparent),transparent_32%),radial-gradient(circle_at_88%_14%,color-mix(in_srgb,var(--pb-brand-accent)_14%,transparent),transparent_30%),linear-gradient(135deg,#f8fafc,#fff7ed_52%,#eef7f3)]";
+const PAGE_BG = "bg-[radial-gradient(circle_at_8%_6%,color-mix(in_srgb,var(--pb-brand-primary)_16%,transparent),transparent_32%),radial-gradient(circle_at_88%_14%,color-mix(in_srgb,var(--pb-brand-accent)_14%,transparent),transparent_30%),linear-gradient(135deg,#f8fafc,#faf4ed_52%,#eaf4f9)]";
 
 export function GoogleLoginChooserPage() {
   let root = null;
@@ -25,7 +25,7 @@ function render(root, context) {
   header.className = "grid gap-3 text-center";
 
   const eyebrow = document.createElement("p");
-  eyebrow.className = "text-xs font-black uppercase tracking-[0.18em] text-orange-700";
+  eyebrow.className = "text-xs font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]";
   eyebrow.textContent = "Login utama";
 
   const title = document.createElement("h1");

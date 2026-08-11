@@ -109,12 +109,12 @@ function render(root, context, state, actions) {
 
 function hero() {
   const section = document.createElement("section");
-  section.className = "grid gap-4 rounded-[1.5rem] border border-white/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(255,247,237,0.86))] p-5 shadow-[var(--pb-shadow-card)] lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center";
+  section.className = "grid gap-4 rounded-[1.5rem] border border-white/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(250,244,237,0.86))] p-5 shadow-[var(--pb-shadow-card)] lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center";
   const copy = document.createElement("section");
   copy.className = "grid min-w-0 gap-2";
   copy.append(
     iconBox("home"),
-    textNode("p", "text-xs font-black uppercase tracking-[0.16em] text-orange-700", "Superadmin"),
+    textNode("p", "text-xs font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", "Superadmin"),
     textNode("h1", "text-3xl font-black leading-tight text-gray-950", "Landing Page Utama"),
     textNode("p", "max-w-2xl text-sm leading-6 text-gray-600", "Pilih halaman yang akan dipakai saat user membuka #/. Halaman lama tetap bisa diakses dari route aslinya."),
   );
@@ -140,8 +140,8 @@ function optionRow(option, selected, actions) {
   const row = document.createElement("button");
   row.type = "button";
   row.className = active
-    ? "grid min-w-0 gap-3 rounded-[1.35rem] border border-orange-300 bg-orange-50 p-4 text-left shadow-[var(--pb-shadow-card)] ring-2 ring-orange-100 md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-center"
-    : "grid min-w-0 gap-3 rounded-[1.35rem] border border-[var(--pb-border)] bg-white p-4 text-left shadow-[var(--pb-shadow-soft)] transition hover:border-orange-200 hover:bg-orange-50/55 md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-center";
+    ? "grid min-w-0 gap-3 rounded-[1.35rem] border border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] bg-[var(--pb-surface-muted)] p-4 text-left shadow-[var(--pb-shadow-card)] ring-2 ring-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)] md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-center"
+    : "grid min-w-0 gap-3 rounded-[1.35rem] border border-[var(--pb-border)] bg-white p-4 text-left shadow-[var(--pb-shadow-soft)] transition hover:border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] hover:bg-[var(--pb-surface-muted)] md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-center";
   row.addEventListener("click", () => actions.select(option.name));
 
   row.append(
@@ -158,7 +158,7 @@ function optionCopy(option) {
   copy.append(
     textNode("h2", "break-words text-base font-black text-gray-950", option.label),
     textNode("p", "break-words text-sm font-semibold leading-6 text-gray-600", option.description),
-    textNode("p", "break-words text-xs font-black uppercase tracking-[0.12em] text-orange-700", `${option.name} | #${option.path}`),
+    textNode("p", "break-words text-xs font-black uppercase tracking-[0.12em] text-[var(--pb-brand-secondary)]", `${option.name} | #${option.path}`),
   );
   return copy;
 }
@@ -166,7 +166,7 @@ function optionCopy(option) {
 function statusPill(active) {
   const pill = document.createElement("span");
   pill.className = active
-    ? "inline-flex w-fit items-center justify-center rounded-full bg-orange-600 px-3 py-1 text-xs font-black text-white"
+    ? "inline-flex w-fit items-center justify-center rounded-full bg-[var(--pb-brand-primary)] px-3 py-1 text-xs font-black text-white"
     : "inline-flex w-fit items-center justify-center rounded-full bg-gray-100 px-3 py-1 text-xs font-black text-gray-500";
   pill.textContent = active ? "Dipakai" : "Pilih";
   return pill;
@@ -200,8 +200,8 @@ function iconBox(icon) {
 function messagePanel(message, type) {
   const section = document.createElement("section");
   section.className = type === "success"
-    ? "rounded-[1rem] border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700"
-    : "rounded-[1rem] border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700";
+    ? "rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-success)_26%,white)] bg-[color-mix(in_srgb,var(--pb-success)_8%,white)] px-4 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-success)_84%,black)]"
+    : "rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
   section.textContent = message;
   return section;
 }

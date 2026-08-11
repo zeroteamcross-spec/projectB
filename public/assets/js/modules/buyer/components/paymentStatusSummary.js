@@ -88,20 +88,20 @@ function nextStepTitle(status) {
 
 function statusBorder(status) {
   return {
-    pending_payment: "border-amber-200 bg-gradient-to-br from-white to-amber-50/60",
-    dp_paid: "border-sky-200 bg-gradient-to-br from-white to-sky-50/60",
-    paid: "border-green-200 bg-gradient-to-br from-white to-green-50/60",
-    expired: "border-red-200 bg-gradient-to-br from-white to-red-50/60",
-    cancelled: "border-red-200 bg-gradient-to-br from-white to-red-50/60",
+    pending_payment: "border-[color-mix(in_srgb,var(--pb-warning)_26%,white)] bg-gradient-to-br from-white to-[color-mix(in_srgb,var(--pb-warning)_8%,white)]",
+    dp_paid: "border-[color-mix(in_srgb,var(--pb-brand-primary)_26%,white)] bg-gradient-to-br from-white to-[color-mix(in_srgb,var(--pb-brand-primary)_8%,white)]",
+    paid: "border-[color-mix(in_srgb,var(--pb-success)_26%,white)] bg-gradient-to-br from-white to-[color-mix(in_srgb,var(--pb-success)_8%,white)]",
+    expired: "border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-gradient-to-br from-white to-[color-mix(in_srgb,var(--pb-danger)_8%,white)]",
+    cancelled: "border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-gradient-to-br from-white to-[color-mix(in_srgb,var(--pb-danger)_8%,white)]",
   }[status] ?? "border-gray-200";
 }
 
 function statusText(status) {
   return {
-    pending_payment: "text-amber-700",
-    dp_paid: "text-sky-700",
-    paid: "text-green-700",
-    expired: "text-red-700",
-    cancelled: "text-red-700",
+    pending_payment: "text-[color-mix(in_srgb,var(--pb-warning)_84%,black)]",
+    dp_paid: "text-[color-mix(in_srgb,var(--pb-brand-primary)_84%,black)]",
+    paid: "text-[color-mix(in_srgb,var(--pb-success)_84%,black)]",
+    expired: "text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]",
+    cancelled: "text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]",
   }[status] ?? tw.brand.mark;
 }

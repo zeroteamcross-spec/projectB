@@ -39,12 +39,12 @@ export function AdminApprovalDetailPanel({
   const heading = document.createElement("div");
   heading.className = "grid gap-4 rounded-[1.5rem] border border-white/80 bg-white/72 p-4 shadow-sm sm:grid-cols-[auto_minmax(0,1fr)] sm:items-start";
   const icon = document.createElement("span");
-  icon.className = "grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#f97316,#14b8a6)] text-white shadow-[0_14px_34px_rgba(249,115,22,0.22)]";
+  icon.className = "grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#1e81b0,#1e81b0)] text-white shadow-[0_14px_34px_rgba(30,129,176,0.22)]";
   icon.append(createIcon("user", { className: "h-5 w-5" }));
   const copy = document.createElement("div");
   copy.className = "grid min-w-0 gap-2";
   copy.append(
-    textBlock("text-[11px] font-black uppercase tracking-[0.16em] text-orange-700", "Approval dossier"),
+    textBlock("text-[11px] font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", "Approval dossier"),
     textBlock("text-xl font-black text-gray-950", user.name || user.email || `User #${user.id}`),
     textBlock(`text-sm ${tw.text.muted}`, `${user.email || "-"} | ${user.role || "-"}`),
   );
@@ -92,7 +92,7 @@ export function AdminApprovalDetailPanel({
     approve.prepend(createIcon("sparkles", { className: "h-4 w-4" }));
     actions.append(approve);
   } else {
-    actions.append(textBlock("text-sm text-emerald-700", "Approval sudah diproses. User ini tidak lagi membutuhkan tindakan approval dasar."));
+    actions.append(textBlock("text-sm text-[color-mix(in_srgb,var(--pb-success)_84%,black)]", "Approval sudah diproses. User ini tidak lagi membutuhkan tindakan approval dasar."));
   }
 
   const management = Button({
@@ -105,7 +105,7 @@ export function AdminApprovalDetailPanel({
   actions.append(management);
 
   if (adminApprovalQueueService.isApprovable(user)) {
-    const note = textBlock("text-sm leading-6 text-amber-700 sm:col-span-2", meta.description);
+    const note = textBlock("text-sm leading-6 text-[color-mix(in_srgb,var(--pb-warning)_84%,black)] sm:col-span-2", meta.description);
     actions.append(note);
   }
 

@@ -285,15 +285,15 @@ function paymentSuccessPanel(transaction) {
   const copy = document.createElement("div");
   copy.className = "grid gap-2";
   const title = document.createElement("h2");
-  title.className = "text-2xl font-bold tracking-normal text-green-950";
+  title.className = "text-2xl font-bold tracking-normal text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
   title.textContent = isCompleted ? "Transaksi Selesai" : "Pembayaran Berhasil";
   const body = document.createElement("p");
-  body.className = "text-sm leading-6 text-green-900";
+  body.className = "text-sm leading-6 text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
   body.textContent = isCompleted
     ? "Buyer sudah menyelesaikan transaksi ini."
     : "Pembayaran Anda sudah diterima 100%. Transaksi sedang diproses oleh showroom/seller.";
   const detail = document.createElement("p");
-  detail.className = "text-sm leading-6 text-green-900";
+  detail.className = "text-sm leading-6 text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
   detail.textContent = isCompleted
     ? "Terima kasih, status akhir transaksi sudah tercatat."
     : "Tim seller akan menyiapkan dokumen dan proses serah terima kendaraan.";
@@ -339,7 +339,7 @@ function fulfillmentProgressPanel({ transaction, isFinishing = false, onFinish =
   copy.append(eyebrow, title, body);
 
   const progress = document.createElement("span");
-  progress.className = "inline-flex w-fit items-center rounded-full border border-orange-100 bg-orange-50 px-3 py-1 text-xs font-black text-orange-700";
+  progress.className = "inline-flex w-fit items-center rounded-full border border-[var(--pb-border)] bg-[var(--pb-surface-muted)] px-3 py-1 text-xs font-black text-[var(--pb-brand-secondary)]";
   progress.textContent = `${doneCount}/${checklist.length} selesai`;
   header.append(copy, progress);
   section.append(header);
@@ -376,7 +376,7 @@ function readOnlyChecklistItem(item) {
   const mark = document.createElement("span");
   mark.className = [
     "mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs font-black",
-    item.is_completed ? "bg-green-100 text-green-700" : "bg-gray-200 text-gray-500",
+    item.is_completed ? "bg-[color-mix(in_srgb,var(--pb-success)_14%,white)] text-[color-mix(in_srgb,var(--pb-success)_84%,black)]" : "bg-gray-200 text-gray-500",
   ].join(" ");
   mark.textContent = item.is_completed ? "OK" : "-";
 
@@ -440,7 +440,7 @@ function pendingPaymentGuidePanel(transaction) {
     const item = document.createElement("section");
     item.className = "grid gap-2 rounded-2xl border border-white/70 bg-white/90 p-4 shadow-sm";
     const mark = document.createElement("span");
-    mark.className = "grid h-8 w-8 place-items-center rounded-full bg-orange-500 text-sm font-black text-white";
+    mark.className = "grid h-8 w-8 place-items-center rounded-full bg-[var(--pb-brand-primary)] text-sm font-black text-white";
     mark.textContent = number;
     const itemTitle = document.createElement("h3");
     itemTitle.className = "text-sm font-black text-gray-950";
@@ -917,7 +917,7 @@ function scrollPaymentSummaryIntoView() {
 
 function paymentSuccessOverlay(onClose = null) {
   const overlay = document.createElement("section");
-  overlay.className = "fixed inset-0 z-[120] grid place-items-center bg-green-950/80 px-4 backdrop-blur-sm";
+  overlay.className = "fixed inset-0 z-[120] grid place-items-center bg-[color-mix(in_srgb,var(--pb-success)_84%,black)] px-4 backdrop-blur-sm";
   overlay.setAttribute("role", "status");
   overlay.setAttribute("aria-live", "polite");
 
@@ -925,7 +925,7 @@ function paymentSuccessOverlay(onClose = null) {
   card.className = "grid w-full max-w-md place-items-center gap-5 rounded-[2rem] border border-white/40 bg-white px-6 py-8 text-center shadow-2xl";
 
   const mark = document.createElement("div");
-  mark.className = "grid h-28 w-28 place-items-center rounded-full bg-green-500 shadow-[0_0_60px_rgba(34,197,94,0.55)] animate-[paymentSuccessPop_700ms_cubic-bezier(.2,1.4,.3,1)_both]";
+  mark.className = "grid h-28 w-28 place-items-center rounded-full bg-[var(--pb-success)] shadow-[0_0_60px_rgba(34,197,94,0.55)] animate-[paymentSuccessPop_700ms_cubic-bezier(.2,1.4,.3,1)_both]";
   const tick = document.createElement("span");
   tick.className = "block h-12 w-6 rotate-45 border-b-[10px] border-r-[10px] border-white";
   tick.setAttribute("aria-hidden", "true");
@@ -934,10 +934,10 @@ function paymentSuccessOverlay(onClose = null) {
   const copy = document.createElement("div");
   copy.className = "grid gap-2";
   const title = document.createElement("h2");
-  title.className = "text-3xl font-black tracking-tight text-green-950";
+  title.className = "text-3xl font-black tracking-tight text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
   title.textContent = "Pembayaran Berhasil";
   const body = document.createElement("p");
-  body.className = "text-sm leading-6 text-green-900";
+  body.className = "text-sm leading-6 text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
   body.textContent = "Transaksi Anda sudah dibayar.";
   copy.append(title, body);
 

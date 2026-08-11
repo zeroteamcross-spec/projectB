@@ -121,12 +121,12 @@ function sectionBlock(titleText, descriptionText, content) {
   section.className = "grid min-w-0 gap-4";
 
   const header = document.createElement("div");
-  header.className = "grid min-w-0 gap-1 text-white";
+  header.className = "grid min-w-0 gap-1 text-[var(--pb-text)]";
   const title = document.createElement("h2");
-  title.className = `${tw.text.sectionTitle} text-white`;
+  title.className = tw.text.sectionTitle;
   title.textContent = titleText;
   const description = document.createElement("p");
-  description.className = "break-words text-sm font-semibold leading-6 text-white/78";
+  description.className = "break-words text-sm font-semibold leading-6 text-[var(--pb-text-muted)]";
   description.textContent = descriptionText;
   header.append(title, description);
 

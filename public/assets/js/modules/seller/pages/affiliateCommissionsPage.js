@@ -303,7 +303,7 @@ function summaryCards(summary, globalRule) {
 function commissionsHero({ summary, actions }) {
   const section = document.createElement("section");
   section.id = "slrafc_header";
-  section.className = "relative overflow-hidden rounded-[2rem] border border-orange-100/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(255,247,237,0.84),rgba(240,253,250,0.72))] p-5 shadow-[0_24px_80px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6 lg:p-7";
+  section.className = "relative overflow-hidden rounded-[2rem] border border-[var(--pb-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(250,244,237,0.84),rgba(234,244,249,0.72))] p-5 shadow-[0_24px_80px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6 lg:p-7";
   section.dataset.ds = "seller.commissions.hero";
 
   const layout = document.createElement("section");
@@ -311,11 +311,11 @@ function commissionsHero({ summary, actions }) {
   const copy = document.createElement("section");
   copy.className = "grid min-w-0 gap-3";
   const icon = document.createElement("span");
-  icon.className = "grid h-12 w-12 place-items-center rounded-2xl bg-[linear-gradient(135deg,#f97316,#14b8a6)] text-white shadow-[0_16px_40px_rgba(249,115,22,0.22)]";
+  icon.className = "grid h-12 w-12 place-items-center rounded-2xl bg-[linear-gradient(135deg,#1e81b0,#1e81b0)] text-white shadow-[0_16px_40px_rgba(30,129,176,0.22)]";
   icon.append(createIcon("commission", { className: "h-5 w-5" }));
   copy.append(
     icon,
-    textBlock("p", "text-xs font-black uppercase tracking-[0.18em] text-orange-700", "Seller commission desk"),
+    textBlock("p", "text-xs font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", "Seller commission desk"),
     textBlock("h1", "max-w-3xl text-3xl font-black leading-tight tracking-normal text-gray-950 sm:text-4xl", "Komisi Marketing"),
     textBlock("p", "max-w-2xl text-sm leading-6 text-gray-600", "Pantau komisi dari referral affiliate, status pembayaran, dan riwayat performa."),
   );
@@ -736,10 +736,10 @@ function filterOverrides(overrides, query) {
 
 function summaryCardClass(index) {
   return [
-    "border-orange-100/80 bg-[linear-gradient(135deg,rgba(255,247,237,0.96),rgba(255,255,255,0.88))]",
-    "border-emerald-100/80 bg-[linear-gradient(135deg,rgba(236,253,245,0.96),rgba(255,255,255,0.88))]",
-    "border-sky-100/80 bg-[linear-gradient(135deg,rgba(240,249,255,0.96),rgba(255,255,255,0.88))]",
-    "border-violet-100/80 bg-[linear-gradient(135deg,rgba(245,243,255,0.96),rgba(255,255,255,0.88))]",
+    "border-[var(--pb-border)] bg-[linear-gradient(135deg,rgba(250,244,237,0.96),rgba(255,255,255,0.88))]",
+    "border-[color-mix(in_srgb,var(--pb-success)_14%,white)] bg-[linear-gradient(135deg,rgba(236,246,239,0.96),rgba(255,255,255,0.88))]",
+    "border-[color-mix(in_srgb,var(--pb-brand-primary)_14%,white)] bg-[linear-gradient(135deg,rgba(234,244,249,0.96),rgba(255,255,255,0.88))]",
+    "border-[color-mix(in_srgb,var(--pb-brand-primary)_14%,white)] bg-[linear-gradient(135deg,rgba(234,244,249,0.96),rgba(255,255,255,0.88))]",
   ][index % 4];
 }
 

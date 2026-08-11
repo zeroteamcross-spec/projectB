@@ -7,10 +7,10 @@ export function EmptyState({ title = "Data belum tersedia", description = "", ac
   applyDesignHook(node, designHook);
 
   const glow = document.createElement("div");
-  glow.className = "pointer-events-none absolute left-1/2 top-0 h-24 w-36 -translate-x-1/2 rounded-full bg-gradient-to-br from-orange-200/60 via-transparent to-transparent blur-2xl";
+  glow.className = "pointer-events-none absolute left-1/2 top-0 h-24 w-36 -translate-x-1/2 rounded-full bg-gradient-to-br from-[color-mix(in_srgb,var(--pb-brand-accent)_45%,white)] via-transparent to-transparent blur-2xl";
 
   const eyebrow = document.createElement("p");
-  eyebrow.className = "text-[11px] font-semibold uppercase tracking-[0.16em] text-orange-600";
+  eyebrow.className = "text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]";
   eyebrow.textContent = "Status";
 
   const heading = document.createElement("strong");

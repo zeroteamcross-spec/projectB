@@ -18,7 +18,7 @@ export function AdminMasterSidebarList({
   onPerPageChange = null,
 } = {}) {
   const icon = document.createElement("span");
-  icon.className = "grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#0f766e,#f97316)] text-white shadow-[0_14px_34px_rgba(15,118,110,0.20)]";
+  icon.className = "grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#17698f,#1e81b0)] text-white shadow-[0_14px_34px_rgba(15,118,110,0.20)]";
   icon.append(createIcon("sort", { className: "h-4 w-4" }));
 
   const pagination = DataTablePagination({
@@ -99,7 +99,7 @@ export function AdminMasterSidebarList({
 function reorderBoard({ items = [], onReorder = null }) {
   const section = document.createElement("section");
   section.id = "admst_sidebar_reorder_section";
-  section.className = "grid gap-3 rounded-[1.5rem] border border-white/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.95),rgba(236,253,245,0.78),rgba(255,247,237,0.78))] p-4 shadow-[var(--pb-shadow-card)]";
+  section.className = "grid gap-3 rounded-[1.5rem] border border-white/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.95),rgba(236,246,239,0.78),rgba(250,244,237,0.78))] p-4 shadow-[var(--pb-shadow-card)]";
   section.dataset.ds = "admin.master.sidebar.reorder";
   let visible = false;
 
@@ -108,7 +108,7 @@ function reorderBoard({ items = [], onReorder = null }) {
   const copy = document.createElement("div");
   copy.className = "grid gap-1";
   copy.append(
-    textBlock("text-[11px] font-black uppercase tracking-[0.16em] text-teal-700", "Drag & drop ordering"),
+    textBlock("text-[11px] font-black uppercase tracking-[0.16em] text-[color-mix(in_srgb,var(--pb-brand-primary)_84%,black)]", "Drag & drop ordering"),
     textBlock("text-sm font-semibold text-gray-700", "Geser kartu menu untuk mengubah urutan role yang sedang dipilih."),
   );
   const controls = document.createElement("div");
@@ -149,7 +149,7 @@ function reorderBoard({ items = [], onReorder = null }) {
     card.dataset.itemId = item.id;
     card.className = "grid cursor-grab grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-[1.15rem] border border-white/80 bg-white/88 px-3 py-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md active:cursor-grabbing";
     const handle = document.createElement("span");
-    handle.className = "grid h-9 w-9 place-items-center rounded-xl bg-teal-50 text-teal-700 ring-1 ring-teal-100";
+    handle.className = "grid h-9 w-9 place-items-center rounded-xl bg-[color-mix(in_srgb,var(--pb-brand-primary)_8%,white)] text-[color-mix(in_srgb,var(--pb-brand-primary)_84%,black)] ring-1 ring-[color-mix(in_srgb,var(--pb-brand-primary)_14%,white)]";
     handle.append(createIcon("sort", { className: "h-4 w-4" }));
     const copy = document.createElement("span");
     copy.className = "grid min-w-0 gap-0.5";
@@ -179,14 +179,14 @@ function reorderBoard({ items = [], onReorder = null }) {
     });
     card.addEventListener("dragover", (event) => {
       event.preventDefault();
-      card.classList.add("ring-2", "ring-orange-300");
+      card.classList.add("ring-2", "ring-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)]");
     });
     card.addEventListener("dragleave", () => {
-      card.classList.remove("ring-2", "ring-orange-300");
+      card.classList.remove("ring-2", "ring-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)]");
     });
     card.addEventListener("drop", (event) => {
       event.preventDefault();
-      card.classList.remove("ring-2", "ring-orange-300");
+      card.classList.remove("ring-2", "ring-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)]");
       const sourceId = event.dataTransfer?.getData("text/plain") || dragId;
       const targetId = item.id;
       if (!sourceId || sourceId === targetId) {
@@ -212,7 +212,7 @@ function menuCell(item) {
   const wrap = document.createElement("div");
   wrap.className = "flex min-w-0 items-start gap-3";
   const icon = document.createElement("span");
-  icon.className = "grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#ecfeff,#fff7ed)] text-teal-700 ring-1 ring-teal-100";
+  icon.className = "grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#eaf4f9,#faf4ed)] text-[color-mix(in_srgb,var(--pb-brand-primary)_84%,black)] ring-1 ring-[color-mix(in_srgb,var(--pb-brand-primary)_14%,white)]";
   icon.append(createIcon(item.icon || "sort", { className: "h-4 w-4" }));
   const copy = document.createElement("div");
   copy.className = "grid min-w-0 gap-1";

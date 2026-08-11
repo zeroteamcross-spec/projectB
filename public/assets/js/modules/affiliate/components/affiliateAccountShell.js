@@ -25,7 +25,7 @@ export function AffiliateAccountLayout({
   ensureAffiliateAccountStyles();
 
   const page = document.createElement("section");
-  page.className = `af-account-page mx-auto grid min-w-0 w-full max-w-[430px] gap-5 overflow-x-clip pb-28 text-white md:${maxWidth} md:gap-6 md:pb-8`;
+  page.className = `af-account-page mx-auto grid min-w-0 w-full max-w-[430px] gap-5 overflow-x-clip pb-28 text-[var(--pb-text)] md:${maxWidth} md:gap-6 md:pb-8`;
   page.dataset.ds = "affiliate.account.page";
 
   const content = document.createElement("section");
@@ -54,12 +54,14 @@ function ensureAffiliateAccountStyles() {
   const style = document.createElement("style");
   style.id = STYLE_ID;
   style.textContent = `
+    /* Dulu putih karena halaman ini berdiri di atas video gelap. Kanvasnya
+       sekarang krem, jadi judul dan deskripsinya ikut warna teks tema. */
     .af-account-page,
     .af-account-page > header,
     .af-account-page [data-ds="shared.section_header"],
     .af-account-page [data-ds="shared.section_header"] h1,
     .af-account-page [data-ds="shared.section_header"] p {
-      color: #fff;
+      color: var(--pb-text);
     }
     .af-account-page [data-ds="shared.section_header"] p {
       opacity: .82;
@@ -138,7 +140,7 @@ function ensureAffiliateAccountStyles() {
       width: 2.75rem;
       height: 2.75rem;
       font-size: 1.42rem;
-      box-shadow: 0 14px 26px rgba(249, 115, 22, 0.3);
+      box-shadow: 0 14px 26px rgba(30,129,176, 0.3);
       outline: 6px solid rgba(255, 255, 255, 0.95);
     }
     .af-account-page .account-mobile-footer--affiliate .account-mobile-footer__action-label {
@@ -165,8 +167,8 @@ function affiliateMobileHeader({ title, subtitle, actions }) {
   const copy = document.createElement("section");
   copy.className = "grid min-w-0 gap-0.5";
   copy.append(
-    textNode("p", "truncate text-sm font-bold text-white/75", subtitle || "Akun marketing"),
-    textNode("h1", "truncate text-xl font-black leading-tight tracking-normal text-white", title),
+    textNode("p", "truncate text-sm font-bold text-[var(--pb-text-muted)]", subtitle || "Akun marketing"),
+    textNode("h1", "truncate text-xl font-black leading-tight tracking-normal text-[var(--pb-text-strong)]", title),
   );
 
   const actionGroup = document.createElement("section");
