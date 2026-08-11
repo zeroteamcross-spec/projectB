@@ -18,6 +18,11 @@ load_env(base_path('.env'));
 require_once __DIR__ . '/autoload.php';
 
 $app = new Application(base_path(), config('app', []));
+// Container mengenali dirinya sendiri, supaya kelas yang perlu menyelesaikan
+// dependensi secara malas bisa memintanya lewat konstruktor. Dipakai
+// DiagnosticsController: ia harus tetap bisa menjawab saat PDO justru gagal
+// dibuat, jadi PDO tidak boleh diminta lewat konstruktor.
+$app->container()->instance(\App\Core\Container::class, $app->container());
 $app->container()->singleton(\PDO::class, static fn () => ConnectionFactory::make());
 $app->container()->singleton(MidtransConfig::class, static fn () => MidtransConfig::fromConfig());
 $app->container()->singleton(MidtransHttpClient::class);

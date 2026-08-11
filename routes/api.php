@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Core\Controllers\DiagnosticsController;
 use App\Core\Controllers\HealthController;
 use App\Core\Router;
 
@@ -9,6 +10,8 @@ return static function (Router $router): void {
     $router->get('/', [HealthController::class, 'root']);
     $router->get('/health', [HealthController::class, 'health']);
     $router->get('/api/health', [HealthController::class, 'health']);
+    // Menjawab 404 selama DIAGNOSTIC_TOKEN belum diisi di .env.
+    $router->get('/api/diagnostics/database', [DiagnosticsController::class, 'database']);
 
     $authRoutes = base_path('app/Modules/Auth/Routes/api.php');
 
