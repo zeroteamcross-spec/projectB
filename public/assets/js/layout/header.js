@@ -20,18 +20,17 @@ export function header(store) {
   titleWrap.className = "flex min-w-0 flex-1 items-center gap-3";
 
   const mark = document.createElement("div");
-  mark.className = tw.layout.shellMark;
-  renderBrandMark(mark);
 
   const title = document.createElement("strong");
   title.className = `${tw.layout.appHeaderTitle} min-w-0 break-words`;
-  title.textContent = brandConfig.shellTitle;
+
+  renderBrand(mark, title);
 
   titleWrap.append(mark, title);
 
   const role = document.createElement("span");
   role.className = `${tw.layout.rolePill} hidden md:inline-flex`;
-  role.textContent = `Level User: ${currentRole(store)}`;
+  role.textContent = `Level User: ${roleLabel(currentRole(store))}`;
 
   const actions = document.createElement("div");
   actions.className = "flex shrink-0 items-center justify-end gap-2";
@@ -45,8 +44,7 @@ export function header(store) {
   const sync = (state) => {
     const isAuthenticated = Boolean(state.auth?.isAuthenticated);
     role.textContent = `Level User: ${roleLabel(state.auth?.role ?? state.app.activeRole ?? "public")}`;
-    renderBrandMark(mark);
-    title.textContent = brandConfig.shellTitle;
+    renderBrand(mark, title);
     renderBanner(bannerHost, state);
     syncProfileButton(profileAction, state.auth?.user ?? null);
     node.classList.toggle("flex-col", Boolean(state.auth.impersonation));
@@ -69,19 +67,37 @@ export function header(store) {
   return node;
 }
 
-function renderBrandMark(mark) {
+/**
+ * Brand di header aplikasi: logo dari Konfigurasi WEB kalau ada, kalau tidak
+ * kotak icon berikut nama aplikasi seperti sebelumnya.
+ *
+ * Saat logonya ada, kotak gradiennya ikut dilepas dan nama aplikasi
+ * disembunyikan -- logo biasanya sudah memuat namanya sendiri, dan menaruhnya
+ * di dalam kotak berwarna hanya membuat dua lambang bertumpuk. Namanya pindah
+ * ke atribut alt supaya pembaca layar tetap mendapatkannya.
+ *
+ * Aturan yang sama sudah dipakai landing page sejak 354e6d7.
+ */
+function renderBrand(mark, title) {
   mark.replaceChildren();
   const logoMark = getAsset(brandConfig.logoMarkAsset);
+
   if (logoMark) {
+    mark.className = "grid shrink-0 place-items-center";
     const image = document.createElement("img");
     image.src = logoMark;
     image.alt = brandConfig.appName;
-    image.className = "h-6 w-6 object-contain";
+    image.className = "h-10 w-auto max-w-[9rem] object-contain";
     mark.append(image);
+    title.hidden = true;
+    title.textContent = "";
     return;
   }
 
+  mark.className = tw.layout.shellMark;
   mark.append(createIcon(brandConfig.logoIcon, { className: "h-5 w-5" }));
+  title.hidden = false;
+  title.textContent = brandConfig.shellTitle;
 }
 
 function currentRole(store) {
