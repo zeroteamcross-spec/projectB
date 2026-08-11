@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Auth\Controllers;
 
+use App\Core\Auth\AuthCookie;
 use App\Core\Controller;
 use App\Core\Exceptions\UnauthorizedException;
 use App\Core\JsonResponse;
@@ -139,32 +140,21 @@ class AuthController extends Controller
 
     private function rememberCookieHeader(string $value, string $expiresAt): string
     {
-        $name = (string) config('auth.remember_cookie.name', 'remember_me');
-        $sameSite = (string) config('auth.remember_cookie.same_site', 'Strict');
-        $secure = (bool) config('auth.remember_cookie.secure', false);
-
-        $header = sprintf(
-            '%s=%s; Expires=%s; Path=/; HttpOnly; SameSite=%s',
-            $name,
-            rawurlencode($value),
-            gmdate('D, d M Y H:i:s T', strtotime($expiresAt)),
-            $sameSite
+        return AuthCookie::header(
+            (string) config('auth.remember_cookie.name', 'remember_me'),
+            $value,
+            $expiresAt,
+            (bool) config('auth.remember_cookie.secure', false),
+            (string) config('auth.remember_cookie.same_site', 'Strict')
         );
-
-        return $secure ? $header . '; Secure' : $header;
     }
 
     private function expiredRememberCookieHeader(): string
     {
-        $name = (string) config('auth.remember_cookie.name', 'remember_me');
-        $sameSite = (string) config('auth.remember_cookie.same_site', 'Strict');
-        $secure = (bool) config('auth.remember_cookie.secure', false);
-        $header = sprintf(
-            '%s=; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=/; HttpOnly; SameSite=%s',
-            $name,
-            $sameSite
+        return AuthCookie::expiredHeader(
+            (string) config('auth.remember_cookie.name', 'remember_me'),
+            (bool) config('auth.remember_cookie.secure', false),
+            (string) config('auth.remember_cookie.same_site', 'Strict')
         );
-
-        return $secure ? $header . '; Secure' : $header;
     }
 }

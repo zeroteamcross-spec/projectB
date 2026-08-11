@@ -3,6 +3,13 @@
 declare(strict_types=1);
 
 return [
+    // Domain untuk semua cookie autentikasi. Kosong berarti host-only: cookie
+    // yang diterbitkan carlynk.id tidak akan terbawa ke admin.carlynk.id, dan
+    // adminnya diminta login lagi di subdomain. Isi ".carlynk.id" supaya sesi
+    // dibagi -- termasuk saat impersonation melempar admin dari subdomain ke
+    // domain utama.
+    'cookie_domain' => env('AUTH_COOKIE_DOMAIN', ''),
+
     'remember_cookie' => [
         'name' => 'remember_me',
         'ttl_days' => 365,

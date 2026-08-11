@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Auth\Services;
 
+use App\Core\Auth\AuthCookie;
 use App\Core\Exceptions\ForbiddenException;
 use App\Core\Exceptions\UnauthorizedException;
 use App\Core\Exceptions\ValidationException;
@@ -884,15 +885,7 @@ class GoogleAuthService
 
     private function cookieHeader(string $name, string $value, int $expiresAt, bool $secure, string $sameSite): string
     {
-        $header = sprintf(
-            '%s=%s; Expires=%s; Path=/; HttpOnly; SameSite=%s',
-            $name,
-            rawurlencode($value),
-            gmdate('D, d M Y H:i:s T', $expiresAt),
-            $sameSite
-        );
-
-        return $secure ? $header . '; Secure' : $header;
+        return AuthCookie::headerFromTimestamp($name, $value, $expiresAt, $secure, $sameSite);
     }
 
     private function base64UrlEncode(string $value): string

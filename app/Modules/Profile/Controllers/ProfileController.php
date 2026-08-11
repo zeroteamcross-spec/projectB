@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Profile\Controllers;
 
+use App\Core\Auth\AuthCookie;
 use App\Core\Controller;
 use App\Core\JsonResponse;
 use App\Core\Request;
@@ -91,15 +92,10 @@ class ProfileController extends Controller
 
     private function expiredRememberCookieHeader(): string
     {
-        $name = (string) config('auth.remember_cookie.name', 'remember_me');
-        $sameSite = (string) config('auth.remember_cookie.same_site', 'Strict');
-        $secure = (bool) config('auth.remember_cookie.secure', false);
-        $header = sprintf(
-            '%s=; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=/; HttpOnly; SameSite=%s',
-            $name,
-            $sameSite
+        return AuthCookie::expiredHeader(
+            (string) config('auth.remember_cookie.name', 'remember_me'),
+            (bool) config('auth.remember_cookie.secure', false),
+            (string) config('auth.remember_cookie.same_site', 'Strict')
         );
-
-        return $secure ? $header . '; Secure' : $header;
     }
 }
