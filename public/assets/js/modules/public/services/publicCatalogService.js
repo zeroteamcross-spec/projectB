@@ -3,13 +3,19 @@ import { imagesResource } from "../../../resources/imagesResource.js";
 import { inspectionsResource } from "../../../resources/inspectionsResource.js";
 import { publicContextService } from "./publicContextService.js";
 
+const CATALOG_CACHE_TTL_MS = 30_000;
+const catalogCache = new Map();
+const catalogInFlight = new Map();
+
 export const publicCatalogService = {
   async list({ page = 1, limit = 12, filters = {}, affiliateSlug = "", showroomSlug = "" } = {}, options = {}) {
+    const normalizedAffiliateSlug = normalizeSlug(affiliateSlug);
+    const normalizedShowroomSlug = normalizeSlug(showroomSlug);
     let affiliateSellerUserId = null;
     let showroomSellerUserId = null;
 
-    if (affiliateSlug) {
-      const context = await publicContextService.activateAffiliateBySlug(affiliateSlug, options);
+    if (normalizedAffiliateSlug) {
+      const context = await publicContextService.activateAffiliateBySlug(normalizedAffiliateSlug, options);
       if (!context) {
         return { cars: [], meta: {} };
       }
@@ -17,8 +23,8 @@ export const publicCatalogService = {
       affiliateSellerUserId = context.sellerUserId;
     }
 
-    if (showroomSlug) {
-      const context = await publicContextService.activateShowroomBySlug(showroomSlug, options);
+    if (normalizedShowroomSlug) {
+      const context = await publicContextService.activateShowroomBySlug(normalizedShowroomSlug, options);
       if (!context) {
         return { cars: [], meta: {} };
       }
@@ -31,8 +37,8 @@ export const publicCatalogService = {
     );
 
     const scopedFilters = {
-      page,
-      limit,
+      page: positiveInteger(page, 1),
+      limit: positiveInteger(limit, 12),
       ...cleanFilters,
       listing_status: "published",
     };
@@ -41,10 +47,45 @@ export const publicCatalogService = {
       scopedFilters.seller_user_id = affiliateSellerUserId || showroomSellerUserId;
     }
 
-    return carsResource.list(
-      (affiliateSellerUserId || showroomSellerUserId) ? scopedFilters : publicContextService.applyCatalogFilters(scopedFilters),
-      options
-    );
+    const requestFilters = (affiliateSellerUserId || showroomSellerUserId)
+      ? scopedFilters
+      : publicContextService.applyCatalogFilters(scopedFilters);
+    const cacheKey = catalogCacheKey({
+      affiliateSlug: normalizedAffiliateSlug,
+      showroomSlug: normalizedShowroomSlug,
+      filters: requestFilters,
+    });
+    const cached = readCatalogCache(cacheKey);
+
+    if (cached) {
+      return cached;
+    }
+
+    const pending = catalogInFlight.get(cacheKey);
+    if (pending) {
+      return pending;
+    }
+
+    const request = carsResource.list(requestFilters, options)
+      .then((data) => {
+        catalogCache.set(cacheKey, {
+          data,
+          expiresAt: Date.now() + CATALOG_CACHE_TTL_MS,
+        });
+        return data;
+      });
+
+    // Route preload requests remain abortable. Calls without a route signal
+    // can still share one in-flight request, such as repeated load-more taps.
+    if (!options.signal) {
+      catalogInFlight.set(cacheKey, request);
+      request.then(
+        () => catalogInFlight.delete(cacheKey),
+        () => catalogInFlight.delete(cacheKey)
+      );
+    }
+
+    return request;
   },
 
   async detail(carId, options = {}) {
@@ -106,3 +147,51 @@ export const publicCatalogService = {
     };
   },
 };
+
+function normalizeSlug(value) {
+  return String(value ?? "").trim().toLowerCase();
+}
+
+function positiveInteger(value, fallback) {
+  const normalized = Number(value);
+  return Number.isFinite(normalized) && normalized > 0 ? Math.floor(normalized) : fallback;
+}
+
+function catalogCacheKey({ affiliateSlug = "", showroomSlug = "", filters = {} } = {}) {
+  return JSON.stringify({
+    affiliateSlug,
+    showroomSlug,
+    filters: stableValue(filters),
+  });
+}
+
+function stableValue(value) {
+  if (Array.isArray(value)) {
+    return value.map((item) => stableValue(item));
+  }
+
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.keys(value)
+        .sort()
+        .map((key) => [key, stableValue(value[key])])
+    );
+  }
+
+  return value;
+}
+
+function readCatalogCache(cacheKey) {
+  const entry = catalogCache.get(cacheKey);
+
+  if (!entry) {
+    return null;
+  }
+
+  if (entry.expiresAt <= Date.now()) {
+    catalogCache.delete(cacheKey);
+    return null;
+  }
+
+  return entry.data;
+}

@@ -85,7 +85,12 @@ function render(root, context, getBackgroundVideoLayer) {
   const affiliate = publicContextService.activeAffiliate();
   const showroom = publicContextService.activeShowroom();
   const activeContext = affiliate || showroom;
-  const summary = publicCatalogState.selectedCarSummary(context.params.id);
+  const summary = publicCatalogState.selectedCarSummary(context.params.id, {
+    affiliateSlug: publicContextService.routeAffiliateSlug(context),
+    showroomSlug: publicContextService.routeShowroomSlug(context),
+    filters: publicCatalogState.filters(),
+    page: publicCatalogState.page(),
+  });
   const car = detail?.car ?? summary;
   const images = detail?.images ?? car?.images ?? [];
   const inspection = detail?.inspection ?? null;

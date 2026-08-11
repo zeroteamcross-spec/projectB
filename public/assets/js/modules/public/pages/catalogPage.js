@@ -113,7 +113,7 @@ function shouldRenderCatalogForAction(action) {
     "favorites:",
     "public:",
     "public-context:",
-    "working:set",
+    "working:",
     "snapshot:set",
     "route:",
     "app.route",
@@ -135,12 +135,26 @@ function render(root, context, flags) {
   const invalidShowroomRoute = isShowroomRoute && publicContextService.invalidSlug() === showroomSlug;
   const activeContext = affiliate || showroom;
   const catalogState = publicCatalogState.get();
-  const snapshot = publicCatalogState.snapshotCatalog({ cars: [], meta: {} });
-  const working = publicCatalogState.workingCatalog(snapshot);
-  const workingHydratedAt = appStore.get("working.publicCatalog.catalog.hydratedAt", 0) ?? 0;
-  const meta = working?.meta ?? snapshot?.meta ?? {};
   const filters = catalogState.filters ?? {};
-  const sourceCars = marketableCars(working?.cars ?? snapshot?.cars ?? []);
+  const catalogScope = {
+    affiliateSlug,
+    showroomSlug,
+    filters,
+    page: catalogState.page,
+  };
+  const cachedCatalog = publicCatalogState.cachedCatalog(catalogScope);
+  const snapshot = publicCatalogState.snapshotCatalog({ cars: [], meta: {} });
+  const hydratedCatalog = publicCatalogState.workingCatalog(null);
+  const fallbackCatalog = isAffiliateRoute || isShowroomRoute
+    ? { cars: [], meta: {} }
+    : snapshot;
+  const working = mergeCatalogForReturn(hydratedCatalog ?? cachedCatalog ?? fallbackCatalog, cachedCatalog, catalogState.page);
+  const workingHydratedAt = appStore.get("working.publicCatalog.catalog.hydratedAt", 0) ?? 0;
+  if (workingHydratedAt && working) {
+    publicCatalogState.rememberCatalog(working, catalogScope);
+  }
+  const meta = working?.meta ?? {};
+  const sourceCars = marketableCars(working?.cars ?? []);
   const allCars = applyQuickFilter(applyLocalFilters(sourceCars, filters), catalogState.quickFilter);
   const filterOptions = buildFilterOptions(sourceCars, resolveLocationMaster());
   const canLoadMore = canLoadMoreCatalog(meta, allCars.length, catalogState.page, catalogState.limit);
@@ -149,7 +163,8 @@ function render(root, context, flags) {
   const useBackgroundVideo = isLandingRoute(context);
   const slidersBeforeRender = resolvePublicSliders();
 
-  if (isAffiliateRoute && !invalidAffiliateRoute && (!contextReady || !workingHydratedAt)) {
+  const isScopedRoute = isAffiliateRoute || isShowroomRoute;
+  if (isScopedRoute && !invalidAffiliateRoute && !invalidShowroomRoute && (!contextReady || (!workingHydratedAt && !cachedCatalog))) {
     disposeSliderBanners(root);
     root.replaceChildren(loadingFrame(
       filters,
@@ -793,7 +808,18 @@ async function loadMore(root, context, flags) {
     const affiliateSlug = publicContextService.routeAffiliateSlug(context);
     const showroomSlug = publicContextService.routeShowroomSlug(context);
     const nextPage = publicCatalogState.page() + 1;
-    const current = publicCatalogState.workingCatalog({ cars: [], meta: {} });
+    const catalogScope = {
+      affiliateSlug,
+      showroomSlug,
+      filters: publicCatalogState.filters(),
+      page: publicCatalogState.page(),
+    };
+    const cachedCatalog = publicCatalogState.cachedCatalog(catalogScope);
+    const current = mergeCatalogForReturn(
+      publicCatalogState.workingCatalog(null) ?? cachedCatalog ?? { cars: [], meta: {} },
+      cachedCatalog,
+      publicCatalogState.page()
+    );
     const next = await publicCatalogService.list({
       page: nextPage,
       limit: publicCatalogState.limit(),
@@ -813,6 +839,29 @@ async function loadMore(root, context, flags) {
     flags.isLoadingMore = false;
     render(root, context, flags);
   }
+}
+
+function mergeCatalogForReturn(primary, cached, page) {
+  if (!primary || !cached || Number(page) <= 1) {
+    return primary;
+  }
+
+  const primaryCars = Array.isArray(primary.cars) ? primary.cars : [];
+  const cachedCars = Array.isArray(cached.cars) ? cached.cars : [];
+
+  if (cachedCars.length <= primaryCars.length) {
+    return primary;
+  }
+
+  const primaryIds = new Set(primaryCars.map((car) => String(car?.id ?? "")));
+  return {
+    ...cached,
+    ...primary,
+    cars: [
+      ...primaryCars,
+      ...cachedCars.filter((car) => !primaryIds.has(String(car?.id ?? ""))),
+    ],
+  };
 }
 
 function activeFilterCount(filters) {

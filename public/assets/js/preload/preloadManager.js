@@ -6,6 +6,7 @@ export class PreloadManager {
     this.bus = bus;
     this.controllers = new Set();
     this.bootedRoles = new Set();
+    this.routeHydration = null;
   }
 
   async boot(role = "buyer") {
@@ -23,9 +24,16 @@ export class PreloadManager {
 
   async hydrateRoute(route, context) {
     const items = route.preload?.working ?? [];
+    this.routeHydration?.controllers.forEach((controller) => controller.abort());
+    const hydration = { controllers: new Set() };
+    this.routeHydration = hydration;
 
-    for (const item of items) {
-      await this.loadWorking(route.workingStateKey, item, context);
+    try {
+      return await Promise.allSettled(items.map((item) => this.loadWorking(route.workingStateKey, item, context, hydration)));
+    } finally {
+      if (this.routeHydration === hydration) {
+        this.routeHydration = null;
+      }
     }
   }
 
@@ -64,16 +72,21 @@ export class PreloadManager {
     }
   }
 
-  async loadWorking(workingStateKey, item, context) {
+  async loadWorking(workingStateKey, item, context, hydration = null) {
     if (!workingStateKey || typeof item.loader !== "function") {
       return null;
     }
 
     const controller = new AbortController();
     this.controllers.add(controller);
+    hydration?.controllers.add(controller);
 
     try {
       const data = await item.loader({ ...context, signal: controller.signal });
+      if (hydration && this.routeHydration !== hydration) {
+        return data;
+      }
+
       this.store.patchState(`working.${workingStateKey}.${item.key}`, {
         data,
         hydratedAt: Date.now(),
@@ -81,11 +94,13 @@ export class PreloadManager {
       return data;
     } finally {
       this.controllers.delete(controller);
+      hydration?.controllers.delete(controller);
     }
   }
 
   dispose() {
     this.controllers.forEach((controller) => controller.abort());
     this.controllers.clear();
+    this.routeHydration = null;
   }
 }

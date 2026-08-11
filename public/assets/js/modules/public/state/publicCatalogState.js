@@ -1,6 +1,8 @@
 import { appStore } from "../../../state/store.js";
 
 const BASE = "modules.public.catalog";
+const WORKING_CATALOG_CACHE_TTL_MS = 5 * 60 * 1000;
+const workingCatalogCache = new Map();
 
 export const publicCatalogState = {
   get() {
@@ -58,12 +60,13 @@ export const publicCatalogState = {
     appStore.patchState(`${BASE}.selectedCarId`, carId, "public:selected-car");
   },
 
-  selectedCarSummary(carId = this.get().selectedCarId) {
+  selectedCarSummary(carId = this.get().selectedCarId, scope = {}) {
     const id = String(carId ?? "");
     const workingCars = this.workingCatalog({ cars: [] })?.cars ?? [];
+    const cachedCars = this.cachedCatalog(scope)?.cars ?? [];
     const snapshotCars = this.snapshotCatalog({ cars: [] })?.cars ?? [];
 
-    return [...workingCars, ...snapshotCars].find((car) => String(car.id) === id) ?? null;
+    return [...workingCars, ...cachedCars, ...snapshotCars].find((car) => String(car.id) === id) ?? null;
   },
 
   /**
@@ -96,4 +99,56 @@ export const publicCatalogState = {
       hydratedAt: Date.now(),
     }, "public:catalog-set");
   },
+
+  cachedCatalog(scope = {}) {
+    const cacheKey = catalogScopeKey(scope);
+    const entry = workingCatalogCache.get(cacheKey);
+
+    if (!entry) {
+      return null;
+    }
+
+    if (Date.now() - entry.storedAt > WORKING_CATALOG_CACHE_TTL_MS) {
+      workingCatalogCache.delete(cacheKey);
+      return null;
+    }
+
+    return entry.catalog;
+  },
+
+  rememberCatalog(catalog, scope = {}) {
+    if (!catalog || !Array.isArray(catalog.cars)) {
+      return;
+    }
+
+    workingCatalogCache.set(catalogScopeKey(scope), {
+      catalog,
+      storedAt: Date.now(),
+    });
+  },
 };
+
+function catalogScopeKey({ affiliateSlug = "", showroomSlug = "", filters = {}, page = 1 } = {}) {
+  return JSON.stringify({
+    affiliateSlug: String(affiliateSlug ?? "").trim().toLowerCase(),
+    showroomSlug: String(showroomSlug ?? "").trim().toLowerCase(),
+    filters: stableValue(filters),
+    page: Number(page) > 0 ? Math.floor(Number(page)) : 1,
+  });
+}
+
+function stableValue(value) {
+  if (Array.isArray(value)) {
+    return value.map((item) => stableValue(item));
+  }
+
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.keys(value)
+        .sort()
+        .map((key) => [key, stableValue(value[key])])
+    );
+  }
+
+  return value;
+}

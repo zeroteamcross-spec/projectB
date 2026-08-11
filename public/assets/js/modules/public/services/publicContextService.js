@@ -36,6 +36,11 @@ export const publicContextService = {
       return null;
     }
 
+    const activeAffiliate = this.activeAffiliate();
+    if (activeAffiliate?.slug?.toLowerCase?.() === normalizedSlug && activeAffiliate.sellerUserId) {
+      return activeAffiliate;
+    }
+
     const result = await affiliatesResource.validateReferralCode(normalizedSlug, options);
     if (!result?.is_valid || !result?.affiliate_id || !result?.seller_user_id) {
       this.clearInvalidSlug(normalizedSlug);
@@ -61,6 +66,11 @@ export const publicContextService = {
     if (!normalizedSlug) {
       this.clear();
       return null;
+    }
+
+    const activeShowroom = this.activeShowroom();
+    if (activeShowroom?.slug?.toLowerCase?.() === normalizedSlug && activeShowroom.sellerUserId) {
+      return activeShowroom;
     }
 
     const result = await showroomsResource.validateSlug(normalizedSlug, options);
