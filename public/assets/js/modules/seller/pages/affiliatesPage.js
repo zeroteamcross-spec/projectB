@@ -248,7 +248,7 @@ function render(root, modalHost, context, actions) {
   if (!listHydratedAt && !(snapshotPayload?.affiliates?.length)) {
     listWrap.append(EmptyState({
       title: "Memuat marketing seller",
-      description: "Snapshot dan working set marketing seller sedang disiapkan.",
+      description: "Daftar marketing sedang dimuat.",
     }));
   } else {
     listWrap.append(applyDesignHook(SellerAffiliatesList({
@@ -315,7 +315,7 @@ function renderModal({ context, mode, selectedAffiliate, detailHydratedAt, runti
   if (mode === "edit" && context.query.affiliate_id && !detailHydratedAt && !selectedAffiliate) {
     panel.append(EmptyState({
       title: "Memuat detail marketing",
-      description: "Detail marketing aktif sedang dihydrate dari working set seller.",
+      description: "Detail marketing sedang dimuat.",
     }));
   } else {
     panel.append(applyDesignHook(SellerAffiliateForm({

@@ -53,7 +53,6 @@ export function TransactionEntryPage() {
       root.className = "min-h-screen";
       render(root, context, getBackgroundVideoLayer);
       publicAffiliateTrackingService.trackCurrentPage();
-      window.scrollTo({ top: 0, behavior: "auto" });
       return root;
     },
     hydrate(context) {

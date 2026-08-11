@@ -19,7 +19,6 @@ export function pasangInteraksi(akar) {
   pembersih.push(pasangReveal(qa));
   pembersih.push(pasangTilt(qa));
   pembersih.push(pasangMagnet(qa));
-  pembersih.push(pasangSorot(q));
   pembersih.push(pasangUiGulir(q, qa));
   pembersih.push(pasangHover(qa));
   pembersih.push(pasangGulirBagian(akar));
@@ -194,41 +193,6 @@ function pasangMagnet(qa) {
   });
 
   return () => lepas.forEach((f) => f());
-}
-
-function pasangSorot(q) {
-  const sorot = q("[data-spot]");
-
-  if (!sorot || window.matchMedia("(hover:none)").matches) {
-    return () => {};
-  }
-
-  let x = window.innerWidth / 2;
-  let y = window.innerHeight / 2;
-  let cx = x;
-  let cy = y;
-  let raf = 0;
-
-  const gerak = (e) => {
-    x = e.clientX;
-    y = e.clientY;
-    sorot.style.opacity = "1";
-  };
-
-  const putar = () => {
-    raf = requestAnimationFrame(putar);
-    cx += (x - cx) * 0.09;
-    cy += (y - cy) * 0.09;
-    sorot.style.transform = `translate(${cx.toFixed(1)}px,${cy.toFixed(1)}px)`;
-  };
-
-  window.addEventListener("pointermove", gerak, { passive: true });
-  putar();
-
-  return () => {
-    window.removeEventListener("pointermove", gerak);
-    cancelAnimationFrame(raf);
-  };
 }
 
 /**

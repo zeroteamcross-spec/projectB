@@ -120,7 +120,7 @@ function render(root, context, notFound, actions) {
   if (!hydratedAt && !affiliate) {
     frame.append(EmptyState({
       title: "Memuat dashboard marketing",
-      description: "Profil marketing dan snapshot aktivitas sedang disiapkan.",
+      description: "Profil marketing dan ringkasan aktivitas sedang dimuat.",
     }));
     root.replaceChildren(AffiliateAccountLayout({
       activePath: context.path,

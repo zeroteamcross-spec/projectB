@@ -136,7 +136,7 @@ function heroSection(overview, filteredCars, isHydrated) {
   const status = textNode(
     "p",
     isHydrated ? "text-xs font-bold text-[color-mix(in_srgb,var(--pb-success)_84%,black)]" : "text-xs font-bold text-[var(--pb-brand-secondary)]",
-    isHydrated ? "Working set penuh siap" : "Render dari snapshot kecil"
+    isHydrated ? "Data lengkap" : "Sedang dimuat"
   );
   status.id = "slrinsp_hydrate_status_section";
   copy.append(status);
@@ -217,7 +217,7 @@ function carQueueSection({ cars, overview }) {
   const header = node("section", "slrinsp_queue_header_section", "flex min-w-0 flex-col gap-2 border-b border-gray-100 pb-4 sm:flex-row sm:items-end sm:justify-between");
   const copy = node("section", "slrinsp_queue_copy_section", "grid min-w-0 gap-1");
   copy.append(
-    textNode("p", "text-xs font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", "Working set"),
+    textNode("p", "text-xs font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", "Data halaman"),
     textNode("h2", "text-xl font-black tracking-normal text-gray-950", "Daftar inspeksi seller"),
     textNode("p", "text-sm leading-6 text-gray-500", `${cars.length} mobil tersedia dari state halaman`)
   );

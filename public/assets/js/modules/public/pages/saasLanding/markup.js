@@ -21,9 +21,7 @@ export function landingMarkup({ namaMerek, tagline, tautanWhatsapp, alamatEtalas
   const merek = escapeHtml(namaMerek);
 
   return `
-<canvas data-stage="" style="position:fixed;inset:0;width:100vw;height:100vh;display:block;z-index:0;opacity:0;transition:opacity .5s ease;touch-action:pan-y"></canvas>
-<div style="position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(75% 65% at 50% 46%,transparent 40%,rgba(255,255,255,.5) 78%,rgba(255,255,255,.9) 100%)"></div>
-<div data-spot="" style="position:fixed;top:0;left:0;width:520px;height:520px;margin:-260px 0 0 -260px;border-radius:50%;pointer-events:none;z-index:1;background:radial-gradient(circle,rgba(30,129,176,.10),transparent 68%);opacity:0;transition:opacity .6s ease"></div>
+<div style="position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(70% 55% at 18% 8%,rgba(30,129,176,.14),transparent 62%),radial-gradient(60% 50% at 88% 22%,rgba(234,182,118,.20),transparent 60%),linear-gradient(180deg,#ffffff,#faf4ed 55%,#f5ece1)"></div>
 
 <div style="position:relative;z-index:2">
 
@@ -47,7 +45,6 @@ export function landingMarkup({ namaMerek, tagline, tautanWhatsapp, alamatEtalas
 </div>
 
 <div data-hero="" style="position:relative;min-height:100vh;display:flex;align-items:center;padding:80px 0 60px">
-  <div style="position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(255,255,255,.93) 0%,rgba(255,255,255,.78) 36%,rgba(255,255,255,.2) 62%,transparent 78%),linear-gradient(180deg,rgba(255,255,255,.7) 0%,transparent 26%,transparent 74%,#faf4ed 100%)"></div>
   <div style="position:relative;max-width:1180px;margin:0 auto;padding:0 24px;width:100%">
     <div data-reveal="" style="display:inline-flex;align-items:center;gap:11px;border:1px solid rgba(30,129,176,.22);background:rgba(30,129,176,.07);border-radius:999px;padding:7px 15px 7px 9px;font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.03em;color:#17698f;margin-bottom:28px">
       <span style="position:relative;display:inline-flex;width:7px;height:7px"><span style="position:absolute;inset:0;border-radius:50%;background:#1e81b0"></span><span style="position:absolute;inset:0;border-radius:50%;background:#1e81b0;animation:pulseRing 2s ease-out infinite"></span></span>
@@ -71,47 +68,9 @@ export function landingMarkup({ namaMerek, tagline, tautanWhatsapp, alamatEtalas
       <span>GRATIS UNTUK PAKET DASAR</span><span>TANPA KARTU KREDIT</span><span>VERIFIKASI 1x24 JAM</span>
     </div>
   </div>
-  <div data-modelload="" style="position:absolute;left:50%;bottom:88px;transform:translateX(-50%);display:flex;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.16em;color:#1c1917;transition:opacity .6s ease">
-    <span style="width:7px;height:7px;border-radius:50%;background:#1e81b0;animation:pulseDot 1.2s ease-in-out infinite"></span>
-    MEMUAT MODEL 3D
-  </div>
   <div data-scrollhint="" style="position:absolute;left:50%;bottom:26px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:9px;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.16em;color:#1c1917">
     GULIR
     <span style="width:1px;height:38px;background:linear-gradient(180deg,#1e81b0,transparent)"></span>
-  </div>
-</div>
-
-<div data-showcase="" style="position:relative;height:340vh">
-  <div style="position:sticky;top:0;height:100vh;display:flex;flex-direction:column;justify-content:flex-end;pointer-events:none">
-    <div style="position:absolute;inset:0;background:linear-gradient(180deg,#faf4ed 0%,transparent 18%,transparent 46%,rgba(255,255,255,.86) 78%,#faf4ed 100%);pointer-events:none"></div>
-    <div style="position:absolute;top:12vh;left:0;right:0;display:flex;justify-content:center">
-      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.18em;color:#1c1917;border:1px solid rgba(28,25,23,.1);border-radius:999px;padding:8px 16px;background:rgba(255,255,255,.5);backdrop-filter:blur(6px)">GULIR UNTUK MEMUTAR &middot; SERET UNTUK MENGGESER</div>
-    </div>
-
-    <div style="position:relative;max-width:1180px;margin:0 auto;padding:0 24px 12vh;width:100%">
-      <div style="display:flex;gap:14px;margin-bottom:26px">
-        <div data-dot="0" style="height:2px;flex:1;background:rgba(28,25,23,.12);overflow:hidden"><span style="display:block;height:100%;width:100%;background:#1e81b0;transform:scaleX(0);transform-origin:left;transition:transform .4s linear"></span></div>
-        <div data-dot="1" style="height:2px;flex:1;background:rgba(28,25,23,.12);overflow:hidden"><span style="display:block;height:100%;width:100%;background:#1e81b0;transform:scaleX(0);transform-origin:left;transition:transform .4s linear"></span></div>
-        <div data-dot="2" style="height:2px;flex:1;background:rgba(28,25,23,.12);overflow:hidden"><span style="display:block;height:100%;width:100%;background:#1e81b0;transform:scaleX(0);transform-origin:left;transition:transform .4s linear"></span></div>
-      </div>
-      <div style="position:relative;min-height:210px">
-        <div data-cap="0" style="position:absolute;inset:0;max-width:44ch;transition:opacity .55s cubic-bezier(.22,.9,.28,1),transform .55s cubic-bezier(.22,.9,.28,1)">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.14em;color:#1e81b0;margin-bottom:16px">01 &mdash; HALAMAN SHOWROOM</div>
-          <h2 style="font-family:Sora,sans-serif;font-weight:700;font-size:clamp(28px,3.6vw,48px);line-height:1.06;letter-spacing:-.035em;margin:0 0 14px">Etalase digital atas nama showroom Anda.</h2>
-          <p style="color:#1c1917;font-size:17px;line-height:1.6;margin:0">Alamat khusus, identitas, katalog unit, dan kontak langsung ke tim penjualan Anda sendiri.</p>
-        </div>
-        <div data-cap="1" style="position:absolute;inset:0;max-width:44ch;opacity:0;transition:opacity .55s cubic-bezier(.22,.9,.28,1),transform .55s cubic-bezier(.22,.9,.28,1)">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.14em;color:#1e81b0;margin-bottom:16px">02 &mdash; KELOLA LISTING</div>
-          <h2 style="font-family:Sora,sans-serif;font-weight:700;font-size:clamp(28px,3.6vw,48px);line-height:1.06;letter-spacing:-.035em;margin:0 0 14px">Stok mobil Anda, di bawah kendali Anda.</h2>
-          <p style="color:#1c1917;font-size:17px;line-height:1.6;margin:0">Tambah unit, perbarui harga, atur status tayang. Perubahan langsung tampil di halaman Anda.</p>
-        </div>
-        <div data-cap="2" style="position:absolute;inset:0;max-width:44ch;opacity:0;transition:opacity .55s cubic-bezier(.22,.9,.28,1),transform .55s cubic-bezier(.22,.9,.28,1)">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.14em;color:#1e81b0;margin-bottom:16px">03 &mdash; PEMASARAN</div>
-          <h2 style="font-family:Sora,sans-serif;font-weight:700;font-size:clamp(28px,3.6vw,48px);line-height:1.06;letter-spacing:-.035em;margin:0 0 14px">Pemasaran dijalankan oleh showroom, bukan perantara.</h2>
-          <p style="color:#1c1917;font-size:17px;line-height:1.6;margin:0">Materi promosi, kanal lead, dan laporan performa yang terhubung ke katalog Anda.</p>
-        </div>
-      </div>
-    </div>
   </div>
 </div>
 

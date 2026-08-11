@@ -12,6 +12,10 @@ export class Router {
     this.notFound = notFound;
     this.guard = guard;
     this.activePage = null;
+    // Jalur yang sedang tampil, dipakai untuk membedakan "pindah halaman" dari
+    // "query berubah di halaman yang sama" (mis. tab role di /auth). Hanya yang
+    // pertama yang memulangkan gulir ke atas.
+    this.jalurTampil = null;
     this.handleChange = this.handleChange.bind(this);
   }
 
@@ -25,6 +29,13 @@ export class Router {
   }
 
   start() {
+    // Peramban memulihkan posisi gulir sendiri saat hash berubah atau saat
+    // tombol back ditekan, dan itu bertabrakan dengan halaman yang baru saja
+    // kita pasang. Kita yang pegang kendali gulirnya.
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+
     window.addEventListener("hashchange", this.handleChange);
     this.handleChange();
 
@@ -106,8 +117,12 @@ export class Router {
     }, "route:change");
     this.bus?.emit("route:change", context);
 
+    const pindahHalaman = this.jalurTampil !== location.path;
+    this.jalurTampil = location.path;
+
     if (!route) {
       await this.mountPage(this.notFound(context), context);
+      this.pulangkanGulir(pindahHalaman);
       this.bus?.emit("route:mounted", context);
       return;
     }
@@ -117,6 +132,7 @@ export class Router {
     }
 
     await this.mountPage(route.page(context), context);
+    this.pulangkanGulir(pindahHalaman);
     this.bus?.emit("route:mounted", context);
 
     this.preloadManager?.hydrateRoute(route, context)
@@ -128,6 +144,23 @@ export class Router {
         return null;
       })
       .catch((error) => this.bus?.emit("route:hydrate-error", { error, route, context }));
+  }
+
+  /**
+   * Halaman baru selalu dibaca dari atas. Ini yang dilakukan peramban pada
+   * situs biasa, dan pengguna tetap mengharapkannya walau ini SPA: berpindah
+   * dari daftar transaksi yang tergulir jauh ke halaman detail tidak boleh
+   * mendarat di tengah-tengah isinya.
+   *
+   * Modal dan popup tidak lewat sini -- keduanya dibuka tanpa mengubah rute --
+   * jadi posisi gulir di belakangnya aman.
+   */
+  pulangkanGulir(pindahHalaman) {
+    if (!pindahHalaman) {
+      return;
+    }
+
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }
 
   async leaveActivePage() {

@@ -33,7 +33,6 @@ export function PublicCatalogPage({ notFound = false } = {}) {
   let backgroundVideoLayer = null;
   let isLoadingMore = false;
   let isRefreshing = false;
-  let didRestoreScroll = false;
   const getBackgroundVideoLayer = () => {
     backgroundVideoLayer ??= createBackgroundVideoLayer({
       id: "public_catalog_background_video_layer",
@@ -66,9 +65,6 @@ export function PublicCatalogPage({ notFound = false } = {}) {
       root.className = "min-h-screen";
       render(root, context, { notFound, isLoadingMore, isRefreshing, getBackgroundVideoLayer });
       publicAffiliateTrackingService.trackCurrentPage();
-      restoreCatalogScrollOnce(() => didRestoreScroll, () => {
-        didRestoreScroll = true;
-      });
       return root;
     },
     hydrate(context) {
@@ -559,7 +555,6 @@ function carGrid({ cars, router, isRefreshing, showFavorite = false }) {
         });
       }),
       onOpenDetail: (selectedCar) => {
-        publicCatalogState.saveScrollPosition(window.scrollY);
         publicCatalogState.setSelectedCar(selectedCar.id);
         router.navigate(publicContextService.carDetailPath(selectedCar.id));
       },
@@ -641,23 +636,6 @@ function injectPublicSliderSkeletonStyle() {
   style.id = "pubcat-slider-skeleton-style";
   style.textContent = "@keyframes pbPublicSliderShimmer{100%{transform:translateX(100%)}}";
   document.head.append(style);
-}
-
-function restoreCatalogScrollOnce(hasRestored, markRestored) {
-  if (hasRestored()) {
-    return;
-  }
-
-  const position = publicCatalogState.consumeScrollPosition();
-
-  if (position === null) {
-    return;
-  }
-
-  markRestored();
-  requestAnimationFrame(() => {
-    window.scrollTo({ top: position, behavior: "auto" });
-  });
 }
 
 function loadMoreSection({ canLoadMore, isLoadingMore, onLoadMore }) {

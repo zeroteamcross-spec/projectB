@@ -54,7 +54,6 @@ export function PublicCarDetailPage() {
       root.className = "min-h-screen pb-24 sm:pb-0";
       render(root, context, getBackgroundVideoLayer);
       publicAffiliateTrackingService.trackCurrentPage();
-      window.scrollTo({ top: 0, behavior: "auto" });
       return root;
     },
     hydrate(context) {

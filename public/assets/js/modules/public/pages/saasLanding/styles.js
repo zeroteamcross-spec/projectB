@@ -13,7 +13,12 @@ export const KELAS_AKTIF = "saas-landing-active";
 
 const ID_GAYA = "saas_landing_style";
 const ID_FONT = "saas_landing_font";
-const URL_FONT = "https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap";
+const ID_PRAKONEKSI = "saas_landing_font_preconnect";
+// Sora 400 tidak dipakai di mana pun -- font itu cuma untuk judul, dan judul
+// paling ringan di sini sudah 600. Satu berat dibuang berarti satu berkas
+// woff2 lebih sedikit yang diunduh.
+const URL_FONT = "https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap";
+const HOST_FONT = ["https://fonts.googleapis.com", "https://fonts.gstatic.com"];
 
 const CSS = `
 #saas_landing_root, #saas_landing_root *{box-sizing:border-box}
@@ -52,7 +57,6 @@ body.${KELAS_AKTIF}{background:#faf4ed;overflow-x:clip}
 @keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 @keyframes barGrow{from{transform:scaleY(.12)}to{transform:scaleY(1)}}
 @keyframes caret{0%,100%{opacity:1}50%{opacity:0}}
-@keyframes pulseDot{0%,100%{opacity:.25;transform:scale(.8)}50%{opacity:1;transform:scale(1.15)}}
 @media (prefers-reduced-motion:reduce){#saas_landing_root *{animation-duration:.01ms !important;transition-duration:.01ms !important}}
 @media (max-width:760px){
   #saas_landing_root [data-navlinks]{display:none !important}
@@ -61,13 +65,11 @@ body.${KELAS_AKTIF}{background:#faf4ed;overflow-x:clip}
   #saas_landing_root [data-heromono]{gap:10px 18px !important;font-size:11px !important;margin-top:30px !important}
   #saas_landing_halaman,#saas_landing_listing,#saas_landing_marketing{padding:72px 0 20px !important}
   #saas_landing_daftar{padding:80px 0 72px !important}
-  #saas_landing_root [data-showcase]{height:300vh !important}
-  #saas_landing_root [data-showcase] [data-cap]{max-width:100% !important}
   /* Tidak ada sisi kosong yang berarti di layar sempit, jadi lajur memenuhi
-     lebar dan panel dibuat lebih pekat agar teks tetap terbaca di atas mobil. */
+     lebar penuh. */
   #saas_landing_root [data-lajur]{justify-content:center !important}
   #saas_landing_root [data-kolom]{width:100% !important}
-  #saas_landing_root [data-panel]{background:rgba(255,255,255,.82) !important;padding:26px 22px 28px !important}
+  #saas_landing_root [data-panel]{padding:26px 22px 28px !important}
 }
 `;
 
@@ -77,6 +79,22 @@ export function pasangGaya() {
     gaya.id = ID_GAYA;
     gaya.textContent = CSS;
     document.head.append(gaya);
+  }
+
+  // Berkas woff2 duduk di host kedua (fonts.gstatic.com) yang baru diketahui
+  // setelah CSS-nya selesai diunduh. Prakoneksi menjalankan DNS dan TLS-nya
+  // lebih awal, jadi teks berhenti memakai font cadangan lebih cepat.
+  if (!document.getElementById(ID_PRAKONEKSI)) {
+    HOST_FONT.forEach((host, i) => {
+      const tautan = document.createElement("link");
+      if (i === 0) {
+        tautan.id = ID_PRAKONEKSI;
+      }
+      tautan.rel = "preconnect";
+      tautan.href = host;
+      tautan.crossOrigin = "anonymous";
+      document.head.append(tautan);
+    });
   }
 
   // Font dimuat di sini, bukan di index.html, supaya rute lain tidak ikut

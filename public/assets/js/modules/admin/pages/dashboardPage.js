@@ -180,7 +180,7 @@ function adminChartPanel({ summary, transactions = [], pendingUsers = [], cars =
   copy.className = "grid gap-1";
   copy.append(
     textNode("p", "text-xs font-black uppercase tracking-[0.16em] text-[color-mix(in_srgb,var(--pb-brand-primary)_84%,black)]", "Grafik operasional"),
-    textNode("h2", "text-xl font-black tracking-[-0.03em] text-gray-950", "Health snapshot dashboard"),
+    textNode("h2", "text-xl font-black tracking-[-0.03em] text-gray-950", "Ringkasan kondisi operasional"),
   );
   header.append(icon, copy);
 
@@ -201,7 +201,7 @@ function adminChartPanel({ summary, transactions = [], pendingUsers = [], cars =
   side.id = "adm_dashboard_chart_side_panel";
   side.className = "grid content-between gap-4 rounded-[1.5rem] border border-white/80 bg-white/76 p-4 shadow-sm";
   side.append(
-    textNode("p", "text-sm leading-6 text-gray-600", "Grafik ini memakai snapshot cepat dashboard untuk membaca beban operasional tanpa membuka modul detail."),
+    textNode("p", "text-sm leading-6 text-gray-600", "Grafik ini membaca beban operasional secara sekilas, tanpa perlu membuka halaman detailnya."),
     metricPills([
       ["Attention", summary?.attentionTransactions ?? 0, "text-[color-mix(in_srgb,var(--pb-danger)_84%,black)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)]"],
       ["Published", summary?.publishedCars ?? 0, "text-[color-mix(in_srgb,var(--pb-success)_84%,black)] bg-[color-mix(in_srgb,var(--pb-success)_8%,white)]"],

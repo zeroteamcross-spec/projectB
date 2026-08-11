@@ -215,7 +215,7 @@ function render(root, context, actions) {
   if (!rulesHydratedAt && !(snapshotPayload?.global_rule || snapshotPayload?.overrides?.length)) {
     left.append(EmptyState({
       title: "Memuat aturan komisi affiliate",
-      description: "Snapshot dan working set komisi marketing seller sedang disiapkan.",
+      description: "Komisi marketing sedang dimuat.",
     }));
   } else {
     left.append(applyDesignHook(SellerCommissionOverridesList({
@@ -567,7 +567,7 @@ function openDetailModal({ rule, actions }) {
   openModal(content, {
     key: `${COMMISSION_MODAL_KEY}-detail`,
     title: "Detail komisi affiliate",
-    description: "Informasi aturan komisi dari working set halaman tanpa fetch detail tambahan.",
+    description: "Rincian aturan komisi yang sedang berlaku.",
     size: "lg",
     footer: null,
     panelId: "slrafc_detail_modal",

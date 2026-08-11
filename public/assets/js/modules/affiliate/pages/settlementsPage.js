@@ -70,7 +70,7 @@ function render(root, context) {
   if (!hydratedAt && !payload) {
     frame.append(EmptyState({
       title: "Memuat settlement marketing",
-      description: "Snapshot dan working set payout baseline sedang disiapkan.",
+      description: "Data payout sedang dimuat.",
     }));
     root.replaceChildren(AffiliateAccountLayout({
       activePath: context.path,

@@ -6,7 +6,7 @@ const SUMMARY_ITEMS = [
     label: "Mobil aktif",
     icon: "car",
     value: (summary) => String(summary.publishedCars ?? 0),
-    note: (summary) => `${summary.totalCars ?? 0} unit seller sudah masuk snapshot dashboard.`,
+    note: (summary) => `${summary.totalCars ?? 0} unit sudah terhitung di dashboard.`,
   },
   {
     key: "draft_cars",

@@ -7,29 +7,23 @@ import { pasangGaya, lepasGaya } from "./saasLanding/styles.js";
 /**
  * Landing SaaS, port dari paket "Carlynk Automotive SaaS Landing Page".
  *
- * Markup, gaya, animasi, dan panggung 3D-nya sama dengan paket asli; yang
- * berbeda hanya cara memuatnya. three.js dan model GLB 17,9 MB di-import
- * setelah halaman tampil, sehingga render pertama tidak menunggu 24 MB aset.
- * Kanvas memang mulai dari opacity 0, jadi urutan tampilnya tetap sama seperti
- * paket asli: halaman dulu, lencana "MEMUAT MODEL 3D", baru mobilnya.
+ * Panggung 3D-nya sudah dibuang. Paket asli memuat three.js 1,3 MB plus model
+ * mobil GLB 18 MB hanya untuk latar hero, dan itu membuat halaman depan --
+ * halaman yang paling sering dibuka orang asing di jaringan seluler -- terasa
+ * berat tanpa menambah satu pun informasi. Latarnya sekarang gradien CSS
+ * murni: nol permintaan jaringan, nol frame yang perlu digambar.
  */
 export function SaasLandingPage() {
   let root = null;
   let lepasInteraksi = null;
-  let lepasPanggung = null;
-  let dibuang = false;
   let headerShell = null;
   let tampilanHeaderShell = null;
 
   return createPageLifecycle({
     mount() {
-      dibuang = false;
       root = document.createElement("div");
       root.id = "saas_landing_root";
       root.className = "relative w-full";
-      // Krem, bukan hitam. Teks landing sudah gelap sejak palet baru, jadi
-      // latar hitam di sini bikin tulisan hilang di celah antar seksi yang
-      // tidak tertutup kanvas 3D.
       root.style.background = "#FAF4ED";
       root.innerHTML = landingMarkup({
         namaMerek: brandConfig.appName,
@@ -50,59 +44,21 @@ export function SaasLandingPage() {
       }
 
       lepasInteraksi = pasangInteraksi(root);
-      mulaiPanggungDiLatar();
     },
 
     unmount() {
-      lepasPanggungDanInteraksi();
+      lepasInteraksi?.();
+      lepasInteraksi = null;
     },
 
     dispose() {
-      dibuang = true;
-      lepasPanggungDanInteraksi();
+      lepasInteraksi?.();
+      lepasInteraksi = null;
       lepasGaya();
       kembalikanHeaderShell();
       root = null;
     },
   });
-
-  /**
-   * Panggung 3D dimuat setelah halaman terpasang, dan kegagalannya tidak boleh
-   * menjatuhkan landing. Tanpa 3D halaman tetap terbaca penuh.
-   */
-  function mulaiPanggungDiLatar() {
-    import("./saasLanding/scene.js")
-      .then(({ mulaiPanggung }) => {
-        if (dibuang || !root) {
-          return null;
-        }
-        return mulaiPanggung(root);
-      })
-      .then((lepas) => {
-        if (typeof lepas !== "function") {
-          return;
-        }
-        if (dibuang) {
-          lepas();
-          return;
-        }
-        lepasPanggung = lepas;
-      })
-      .catch((error) => {
-        console.warn("Panggung 3D landing gagal dimuat.", error);
-        const lencana = root?.querySelector("[data-modelload]");
-        if (lencana) {
-          lencana.textContent = "MODEL 3D GAGAL DIMUAT";
-        }
-      });
-  }
-
-  function lepasPanggungDanInteraksi() {
-    lepasPanggung?.();
-    lepasPanggung = null;
-    lepasInteraksi?.();
-    lepasInteraksi = null;
-  }
 
   /**
    * PublicShell memasang header terangnya sendiri di top-0. Landing ini sudah

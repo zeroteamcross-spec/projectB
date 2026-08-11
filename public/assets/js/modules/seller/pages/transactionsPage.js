@@ -294,7 +294,7 @@ function openTransactionModal({ transaction, actions }) {
   openModal(content, {
     key: "slrtx-detail-modal",
     title: "Detail transaksi",
-    description: "Ringkasan buyer, mobil, pembayaran, dan riwayat dari working set halaman.",
+    description: "Ringkasan buyer, mobil, pembayaran, dan riwayatnya.",
     size: "xl",
     footer: null,
     panelId: "slrtx_detail_modal",

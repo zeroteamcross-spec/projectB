@@ -48,12 +48,12 @@ function carsSummaryCard(cars, onClick) {
   const card = Card([], { variant: "raised" });
   card.id = "adm_dashboard_cars_card";
   card.className = "grid gap-4 rounded-[1.6rem] border border-[color-mix(in_srgb,var(--pb-success)_14%,white)] bg-[linear-gradient(135deg,rgba(255,255,255,0.9),rgba(236,246,239,0.72))] p-5 shadow-[0_18px_55px_rgba(15,23,42,0.08)] backdrop-blur transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_26px_70px_rgba(15,23,42,0.12)]";
-  card.append(sectionHeader("Cars snapshot", "Ringkasan listing mobil terbaru untuk screening awal admin.", onClick, "Masuk user management", "car", "adm_dashboard_cars_open_button"));
+  card.append(sectionHeader("Ringkasan mobil", "Listing mobil terbaru untuk penyaringan awal admin.", onClick, "Masuk user management", "car", "adm_dashboard_cars_open_button"));
 
   if (!cars.length) {
     card.append(EmptyState({
       title: "Belum ada mobil",
-      description: "Tidak ada listing mobil yang masuk ke snapshot admin.",
+      description: "Belum ada listing mobil yang masuk.",
     }));
     return card;
   }
@@ -105,7 +105,7 @@ function carsTable(cars) {
   icon.append(createIcon("car", { className: "h-4 w-4" }));
   return DataTable({
     shellId: "adm_dashboard_cars_table_card",
-    title: "Cars snapshot",
+    title: "Ringkasan mobil",
     subtitle: `${cars.length} listing terbaru untuk screening awal`,
     icon,
     columns: [
@@ -120,7 +120,7 @@ function carsTable(cars) {
     rows: cars,
     mobileMode: "disclosure",
     emptyTitle: "Belum ada mobil",
-    emptyDescription: "Tidak ada listing mobil yang masuk ke snapshot admin.",
+    emptyDescription: "Belum ada listing mobil yang masuk.",
     mobileCardTitle: (car) => `${car.brand_name || "-"} ${car.model_name || ""}`.trim(),
     mobileCardSubtitle: (car) => car.location_name || "-",
     mobileCardBadges: (car) => {

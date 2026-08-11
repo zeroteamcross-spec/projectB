@@ -69,7 +69,7 @@ function render(root, context) {
   if (!hydratedAt && !payload) {
     frame.append(EmptyState({
       title: "Memuat activity marketing",
-      description: "Snapshot dan working set aktivitas click sedang disiapkan.",
+      description: "Aktivitas klik sedang dimuat.",
     }));
     root.replaceChildren(AffiliateAccountLayout({
       activePath: context.path,

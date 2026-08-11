@@ -241,7 +241,7 @@ function render(root, context, state, actions) {
   if (!pendingHydratedAt && !hasPendingSource) {
     const loading = EmptyState({
       title: "Memuat approval queue",
-      description: "Snapshot dan working set approval queue sedang disiapkan.",
+      description: "Antrean approval sedang dimuat.",
     });
     loading.id = "adpv_loading_section";
     main.append(loading);

@@ -69,7 +69,7 @@ function render(root, context) {
   if (!hydratedAt && !payload) {
     frame.append(EmptyState({
       title: "Memuat ledger marketing",
-      description: "Snapshot dan working set ledger marketing sedang disiapkan.",
+      description: "Ledger marketing sedang dimuat.",
     }));
     root.replaceChildren(AffiliateAccountLayout({
       activePath: context.path,

@@ -60,7 +60,7 @@ function render(root, context, actions) {
     buyerMobileHeader({ actions }),
     SectionHeader({
       title: "Katalog Mobil",
-      description: "Data awal memakai snapshot kecil, daftar penuh hidup sebagai working set halaman.",
+      description: "Daftar mobil sedang dimuat.",
     }),
     CarGridSection({ cars, onOpenDetail: (car) => buyerState.setSelectedCar(car.id) }),
     BuyerMobileFooterNav({

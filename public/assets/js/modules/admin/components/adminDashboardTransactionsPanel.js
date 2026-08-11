@@ -52,7 +52,7 @@ function transactionsTable(transactions) {
 
   return DataTable({
     shellId: "adm_dashboard_transactions_table_card",
-    title: "Snapshot transaksi",
+    title: "Ringkasan transaksi",
     subtitle: `${transactions.length} transaksi terbaru untuk screening cepat`,
     icon,
     columns: [

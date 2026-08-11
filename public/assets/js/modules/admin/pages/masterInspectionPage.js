@@ -381,7 +381,7 @@ function editorSection({ template, saving, onSave }) {
   });
 
   section.append(
-    textNode("p", "text-sm leading-6 text-gray-600", "Perubahan definisi master hanya memengaruhi draft baru. Report yang sudah tersimpan tetap memakai snapshot itemnya."),
+    textNode("p", "text-sm leading-6 text-gray-600", "Perubahan definisi master hanya memengaruhi draft baru. Report yang sudah tersimpan tetap memakai salinan item saat itu."),
     form,
   );
   return section;

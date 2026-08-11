@@ -397,7 +397,7 @@ function openAffiliateModal({ mode, selectedAffiliate, runtime, actions }) {
       ? "Tambahkan partner marketing dan slug referral dari modal ini."
       : isEdit
         ? "Perbarui data marketing tanpa mengambil detail baru dari server."
-        : "Ringkasan marketing dari working set halaman.",
+        : "Ringkasan marketing.",
     size: isEdit || isCreate ? "lg" : "xl",
     footer: null,
     panelId: isCreate ? "slraf_create_modal" : isEdit ? "slraf_edit_modal" : "slraf_detail_modal",
@@ -631,7 +631,7 @@ function affiliateDetailPanel({ affiliate }) {
   section.className = "grid min-w-0 gap-4";
 
   if (!affiliate) {
-    section.append(textNode("p", "rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-warning)_26%,white)] bg-[color-mix(in_srgb,var(--pb-warning)_8%,white)] px-4 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-warning)_84%,black)]", "Marketing tidak ditemukan di working set halaman."));
+    section.append(textNode("p", "rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-warning)_26%,white)] bg-[color-mix(in_srgb,var(--pb-warning)_8%,white)] px-4 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--pb-warning)_84%,black)]", "Marketing tidak ditemukan."));
     return section;
   }
 
