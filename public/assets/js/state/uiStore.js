@@ -35,15 +35,23 @@ export const uiStore = {
     appStore.patchState("ui.sidebarOpen", !Boolean(appStore.get("ui.sidebarOpen", false)), "ui:sidebar-toggle");
   },
 
-  setSidebarCompactExpanded(value) {
-    appStore.patchState("ui.sidebarCompactExpanded", Boolean(value), "ui:sidebar-compact-expanded");
+  /**
+   * Sidebar diciutkan jadi rail icon, atau melebar penuh dengan nama menu.
+   *
+   * Bawaannya melebar. Sebelumnya keadaan ini bernama sidebarCompactExpanded
+   * dengan arti terbalik dan hanya berlaku di bawah xl -- di atas itu sidebar
+   * dipaksa penuh lewat kelas `xl:`, sehingga tombolnya tidak berguna di layar
+   * besar. Sekarang satu keadaan ini yang menentukan, di semua lebar mulai md.
+   */
+  setSidebarCollapsed(value) {
+    appStore.patchState("ui.sidebarCollapsed", Boolean(value), "ui:sidebar-collapsed");
   },
 
-  toggleSidebarCompactExpanded() {
+  toggleSidebarCollapsed() {
     appStore.patchState(
-      "ui.sidebarCompactExpanded",
-      !Boolean(appStore.get("ui.sidebarCompactExpanded", false)),
-      "ui:sidebar-compact-toggle",
+      "ui.sidebarCollapsed",
+      !Boolean(appStore.get("ui.sidebarCollapsed", false)),
+      "ui:sidebar-collapse-toggle",
     );
   },
 };

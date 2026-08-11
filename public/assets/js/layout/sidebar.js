@@ -1,5 +1,5 @@
 import { brandConfig } from "../theme/brandConfig.js";
-import { renderBrandLockup } from "../theme/brandLockup.js";
+import { KELAS_GAMBAR_LOGO, renderBrandLockup } from "../theme/brandLockup.js";
 import { createIcon } from "../theme/iconRegistry.js";
 import { tw } from "../theme/tailwindClasses.js";
 import { applyDesignHook } from "../theme/designStudioHooks.js";
@@ -87,7 +87,7 @@ const AFFILIATE_LINKS = [
 
 export function sidebar(store = null, options = {}) {
   const mode = options.mode ?? "desktop";
-  const compactExpanded = isCompactExpanded(store, mode);
+  const collapsed = isSidebarCollapsed(store, mode);
   const aside = document.createElement("aside");
   aside.className = mode === "drawer" ? drawerSidebarClassName() : tw.layout.sidebar;
   applyDesignHook(aside, "shell.app.sidebar");
@@ -96,24 +96,25 @@ export function sidebar(store = null, options = {}) {
   const brand = document.createElement("div");
   brand.className = mode === "drawer"
     ? "mb-[var(--pb-space-lg)] flex min-w-0 items-start justify-between gap-3"
-    : brandClassName(compactExpanded);
+    : brandClassName(collapsed);
 
   const brandCopy = document.createElement("div");
   brandCopy.className = "grid min-w-0 gap-1";
 
   const brandName = document.createElement("div");
-  brandName.className = mode === "drawer" ? tw.layout.brand : brandNameClassName(compactExpanded);
+  brandName.className = mode === "drawer" ? tw.layout.brand : brandNameClassName(collapsed);
   brandName.textContent = brandConfig.appName;
 
   const tagline = document.createElement("p");
-  tagline.className = mode === "drawer" ? tw.layout.sidebarTagline : taglineClassName(compactExpanded);
+  tagline.className = mode === "drawer" ? tw.layout.sidebarTagline : taglineClassName(collapsed);
   tagline.textContent = brandConfig.appTagline;
 
   const compactMark = document.createElement("span");
   renderBrandMark(
     compactMark,
     [brandName, tagline],
-    mode === "drawer" ? "hidden" : compactMarkClassName(compactExpanded)
+    mode === "drawer" ? "hidden" : compactMarkClassName(collapsed),
+    collapsed
   );
 
   brandCopy.append(compactMark, brandName, tagline);
@@ -131,26 +132,27 @@ export function sidebar(store = null, options = {}) {
   }
 
   const nav = document.createElement("nav");
-  nav.className = mode === "drawer" ? tw.layout.nav : navClassName(compactExpanded);
+  nav.className = mode === "drawer" ? tw.layout.nav : navClassName(collapsed);
   renderLinks(nav, store, { ...options, store });
 
   const compactToggle = mode === "drawer" ? null : compactSidebarToggle(store);
 
   const syncBrand = () => {
-    const expanded = isCompactExpanded(store, mode);
+    const collapsed = isSidebarCollapsed(store, mode);
     brand.className = mode === "drawer"
       ? "mb-[var(--pb-space-lg)] flex min-w-0 items-start justify-between gap-3"
-      : brandClassName(expanded);
-    brandName.className = mode === "drawer" ? tw.layout.brand : brandNameClassName(expanded);
-    tagline.className = mode === "drawer" ? tw.layout.sidebarTagline : taglineClassName(expanded);
-    nav.className = mode === "drawer" ? tw.layout.nav : navClassName(expanded);
-    syncCompactToggle(compactToggle, expanded);
+      : brandClassName(collapsed);
+    brandName.className = mode === "drawer" ? tw.layout.brand : brandNameClassName(collapsed);
+    tagline.className = mode === "drawer" ? tw.layout.sidebarTagline : taglineClassName(collapsed);
+    nav.className = mode === "drawer" ? tw.layout.nav : navClassName(collapsed);
+    syncCompactToggle(compactToggle, collapsed);
     brandName.textContent = brandConfig.appName;
     tagline.textContent = brandConfig.appTagline;
     renderBrandMark(
       compactMark,
       [brandName, tagline],
-      mode === "drawer" ? "hidden" : compactMarkClassName(expanded)
+      mode === "drawer" ? "hidden" : compactMarkClassName(collapsed),
+      collapsed
     );
   };
 
@@ -171,69 +173,86 @@ export function sidebar(store = null, options = {}) {
  * Kelas wadahnya dihitung ulang tiap sync mengikuti keadaan compact, jadi
  * dioperkan setiap kali, bukan disimpan.
  */
-function renderBrandMark(mark, teks = [], markClass = "") {
+function renderBrandMark(mark, teks = [], markClass = "", collapsed = false) {
   renderBrandLockup(mark, teks, {
     markClass,
-    imageClass: "block h-9 w-auto max-w-[9rem] object-contain",
+    // Saat melebar logonya menggantikan nama dan tagline, jadi boleh sebesar
+    // di header mobile. Saat diciutkan rail-nya hanya 80px dengan padding
+    // 12px di tiap sisi, jadi 90px tidak akan muat.
+    imageClass: collapsed
+      ? "block h-8 w-8 object-contain"
+      : KELAS_GAMBAR_LOGO,
   });
 }
 
-function isCompactExpanded(store, mode = "desktop") {
-  return mode === "desktop" && Boolean(store?.get("ui.sidebarCompactExpanded", false));
+/**
+ * Sidebar sedang diciutkan atau tidak. Bawaannya tidak -- melebar penuh.
+ *
+ * Kelas `xl:` yang dulu menempel di helper-helper di bawah memaksa tampilan
+ * melebar begitu layar mencapai xl, apa pun keadaannya, sehingga tombol ciutkan
+ * tidak berpengaruh di layar besar. Sekarang keadaan inilah yang menentukan, di
+ * semua lebar mulai md; di bawah md sidebar memakai drawer, bukan rail.
+ */
+function isSidebarCollapsed(store, mode = "desktop") {
+  return mode === "desktop" && Boolean(store?.get("ui.sidebarCollapsed", false));
 }
 
-function brandClassName(expanded = false) {
-  return expanded
-    ? `${tw.layout.sidebarBrandBlock} justify-items-start`
-    : `${tw.layout.sidebarBrandBlock} justify-items-center xl:justify-items-start`;
+function brandClassName(collapsed = false) {
+  return collapsed
+    ? `${tw.layout.sidebarBrandBlock} justify-items-center`
+    : `${tw.layout.sidebarBrandBlock} justify-items-start`;
 }
 
-function brandNameClassName(expanded = false) {
-  return expanded ? tw.layout.brand : `${tw.layout.brand} hidden xl:block`;
+function brandNameClassName(collapsed = false) {
+  return collapsed ? `${tw.layout.brand} hidden` : tw.layout.brand;
 }
 
-function taglineClassName(expanded = false) {
-  return expanded ? tw.layout.sidebarTagline : `${tw.layout.sidebarTagline} hidden xl:block`;
+function taglineClassName(collapsed = false) {
+  return collapsed ? `${tw.layout.sidebarTagline} hidden` : tw.layout.sidebarTagline;
 }
 
-function compactMarkClassName(expanded = false) {
-  return expanded
-    ? "hidden xl:hidden"
-    : "inline-flex h-11 w-11 items-center justify-center rounded-[var(--pb-radius-xl)] bg-[var(--pb-shell-nav-active)] text-[var(--pb-shell-nav-text)] shadow-[var(--pb-shadow-soft)] xl:hidden";
+function compactMarkClassName(collapsed = false) {
+  return collapsed
+    ? "inline-flex h-11 w-11 items-center justify-center rounded-[var(--pb-radius-xl)] bg-[var(--pb-shell-nav-active)] text-[var(--pb-shell-nav-text)] shadow-[var(--pb-shadow-soft)]"
+    : "hidden";
 }
 
-function navClassName(expanded = false) {
-  return expanded ? `${tw.layout.nav} justify-items-stretch` : `${tw.layout.nav} justify-items-center xl:justify-items-stretch`;
+function navClassName(collapsed = false) {
+  return collapsed ? `${tw.layout.nav} justify-items-center` : `${tw.layout.nav} justify-items-stretch`;
 }
 
 function compactSidebarToggle(store) {
   const button = document.createElement("button");
   button.type = "button";
-  button.className = "mb-[var(--pb-space-lg)] hidden min-h-10 items-center justify-center gap-2 rounded-[var(--pb-radius-xl)] border border-[color-mix(in_srgb,var(--pb-shell-nav-text)_24%,transparent)] bg-[var(--pb-shell-nav-active)] px-3 py-2 text-xs font-semibold text-[var(--pb-shell-nav-text)] shadow-[var(--pb-shadow-soft)] transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,var(--pb-shell-nav-text)_40%,transparent)] md:inline-flex xl:hidden";
-  button.addEventListener("click", () => uiStore.toggleSidebarCompactExpanded());
-  syncCompactToggle(button, Boolean(store?.get("ui.sidebarCompactExpanded", false)));
+  button.id = "global_sidebar_collapse_button";
+  button.className = "mb-[var(--pb-space-lg)] hidden min-h-10 items-center justify-center gap-2 rounded-[var(--pb-radius-xl)] border border-[color-mix(in_srgb,var(--pb-shell-nav-text)_24%,transparent)] bg-[var(--pb-shell-nav-active)] px-3 py-2 text-xs font-semibold text-[var(--pb-shell-nav-text)] shadow-[var(--pb-shadow-soft)] transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,var(--pb-shell-nav-text)_40%,transparent)] md:inline-flex";
+  button.addEventListener("click", () => uiStore.toggleSidebarCollapsed());
+  syncCompactToggle(button, Boolean(store?.get("ui.sidebarCollapsed", false)));
   return button;
 }
 
-function syncCompactToggle(button, expanded = false) {
+function syncCompactToggle(button, collapsed = false) {
   if (!button) {
     return;
   }
 
-  button.classList.toggle("w-12", !expanded);
-  button.classList.toggle("w-full", expanded);
-  button.setAttribute("aria-label", expanded ? "Sembunyikan nama menu" : "Tampilkan nama menu");
-  button.title = expanded ? "Sembunyikan nama menu" : "Tampilkan nama menu";
+  button.classList.toggle("w-12", collapsed);
+  button.classList.toggle("w-full", !collapsed);
+  const label = collapsed ? "Lebarkan sidebar" : "Ciutkan sidebar";
+  button.setAttribute("aria-label", label);
+  button.title = label;
   button.replaceChildren(
-    createIcon(expanded ? "arrowLeft" : "arrowRight", { className: "block h-4 w-4 leading-none" }),
-    compactToggleLabel(expanded),
+    createIcon(collapsed ? "arrowRight" : "arrowLeft", { className: "block h-4 w-4 leading-none" }),
+    compactToggleLabel(collapsed),
   );
 }
 
-function compactToggleLabel(expanded = false) {
+function compactToggleLabel(collapsed = false) {
   const label = document.createElement("span");
-  label.className = expanded ? "min-w-0 truncate" : "sr-only";
-  label.textContent = expanded ? "Sembunyikan" : "Tampilkan nama menu";
+  // Saat diciutkan hanya icon yang tersisa, jadi teksnya cuma untuk pembaca
+  // layar -- kalau ditampilkan ia yang justru melebarkan kembali rail-nya.
+  label.className = collapsed ? "sr-only" : "min-w-0 truncate";
+  label.textContent = collapsed ? "Lebarkan sidebar" : "Ciutkan sidebar";
   return label;
 }
 
@@ -387,20 +406,20 @@ function renderSidebarNode(link, path, options = {}) {
     const group = document.createElement("div");
     group.className = options.mode === "drawer" ? "grid w-full gap-1" : "grid w-full gap-1";
     const childActive = link.children.some((child) => isActive(path, child.href));
-    const compactExpanded = isCompactExpanded(options.store, options.mode);
+    const collapsed = isSidebarCollapsed(options.store, options.mode);
     const parent = renderSidebarAnchor(link, path, false, true, childActive, options);
     const arrow = document.createElement("span");
     arrow.className = options.mode === "drawer"
       ? childActive
         ? "ml-auto inline-flex shrink-0 rotate-180 items-center justify-center transition-transform duration-150"
         : "ml-auto inline-flex shrink-0 items-center justify-center transition-transform duration-150"
-      : compactExpanded
-        ? childActive
-          ? "ml-auto inline-flex shrink-0 rotate-180 items-center justify-center transition-transform duration-150 xl:inline-flex"
-          : "ml-auto inline-flex shrink-0 items-center justify-center transition-transform duration-150 xl:inline-flex"
+      // Saat diciutkan panahnya ikut hilang: rail selebar icon tidak menyisakan
+      // ruang untuknya, dan submenu dibuka lewat klik pada icon induknya.
+      : collapsed
+        ? "hidden"
         : childActive
-          ? "ml-auto hidden shrink-0 rotate-180 items-center justify-center transition-transform duration-150 xl:inline-flex"
-          : "ml-auto hidden shrink-0 items-center justify-center transition-transform duration-150 xl:inline-flex";
+          ? "ml-auto inline-flex shrink-0 rotate-180 items-center justify-center transition-transform duration-150"
+          : "ml-auto inline-flex shrink-0 items-center justify-center transition-transform duration-150";
     arrow.append(createIcon("chevron-down", { className: "block h-3.5 w-3.5 leading-none" }));
     parent.append(arrow);
     const childWrap = document.createElement("div");
@@ -429,16 +448,16 @@ function syncSidebarGroup(childWrap, arrow, parent, expanded = false, options = 
 function renderSidebarAnchor(link, path, child = false, parent = false, activeOverride = false, options = {}) {
   const anchor = document.createElement("a");
   anchor.href = link.href;
-  const compactExpanded = isCompactExpanded(options.store, options.mode);
+  const collapsed = isSidebarCollapsed(options.store, options.mode);
   const active = Boolean(activeOverride || isActive(path, link.href));
   anchor.className = active
     ? `${tw.layout.navLink} ${tw.layout.navLinkActive}`
     : tw.layout.navLink;
   anchor.classList.add(...(options.mode === "drawer"
     ? ["w-full"]
-    : compactExpanded
-      ? ["w-full", "justify-start"]
-      : ["w-12", "justify-center", "xl:w-full", "xl:justify-start"]));
+    : collapsed
+      ? ["w-12", "justify-center"]
+      : ["w-full", "justify-start"]));
   anchor.title = link.label ?? "";
   anchor.setAttribute("aria-current", active ? "page" : "false");
   if (!parent && options.mode === "drawer") {
@@ -448,9 +467,9 @@ function renderSidebarAnchor(link, path, child = false, parent = false, activeOv
     anchor.classList.add("text-xs", "opacity-90");
   }
   const label = document.createElement("span");
-  label.className = options.mode === "drawer" || compactExpanded
-    ? "min-w-0 break-words"
-    : "hidden min-w-0 break-words xl:inline";
+  label.className = options.mode !== "drawer" && collapsed
+    ? "hidden min-w-0 break-words"
+    : "min-w-0 break-words";
   label.textContent = link.label;
   const iconWrap = document.createElement("span");
   iconWrap.className = "inline-flex h-5 w-5 shrink-0 items-center justify-center";

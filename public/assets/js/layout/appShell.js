@@ -115,14 +115,17 @@ export class AppShell {
     const isAffiliateAccountShell = role === "affiliate_admin" && this.isAffiliateAccountExperiencePath(path);
     const isAccountShell = isBuyerShell || isAffiliateAccountShell;
     const hasSidebarShell = this.hasSidebarShell(role, path);
-    const compactExpanded = hasSidebarShell && Boolean(this.store?.get("ui.sidebarCompactExpanded", false));
+    const sidebarCollapsed = hasSidebarShell && Boolean(this.store?.get("ui.sidebarCollapsed", false));
     const isSuperAdminTool = this.isSuperAdminToolPath(path);
 
+    // Lebar kolom sidebar mengikuti keadaan, bukan lebar layar. tw.layout.shell
+    // masih memakai breakpoint (80px di md, 272px di xl) dan itu yang dulu
+    // membuat tombol ciutkan tidak berpengaruh di layar besar.
     this.root.className = isAccountShell
       ? "relative isolate min-h-screen grid min-w-0 grid-cols-1 bg-[var(--pb-page-bg)]"
-      : compactExpanded
-        ? "min-h-screen grid min-w-0 grid-cols-1 overflow-x-clip md:grid-cols-[272px_minmax(0,1fr)] xl:grid-cols-[272px_minmax(0,1fr)]"
-        : tw.layout.shell;
+      : sidebarCollapsed
+        ? "min-h-screen grid min-w-0 grid-cols-1 overflow-x-clip md:grid-cols-[80px_minmax(0,1fr)]"
+        : "min-h-screen grid min-w-0 grid-cols-1 overflow-x-clip md:grid-cols-[272px_minmax(0,1fr)]";
     if (this.backgroundVideoNode) {
       this.backgroundVideoNode.hidden = !isAccountShell;
       this.backgroundVideoNode.setEnabled?.(isAccountShell);
@@ -158,8 +161,8 @@ export class AppShell {
     if (!hasSidebarShell && this.store?.get("ui.sidebarOpen", false)) {
       uiStore.closeSidebar();
     }
-    if (!hasSidebarShell && this.store?.get("ui.sidebarCompactExpanded", false)) {
-      uiStore.setSidebarCompactExpanded(false);
+    if (!hasSidebarShell && this.store?.get("ui.sidebarCollapsed", false)) {
+      uiStore.setSidebarCollapsed(false);
     }
   }
 

@@ -28,7 +28,7 @@ export const appStore = new StateEngine({
     modal: null,
     toasts: [],
     sidebarOpen: false,
-    sidebarCompactExpanded: false,
+    sidebarCollapsed: false,
   },
   snapshot: {},
   working: {},

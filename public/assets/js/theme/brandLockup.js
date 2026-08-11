@@ -29,11 +29,16 @@ import { createIcon } from "./iconRegistry.js";
  * Header ikut meninggi mengikuti angka ini -- itu memang konsekuensinya, bukan
  * efek samping yang terlewat.
  */
-export const KELAS_GAMBAR_LOGO = "block h-[60px] w-auto max-w-[12rem] object-contain";
+export const KELAS_GAMBAR_LOGO = "block h-[90px] w-auto max-w-full object-contain";
 
 export function renderBrandLockup(mark, teks = [], {
   markClass = "",
   imageClass = KELAS_GAMBAR_LOGO,
+  // Kelas wadah saat logonya tampil. Sengaja terpisah dari markClass: kotak
+  // yang dipakai versi icon harus hilang, tapi pemanggil kadang masih perlu
+  // menempelkan aturan sendiri -- header aplikasi menyembunyikannya di desktop
+  // karena logonya sudah pindah ke sidebar.
+  markLogoClass = "inline-flex shrink-0 items-center",
   iconName = null,
   iconClass = "block h-5 w-5 leading-none",
 } = {}) {
@@ -46,10 +51,11 @@ export function renderBrandLockup(mark, teks = [], {
   const simpulTeks = teks.filter(Boolean);
 
   if (logo) {
-    // Kelas wadahnya dikosongkan, bukan diganti: apa pun kotak, lingkaran, atau
-    // gradien yang dipasang pemanggil harus hilang, bukan sekadar diperkecil.
-    mark.className = "inline-flex shrink-0 items-center";
-    mark.hidden = false;
+    // Kelas wadahnya diganti seluruhnya, bukan ditambahi: apa pun kotak,
+    // lingkaran, atau gradien yang dipasang pemanggil harus hilang, bukan
+    // sekadar diperkecil.
+    mark.className = markLogoClass;
+    tampilkan(mark);
 
     const image = document.createElement("img");
     image.src = logo;

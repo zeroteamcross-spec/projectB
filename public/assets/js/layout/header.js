@@ -84,8 +84,13 @@ function renderBrand(mark, title) {
   // kosong.
   title.textContent = brandConfig.shellTitle;
 
+  // Di desktop logonya disembunyikan dari header: sidebar sudah menampilkannya
+  // di tempat nama aplikasi, dan dua logo sekaligus di satu layar hanya
+  // mengulang hal yang sama. Batasnya md, titik yang sama dengan munculnya
+  // sidebar -- di bawah itu tidak ada sidebar, jadi header yang membawanya.
   renderBrandLockup(mark, [title], {
     markClass: tw.layout.shellMark,
+    markLogoClass: "inline-flex shrink-0 items-center md:hidden",
     iconClass: "h-5 w-5",
   });
 }

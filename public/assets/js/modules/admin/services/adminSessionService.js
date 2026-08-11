@@ -163,7 +163,7 @@ export const adminSessionService = {
     snapshotStore.clearRole("affiliate_admin");
     appStore.patchState("app.routeHydrateError", null, "impersonation:clear-hydrate-error");
     appStore.patchState("ui.sidebarOpen", false, "impersonation:close-sidebar");
-    appStore.patchState("ui.sidebarCompactExpanded", false, "impersonation:close-compact-sidebar");
+    appStore.patchState("ui.sidebarCollapsed", false, "impersonation:expand-sidebar");
     authStore.setContext({
       user: payload?.user ?? null,
       actor: payload?.actor ?? null,
