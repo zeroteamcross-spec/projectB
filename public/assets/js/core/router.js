@@ -16,6 +16,7 @@ export class Router {
     // "query berubah di halaman yang sama" (mis. tab role di /auth). Hanya yang
     // pertama yang memulangkan gulir ke atas.
     this.jalurTampil = null;
+    this.gulirDitahan = false;
     this.handleChange = this.handleChange.bind(this);
   }
 
@@ -119,6 +120,9 @@ export class Router {
 
     const pindahHalaman = this.jalurTampil !== location.path;
     this.jalurTampil = location.path;
+    // Dibersihkan sebelum halaman dipasang, supaya penahanan dari navigasi
+    // sebelumnya tidak terbawa ke navigasi ini.
+    this.gulirDitahan = false;
 
     if (!route) {
       await this.mountPage(this.notFound(context), context);
@@ -154,9 +158,15 @@ export class Router {
    *
    * Modal dan popup tidak lewat sini -- keduanya dibuka tanpa mengubah rute --
    * jadi posisi gulir di belakangnya aman.
+   *
+   * Halaman berisi daftar panjang boleh mengecualikan diri lewat
+   * tahanGulirSekali(); lihat catatannya di sana.
    */
   pulangkanGulir(pindahHalaman) {
-    if (!pindahHalaman) {
+    const ditahan = this.gulirDitahan;
+    this.gulirDitahan = false;
+
+    if (!pindahHalaman || ditahan) {
       return;
     }
 
@@ -165,6 +175,21 @@ export class Router {
     // lalu terpotong di tengah jalan saat halaman lama dilepas dan berhenti
     // beberapa piksel dari atas.
     window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }
+
+  /**
+   * Membatalkan pemulangan gulir untuk satu navigasi ini saja.
+   *
+   * Dipakai daftar panjang yang ingin mengembalikan pembaca ke baris yang tadi
+   * dibuka: katalog menyimpan posisinya sebelum membuka detail mobil, lalu
+   * memulihkannya saat pembaca menekan kembali. Tanpa ini pembaca terlempar ke
+   * baris pertama dan harus menggulir dari awal setiap kali melihat satu unit.
+   *
+   * Dipanggil dari mount() halaman, yang berjalan sebelum pulangkanGulir(),
+   * dan hanya berlaku sekali -- navigasi berikutnya kembali ke aturan umum.
+   */
+  tahanGulirSekali() {
+    this.gulirDitahan = true;
   }
 
   async leaveActivePage() {

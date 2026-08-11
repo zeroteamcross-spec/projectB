@@ -66,6 +66,22 @@ export const publicCatalogState = {
     return [...workingCars, ...snapshotCars].find((car) => String(car.id) === id) ?? null;
   },
 
+  /**
+   * Posisi gulir katalog, dititipkan sebelum membuka detail mobil dan diambil
+   * lagi sekali saat pembaca kembali. Sekali pakai: dibaca berarti hangus,
+   * supaya membuka katalog dari menu tetap mulai dari atas.
+   */
+  saveScrollPosition(value) {
+    const position = Number.isFinite(Number(value)) ? Number(value) : 0;
+    appStore.patchState(`${BASE}.scrollPosition`, position, "public:scroll-save");
+  },
+
+  consumeScrollPosition() {
+    const position = appStore.get(`${BASE}.scrollPosition`, null);
+    appStore.patchState(`${BASE}.scrollPosition`, null, "public:scroll-consume");
+    return Number.isFinite(Number(position)) ? Number(position) : null;
+  },
+
   snapshotCatalog(fallback = null) {
     return appStore.get("snapshot.public.catalog.data", fallback);
   },

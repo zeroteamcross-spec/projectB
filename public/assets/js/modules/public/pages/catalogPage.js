@@ -65,6 +65,7 @@ export function PublicCatalogPage({ notFound = false } = {}) {
       root.className = "min-h-screen";
       render(root, context, { notFound, isLoadingMore, isRefreshing, getBackgroundVideoLayer });
       publicAffiliateTrackingService.trackCurrentPage();
+      pulihkanGulirKatalog(context);
       return root;
     },
     hydrate(context) {
@@ -555,6 +556,7 @@ function carGrid({ cars, router, isRefreshing, showFavorite = false }) {
         });
       }),
       onOpenDetail: (selectedCar) => {
+        publicCatalogState.saveScrollPosition(window.scrollY);
         publicCatalogState.setSelectedCar(selectedCar.id);
         router.navigate(publicContextService.carDetailPath(selectedCar.id));
       },
@@ -636,6 +638,32 @@ function injectPublicSliderSkeletonStyle() {
   style.id = "pubcat-slider-skeleton-style";
   style.textContent = "@keyframes pbPublicSliderShimmer{100%{transform:translateX(100%)}}";
   document.head.append(style);
+}
+
+/**
+ * Pengecualian dari aturan "halaman baru dibaca dari atas".
+ *
+ * Katalog bisa panjang sekali, dan menengok satu unit lalu kembali adalah cara
+ * orang membaca daftar. Kalau tiap kali kembali dilempar ke baris pertama,
+ * melihat unit kesepuluh berarti menggulir dari awal sepuluh kali. Jadi posisi
+ * disimpan saat detail dibuka dan dipulihkan sekali saat kembali.
+ *
+ * Router ditahan lebih dulu supaya tidak ada dua perintah gulir yang bertabrakan.
+ * Pemulihannya sendiri menunggu satu frame, karena saat mount() dipanggil simpul
+ * halaman belum masuk ke DOM dan tingginya belum ada -- menggulir sekarang cuma
+ * akan dijepit ke nol.
+ */
+function pulihkanGulirKatalog(context) {
+  const posisi = publicCatalogState.consumeScrollPosition();
+
+  if (posisi === null) {
+    return;
+  }
+
+  context?.router?.tahanGulirSekali?.();
+  requestAnimationFrame(() => {
+    window.scrollTo({ top: posisi, left: 0, behavior: "instant" });
+  });
 }
 
 function loadMoreSection({ canLoadMore, isLoadingMore, onLoadMore }) {
