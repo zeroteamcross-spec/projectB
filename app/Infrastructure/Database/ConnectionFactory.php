@@ -33,6 +33,19 @@ class ConnectionFactory
             $options[PDO::ATTR_TIMEOUT] = $config['timeout'];
         }
 
+        // Seluruh tabel aplikasi ini utf8mb4_unicode_ci, tapi charset di DSN
+        // saja membuat literal dan user variable memakai kolasi bawaan server
+        // -- utf8mb4_general_ci atau utf8mb4_0900_ai_ci, tergantung mesinnya.
+        // Membandingkan kolom dengan literal lalu ditolak MySQL sebagai
+        // "Illegal mix of collations", dan gejalanya baru muncul di server yang
+        // bawaannya berbeda dari mesin tempat kode ditulis. Koneksinya
+        // disamakan dengan skemanya.
+        $options[PDO::MYSQL_ATTR_INIT_COMMAND] = sprintf(
+            'SET NAMES %s COLLATE %s',
+            $config['charset'],
+            $config['collation']
+        );
+
         try {
             return new PDO(self::mysqlDsn($config), $config['username'], $config['password'], $options);
         } catch (PDOException $exception) {
@@ -50,6 +63,7 @@ class ConnectionFactory
             'username' => self::stringValue($config, 'username'),
             'password' => self::stringValue($config, 'password'),
             'charset' => self::stringValue($config, 'charset') !== '' ? self::stringValue($config, 'charset') : 'utf8mb4',
+            'collation' => self::stringValue($config, 'collation') !== '' ? self::stringValue($config, 'collation') : 'utf8mb4_unicode_ci',
             'timeout' => max(0, (int) self::stringValue($config, 'timeout')),
         ];
 

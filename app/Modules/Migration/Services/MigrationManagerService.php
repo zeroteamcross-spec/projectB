@@ -232,6 +232,13 @@ class MigrationManagerService
             return null;
         }
 
+        // CREATE INDEX berdiri sendiri, di luar ALTER TABLE, jadi tidak lewat
+        // pemeriksaan klausa di bawah. Dua migrasi memakai bentuk ini dan
+        // keduanya mati saat diulang.
+        if (preg_match('/^CREATE\s+(?:UNIQUE\s+|FULLTEXT\s+|SPATIAL\s+)?INDEX\s+`?([a-zA-Z0-9_]+)`?\s+ON\s+`?([a-zA-Z0-9_]+)`?/is', $trimmed, $matches)) {
+            return $this->indexExists($matches[2], $matches[1]) ? null : $trimmed;
+        }
+
         if (! preg_match('/^ALTER\s+TABLE\s+`?([a-zA-Z0-9_]+)`?\s+(.*)$/is', $trimmed, $matches)) {
             return $trimmed;
         }
@@ -255,18 +262,37 @@ class MigrationManagerService
         return 'ALTER TABLE ' . $this->quoteIdentifier($table) . "\n    " . implode(",\n    ", $pending);
     }
 
+    /**
+     * Urutannya penting, dan dulu terbalik.
+     *
+     * Pola kolom "ADD (COLUMN )?<nama>" juga cocok dengan "ADD INDEX foo (bar)"
+     * -- ia menangkap kata INDEX sebagai nama kolom, mencari kolom bernama
+     * "INDEX", tidak menemukannya, lalu menyimpulkan klausanya perlu dijalankan.
+     * Akibatnya indeks dan constraint tidak pernah benar-benar idempoten, dan
+     * migrasi yang diulang mati dengan "Duplicate key name". Yang spesifik
+     * harus diperiksa lebih dulu.
+     */
     private function shouldSkipAlterClause(string $table, string $clause): bool
     {
-        if (preg_match('/^ADD\s+(?:COLUMN\s+)?`?([a-zA-Z0-9_]+)`?\s+/is', trim($clause), $matches)) {
-            return $this->columnExists($table, $matches[1]);
-        }
+        $trimmed = trim($clause);
 
-        if (preg_match('/^ADD\s+(?:UNIQUE\s+)?(?:INDEX|KEY)\s+`?([a-zA-Z0-9_]+)`?/is', trim($clause), $matches)) {
+        if (preg_match('/^ADD\s+(?:UNIQUE\s+|FULLTEXT\s+|SPATIAL\s+)?(?:INDEX|KEY)\s+`?([a-zA-Z0-9_]+)`?/is', $trimmed, $matches)) {
             return $this->indexExists($table, $matches[1]);
         }
 
-        if (preg_match('/^ADD\s+CONSTRAINT\s+`?([a-zA-Z0-9_]+)`?/is', trim($clause), $matches)) {
+        if (preg_match('/^ADD\s+CONSTRAINT\s+`?([a-zA-Z0-9_]+)`?/is', $trimmed, $matches)) {
             return $this->constraintExists($table, $matches[1]);
+        }
+
+        // Bentuk tanpa nama -- ADD PRIMARY KEY, ADD FOREIGN KEY, ADD UNIQUE
+        // (kolom) -- tidak punya pengenal untuk dicari, jadi dibiarkan jalan
+        // dan biar database yang menolak kalau memang sudah ada.
+        if (preg_match('/^ADD\s+(?:PRIMARY\s+KEY|FOREIGN\s+KEY|UNIQUE)\b/is', $trimmed)) {
+            return false;
+        }
+
+        if (preg_match('/^ADD\s+(?:COLUMN\s+)?`?([a-zA-Z0-9_]+)`?\s+/is', $trimmed, $matches)) {
+            return $this->columnExists($table, $matches[1]);
         }
 
         return false;
