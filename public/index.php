@@ -51,10 +51,43 @@ function serveSpaShell(string $basePath, string $publicPath, string $path): bool
     if ($method !== 'HEAD') {
         $html = str_replace('__APP_SPLASH_MAX_WAIT_MS__', '1600', $html);
         $html = str_replace('__ASSET_VER__', assetVersionToken($publicPath), $html);
+        $html = str_replace('__ROLE_HOSTS__', roleHostsJson(), $html);
         echo injectPublicMetadata($html, loadPublicWebConfigMetadata($basePath));
     }
 
     return true;
+}
+
+/**
+ * Peta host per peran untuk penjaga domain di frontend.
+ *
+ * Hanya entri yang benar-benar diisi yang diteruskan; sisanya dibuang supaya
+ * peta kosong menghasilkan "{}" dan penjaganya diam.
+ */
+function roleHostsJson(): string
+{
+    // Shell HTML dilayani sebelum bootstrap/app.php dijalankan, jadi config()
+    // belum tentu ada. Helper dan .env dimuat seperlunya di sini; keduanya
+    // memakai penjaga sehingga aman kalau nanti dimuat lagi oleh bootstrap.
+    if (! function_exists('config')) {
+        require_once dirname(__DIR__) . '/bootstrap/helpers.php';
+        load_env(base_path('.env'));
+    }
+
+    $hosts = (array) config('app.role_hosts', []);
+    $bersih = [];
+
+    foreach ($hosts as $peran => $host) {
+        $host = strtolower(trim((string) $host));
+
+        if ($host !== '') {
+            $bersih[(string) $peran] = $host;
+        }
+    }
+
+    $json = json_encode($bersih === [] ? (object) [] : $bersih, JSON_UNESCAPED_SLASHES);
+
+    return $json === false ? '{}' : $json;
 }
 
 /**
