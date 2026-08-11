@@ -10,35 +10,10 @@ if ($publicRoot !== false && $file !== false && strpos($file, $publicRoot) === 0
     return false;
 }
 
-if (shouldServeSpa($path)) {
-    $index = $publicRoot ? $publicRoot . DIRECTORY_SEPARATOR . 'index.html' : false;
-
-    if ($index && is_file($index)) {
-        header('Content-Type: text/html; charset=utf-8');
-        readfile($index);
-        return;
-    }
-}
-
+// Semua yang bukan berkas nyata diserahkan ke public/index.php, termasuk
+// halaman HTML-nya. Router ini dulu membaca index.html mentah-mentah supaya
+// cepat, tapi itu melewati substitusi placeholder di index.php -- __ASSET_VER__
+// akan sampai ke peramban apa adanya dan tidak ada satu pun aset yang termuat.
+// Perbedaan kecepatannya tidak sebanding dengan dev lokal yang berperilaku
+// berbeda dari produksi.
 require __DIR__ . '/../public/index.php';
-
-function shouldServeSpa(string $path): bool
-{
-    if ($path === '/' || $path === '') {
-        return true;
-    }
-
-    if (strpos($path, '/api/') === 0 || $path === '/api') {
-        return false;
-    }
-
-    if ($path === '/health') {
-        return false;
-    }
-
-    if (strpos($path, '/storage/uploads/') === 0) {
-        return false;
-    }
-
-    return ! preg_match('/\.[A-Za-z0-9]{1,8}$/', $path);
-}

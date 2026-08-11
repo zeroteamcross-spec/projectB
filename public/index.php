@@ -7,6 +7,10 @@ if (serveStorageUpload(dirname(__DIR__))) {
 }
 
 $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+if (serveVersionedAsset(__DIR__, $path)) {
+    return;
+}
+
 if (serveSpaShell(dirname(__DIR__), __DIR__, $path)) {
     return;
 }
@@ -46,10 +50,125 @@ function serveSpaShell(string $basePath, string $publicPath, string $path): bool
 
     if ($method !== 'HEAD') {
         $html = str_replace('__APP_SPLASH_MAX_WAIT_MS__', '1600', $html);
+        $html = str_replace('__ASSET_VER__', assetVersionToken($publicPath), $html);
         echo injectPublicMetadata($html, loadPublicWebConfigMetadata($basePath));
     }
 
     return true;
+}
+
+/**
+ * Token versi untuk jalur aset.
+ *
+ * Diambil dari mtime terbaru seluruh isi public/assets. Deploy mengubah berkas,
+ * mtime naik, token berubah, dan setiap URL modul ikut berubah -- tidak ada
+ * langkah manual yang bisa terlupa. Dihitung hanya saat melayani HTML, yang
+ * terjadi sekali per buka halaman, bukan pada ratusan permintaan asetnya.
+ */
+function assetVersionToken(string $publicPath): string
+{
+    $akar = $publicPath . DIRECTORY_SEPARATOR . 'assets';
+
+    if (! is_dir($akar)) {
+        return '0';
+    }
+
+    $terbaru = 0;
+    $iterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($akar, FilesystemIterator::SKIP_DOTS)
+    );
+
+    foreach ($iterator as $item) {
+        if (! $item->isFile()) {
+            continue;
+        }
+
+        $waktu = (int) $item->getMTime();
+        if ($waktu > $terbaru) {
+            $terbaru = $waktu;
+        }
+    }
+
+    return base_convert((string) $terbaru, 10, 36);
+}
+
+/**
+ * Menyajikan /assets/v-<token>/<jalur> dari berkas asli di /assets/<jalur>.
+ *
+ * Token tidak diperiksa isinya dengan sengaja. Gunanya bukan keamanan,
+ * melainkan membuat URL berubah setiap deploy; berkas yang dilayani selalu yang
+ * ada di disk sekarang. Token lama tetap dijawab -- halaman yang sudah telanjur
+ * terbuka di tab pengguna tidak mendadak rusak.
+ *
+ * Di produksi Nginx yang menangani jalur ini langsung dari disk. Fungsi ini
+ * dipakai server PHP bawaan saat pengembangan, dan jadi jaring pengaman kalau
+ * aturan rewrite belum terpasang.
+ */
+function serveVersionedAsset(string $publicPath, string $path): bool
+{
+    $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+    if (! in_array($method, ['GET', 'HEAD'], true)) {
+        return false;
+    }
+
+    if (preg_match('~^/assets/v-[^/]+/(.+)$~', $path, $cocok) !== 1) {
+        return false;
+    }
+
+    $relatif = str_replace('\\', '/', rawurldecode($cocok[1]));
+    if ($relatif === '' || strpos($relatif, '..') !== false) {
+        http_response_code(404);
+        return true;
+    }
+
+    $akar = realpath($publicPath . DIRECTORY_SEPARATOR . 'assets');
+    $berkas = realpath($publicPath . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $relatif));
+
+    if ($akar === false || $berkas === false || strpos($berkas, $akar . DIRECTORY_SEPARATOR) !== 0 || ! is_file($berkas)) {
+        http_response_code(404);
+        return true;
+    }
+
+    header('Content-Type: ' . assetContentType($berkas));
+    header('Content-Length: ' . filesize($berkas));
+    // Setahun dan immutable: token di URL yang membatalkannya, bukan waktu.
+    header('Cache-Control: public, max-age=31536000, immutable');
+
+    if ($method !== 'HEAD') {
+        readfile($berkas);
+    }
+
+    return true;
+}
+
+/**
+ * mime_content_type() menebak .js sebagai text/plain, dan peramban menolak
+ * mengeksekusi modul dengan tipe itu. Jadi ekstensi yang kita sajikan sendiri
+ * dipetakan eksplisit.
+ */
+function assetContentType(string $berkas): string
+{
+    $peta = [
+        'js' => 'application/javascript; charset=utf-8',
+        'mjs' => 'application/javascript; charset=utf-8',
+        'css' => 'text/css; charset=utf-8',
+        'json' => 'application/json; charset=utf-8',
+        'svg' => 'image/svg+xml',
+        'png' => 'image/png',
+        'jpg' => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
+        'webp' => 'image/webp',
+        'gif' => 'image/gif',
+        'ico' => 'image/x-icon',
+        'woff' => 'font/woff',
+        'woff2' => 'font/woff2',
+        'ttf' => 'font/ttf',
+        'map' => 'application/json; charset=utf-8',
+    ];
+
+    $ekstensi = strtolower(pathinfo($berkas, PATHINFO_EXTENSION));
+
+    return $peta[$ekstensi] ?? (mime_content_type($berkas) ?: 'application/octet-stream');
 }
 
 function loadPublicWebConfigMetadata(string $basePath): array

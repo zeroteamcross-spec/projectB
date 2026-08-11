@@ -29,6 +29,7 @@ $tests = [
     Tests\Unit\FavoritesTest::class,
     Tests\Unit\ShowroomRegistrationTest::class,
     Tests\Unit\BookingFeeAndReturnTest::class,
+    Tests\Unit\FrontendAssetVersioningTest::class,
 ];
 
 $passed = 0;
