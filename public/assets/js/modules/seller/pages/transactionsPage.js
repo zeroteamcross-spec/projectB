@@ -23,10 +23,16 @@ const DEFAULT_QUERY = {
   pageSize: 10,
 };
 
+const TRANSACTIONS_POLL_INTERVAL_MS = 45_000;
+const TRANSACTIONS_POLL_LIMIT = 20;
+
 export function SellerTransactionsPage() {
   let root = null;
   let unsubscribe = null;
   let currentContext = null;
+  let pollingTimer = null;
+  let pollingRequest = null;
+  let pollingEnabled = false;
   const state = {
     query: { ...DEFAULT_QUERY },
     checklistDraft: {},
@@ -34,6 +40,80 @@ export function SellerTransactionsPage() {
   };
 
   const rerender = () => render(root, currentContext, state, actions);
+
+  const stopPolling = ({ keepEnabled = false } = {}) => {
+    if (pollingTimer !== null) {
+      window.clearInterval(pollingTimer);
+      pollingTimer = null;
+    }
+
+    pollingRequest?.abort();
+    pollingRequest = null;
+
+    if (!keepEnabled) {
+      pollingEnabled = false;
+    }
+  };
+
+  const pullTransactions = async () => {
+    if (!pollingEnabled || isDocumentHidden() || pollingRequest) {
+      return;
+    }
+
+    const controller = new AbortController();
+    pollingRequest = controller;
+
+    try {
+      const payload = await sellerTransactionService.list(
+        { limit: TRANSACTIONS_POLL_LIMIT },
+        { signal: controller.signal },
+      );
+
+      if (!pollingEnabled || controller.signal.aborted || isDocumentHidden()) {
+        return;
+      }
+
+      appStore.patchState("working.sellerTransactions.transactions", {
+        data: {
+          transactions: Array.isArray(payload?.transactions) ? payload.transactions : [],
+          meta: payload?.meta && typeof payload.meta === "object" ? payload.meta : {},
+        },
+        hydratedAt: Date.now(),
+      }, "seller-transactions:poll");
+    } catch (error) {
+      if (!controller.signal.aborted && !isAbortError(error)) {
+        console.warn("Polling transaksi seller gagal.", error);
+      }
+    } finally {
+      if (pollingRequest === controller) {
+        pollingRequest = null;
+      }
+    }
+  };
+
+  const startPolling = () => {
+    pollingEnabled = true;
+
+    if (isDocumentHidden() || pollingTimer !== null) {
+      return;
+    }
+
+    pollingTimer = window.setInterval(() => {
+      void pullTransactions();
+    }, TRANSACTIONS_POLL_INTERVAL_MS);
+  };
+
+  const handleVisibilityChange = () => {
+    if (isDocumentHidden()) {
+      stopPolling({ keepEnabled: true });
+      return;
+    }
+
+    if (pollingEnabled) {
+      startPolling();
+      void pullTransactions();
+    }
+  };
 
   const actions = {
     refresh() {
@@ -123,19 +203,27 @@ export function SellerTransactionsPage() {
       currentContext = context;
       state.query = createTransactionsQuery(context?.query);
       rerender();
+      startPolling();
     },
     bindEvents(context) {
       currentContext = context;
+      document.addEventListener("visibilitychange", handleVisibilityChange);
       unsubscribe = appStore.subscribe((state, action) => {
         if (String(action ?? "").startsWith("ui:")) {
           return;
         }
         rerender();
       });
-      return () => unsubscribe?.();
+      return () => {
+        unsubscribe?.();
+        unsubscribe = null;
+        document.removeEventListener("visibilitychange", handleVisibilityChange);
+        stopPolling();
+      };
     },
     dispose() {
       closeTransactionModal();
+      stopPolling();
       unsubscribe = null;
     },
   });
@@ -511,6 +599,14 @@ function syncTransactionsUrl(query) {
   const url = new URL(window.location.href);
   url.hash = `#${buildTransactionsPath(query)}`;
   window.history.replaceState(window.history.state, "", url);
+}
+
+function isDocumentHidden() {
+  return typeof document !== "undefined" && document.visibilityState === "hidden";
+}
+
+function isAbortError(error) {
+  return error?.name === "AbortError";
 }
 
 function isInPeriod(value, period) {
