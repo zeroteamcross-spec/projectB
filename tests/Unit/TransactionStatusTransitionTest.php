@@ -20,6 +20,10 @@ class TransactionStatusTransitionTest extends TestCase
     public function run(): void
     {
         $this->paidStatusClearsRemainingAmountAndSetsPaidAt();
+        $this->providerSettlementSyncsFullPayment();
+        $this->providerSettlementSyncsDpPayment();
+        $this->providerPendingSyncKeepsTransactionPending();
+        $this->providerSyncFailureKeepsTransactionPending();
         $this->fullPaymentTransactionCannotBecomeDpPaid();
         $this->sellerCanViewDetailButCannotCreateCompletionPayment();
         $this->providerFailureIsLoggedForCompletionPayment();
@@ -46,6 +50,107 @@ class TransactionStatusTransitionTest extends TestCase
         $this->assertSame(0, (int) $row['remaining_amount']);
         $this->assertNotNull($row['paid_at']);
         $this->assertSame('paid', $result['transaction_status']);
+    }
+
+    private function providerSettlementSyncsFullPayment(): void
+    {
+        [$pdo, $service] = $this->serviceWithSeedData(
+            'full',
+            'pending_payment',
+            null,
+            0,
+            new StatusTransactionPaymentProvider([
+                'transaction_status' => 'settlement',
+                'gross_amount' => '150000000.00',
+                'payment_type' => 'bank_transfer',
+                'transaction_id' => 'MID-001',
+            ]),
+            'ORDER-TRX-001'
+        );
+
+        $result = $service->syncPaymentStatus(['id' => 1, 'role' => 'buyer'], 1);
+        $transaction = $pdo->query('SELECT transaction_status, paid_at FROM transactions WHERE id = 1')->fetch();
+        $car = $pdo->query('SELECT listing_status FROM cars WHERE id = 10')->fetch();
+        $log = $pdo->query('SELECT provider_order_id, transaction_status, payload_response_json FROM transaction_payment_logs WHERE transaction_id = 1')->fetch();
+
+        $this->assertSame('paid', $transaction['transaction_status']);
+        $this->assertNotNull($transaction['paid_at']);
+        $this->assertSame('sold', $car['listing_status']);
+        $this->assertSame('paid', $result['transaction_status']);
+        $this->assertSame('ORDER-TRX-001', $log['provider_order_id']);
+        $this->assertSame('settlement', $log['transaction_status']);
+        $this->assertSame('settlement', json_decode((string) $log['payload_response_json'], true)['transaction_status']);
+    }
+
+    private function providerSettlementSyncsDpPayment(): void
+    {
+        [$pdo, $service] = $this->serviceWithSeedData(
+            'dp',
+            'pending_payment',
+            50000000,
+            100000000,
+            new StatusTransactionPaymentProvider([
+                'transaction_status' => 'capture',
+                'gross_amount' => '50000000.00',
+                'payment_type' => 'bank_transfer',
+                'transaction_id' => 'MID-002',
+            ]),
+            'ORDER-TRX-002'
+        );
+
+        $result = $service->syncPaymentStatus(['id' => 1, 'role' => 'buyer'], 1);
+        $transaction = $pdo->query('SELECT transaction_status, remaining_amount, paid_at FROM transactions WHERE id = 1')->fetch();
+        $car = $pdo->query('SELECT listing_status FROM cars WHERE id = 10')->fetch();
+
+        $this->assertSame('dp_paid', $transaction['transaction_status']);
+        $this->assertSame(100000000, (int) $transaction['remaining_amount']);
+        $this->assertNotNull($transaction['paid_at']);
+        $this->assertSame('sold', $car['listing_status']);
+        $this->assertSame('dp_paid', $result['transaction_status']);
+    }
+
+    private function providerPendingSyncKeepsTransactionPending(): void
+    {
+        [$pdo, $service] = $this->serviceWithSeedData(
+            'full',
+            'pending_payment',
+            null,
+            0,
+            new StatusTransactionPaymentProvider([
+                'transaction_status' => 'pending',
+                'gross_amount' => '150000000.00',
+                'payment_type' => 'bank_transfer',
+            ]),
+            'ORDER-TRX-003'
+        );
+
+        $service->syncPaymentStatus(['id' => 1, 'role' => 'buyer'], 1);
+        $transaction = $pdo->query('SELECT transaction_status, paid_at FROM transactions WHERE id = 1')->fetch();
+        $log = $pdo->query('SELECT transaction_status FROM transaction_payment_logs WHERE transaction_id = 1')->fetch();
+
+        $this->assertSame('pending_payment', $transaction['transaction_status']);
+        $this->assertSame(null, $transaction['paid_at']);
+        $this->assertSame('pending', $log['transaction_status']);
+    }
+
+    private function providerSyncFailureKeepsTransactionPending(): void
+    {
+        [$pdo, $service] = $this->serviceWithSeedData(
+            'full',
+            'pending_payment',
+            null,
+            0,
+            new FailingTransactionPaymentProvider(),
+            'ORDER-FAIL'
+        );
+
+        $this->expectException(PaymentProviderException::class, static function () use ($service): void {
+            $service->syncPaymentStatus(['id' => 1, 'role' => 'buyer'], 1);
+        });
+
+        $transaction = $pdo->query('SELECT transaction_status, paid_at FROM transactions WHERE id = 1')->fetch();
+        $this->assertSame('pending_payment', $transaction['transaction_status']);
+        $this->assertSame(null, $transaction['paid_at']);
     }
 
     private function fullPaymentTransactionCannotBecomeDpPaid(): void
@@ -223,7 +328,8 @@ class TransactionStatusTransitionTest extends TestCase
         string $status,
         ?int $dpAmount,
         int $remainingAmount,
-        ?PaymentProviderInterface $paymentProvider = null
+        ?PaymentProviderInterface $paymentProvider = null,
+        ?string $providerOrderId = null
     ): array
     {
         $pdo = $this->sqlite();
@@ -240,12 +346,13 @@ class TransactionStatusTransitionTest extends TestCase
              midtrans_redirect_url, expires_at, paid_at, created_at, updated_at, deleted_at)
             VALUES
             (1, 'TRX-001', 1, 2, 10, 150000000, :payment_type, :dp_amount, :remaining_amount,
-             :transaction_status, NULL, NULL, NULL, NULL, NULL, '2026-01-01 00:00:00', NULL, NULL)");
+             :transaction_status, :midtrans_order_id, NULL, NULL, NULL, NULL, '2026-01-01 00:00:00', NULL, NULL)");
         $stmt->execute([
             'payment_type' => $paymentType,
             'dp_amount' => $dpAmount,
             'remaining_amount' => $remainingAmount,
             'transaction_status' => $status,
+            'midtrans_order_id' => $providerOrderId,
         ]);
 
         $service = new TransactionService(
@@ -383,6 +490,31 @@ class FakeTransactionPaymentProvider implements PaymentProviderInterface
     public function checkStatus(string $providerOrderId): array
     {
         return [];
+    }
+}
+
+class StatusTransactionPaymentProvider implements PaymentProviderInterface
+{
+    private array $status;
+
+    public function __construct(array $status)
+    {
+        $this->status = $status;
+    }
+
+    public function createInitialPayment(array $transaction, array $customer, string $paymentMethod): array
+    {
+        return [];
+    }
+
+    public function createCompletionPayment(array $transaction, array $customer, string $paymentMethod): array
+    {
+        return [];
+    }
+
+    public function checkStatus(string $providerOrderId): array
+    {
+        return array_merge(['order_id' => $providerOrderId], $this->status);
     }
 }
 

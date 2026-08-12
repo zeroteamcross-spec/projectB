@@ -25,6 +25,11 @@ export const transactionsResource = {
     return response.data?.transaction ?? null;
   },
 
+  async syncPaymentStatus(id, options = {}) {
+    const response = await apiClient.post(`/transactions/${encodeURIComponent(id)}/payment-status/sync`, {}, options);
+    return response.data?.transaction ?? null;
+  },
+
   async updateStatus(id, payload = {}, options = {}) {
     const response = await apiClient.patch(`/transactions/${encodeURIComponent(id)}/status`, payload, options);
     return response.data?.transaction ?? null;

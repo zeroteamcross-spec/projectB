@@ -380,7 +380,10 @@ function buyerCategoryMenu({ activePath, actions }) {
         return;
       }
       if (item.path) {
-        actions.navigate(item.path);
+        const target = item.id === "catalog" ? getBuyerShowroomCatalogUrl() : item.path;
+        if (target) {
+          actions.navigate(target);
+        }
         return;
       }
       actions.setCategory(item.id);

@@ -40,6 +40,7 @@ class TransactionFoundationHardeningTest extends TestCase
         $routes = file_get_contents($this->projectPath('app/Modules/Transactions/Routes/api.php'));
 
         $this->assertTrue(strpos($routes, '[TransactionController::class') !== false);
+        $this->assertTrue(strpos($routes, '/{transaction_id}/payment-status/sync') !== false);
         $this->assertTrue(strpos($routes, '(new TransactionController') === false);
         $this->assertTrue(strpos($routes, 'static fn') === false);
     }

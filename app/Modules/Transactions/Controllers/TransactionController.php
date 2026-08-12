@@ -70,6 +70,15 @@ class TransactionController extends Controller
         ], 'Status transaksi berhasil diambil.');
     }
 
+    public function syncPaymentStatus(Request $request): JsonResponse
+    {
+        $user = $this->user($request);
+
+        return JsonResponse::success([
+            'transaction' => $this->service->syncPaymentStatus($user, (int) $request->routeParam('transaction_id')),
+        ], 'Status pembayaran berhasil disinkronkan.');
+    }
+
     public function downloadPaymentQr(Request $request): Response
     {
         $user = $this->user($request);

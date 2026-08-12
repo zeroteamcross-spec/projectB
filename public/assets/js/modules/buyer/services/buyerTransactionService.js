@@ -13,6 +13,10 @@ export const buyerTransactionService = {
     return transactionsResource.status(transactionId, options);
   },
 
+  syncPaymentStatus(transactionId, options = {}) {
+    return transactionsResource.syncPaymentStatus(transactionId, options);
+  },
+
   updateStatus(transactionId, payload = {}, options = {}) {
     return transactionsResource.updateStatus(transactionId, payload, options);
   },

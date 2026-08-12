@@ -220,6 +220,26 @@ class TransactionService
         return TransactionMapper::status($transaction);
     }
 
+    public function syncPaymentStatus(array $user, int $transactionId): array
+    {
+        $transaction = $this->requireTransaction($transactionId);
+        TransactionPolicy::ensureCanView($user, $transaction);
+
+        if (($transaction['transaction_status'] ?? null) !== 'pending_payment') {
+            return $this->detail($user, $transactionId);
+        }
+
+        $providerOrderId = $this->providerOrderId($transaction);
+        if ($providerOrderId === '') {
+            return $this->detail($user, $transactionId);
+        }
+
+        $providerStatus = $this->paymentProvider->checkStatus($providerOrderId);
+        $this->processProviderStatus($transaction, $providerOrderId, $providerStatus, 'response');
+
+        return $this->detail($user, $transactionId);
+    }
+
     public function downloadPaymentQr(array $user, int $transactionId): array
     {
         $transaction = $this->requireTransaction($transactionId);
@@ -487,38 +507,11 @@ class TransactionService
             ];
         }
 
-        $grossAmount = isset($payload['gross_amount']) ? (int) $payload['gross_amount'] : null;
-
-        try {
-            $this->pdo->beginTransaction();
-            $log = $this->paymentLogs->record((int) $transaction['id'], [
-                'provider_name' => $payload['provider_name'] ?? 'midtrans',
-                'provider_order_id' => $providerOrderId,
-                'provider_transaction_id' => $payload['transaction_id'] ?? null,
-                'payment_method' => $payload['payment_type'] ?? null,
-                'transaction_status' => $payload['transaction_status'],
-                'gross_amount' => $grossAmount,
-                'payload_callback' => $payload['payload_callback'] ?? $payload,
-            ]);
-
-            $nextStatus = $this->paymentLogs->providerStatusToCanon($transaction, $payload['transaction_status'], $grossAmount);
-
-            if ($nextStatus !== null) {
-                $this->applyStatus($transaction, $nextStatus);
-            }
-
-            $this->pdo->commit();
-        } catch (Throwable $exception) {
-            if ($this->pdo->inTransaction()) {
-                $this->pdo->rollBack();
-            }
-
-            throw $exception;
-        }
+        $processed = $this->processProviderStatus($transaction, $providerOrderId, $payload, 'callback');
 
         return [
             'transaction' => TransactionMapper::status($this->requireTransaction((int) $transaction['id'])),
-            'payment_log' => $log,
+            'payment_log' => $processed['log'],
         ];
     }
 
@@ -529,48 +522,24 @@ class TransactionService
         $expiredTransactionIds = [];
 
         foreach ($this->transactions->listStalePending($threshold) as $transaction) {
-            $providerOrderId = trim((string) ($transaction['midtrans_order_id'] ?? ''));
+            $providerOrderId = $this->providerOrderId($transaction);
 
             if ($providerOrderId !== '') {
                 $providerStatus = $this->paymentProvider->checkStatus($providerOrderId);
-                $grossAmount = isset($providerStatus['gross_amount']) ? (int) $providerStatus['gross_amount'] : null;
 
-                try {
-                    $this->pdo->beginTransaction();
-                    $this->paymentLogs->record((int) $transaction['id'], [
-                        'provider_name' => 'midtrans',
-                        'provider_order_id' => $providerOrderId,
-                        'provider_transaction_id' => $providerStatus['transaction_id'] ?? null,
-                        'payment_method' => $providerStatus['payment_type'] ?? null,
-                        'transaction_status' => $providerStatus['transaction_status'] ?? null,
-                        'gross_amount' => $grossAmount,
-                        'payload_callback' => $providerStatus,
-                    ]);
+                $processed = $this->processProviderStatus(
+                    $transaction,
+                    $providerOrderId,
+                    $providerStatus,
+                    'response',
+                    true
+                );
 
-                    $providerNextStatus = $this->paymentLogs->providerStatusToCanon(
-                        $transaction,
-                        $providerStatus['transaction_status'] ?? null,
-                        $grossAmount
-                    );
-                    $nextStatus = in_array($providerNextStatus, ['dp_paid', 'paid', 'completed'], true)
-                        ? $providerNextStatus
-                        : 'expired';
-
-                    $this->applyStatus($transaction, $nextStatus);
-
-                    if ($nextStatus === 'expired') {
-                        $expiredTransactionIds[] = (int) $transaction['id'];
-                        $this->transactions->publishReservedCarsByIds([(int) $transaction['car_id']]);
-                    }
-
-                    $this->pdo->commit();
-                } catch (Throwable $exception) {
-                    if ($this->pdo->inTransaction()) {
-                        $this->pdo->rollBack();
-                    }
-
-                    throw $exception;
+                if ($processed['next_status'] === 'expired') {
+                    $expiredTransactionIds[] = (int) $transaction['id'];
+                    $this->transactions->publishReservedCarsByIds([(int) $transaction['car_id']]);
                 }
+
                 continue;
             }
 
@@ -596,6 +565,88 @@ class TransactionService
             'expired_count' => count($expiredTransactionIds),
             'expired_transaction_ids' => $expiredTransactionIds,
         ];
+    }
+
+    private function processProviderStatus(
+        array $transaction,
+        string $providerOrderId,
+        array $providerPayload,
+        string $payloadType,
+        bool $expireUnresolved = false
+    ): array {
+        $providerStatus = isset($providerPayload['transaction_status'])
+            ? (string) $providerPayload['transaction_status']
+            : null;
+        $grossAmount = isset($providerPayload['gross_amount'])
+            ? (int) $providerPayload['gross_amount']
+            : null;
+        $logData = [
+            'provider_name' => $providerPayload['provider_name'] ?? 'midtrans',
+            'provider_order_id' => $providerOrderId,
+            'provider_transaction_id' => $providerPayload['transaction_id'] ?? null,
+            'payment_method' => $providerPayload['payment_type'] ?? null,
+            'transaction_status' => $providerStatus,
+            'gross_amount' => $grossAmount,
+        ];
+
+        if ($payloadType === 'callback') {
+            $logData['payload_callback'] = $providerPayload['payload_callback'] ?? $providerPayload;
+        } else {
+            $logData['payload_response'] = $providerPayload;
+        }
+
+        try {
+            $this->pdo->beginTransaction();
+            $log = $this->paymentLogs->record((int) $transaction['id'], $logData);
+            $providerNextStatus = $this->paymentLogs->providerStatusToCanon(
+                $transaction,
+                $providerStatus,
+                $grossAmount
+            );
+            $nextStatus = $expireUnresolved
+                ? (in_array($providerNextStatus, ['dp_paid', 'paid', 'completed'], true)
+                    ? $providerNextStatus
+                    : 'expired')
+                : $providerNextStatus;
+
+            if ($nextStatus !== null && $nextStatus !== ($transaction['transaction_status'] ?? null)) {
+                $this->applyStatus($transaction, $nextStatus);
+            }
+
+            $this->pdo->commit();
+        } catch (Throwable $exception) {
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+
+            throw $exception;
+        }
+
+        return [
+            'log' => $log,
+            'next_status' => $nextStatus,
+        ];
+    }
+
+    private function providerOrderId(array $transaction): string
+    {
+        $providerOrderId = trim((string) ($transaction['midtrans_order_id'] ?? ''));
+        if ($providerOrderId !== '') {
+            return $providerOrderId;
+        }
+
+        foreach ($this->paymentLogs->latestByTransaction((int) $transaction['id'], 10) as $log) {
+            if (($log['provider_name'] ?? 'midtrans') !== 'midtrans') {
+                continue;
+            }
+
+            $providerOrderId = trim((string) ($log['provider_order_id'] ?? ''));
+            if ($providerOrderId !== '') {
+                return $providerOrderId;
+            }
+        }
+
+        return '';
     }
 
     private function applyStatus(array $transaction, string $status): void

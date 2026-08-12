@@ -23,6 +23,7 @@ return static function (Router $router): void {
         $router->post('', [TransactionController::class, 'create']);
         $router->get('/{transaction_id}', [TransactionController::class, 'detail']);
         $router->get('/{transaction_id}/status', [TransactionController::class, 'status']);
+        $router->post('/{transaction_id}/payment-status/sync', [TransactionController::class, 'syncPaymentStatus']);
         $router->get('/{transaction_id}/payment-qr', [TransactionController::class, 'downloadPaymentQr']);
         $router->patch('/{transaction_id}/status', [TransactionController::class, 'updateStatus']);
         $router->patch('/{transaction_id}/fulfillment-checklist', [TransactionController::class, 'updateFulfillmentChecklist']);

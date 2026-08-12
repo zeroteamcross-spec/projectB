@@ -29,6 +29,7 @@ export function PaymentStatusPage() {
   let root = null;
   let unsubscribe = null;
   let visibilityCleanup = null;
+  let initialSyncStarted = false;
   const flags = {
     isRefreshing: false,
     isAutoChecking: false,
@@ -56,6 +57,7 @@ export function PaymentStatusPage() {
       scrollToPageTop();
       render(root, context, flags);
       syncAutoStatusPolling(context, flags, poller);
+      syncInitialPaymentStatus(context, flags);
     },
     bindEvents(context) {
       unsubscribe = appStore.subscribe(() => {
@@ -152,7 +154,13 @@ function render(root, context, flags) {
     }
     main.append(PaymentStatusSummary({ transaction }));
     if (isPendingPayment(transaction)) {
-      main.append(pendingPaymentGuidePanel(transaction));
+      main.append(pendingPaymentGuidePanel({
+        transaction,
+        isRefreshing: flags.isRefreshing,
+        onRefresh: () => refreshStatus(context, flags, {
+          source: "buyer-payment-status:refresh",
+        }),
+      }));
     }
     if (canBuyerCancel(transaction)) {
       main.append(cancelTransactionPanel({
@@ -173,7 +181,6 @@ function render(root, context, flags) {
       isCompleting: flags.isCompleting,
       completionOpen: Boolean(completion.open),
       onRefresh: () => refreshStatus(context, flags, {
-        forceDetail: true,
         showToastOnSuccess: true,
         source: "buyer-payment-status:refresh",
       }),
@@ -412,7 +419,7 @@ function handoverInstructionPanel() {
   return section;
 }
 
-function pendingPaymentGuidePanel(transaction) {
+function pendingPaymentGuidePanel({ transaction, isRefreshing = false, onRefresh = null } = {}) {
   const section = document.createElement("section");
   section.className = `grid gap-4 ${tw.surface.accentPanel} p-5`;
   applyDesignHook(section, "buyer.payment.pendingGuide");
@@ -453,6 +460,18 @@ function pendingPaymentGuidePanel(transaction) {
   });
 
   section.append(copy, steps);
+
+  const refresh = Button({
+    label: isRefreshing ? "Memuat status..." : "Refresh status",
+    variant: "secondary",
+    disabled: isRefreshing,
+    onClick: onRefresh,
+    designHook: "shared.button.secondary",
+  });
+  refresh.id = "byrpay_refresh_status_button";
+  refresh.classList.add("w-full", "sm:w-fit");
+  section.append(refresh);
+
   return section;
 }
 
@@ -485,7 +504,6 @@ function cancelTransactionPanel({ transaction, isCancelling = false, onCancel = 
 }
 
 async function refreshStatus(context, flags, {
-  forceDetail = true,
   silent = false,
   showToastOnSuccess = true,
   source = "buyer-payment-status:refresh",
@@ -505,14 +523,7 @@ async function refreshStatus(context, flags, {
   setActionState(flags);
 
   try {
-    const statusTransaction = await buyerTransactionService.status(context.params.id);
-    const statusChanged = statusTransaction?.transaction_status
-      && statusTransaction.transaction_status !== current?.transaction_status;
-    const shouldLoadDetail = forceDetail || statusChanged || isPaymentPaid(statusTransaction) !== wasPaid;
-    const detailTransaction = shouldLoadDetail
-      ? await buyerTransactionService.detail(context.params.id)
-      : null;
-    const transaction = detailTransaction ?? mergeTransactionStatus(current, statusTransaction);
+    const transaction = await buyerTransactionService.syncPaymentStatus(context.params.id);
 
     if (!transaction) {
       return null;
@@ -554,6 +565,24 @@ async function refreshStatus(context, flags, {
   }
 }
 
+function syncInitialPaymentStatus(context, flags) {
+  if (initialSyncStarted) {
+    return;
+  }
+
+  const transaction = appStore.get("working.buyerPaymentStatus.transaction", null)?.data ?? null;
+  if (!isPendingPayment(transaction)) {
+    return;
+  }
+
+  initialSyncStarted = true;
+  void refreshStatus(context, flags, {
+    silent: true,
+    showToastOnSuccess: false,
+    source: "buyer-payment-status:initial-sync",
+  });
+}
+
 function syncAutoStatusPolling(context, flags, poller) {
   const transaction = appStore.get("working.buyerPaymentStatus.transaction", null)?.data ?? null;
 
@@ -584,7 +613,6 @@ async function runAutoStatusCheck(context, flags, poller) {
   poller.inFlight = true;
   try {
     await refreshStatus(context, flags, {
-      forceDetail: false,
       silent: true,
       showToastOnSuccess: false,
       source: "buyer-payment-status:auto-refresh",
@@ -626,17 +654,6 @@ function shouldAutoPollTransaction(transaction) {
 
   const status = String(transaction.transaction_status ?? transaction.status ?? "").toLowerCase();
   return !isPaymentPaid(transaction) && !["expired", "cancelled", "failed", "refunded", "completed"].includes(status);
-}
-
-function mergeTransactionStatus(current, statusTransaction) {
-  if (!current && !statusTransaction) {
-    return null;
-  }
-
-  return {
-    ...(current ?? {}),
-    ...(statusTransaction ?? {}),
-  };
 }
 
 function openCompletionFlow() {
