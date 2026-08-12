@@ -342,7 +342,20 @@ function getSidebarLinksForRole(role, store, fallbackLinks) {
     return fallbackLinks;
   }
 
-  return ensureAdminWebConfigMenu(ensureProfileMenu(buildSidebarTree(items)), role);
+  // Daftar dari master data dipakai apa adanya.
+  //
+  // Dulu "Profil Saya" dan "Konfigurasi WEB" disisipkan paksa di sini kalau
+  // tidak ditemukan. Maksudnya menjaga admin supaya tidak kehilangan jalan ke
+  // halaman konfigurasinya sendiri -- tapi keadaan itu sudah dijaga beberapa
+  // baris di atas: master data yang kosong mengembalikan daftar bawaan yang
+  // lengkap. Jadi penyisipan ini hanya pernah aktif pada satu keadaan, yaitu
+  // ketika admin punya daftar isi dan sengaja membuang menu itu -- persis saat
+  // ia paling tidak boleh aktif. Menghapus menu lewat Master Sidebar jadi tidak
+  // pernah bisa bertahan, dan tidak ada pesan apa pun yang menjelaskannya.
+  //
+  // Rutenya sendiri tetap bisa dibuka lewat URL, dan sidebar super admin selalu
+  // memuat Konfigurasi WEB, jadi tidak ada yang benar-benar terkunci.
+  return buildSidebarTree(items);
 }
 
 function normalizeSidebarRole(role) {
@@ -367,31 +380,6 @@ function withDesignStudioV2Menu(links, role, store) {
   }
 
   return [...links, designStudioV2MenuItem()];
-}
-
-function ensureProfileMenu(links) {
-  return ensureMenuLink(links, { href: "#/profile", label: "Profil Saya", icon: "user" }, 1);
-}
-
-function ensureAdminWebConfigMenu(links, role) {
-  if (normalizeSidebarRole(role) !== "admin") {
-    return links;
-  }
-
-  return ensureMenuLink(links, { href: "#/admin/web-config", label: "Konfigurasi WEB", icon: "settings" }, 2);
-}
-
-function ensureMenuLink(links, menu, index = 1) {
-  if (links.some((link) => String(link.href ?? "") === menu.href)) {
-    return links;
-  }
-
-  const insertAt = Math.min(Math.max(0, index), links.length);
-  return [
-    ...links.slice(0, insertAt),
-    menu,
-    ...links.slice(insertAt),
-  ];
 }
 
 function buildSidebarTree(items) {
