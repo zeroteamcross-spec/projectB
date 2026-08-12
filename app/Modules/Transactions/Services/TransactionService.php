@@ -289,9 +289,15 @@ class TransactionService
         $transaction = $this->requireTransaction($transactionId);
         TransactionPolicy::ensureCanManageFulfillmentChecklist($user, $transaction);
 
-        // Serah terima dimulai begitu Booking Fee masuk. `paid` tetap diterima
-        // untuk transaksi lunas lama.
-        if (! in_array($transaction['transaction_status'] ?? null, ['dp_paid', 'paid'], true)) {
+        // dp_paid is now the terminal transaction state. Fulfillment checklist
+        // updates remain available only for legacy paid transactions.
+        if (($transaction['transaction_status'] ?? null) === 'dp_paid') {
+            throw new ValidationException([
+                'transaction_status' => 'Transaksi dp_paid sudah selesai dan tidak memerlukan checklist lanjutan.',
+            ]);
+        }
+
+        if (($transaction['transaction_status'] ?? null) !== 'paid') {
             throw new ValidationException([
                 'transaction_status' => 'Checklist hanya bisa diproses setelah Booking Fee dibayar.',
             ]);
@@ -409,8 +415,8 @@ class TransactionService
             throw new ValidationException(['payment_type' => 'Only DP transactions can use complete payment.']);
         }
 
-        if (($transaction['transaction_status'] ?? null) === 'paid') {
-            throw new ValidationException(['transaction_status' => 'Transaction is already paid.']);
+        if (in_array(($transaction['transaction_status'] ?? null), ['dp_paid', 'paid', 'completed'], true)) {
+            throw new ValidationException(['transaction_status' => 'Transaksi sudah selesai dan tidak memiliki pelunasan lanjutan.']);
         }
 
         $remainingAmount = (int) ($transaction['remaining_amount'] ?? 0);
@@ -658,12 +664,19 @@ class TransactionService
             throw new ValidationException(['transaction_status' => 'dp_paid is only valid for DP transactions.']);
         }
 
-        // Booking Fee menutup pembayaran, jadi `dp_paid` sudah layak diselesaikan.
-        // `paid` tetap diterima untuk transaksi lunas lama.
-        if ($status === 'completed'
-            && ! in_array($transaction['transaction_status'] ?? null, ['dp_paid', 'paid'], true)) {
+        if (($transaction['transaction_status'] ?? null) === 'dp_paid' && $status === 'paid') {
             throw new ValidationException([
-                'transaction_status' => 'Hanya transaksi yang sudah dibayar yang bisa diselesaikan.',
+                'transaction_status' => 'Transaksi dp_paid sudah selesai dan tidak boleh dipromosikan ke status paid.',
+            ]);
+        }
+
+        // dp_paid is the terminal transaction state. `completed` remains
+        // accepted only for legacy records that already reached `paid`.
+        if ($status === 'completed' && ($transaction['transaction_status'] ?? null) !== 'paid') {
+            throw new ValidationException([
+                'transaction_status' => ($transaction['transaction_status'] ?? null) === 'dp_paid'
+                    ? 'Transaksi dp_paid sudah selesai.'
+                    : 'Hanya transaksi legacy berstatus paid yang bisa diselesaikan.',
             ]);
         }
 

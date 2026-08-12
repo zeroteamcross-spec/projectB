@@ -860,7 +860,11 @@ class AffiliateService
                 'settlement_id' => null,
                 'finality_event' => 'paid',
                 'accrued_at' => $now,
-                'notes' => sprintf('Accrued automatically when transaction %s reached paid.', $transaction['transaction_code'] ?? ('#' . $transactionId)),
+                'notes' => sprintf(
+                    'Accrued automatically when transaction %s reached %s.',
+                    $transaction['transaction_code'] ?? ('#' . $transactionId),
+                    $transaction['transaction_status'] ?? 'paid'
+                ),
                 'created_at' => $now,
                 'updated_at' => $now,
             ]);

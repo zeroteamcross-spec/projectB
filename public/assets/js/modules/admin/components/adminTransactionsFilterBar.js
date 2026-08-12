@@ -53,8 +53,8 @@ export function AdminTransactionsFilterBar({ filters = {}, counts = {}, onSubmit
   buildOptions(statusSelect, filters.status ?? "", [
     ["", "Semua status"],
     ["pending_payment", "Menunggu pembayaran"],
-    ["dp_paid", "DP dibayar"],
-    ["paid", "Lunas"],
+    ["dp_paid", "Lunas (DP)"],
+    ["paid", "Lunas (legacy/full)"],
     ["expired", "Kadaluarsa"],
     ["cancelled", "Dibatalkan"],
   ]);
@@ -117,8 +117,8 @@ function countsRow(counts) {
   [
     ["Total", counts.total ?? 0],
     ["Pending", counts.pending ?? 0],
-    ["DP paid", counts.dpPaid ?? 0],
-    ["Paid", counts.paid ?? 0],
+    ["DP lunas", counts.dpPaid ?? 0],
+    ["Lunas / selesai", counts.paid ?? 0],
     ["Perlu perhatian", counts.attention ?? 0],
   ].forEach(([label, value]) => {
     const chip = document.createElement("span");

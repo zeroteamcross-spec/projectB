@@ -5,10 +5,13 @@ import { Button } from "../../../ui/primitives/button.js";
 import { openModal } from "../../../ui/primitives/modal.js";
 import { showToast } from "../../../ui/primitives/toast.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
+import { Badge } from "../../../ui/primitives/badge.js";
 import { AdminSettlementList } from "../components/adminSettlementList.js";
+import { adminAffiliateFinanceService } from "../services/adminAffiliateFinanceService.js";
 import { adminSessionService } from "../services/adminSessionService.js";
 import { adminSettlementService } from "../services/adminSettlementService.js";
 import { applyDesignHook } from "../../../theme/designStudioHooks.js";
+import { getTransactionStatusMeta } from "../../../utils/transactionStatus.js";
 
 export function AdminSettlementsPage() {
   let root = null;
@@ -115,6 +118,14 @@ function render(root, context, state, actions) {
   const payload = workingPayload ?? snapshotPayload ?? { settlements: [], meta: {} };
   const hydratedAt = appStore.get("working.adminSettlements.settlements.hydratedAt", 0) ?? 0;
   const hasSource = Boolean(workingPayload || snapshotPayload);
+  const workingEligiblePayload = appStore.get("working.adminSettlements.ledgers.data", null);
+  const snapshotEligiblePayload = appStore.get("snapshot.admin.affiliateLedgers.data", null);
+  const eligiblePayload = workingEligiblePayload ?? snapshotEligiblePayload ?? { ledgers: [] };
+  const eligibleLedgers = adminAffiliateFinanceService
+    .normalizedLedgers(eligiblePayload.ledgers ?? [])
+    .filter((ledger) => ledger.ledger_status === "accrued"
+      && ["dp_paid", "paid", "completed"].includes(ledger.transaction?.transaction_status));
+  const eligibleHydratedAt = appStore.get("working.adminSettlements.ledgers.hydratedAt", 0) ?? 0;
   const allSettlements = adminSettlementService.normalizedSettlements(payload.settlements ?? []);
   const settlements = adminSettlementService.filterSettlements(allSettlements, filters);
   const currentPage = Math.max(1, Number(filters.page || 1));
@@ -145,6 +156,10 @@ function render(root, context, state, actions) {
     settlementsHero({ action: dashboardButton, summary }),
     applyDesignHook(settlementsSummary(summary), "admin.settlements.summary"),
     applyDesignHook(settlementFilterBar(filters, summary, actions), "admin.settlements.filters"),
+    eligibleDpPaidSection({
+      ledgers: eligibleLedgers,
+      loading: !eligibleHydratedAt && !workingEligiblePayload && !snapshotEligiblePayload,
+    }),
   );
 
   frame.append(applyDesignHook(AdminSettlementList({
@@ -173,6 +188,69 @@ function render(root, context, state, actions) {
   });
 
   replaceStableFrame(root, frame);
+}
+
+function eligibleDpPaidSection({ ledgers = [], loading = false } = {}) {
+  const section = document.createElement("section");
+  section.id = "adst_dp_paid_section";
+  section.className = "grid min-w-0 gap-4 rounded-[var(--pb-radius-2xl)] border border-[var(--pb-card-border)] bg-white/88 p-4 shadow-[var(--pb-shadow-card)]";
+
+  const header = document.createElement("div");
+  header.className = "flex min-w-0 flex-col gap-1 sm:flex-row sm:items-end sm:justify-between";
+  header.append(
+    textNode("h2", "text-base font-black text-gray-950", "Transaksi lunas siap settlement"),
+    textNode("p", "text-xs font-semibold text-gray-500", `${ledgers.length} ledger accrued`),
+  );
+
+  const body = document.createElement("div");
+  body.id = "adst_dp_paid_list_section";
+  body.className = "grid min-w-0 gap-2";
+
+  if (loading) {
+    body.append(textNode("p", "text-xs font-semibold text-gray-500", "Memuat transaksi lunas..."));
+  } else if (!ledgers.length) {
+    body.append(textNode("p", "text-xs font-semibold text-gray-500", "Belum ada transaksi lunas yang siap masuk settlement."));
+  } else {
+    ledgers.forEach((ledger) => body.append(eligibleDpPaidRow(ledger)));
+  }
+
+  section.append(header, body);
+  return section;
+}
+
+function eligibleDpPaidRow(ledger) {
+  const row = document.createElement("article");
+  row.id = `adst_dp_paid_row_${ledger.id}`;
+  row.className = "grid min-w-0 gap-3 rounded-[var(--pb-radius-xl)] border border-[var(--pb-border)] bg-white/80 p-3 sm:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_auto_auto_auto] sm:items-center";
+
+  const transaction = document.createElement("div");
+  transaction.className = "grid min-w-0 gap-1";
+  transaction.append(
+    textNode("p", "break-words text-xs font-black text-gray-950", ledger.transactionCodeLabel),
+    textNode("p", "break-words text-[11px] font-semibold text-gray-500", ledger.carLabel),
+  );
+
+  const affiliate = document.createElement("div");
+  affiliate.className = "grid min-w-0 gap-1";
+  affiliate.append(
+    textNode("p", "break-words text-xs font-semibold text-gray-900", ledger.affiliateLabel),
+    textNode("p", "text-[11px] text-gray-500", `Ledger #${ledger.id}`),
+  );
+
+  const paymentStatus = Badge({
+    label: ledger.paymentStatusMeta?.label || "Lunas",
+    variant: ledger.paymentStatusMeta?.variant || "success",
+  });
+  paymentStatus.id = `adst_dp_paid_status_badge_${ledger.id}`;
+
+  const ledgerStatus = Badge({
+    label: ledger.statusMeta?.label || "Belum Dibayar",
+    variant: ledger.statusMeta?.variant || "warning",
+  });
+  ledgerStatus.id = `adst_dp_paid_ledger_status_badge_${ledger.id}`;
+
+  row.append(transaction, affiliate, paymentStatus, ledgerStatus, textNode("p", "whitespace-nowrap text-xs font-black text-gray-950", ledger.amountLabel));
+  return row;
 }
 
 function settlementsHero({ action, summary = {} }) {
@@ -467,13 +545,15 @@ function settlementItems(items) {
   list.className = "grid min-w-0 gap-2";
   items.forEach((item) => {
     const row = document.createElement("div");
-    row.className = "grid min-w-0 gap-2 rounded-[var(--pb-radius-xl)] border border-[var(--pb-border)] bg-white/85 p-3 sm:grid-cols-4";
+    const paymentStatus = getTransactionStatusMeta(item.transaction_status);
     row.append(
       detailRow("Ledger", item.ledger_id ? `#${item.ledger_id}` : "-"),
       detailRow("Amount", item.amount_snapshot ?? "-"),
-      detailRow("Status", item.ledger_status || "-"),
+      detailRow("Status pembayaran", paymentStatus.label || "-"),
+      detailRow("Status ledger", adminAffiliateFinanceService.ledgerStatusMeta(item.ledger_status).label),
       detailRow("Transaksi", item.transaction_code || (item.transaction_id ? `#${item.transaction_id}` : "-")),
     );
+    row.className = "grid min-w-0 gap-2 rounded-[var(--pb-radius-xl)] border border-[var(--pb-border)] bg-white/85 p-3 sm:grid-cols-5";
     list.append(row);
   });
   return list;

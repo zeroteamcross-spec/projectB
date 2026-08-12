@@ -137,12 +137,6 @@ function render(root, context, flags) {
   if (isPaymentPaid(transaction)) {
     main.append(paymentSuccessPanel(transaction));
     main.append(PaymentStatusSummary({ transaction }), carSummary(transaction));
-    main.append(fulfillmentProgressPanel({
-      transaction,
-      isFinishing: flags.isFinishing,
-      onFinish: () => finishTransaction(context, flags),
-    }));
-    main.append(handoverInstructionPanel());
   } else {
     if (isPendingPayment(transaction)) {
       main.append(applyDesignHook(PaymentInstructionPanel({
@@ -284,7 +278,9 @@ function carSummary(transaction) {
 }
 
 function paymentSuccessPanel(transaction) {
-  const isCompleted = String(transaction?.transaction_status ?? "").toLowerCase() === "completed";
+  const isCompleted = ["dp_paid", "paid", "completed"].includes(
+    String(transaction?.transaction_status ?? "").toLowerCase(),
+  );
   const section = document.createElement("section");
   section.className = `grid gap-4 ${tw.surface.successInset} p-5`;
   applyDesignHook(section, "buyer.payment.success");
@@ -297,13 +293,13 @@ function paymentSuccessPanel(transaction) {
   const body = document.createElement("p");
   body.className = "text-xs leading-6 text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
   body.textContent = isCompleted
-    ? "Buyer sudah menyelesaikan transaksi ini."
-    : "Pembayaran Anda sudah diterima 100%. Transaksi sedang diproses oleh showroom.";
+    ? "Pembayaran sudah diterima dan transaksi ini sudah selesai."
+    : "Pembayaran Anda sudah diterima.";
   const detail = document.createElement("p");
   detail.className = "text-xs leading-6 text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
   detail.textContent = isCompleted
     ? "Terima kasih, status akhir transaksi sudah tercatat."
-    : "Tim showroom akan menyiapkan dokumen dan proses serah terima kendaraan.";
+    : "Status pembayaran sedang diproses.";
   copy.append(title, body, detail);
 
   const action = Button({

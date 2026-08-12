@@ -1085,7 +1085,7 @@ function transactionStatusMeta(status) {
     pending_payment: { label: "Menunggu Pembayaran", variant: "warning" },
     pending: { label: "Pending", variant: "warning" },
     dp_pending: { label: "Menunggu DP", variant: "warning" },
-    dp_paid: { label: "Booking Fee Lunas", variant: "success" },
+    dp_paid: { label: "Lunas", variant: "success" },
     paid: { label: "Lunas", variant: "success" },
     completed: { label: "Selesai", variant: "success" },
     expired: { label: "Kadaluarsa", variant: "danger" },

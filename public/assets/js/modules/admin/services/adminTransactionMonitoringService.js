@@ -64,26 +64,13 @@ export const adminTransactionMonitoringService = {
     const status = transaction?.transaction_status ?? "pending_payment";
 
     if (transaction?.payment_type === "dp") {
-      if (["paid", "completed"].includes(status)) {
+      if (["dp_paid", "paid", "completed"].includes(status)) {
         return {
           total,
           paid: total,
           remaining: 0,
           dueNow: 0,
           dueNowLabel: "Sudah dibayar",
-        };
-      }
-
-      if (status === "dp_paid") {
-        // Booking Fee menutup kewajiban pembayaran di aplikasi; sisa harga
-        // diselesaikan langsung buyer-showroom di luar sistem, jadi dueNow
-        // tetap 0 (lihat sellerTransactionService.js untuk penjelasan sama).
-        return {
-          total,
-          paid: dpAmount,
-          remaining,
-          dueNow: 0,
-          dueNowLabel: "Sisa diselesaikan langsung dengan buyer",
         };
       }
 
@@ -110,7 +97,7 @@ export const adminTransactionMonitoringService = {
       total: transactions.length,
       pending: transactions.filter((transaction) => transaction.transaction_status === "pending_payment").length,
       dpPaid: transactions.filter((transaction) => transaction.transaction_status === "dp_paid").length,
-      paid: transactions.filter((transaction) => ["paid", "completed"].includes(transaction.transaction_status)).length,
+      paid: transactions.filter((transaction) => ["dp_paid", "paid", "completed"].includes(transaction.transaction_status)).length,
       attention: transactions.filter((transaction) => ["expired", "cancelled"].includes(transaction.transaction_status)).length,
     };
   },

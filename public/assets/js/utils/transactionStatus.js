@@ -1,11 +1,11 @@
 const PAYMENT_STATUS_LABELS = {
   unpaid: "Belum Dibayar",
   partial: "Dibayar Sebagian",
-  paid: "Dibayar",
+  paid: "Lunas",
   failed: "Gagal",
   refunded: "Refunded",
   pending_payment: "Belum Dibayar",
-  dp_paid: "Booking Fee Lunas",
+  dp_paid: "Lunas",
   returned: "Diretur",
   expired: "Kadaluarsa",
   cancelled: "Dibatalkan",
@@ -48,11 +48,11 @@ const TRANSACTION_STATUS_META = {
     description: "Transaksi menunggu pembayaran DP.",
   },
   dp_paid: {
-    label: "Booking Fee Lunas",
-    shortLabel: "Booking Fee Lunas",
+    label: "Lunas",
+    shortLabel: "Lunas",
     variant: "success",
-    bucket: "process",
-    description: "Booking Fee sudah diterima. Mobil terjual dan menunggu serah terima.",
+    bucket: "done",
+    description: "Booking Fee sudah diterima dan transaksi dianggap selesai.",
   },
   returned: {
     label: "Diretur",
@@ -62,11 +62,11 @@ const TRANSACTION_STATUS_META = {
     description: "Transaksi diretur showroom. Mobil kembali dijual dan komisi dibatalkan.",
   },
   paid: {
-    label: "Pembayaran Lunas",
+    label: "Lunas",
     shortLabel: "Lunas",
     variant: "success",
-    bucket: "process",
-    description: "Pembayaran sudah 100% dan transaksi perlu diproses showroom.",
+    bucket: "done",
+    description: "Pembayaran sudah diterima dan transaksi dianggap selesai.",
   },
   paid_confirmed: {
     label: "Pembayaran Dikonfirmasi",
@@ -169,12 +169,12 @@ export function isPaymentPaid(transaction) {
 
 export function isTransactionFulfillment(transaction) {
   const status = normalizeStatus(transaction?.transaction_status ?? transaction?.status ?? transaction);
-  return ["dp_paid", "paid", "processing", "handover"].includes(status);
+  return ["processing", "handover"].includes(status);
 }
 
 export function isTransactionCompleted(transaction) {
   const status = normalizeStatus(transaction?.transaction_status ?? transaction?.status ?? transaction);
-  return status === "completed";
+  return ["dp_paid", "paid", "completed"].includes(status);
 }
 
 export function isTransactionCancelled(transaction) {
@@ -288,7 +288,7 @@ export function getListingLockStatus(transaction) {
   // dp_paid langsung menjualkan mobil (lihat BUSINESS_FLOW.md bagian 11);
   // listingStatus "reserved" tetap diperiksa untuk data lama sebelum
   // perubahan ini, supaya tidak tiba-tiba terbuka lagi untuk dibeli.
-  if (["dp_paid", "paid"].includes(transactionStatus) || ["sold", "reserved"].includes(listingStatus)) {
+  if (["dp_paid", "paid", "completed"].includes(transactionStatus) || ["sold", "reserved"].includes(listingStatus)) {
     return {
       status: "sold",
       label: "Terjual",

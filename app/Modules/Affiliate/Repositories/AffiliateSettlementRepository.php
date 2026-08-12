@@ -217,7 +217,9 @@ class AffiliateSettlementRepository
     {
         $stmt = $this->pdo->prepare(
             'SELECT i.id, i.settlement_batch_id, i.ledger_id, i.amount_snapshot, i.created_at,
-                    l.ledger_status, l.transaction_id, t.transaction_code
+                    l.ledger_status, l.transaction_id,
+                    t.transaction_code, t.payment_type, t.transaction_status,
+                    t.dp_amount, t.remaining_amount
              FROM affiliate_settlement_items AS i
              INNER JOIN affiliate_commission_ledgers AS l ON l.id = i.ledger_id AND l.deleted_at IS NULL
              LEFT JOIN transactions AS t ON t.id = l.transaction_id AND t.deleted_at IS NULL

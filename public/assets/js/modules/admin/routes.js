@@ -254,7 +254,7 @@ export const adminRoutes = [
         {
           key: "ledgers",
           loader: ({ signal }) => adminSessionService.listAffiliateLedgers({
-            status: "accrued",
+            ledger_status: "accrued",
             limit: 100,
           }, { signal }).catch(() => ({ ledgers: [], meta: {} })),
         },

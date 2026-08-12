@@ -25,7 +25,7 @@ class PaymentStatusTest extends TestCase
             'remaining_amount' => 100000000,
         ], 'capture', 50000000));
 
-        $this->assertSame('paid', $service->providerStatusToCanon([
+        $this->assertSame('dp_paid', $service->providerStatusToCanon([
             'payment_type' => 'dp',
             'transaction_status' => 'dp_paid',
             'remaining_amount' => 100000000,

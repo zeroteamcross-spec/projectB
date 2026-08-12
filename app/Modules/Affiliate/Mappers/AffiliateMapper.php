@@ -193,6 +193,10 @@ class AffiliateMapper
             'ledger_status' => $item['ledger_status'] ?? null,
             'transaction_id' => isset($item['transaction_id']) && $item['transaction_id'] !== null ? (int) $item['transaction_id'] : null,
             'transaction_code' => $item['transaction_code'] ?? null,
+            'payment_type' => $item['payment_type'] ?? null,
+            'transaction_status' => $item['transaction_status'] ?? null,
+            'dp_amount' => isset($item['dp_amount']) && $item['dp_amount'] !== null ? (float) $item['dp_amount'] : null,
+            'remaining_amount' => isset($item['remaining_amount']) && $item['remaining_amount'] !== null ? (float) $item['remaining_amount'] : null,
             'created_at' => $item['created_at'] ?? null,
         ], $items);
     }

@@ -66,7 +66,7 @@ function actionHint(transaction) {
   const box = document.createElement("div");
   box.className = `${tw.surface.inset} text-xs leading-6 text-gray-600`;
   box.textContent = isPaymentPaid(transaction)
-    ? "Tim showroom akan menyiapkan dokumen dan mengatur serah terima kendaraan."
+    ? "Pembayaran sudah lunas dan transaksi sudah selesai."
     : canComplete(transaction)
     ? "DP sudah masuk. Buyer bisa membuat sesi pelunasan dari panel ini tanpa meninggalkan halaman status."
     : "Gunakan panel ini untuk membuka link payment aktif atau sinkronkan status terbaru dari provider.";
@@ -104,11 +104,11 @@ function actionCopy(transaction) {
   }
 
   if (status === "dp_paid") {
-    return "DP sudah masuk dan mobil sudah dikunci. Lanjutkan pelunasan atau refresh jika baru saja membayar.";
+    return "Pembayaran sudah lunas dan transaksi sudah selesai.";
   }
 
   if (status === "paid") {
-    return "Pembayaran berhasil. Showroom akan menyiapkan dokumen dan proses serah terima.";
+    return "Pembayaran sudah lunas dan transaksi sudah selesai.";
   }
 
   if (status === "expired" || status === "cancelled") {

@@ -123,7 +123,7 @@ function instructionIntro(transaction) {
   }
 
   if (status === "dp_paid") {
-    return "DP sudah masuk. Gunakan panel pelunasan jika ingin membuat sesi pembayaran sisa.";
+    return "Pembayaran sudah selesai. Instruksi ini hanya sebagai referensi.";
   }
 
   if (status === "expired" || status === "cancelled") {

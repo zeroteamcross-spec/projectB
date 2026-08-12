@@ -48,7 +48,7 @@ export function AdminAffiliateLedgerList({
     rows: ledgers,
     mobileMode: "disclosure",
     emptyTitle: "Ledger marketing belum tersedia",
-    emptyDescription: "Komisi marketing akan muncul setelah transaksi paid eligible diproses.",
+    emptyDescription: "Komisi marketing akan muncul saat transaksi mencapai status pembayaran final dan eligible.",
     mobileCardTitle: (ledger) => ledger.transactionCodeLabel,
     mobileCardSubtitle: (ledger) => `${ledger.affiliateLabel} | ${ledger.amountLabel}`,
     mobileCardBadges: (ledger) => [Badge({ label: ledger.statusMeta?.label || ledger.ledger_status || "-", variant: ledger.statusMeta?.variant || "default" })],

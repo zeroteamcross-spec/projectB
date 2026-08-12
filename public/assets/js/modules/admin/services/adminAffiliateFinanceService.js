@@ -1,4 +1,5 @@
 import { formatCurrency } from "../../../utils/formatCurrency.js";
+import { getTransactionStatusMeta } from "../../../utils/transactionStatus.js";
 
 const LEDGER_STATUS_META = {
   accrued: { label: "Belum Dibayar", variant: "warning" },
@@ -28,6 +29,7 @@ export const adminAffiliateFinanceService = {
         amountLabel: formatCurrency(ledger.commission_amount ?? ledger.amount ?? 0),
         baseAmountLabel: formatCurrency(ledger.base_amount ?? 0),
         statusMeta: this.ledgerStatusMeta(ledger.ledger_status),
+        paymentStatusMeta: getTransactionStatusMeta(ledger.transaction?.transaction_status),
       };
     });
   },

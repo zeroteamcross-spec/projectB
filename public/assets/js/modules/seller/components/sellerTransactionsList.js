@@ -162,13 +162,11 @@ function actionGroup({ transaction, selectedTransactionId, onOpen, idScope = "de
   const actions = document.createElement("section");
   actions.className = "flex flex-wrap gap-2";
   const selected = Number(selectedTransactionId) === Number(transaction.id);
-  const status = String(transaction.transaction_status ?? "").toLowerCase();
-  const isFulfillment = status === "paid";
   const detail = Button({
-    label: selected ? "Detail aktif" : isFulfillment ? "Proses Transaksi" : "Detail",
-    variant: selected || isFulfillment ? "primary" : "secondary",
+    label: selected ? "Detail aktif" : "Detail",
+    variant: selected ? "primary" : "secondary",
     onClick: () => onOpen?.(transaction),
-    designHook: selected || isFulfillment ? "shared.button.primary" : "shared.button.secondary",
+    designHook: selected ? "shared.button.primary" : "shared.button.secondary",
   });
   detail.id = `slrtx_detail_button_${idScope}_${transaction.id}`;
   detail.prepend(createIcon("eye", { className: "block h-4 w-4 leading-none" }));
@@ -179,11 +177,8 @@ function actionGroup({ transaction, selectedTransactionId, onOpen, idScope = "de
 
 function extraStatusBadges(transaction) {
   const status = String(transaction?.transaction_status ?? "").toLowerCase();
-  if (status === "paid") {
-    return [Badge({ label: "Perlu Diproses", variant: "warning" })];
-  }
   if (status === "dp_paid") {
-    return [Badge({ label: "Mobil Terkunci", variant: "info" })];
+    return [Badge({ label: "Mobil Terjual", variant: "info" })];
   }
   return [];
 }

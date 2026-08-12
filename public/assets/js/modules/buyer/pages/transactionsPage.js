@@ -427,13 +427,9 @@ function transactionActions(transaction, actions) {
   const wrap = document.createElement("section");
   wrap.className = "flex flex-wrap gap-2 md:justify-end";
   const bucket = statusBucket(transaction.transaction_status);
-  const status = String(transaction.transaction_status ?? "").toLowerCase();
-  const detailLabel = ["paid", "processing", "handover", "dp_paid"].includes(status)
-    ? "Lihat Proses"
-    : "Lihat Detail";
 
   const detail = Button({
-    label: detailLabel,
+    label: "Lihat Detail",
     variant: bucket === "process" ? "primary" : "secondary",
     onClick: () => actions.openTransaction(transaction),
     designHook: bucket === "process" ? "shared.button.primary" : "shared.button.secondary",

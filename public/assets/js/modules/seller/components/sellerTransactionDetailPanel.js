@@ -73,8 +73,8 @@ function fulfillmentChecklistCard({
 } = {}) {
   const status = String(transaction?.transaction_status ?? "").toLowerCase();
   const checklist = transaction?.fulfillment_checklist ?? [];
-  const isPaidLike = ["dp_paid", "paid"].includes(status);
-  const shouldShow = checklist.length || isPaidLike || status === "completed";
+  const isPaidLike = ["paid", "completed"].includes(status);
+  const shouldShow = status === "completed" && checklist.length > 0;
 
   if (!shouldShow) {
     return document.createDocumentFragment();
@@ -121,7 +121,7 @@ function fulfillmentChecklistCard({
   const action = Button({
     label: checklistSaving ? "Menyimpan..." : "Simpan Checklist",
     variant: "primary",
-    disabled: checklistSaving || !isPaidLike,
+    disabled: checklistSaving || status === "completed" || !isPaidLike,
     onClick: onChecklistSave,
     designHook: "shared.button.primary",
   });
@@ -246,7 +246,7 @@ function canSellerCancel(transaction) {
   return ["pending_payment", "dp_paid"].includes(String(transaction?.transaction_status ?? "").toLowerCase());
 }
 
-// Retur hanya setelah Booking Fee masuk dan sebelum buyer menutup transaksi.
+// Retur tetap menjadi jalur pengecualian untuk transaksi dp_paid yang sudah selesai.
 function canSellerReturn(transaction) {
   return String(transaction?.transaction_status ?? "").toLowerCase() === "dp_paid";
 }

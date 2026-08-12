@@ -70,19 +70,6 @@ export const sellerTransactionService = {
         };
       }
 
-      if (status === "dp_paid") {
-        // Booking Fee menutup kewajiban pembayaran di aplikasi. Sisa harga
-        // diselesaikan langsung buyer-showroom di luar sistem dan tidak
-        // ditagih atau dilacak di sini, jadi dueNow tetap 0.
-        return {
-          total: carPrice,
-          paid: dpAmount,
-          remaining: remainingAmount,
-          dueNow: 0,
-          dueNowLabel: "Sisa diselesaikan langsung dengan buyer",
-        };
-      }
-
       return {
         total: carPrice,
         paid: 0,
@@ -103,5 +90,5 @@ export const sellerTransactionService = {
 };
 
 function isPaidStatus(status) {
-  return ["paid", "completed"].includes(String(status ?? ""));
+  return ["dp_paid", "paid", "completed"].includes(String(status ?? ""));
 }

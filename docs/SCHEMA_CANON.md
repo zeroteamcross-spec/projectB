@@ -69,7 +69,7 @@ lazim di pasar.
 | `cars.dp_amount` | Booking Fee |
 | `transactions.dp_amount` | Booking Fee |
 | `transactions.payment_type = 'dp'` | Booking Fee |
-| `transaction_status = 'dp_paid'` | Booking Fee Lunas |
+| `transaction_status = 'dp_paid'` | Lunas |
 | `transaction_status = 'returned'` | Diretur |
 | `showrooms.city_name` | Kota |
 
@@ -413,7 +413,9 @@ Catatan penting:
 - ini menggantikan struktur lama yang ambigu pada `id_transaksi`
 - PK dan kode transaksi dipisahkan secara tegas
 - `dp_amount` disalin dari `cars.dp_amount` saat transaksi dibuat, bukan dari input buyer. Salinan ini menjaga nominal historis tetap utuh bila showroom mengubah Booking Fee mobil di kemudian hari
-- `remaining_amount` bersifat informatif. Sisa pembayaran diselesaikan di luar sistem, tidak ada penagihan lanjutan di aplikasi
+- `dp_paid` adalah status terminal transaksi untuk alur baru: Booking Fee sudah lunas, transaksi dianggap selesai, dan tidak ada pelunasan atau langkah fulfillment lanjutan di aplikasi
+- `remaining_amount` bersifat informatif. Sisa harga diselesaikan di luar sistem, bukan melalui transaksi lanjutan di aplikasi
+- `paid` dan `completed` dipertahankan untuk data lama atau alur historis; keduanya bukan target status untuk transaksi DP baru
 - `returned_at` dan `return_reason` diisi saat showroom meretur transaksi. Retur hanya boleh dari status `dp_paid`
 
 ---
@@ -539,6 +541,7 @@ Index:
 Catatan:
 - `amount` dipertahankan untuk kompatibilitas ringan, dan pada accrual canon nilainya harus sama dengan `commission_amount`
 - snapshot historis rule wajib disimpan di ledger agar payout/settlement nanti tidak bergantung pada rule aktif saat ini
+- `ledger_status = 'accrued'` dibuat saat transaksi mencapai status final pembayaran. Untuk transaksi DP baru, titik final tersebut adalah `dp_paid`, sehingga komisi langsung masuk ledger tanpa menunggu pelunasan di aplikasi
 
 ---
 
@@ -713,7 +716,7 @@ Catatan:
 ## 4.20 `transaction_fulfillment_checklist_items`
 
 Tujuan:
-Menyimpan checklist fulfillment transaksi setelah pembayaran lunas. Seller mengelola checklist ini, buyer melihat progres dan hanya buyer yang dapat menandai transaksi `completed` setelah semua item wajib selesai.
+Menyimpan checklist fulfillment pada data historis yang pernah memakai proses serah terima terpisah. Seller dapat mengelola data lama, tetapi transaksi baru berstatus `dp_paid` sudah selesai dan tidak memerlukan checklist untuk menutup transaksi.
 
 Field:
 - `id` bigint unsigned, PK, auto increment
@@ -736,8 +739,8 @@ Index:
 
 Catatan:
 - item default dibuat oleh service transaksi agar checklist konsisten lintas seller/buyer.
-- status `completed` hanya boleh ditandai buyer setelah semua item wajib selesai.
-- settlement tetap mengikuti runbook; `completed` belum otomatis berarti payout selesai.
+- status `completed` dipertahankan untuk kompatibilitas data lama; status itu bukan langkah lanjutan untuk transaksi baru berstatus `dp_paid`.
+- settlement tetap mengikuti runbook. Status transaksi `dp_paid` menandai transaksi selesai, sedangkan `accrued`, `pending`, dan `paid_out` tetap mengatur siklus payout komisi.
 
 ---
 
@@ -1099,8 +1102,8 @@ Label domain UI:
 - `returned`
 
 Catatan:
-- `dp_paid` adalah status terminal untuk pembayaran. Setelah Booking Fee masuk, tidak ada tagihan lanjutan di sistem
-- `paid` masih ada untuk transaksi lama dan pelunasan penuh, tetapi jalur UI-nya sudah ditutup
+- `dp_paid` adalah status terminal transaksi untuk alur baru. Setelah Booking Fee masuk, transaksi dianggap Lunas dan Selesai tanpa tagihan atau langkah fulfillment lanjutan di sistem
+- `paid` dan `completed` masih ada untuk transaksi lama atau histori pelunasan penuh; jalur UI transaksi baru tidak mengarah ke status tersebut
 - `returned` hanya bisa dicapai dari `dp_paid`, lewat aksi retur oleh showroom pemilik transaksi
 
 ### 6.8 Affiliate status

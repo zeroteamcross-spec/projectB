@@ -26,9 +26,12 @@ class TransactionStatusTransitionTest extends TestCase
         $this->providerSyncFailureKeepsTransactionPending();
         $this->fullPaymentTransactionCannotBecomeDpPaid();
         $this->sellerCanViewDetailButCannotCreateCompletionPayment();
-        $this->providerFailureIsLoggedForCompletionPayment();
+        $this->dpPaidRejectsCompletionPayment();
         $this->sellerCannotMarkTransactionCompleted();
         $this->buyerCanCompletePaidTransactionAfterChecklistIsDone();
+        $this->dpPaidCannotBeMarkedCompleted();
+        $this->dpPaidCannotBePromotedToPaid();
+        $this->dpPaidCannotUpdateFulfillmentChecklist();
         $this->buyerCanCancelDpPaidTransactionWithRefundAccount();
         $this->buyerCannotCancelDpPaidTransactionWithoutRefundAccount();
         $this->sellerCanCancelDpPaidTransactionAndPublishListing();
@@ -107,6 +110,7 @@ class TransactionStatusTransitionTest extends TestCase
         $this->assertNotNull($transaction['paid_at']);
         $this->assertSame('sold', $car['listing_status']);
         $this->assertSame('dp_paid', $result['transaction_status']);
+        $this->assertSame('dp_paid', FakeTransactionAffiliateService::$lastAccruedTransaction['transaction_status'] ?? null);
     }
 
     private function providerPendingSyncKeepsTransactionPending(): void
@@ -179,7 +183,7 @@ class TransactionStatusTransitionTest extends TestCase
         });
     }
 
-    private function providerFailureIsLoggedForCompletionPayment(): void
+    private function dpPaidRejectsCompletionPayment(): void
     {
         [$pdo, $service] = $this->serviceWithSeedData(
             'dp',
@@ -189,19 +193,15 @@ class TransactionStatusTransitionTest extends TestCase
             new FailingTransactionPaymentProvider()
         );
 
-        $this->expectException(PaymentProviderException::class, static function () use ($service): void {
+        $this->expectException(ValidationException::class, static function () use ($service): void {
             $service->completePayment(['id' => 1, 'role' => 'buyer'], 1, [
                 'payment_method' => 'bca_va',
             ]);
-        });
+        }, 'transaction_status');
 
         $log = $pdo->query('SELECT provider_name, provider_order_id, transaction_status, payload_request_json, payload_response_json FROM transaction_payment_logs WHERE transaction_id = 1')->fetch();
 
-        $this->assertSame('midtrans', $log['provider_name']);
-        $this->assertSame('ORDER-FAIL', $log['provider_order_id']);
-        $this->assertSame('create_session_failed', $log['transaction_status']);
-        $this->assertNotNull($log['payload_request_json']);
-        $this->assertNotNull($log['payload_response_json']);
+        $this->assertSame(false, $log);
     }
 
     private function sellerCannotMarkTransactionCompleted(): void
@@ -228,6 +228,39 @@ class TransactionStatusTransitionTest extends TestCase
         $row = $pdo->query('SELECT transaction_status FROM transactions WHERE id = 1')->fetch();
         $this->assertSame('completed', $row['transaction_status']);
         $this->assertSame('completed', $result['transaction_status']);
+    }
+
+    private function dpPaidCannotBeMarkedCompleted(): void
+    {
+        [, $service] = $this->serviceWithSeedData('dp', 'dp_paid', 50000000, 100000000);
+
+        $this->expectException(ValidationException::class, static function () use ($service): void {
+            $service->updateStatus(['id' => 1, 'role' => 'buyer'], 1, [
+                'transaction_status' => 'completed',
+            ]);
+        }, 'transaction_status');
+    }
+
+    private function dpPaidCannotUpdateFulfillmentChecklist(): void
+    {
+        [, $service] = $this->serviceWithSeedData('dp', 'dp_paid', 50000000, 100000000);
+
+        $this->expectException(ValidationException::class, static function () use ($service): void {
+            $service->updateFulfillmentChecklist(['id' => 2, 'role' => 'seller'], 1, [
+                'items' => [],
+            ]);
+        }, 'transaction_status');
+    }
+
+    private function dpPaidCannotBePromotedToPaid(): void
+    {
+        [, $service] = $this->serviceWithSeedData('dp', 'dp_paid', 50000000, 100000000);
+
+        $this->expectException(ValidationException::class, static function () use ($service): void {
+            $service->updateStatus(['id' => 9, 'role' => 'admin'], 1, [
+                'transaction_status' => 'paid',
+            ]);
+        }, 'transaction_status');
     }
 
     private function buyerCanCancelDpPaidTransactionWithRefundAccount(): void
@@ -460,8 +493,11 @@ class TransactionStatusTransitionTest extends TestCase
 
 class FakeTransactionAffiliateService extends AffiliateService
 {
+    public static $lastAccruedTransaction = null;
+
     public function __construct()
     {
+        self::$lastAccruedTransaction = null;
     }
 
     public function resolveTransactionAttribution(string $referralCode, int $sellerUserId): array
@@ -471,6 +507,8 @@ class FakeTransactionAffiliateService extends AffiliateService
 
     public function accrueCommissionForPaidTransaction(array $transaction): ?array
     {
+        self::$lastAccruedTransaction = $transaction;
+
         return null;
     }
 }

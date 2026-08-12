@@ -386,6 +386,7 @@ class AffiliateCommissionLedgerRepository
             'ledger_status' => 'l.ledger_status',
             'transaction_id' => 'l.transaction_id',
             'settlement_id' => 'l.settlement_id',
+            'transaction_status' => 't.transaction_status',
         ] as $key => $column) {
             if (isset($filters[$key]) && $filters[$key] !== '') {
                 $where[] = $column . ' = :' . $key;

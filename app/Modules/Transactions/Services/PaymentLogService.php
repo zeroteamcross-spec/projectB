@@ -50,6 +50,13 @@ class PaymentLogService
 
         $providerStatus = strtolower($providerStatus);
 
+        // Booking Fee closes the transaction in the application. Keep the
+        // canonical dp_paid status stable when a late provider callback for
+        // an old completion session arrives.
+        if (($transaction['transaction_status'] ?? null) === 'dp_paid') {
+            return 'dp_paid';
+        }
+
         if (($transaction['transaction_status'] ?? null) === 'completed') {
             return 'completed';
         }
