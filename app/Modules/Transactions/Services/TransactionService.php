@@ -537,7 +537,6 @@ class TransactionService
 
                 if ($processed['next_status'] === 'expired') {
                     $expiredTransactionIds[] = (int) $transaction['id'];
-                    $this->transactions->publishReservedCarsByIds([(int) $transaction['car_id']]);
                 }
 
                 continue;
@@ -611,6 +610,10 @@ class TransactionService
 
             if ($nextStatus !== null && $nextStatus !== ($transaction['transaction_status'] ?? null)) {
                 $this->applyStatus($transaction, $nextStatus);
+            }
+
+            if ($expireUnresolved && $nextStatus === 'expired') {
+                $this->transactions->publishReservedCarsByIds([(int) $transaction['car_id']]);
             }
 
             $this->pdo->commit();

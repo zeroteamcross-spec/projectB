@@ -648,12 +648,7 @@ function bindVisibilityResume(context, flags, poller) {
 }
 
 function shouldAutoPollTransaction(transaction) {
-  if (!transaction?.id) {
-    return false;
-  }
-
-  const status = String(transaction.transaction_status ?? transaction.status ?? "").toLowerCase();
-  return !isPaymentPaid(transaction) && !["expired", "cancelled", "failed", "refunded", "completed"].includes(status);
+  return Boolean(transaction?.id) && isPendingPayment(transaction);
 }
 
 function openCompletionFlow() {
