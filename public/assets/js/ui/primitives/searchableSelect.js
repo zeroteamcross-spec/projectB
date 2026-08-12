@@ -1,4 +1,5 @@
 import { tw } from "../theme/tailwindClasses.js";
+import { ensureControlId } from "../../utils/controlIds.js";
 
 /**
  * Dropdown yang bisa dicari, untuk daftar panjang seperti Master Lokasi.
@@ -54,6 +55,7 @@ export function SearchableSelect({
   hidden.type = "hidden";
   hidden.name = name ?? "";
   hidden.value = terpilih ? String(terpilih.value) : "";
+  ensureControlId(hidden, id ? `${id}_value` : "");
 
   const search = document.createElement("input");
   search.type = "text";
@@ -64,11 +66,9 @@ export function SearchableSelect({
   search.setAttribute("aria-autocomplete", "list");
   search.placeholder = String(placeholder?.label ?? "Cari lalu pilih");
   search.value = terpilih ? String(terpilih.label) : "";
-  if (id) {
-    // id-nya menempel di kotak yang benar-benar diketik pengguna, supaya
-    // tester dan label tetap menunjuk ke sesuatu yang bisa diisi.
-    search.id = id;
-  }
+  // id-nya menempel di kotak yang benar-benar diketik pengguna, supaya
+  // tester dan label tetap menunjuk ke sesuatu yang bisa diisi.
+  ensureControlId(search, id);
 
   const panel = document.createElement("span");
   panel.className =

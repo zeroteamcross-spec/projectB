@@ -1,5 +1,6 @@
 import { cx, tw } from "../theme/tailwindClasses.js";
 import { applyDesignHook } from "../../theme/designStudioHooks.js";
+import { ensureControlId } from "../../utils/controlIds.js";
 
 /**
  * Aturan warna tombol seluruh aplikasi: hijau untuk "Ya", merah untuk "Tidak",
@@ -25,12 +26,13 @@ const POLA_YA = /\b(simpan|save|daftar|daftarkan|masuk|login|lanjut|lanjutkan|ne
 
 const VARIAN_EKSPLISIT = new Set(["ya", "tidak", "netral", "ghost"]);
 
-export function Button({ label, variant = "primary", disabled = false, onClick = null, designHook = null } = {}) {
+export function Button({ id = "", label, variant = "primary", disabled = false, onClick = null, designHook = null } = {}) {
   const button = document.createElement("button");
   button.type = "button";
   button.className = cx(tw.button.base, tw.button[peranTombol(label, variant)] ?? tw.button.netral);
   button.disabled = disabled;
   button.textContent = label ?? "Aksi";
+  ensureControlId(button, id);
   applyDesignHook(button, designHook);
 
   if (onClick) {

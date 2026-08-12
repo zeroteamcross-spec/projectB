@@ -1,5 +1,6 @@
 import { tw } from "../theme/tailwindClasses.js";
 import { applyDesignHook } from "../../theme/designStudioHooks.js";
+import { ensureControlId } from "../../utils/controlIds.js";
 
 export function NumericInput({
   id = "",
@@ -20,9 +21,6 @@ export function NumericInput({
   }
 
   const visible = document.createElement("input");
-  if (id) {
-    visible.id = id;
-  }
   visible.type = "text";
   visible.inputMode = "numeric";
   visible.autocomplete = "off";
@@ -31,16 +29,16 @@ export function NumericInput({
   visible.placeholder = formatThousands(placeholder);
   visible.value = formatThousands(value);
   visible.dataset.numericFormatted = "thousands";
+  ensureControlId(visible, id);
   applyDesignHook(visible, designHook);
 
   const hidden = document.createElement("input");
   hidden.type = "hidden";
   hidden.name = name ?? "";
   hidden.value = rawNumericValue(value);
-  if (id) {
-    hidden.id = `${id}_raw`;
-    hidden.dataset.numericVisibleId = id;
-  }
+  hidden.id = `${visible.id}_raw`;
+  hidden.dataset.numericVisibleId = visible.id;
+  ensureControlId(hidden, hidden.id);
 
   visible.addEventListener("input", () => {
     const caret = visible.selectionStart ?? visible.value.length;

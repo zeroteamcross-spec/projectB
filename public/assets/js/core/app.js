@@ -20,6 +20,7 @@ import { showToast } from "../ui/primitives/toast.js";
 import { createRoleGuard } from "./roleGuard.js";
 import { bindDesignStudioPreviewRuntime } from "../theme/designStudioPreviewRuntime.js";
 import { bindDesignStudioStyleLoader } from "../theme/designStudioStyleLoader.js";
+import { bindUniqueControlIds } from "../utils/controlIds.js";
 
 /**
  * Manifest yang dimuat sesuai kebutuhan, bukan di awal.
@@ -155,6 +156,7 @@ export class ProjectBApp {
       throw new Error("SPA root element is missing.");
     }
 
+    this.cleanup.push(bindUniqueControlIds(document.body));
     this.root.replaceChildren(this.shell.render());
     this.cleanup.push(bindToastContainer(this.toastRoot));
     this.cleanup.push(bindModal(this.modalRoot));

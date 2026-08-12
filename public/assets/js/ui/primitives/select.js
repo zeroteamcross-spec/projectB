@@ -1,4 +1,5 @@
 import { tw } from "../theme/tailwindClasses.js";
+import { ensureControlId } from "../../utils/controlIds.js";
 
 export function Select({ id = "", name, label = "", options = [], value = "" } = {}) {
   const wrap = document.createElement("label");
@@ -8,9 +9,6 @@ export function Select({ id = "", name, label = "", options = [], value = "" } =
   }
 
   const select = document.createElement("select");
-  if (id) {
-    select.id = id;
-  }
   select.name = name ?? "";
   select.className = tw.form.control;
   options.forEach((option) => {
@@ -20,6 +18,7 @@ export function Select({ id = "", name, label = "", options = [], value = "" } =
     item.selected = option.value === value;
     select.append(item);
   });
+  ensureControlId(select, id);
   wrap.append(select);
   return wrap;
 }
