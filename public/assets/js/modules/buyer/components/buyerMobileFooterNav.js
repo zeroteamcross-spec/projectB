@@ -1,4 +1,5 @@
 import { createIcon } from "../../../theme/iconRegistry.js";
+import { getBuyerShowroomCatalogUrl } from "../../../utils/buyerShowroomUrl.js";
 
 const STYLE_ID = "pb-account-mobile-footer-nav-style";
 
@@ -53,6 +54,7 @@ function footerLink({ item, activePath, onNavigate }) {
   const active = isActiveNav(item, activePath);
   const link = item.disabled ? document.createElement("button") : document.createElement("a");
   link.id = `byr_nav_mobile_${item.id}`;
+  const target = item.id === "catalog" ? getBuyerShowroomCatalogUrl() : item.path;
   link.className = item.featured
     ? "account-mobile-footer__action"
     : active
@@ -65,10 +67,16 @@ function footerLink({ item, activePath, onNavigate }) {
     link.setAttribute("aria-disabled", "true");
     link.classList.add("account-mobile-footer__item--disabled");
   } else {
-    link.href = `#${item.path}`;
+    if (target) {
+      link.href = item.id === "catalog" ? target : `#${target}`;
+    } else {
+      link.setAttribute("aria-disabled", "true");
+    }
     link.addEventListener("click", (event) => {
       event.preventDefault();
-      onNavigate?.(item.path);
+      if (target) {
+        onNavigate?.(target);
+      }
     });
   }
 

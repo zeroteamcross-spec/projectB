@@ -21,6 +21,7 @@ import { adminMasterService } from "../../admin/services/adminMasterService.js";
 import { buyerState } from "../state/buyerState.js";
 import { BUYER_MOBILE_FOOTER_ITEMS, BuyerMobileFooterNav } from "../components/buyerMobileFooterNav.js";
 import { PublicSearchFilterBar } from "../../public/components/publicSearchFilterBar.js";
+import { getBuyerShowroomCatalogUrl } from "../../../utils/buyerShowroomUrl.js";
 
 const CAR_MODAL_KEY = "byr-car-detail-modal";
 const FILTER_MODAL_KEY = "byr-local-filter-modal";
@@ -59,7 +60,10 @@ export function BuyerDashboardPage({ notFound = false } = {}) {
 
   const actions = {
     openCatalog() {
-      currentContext?.router?.navigate("/buyer/cars");
+      const showroomUrl = getBuyerShowroomCatalogUrl();
+      if (showroomUrl) {
+        currentContext?.router?.navigate(showroomUrl);
+      }
     },
     openTransactions() {
       currentContext?.router?.navigate("/buyer/transactions");
@@ -567,12 +571,17 @@ function navLink(item, activePath, actions, mode) {
   const active = isActiveNav(item, activePath);
   const link = item.disabled ? document.createElement("button") : document.createElement("a");
   link.id = `byr_nav_${mode}_${item.id}`;
+  const target = item.id === "catalog" ? getBuyerShowroomCatalogUrl() : item.path;
   if (item.disabled) {
     link.type = "button";
     link.disabled = true;
     link.setAttribute("aria-disabled", "true");
   } else {
-    link.href = `#${item.path}`;
+    if (target) {
+      link.href = item.id === "catalog" ? target : `#${target}`;
+    } else {
+      link.setAttribute("aria-disabled", "true");
+    }
   }
   link.className = desktopNavClassName({ active, disabled: item.disabled });
   if (active) {
@@ -583,7 +592,9 @@ function navLink(item, activePath, actions, mode) {
     if (item.disabled) {
       return;
     }
-    actions.navigate(item.path);
+    if (target) {
+      actions.navigate(target);
+    }
   });
   link.append(navIcon(item.icon, active), textNode("span", "truncate", item.label));
   link.setAttribute("aria-label", item.label);

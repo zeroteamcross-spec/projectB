@@ -15,6 +15,7 @@ import { buyerTransactionService } from "../services/buyerTransactionService.js"
 import { buyerTransactionDetailPreloadService } from "../services/buyerTransactionDetailPreloadService.js";
 import { BUYER_MOBILE_FOOTER_ITEMS, BuyerMobileFooterNav } from "../components/buyerMobileFooterNav.js";
 import { getTransactionStatusMeta, titleizeStatus } from "../../../utils/transactionStatus.js";
+import { getBuyerShowroomCatalogUrl } from "../../../utils/buyerShowroomUrl.js";
 
 const STATUS_FILTERS = [
   { id: "all", label: "Semua", icon: "transaction" },
@@ -37,7 +38,10 @@ export function BuyerTransactionsPage() {
       currentContext?.router?.navigate(path);
     },
     openCatalog() {
-      currentContext?.router?.navigate("/");
+      const showroomUrl = getBuyerShowroomCatalogUrl();
+      if (showroomUrl) {
+        currentContext?.router?.navigate(showroomUrl);
+      }
     },
     openTransaction(transaction) {
       if (transaction?.id) {
@@ -557,15 +561,22 @@ function desktopNavLink(item, activePath, actions) {
   const active = isActiveNav(item, activePath);
   const link = item.disabled ? document.createElement("button") : document.createElement("a");
   link.id = `byrtx_nav_desktop_${item.id}`;
+  const target = item.id === "catalog" ? getBuyerShowroomCatalogUrl() : item.path;
   if (item.disabled) {
     link.type = "button";
     link.disabled = true;
     link.setAttribute("aria-disabled", "true");
   } else {
-    link.href = `#${item.path}`;
+    if (target) {
+      link.href = item.id === "catalog" ? target : `#${target}`;
+    } else {
+      link.setAttribute("aria-disabled", "true");
+    }
     link.addEventListener("click", (event) => {
       event.preventDefault();
-      actions.navigate(item.path);
+      if (target) {
+        actions.navigate(target);
+      }
     });
   }
   link.className = active

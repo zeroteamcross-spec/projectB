@@ -13,6 +13,7 @@ import { profileResource } from "../../../resources/profileResource.js";
 import { buyerState } from "../state/buyerState.js";
 import { BUYER_MOBILE_FOOTER_ITEMS, BuyerMobileFooterNav } from "../components/buyerMobileFooterNav.js";
 import { BuyerDesktopTopNav } from "../components/buyerDesktopTopNav.js";
+import { getBuyerShowroomCatalogUrl } from "../../../utils/buyerShowroomUrl.js";
 
 const PROFILE_MODAL_KEY = "byr-account-profile-modal";
 const PASSWORD_MODAL_KEY = "byr-account-password-modal";
@@ -511,15 +512,22 @@ function desktopNavLink(item, activePath, actions) {
   const active = isActiveNav(item, activePath);
   const link = item.disabled ? document.createElement("button") : document.createElement("a");
   link.id = `byrac_nav_desktop_${item.id}`;
+  const target = item.id === "catalog" ? getBuyerShowroomCatalogUrl() : item.path;
   if (item.disabled) {
     link.type = "button";
     link.disabled = true;
     link.setAttribute("aria-disabled", "true");
   } else {
-    link.href = `#${item.path}`;
+    if (target) {
+      link.href = item.id === "catalog" ? target : `#${target}`;
+    } else {
+      link.setAttribute("aria-disabled", "true");
+    }
     link.addEventListener("click", (event) => {
       event.preventDefault();
-      actions.navigate(item.path);
+      if (target) {
+        actions.navigate(target);
+      }
     });
   }
   link.className = active

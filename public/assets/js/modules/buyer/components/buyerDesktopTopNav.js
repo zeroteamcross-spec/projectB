@@ -2,6 +2,7 @@ import { appStore } from "../../../state/store.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 import { NotificationBell } from "../../notifications/components/notificationBell.js";
 import { BUYER_MOBILE_FOOTER_ITEMS } from "./buyerMobileFooterNav.js";
+import { getBuyerShowroomCatalogUrl } from "../../../utils/buyerShowroomUrl.js";
 
 export function BuyerDesktopTopNav({
   activePath = "/buyer",
@@ -54,16 +55,23 @@ function desktopNavLink(item, activePath, onNavigate) {
   const active = isActiveNav(item, activePath);
   const link = item.disabled ? document.createElement("button") : document.createElement("a");
   link.id = `byrtx_nav_desktop_${item.id}`;
+  const target = item.id === "catalog" ? getBuyerShowroomCatalogUrl() : item.path;
 
   if (item.disabled) {
     link.type = "button";
     link.disabled = true;
     link.setAttribute("aria-disabled", "true");
   } else {
-    link.href = `#${item.path}`;
+    if (target) {
+      link.href = item.id === "catalog" ? target : `#${target}`;
+    } else {
+      link.setAttribute("aria-disabled", "true");
+    }
     link.addEventListener("click", (event) => {
       event.preventDefault();
-      onNavigate?.(item.path);
+      if (target) {
+        onNavigate?.(target);
+      }
     });
   }
 

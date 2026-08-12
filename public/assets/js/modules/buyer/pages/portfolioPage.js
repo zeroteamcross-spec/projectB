@@ -9,6 +9,7 @@ import { showToast } from "../../../ui/primitives/toast.js";
 import { formatCurrency } from "../../../utils/formatCurrency.js";
 import { formatDate } from "../../../utils/formatDate.js";
 import { getTransactionStatusMeta } from "../../../utils/transactionStatus.js";
+import { getBuyerShowroomCatalogUrl } from "../../../utils/buyerShowroomUrl.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 import { NotificationBell } from "../../notifications/components/notificationBell.js";
 import { BUYER_MOBILE_FOOTER_ITEMS, BuyerMobileFooterNav } from "../components/buyerMobileFooterNav.js";
@@ -36,7 +37,10 @@ export function BuyerPortfolioPage() {
       currentContext?.router?.navigate("/buyer/transactions");
     },
     openCatalog() {
-      currentContext?.router?.navigate("/");
+      const showroomUrl = getBuyerShowroomCatalogUrl();
+      if (showroomUrl) {
+        currentContext?.router?.navigate(showroomUrl);
+      }
     },
     showDevelopmentToast() {
       showToast("Fitur masih dalam Pengembangan", { type: "info" });
