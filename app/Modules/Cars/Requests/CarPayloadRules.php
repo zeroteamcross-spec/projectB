@@ -13,7 +13,7 @@ trait CarPayloadRules
         return [
             'seller_user_id' => 'nullable|integer',
             'showroom_id' => 'nullable|integer',
-            'listing_status' => 'nullable|string|in:draft,published,reserved,sold,archived',
+            'listing_status' => 'nullable|string|in:draft,published,reserved,sold,view_sold,archived',
             'stock' => 'nullable|integer|min_value:0',
             'license_plate_number' => 'nullable|string|max:100',
             'brand_name' => $required . '|string|max:100',

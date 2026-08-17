@@ -24,6 +24,7 @@ export function ShowroomRegisterPage() {
     fieldErrors: {},
     registered: null,
     banks: [],
+    bankIcons: new Map(),
     cities: [],
     // Keeps the typed values across re-renders so a failed submit never wipes
     // a long form.
@@ -85,10 +86,14 @@ export function ShowroomRegisterPage() {
         adminMasterService.getLocationMaster().catch(() => null),
       ]);
 
-      state.banks = (bankMaster?.data?.banks ?? bankMaster?.banks ?? [])
-        .filter((bank) => (bank?.status ?? "active") === "active")
-        .map((bank) => String(bank?.bank_name ?? "").trim())
-        .filter(Boolean);
+      const activeBanks = (bankMaster?.data?.banks ?? bankMaster?.banks ?? [])
+        .filter((bank) => (bank?.status ?? "active") === "active");
+      state.banks = activeBanks.map((bank) => String(bank?.bank_name ?? "").trim()).filter(Boolean);
+      state.bankIcons = new Map(
+        activeBanks
+          .map((bank) => [String(bank?.bank_name ?? "").trim(), String(bank?.icon_path ?? "").trim()])
+          .filter(([name, icon]) => name && icon)
+      );
 
       state.cities = (locationMaster?.data?.cities ?? locationMaster?.cities ?? [])
         .filter((city) => (city?.status ?? "active") === "active")
@@ -177,7 +182,7 @@ function registerPanel(state, actions, context) {
   const nameInput = field({
     id: "shr_register_name_input",
     name: "name",
-    label: "Nama pemilik",
+    label: "Nama",
     placeholder: "Nama lengkap pemilik showroom",
     value: state.draft.name,
     error: state.fieldErrors.name,
@@ -195,7 +200,7 @@ function registerPanel(state, actions, context) {
   const slugInput = field({
     id: "shr_register_showroom_slug_input",
     name: "showroom_slug",
-    label: "Alamat halaman showroom",
+    label: "Alamat URL Showroom",
     placeholder: "toko-jaya-motor",
     value: state.draft.showroom_slug,
     error: state.fieldErrors["showroom.slug"],
@@ -252,24 +257,6 @@ function registerPanel(state, actions, context) {
         value: state.draft.password,
         error: state.fieldErrors.password,
       }),
-      field({
-        id: "shr_register_phone_input",
-        name: "phone_number",
-        label: "Nomor WhatsApp pemilik",
-        placeholder: "081234567890",
-        required: false,
-        value: state.draft.phone_number,
-        error: state.fieldErrors.phone_number,
-      }),
-      textareaField({
-        id: "shr_register_address_input",
-        name: "address",
-        label: "Alamat pemilik",
-        placeholder: "Alamat domisili pemilik",
-        required: false,
-        value: state.draft.address,
-        error: state.fieldErrors.address,
-      }),
     ]),
     fieldGroup("", [
       showroomNameInput,
@@ -298,7 +285,7 @@ function registerPanel(state, actions, context) {
       field({
         id: "shr_register_showroom_phone_input",
         name: "showroom_phone_number",
-        label: "Telepon showroom",
+        label: "Nomor WA Showroom",
         placeholder: "0217654321",
         required: false,
         value: state.draft.showroom_phone_number,
@@ -315,6 +302,7 @@ function registerPanel(state, actions, context) {
         required: false,
         value: state.draft.bank_type,
         error: state.fieldErrors["showroom.bank_type"],
+        iconFor: (option) => state.bankIcons.get(option) ?? "",
       }),
       field({
         id: "shr_register_bank_account_number_input",
@@ -516,7 +504,7 @@ function field({ id, name, label, type = "text", placeholder = "", required = tr
  * dikirim ke form tetap teks polos dari input (sama seperti versi
  * datalist), jadi validasi backend dan frontend tidak berubah.
  */
-function selectField({ id, name, label, placeholder = "", options = [], required = true, value = "", error = "" }) {
+function selectField({ id, name, label, placeholder = "", options = [], required = true, value = "", error = "", iconFor = null }) {
   const wrap = document.createElement("div");
   wrap.className = "grid gap-1.5 text-xs font-semibold text-gray-700";
 
@@ -578,10 +566,21 @@ function selectField({ id, name, label, placeholder = "", options = [], required
       item.dataset.comboboxOption = option;
       item.setAttribute("role", "option");
       item.className = [
-        "block w-full rounded-xl px-3 py-2 text-left text-xs font-semibold transition",
+        "flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-xs font-semibold transition",
         index === highlighted ? "bg-[var(--pb-surface-muted)] text-[var(--pb-brand-secondary)]" : "text-gray-800 hover:bg-gray-50",
       ].join(" ");
-      item.textContent = option;
+      const iconUrl = iconFor?.(option);
+      if (iconUrl) {
+        const icon = document.createElement("span");
+        icon.className = "grid h-6 w-6 shrink-0 place-items-center overflow-hidden rounded-lg border border-[var(--pb-border)] bg-white";
+        const image = document.createElement("img");
+        image.src = iconUrl;
+        image.alt = "";
+        image.className = "h-full w-full object-contain p-0.5";
+        icon.append(image);
+        item.append(icon);
+      }
+      item.append(document.createTextNode(option));
       // mousedown (bukan click) supaya terjadi sebelum blur input menutup panel.
       item.addEventListener("mousedown", (event) => {
         event.preventDefault();
@@ -710,7 +709,7 @@ function validateDraft(data) {
   const fields = {};
 
   if (!String(data.name ?? "").trim()) {
-    fields.name = "Nama pemilik wajib diisi.";
+    fields.name = "Nama wajib diisi.";
   }
 
   if (!String(data.email ?? "").trim()) {

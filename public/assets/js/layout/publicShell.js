@@ -14,7 +14,7 @@ import { BuyerMobileFooterNav } from "../modules/buyer/components/buyerMobileFoo
  * Halaman pendaftaran showroom memang dirancang hanya untuk mendaftar; jalan
  * masuk login-nya ada di landing page, bukan di sini.
  */
-const RUTE_TANPA_TOMBOL_LOGIN = Object.freeze(["/daftar-showroom"]);
+const RUTE_TANPA_TOMBOL_LOGIN = Object.freeze(["/daftar-showroom", "/login/seller"]);
 
 // Kotak lambang saat belum ada logo yang diunggah. Begitu logonya ada, kelas
 // ini tidak dipakai sama sekali -- gambarnya berdiri sendiri tanpa kotak.

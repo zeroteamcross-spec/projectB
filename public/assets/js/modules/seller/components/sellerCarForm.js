@@ -17,16 +17,16 @@ const STEP_META = [
 
 const REQUIRED_FIELDS = {
   1: ["license_plate_number", "brand_name", "model_name"],
-  2: ["registration_date", "engine_number", "chassis_number"],
+  2: ["registration_date"],
   3: ["price_cash", "dp_amount"],
 };
 
 const STATUS_OPTIONS = [
   { value: "draft", label: "Draft" },
   { value: "published", label: "Published" },
-  { value: "reserved", label: "Reserved" },
   { value: "sold", label: "Sold" },
-  { value: "archived", label: "Dikeluarkan dari Listing" },
+  { value: "view_sold", label: "View Sold" },
+  { value: "archived", label: "Archived" },
 ];
 
 const TRANSMISSION_OPTIONS = [
@@ -111,18 +111,14 @@ export function SellerCarForm({
     brandField.field,
     modelField.field,
     Input({ id: "slrc_sub_model_name_input", name: "sub_model_name", label: "Sub model", value: values.sub_model_name ?? "", placeholder: "1.5 G MT" }),
-    Input({ id: "slrc_primary_color_input", name: "primary_color", label: "Warna", value: values.primary_color ?? "", placeholder: "Putih" }),
-    Select({ id: "slrc_secondary_color_input", name: "secondary_color", label: "Warna dasar", value: values.secondary_color ?? "", options: colorOptions() }),
-    Input({ id: "slrc_color_variation_input", name: "color_variation", label: "Variasi warna", value: values.color_variation ?? "", placeholder: "Metalik" })
+    Input({ id: "slrc_primary_color_input", name: "primary_color", label: "Warna", value: values.primary_color ?? "", placeholder: "Putih" })
   );
   step1.append(identity.section);
 
   const step2 = createStepPanel(2, currentStep);
   const technical = fieldGroup("slrc_car_step_2_technical_fields_section", "Spesifikasi Teknis", "settings");
   technical.body.append(
-    Input({ id: "slrc_registration_date_input", name: "registration_date", label: "Tanggal registrasi", type: "date", value: values.registration_date ?? "" }),
-    Input({ id: "slrc_engine_number_input", name: "engine_number", label: "Nomor mesin", value: values.engine_number ?? "", placeholder: "Nomor mesin" }),
-    Input({ id: "slrc_chassis_number_input", name: "chassis_number", label: "Nomor rangka", value: values.chassis_number ?? "", placeholder: "Nomor rangka" }),
+    Input({ id: "slrc_registration_date_input", name: "registration_date", label: "Tahun Registrasi", type: "date", value: values.registration_date ?? "" }),
     NumericInput({ id: "slrc_engine_capacity_cc_input", name: "engine_capacity_cc", label: "Kapasitas mesin (cc)", value: values.engine_capacity_cc ?? "", placeholder: "1500" }),
     NumericInput({ id: "slrc_mileage_km_input", name: "mileage_km", label: "Jarak tempuh (km)", value: values.mileage_km ?? "", placeholder: "15000" }),
     Select({ id: "slrc_seat_count_input", name: "seat_count", label: "Jumlah kursi", value: seatCountValue(values.seat_count), options: SEAT_OPTIONS }),
@@ -155,7 +151,6 @@ export function SellerCarForm({
     NumericInput({ id: "slrc_price_discount_input", name: "price_discount", label: "Harga diskon", value: values.price_discount ?? "", placeholder: "240000000" }),
     NumericInput({ id: "slrc_price_credit_input", name: "price_credit", label: "Harga kredit", value: values.price_credit ?? "", placeholder: "260000000" }),
     NumericInput({ id: "slrc_dp_amount_input", name: "dp_amount", label: "Nominal Booking Fee", value: values.dp_amount ?? "", placeholder: "5000000" }),
-    NumericInput({ id: "slrc_stock_input", name: "stock", label: "Stok", value: values.stock ?? 1, placeholder: "1" }),
     Select({ id: "slrc_listing_status_input", name: "listing_status", label: "Status listing", value: values.listing_status ?? "draft", options: STATUS_OPTIONS }),
     Select({ id: "slrc_inspection_summary_status_input", name: "inspection_summary_status", label: "Status inspeksi", value: values.inspection_summary_status ?? "not_checked", options: INSPECTION_STATUS_OPTIONS }),
     Input({ id: "slrc_youtube_url_input", name: "youtube_url", label: "URL YouTube", value: values.youtube_url ?? "", type: "url", placeholder: "https://www.youtube.com/watch?v=..." }),
@@ -401,13 +396,12 @@ function createDocumentTypeToggle(value = "new") {
 
   const buttons = document.createElement("section");
   buttons.id = "slrc_document_type_actions_section";
-  buttons.className = "grid grid-cols-2 gap-2";
-  const newButton = documentTypeButton("slrc_document_type_new_button", "Mobil Baru", "new", input);
+  buttons.className = "grid grid-cols-1 gap-2";
   const oldButton = documentTypeButton("slrc_document_type_old_button", "Mobil Lama", "old", input);
-  buttons.append(newButton, oldButton);
+  buttons.append(oldButton);
 
   const sync = () => {
-    [newButton, oldButton].forEach((button) => {
+    [oldButton].forEach((button) => {
       const active = button.dataset.value === input.value;
       button.className = [
         "min-h-11 rounded-[1rem] border px-3 py-2 text-xs font-black transition duration-150",
@@ -415,11 +409,6 @@ function createDocumentTypeToggle(value = "new") {
       ].join(" ");
     });
   };
-  newButton.addEventListener("click", () => {
-    input.value = "new";
-    sync();
-    input.dispatchEvent(new Event("change", { bubbles: true }));
-  });
   oldButton.addEventListener("click", () => {
     input.value = "old";
     sync();
@@ -590,21 +579,6 @@ function cityOptionsList(cities = [], selectedValue = "") {
   }
 
   return options;
-}
-
-function colorOptions() {
-  return [
-    { value: "", label: "Pilih warna dasar" },
-    { value: "putih", label: "Putih" },
-    { value: "hitam", label: "Hitam" },
-    { value: "silver", label: "Silver" },
-    { value: "abu-abu", label: "Abu-abu" },
-    { value: "merah", label: "Merah" },
-    { value: "biru", label: "Biru" },
-    { value: "coklat", label: "Coklat" },
-    { value: "hijau", label: "Hijau" },
-    { value: "kuning", label: "Kuning" },
-  ];
 }
 
 function serviceBookValue(value) {

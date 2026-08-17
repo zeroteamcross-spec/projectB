@@ -477,30 +477,18 @@ function identityCard(profile, actions) {
 
   const identity = document.createElement("section");
   identity.className = "grid min-w-0 justify-items-center gap-3 text-center";
-  identity.append(
-    avatarNode(profile),
-    textNode("h2", "break-words text-xl font-black text-[var(--pb-text)]", profileName(profile)),
-    textNode("p", "break-words text-xs font-semibold text-[var(--pb-text-muted)]", profile.username || profile.email || "-"),
-  );
-
-  const badges = document.createElement("section");
-  badges.className = "hidden flex flex-wrap justify-center gap-2";
-  badges.append(
-    Badge({ label: roleLabel(profile.role), variant: "info" }),
-    Badge({ label: accountStatusLabel(profile.account_status), variant: profile.account_status === "suspended" ? "danger" : "success" }),
-  );
+  identity.append(avatarNode(profile));
 
   const facts = document.createElement("section");
   facts.className = "grid min-w-0 gap-2";
   facts.append(
-    summaryFact("Level User", roleLabel(profile.role), "shield"),
-    summaryFact("Cabang", branchLabel(profile), "showroom"),
-    summaryFact("Scope", "Own", "lock"),
+    summaryFact("Nama", profileName(profile), "user"),
+    summaryFact("Email", cleanValue(profile.email), "envelope"),
+    summaryFact("Status", accountStatusLabel(profile.account_status), "shield"),
   );
 
   card.append(
     identity,
-    badges,
     facts,
     hiddenLegacyLogoutButton("profile_logout_button", actions.logout),
     roleSpecificLogoutButton("profile_role_specific_logout_button", actions.logout, ["w-full"]),
@@ -547,14 +535,16 @@ function detailPanel(profile, actions) {
   }
 
   panel.append(
-    detailSection("Informasi Akun", "idCard", [
-      ["Username", profile.username || profile.email || "-"],
-      ["Nama Lengkap", profileName(profile)],
-      ["Email", profile.email || "-"],
-      ["Nomor HP", profile.phone_number || profile.phone || "-"],
-      ["Foto Profil", avatarSource(profile) ? "Tersedia" : "Belum tersedia"],
-      ["Status Akun", accountStatusLabel(profile.account_status)],
-    ]),
+    profile.role === "seller"
+      ? showroomAccountSection(profile)
+      : detailSection("Informasi Akun", "idCard", [
+        ["Username", profile.username || profile.email || "-"],
+        ["Nama Lengkap", profileName(profile)],
+        ["Email", profile.email || "-"],
+        ["Nomor HP", profile.phone_number || profile.phone || "-"],
+        ["Foto Profil", avatarSource(profile) ? "Tersedia" : "Belum tersedia"],
+        ["Status Akun", accountStatusLabel(profile.account_status)],
+      ]),
     detailSection("Info Login", "clock", [
       ["Tanggal dibuat", formatDate(profile.created_at)],
       ["Terakhir diperbarui", formatDate(profile.updated_at)],
@@ -562,6 +552,45 @@ function detailPanel(profile, actions) {
   );
 
   return panel;
+}
+
+/**
+ * Akun showroom tidak punya kolom "pemilik" terpisah lagi -- lihat perubahan
+ * pendaftaran showroom. Kartunya dipecah dua kolom eksplisit (bukan grid rows
+ * yang saling berselang-seling) supaya identitas pengguna dan identitas
+ * showroom tetap terlihat sebagai dua hal yang berbeda.
+ */
+function showroomAccountSection(profile) {
+  const section = document.createElement("section");
+  section.className = "grid min-w-0 w-full gap-4 rounded-[1.5rem] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] p-5 shadow-[var(--pb-shadow-card)]";
+
+  const header = document.createElement("header");
+  header.className = "flex min-w-0 items-center gap-3";
+  header.append(
+    iconBox("idCard", "h-11 w-11 rounded-full bg-[var(--pb-brand-primary)] text-white"),
+    textNode("h2", "break-words text-base font-black text-[var(--pb-text)]", "Informasi Akun"),
+  );
+
+  const grid = document.createElement("section");
+  grid.className = "grid min-w-0 gap-3 md:grid-cols-2";
+
+  const left = document.createElement("section");
+  left.className = "grid min-w-0 gap-3";
+  left.append(
+    infoItem("Nama", profileName(profile)),
+    infoItem("Email", profile.email || "-"),
+  );
+
+  const right = document.createElement("section");
+  right.className = "grid min-w-0 gap-3";
+  right.append(
+    infoItem("Nama Showroom", profile.showroom?.name || "-"),
+    infoItem("Nomor WA Showroom", profile.showroom?.phone_number || "-"),
+  );
+
+  grid.append(left, right);
+  section.append(header, grid);
+  return section;
 }
 
 function detailSection(title, icon, rows) {
@@ -994,7 +1023,7 @@ function avatarSource(profile) {
 
 function summaryFact(label, value, icon) {
   const item = document.createElement("section");
-  item.className = "hidden grid min-w-0 grid-cols-[auto_minmax(0,1fr)] gap-3 rounded-[1rem] border border-[var(--pb-border)] bg-[var(--pb-surface-muted)] p-3";
+  item.className = "grid min-w-0 grid-cols-[auto_minmax(0,1fr)] gap-3 rounded-[1rem] border border-[var(--pb-border)] bg-[var(--pb-surface-muted)] p-3";
   item.append(iconBox(icon, "h-10 w-10 rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_10%,white)] text-[var(--pb-brand-secondary)]"), textWrap(label, value));
   return item;
 }

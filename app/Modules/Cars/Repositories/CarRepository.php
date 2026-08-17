@@ -175,6 +175,16 @@ class CarRepository
         $conditions = ['deleted_at IS NULL'];
         $params = [];
 
+        if (isset($filters['listing_status']) && is_array($filters['listing_status']) && $filters['listing_status'] !== []) {
+            $placeholders = [];
+            foreach (array_values($filters['listing_status']) as $index => $status) {
+                $key = 'listing_status_' . $index;
+                $placeholders[] = ':' . $key;
+                $params[$key] = $status;
+            }
+            $conditions[] = 'listing_status IN (' . implode(', ', $placeholders) . ')';
+        }
+
         foreach ([
             'listing_status',
             'seller_user_id',
@@ -186,7 +196,7 @@ class CarRepository
             'document_type',
             'inspection_summary_status',
         ] as $field) {
-            if (isset($filters[$field]) && $filters[$field] !== '') {
+            if (isset($filters[$field]) && ! is_array($filters[$field]) && $filters[$field] !== '') {
                 $conditions[] = $field . ' = :' . $field;
                 $params[$field] = $filters[$field];
             }

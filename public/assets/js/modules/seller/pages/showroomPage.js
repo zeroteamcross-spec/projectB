@@ -57,6 +57,10 @@ function render(root, router) {
   const snapshotBankMaster = sellerState.snapshot("masterBank", adminMasterService.normalizeBankMaster(null));
   const bankMaster = sellerState.working("sellerShowroom", "masterBank", snapshotBankMaster);
   const bankOptions = adminMasterService.normalizeBankMaster(bankMaster).data.banks;
+  const snapshotLocationMaster = sellerState.snapshot("masterLocation", adminMasterService.normalizeLocationMaster(null));
+  const workingLocationMaster = sellerState.working("sellerShowroom", "masterLocation", snapshotLocationMaster);
+  const locationMaster = adminMasterService.normalizeLocationMaster(workingLocationMaster ?? snapshotLocationMaster);
+  const cityOptions = locationMaster?.data?.cities ?? [];
   const runtime = runtimeState();
 
   const body = applyDesignHook(SellerShowroomView({
@@ -65,7 +69,7 @@ function render(root, router) {
   }), "seller.showroom.view");
 
   if (runtime.editing) {
-    openShowroomEditModal({ showroom, bankOptions, runtime, router });
+    openShowroomEditModal({ showroom, bankOptions, cityOptions, runtime, router });
   } else {
     closeShowroomEditModal();
   }
@@ -79,7 +83,7 @@ function render(root, router) {
   root.replaceChildren(layout);
 }
 
-function openShowroomEditModal({ showroom, bankOptions, runtime, router }) {
+function openShowroomEditModal({ showroom, bankOptions, cityOptions, runtime, router }) {
   const modalBody = document.createElement("section");
   modalBody.id = "slrsr_edit_modal_content_section";
   modalBody.className = "grid min-w-0 gap-4";
@@ -89,6 +93,7 @@ function openShowroomEditModal({ showroom, bankOptions, runtime, router }) {
     saving: runtime.saving,
     error: runtime.error,
     bankOptions,
+    cityOptions,
     onSubmit: (payload) => saveShowroom(payload, router),
   }), "seller.showroom.form"));
 
@@ -202,24 +207,6 @@ function showroomHero({ router, showroom, editing }) {
     textNode("p", "max-w-2xl text-xs leading-6 text-gray-600", "Kelola identitas showroom, kontak aktif, dan rekening pencairan seller dalam satu tempat.")
   );
 
-  const stats = document.createElement("section");
-  stats.id = "slrsr_hero_stats_section";
-  stats.className = "grid gap-2 sm:grid-cols-3 lg:min-w-[390px]";
-  [
-    ["Profil", showroom?.name ? "Siap" : "Baru"],
-    ["Kontak", showroom?.phone_number ? "Siap" : "Lengkapi"],
-    ["Rekening", showroom?.bank_account_number ? "Siap" : "Lengkapi"],
-  ].forEach(([label, value]) => {
-    const stat = document.createElement("section");
-    stat.id = `slrsr_hero_stat_${slugify(label)}_section`;
-    stat.className = "rounded-[1.25rem] border border-[var(--pb-card-border)] bg-white/78 p-3 shadow-sm transition duration-150 hover:-translate-y-0.5 hover:shadow-md";
-    stat.append(
-      textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label),
-      textNode("p", "text-lg font-black text-gray-950", value)
-    );
-    stats.append(stat);
-  });
-
   const dashboardButton = Button({
     label: "Dashboard",
     variant: "secondary",
@@ -236,7 +223,7 @@ function showroomHero({ router, showroom, editing }) {
   status.id = "slrsr_mode_status_section";
   status.className = "rounded-[1.25rem] border border-[var(--pb-card-border)] bg-white/78 px-4 py-3 text-xs font-bold text-gray-700 shadow-sm";
   status.append(createIcon(editing ? "edit" : "eye", { className: "mr-2 h-4 w-4 text-[var(--pb-brand-secondary)]" }), document.createTextNode(editing ? "Mode edit showroom" : "Mode lihat showroom"));
-  side.append(stats, status, dashboardButton);
+  side.append(status, dashboardButton);
 
   layout.append(copy, side);
   section.append(layout);
@@ -248,8 +235,4 @@ function textNode(tagName, className, text) {
   node.className = className;
   node.textContent = text ?? "";
   return node;
-}
-
-function slugify(value) {
-  return String(value ?? "").trim().toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
 }

@@ -1,4 +1,3 @@
-import { Badge } from "../../../ui/primitives/badge.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 
 export function SellerShowroomPanel({ summary = {} } = {}) {
@@ -19,18 +18,12 @@ export function SellerShowroomPanel({ summary = {} } = {}) {
   const copy = document.createElement("div");
   copy.className = "grid min-w-0 gap-1";
   copy.append(
-    textNode("p", "text-[10px] font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", "Showroom readiness"),
     textNode("h2", "break-words text-lg font-black tracking-normal text-gray-950", summary.showroomName ?? "Showroom"),
   );
 
   left.append(icon, copy);
 
-  const badge = Badge({
-    label: summary.showroomReady ? "Siap dipakai" : "Perlu dilengkapi",
-    variant: summary.showroomReady ? "success" : "warning",
-  });
-
-  header.append(left, badge);
+  header.append(left);
 
   const text = textNode(
     "p",

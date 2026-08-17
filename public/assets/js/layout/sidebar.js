@@ -257,7 +257,7 @@ function syncCompactToggle(button, collapsed = false) {
 
   button.classList.toggle("w-12", collapsed);
   button.classList.toggle("w-full", !collapsed);
-  const label = collapsed ? "Lebarkan sidebar" : "Ciutkan sidebar";
+  const label = collapsed ? "Lebarkan sidebar" : "Sembunyikan Sidebar";
   button.setAttribute("aria-label", label);
   button.title = label;
   button.replaceChildren(
@@ -271,7 +271,7 @@ function compactToggleLabel(collapsed = false) {
   // Saat diciutkan hanya icon yang tersisa, jadi teksnya cuma untuk pembaca
   // layar -- kalau ditampilkan ia yang justru melebarkan kembali rail-nya.
   label.className = collapsed ? "sr-only" : "min-w-0 truncate";
-  label.textContent = collapsed ? "Lebarkan sidebar" : "Ciutkan sidebar";
+  label.textContent = collapsed ? "Lebarkan sidebar" : "Sembunyikan Sidebar";
   return label;
 }
 

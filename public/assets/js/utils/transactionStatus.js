@@ -145,10 +145,11 @@ const LISTING_STATUS_META = {
   published: { label: "Tersedia", variant: "success", locked: false },
   reserved: { label: "Terkunci DP", variant: "warning", locked: true },
   sold: { label: "Terjual", variant: "info", locked: true },
-  archived: { label: "Archived", variant: "danger", locked: true },
+  view_sold: { label: "Terjual (Tampil)", variant: "info", locked: true },
+  archived: { label: "Dikeluarkan dari Listing", variant: "danger", locked: true },
 };
 
-export const CANON_LISTING_STATUSES = Object.freeze(["draft", "published", "reserved", "sold", "archived"]);
+export const CANON_LISTING_STATUSES = Object.freeze(["draft", "published", "reserved", "sold", "view_sold", "archived"]);
 export const CANON_TRANSACTION_STATUSES = Object.freeze(["pending_payment", "dp_paid", "paid", "completed", "expired", "cancelled", "returned"]);
 export const CANON_SETTLEMENT_STATUSES = Object.freeze(["pending", "settled", "cancelled"]);
 export const CANON_AFFILIATE_LEDGER_STATUSES = Object.freeze(["accrued", "pending", "paid_out", "voided"]);
@@ -288,7 +289,7 @@ export function getListingLockStatus(transaction) {
   // dp_paid langsung menjualkan mobil (lihat BUSINESS_FLOW.md bagian 11);
   // listingStatus "reserved" tetap diperiksa untuk data lama sebelum
   // perubahan ini, supaya tidak tiba-tiba terbuka lagi untuk dibeli.
-  if (["dp_paid", "paid", "completed"].includes(transactionStatus) || ["sold", "reserved"].includes(listingStatus)) {
+  if (["dp_paid", "paid", "completed"].includes(transactionStatus) || ["sold", "view_sold", "reserved"].includes(listingStatus)) {
     return {
       status: "sold",
       label: "Terjual",

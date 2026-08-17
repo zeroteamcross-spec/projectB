@@ -316,6 +316,7 @@ function carsToolbar({ filters, isForm }) {
     ["published", "Tersedia"],
     ["reserved", "Terkunci DP"],
     ["sold", "Terjual"],
+    ["view_sold", "Terjual (Tampil)"],
     ["archived", "Dikeluarkan dari Listing"],
   ].forEach(([value, label]) => {
     const option = document.createElement("option");

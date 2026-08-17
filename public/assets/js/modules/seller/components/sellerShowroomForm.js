@@ -1,8 +1,9 @@
 import { Button } from "../../../ui/primitives/button.js";
+import { SearchableSelect } from "../../../ui/primitives/searchableSelect.js";
 import { tw } from "../../../ui/theme/tailwindClasses.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 
-export function SellerShowroomForm({ showroom = null, saving = false, error = "", bankOptions = [], onSubmit = null } = {}) {
+export function SellerShowroomForm({ showroom = null, saving = false, error = "", bankOptions = [], cityOptions = [], onSubmit = null } = {}) {
   const form = document.createElement("form");
   form.id = "slrsr_form_section";
   form.className = "grid gap-5 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white p-4 shadow-sm transition duration-150 sm:p-5";
@@ -32,6 +33,17 @@ export function SellerShowroomForm({ showroom = null, saving = false, error = ""
   const profileSection = fieldGroup("slrsr_profile_fields_section", "Profil showroom", "showroom");
   profileSection.body.append(
     inputField({ id: "slrsr_name_input", name: "name", label: "Nama showroom", value: showroom?.name ?? "", placeholder: "Contoh: ProjectB Auto" }),
+    SearchableSelect({
+      id: "slrsr_city_name_input",
+      name: "city_name",
+      label: "Kota",
+      value: showroom?.city_name ?? "",
+      options: cityOptionsList(cityOptions, showroom?.city_name),
+      helper: cityOptions.length ? "Ketik untuk mencari kota." : "Master Lokasi belum tersedia.",
+      emptyLabel: "Kota tidak ditemukan",
+      labelClass: "grid min-w-0 gap-1.5 text-xs font-bold text-gray-700",
+      controlClass: "min-h-11 min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-2.5 text-xs font-semibold text-[var(--pb-text)] outline-none transition duration-150 placeholder:text-[var(--pb-text-muted)] focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]",
+    }),
     textareaField({ id: "slrsr_address_input", name: "address", label: "Alamat", value: showroom?.address ?? "", placeholder: "Alamat lengkap showroom" })
   );
 
@@ -56,6 +68,7 @@ export function SellerShowroomForm({ showroom = null, saving = false, error = ""
     const formData = new FormData(form);
     onSubmit?.({
       name: String(formData.get("name") ?? "").trim(),
+      city_name: String(formData.get("city_name") ?? "").trim(),
       address: String(formData.get("address") ?? "").trim(),
       phone_number: String(formData.get("phone_number") ?? "").trim(),
       bank_account_number: String(formData.get("bank_account_number") ?? "").trim(),
@@ -251,4 +264,18 @@ function textareaField({ id, name, label, value = "", placeholder = "" }) {
 
 function slugify(value) {
   return String(value ?? "").trim().toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+}
+
+function cityOptionsList(cities = [], selectedValue = "") {
+  const active = (Array.isArray(cities) ? cities : [])
+    .filter((city) => (city?.status ?? "active") === "active")
+    .map((city) => String(city?.name ?? "").trim())
+    .filter(Boolean);
+
+  const current = String(selectedValue ?? "").trim();
+  if (current && !active.includes(current)) {
+    active.push(current);
+  }
+
+  return active;
 }

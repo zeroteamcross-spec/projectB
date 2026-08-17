@@ -26,7 +26,10 @@ class CarService
     public function catalog(array $filters): array
     {
         $pagination = $this->pagination($filters);
-        $filters['listing_status'] = 'published';
+        // view_sold ikut tampil di katalog publik -- itu tujuannya, mobil
+        // yang sudah laku tapi tetap ditampilkan dengan badge Sold. Beda
+        // dengan `sold` biasa yang disembunyikan seperti draft/archived.
+        $filters['listing_status'] = ['published', 'view_sold'];
 
         return $this->listWithMeta($filters, $pagination);
     }
