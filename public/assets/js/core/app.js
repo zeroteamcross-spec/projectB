@@ -217,6 +217,50 @@ export class ProjectBApp {
     this.cleanup.push(this.router.start());
     appStore.patchState("app", { bootstrapped: true, startedAt: Date.now() }, "app:bootstrapped");
     this.bus.emit("app:bootstrapped", appStore.getState().app);
+    this.cleanup.push(this.bindReleaseVersionLifecycle());
+  }
+
+  /**
+   * checkReleaseVersion() di bootstrap() hanya jalan sekali, saat tab
+   * pertama dibuka. Tab yang dibiarkan terbuka lama tidak pernah tahu ada
+   * rilis baru -- satu-satunya jalan pengguna tahu selama ini adalah
+   * refresh manual. Di sini dicek ulang secara berkala selagi tab terlihat,
+   * dan langsung dicek lagi begitu pengguna kembali ke tab ini, supaya
+   * tombol "Muat Ulang" muncul sendiri tanpa perlu diberi tahu untuk hard
+   * refresh.
+   */
+  bindReleaseVersionLifecycle({ intervalMs = 5 * 60 * 1000 } = {}) {
+    let timer = null;
+
+    const stop = () => {
+      if (timer) {
+        window.clearInterval(timer);
+        timer = null;
+      }
+    };
+
+    const start = () => {
+      if (!timer) {
+        timer = window.setInterval(() => this.checkReleaseVersion(), intervalMs);
+      }
+    };
+
+    const handleVisibility = () => {
+      if (document.hidden) {
+        stop();
+        return;
+      }
+      this.checkReleaseVersion();
+      start();
+    };
+
+    document.addEventListener("visibilitychange", handleVisibility);
+    start();
+
+    return () => {
+      stop();
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
   }
 
   async checkReleaseVersion() {
