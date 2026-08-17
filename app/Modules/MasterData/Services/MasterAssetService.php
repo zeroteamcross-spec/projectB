@@ -118,6 +118,59 @@ class MasterAssetService
         ];
     }
 
+    public function storeShowroomIcon(array $file, string $mimeType, int $showroomId): array
+    {
+        if ($mimeType === 'image/svg+xml') {
+            return $this->storeSvgIconAt(
+                $file,
+                base_path('public/uploads/showrooms/' . $showroomId),
+                '/uploads/showrooms/' . $showroomId . '/',
+                'showroom-icon'
+            );
+        }
+
+        if (! function_exists('imagecreatetruecolor')) {
+            throw new RuntimeException('Image processing extension is not available.');
+        }
+
+        $source = $this->createSourceImage((string) $file['tmp_name'], $mimeType);
+        $sourceWidth = imagesx($source);
+        $sourceHeight = imagesy($source);
+        $cropSize = min($sourceWidth, $sourceHeight);
+        $sourceX = (int) floor(($sourceWidth - $cropSize) / 2);
+        $sourceY = (int) floor(($sourceHeight - $cropSize) / 2);
+
+        $target = imagecreatetruecolor(self::BANK_ICON_SIZE, self::BANK_ICON_SIZE);
+        imagealphablending($target, false);
+        imagesavealpha($target, true);
+        $transparent = imagecolorallocatealpha($target, 0, 0, 0, 127);
+        imagefill($target, 0, 0, $transparent);
+        imagecopyresampled($target, $source, 0, 0, $sourceX, $sourceY, self::BANK_ICON_SIZE, self::BANK_ICON_SIZE, $cropSize, $cropSize);
+
+        $directory = base_path('public/uploads/showrooms/' . $showroomId);
+        if (! is_dir($directory) && ! mkdir($directory, 0775, true) && ! is_dir($directory)) {
+            throw new RuntimeException('Unable to create showroom icon directory.');
+        }
+
+        $fileName = 'showroom-icon-' . bin2hex(random_bytes(10)) . '.png';
+        $path = $directory . DIRECTORY_SEPARATOR . $fileName;
+        if (! imagepng($target, $path, 8)) {
+            throw new RuntimeException('Unable to store showroom icon.');
+        }
+
+        imagedestroy($source);
+        imagedestroy($target);
+
+        return [
+            'path' => '/uploads/showrooms/' . $showroomId . '/' . $fileName,
+            'file_name' => $fileName,
+            'mime_type' => 'image/png',
+            'width' => self::BANK_ICON_SIZE,
+            'height' => self::BANK_ICON_SIZE,
+            'size' => is_file($path) ? filesize($path) : null,
+        ];
+    }
+
     private function storeSvgBankIcon(array $file): array
     {
         return $this->storeSvgIcon($file, 'banks', 'bank-icon');
@@ -125,7 +178,16 @@ class MasterAssetService
 
     private function storeSvgIcon(array $file, string $directoryName, string $prefix): array
     {
-        $directory = base_path('public/uploads/master/' . $directoryName);
+        return $this->storeSvgIconAt(
+            $file,
+            base_path('public/uploads/master/' . $directoryName),
+            '/uploads/master/' . $directoryName . '/',
+            $prefix
+        );
+    }
+
+    private function storeSvgIconAt(array $file, string $directory, string $urlPrefix, string $prefix): array
+    {
         if (! is_dir($directory) && ! mkdir($directory, 0775, true) && ! is_dir($directory)) {
             throw new RuntimeException('Unable to create icon directory.');
         }
@@ -140,7 +202,7 @@ class MasterAssetService
         }
 
         return [
-            'path' => '/uploads/master/' . $directoryName . '/' . $fileName,
+            'path' => $urlPrefix . $fileName,
             'file_name' => $fileName,
             'mime_type' => 'image/svg+xml',
             'width' => self::BANK_ICON_SIZE,

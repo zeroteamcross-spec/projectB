@@ -7,18 +7,22 @@ namespace App\Modules\Showrooms\Controllers;
 use App\Core\Controller;
 use App\Core\JsonResponse;
 use App\Core\Request;
+use App\Modules\MasterData\Requests\UploadAppIconRequest;
+use App\Modules\MasterData\Services\MasterAssetService;
 use App\Modules\Showrooms\Requests\UpsertShowroomRequest;
 use App\Modules\Showrooms\Services\ShowroomService;
 
 class ShowroomController extends Controller
 {
     private ShowroomService $service;
+    private MasterAssetService $assets;
 
-    public function __construct(ShowroomService $service)
+    public function __construct(ShowroomService $service, MasterAssetService $assets)
     {
         parent::__construct();
 
         $this->service = $service;
+        $this->assets = $assets;
     }
 
     public function mine(Request $request): JsonResponse
@@ -54,5 +58,17 @@ class ShowroomController extends Controller
         return JsonResponse::success([
             'showroom' => $this->service->validateSlug((string) $request->routeParam('slug')),
         ], 'Validasi slug showroom selesai.');
+    }
+
+    public function uploadBrandingIcon(Request $request): JsonResponse
+    {
+        $user = $this->user($request);
+        $this->service->ensureSellerAccess($user);
+        $showroom = $this->service->mine($user);
+        $payload = (new UploadAppIconRequest($request))->validate();
+
+        return JsonResponse::success([
+            'asset' => $this->assets->storeShowroomIcon($payload['icon'], $payload['mime_type'], (int) $showroom['id']),
+        ], 'Icon showroom berhasil diupload.', [], 201);
     }
 }

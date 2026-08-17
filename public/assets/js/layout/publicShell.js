@@ -7,6 +7,7 @@ import { applyDesignHook } from "../theme/designStudioHooks.js";
 import { renderImpersonationBanner as mountImpersonationBanner } from "./impersonationBanner.js";
 import { loginPathForCurrentHost } from "../core/roleGuard.js";
 import { BuyerMobileFooterNav } from "../modules/buyer/components/buyerMobileFooterNav.js";
+import { publicContextService } from "../modules/public/services/publicContextService.js";
 
 /**
  * Rute publik yang sengaja tidak menampilkan tombol Login di header.
@@ -114,6 +115,9 @@ export class PublicShell {
   }
 
   syncActionLink() {
+    const currentPath = window.location.hash.replace(/^#/, "").split("?")[0] || "/";
+    publicContextService.syncBrandingFromPath(currentPath);
+
     if (!this.actionLink) {
       return;
     }

@@ -3,7 +3,7 @@ import { SearchableSelect } from "../../../ui/primitives/searchableSelect.js";
 import { tw } from "../../../ui/theme/tailwindClasses.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 
-export function SellerShowroomForm({ showroom = null, saving = false, error = "", bankOptions = [], cityOptions = [], onSubmit = null } = {}) {
+export function SellerShowroomForm({ showroom = null, saving = false, error = "", bankOptions = [], cityOptions = [], uploading = false, onUploadIcon = null, onSubmit = null } = {}) {
   const form = document.createElement("form");
   form.id = "slrsr_form_section";
   form.className = "grid gap-5 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white p-4 shadow-sm transition duration-150 sm:p-5";
@@ -47,6 +47,31 @@ export function SellerShowroomForm({ showroom = null, saving = false, error = ""
     textareaField({ id: "slrsr_address_input", name: "address", label: "Alamat", value: showroom?.address ?? "", placeholder: "Alamat lengkap showroom" })
   );
 
+  const brandingSection = fieldGroup("slrsr_branding_fields_section", "Branding showroom", "brandMark");
+  const iconUrlInput = document.createElement("input");
+  iconUrlInput.type = "hidden";
+  iconUrlInput.id = "slrsr_icon_url_input";
+  iconUrlInput.name = "icon_url";
+  iconUrlInput.value = showroom?.icon_url ?? "";
+  const iconPreview = document.createElement("section");
+  iconPreview.id = "slrsr_icon_preview_section";
+  iconPreview.className = "grid h-20 w-20 place-items-center overflow-hidden rounded-[1.25rem] border border-[var(--pb-card-border)] bg-white shadow-[var(--pb-shadow-soft)]";
+  renderIconPreview(iconPreview, iconUrlInput.value);
+  const iconFile = document.createElement("input");
+  iconFile.type = "file";
+  iconFile.id = "slrsr_icon_file_input";
+  iconFile.accept = "image/jpeg,image/png,image/webp,image/svg+xml,.jpg,.jpeg,.png,.webp,.svg";
+  iconFile.className = "sr-only";
+  iconFile.addEventListener("change", () => {
+    const nextFile = iconFile.files?.[0] ?? null;
+    if (nextFile) onUploadIcon?.(nextFile, iconUrlInput, iconPreview);
+  });
+  brandingSection.body.append(
+    uploadDropzone({ input: iconFile, preview: iconPreview, uploading, onFile: (nextFile) => onUploadIcon?.(nextFile, iconUrlInput, iconPreview) }),
+    iconUrlInput,
+    inputField({ id: "slrsr_tab_title_input", name: "tab_title", label: "Judul tab browser", value: showroom?.tab_title ?? "", placeholder: "Contoh: Metro Auto Jakarta - Jual Beli Mobil" })
+  );
+
   const contactSection = fieldGroup("slrsr_contact_fields_section", "Kontak operasional", "phone");
   contactSection.body.append(
     inputField({ id: "slrsr_phone_number_input", name: "phone_number", label: "Nomor telepon", value: showroom?.phone_number ?? "", placeholder: "Contoh: 081234567890" })
@@ -62,7 +87,7 @@ export function SellerShowroomForm({ showroom = null, saving = false, error = ""
 
   // Batal/Simpan showroom live in the modal header (see showroomPage.js),
   // not here, so they stay visible without scrolling this form's length.
-  form.append(header, errorNode, profileSection.section, contactSection.section, bankSection.section);
+  form.append(header, errorNode, profileSection.section, brandingSection.section, contactSection.section, bankSection.section);
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     const formData = new FormData(form);
@@ -74,6 +99,8 @@ export function SellerShowroomForm({ showroom = null, saving = false, error = ""
       bank_account_number: String(formData.get("bank_account_number") ?? "").trim(),
       bank_type: String(formData.get("bank_type") ?? "").trim(),
       bank_account_name: String(formData.get("bank_account_name") ?? "").trim(),
+      icon_url: String(formData.get("icon_url") ?? "").trim(),
+      tab_title: String(formData.get("tab_title") ?? "").trim(),
     });
   });
 
@@ -264,6 +291,70 @@ function textareaField({ id, name, label, value = "", placeholder = "" }) {
 
 function slugify(value) {
   return String(value ?? "").trim().toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+}
+
+function renderIconPreview(preview, url) {
+  preview.replaceChildren();
+  if (url) {
+    const image = document.createElement("img");
+    image.src = url;
+    image.alt = "Icon showroom";
+    image.className = "h-full w-full object-contain p-2";
+    image.addEventListener("error", () => {
+      preview.replaceChildren(createIcon("brandMark", { className: "h-8 w-8 text-[var(--pb-text-muted)]" }));
+    }, { once: true });
+    preview.append(image);
+    return;
+  }
+  preview.append(createIcon("brandMark", { className: "h-8 w-8 text-[var(--pb-text-muted)]" }));
+}
+
+function uploadDropzone({ input, preview, uploading, onFile }) {
+  const section = document.createElement("section");
+  section.id = "slrsr_icon_dropzone_section";
+  section.className = "grid gap-4 rounded-[1.25rem] border border-dashed border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] bg-[linear-gradient(135deg,rgba(250,244,237,0.85),rgba(255,255,255,0.96),rgba(234,244,249,0.82))] p-4 shadow-sm md:grid-cols-[96px_minmax(0,1fr)] md:items-center";
+
+  const body = document.createElement("section");
+  body.className = "grid min-w-0 gap-3";
+  const title = textNode("p", "text-xs font-black text-gray-950", uploading ? "Mengupload icon..." : "Upload Favicon / Icon Header");
+  const desc = textNode("p", "text-[11px] leading-6 text-gray-600", "Berlaku hanya untuk halaman showroom Anda. SVG, PNG, JPG, atau WebP. Maksimal 2 MB.");
+  const actionsRow = document.createElement("section");
+  actionsRow.className = "flex flex-wrap items-center gap-2";
+  const choose = document.createElement("button");
+  choose.id = "slrsr_icon_choose_button";
+  choose.type = "button";
+  choose.className = "inline-flex min-h-10 items-center justify-center gap-2 rounded-[1rem] bg-[var(--pb-brand-primary)] px-4 py-2 text-xs font-bold text-white shadow-[var(--pb-shadow-soft)] transition hover:brightness-105 focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)] disabled:cursor-not-allowed disabled:opacity-60";
+  choose.disabled = Boolean(uploading);
+  choose.append(createIcon("upload", { className: "block h-4 w-4 leading-none" }), document.createTextNode(uploading ? "Memproses..." : "Pilih File"));
+  choose.addEventListener("click", () => input.click());
+  actionsRow.append(choose, input);
+  body.append(title, desc, actionsRow);
+  section.append(preview, body);
+
+  const setDrag = (active) => {
+    section.classList.toggle("border-[color-mix(in_srgb,var(--pb-brand-primary)_45%,white)]", active);
+    section.classList.toggle("bg-[var(--pb-surface-muted)]", active);
+  };
+  section.addEventListener("dragover", (event) => {
+    event.preventDefault();
+    setDrag(true);
+  });
+  section.addEventListener("dragleave", () => setDrag(false));
+  section.addEventListener("drop", (event) => {
+    event.preventDefault();
+    setDrag(false);
+    const file = event.dataTransfer?.files?.[0] ?? null;
+    if (file) onFile?.(file);
+  });
+
+  return section;
+}
+
+function textNode(tagName, className, text) {
+  const node = document.createElement(tagName);
+  node.className = className;
+  node.textContent = text ?? "";
+  return node;
 }
 
 function cityOptionsList(cities = [], selectedValue = "") {

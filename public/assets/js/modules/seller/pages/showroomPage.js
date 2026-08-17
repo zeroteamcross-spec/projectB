@@ -19,7 +19,9 @@ const EDIT_MODAL_KEY = "seller-showroom-edit-modal";
 const DEFAULT_RUNTIME = {
   editing: false,
   saving: false,
+  uploading: false,
   error: "",
+  iconUrlDraft: null,
 };
 
 export function SellerShowroomPage() {
@@ -88,12 +90,18 @@ function openShowroomEditModal({ showroom, bankOptions, cityOptions, runtime, ro
   modalBody.id = "slrsr_edit_modal_content_section";
   modalBody.className = "grid min-w-0 gap-4";
   modalBody.dataset.ds = "seller.showroom.editModal";
+  const showroomDraft = runtime.iconUrlDraft !== null
+    ? { ...(showroom ?? {}), icon_url: runtime.iconUrlDraft }
+    : showroom;
+
   modalBody.append(applyDesignHook(SellerShowroomForm({
-    showroom,
+    showroom: showroomDraft,
     saving: runtime.saving,
     error: runtime.error,
     bankOptions,
     cityOptions,
+    uploading: runtime.uploading,
+    onUploadIcon: (file) => uploadBrandingIcon(file),
     onSubmit: (payload) => saveShowroom(payload, router),
   }), "seller.showroom.form"));
 
@@ -116,7 +124,7 @@ function openShowroomEditModal({ showroom, bankOptions, cityOptions, runtime, ro
       saving: runtime.saving,
       onCancel: () => closeModal(),
     }),
-    onClose: () => setRuntime({ editing: false, error: "" }),
+    onClose: () => setRuntime({ editing: false, error: "", iconUrlDraft: null }),
     preserveContentOnSameSignature: true,
     contentSignature: showroomModalSignature({ showroom, runtime }),
   });
@@ -133,8 +141,25 @@ function showroomModalSignature({ showroom, runtime }) {
   return [
     showroom?.id ?? "new",
     runtime.saving ? "saving" : "idle",
+    runtime.uploading ? "uploading" : "idle",
+    runtime.iconUrlDraft ?? "",
     runtime.error ?? "",
   ].join("|");
+}
+
+async function uploadBrandingIcon(file) {
+  setRuntime({ uploading: true, error: "" });
+  try {
+    const asset = await showroomsResource.uploadBrandingIcon(file);
+    const path = asset?.path ?? asset?.url ?? "";
+    if (!path) throw new Error("Upload icon tidak mengembalikan path.");
+    setRuntime({ uploading: false, iconUrlDraft: path });
+    showToast("Icon showroom berhasil diupload.", { type: "success" });
+  } catch (error) {
+    const message = error?.message ?? "Gagal upload icon showroom.";
+    setRuntime({ uploading: false });
+    showToast(message, { type: "error" });
+  }
 }
 
 async function saveShowroom(payload) {
@@ -154,7 +179,7 @@ async function saveShowroom(payload) {
       version: "seller-showroom-v1",
       stale: false,
     }, "seller:showroom-snapshot");
-    setRuntime({ editing: false, saving: false, error: "" });
+    setRuntime({ editing: false, saving: false, error: "", iconUrlDraft: null });
     closeModal({ notify: false });
     showToast(isCreate ? "Showroom berhasil dibuat." : "Showroom berhasil diperbarui.", { type: "success" });
   } catch (error) {

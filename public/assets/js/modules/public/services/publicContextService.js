@@ -3,6 +3,70 @@ import { affiliatesResource } from "../../../resources/affiliatesResource.js";
 import { showroomsResource } from "../../../resources/showroomsResource.js";
 import { publicContextState } from "../state/publicContextState.js";
 
+const ICON_RELS = ["icon", "shortcut icon", "apple-touch-icon"];
+
+let brandingOriginal = null;
+let brandingShowroomId = null;
+
+function applyShowroomBranding(showroom) {
+  const iconUrl = String(showroom?.showroom?.icon_url ?? "").trim();
+  const tabTitle = String(showroom?.showroom?.tab_title ?? "").trim();
+
+  if (!iconUrl && !tabTitle) {
+    return;
+  }
+
+  if (brandingOriginal === null) {
+    brandingOriginal = {
+      title: document.title,
+      // null means the tag didn't exist originally, so revert should
+      // remove it rather than write back an empty href.
+      icons: Object.fromEntries(ICON_RELS.map((rel) => [
+        rel,
+        document.head.querySelector(`link[rel="${rel}"]`)?.getAttribute("href") ?? null,
+      ])),
+    };
+  }
+  brandingShowroomId = showroom?.id ?? null;
+
+  if (tabTitle) {
+    document.title = tabTitle;
+  }
+
+  if (iconUrl) {
+    ICON_RELS.forEach((rel) => upsertShowroomIconLink(rel, iconUrl));
+  }
+}
+
+function revertShowroomBranding() {
+  if (brandingOriginal === null) {
+    return;
+  }
+
+  document.title = brandingOriginal.title;
+  ICON_RELS.forEach((rel) => {
+    const originalHref = brandingOriginal.icons[rel];
+    if (originalHref === null) {
+      document.head.querySelector(`link[rel="${rel}"]`)?.remove();
+    } else {
+      upsertShowroomIconLink(rel, originalHref);
+    }
+  });
+  brandingOriginal = null;
+  brandingShowroomId = null;
+}
+
+function upsertShowroomIconLink(rel, href) {
+  const selector = `link[rel="${rel.replace(/"/g, '\\"')}"]`;
+  let node = document.head.querySelector(selector);
+  if (!node) {
+    node = document.createElement("link");
+    node.rel = rel;
+    document.head.append(node);
+  }
+  node.href = href;
+}
+
 export const publicContextService = {
   restore() {
     publicContextState.setDefault();
@@ -70,6 +134,7 @@ export const publicContextService = {
 
     const activeShowroom = this.activeShowroom();
     if (activeShowroom?.slug?.toLowerCase?.() === normalizedSlug && activeShowroom.sellerUserId) {
+      applyShowroomBranding(activeShowroom);
       return activeShowroom;
     }
 
@@ -89,11 +154,31 @@ export const publicContextService = {
     };
 
     publicContextState.setShowroom(showroom);
+    applyShowroomBranding(showroom);
     return showroom;
   },
 
   clear() {
+    if (brandingShowroomId !== null) {
+      revertShowroomBranding();
+    }
     publicContextState.setDefault();
+  },
+
+  /**
+   * Safety net for showroom branding (tab title/favicon): the pages that
+   * activate a showroom's branding (catalog/car-detail/transaction-entry)
+   * are also the only ones that ever revert it via clear(). Routes outside
+   * that set (e.g. the plain landing page) never call syncRouteContext(),
+   * so branding would otherwise stay stuck after navigating away. Called
+   * from PublicShell on every hash change instead, using the raw path so
+   * it works regardless of which page component is mounted.
+   */
+  syncBrandingFromPath(path = "") {
+    const isShowroomPath = /^\/(?:showrooms|s)\//.test(String(path ?? ""));
+    if (!isShowroomPath && brandingShowroomId !== null) {
+      revertShowroomBranding();
+    }
   },
 
   clearInvalidSlug(slug) {

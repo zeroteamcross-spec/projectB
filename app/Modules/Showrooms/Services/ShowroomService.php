@@ -64,6 +64,8 @@ class ShowroomService
                 'bank_account_name' => array_key_exists('bank_account_name', $data)
                     ? $data['bank_account_name']
                     : $existing['bank_account_name'],
+                'icon_url' => array_key_exists('icon_url', $data) ? $data['icon_url'] : $existing['icon_url'],
+                'tab_title' => array_key_exists('tab_title', $data) ? $data['tab_title'] : $existing['tab_title'],
             ];
 
             $this->showrooms->update((int) $existing['id'], $payload);
@@ -101,6 +103,8 @@ class ShowroomService
                 'address' => $showroom['address'] ?? null,
                 'city_name' => $showroom['city_name'] ?? null,
                 'phone_number' => $showroom['phone_number'] ?? null,
+                'icon_url' => $showroom['icon_url'] ?? null,
+                'tab_title' => $showroom['tab_title'] ?? null,
             ] : null,
         ];
     }
@@ -125,9 +129,16 @@ class ShowroomService
             'bank_account_number' => $showroom['bank_account_number'],
             'bank_type' => $showroom['bank_type'],
             'bank_account_name' => $showroom['bank_account_name'],
+            'icon_url' => $showroom['icon_url'] ?? null,
+            'tab_title' => $showroom['tab_title'] ?? null,
             'created_at' => $showroom['created_at'],
             'updated_at' => $showroom['updated_at'],
         ];
+    }
+
+    public function ensureSellerAccess(array $user): void
+    {
+        $this->ensureSeller($user);
     }
 
     private function generateSlug(string $name, ?int $ignoreShowroomId = null): string

@@ -15,4 +15,11 @@ export const showroomsResource = {
     const response = await apiClient.patch("/showrooms/me", payload, options);
     return response.data?.showroom ?? null;
   },
+
+  async uploadBrandingIcon(file, options = {}) {
+    const formData = new FormData();
+    formData.append("icon", file);
+    const response = await apiClient.post("/showrooms/me/branding-icon", formData, options);
+    return response.data?.asset ?? null;
+  },
 };

@@ -428,6 +428,8 @@ CREATE TABLE IF NOT EXISTS `showrooms` (
   `bank_account_number` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `bank_type` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `bank_account_name` varchar(225) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `icon_url` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `tab_title` varchar(70) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime DEFAULT NULL,
   `deleted_at` datetime DEFAULT NULL,

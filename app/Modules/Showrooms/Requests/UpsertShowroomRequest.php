@@ -17,6 +17,8 @@ class UpsertShowroomRequest extends FormRequest
             'bank_account_number' => 'nullable|string|max:50',
             'bank_type' => 'nullable|string|max:100',
             'bank_account_name' => 'nullable|string|max:225',
+            'icon_url' => 'nullable|string|max:255',
+            'tab_title' => 'nullable|string|max:70',
         ];
     }
 
@@ -29,6 +31,8 @@ class UpsertShowroomRequest extends FormRequest
             'bank_account_number',
             'bank_type',
             'bank_account_name',
+            'icon_url',
+            'tab_title',
         ];
 
         if (array_intersect(array_keys($data), $allowedFields) === []) {
