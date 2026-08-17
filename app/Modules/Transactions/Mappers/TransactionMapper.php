@@ -16,6 +16,7 @@ class TransactionMapper
             'car_id' => (int) $transaction['car_id'],
             'car_price' => (int) $transaction['car_price'],
             'payment_type' => $transaction['payment_type'],
+            'payment_method' => $transaction['payment_method'] ?? null,
             'dp_amount' => isset($transaction['dp_amount']) ? (int) $transaction['dp_amount'] : null,
             'remaining_amount' => isset($transaction['remaining_amount']) ? (int) $transaction['remaining_amount'] : null,
             'transaction_status' => $transaction['transaction_status'],
@@ -30,6 +31,7 @@ class TransactionMapper
             'return_reason' => $transaction['return_reason'] ?? null,
             'created_at' => $transaction['created_at'],
             'updated_at' => $transaction['updated_at'],
+            'manual_transfer' => self::manualTransfer($transaction),
             'buyer' => isset($transaction['buyer_name'])
                 ? [
                     'id' => (int) $transaction['buyer_user_id'],
@@ -71,6 +73,32 @@ class TransactionMapper
     public static function transactions(array $transactions): array
     {
         return array_map(static fn (array $transaction): array => self::transaction($transaction), $transactions);
+    }
+
+    /**
+     * Rekening tujuan diambil dari showrooms.bank_* -- sudah ada, diisi
+     * showroom sendiri lewat form profil showroom, tidak perlu manajemen
+     * rekening baru untuk transfer manual.
+     */
+    public static function manualTransfer(array $transaction): array
+    {
+        return [
+            'proof_path' => $transaction['manual_transfer_proof_path'] ?? null,
+            'note' => $transaction['manual_transfer_note'] ?? null,
+            'submitted_at' => $transaction['manual_transfer_submitted_at'] ?? null,
+            'confirmed_at' => $transaction['manual_transfer_confirmed_at'] ?? null,
+            'confirmed_by' => isset($transaction['manual_transfer_confirmed_by']) && $transaction['manual_transfer_confirmed_by'] !== null
+                ? (int) $transaction['manual_transfer_confirmed_by']
+                : null,
+            'rejected_at' => $transaction['manual_transfer_rejected_at'] ?? null,
+            'rejected_reason' => $transaction['manual_transfer_rejected_reason'] ?? null,
+            'bank' => [
+                'showroom_name' => $transaction['showroom_name'] ?? null,
+                'bank_type' => $transaction['showroom_bank_type'] ?? null,
+                'bank_account_number' => $transaction['showroom_bank_account_number'] ?? null,
+                'bank_account_name' => $transaction['showroom_bank_account_name'] ?? null,
+            ],
+        ];
     }
 
     public static function status(array $transaction): array

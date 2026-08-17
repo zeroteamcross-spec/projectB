@@ -9,6 +9,7 @@ use App\Core\Exceptions\ForbiddenException;
 use App\Modules\Affiliate\Services\AffiliateService;
 use App\Infrastructure\Payment\PaymentProviderException;
 use App\Infrastructure\Payment\PaymentProviderInterface;
+use App\Infrastructure\Storage\StorageServiceInterface;
 use App\Modules\Transactions\Repositories\PaymentLogRepository;
 use App\Modules\Transactions\Repositories\TransactionRepository;
 use App\Modules\Transactions\Services\PaymentLogService;
@@ -393,7 +394,8 @@ class TransactionStatusTransitionTest extends TestCase
             new TransactionRepository($pdo),
             new PaymentLogService(new PaymentLogRepository($pdo)),
             $paymentProvider ?? new FakeTransactionPaymentProvider(),
-            new FakeTransactionAffiliateService()
+            new FakeTransactionAffiliateService(),
+            new FakeTransactionStorageService()
         );
 
         return [$pdo, $service];
@@ -436,6 +438,7 @@ class TransactionStatusTransitionTest extends TestCase
             car_id INTEGER,
             car_price INTEGER,
             payment_type TEXT,
+            payment_method TEXT NULL,
             dp_amount INTEGER NULL,
             remaining_amount INTEGER NULL,
             transaction_status TEXT,
@@ -448,6 +451,13 @@ class TransactionStatusTransitionTest extends TestCase
             paid_at TEXT NULL,
             returned_at TEXT NULL,
             return_reason TEXT NULL,
+            manual_transfer_proof_path TEXT NULL,
+            manual_transfer_note TEXT NULL,
+            manual_transfer_submitted_at TEXT NULL,
+            manual_transfer_confirmed_at TEXT NULL,
+            manual_transfer_confirmed_by INTEGER NULL,
+            manual_transfer_rejected_at TEXT NULL,
+            manual_transfer_rejected_reason TEXT NULL,
             created_at TEXT,
             updated_at TEXT NULL,
             deleted_at TEXT NULL
@@ -466,6 +476,13 @@ class TransactionStatusTransitionTest extends TestCase
             payload_callback_json TEXT NULL,
             logged_at TEXT,
             created_at TEXT
+        )');
+        $pdo->exec('CREATE TABLE showrooms (
+            id INTEGER PRIMARY KEY,
+            name TEXT NULL,
+            bank_account_number TEXT NULL,
+            bank_type TEXT NULL,
+            bank_account_name TEXT NULL
         )');
         $pdo->exec('CREATE TABLE affiliates (
             id INTEGER PRIMARY KEY,
@@ -510,6 +527,23 @@ class FakeTransactionAffiliateService extends AffiliateService
         self::$lastAccruedTransaction = $transaction;
 
         return null;
+    }
+}
+
+class FakeTransactionStorageService implements StorageServiceInterface
+{
+    public function storeUploadedFile(array $file, string $directory): array
+    {
+        return [
+            'file_path' => '/storage/uploads/' . $directory . '/fake.jpg',
+            'storage_path' => $directory . '/fake.jpg',
+            'file_name' => 'fake.jpg',
+        ];
+    }
+
+    public function delete(string $relativePath): bool
+    {
+        return true;
     }
 }
 

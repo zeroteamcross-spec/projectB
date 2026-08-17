@@ -9,6 +9,7 @@ use App\Core\Exceptions\NotFoundException;
 use App\Core\Exceptions\ValidationException;
 use App\Infrastructure\Payment\PaymentProviderException;
 use App\Infrastructure\Payment\PaymentProviderInterface;
+use App\Infrastructure\Storage\StorageServiceInterface;
 use App\Modules\Affiliate\Services\AffiliateService;
 use App\Modules\Notifications\Services\NotificationService;
 use App\Modules\Transactions\Mappers\TransactionMapper;
@@ -31,12 +32,15 @@ class TransactionService
 
     private ?NotificationService $notificationService;
 
+    private StorageServiceInterface $storage;
+
     public function __construct(
         PDO $pdo,
         TransactionRepository $transactions,
         PaymentLogService $paymentLogs,
         PaymentProviderInterface $paymentProvider,
         AffiliateService $affiliateService,
+        StorageServiceInterface $storage,
         ?NotificationService $notificationService = null
     ) {
         $this->pdo = $pdo;
@@ -44,6 +48,7 @@ class TransactionService
         $this->paymentLogs = $paymentLogs;
         $this->paymentProvider = $paymentProvider;
         $this->affiliateService = $affiliateService;
+        $this->storage = $storage;
         $this->notificationService = $notificationService;
     }
 
@@ -106,6 +111,14 @@ class TransactionService
         $remainingAmount = $paymentType === 'dp' ? $carPrice - $dpAmount : 0;
         $transactionCode = $this->generateTransactionCode();
         $now = date('Y-m-d H:i:s');
+        $paymentMethod = trim((string) ($data['payment_method'] ?? 'bca_va'));
+        $isManualTransfer = $paymentMethod === 'manual_transfer';
+
+        if ($isManualTransfer && $paymentType !== 'dp') {
+            throw new ValidationException([
+                'payment_method' => 'Transfer manual hanya tersedia untuk pembayaran Booking Fee.',
+            ]);
+        }
 
         try {
             $this->pdo->beginTransaction();
@@ -116,6 +129,7 @@ class TransactionService
                 'car_id' => (int) $car['id'],
                 'car_price' => $carPrice,
                 'payment_type' => $paymentType,
+                'payment_method' => $paymentMethod,
                 'dp_amount' => $dpAmount,
                 'remaining_amount' => $remainingAmount,
                 'transaction_status' => 'pending_payment',
@@ -143,9 +157,53 @@ class TransactionService
             throw new NotFoundException('Transaksi tidak ditemukan setelah dibuat.');
         }
 
+        // Transfer manual tidak punya provider -- buyer transfer langsung ke
+        // rekening showroom dan upload buktinya sendiri, tidak ada sesi
+        // Midtrans untuk dibuat sama sekali.
+        if ($isManualTransfer) {
+            $session = [
+                'provider_name' => 'manual_transfer',
+                'provider_order_id' => $transactionCode,
+                'provider_transaction_id' => null,
+                'payment_method' => 'manual_transfer',
+                'transaction_status' => 'pending_payment',
+                'gross_amount' => $dpAmount,
+                'payment_data' => null,
+                'payload_response' => null,
+            ];
+
+            try {
+                $this->pdo->beginTransaction();
+                $this->paymentLogs->record($transactionId, $session);
+                $this->pdo->commit();
+            } catch (Throwable $exception) {
+                if ($this->pdo->inTransaction()) {
+                    $this->pdo->rollBack();
+                }
+
+                throw $exception;
+            }
+
+            $result = $this->detail($user, $transactionId);
+            $result['payment_session'] = [
+                'provider_name' => 'manual_transfer',
+                'provider_order_id' => $transactionCode,
+                'provider_transaction_id' => null,
+                'payment_method' => 'manual_transfer',
+                'transaction_status' => 'pending_payment',
+                'gross_amount' => $dpAmount,
+                'payment_data' => null,
+                'payload_response' => null,
+                'redirect_url' => null,
+                'expires_at' => $transaction['expires_at'],
+            ];
+
+            return $result;
+        }
+
         $session = $this->createProviderSession(
             $transactionId,
-            fn (): array => $this->paymentProvider->createInitialPayment($transaction, $buyer, $data['payment_method'])
+            fn (): array => $this->paymentProvider->createInitialPayment($transaction, $buyer, $paymentMethod)
         );
 
         try {
@@ -401,6 +459,159 @@ class TransactionService
             }
 
             throw $exception;
+        }
+
+        return $this->detail($user, $transactionId);
+    }
+
+    /**
+     * Buyer mengunggah bukti transfer bank manual. Bisa dipanggil ulang
+     * selama transaksi masih pending_payment -- upload baru menimpa bukti
+     * lama dan mencabut penolakan sebelumnya, supaya alur "ditolak lalu
+     * upload ulang" tidak butuh endpoint terpisah.
+     */
+    public function submitManualTransferProof(array $user, int $transactionId, array $data): array
+    {
+        $transaction = $this->requireTransaction($transactionId);
+        TransactionPolicy::ensureCanSubmitManualTransferProof($user, $transaction);
+
+        if (($transaction['payment_method'] ?? null) !== 'manual_transfer') {
+            throw new ValidationException([
+                'payment_method' => 'Transaksi ini bukan transfer manual.',
+            ]);
+        }
+
+        if (($transaction['transaction_status'] ?? null) !== 'pending_payment') {
+            throw new ValidationException([
+                'transaction_status' => 'Bukti transfer hanya bisa diunggah selama transaksi menunggu pembayaran.',
+            ]);
+        }
+
+        $stored = $this->storage->storeUploadedFile($data['proof'], 'transactions/' . $transactionId . '/manual-transfer');
+        $now = date('Y-m-d H:i:s');
+
+        try {
+            $this->pdo->beginTransaction();
+            $this->transactions->updateManualTransferSubmission($transactionId, [
+                'manual_transfer_proof_path' => $stored['file_path'],
+                'manual_transfer_note' => $data['note'] !== '' ? $data['note'] : null,
+                'manual_transfer_submitted_at' => $now,
+                'updated_at' => $now,
+            ]);
+            $this->pdo->commit();
+        } catch (Throwable $exception) {
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+
+            $this->storage->delete($stored['file_path']);
+            throw $exception;
+        }
+
+        if ($this->notificationService !== null) {
+            $this->notificationService->createManualTransferSubmittedNotification(
+                $this->requireTransaction($transactionId)
+            );
+        }
+
+        return $this->detail($user, $transactionId);
+    }
+
+    /**
+     * Showroom mengonfirmasi bukti transfer sudah dicek di mutasi rekening.
+     * Menuntun ke status yang sama persis dengan pembayaran Midtrans yang
+     * berhasil (dp_paid), lewat applyStatus() yang sama -- accrual komisi dan
+     * notifikasi pembayaran ikut jalan tanpa perlu ditulis ulang di sini.
+     */
+    public function confirmManualTransfer(array $user, int $transactionId): array
+    {
+        $transaction = $this->requireTransaction($transactionId);
+        TransactionPolicy::ensureCanConfirmManualTransfer($user, $transaction);
+
+        if (($transaction['payment_method'] ?? null) !== 'manual_transfer') {
+            throw new ValidationException([
+                'payment_method' => 'Transaksi ini bukan transfer manual.',
+            ]);
+        }
+
+        if (trim((string) ($transaction['manual_transfer_proof_path'] ?? '')) === '') {
+            throw new ValidationException([
+                'manual_transfer_proof_path' => 'Buyer belum mengunggah bukti transfer.',
+            ]);
+        }
+
+        if (($transaction['transaction_status'] ?? null) !== 'pending_payment') {
+            throw new ValidationException([
+                'transaction_status' => 'Transaksi ini sudah tidak menunggu konfirmasi pembayaran.',
+            ]);
+        }
+
+        $now = date('Y-m-d H:i:s');
+
+        try {
+            $this->pdo->beginTransaction();
+            $this->transactions->updateManualTransferConfirmation($transactionId, [
+                'manual_transfer_confirmed_at' => $now,
+                'manual_transfer_confirmed_by' => (int) $user['id'],
+                'updated_at' => $now,
+            ]);
+            $this->applyStatus($transaction, 'dp_paid');
+            $this->pdo->commit();
+        } catch (Throwable $exception) {
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+
+            throw $exception;
+        }
+
+        return $this->detail($user, $transactionId);
+    }
+
+    /**
+     * Showroom menolak bukti yang diunggah -- nominal tidak cocok, bukti
+     * tidak jelas, dsb. Transaksi tetap pending_payment, bukti lama dihapus
+     * dari kolomnya supaya buyer harus unggah yang baru, bukan sekadar
+     * menimpa bukti yang sama.
+     */
+    public function rejectManualTransfer(array $user, int $transactionId, array $data): array
+    {
+        $transaction = $this->requireTransaction($transactionId);
+        TransactionPolicy::ensureCanConfirmManualTransfer($user, $transaction);
+
+        if (($transaction['payment_method'] ?? null) !== 'manual_transfer') {
+            throw new ValidationException([
+                'payment_method' => 'Transaksi ini bukan transfer manual.',
+            ]);
+        }
+
+        if (trim((string) ($transaction['manual_transfer_proof_path'] ?? '')) === '') {
+            throw new ValidationException([
+                'manual_transfer_proof_path' => 'Buyer belum mengunggah bukti transfer.',
+            ]);
+        }
+
+        $reason = trim((string) ($data['reason'] ?? ''));
+        if ($reason === '') {
+            throw new ValidationException([
+                'reason' => 'Alasan penolakan wajib diisi.',
+            ]);
+        }
+
+        $proofPath = (string) $transaction['manual_transfer_proof_path'];
+        $now = date('Y-m-d H:i:s');
+
+        $this->transactions->updateManualTransferRejection($transactionId, [
+            'manual_transfer_rejected_at' => $now,
+            'manual_transfer_rejected_reason' => $reason,
+            'updated_at' => $now,
+        ]);
+        $this->storage->delete($proofPath);
+
+        $rejected = $this->requireTransaction($transactionId);
+
+        if ($this->notificationService !== null) {
+            $this->notificationService->createManualTransferRejectedNotification($rejected);
         }
 
         return $this->detail($user, $transactionId);

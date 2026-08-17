@@ -61,13 +61,13 @@ class TransactionRepository
         $stmt = $this->pdo->prepare(
             'INSERT INTO transactions
                 (transaction_code, buyer_user_id, seller_user_id, car_id, car_price,
-                 payment_type, dp_amount, remaining_amount, transaction_status,
+                 payment_type, payment_method, dp_amount, remaining_amount, transaction_status,
                  affiliate_id, affiliate_referral_code_snapshot,
                  midtrans_order_id, midtrans_token, midtrans_redirect_url,
                  expires_at, paid_at, created_at, updated_at, deleted_at)
              VALUES
                 (:transaction_code, :buyer_user_id, :seller_user_id, :car_id, :car_price,
-                 :payment_type, :dp_amount, :remaining_amount, :transaction_status,
+                 :payment_type, :payment_method, :dp_amount, :remaining_amount, :transaction_status,
                  :affiliate_id, :affiliate_referral_code_snapshot,
                  :midtrans_order_id, :midtrans_token, :midtrans_redirect_url,
                  :expires_at, :paid_at, :created_at, :updated_at, NULL)'
@@ -396,6 +396,52 @@ class TransactionRepository
         $stmt->execute($data);
     }
 
+    public function updateManualTransferSubmission(int $id, array $data): void
+    {
+        $stmt = $this->pdo->prepare(
+            'UPDATE transactions
+             SET manual_transfer_proof_path = :manual_transfer_proof_path,
+                 manual_transfer_note = :manual_transfer_note,
+                 manual_transfer_submitted_at = :manual_transfer_submitted_at,
+                 manual_transfer_rejected_at = NULL,
+                 manual_transfer_rejected_reason = NULL,
+                 updated_at = :updated_at
+             WHERE id = :id
+             AND deleted_at IS NULL'
+        );
+        $data['id'] = $id;
+        $stmt->execute($data);
+    }
+
+    public function updateManualTransferConfirmation(int $id, array $data): void
+    {
+        $stmt = $this->pdo->prepare(
+            'UPDATE transactions
+             SET manual_transfer_confirmed_at = :manual_transfer_confirmed_at,
+                 manual_transfer_confirmed_by = :manual_transfer_confirmed_by,
+                 updated_at = :updated_at
+             WHERE id = :id
+             AND deleted_at IS NULL'
+        );
+        $data['id'] = $id;
+        $stmt->execute($data);
+    }
+
+    public function updateManualTransferRejection(int $id, array $data): void
+    {
+        $stmt = $this->pdo->prepare(
+            'UPDATE transactions
+             SET manual_transfer_proof_path = NULL,
+                 manual_transfer_rejected_at = :manual_transfer_rejected_at,
+                 manual_transfer_rejected_reason = :manual_transfer_rejected_reason,
+                 updated_at = :updated_at
+             WHERE id = :id
+             AND deleted_at IS NULL'
+        );
+        $data['id'] = $id;
+        $stmt->execute($data);
+    }
+
     public function listFulfillmentChecklistItems(int $transactionId): array
     {
         $stmt = $this->pdo->prepare(
@@ -447,16 +493,24 @@ class TransactionRepository
     private function baseSelect(): string
     {
         return 'SELECT t.id, t.transaction_code, t.buyer_user_id, t.seller_user_id, t.car_id,
-                       t.car_price, t.payment_type, t.dp_amount, t.remaining_amount,
+                       t.car_price, t.payment_type, t.payment_method, t.dp_amount, t.remaining_amount,
                        t.transaction_status, t.midtrans_order_id, t.midtrans_token,
                        t.midtrans_redirect_url, t.expires_at, t.paid_at,
                        t.returned_at, t.return_reason,
+                       t.manual_transfer_proof_path, t.manual_transfer_note,
+                       t.manual_transfer_submitted_at, t.manual_transfer_confirmed_at,
+                       t.manual_transfer_confirmed_by, t.manual_transfer_rejected_at,
+                       t.manual_transfer_rejected_reason,
                        t.affiliate_id, t.affiliate_referral_code_snapshot,
                        t.created_at, t.updated_at,
                        buyer.name AS buyer_name, buyer.email AS buyer_email,
                        seller.name AS seller_name, seller.email AS seller_email,
                        cars.brand_name, cars.model_name, cars.listing_status, cars.showroom_id,
                        cover_image.file_path AS car_cover_image,
+                       showroom.name AS showroom_name,
+                       showroom.bank_account_number AS showroom_bank_account_number,
+                       showroom.bank_type AS showroom_bank_type,
+                       showroom.bank_account_name AS showroom_bank_account_name,
                        affiliate_user.name AS affiliate_name, affiliate_user.email AS affiliate_email
                 FROM transactions AS t
                 INNER JOIN users AS buyer ON buyer.id = t.buyer_user_id
@@ -470,6 +524,7 @@ class TransactionRepository
                     ORDER BY ci.is_cover DESC, ci.sort_order ASC, ci.id ASC
                     LIMIT 1
                 )
+                LEFT JOIN showrooms AS showroom ON showroom.id = cars.showroom_id
                 LEFT JOIN affiliates AS affiliate ON affiliate.id = t.affiliate_id
                 LEFT JOIN users AS affiliate_user ON affiliate_user.id = affiliate.user_id';
     }

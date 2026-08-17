@@ -126,6 +126,37 @@ class TransactionPolicy
         throw new ForbiddenException('Akses pelunasan transaksi tidak diizinkan.');
     }
 
+    public static function ensureCanSubmitManualTransferProof(array $user, array $transaction): void
+    {
+        if (in_array(($user['role'] ?? null), ['admin', 'super_admin'], true)) {
+            return;
+        }
+
+        if (($user['role'] ?? null) === 'buyer' && (int) $user['id'] === (int) $transaction['buyer_user_id']) {
+            return;
+        }
+
+        throw new ForbiddenException('Hanya buyer pemilik transaksi yang dapat mengunggah bukti transfer.');
+    }
+
+    /**
+     * Konfirmasi transfer manual adalah keputusan showroom pemilik transaksi
+     * -- rekeningnya rekening mereka, mereka yang tahu mutasinya. Admin ikut
+     * diizinkan sebagai jaring pengaman, sama seperti retur transaksi.
+     */
+    public static function ensureCanConfirmManualTransfer(array $user, array $transaction): void
+    {
+        if (($user['role'] ?? null) === 'seller' && (int) $user['id'] === (int) $transaction['seller_user_id']) {
+            return;
+        }
+
+        if (in_array(($user['role'] ?? null), ['admin', 'super_admin'], true)) {
+            return;
+        }
+
+        throw new ForbiddenException('Hanya showroom pemilik transaksi yang dapat mengonfirmasi transfer manual.');
+    }
+
     public static function ensureCanCancel(array $user, array $transaction): void
     {
         if (in_array(($user['role'] ?? null), ['admin', 'super_admin'], true)) {

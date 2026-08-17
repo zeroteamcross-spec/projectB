@@ -169,6 +169,7 @@ class RepositoryQueryTest extends TestCase
             car_id INTEGER,
             car_price INTEGER,
             payment_type TEXT,
+            payment_method TEXT NULL,
             dp_amount INTEGER NULL,
             remaining_amount INTEGER NULL,
             transaction_status TEXT,
@@ -181,9 +182,23 @@ class RepositoryQueryTest extends TestCase
             paid_at TEXT NULL,
             returned_at TEXT NULL,
             return_reason TEXT NULL,
+            manual_transfer_proof_path TEXT NULL,
+            manual_transfer_note TEXT NULL,
+            manual_transfer_submitted_at TEXT NULL,
+            manual_transfer_confirmed_at TEXT NULL,
+            manual_transfer_confirmed_by INTEGER NULL,
+            manual_transfer_rejected_at TEXT NULL,
+            manual_transfer_rejected_reason TEXT NULL,
             created_at TEXT,
             updated_at TEXT NULL,
             deleted_at TEXT NULL
+        )');
+        $pdo->exec('CREATE TABLE showrooms (
+            id INTEGER PRIMARY KEY,
+            name TEXT NULL,
+            bank_account_number TEXT NULL,
+            bank_type TEXT NULL,
+            bank_account_name TEXT NULL
         )');
         $pdo->exec('CREATE TABLE transaction_payment_logs (
             id INTEGER PRIMARY KEY,

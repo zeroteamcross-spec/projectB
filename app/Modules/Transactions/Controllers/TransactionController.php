@@ -12,7 +12,9 @@ use App\Modules\Transactions\Requests\CancelTransactionRequest;
 use App\Modules\Transactions\Requests\CompleteTransactionRequest;
 use App\Modules\Transactions\Requests\CreateTransactionRequest;
 use App\Modules\Transactions\Requests\ProviderCallbackRequest;
+use App\Modules\Transactions\Requests\RejectManualTransferRequest;
 use App\Modules\Transactions\Requests\ReturnTransactionRequest;
+use App\Modules\Transactions\Requests\SubmitManualTransferProofRequest;
 use App\Modules\Transactions\Requests\UpdateFulfillmentChecklistRequest;
 use App\Modules\Transactions\Requests\UpdateTransactionStatusRequest;
 use App\Infrastructure\Payment\Midtrans\MidtransCallbackHandler;
@@ -144,6 +146,46 @@ class TransactionController extends Controller
                 $payload
             ),
         ], 'Transaksi berhasil diretur.');
+    }
+
+    public function submitManualTransferProof(Request $request): JsonResponse
+    {
+        $user = $this->user($request);
+        $payload = (new SubmitManualTransferProofRequest($request))->validate();
+
+        return JsonResponse::success([
+            'transaction' => $this->service->submitManualTransferProof(
+                $user,
+                (int) $request->routeParam('transaction_id'),
+                $payload
+            ),
+        ], 'Bukti transfer berhasil diunggah.');
+    }
+
+    public function confirmManualTransfer(Request $request): JsonResponse
+    {
+        $user = $this->user($request);
+
+        return JsonResponse::success([
+            'transaction' => $this->service->confirmManualTransfer(
+                $user,
+                (int) $request->routeParam('transaction_id')
+            ),
+        ], 'Transfer manual berhasil dikonfirmasi.');
+    }
+
+    public function rejectManualTransfer(Request $request): JsonResponse
+    {
+        $user = $this->user($request);
+        $payload = (new RejectManualTransferRequest($request))->validate();
+
+        return JsonResponse::success([
+            'transaction' => $this->service->rejectManualTransfer(
+                $user,
+                (int) $request->routeParam('transaction_id'),
+                $payload
+            ),
+        ], 'Bukti transfer ditolak.');
     }
 
     public function providerCallback(Request $request): JsonResponse

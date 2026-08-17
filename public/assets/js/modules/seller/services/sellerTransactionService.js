@@ -26,6 +26,14 @@ export const sellerTransactionService = {
     return transactionsResource.returnTransaction(transactionId, payload, options);
   },
 
+  confirmManualTransfer(transactionId, options = {}) {
+    return transactionsResource.confirmManualTransfer(transactionId, options);
+  },
+
+  rejectManualTransfer(transactionId, reason, options = {}) {
+    return transactionsResource.rejectManualTransfer(transactionId, reason, options);
+  },
+
   summarize(transactions = []) {
     return {
       total: transactions.length,

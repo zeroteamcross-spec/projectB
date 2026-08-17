@@ -2,6 +2,7 @@ export const PAYMENT_METHOD_OPTIONS = [
   { value: "bca_va", label: "BCA Virtual Account", description: "Transfer VA BCA" },
   { value: "gopay", label: "GoPay", description: "Bayar lewat aplikasi GoPay" },
   { value: "qris", label: "QRIS", description: "Scan QR dengan e-wallet atau m-banking" },
+  { value: "manual_transfer", label: "Transfer Manual", description: "Transfer ke rekening showroom, upload bukti" },
 ];
 
 const GOPAY_AUTO_OPEN_PREFIX = "projectb:gopay:auto-open:";
@@ -15,6 +16,7 @@ export function paymentMethodLabel(method) {
     gopay: "GoPay",
     qris: "QRIS",
     shopeepay: "ShopeePay",
+    manual_transfer: "Transfer Manual",
   }[String(method ?? "").toLowerCase()] ?? String(method ?? "-").replace(/_/g, " ").toUpperCase();
 }
 
@@ -91,6 +93,15 @@ export function resolvePaymentArtifacts(transaction = {}) {
 }
 
 export function instructionSteps(method, { hasQr = false, hasDeeplink = false } = {}) {
+  if (method === "manual_transfer") {
+    return [
+      "Buka halaman status pembayaran untuk melihat rekening tujuan transfer.",
+      "Transfer sesuai nominal Booking Fee persis ke rekening showroom.",
+      "Unggah bukti transfernya di halaman status pembayaran.",
+      "Showroom akan mengecek mutasi rekening lalu mengonfirmasi pembayaran.",
+    ];
+  }
+
   if (method === "gopay") {
     return [
       "Pastikan aplikasi GoPay atau Gojek tersedia di perangkat Anda.",

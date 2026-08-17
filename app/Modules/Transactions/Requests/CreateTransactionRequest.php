@@ -39,6 +39,6 @@ class CreateTransactionRequest extends FormRequest
 
     private static function supportedPaymentMethods(): array
     {
-        return ['bca_va', 'bni_va', 'bri_va', 'mandiri_va', 'gopay', 'qris', 'shopeepay'];
+        return ['bca_va', 'bni_va', 'bri_va', 'mandiri_va', 'gopay', 'qris', 'shopeepay', 'manual_transfer'];
     }
 }

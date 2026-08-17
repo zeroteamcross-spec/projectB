@@ -30,5 +30,8 @@ return static function (Router $router): void {
         $router->post('/{transaction_id}/complete-payment', [TransactionController::class, 'completePayment']);
         $router->post('/{transaction_id}/cancel', [TransactionController::class, 'cancel']);
         $router->post('/{transaction_id}/return', [TransactionController::class, 'returnTransaction']);
+        $router->post('/{transaction_id}/manual-transfer/proof', [TransactionController::class, 'submitManualTransferProof']);
+        $router->post('/{transaction_id}/manual-transfer/confirm', [TransactionController::class, 'confirmManualTransfer']);
+        $router->post('/{transaction_id}/manual-transfer/reject', [TransactionController::class, 'rejectManualTransfer']);
     }, [AuthenticatedUserMiddleware::class]);
 };

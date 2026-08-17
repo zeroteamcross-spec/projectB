@@ -7,6 +7,7 @@ import { Skeleton } from "../../../ui/primitives/skeleton.js";
 import { showToast } from "../../../ui/primitives/toast.js";
 import { buyerTransactionService } from "../services/buyerTransactionService.js";
 import { CompletionPaymentPanel } from "../components/completionPaymentPanel.js";
+import { ManualTransferPanel } from "../components/manualTransferPanel.js";
 import { PaymentActionPanel } from "../components/paymentActionPanel.js";
 import { PaymentInstructionPanel } from "../components/paymentInstructionPanel.js";
 import { PaymentStatusSummary } from "../components/paymentStatusSummary.js";
@@ -29,7 +30,6 @@ export function PaymentStatusPage() {
   let root = null;
   let unsubscribe = null;
   let visibilityCleanup = null;
-  let initialSyncStarted = false;
   const flags = {
     isRefreshing: false,
     isAutoChecking: false,
@@ -37,6 +37,8 @@ export function PaymentStatusPage() {
     isFinishing: false,
     isCancelling: false,
     isDownloadingQr: false,
+    isSubmittingManualTransfer: false,
+    hasStartedInitialSync: false,
   };
   const poller = {
     timer: null,
@@ -138,7 +140,14 @@ function render(root, context, flags) {
     main.append(paymentSuccessPanel(transaction));
     main.append(PaymentStatusSummary({ transaction }), carSummary(transaction));
   } else {
-    if (isPendingPayment(transaction)) {
+    if (isPendingPayment(transaction) && transaction.payment_method === "manual_transfer") {
+      main.append(applyDesignHook(ManualTransferPanel({
+        transaction,
+        isSubmitting: flags.isSubmittingManualTransfer,
+        error: appStore.get("runtime.buyerPaymentStatus.manualTransferError", ""),
+        onSubmit: (file, note) => submitManualTransferProof(context, flags, file, note),
+      }), "buyer.payment.manual-transfer"));
+    } else if (isPendingPayment(transaction)) {
       main.append(applyDesignHook(PaymentInstructionPanel({
         transaction,
         isDownloadingQr: flags.isDownloadingQr,
@@ -562,7 +571,7 @@ async function refreshStatus(context, flags, {
 }
 
 function syncInitialPaymentStatus(context, flags) {
-  if (initialSyncStarted) {
+  if (flags.hasStartedInitialSync) {
     return;
   }
 
@@ -571,7 +580,7 @@ function syncInitialPaymentStatus(context, flags) {
     return;
   }
 
-  initialSyncStarted = true;
+  flags.hasStartedInitialSync = true;
   void refreshStatus(context, flags, {
     silent: true,
     showToastOnSuccess: false,
@@ -766,6 +775,38 @@ async function finishTransaction(context, flags) {
     showToast(error.message || "Gagal menyelesaikan transaksi.", { type: "error" });
   } finally {
     flags.isFinishing = false;
+    setActionState(flags);
+  }
+}
+
+async function submitManualTransferProof(context, flags, file, note) {
+  const transaction = appStore.get("working.buyerPaymentStatus.transaction", null)?.data ?? null;
+  if (!transaction?.id || flags.isSubmittingManualTransfer) {
+    return;
+  }
+
+  flags.isSubmittingManualTransfer = true;
+  appStore.patchState("runtime.buyerPaymentStatus.manualTransferError", "", "buyer-payment-status:manual-transfer-error-clear");
+  setActionState(flags);
+
+  try {
+    const updated = await buyerTransactionService.submitManualTransferProof(context.params.id, file, note);
+    if (updated) {
+      appStore.patchState("working.buyerPaymentStatus.transaction", {
+        data: updated,
+        hydratedAt: Date.now(),
+      }, "buyer-payment-status:manual-transfer-submitted");
+      syncBusinessTransaction(updated, {
+        primaryRole: "buyer",
+        source: "buyer-payment-status:manual-transfer-submitted",
+      });
+    }
+    showToast("Bukti transfer berhasil diunggah. Menunggu konfirmasi showroom.", { type: "success" });
+  } catch (error) {
+    appStore.patchState("runtime.buyerPaymentStatus.manualTransferError", error.message || "Gagal mengunggah bukti transfer.", "buyer-payment-status:manual-transfer-error");
+    showToast(error.message || "Gagal mengunggah bukti transfer.", { type: "error" });
+  } finally {
+    flags.isSubmittingManualTransfer = false;
     setActionState(flags);
   }
 }

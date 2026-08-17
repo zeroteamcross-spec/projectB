@@ -16,6 +16,7 @@ export function SellerTransactionDetailPage() {
   const flags = {
     isCancelling: false,
     isReturning: false,
+    isConfirmingManualTransfer: false,
   };
 
   return createPageLifecycle({
@@ -76,6 +77,9 @@ function render(root, context, flags) {
       onCancel: () => cancelTransaction(root, context, flags, transaction),
       isReturning: flags.isReturning,
       onReturn: () => returnTransaction(root, context, flags, transaction),
+      isConfirmingManualTransfer: flags.isConfirmingManualTransfer,
+      onConfirmManualTransfer: () => confirmManualTransfer(root, context, flags, transaction),
+      onRejectManualTransfer: () => rejectManualTransfer(root, context, flags, transaction),
     })
   );
 }
@@ -130,6 +134,73 @@ async function cancelTransaction(root, context, flags, transaction) {
     showToast(error.message || "Gagal membatalkan transaksi.", { type: "error" });
   } finally {
     flags.isCancelling = false;
+    render(root, context, flags);
+  }
+}
+
+async function confirmManualTransfer(root, context, flags, transaction) {
+  if (!transaction?.id || flags.isConfirmingManualTransfer) {
+    return;
+  }
+
+  if (!window.confirm("Konfirmasi transfer manual ini sudah dicek di mutasi rekening showroom?")) {
+    return;
+  }
+
+  flags.isConfirmingManualTransfer = true;
+  render(root, context, flags);
+
+  try {
+    const updated = await sellerTransactionService.confirmManualTransfer(transaction.id);
+    if (updated) {
+      appStore.patchState("working.sellerTransactionDetail.transaction", {
+        data: updated,
+        hydratedAt: Date.now(),
+      }, "seller-transaction-detail:manual-transfer-confirm");
+      syncBusinessTransaction(updated, {
+        primaryRole: "seller",
+        source: "seller-transaction-detail:manual-transfer-confirm",
+      });
+    }
+    showToast("Transfer manual berhasil dikonfirmasi.", { type: "success" });
+  } catch (error) {
+    showToast(error.message || "Gagal mengonfirmasi transfer manual.", { type: "error" });
+  } finally {
+    flags.isConfirmingManualTransfer = false;
+    render(root, context, flags);
+  }
+}
+
+async function rejectManualTransfer(root, context, flags, transaction) {
+  if (!transaction?.id || flags.isConfirmingManualTransfer) {
+    return;
+  }
+
+  const reason = window.prompt("Alasan penolakan bukti transfer (minimal 5 karakter)", "");
+  if (reason === null) {
+    return;
+  }
+
+  flags.isConfirmingManualTransfer = true;
+  render(root, context, flags);
+
+  try {
+    const updated = await sellerTransactionService.rejectManualTransfer(transaction.id, reason);
+    if (updated) {
+      appStore.patchState("working.sellerTransactionDetail.transaction", {
+        data: updated,
+        hydratedAt: Date.now(),
+      }, "seller-transaction-detail:manual-transfer-reject");
+      syncBusinessTransaction(updated, {
+        primaryRole: "seller",
+        source: "seller-transaction-detail:manual-transfer-reject",
+      });
+    }
+    showToast("Bukti transfer ditolak.", { type: "success" });
+  } catch (error) {
+    showToast(error.message || "Gagal menolak bukti transfer.", { type: "error" });
+  } finally {
+    flags.isConfirmingManualTransfer = false;
     render(root, context, flags);
   }
 }

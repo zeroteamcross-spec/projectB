@@ -28,6 +28,8 @@ class NotificationService
         'settlement_paid',
         'security_alert',
         'system_message',
+        'manual_transfer_submitted',
+        'manual_transfer_rejected',
     ];
 
     private const ICON_KEYS = [
@@ -191,6 +193,55 @@ class NotificationService
         }
 
         return $created;
+    }
+
+    public function createManualTransferSubmittedNotification(array $transaction): ?array
+    {
+        $sellerUserId = (int) ($transaction['seller_user_id'] ?? 0);
+        if ($sellerUserId <= 0) {
+            return null;
+        }
+
+        $carLabel = $this->transactionCarLabel($transaction);
+        $code = (string) ($transaction['transaction_code'] ?? ('#' . (int) ($transaction['id'] ?? 0)));
+
+        return $this->create([
+            'user_id' => $sellerUserId,
+            'role' => 'seller',
+            'type' => 'manual_transfer_submitted',
+            'title' => 'Bukti Transfer Manual Masuk',
+            'body' => sprintf('Buyer mengunggah bukti transfer untuk %s. Cek mutasi rekening lalu konfirmasi.', $carLabel ?: $code),
+            'data' => $this->transactionNotificationData($transaction),
+            'link_url' => '#/seller/transactions',
+            'icon_key' => 'payment',
+            'priority' => 'high',
+        ]);
+    }
+
+    public function createManualTransferRejectedNotification(array $transaction): ?array
+    {
+        $buyerUserId = (int) ($transaction['buyer_user_id'] ?? 0);
+        if ($buyerUserId <= 0) {
+            return null;
+        }
+
+        $carLabel = $this->transactionCarLabel($transaction);
+        $code = (string) ($transaction['transaction_code'] ?? ('#' . (int) ($transaction['id'] ?? 0)));
+        $reason = trim((string) ($transaction['manual_transfer_rejected_reason'] ?? ''));
+
+        return $this->create([
+            'user_id' => $buyerUserId,
+            'role' => 'buyer',
+            'type' => 'manual_transfer_rejected',
+            'title' => 'Bukti Transfer Ditolak',
+            'body' => $reason !== ''
+                ? sprintf('Bukti transfer untuk %s ditolak: %s. Unggah ulang buktinya.', $carLabel ?: $code, $reason)
+                : sprintf('Bukti transfer untuk %s ditolak showroom. Unggah ulang buktinya.', $carLabel ?: $code),
+            'data' => $this->transactionNotificationData($transaction),
+            'link_url' => '#/buyer/transactions',
+            'icon_key' => 'payment',
+            'priority' => 'high',
+        ]);
     }
 
     public function createCommissionAccruedNotification(array $ledger, array $affiliate, array $transaction = []): ?array

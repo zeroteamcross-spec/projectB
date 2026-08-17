@@ -55,6 +55,27 @@ export const transactionsResource = {
     return response.data?.transaction ?? null;
   },
 
+  async submitManualTransferProof(id, file, note = "", options = {}) {
+    const formData = new FormData();
+    formData.append("proof", file);
+    if (note) {
+      formData.append("note", note);
+    }
+
+    const response = await apiClient.post(`/transactions/${encodeURIComponent(id)}/manual-transfer/proof`, formData, options);
+    return response.data?.transaction ?? null;
+  },
+
+  async confirmManualTransfer(id, options = {}) {
+    const response = await apiClient.post(`/transactions/${encodeURIComponent(id)}/manual-transfer/confirm`, {}, options);
+    return response.data?.transaction ?? null;
+  },
+
+  async rejectManualTransfer(id, reason, options = {}) {
+    const response = await apiClient.post(`/transactions/${encodeURIComponent(id)}/manual-transfer/reject`, { reason }, options);
+    return response.data?.transaction ?? null;
+  },
+
   async downloadPaymentQr(id, options = {}) {
     const response = await fetch(apiClient.url(`/transactions/${encodeURIComponent(id)}/payment-qr`), {
       method: "GET",

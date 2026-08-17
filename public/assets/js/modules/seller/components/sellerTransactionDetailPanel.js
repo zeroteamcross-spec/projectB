@@ -18,6 +18,9 @@ export function SellerTransactionDetailPanel({
   onCancel = null,
   isReturning = false,
   onReturn = null,
+  isConfirmingManualTransfer = false,
+  onConfirmManualTransfer = null,
+  onRejectManualTransfer = null,
 } = {}) {
   if (!transaction) {
     return EmptyState({
@@ -32,6 +35,7 @@ export function SellerTransactionDetailPanel({
   layout.className = "grid min-w-0 gap-4";
   layout.append(
     statusCard(transaction, statusMeta, { isCancelling, onCancel, isReturning, onReturn }),
+    manualTransferConfirmationCard(transaction, { isConfirmingManualTransfer, onConfirmManualTransfer, onRejectManualTransfer }),
     fulfillmentChecklistCard({
       transaction,
       checklistDraft,
@@ -240,6 +244,78 @@ function statusCard(transaction, statusMeta, { isCancelling = false, onCancel = 
 
   header.append(copy, actions);
   return Card(header);
+}
+
+/**
+ * Muncul hanya kalau ada bukti yang benar-benar menunggu keputusan --
+ * transaksi manual_transfer, masih pending_payment, dan buyer sudah unggah.
+ * Setelah dikonfirmasi statusnya pindah ke dp_paid dan kartu ini otomatis
+ * tidak lagi cocok dengan syaratnya sendiri, jadi hilang tanpa flag tambahan.
+ */
+function manualTransferConfirmationCard(transaction, { isConfirmingManualTransfer = false, onConfirmManualTransfer = null, onRejectManualTransfer = null } = {}) {
+  const manualTransfer = transaction?.manual_transfer ?? {};
+  const isPending = String(transaction?.transaction_status ?? "").toLowerCase() === "pending_payment";
+  const hasProof = Boolean(manualTransfer.proof_path);
+
+  if (transaction?.payment_method !== "manual_transfer" || !isPending || !hasProof) {
+    return document.createDocumentFragment();
+  }
+
+  const card = Card();
+  card.id = "slrtx_manual_transfer_card";
+  card.classList.add("grid", "gap-4");
+
+  const title = document.createElement("h2");
+  title.className = "text-base font-bold tracking-normal text-gray-950";
+  title.textContent = "Konfirmasi Transfer Manual";
+  const body = document.createElement("p");
+  body.className = "text-xs leading-6 text-gray-600";
+  body.textContent = "Buyer sudah mengunggah bukti transfer. Cek mutasi rekening showroom sebelum mengonfirmasi.";
+  card.append(title, body);
+
+  const proofLink = document.createElement("a");
+  proofLink.id = "slrtx_manual_transfer_proof_link";
+  proofLink.href = manualTransfer.proof_path;
+  proofLink.target = "_blank";
+  proofLink.rel = "noopener noreferrer";
+  proofLink.className = "inline-flex w-fit items-center rounded-full border border-[var(--pb-border)] bg-[var(--pb-surface-muted)] px-4 py-2 text-xs font-black text-[var(--pb-brand-secondary)] underline";
+  proofLink.textContent = "Lihat Bukti Transfer";
+  card.append(proofLink);
+
+  if (manualTransfer.note) {
+    const note = document.createElement("p");
+    note.className = "text-xs leading-6 text-gray-600";
+    note.textContent = `Catatan buyer: ${manualTransfer.note}`;
+    card.append(note);
+  }
+
+  const actions = document.createElement("div");
+  actions.className = "flex flex-wrap gap-2";
+
+  const confirm = Button({
+    label: isConfirmingManualTransfer ? "Memproses..." : "Konfirmasi Pembayaran",
+    variant: "primary",
+    disabled: isConfirmingManualTransfer,
+    onClick: onConfirmManualTransfer,
+    designHook: "shared.button.primary",
+  });
+  confirm.id = "slrtx_manual_transfer_confirm_button";
+  confirm.classList.add("w-full", "sm:w-fit");
+
+  const reject = Button({
+    label: "Tolak",
+    variant: "danger",
+    disabled: isConfirmingManualTransfer,
+    onClick: onRejectManualTransfer,
+    designHook: "shared.button.secondary",
+  });
+  reject.id = "slrtx_manual_transfer_reject_button";
+  reject.classList.add("w-full", "sm:w-fit");
+
+  actions.append(confirm, reject);
+  card.append(actions);
+
+  return card;
 }
 
 function canSellerCancel(transaction) {

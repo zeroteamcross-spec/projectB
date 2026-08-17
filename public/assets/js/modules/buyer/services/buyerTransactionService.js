@@ -32,4 +32,8 @@ export const buyerTransactionService = {
   downloadPaymentQr(transactionId, options = {}) {
     return transactionsResource.downloadPaymentQr(transactionId, options);
   },
+
+  submitManualTransferProof(transactionId, file, note = "", options = {}) {
+    return transactionsResource.submitManualTransferProof(transactionId, file, note, options);
+  },
 };
