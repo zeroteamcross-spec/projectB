@@ -11,21 +11,7 @@ const app = createProjectBApp({
   modalRoot: "#modal-root",
 });
 
-let resolveInitialRoute;
-const initialRouteMounted = new Promise((resolve) => {
-  resolveInitialRoute = resolve;
+app.bootstrap().catch((error) => {
+  console.error("ProjectB app bootstrap failed.", error);
+  disposeDomainRouteGuard();
 });
-const disposeInitialRouteListener = app.bus.on("route:mounted", () => {
-  disposeInitialRouteListener();
-  window.setTimeout(resolveInitialRoute, 32);
-});
-
-app.bootstrap()
-  .then(() => initialRouteMounted)
-  .catch((error) => {
-    console.error("ProjectB app bootstrap failed.", error);
-    disposeDomainRouteGuard();
-  })
-  .finally(() => {
-    window.AppSplash?.hide();
-  });

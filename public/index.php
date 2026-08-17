@@ -50,7 +50,6 @@ function serveSpaShell(string $basePath, string $publicPath, string $path): bool
 
     if ($method !== 'HEAD') {
         $theme = loadThemeConfig($basePath);
-        $html = str_replace('__APP_SPLASH_MAX_WAIT_MS__', '1600', $html);
         $html = str_replace('__ASSET_VER__', assetVersionToken($publicPath), $html);
         $html = str_replace('__ROLE_HOSTS__', roleHostsJson(), $html);
         $html = str_replace('__THEME_CONFIG__', themeConfigJson($theme), $html);

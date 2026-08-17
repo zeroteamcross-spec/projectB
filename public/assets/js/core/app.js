@@ -189,8 +189,9 @@ export class ProjectBApp {
     this.registerFeatures([publicManifest, authManifest]);
     publicContextService.restore();
 
-    await this.checkReleaseVersion();
-    await this.loadAuthContext();
+    // Rilis dan konteks auth tidak saling bergantung -- dulu berurutan,
+    // sekarang jalan bersamaan supaya boot tidak menunggu dua kali round-trip.
+    await Promise.all([this.checkReleaseVersion(), this.loadAuthContext()]);
     await this.muatManifestUntukRole(authStore.role());
     await this.bootstrapDesignStudioV2();
     await notificationService.ensureSnapshot({ force: true, store: appStore });
