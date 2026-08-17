@@ -189,13 +189,30 @@ export class ProjectBApp {
     this.registerFeatures([publicManifest, authManifest]);
     publicContextService.restore();
 
+    // Role bawaan di store sudah "public" sebelum autologin dijawab, jadi
+    // preload katalog/slider/lokasi publik bisa langsung jalan tanpa menunggu
+    // giliran auth selesai -- ini bukan basa-basi, ini permintaan data yang
+    // dibutuhkan halaman untuk bisa tampil. Pengunjung anonim (mayoritas yang
+    // membuka landing page) diam-diam sudah punya role ini sejak awal, jadi
+    // permintaan ini benar sejak baris pertama, bukan tebakan.
+    const preloadAwal = this.preloadManager.boot(authStore.role());
+
     // Rilis dan konteks auth tidak saling bergantung -- dulu berurutan,
     // sekarang jalan bersamaan supaya boot tidak menunggu dua kali round-trip.
     await Promise.all([this.checkReleaseVersion(), this.loadAuthContext()]);
     await this.muatManifestUntukRole(authStore.role());
     await this.bootstrapDesignStudioV2();
     await notificationService.ensureSnapshot({ force: true, store: appStore });
-    await this.preloadManager.boot(authStore.role());
+
+    // Kalau ternyata login (role berubah dari "public"), preload awal tadi
+    // sudah memuat plan yang salah -- susulkan plan yang benar. Untuk tamu
+    // anonim (kasus paling umum di halaman depan), baris ini tidak melakukan
+    // apa-apa karena preloadAwal sudah memuat plan yang tepat sejak awal.
+    const roleSetelahAuth = authStore.role();
+    await Promise.all([
+      preloadAwal,
+      roleSetelahAuth === "public" ? null : this.preloadManager.boot(roleSetelahAuth),
+    ]);
 
     this.cleanup.push(this.router.start());
     appStore.patchState("app", { bootstrapped: true, startedAt: Date.now() }, "app:bootstrapped");
