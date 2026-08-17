@@ -10,6 +10,12 @@ const APPROVAL_META = {
 };
 const IMPERSONATION_ROLES = new Set(["seller", "affiliate_admin"]);
 
+// Dimatikan sementara atas permintaan -- akan dipakai lagi nanti, jadi
+// logikanya (isImpersonatable, backend, dst) sengaja dibiarkan utuh. Ini
+// satu-satunya saklar: begitu true lagi, tombol "Login sebagai" muncul lagi
+// di semua tempat tanpa perlu ubah apa pun yang lain.
+const IMPERSONATION_UI_ENABLED = false;
+
 export const adminUserManagementService = {
   filterUsers(users = [], filters = {}) {
     const normalizedKeyword = String(filters.keyword ?? "").trim().toLowerCase();
@@ -54,6 +60,10 @@ export const adminUserManagementService = {
   isPendingApproval,
 
   isImpersonatable(user = null) {
+    if (!IMPERSONATION_UI_ENABLED) {
+      return false;
+    }
+
     if (!user || !IMPERSONATION_ROLES.has(user.role)) {
       return false;
     }
