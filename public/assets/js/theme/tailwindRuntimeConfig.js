@@ -231,55 +231,6 @@
     return fallback;
   }
 
-  function mix(hex, ratio, base) {
-    var a = toRgb(hex);
-    var b = toRgb(base);
-
-    if (!a || !b) {
-      return hex;
-    }
-
-    return toHex({
-      r: Math.round(a.r * ratio + b.r * (1 - ratio)),
-      g: Math.round(a.g * ratio + b.g * (1 - ratio)),
-      b: Math.round(a.b * ratio + b.b * (1 - ratio)),
-    });
-  }
-
-  function darken(hex, amount) {
-    var rgb = toRgb(hex);
-
-    if (!rgb) {
-      return hex;
-    }
-
-    return toHex({
-      r: Math.max(0, Math.round(rgb.r * (1 - amount))),
-      g: Math.max(0, Math.round(rgb.g * (1 - amount))),
-      b: Math.max(0, Math.round(rgb.b * (1 - amount))),
-    });
-  }
-
-  function toRgb(hex) {
-    var value = String(hex || "").trim().replace("#", "");
-
-    if (!/^[0-9a-fA-F]{6}$/.test(value)) {
-      return null;
-    }
-
-    return {
-      r: parseInt(value.slice(0, 2), 16),
-      g: parseInt(value.slice(2, 4), 16),
-      b: parseInt(value.slice(4, 6), 16),
-    };
-  }
-
-  function toHex(rgb) {
-    return "#" + [rgb.r, rgb.g, rgb.b].map(function mapChannel(channel) {
-      return String(channel.toString(16)).padStart(2, "0");
-    }).join("");
-  }
-
   function spacing(scale, base) {
     return Math.max(8, Math.round(base * scale)) + "px";
   }
@@ -377,33 +328,18 @@
     });
   }
 
-  function syncTailwindConfig(theme) {
-    global.tailwind = global.tailwind || {};
-    global.tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              50: mix(theme.colors.primary, 0.1, "#ffffff"),
-              100: mix(theme.colors.primary, 0.18, "#ffffff"),
-              600: theme.colors.primary,
-              700: theme.colors.secondary,
-              800: darken(theme.colors.secondary, 0.18),
-            },
-          },
-          boxShadow: {
-            card: shadow(theme).card,
-          },
-        },
-      },
-    };
-  }
-
+  // syncTailwindConfig() dulu ada di sini, mengisi window.tailwind.config
+  // supaya mesin JIT di peramban (tailwindcss.js) ikut memakai warna tema
+  // lewat theme.extend.colors.brand.*. Kelas itu ternyata tidak pernah
+  // dipakai di kode manapun -- diperiksa lewat pencarian menyeluruh sebelum
+  // dihapus. Satu-satunya bagian yang benar-benar dipakai, shadow-card, sudah
+  // dipindah ke CSS statis (tailwind.config.cjs) dan menunjuk
+  // var(--pb-shadow-card), variabel yang sama yang disetel applyVariables()
+  // di bawah -- jadi nilainya tetap ikut berubah live tanpa mesin JIT.
   function applyTheme(overrides) {
     currentTheme = normalize(deepMerge(currentTheme, overrides || {}));
     global.__PROJECTB_THEME__ = currentTheme;
     applyVariables(currentTheme);
-    syncTailwindConfig(currentTheme);
     syncDocumentMetadata(currentTheme);
     return clone(currentTheme);
   }

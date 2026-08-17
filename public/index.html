@@ -32,7 +32,14 @@
       }(window));
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <script src="/assets/v-__ASSET_VER__/js/theme/tailwindcss.js"></script>
+    <!-- Dulu mesin Tailwind lengkap (cdn.tailwindcss.com yang di-self-host,
+         407KB) jalan di sini dan mengompilasi ulang seluruh kelas utility
+         setiap kali halaman dibuka -- ~960ms hanya untuk itu, terukur di
+         carlynk.id. Sekarang tinggal berkas CSS yang sudah jadi hasil build
+         (npm run build:css). Nilai temanya tetap hidup: setiap kelas warna di
+         sini menunjuk var(--pb-*), dan variabel itu yang diubah live oleh
+         tailwindRuntimeConfig.js di atas -- bukan kelasnya. -->
+    <link rel="stylesheet" href="/assets/v-__ASSET_VER__/css/tailwind.css">
     <style>
       :root {
         --app-splash-base: #ffffff;
