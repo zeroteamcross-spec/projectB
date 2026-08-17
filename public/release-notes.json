@@ -1,7 +1,8 @@
 {
   "notes": [
+    "Buyer sekarang bisa bayar Booking Fee lewat Transfer Manual ke rekening showroom, upload bukti, dan menunggu konfirmasi showroom.",
+    "Tombol \"Keluarkan dari Listing\" untuk showroom menyembunyikan mobil dari katalog publik kapan saja.",
     "Halaman dibuka jauh lebih cepat -- aset digabung dan splash screen yang menahan tampilan dihapus.",
-    "Data katalog dan lokasi mulai dimuat lebih awal, tidak lagi menunggu proses login selesai dulu.",
     "Aplikasi kini mendeteksi versi terbaru secara otomatis dan menawarkan tombol muat ulang -- tidak perlu clear cache manual lagi."
   ]
 }
