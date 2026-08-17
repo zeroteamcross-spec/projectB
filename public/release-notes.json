@@ -1,0 +1,7 @@
+{
+  "notes": [
+    "Halaman dibuka jauh lebih cepat -- aset digabung dan splash screen yang menahan tampilan dihapus.",
+    "Data katalog dan lokasi mulai dimuat lebih awal, tidak lagi menunggu proses login selesai dulu.",
+    "Aplikasi kini mendeteksi versi terbaru secara otomatis dan menawarkan tombol muat ulang -- tidak perlu clear cache manual lagi."
+  ]
+}

@@ -166,10 +166,35 @@ function serveReleaseManifest(string $publicPath, string $path): bool
             'release_version' => assetVersionToken($publicPath),
             'channel' => 'production',
             'resources' => ['app'],
+            'notes' => releaseNotes($publicPath),
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL;
     }
 
     return true;
+}
+
+/**
+ * Catatan "apa yang baru" yang ditampilkan di modal tombol Muat Ulang --
+ * pengguna tidak peduli angka versi, mereka mau tahu apa yang berubah.
+ *
+ * Ini murni kosmetik dan sengaja terpisah dari release_version di atas: kalau
+ * berkas ini lupa diperbarui, modalnya cuma jatuh ke pesan generik, bukan
+ * membuat tombolnya berhenti muncul seperti yang terjadi pada release_version
+ * lama. Diperbarui manual di public/release-notes.json setiap kali ada
+ * perubahan yang layak diceritakan ke pengguna.
+ */
+function releaseNotes(string $publicPath): array
+{
+    $path = $publicPath . DIRECTORY_SEPARATOR . 'release-notes.json';
+
+    if (! is_file($path)) {
+        return [];
+    }
+
+    $decoded = json_decode((string) file_get_contents($path), true);
+    $catatan = is_array($decoded['notes'] ?? null) ? $decoded['notes'] : [];
+
+    return array_values(array_filter(array_map('strval', $catatan), static fn ($item) => trim($item) !== ''));
 }
 
 /**

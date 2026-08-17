@@ -47,23 +47,30 @@ function labelNode() {
 
 function openReleaseModal(store) {
   const latestVersion = store?.get("app.release.latestVersion", null);
-  const appliedVersion = store?.get("app.release.appliedVersion", null);
+  const notes = store?.get("app.release.manifest.notes", []);
   const body = document.createElement("div");
   body.className = "grid gap-4 text-xs leading-6 text-[var(--pb-text-muted)]";
 
   const message = document.createElement("p");
-  message.textContent = "Versi aplikasi terbaru sudah tersedia. Setelah dimuat ulang, browser akan mengambil file aplikasi terbaru dari server.";
-
-  const detail = document.createElement("div");
-  detail.className = "rounded-lg border border-[var(--pb-border)] bg-gray-50 px-4 py-3 text-[10px] leading-5 text-gray-700";
-  detail.textContent = [
-    latestVersion ? `Versi terbaru: ${latestVersion}` : "",
-    appliedVersion ? `Versi sebelumnya: ${appliedVersion}` : "",
-  ].filter(Boolean).join(" | ");
+  message.textContent = "Versi aplikasi terbaru sudah tersedia.";
 
   body.append(message);
-  if (detail.textContent) {
-    body.append(detail);
+
+  if (Array.isArray(notes) && notes.length > 0) {
+    const list = document.createElement("ul");
+    list.className = "grid gap-2 rounded-lg border border-[var(--pb-border)] bg-gray-50 px-4 py-3 text-[11px] leading-5 text-gray-700";
+    notes.forEach((catatan) => {
+      const item = document.createElement("li");
+      item.className = "flex gap-2";
+      item.innerHTML = '<span aria-hidden="true">•</span><span></span>';
+      item.lastElementChild.textContent = String(catatan);
+      list.append(item);
+    });
+    body.append(list);
+  } else {
+    const fallback = document.createElement("p");
+    fallback.textContent = "Berisi perbaikan dan peningkatan performa terbaru.";
+    body.append(fallback);
   }
 
   const actions = document.createElement("div");
