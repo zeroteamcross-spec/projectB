@@ -9,13 +9,16 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:css": "tailwindcss -c tailwind.config.cjs -i ./public/assets/css/tailwind.src.css -o ./public/assets/css/tailwind.css --minify"
+    "build:css": "tailwindcss -c tailwind.config.cjs -i ./public/assets/css/tailwind.src.css -o ./public/assets/css/tailwind.css --minify",
+    "build:js": "node -e \"require('fs').rmSync('public/assets/dist/js', { recursive: true, force: true })\" && esbuild public/assets/js/app.js --bundle --splitting --format=esm --minify --sourcemap=external --outdir=public/assets/dist/js --outbase=public/assets/js --chunk-names=chunks/[name]-[hash] --target=es2020",
+    "build": "npm run build:css && npm run build:js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "devDependencies": {
+    "esbuild": "^0.28.2",
     "playwright": "^1.59.1",
     "tailwindcss": "^3.4.19"
   }
