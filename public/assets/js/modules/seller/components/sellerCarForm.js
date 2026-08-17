@@ -26,7 +26,7 @@ const STATUS_OPTIONS = [
   { value: "published", label: "Published" },
   { value: "reserved", label: "Reserved" },
   { value: "sold", label: "Sold" },
-  { value: "archived", label: "Archived" },
+  { value: "archived", label: "Dikeluarkan dari Listing" },
 ];
 
 const TRANSMISSION_OPTIONS = [

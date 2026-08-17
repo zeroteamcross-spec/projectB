@@ -337,7 +337,7 @@ function carsToolbar({ filters, isForm }) {
     ["published", "Tersedia"],
     ["reserved", "Terkunci DP"],
     ["sold", "Terjual"],
-    ["archived", "Archived"],
+    ["archived", "Dikeluarkan dari Listing"],
   ].forEach(([value, label]) => {
     const option = document.createElement("option");
     option.value = value;
@@ -393,9 +393,9 @@ async function archiveCar(car) {
     return;
   }
   const confirmed = await confirmDialog({
-    title: "Archive mobil",
-    message: "Yakin mau archive mobil ini?",
-    confirmLabel: "Archive",
+    title: "Keluarkan dari Listing",
+    message: "Mobil ini akan disembunyikan dari katalog publik. Anda bisa memunculkannya lagi kapan saja lewat form edit. Lanjutkan?",
+    confirmLabel: "Keluarkan",
     key: `slrc-archive-car-${car.id}`,
   });
   if (!confirmed) {

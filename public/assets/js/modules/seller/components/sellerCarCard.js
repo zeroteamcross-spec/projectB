@@ -78,7 +78,7 @@ export function SellerCarCard({ car, onEdit = null, onArchive = null, onImages =
   actions.append(edit, images, inspection);
 
   if (car.listing_status !== "archived") {
-    const archive = Button({ label: "Archive", variant: "danger", onClick: () => onArchive?.(car) });
+    const archive = Button({ label: "Keluarkan dari Listing", variant: "danger", onClick: () => onArchive?.(car) });
     archive.id = `slrc_archive_car_button_${cardId}`;
     archive.prepend(createIcon("folder", { className: "h-4 w-4" }));
     actions.append(archive);
