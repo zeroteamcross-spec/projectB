@@ -7,6 +7,10 @@ if (serveStorageUpload(dirname(__DIR__))) {
 }
 
 $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+if (serveReleaseManifest(__DIR__, $path)) {
+    return;
+}
+
 if (serveVersionedAsset(__DIR__, $path)) {
     return;
 }
@@ -124,6 +128,48 @@ function assetVersionToken(string $publicPath): string
     }
 
     return base_convert((string) $terbaru, 10, 36);
+}
+
+/**
+ * /release-manifest.json dulu adalah berkas statis yang cuma berubah kalau
+ * seseorang ingat menjalankan scripts/release/prepare-release.php sebelum
+ * deploy. Tidak ada yang mengingatnya -- berkasnya diam di versi Juni sambil
+ * puluhan deploy nyata lewat, jadi tombol "Muat Ulang" tidak pernah punya
+ * versi baru untuk dibandingkan dan tidak pernah muncul.
+ *
+ * Sekarang dihitung di sini dari sumber yang sama dengan token aset
+ * (assetVersionToken -- mtime terbaru public/assets), sehingga otomatis naik
+ * kapan pun aset frontend benar-benar berubah, tanpa langkah manual yang bisa
+ * terlupa lagi. Nginx tetap mencoba berkas fisik lebih dulu (lihat
+ * rewrite/carlynk.id.conf), jadi berkas public/release-manifest.json yang
+ * lama sengaja dihapus dari repo -- kalau dibiarkan ada, Nginx akan selalu
+ * menjawab dari situ dan fungsi ini tidak akan pernah tercapai.
+ */
+function serveReleaseManifest(string $publicPath, string $path): bool
+{
+    if ($path !== '/release-manifest.json') {
+        return false;
+    }
+
+    $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+    if (! in_array($method, ['GET', 'HEAD'], true)) {
+        return false;
+    }
+
+    header('Content-Type: application/json; charset=utf-8');
+    header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+    header('Pragma: no-cache');
+    header('Expires: 0');
+
+    if ($method !== 'HEAD') {
+        echo json_encode([
+            'release_version' => assetVersionToken($publicPath),
+            'channel' => 'production',
+            'resources' => ['app'],
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL;
+    }
+
+    return true;
 }
 
 /**
