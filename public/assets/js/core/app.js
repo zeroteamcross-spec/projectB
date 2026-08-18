@@ -197,9 +197,13 @@ export class ProjectBApp {
     // permintaan ini benar sejak baris pertama, bukan tebakan.
     const preloadAwal = this.preloadManager.boot(authStore.role());
 
-    // Rilis dan konteks auth tidak saling bergantung -- dulu berurutan,
-    // sekarang jalan bersamaan supaya boot tidak menunggu dua kali round-trip.
-    await Promise.all([this.checkReleaseVersion(), this.loadAuthContext()]);
+    // Pengecekan rilis tidak lagi menggerakkan apa pun yang terlihat (tombol
+    // "Muat Ulang"-nya sudah dilepas dari shell), jadi tidak ada alasan boot
+    // menunggu round-trip-nya -- dilepas begitu saja di latar belakang,
+    // sementara konteks auth (yang memang dibutuhkan sebelum router jalan)
+    // tetap ditunggu.
+    this.checkReleaseVersion();
+    await this.loadAuthContext();
     await this.muatManifestUntukRole(authStore.role());
     await this.bootstrapDesignStudioV2();
     await notificationService.ensureSnapshot({ force: true, store: appStore });
