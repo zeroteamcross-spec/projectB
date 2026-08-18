@@ -200,20 +200,39 @@ export class ProjectBApp {
     // Pengecekan rilis tidak lagi menggerakkan apa pun yang terlihat (tombol
     // "Muat Ulang"-nya sudah dilepas dari shell), jadi tidak ada alasan boot
     // menunggu round-trip-nya -- dilepas begitu saja di latar belakang,
-    // sementara konteks auth (yang memang dibutuhkan sebelum router jalan)
-    // tetap ditunggu.
+    // sementara konteks auth (yang memang dibutuhkan sebelum router jalan,
+    // karena guard rute memutuskan berdasarkan role) tetap ditunggu.
     this.checkReleaseVersion();
     await this.loadAuthContext();
-    await this.muatManifestUntukRole(authStore.role());
-    await this.bootstrapDesignStudioV2();
-    await notificationService.ensureSnapshot({ force: true, store: appStore });
 
-    // Kalau ternyata login (role berubah dari "public"), preload awal tadi
-    // sudah memuat plan yang salah -- susulkan plan yang benar. Untuk tamu
-    // anonim (kasus paling umum di halaman depan), baris ini tidak melakukan
-    // apa-apa karena preloadAwal sudah memuat plan yang tepat sejak awal.
+    // Empat baris di bawah ini dulu ditunggu satu per satu sebelum
+    // router.start() -- itulah jeda panjang yang terlihat sebagai "header
+    // muncul duluan, lalu lama menunggu isinya". Tidak satu pun sebenarnya
+    // perlu selesai dulu:
+    //  - muatManifestUntukRole() cuma prefetch. Router sendiri sudah lazy-
+    //    load manifest yang belum terdaftar lewat resolveMissing() begitu
+    //    rute pertama dicocokkan (lihat Router.handleChange()), jadi rute
+    //    apa pun tetap termuat benar tanpa menunggu baris ini lebih dulu.
+    //  - bootstrapDesignStudioV2() cuma relevan buat super_admin dalam mode
+    //    desain -- menahan SEMUA pengunjung demi pengecekan yang hampir
+    //    selalu no-op untuk mereka tidak masuk akal.
+    //  - ensureSnapshot notifikasi tidak dibutuhkan halaman pertama tampil;
+    //    badge notifikasi boleh menyusul begitu datanya sampai.
+    //  - preload awal (katalog/slider/lokasi publik, atau plan role) memang
+    //    dibuat untuk mengisi cache SEBELUM halaman butuh -- tapi
+    //    Router.ensureRoleSnapshot() sudah memanggil preloadManager.boot()
+    //    sendiri, khusus untuk rute yang benar-benar sedang dituju, sesaat
+    //    sebelum me-mount halamannya. Menunggu preload GLOBAL selesai di
+    //    sini sebelum boleh mulai routing sama sekali menahan cat pertama
+    //    tanpa manfaat tambahan.
+    // Jadi keempatnya dilepas begitu saja di latar belakang, dan
+    // router.start() -- yang benar-benar mengecat konten rute -- langsung
+    // jalan begitu auth selesai.
+    this.muatManifestUntukRole(authStore.role());
+    this.bootstrapDesignStudioV2();
+    notificationService.ensureSnapshot({ force: true, store: appStore });
     const roleSetelahAuth = authStore.role();
-    await Promise.all([
+    Promise.all([
       preloadAwal,
       roleSetelahAuth === "public" ? null : this.preloadManager.boot(roleSetelahAuth),
     ]);
