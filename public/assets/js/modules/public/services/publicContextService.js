@@ -47,7 +47,7 @@ function revertShowroomBranding() {
   ICON_RELS.forEach((rel) => {
     const originalHref = brandingOriginal.icons[rel];
     if (originalHref === null) {
-      document.head.querySelector(`link[rel="${rel}"]`)?.remove();
+      document.head.querySelectorAll(`link[rel="${rel.replace(/"/g, '\\"')}"]`).forEach((node) => node.remove());
     } else {
       upsertShowroomIconLink(rel, originalHref);
     }
@@ -56,13 +56,25 @@ function revertShowroomBranding() {
   brandingShowroomId = null;
 }
 
+/**
+ * tailwindRuntimeConfig.js (the inline bootstrap script) runs before the
+ * server-rendered <link rel="icon"> tags reach the parser, so on some pages
+ * two nodes end up sharing the same rel -- one it created, one from the
+ * static HTML. querySelector() only ever sees/updates the first, which may
+ * not be the one the browser actually renders as the tab icon. Cleaning up
+ * the extras here keeps exactly one canonical node per rel from this point
+ * on, regardless of how many existed when this first ran.
+ */
 function upsertShowroomIconLink(rel, href) {
   const selector = `link[rel="${rel.replace(/"/g, '\\"')}"]`;
-  let node = document.head.querySelector(selector);
+  const nodes = document.head.querySelectorAll(selector);
+  let node = nodes[0];
   if (!node) {
     node = document.createElement("link");
     node.rel = rel;
     document.head.append(node);
+  } else {
+    nodes.forEach((extra, index) => index > 0 && extra.remove());
   }
   node.href = href;
 }

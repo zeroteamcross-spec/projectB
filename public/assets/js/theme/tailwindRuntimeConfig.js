@@ -367,9 +367,16 @@
     upsertMeta("name", "twitter:description", tagline);
 
     if (iconUrl) {
-      upsertLink("icon", iconUrl);
-      upsertLink("shortcut icon", iconUrl);
-      upsertLink("apple-touch-icon", iconUrl);
+      // Bukan upsertLink(): skrip ini jalan sinkron lewat <script src> di
+      // atas <head>, sebelum parser sampai ke <link rel="icon"> yang sudah
+      // dirender server dengan nilai yang sama (lihat index.php). Membuat
+      // node baru di sini cuma akan dobel begitu tag statisnya menyusul --
+      // dua node dengan rel sama, dan browser bebas pilih mana yang jadi
+      // favicon tab. Cukup perbarui tag yang sudah ada; kalau memang belum
+      // ada (jalur tanpa index.php), biarkan kosong daripada dobel.
+      updateExistingLink("icon", iconUrl);
+      updateExistingLink("shortcut icon", iconUrl);
+      updateExistingLink("apple-touch-icon", iconUrl);
       upsertMeta("property", "og:image", iconUrl);
       upsertMeta("name", "twitter:image", iconUrl);
     }
@@ -404,24 +411,25 @@
     node.setAttribute("content", String(content || ""));
   }
 
-  function upsertLink(rel, href) {
+  function updateExistingLink(rel, href) {
     var doc = global.document;
-    var selector = 'link[rel="' + cssEscape(rel) + '"]';
-    var node = doc.head.querySelector(selector);
-    if (!node) {
-      node = doc.createElement("link");
-      node.setAttribute("rel", rel);
-      doc.head.appendChild(node);
+    var nodes = doc.head.querySelectorAll('link[rel="' + cssEscape(rel) + '"]');
+    if (!nodes.length) {
+      return;
     }
+    var node = nodes[0];
     node.setAttribute("href", href);
-    if (/\\.svg(?:[?#].*)?$/i.test(href)) {
+    if (/\.svg(?:[?#].*)?$/i.test(href)) {
       node.setAttribute("type", "image/svg+xml");
-    } else if (/\\.png(?:[?#].*)?$/i.test(href)) {
+    } else if (/\.png(?:[?#].*)?$/i.test(href)) {
       node.setAttribute("type", "image/png");
-    } else if (/\\.webp(?:[?#].*)?$/i.test(href)) {
+    } else if (/\.webp(?:[?#].*)?$/i.test(href)) {
       node.setAttribute("type", "image/webp");
     } else {
       node.removeAttribute("type");
+    }
+    for (var i = 1; i < nodes.length; i += 1) {
+      nodes[i].parentNode && nodes[i].parentNode.removeChild(nodes[i]);
     }
   }
 
