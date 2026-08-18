@@ -124,24 +124,31 @@ function copyToClipboard(value, button) {
     }, 1500);
   };
 
+  const fallbackCopy = () => {
+    try {
+      const helper = document.createElement("textarea");
+      helper.value = String(value ?? "");
+      helper.style.position = "fixed";
+      helper.style.opacity = "0";
+      document.body.append(helper);
+      helper.select();
+      const ok = document.execCommand("copy");
+      helper.remove();
+      onDone(ok);
+    } catch {
+      onDone(false);
+    }
+  };
+
   if (navigator.clipboard?.writeText) {
-    navigator.clipboard.writeText(String(value ?? "")).then(() => onDone(true)).catch(() => onDone(false));
+    // Beberapa environment (mis. iframe dengan permission policy ketat) punya
+    // navigator.clipboard.writeText tapi menolaknya -- jangan langsung
+    // menyerah, coba execCommand sebagai jalan kedua.
+    navigator.clipboard.writeText(String(value ?? "")).then(() => onDone(true)).catch(fallbackCopy);
     return;
   }
 
-  try {
-    const helper = document.createElement("textarea");
-    helper.value = String(value ?? "");
-    helper.style.position = "fixed";
-    helper.style.opacity = "0";
-    document.body.append(helper);
-    helper.select();
-    document.execCommand("copy");
-    helper.remove();
-    onDone(true);
-  } catch {
-    onDone(false);
-  }
+  fallbackCopy();
 }
 
 function formatExpiry(value) {
