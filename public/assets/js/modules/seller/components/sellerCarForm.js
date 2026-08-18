@@ -12,7 +12,7 @@ const TOTAL_STEPS = 3;
 const STEP_META = [
   { step: 1, title: "Data Dasar", icon: "car", helper: "Identitas kendaraan dan warna utama." },
   { step: 2, title: "Spesifikasi Teknis", icon: "settings", helper: "Dokumen, mesin, kilometer, dan lokasi." },
-  { step: 3, title: "Harga dan Deskripsi", icon: "transaction", helper: "Harga, stok, deskripsi, dan status listing." },
+  { step: 3, title: "Harga dan Deskripsi", icon: "transaction", helper: "Harga, deskripsi, dan status listing." },
 ];
 
 const REQUIRED_FIELDS = {

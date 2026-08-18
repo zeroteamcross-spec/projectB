@@ -113,8 +113,4 @@ export const sellerAffiliateService = {
     return `${origin}${window.location.pathname}#${path}`;
   },
 
-  slugHelper(slug = "") {
-    const normalized = this.normalizeSlug(slug);
-    return normalized ? `Route marketing: #/af/${normalized}` : "Gunakan huruf, angka, underscore, atau dash.";
-  },
 };

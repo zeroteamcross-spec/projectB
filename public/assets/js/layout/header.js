@@ -6,6 +6,7 @@ import { tw } from "../theme/tailwindClasses.js";
 import { adminSessionService } from "../modules/admin/services/adminSessionService.js";
 import { applyDesignHook } from "../theme/designStudioHooks.js";
 import { NotificationBell } from "../modules/notifications/components/notificationBell.js";
+import { navigateToOwnShowroom } from "./sellerShowroomLink.js";
 
 export function header(store) {
   const node = document.createElement("header");
@@ -24,6 +25,7 @@ export function header(store) {
   title.className = `${tw.layout.appHeaderTitle} min-w-0 break-words`;
 
   renderBrand(mark, title);
+  syncBrandLink(titleWrap, currentRole(store));
 
   titleWrap.append(mark, title);
 
@@ -44,6 +46,7 @@ export function header(store) {
     const isAuthenticated = Boolean(state.auth?.isAuthenticated);
     role.textContent = `Level User: ${roleLabel(state.auth?.role ?? state.app.activeRole ?? "public")}`;
     renderBrand(mark, title);
+    syncBrandLink(titleWrap, currentRole(store));
     renderBanner(bannerHost, state);
     syncProfileButton(profileAction, state.auth?.user ?? null);
     node.classList.toggle("flex-col", Boolean(state.auth.impersonation));
@@ -97,6 +100,17 @@ function renderBrand(mark, title) {
 
 function currentRole(store) {
   return store?.get("app.activeRole", "public") ?? "public";
+}
+
+/**
+ * Untuk seller, klik logo (versi mobile-nya, yang tampil di header) langsung
+ * membuka halaman showroom publik miliknya sendiri. Role lain tidak diubah,
+ * logo tetap dekoratif seperti sebelumnya.
+ */
+function syncBrandLink(titleWrap, role) {
+  const isSeller = role === "seller";
+  titleWrap.classList.toggle("cursor-pointer", isSeller);
+  titleWrap.onclick = isSeller ? () => { navigateToOwnShowroom(); } : null;
 }
 
 function renderBanner(host, state) {

@@ -6,6 +6,7 @@ import { applyDesignHook } from "../theme/designStudioHooks.js";
 import { adminMasterService } from "../modules/admin/services/adminMasterService.js";
 import { uiStore } from "../state/uiStore.js";
 import { designStudioV2MenuItem, isDesignStudioV2Allowed } from "../modules/designStudioV2/accessGuard.js";
+import { navigateToOwnShowroom } from "./sellerShowroomLink.js";
 
 // "Katalog" (#/buyer/cars) is intentionally absent: it lists cars across every
 // showroom, which is not how buyers browse. They arrive through a showroom or
@@ -119,6 +120,7 @@ export function sidebar(store = null, options = {}) {
 
   brandCopy.append(compactMark, brandName, tagline);
   brand.append(brandCopy);
+  syncBrandLink(brandCopy, resolveSidebarRole(store));
 
   if (mode === "drawer") {
     const close = document.createElement("button");
@@ -149,6 +151,7 @@ export function sidebar(store = null, options = {}) {
     syncCompactToggle(compactToggle, collapsed);
     brandName.textContent = brandConfig.appName;
     tagline.textContent = brandConfig.appTagline;
+    syncBrandLink(brandCopy, resolveSidebarRole(store));
     renderBrandMark(
       compactMark,
       [brandName, tagline],
@@ -174,6 +177,16 @@ export function sidebar(store = null, options = {}) {
  * Kelas wadahnya dihitung ulang tiap sync mengikuti keadaan compact, jadi
  * dioperkan setiap kali, bukan disimpan.
  */
+/**
+ * Untuk seller, klik logo sidebar langsung membuka halaman showroom publik
+ * miliknya sendiri. Role lain tidak diubah, logo tetap dekoratif.
+ */
+function syncBrandLink(brandCopyNode, role) {
+  const isSeller = role === "seller";
+  brandCopyNode.classList.toggle("cursor-pointer", isSeller);
+  brandCopyNode.onclick = isSeller ? () => { navigateToOwnShowroom(); } : null;
+}
+
 function renderBrandMark(mark, teks = [], markClass = "", collapsed = false) {
   renderBrandLockup(mark, teks, {
     markClass,

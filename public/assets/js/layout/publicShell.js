@@ -150,9 +150,13 @@ export class PublicShell {
     );
     this.renderImpersonationBanner();
 
-    // Toggle public header and sync mobile footer if logged in as buyer on landing page
-    const isLandingPage = !window.location.hash || window.location.hash === "#/" || window.location.hash === "#/public";
-    const isMobileLoggedIn = isAuthenticated && role === "buyer" && isLandingPage;
+    // Toggle public header, sync mobile footer.
+    const isBuyerLoggedIn = isAuthenticated && role === "buyer";
+    // Bottom footer juga tampil di halaman showroom bahkan sebelum login,
+    // supaya pengunjung mobile langsung punya navigasi -- klik menunya nanti
+    // yang mengarahkan ke login buyer kalau memang belum masuk.
+    const isShowroomPage = /^\/(?:s|showrooms)\/[^/]+/.test(currentPath);
+    const showMobileFooter = isBuyerLoggedIn || isShowroomPage;
 
     if (this.headerNode) {
       this.headerNode.classList.toggle("hidden", isAuthenticated);
@@ -161,11 +165,15 @@ export class PublicShell {
 
     if (this.mobileFooterContainer) {
       this.mobileFooterContainer.replaceChildren();
-      if (isMobileLoggedIn) {
+      if (showMobileFooter) {
         const activePath = window.location.hash.replace(/^#/, "") || "/";
         const footer = BuyerMobileFooterNav({
           activePath,
           onNavigate: (path) => {
+            if (!isBuyerLoggedIn) {
+              window.location.hash = loginHashForShowroomRoute() ?? loginHashForCurrentHost();
+              return;
+            }
             window.location.hash = `#${path}`;
           }
         });

@@ -80,6 +80,34 @@ export function SellerAffiliateForm({
   const form = document.createElement("form");
   form.className = "grid gap-4";
 
+  const referralCodeField = document.createElement("div");
+  referralCodeField.className = "grid gap-1.5";
+  referralCodeField.append(
+    Input({
+      id: "slraf_affiliate_referral_code_input",
+      name: "referral_code",
+      label: "URL marketing",
+      value: draft.referral_code ?? "",
+      placeholder: "Contoh: JOKO_SANTOSO",
+    }),
+  );
+
+  const urlPreview = document.createElement("p");
+  urlPreview.id = "slraf_affiliate_url_preview";
+  urlPreview.className = `text-xs ${tw.text.muted}`;
+  urlPreview.textContent = draft.referral_code
+    ? `Halaman Anda: ${sellerAffiliateService.landingUrl(draft.referral_code)}`
+    : "Halaman Anda akan tampil di sini setelah URL diisi.";
+  referralCodeField.append(urlPreview);
+
+  if (!checkingSlug && slugState && slugState.is_available === false) {
+    const slugError = document.createElement("p");
+    slugError.id = "slraf_affiliate_slug_taken_error";
+    slugError.className = "text-xs font-semibold text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
+    slugError.textContent = slugState.message || "URL marketing ini sudah dipakai.";
+    referralCodeField.append(slugError);
+  }
+
   form.append(
     Input({
       id: "slraf_affiliate_name_input",
@@ -96,13 +124,7 @@ export function SellerAffiliateForm({
       value: draft.user?.email ?? draft.email ?? "",
       placeholder: "marketing@example.com",
     }),
-    Input({
-      id: "slraf_affiliate_referral_code_input",
-      name: "referral_code",
-      label: "Slug marketing",
-      value: draft.referral_code ?? "",
-      placeholder: "Contoh: JOKO_SANTOSO",
-    }),
+    referralCodeField,
     Input({
       id: "slraf_affiliate_phone_number_input",
       name: "phone_number",
@@ -151,14 +173,6 @@ export function SellerAffiliateForm({
   });
   statusField.append(statusSelect);
   form.append(statusField);
-
-  const slugHint = document.createElement("div");
-  slugHint.className = `grid gap-1 rounded-lg px-3 py-3 text-xs ${slugState?.is_available ? "border border-[color-mix(in_srgb,var(--pb-success)_26%,white)] bg-[color-mix(in_srgb,var(--pb-success)_8%,white)] text-[color-mix(in_srgb,var(--pb-success)_84%,black)]" : "border border-gray-200 bg-gray-50 text-gray-600"}`;
-  slugHint.append(
-    textBlock("font-semibold", checkingSlug ? "Memeriksa slug..." : "Validasi slug"),
-    textBlock("", slugState?.message || sellerAffiliateService.slugHelper(draft.referral_code)),
-  );
-  form.append(slugHint);
 
   form.addEventListener("submit", (event) => {
     event.preventDefault();
