@@ -22,4 +22,11 @@ export const showroomsResource = {
     const response = await apiClient.post("/showrooms/me/branding-icon", formData, options);
     return response.data?.asset ?? null;
   },
+
+  async uploadBrandingLogo(file, options = {}) {
+    const formData = new FormData();
+    formData.append("icon", file);
+    const response = await apiClient.post("/showrooms/me/branding-logo", formData, options);
+    return response.data?.asset ?? null;
+  },
 };

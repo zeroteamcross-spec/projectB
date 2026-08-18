@@ -19,7 +19,7 @@ class ShowroomRepository
     {
         $stmt = $this->pdo->prepare(
             'SELECT id, user_id, slug, name, address, city_name, phone_number, bank_account_number,
-                    bank_type, bank_account_name, icon_url, tab_title, created_at, updated_at
+                    bank_type, bank_account_name, icon_url, header_logo_url, tab_title, created_at, updated_at
              FROM showrooms
              WHERE id = :id
              AND deleted_at IS NULL
@@ -35,7 +35,7 @@ class ShowroomRepository
     {
         $stmt = $this->pdo->prepare(
             'SELECT id, user_id, slug, name, address, city_name, phone_number, bank_account_number,
-                    bank_type, bank_account_name, icon_url, tab_title, created_at, updated_at
+                    bank_type, bank_account_name, icon_url, header_logo_url, tab_title, created_at, updated_at
              FROM showrooms
              WHERE user_id = :user_id
              AND deleted_at IS NULL
@@ -51,7 +51,7 @@ class ShowroomRepository
     {
         $stmt = $this->pdo->prepare(
             'SELECT sh.id, sh.user_id, sh.slug, sh.name, sh.address, sh.city_name, sh.phone_number,
-                    sh.icon_url, sh.tab_title,
+                    sh.icon_url, sh.header_logo_url, sh.tab_title,
                     u.name AS seller_name, u.email AS seller_email, u.phone_number AS seller_phone_number
              FROM showrooms AS sh
              INNER JOIN users AS u ON u.id = sh.user_id
@@ -88,10 +88,10 @@ class ShowroomRepository
         $stmt = $this->pdo->prepare(
             'INSERT INTO showrooms
                 (user_id, slug, name, address, city_name, phone_number, bank_account_number,
-                 bank_type, bank_account_name, icon_url, tab_title, created_at, updated_at)
+                 bank_type, bank_account_name, icon_url, header_logo_url, tab_title, created_at, updated_at)
              VALUES
                 (:user_id, :slug, :name, :address, :city_name, :phone_number, :bank_account_number,
-                 :bank_type, :bank_account_name, :icon_url, :tab_title, :created_at, :updated_at)'
+                 :bank_type, :bank_account_name, :icon_url, :header_logo_url, :tab_title, :created_at, :updated_at)'
         );
 
         $stmt->execute([
@@ -105,6 +105,7 @@ class ShowroomRepository
             'bank_type' => $data['bank_type'] ?? null,
             'bank_account_name' => $data['bank_account_name'] ?? null,
             'icon_url' => $data['icon_url'] ?? null,
+            'header_logo_url' => $data['header_logo_url'] ?? null,
             'tab_title' => $data['tab_title'] ?? null,
             'created_at' => date('Y-m-d H:i:s'),
             'updated_at' => null,
@@ -126,6 +127,7 @@ class ShowroomRepository
                  bank_type = :bank_type,
                  bank_account_name = :bank_account_name,
                  icon_url = :icon_url,
+                 header_logo_url = :header_logo_url,
                  tab_title = :tab_title,
                  updated_at = :updated_at
              WHERE id = :id
@@ -143,6 +145,7 @@ class ShowroomRepository
             'bank_type' => $data['bank_type'] ?? null,
             'bank_account_name' => $data['bank_account_name'] ?? null,
             'icon_url' => $data['icon_url'] ?? null,
+            'header_logo_url' => $data['header_logo_url'] ?? null,
             'tab_title' => $data['tab_title'] ?? null,
             'updated_at' => date('Y-m-d H:i:s'),
         ]);

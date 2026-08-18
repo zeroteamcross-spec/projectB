@@ -10,6 +10,13 @@ class MasterAssetService
 {
     private const BANK_ICON_SIZE = 96;
 
+    // Cuma dipakai untuk logo header (bukan favicon), yang boleh memanjang.
+    // Ini batas kotak muat, bukan ukuran akhir -- gambarnya diskalakan
+    // proporsional supaya pas di dalamnya, tidak pernah dipotong atau
+    // diperbesar melebihi ukuran aslinya.
+    private const LOGO_MAX_WIDTH = 640;
+    private const LOGO_MAX_HEIGHT = 200;
+
     public function storeBankIcon(array $file, string $mimeType): array
     {
         if ($mimeType === 'image/svg+xml') {
@@ -167,6 +174,66 @@ class MasterAssetService
             'mime_type' => 'image/png',
             'width' => self::BANK_ICON_SIZE,
             'height' => self::BANK_ICON_SIZE,
+            'size' => is_file($path) ? filesize($path) : null,
+        ];
+    }
+
+    /**
+     * Beda dari storeShowroomIcon(): itu untuk favicon, jadi selalu dipotong
+     * persegi. Ini untuk logo header, yang biasanya wordmark memanjang --
+     * dipotong persegi akan merusak bentuknya. Jadi rasternya diskalakan
+     * proporsional supaya muat dalam kotak LOGO_MAX_WIDTH x LOGO_MAX_HEIGHT,
+     * tanpa pernah dipotong atau diperbesar melebihi ukuran aslinya.
+     */
+    public function storeShowroomLogo(array $file, string $mimeType, int $showroomId): array
+    {
+        if ($mimeType === 'image/svg+xml') {
+            return $this->storeSvgIconAt(
+                $file,
+                base_path('public/uploads/showrooms/' . $showroomId),
+                '/uploads/showrooms/' . $showroomId . '/',
+                'showroom-logo'
+            );
+        }
+
+        if (! function_exists('imagecreatetruecolor')) {
+            throw new RuntimeException('Image processing extension is not available.');
+        }
+
+        $source = $this->createSourceImage((string) $file['tmp_name'], $mimeType);
+        $sourceWidth = imagesx($source);
+        $sourceHeight = imagesy($source);
+        $scale = min(self::LOGO_MAX_WIDTH / $sourceWidth, self::LOGO_MAX_HEIGHT / $sourceHeight, 1.0);
+        $targetWidth = max(1, (int) round($sourceWidth * $scale));
+        $targetHeight = max(1, (int) round($sourceHeight * $scale));
+
+        $target = imagecreatetruecolor($targetWidth, $targetHeight);
+        imagealphablending($target, false);
+        imagesavealpha($target, true);
+        $transparent = imagecolorallocatealpha($target, 0, 0, 0, 127);
+        imagefill($target, 0, 0, $transparent);
+        imagecopyresampled($target, $source, 0, 0, 0, 0, $targetWidth, $targetHeight, $sourceWidth, $sourceHeight);
+
+        $directory = base_path('public/uploads/showrooms/' . $showroomId);
+        if (! is_dir($directory) && ! mkdir($directory, 0775, true) && ! is_dir($directory)) {
+            throw new RuntimeException('Unable to create showroom logo directory.');
+        }
+
+        $fileName = 'showroom-logo-' . bin2hex(random_bytes(10)) . '.png';
+        $path = $directory . DIRECTORY_SEPARATOR . $fileName;
+        if (! imagepng($target, $path, 8)) {
+            throw new RuntimeException('Unable to store showroom logo.');
+        }
+
+        imagedestroy($source);
+        imagedestroy($target);
+
+        return [
+            'path' => '/uploads/showrooms/' . $showroomId . '/' . $fileName,
+            'file_name' => $fileName,
+            'mime_type' => 'image/png',
+            'width' => $targetWidth,
+            'height' => $targetHeight,
             'size' => is_file($path) ? filesize($path) : null,
         ];
     }

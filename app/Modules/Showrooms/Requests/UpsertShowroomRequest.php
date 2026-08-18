@@ -18,6 +18,7 @@ class UpsertShowroomRequest extends FormRequest
             'bank_type' => 'nullable|string|max:100',
             'bank_account_name' => 'nullable|string|max:225',
             'icon_url' => 'nullable|string|max:255',
+            'header_logo_url' => 'nullable|string|max:255',
             'tab_title' => 'nullable|string|max:70',
         ];
     }
@@ -32,6 +33,7 @@ class UpsertShowroomRequest extends FormRequest
             'bank_type',
             'bank_account_name',
             'icon_url',
+            'header_logo_url',
             'tab_title',
         ];
 

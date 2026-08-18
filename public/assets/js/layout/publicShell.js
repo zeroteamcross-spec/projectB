@@ -203,12 +203,15 @@ function publicLogoIcon() {
 /**
  * Logo header pojok kiri atas milik showroom sendiri -- hanya dipakai kalau
  * showroom itu sedang aktif (halaman #/showrooms/:slug dan sejenisnya) dan
- * showroom itu memang sudah mengunggah icon_url-nya sendiri. Di luar itu,
- * renderBrandLockup() jatuh kembali ke logo global Konfigurasi WEB.
+ * showroom itu memang sudah mengunggah header_logo_url-nya sendiri. Field
+ * ini sengaja terpisah dari icon_url (favicon): favicon dipotong persegi
+ * untuk tab browser, logo header biasanya memanjang, jadi keduanya tidak
+ * boleh berbagi satu gambar. Di luar itu, renderBrandLockup() jatuh kembali
+ * ke logo global Konfigurasi WEB.
  */
 function showroomLogoUrl() {
   const showroom = publicContextService.activeShowroom();
-  return String(showroom?.showroom?.icon_url ?? "").trim();
+  return String(showroom?.showroom?.header_logo_url ?? "").trim();
 }
 
 function dashboardHash(role) {

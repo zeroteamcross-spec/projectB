@@ -3,7 +3,7 @@ import { SearchableSelect } from "../../../ui/primitives/searchableSelect.js";
 import { tw } from "../../../ui/theme/tailwindClasses.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 
-export function SellerShowroomForm({ showroom = null, saving = false, error = "", bankOptions = [], cityOptions = [], uploading = false, onUploadIcon = null, onSubmit = null } = {}) {
+export function SellerShowroomForm({ showroom = null, saving = false, error = "", bankOptions = [], cityOptions = [], uploadingIcon = false, uploadingLogo = false, onUploadIcon = null, onUploadLogo = null, onSubmit = null } = {}) {
   const form = document.createElement("form");
   form.id = "slrsr_form_section";
   form.className = "grid gap-5 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white p-4 shadow-sm transition duration-150 sm:p-5";
@@ -48,6 +48,12 @@ export function SellerShowroomForm({ showroom = null, saving = false, error = ""
   );
 
   const brandingSection = fieldGroup("slrsr_branding_fields_section", "Branding showroom", "brandMark");
+
+  // Favicon dan logo header adalah dua gambar yang berbeda, bukan satu:
+  // favicon persegi untuk tab browser, logo header biasanya memanjang
+  // (wordmark) untuk pojok kiri atas halaman showroom. Menyatukan keduanya
+  // lewat satu upload memaksa bentuk yang satu merusak yang lain, jadi
+  // masing-masing punya field, preview, dan endpoint upload sendiri.
   const iconUrlInput = document.createElement("input");
   iconUrlInput.type = "hidden";
   iconUrlInput.id = "slrsr_icon_url_input";
@@ -66,9 +72,45 @@ export function SellerShowroomForm({ showroom = null, saving = false, error = ""
     const nextFile = iconFile.files?.[0] ?? null;
     if (nextFile) onUploadIcon?.(nextFile, iconUrlInput, iconPreview);
   });
+
+  const headerLogoUrlInput = document.createElement("input");
+  headerLogoUrlInput.type = "hidden";
+  headerLogoUrlInput.id = "slrsr_header_logo_url_input";
+  headerLogoUrlInput.name = "header_logo_url";
+  headerLogoUrlInput.value = showroom?.header_logo_url ?? "";
+  const headerLogoPreview = document.createElement("section");
+  headerLogoPreview.id = "slrsr_header_logo_preview_section";
+  headerLogoPreview.className = "grid h-20 w-full max-w-[220px] place-items-center overflow-hidden rounded-[1.25rem] border border-[var(--pb-card-border)] bg-white px-3 shadow-[var(--pb-shadow-soft)]";
+  renderIconPreview(headerLogoPreview, headerLogoUrlInput.value);
+  const headerLogoFile = document.createElement("input");
+  headerLogoFile.type = "file";
+  headerLogoFile.id = "slrsr_header_logo_file_input";
+  headerLogoFile.accept = "image/jpeg,image/png,image/webp,image/svg+xml,.jpg,.jpeg,.png,.webp,.svg";
+  headerLogoFile.className = "sr-only";
+  headerLogoFile.addEventListener("change", () => {
+    const nextFile = headerLogoFile.files?.[0] ?? null;
+    if (nextFile) onUploadLogo?.(nextFile, headerLogoUrlInput, headerLogoPreview);
+  });
+
   brandingSection.body.append(
-    uploadDropzone({ input: iconFile, preview: iconPreview, uploading, onFile: (nextFile) => onUploadIcon?.(nextFile, iconUrlInput, iconPreview) }),
+    uploadDropzone({
+      input: iconFile,
+      preview: iconPreview,
+      uploading: uploadingIcon,
+      title: "Upload Favicon",
+      description: "Icon tab browser -- otomatis dipotong persegi. Berlaku hanya untuk halaman showroom Anda. SVG, PNG, JPG, atau WebP. Maksimal 2 MB.",
+      onFile: (nextFile) => onUploadIcon?.(nextFile, iconUrlInput, iconPreview),
+    }),
     iconUrlInput,
+    uploadDropzone({
+      input: headerLogoFile,
+      preview: headerLogoPreview,
+      uploading: uploadingLogo,
+      title: "Upload Logo Header",
+      description: "Logo pojok kiri atas halaman showroom -- rasio aslinya dipertahankan, tidak dipotong persegi. SVG, PNG, JPG, atau WebP. Maksimal 2 MB.",
+      onFile: (nextFile) => onUploadLogo?.(nextFile, headerLogoUrlInput, headerLogoPreview),
+    }),
+    headerLogoUrlInput,
     inputField({ id: "slrsr_tab_title_input", name: "tab_title", label: "Judul tab browser", value: showroom?.tab_title ?? "", placeholder: "Contoh: Metro Auto Jakarta - Jual Beli Mobil" })
   );
 
@@ -100,6 +142,7 @@ export function SellerShowroomForm({ showroom = null, saving = false, error = ""
       bank_type: String(formData.get("bank_type") ?? "").trim(),
       bank_account_name: String(formData.get("bank_account_name") ?? "").trim(),
       icon_url: String(formData.get("icon_url") ?? "").trim(),
+      header_logo_url: String(formData.get("header_logo_url") ?? "").trim(),
       tab_title: String(formData.get("tab_title") ?? "").trim(),
     });
   });
@@ -309,19 +352,19 @@ function renderIconPreview(preview, url) {
   preview.append(createIcon("brandMark", { className: "h-8 w-8 text-[var(--pb-text-muted)]" }));
 }
 
-function uploadDropzone({ input, preview, uploading, onFile }) {
+function uploadDropzone({ input, preview, uploading, title: titleText, description, onFile }) {
   const section = document.createElement("section");
-  section.id = "slrsr_icon_dropzone_section";
+  section.id = `${input.id}_dropzone_section`;
   section.className = "grid gap-4 rounded-[1.25rem] border border-dashed border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] bg-[linear-gradient(135deg,rgba(250,244,237,0.85),rgba(255,255,255,0.96),rgba(234,244,249,0.82))] p-4 shadow-sm md:grid-cols-[96px_minmax(0,1fr)] md:items-center";
 
   const body = document.createElement("section");
   body.className = "grid min-w-0 gap-3";
-  const title = textNode("p", "text-xs font-black text-gray-950", uploading ? "Mengupload icon..." : "Upload Favicon / Icon Header");
-  const desc = textNode("p", "text-[11px] leading-6 text-gray-600", "Berlaku hanya untuk halaman showroom Anda. SVG, PNG, JPG, atau WebP. Maksimal 2 MB.");
+  const title = textNode("p", "text-xs font-black text-gray-950", uploading ? "Mengupload..." : titleText);
+  const desc = textNode("p", "text-[11px] leading-6 text-gray-600", description);
   const actionsRow = document.createElement("section");
   actionsRow.className = "flex flex-wrap items-center gap-2";
   const choose = document.createElement("button");
-  choose.id = "slrsr_icon_choose_button";
+  choose.id = `${input.id}_choose_button`;
   choose.type = "button";
   choose.className = "inline-flex min-h-10 items-center justify-center gap-2 rounded-[1rem] bg-[var(--pb-brand-primary)] px-4 py-2 text-xs font-bold text-white shadow-[var(--pb-shadow-soft)] transition hover:brightness-105 focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)] disabled:cursor-not-allowed disabled:opacity-60";
   choose.disabled = Boolean(uploading);

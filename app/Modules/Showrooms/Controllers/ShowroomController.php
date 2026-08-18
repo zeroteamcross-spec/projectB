@@ -71,4 +71,16 @@ class ShowroomController extends Controller
             'asset' => $this->assets->storeShowroomIcon($payload['icon'], $payload['mime_type'], (int) $showroom['id']),
         ], 'Icon showroom berhasil diupload.', [], 201);
     }
+
+    public function uploadBrandingLogo(Request $request): JsonResponse
+    {
+        $user = $this->user($request);
+        $this->service->ensureSellerAccess($user);
+        $showroom = $this->service->mine($user);
+        $payload = (new UploadAppIconRequest($request))->validate();
+
+        return JsonResponse::success([
+            'asset' => $this->assets->storeShowroomLogo($payload['icon'], $payload['mime_type'], (int) $showroom['id']),
+        ], 'Logo header showroom berhasil diupload.', [], 201);
+    }
 }

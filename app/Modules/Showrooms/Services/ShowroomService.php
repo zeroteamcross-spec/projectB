@@ -65,6 +65,9 @@ class ShowroomService
                     ? $data['bank_account_name']
                     : $existing['bank_account_name'],
                 'icon_url' => array_key_exists('icon_url', $data) ? $data['icon_url'] : $existing['icon_url'],
+                'header_logo_url' => array_key_exists('header_logo_url', $data)
+                    ? $data['header_logo_url']
+                    : $existing['header_logo_url'],
                 'tab_title' => array_key_exists('tab_title', $data) ? $data['tab_title'] : $existing['tab_title'],
             ];
 
@@ -104,6 +107,7 @@ class ShowroomService
                 'city_name' => $showroom['city_name'] ?? null,
                 'phone_number' => $showroom['phone_number'] ?? null,
                 'icon_url' => $showroom['icon_url'] ?? null,
+                'header_logo_url' => $showroom['header_logo_url'] ?? null,
                 'tab_title' => $showroom['tab_title'] ?? null,
             ] : null,
         ];
@@ -130,6 +134,7 @@ class ShowroomService
             'bank_type' => $showroom['bank_type'],
             'bank_account_name' => $showroom['bank_account_name'],
             'icon_url' => $showroom['icon_url'] ?? null,
+            'header_logo_url' => $showroom['header_logo_url'] ?? null,
             'tab_title' => $showroom['tab_title'] ?? null,
             'created_at' => $showroom['created_at'],
             'updated_at' => $showroom['updated_at'],
