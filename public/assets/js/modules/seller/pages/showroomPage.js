@@ -116,16 +116,14 @@ function openShowroomEditModal({ showroom, bankOptions, cityOptions, runtime, ro
   openModal(modalBody, {
     key: EDIT_MODAL_KEY,
     title: showroom ? "Edit showroom" : "Buat showroom",
-    description: "Perbarui profil, kontak, dan rekening pembayaran showroom.",
     size: "xl",
-    footer: null,
     closeLabel: "Tutup",
     panelId: "slrsr_edit_modal_section",
     bodyId: "slrsr_edit_modal_body_section",
     headerId: "slrsr_edit_modal_header_section",
-    // Batal/Simpan showroom replace the corner close button, since the form
-    // (profil + kontak + rekening) is long enough to need scrolling.
-    headerActions: () => ModalHeaderFormActions({
+    // Batal/Simpan showroom live in the footer, so the default close (X)
+    // button stays in the header.
+    footerNode: () => ModalHeaderFormActions({
       formId: FORM_ID,
       idPrefix: "slrsr_edit_modal",
       submitLabel: "Simpan showroom",
