@@ -229,19 +229,36 @@ function showroomContextMatchesPath(path) {
 }
 
 /**
- * Tanpa ini, pembuka halaman showroom sempat melihat logo global berkedip
- * lalu berganti ke logo showroom begitu context-nya sampai -- salah satu
- * bug yang dilaporkan. Selama slug di URL belum cocok dengan showroom aktif
- * di state, lambangnya disembunyikan (bukan diisi logo global) supaya tidak
- * ada logo yang salah sempat tampil sama sekali; kotaknya tetap ada supaya
- * tata letak header tidak ikut melompat begitu logonya muncul.
+ * Tanpa ini, pembuka halaman showroom sempat melihat brand global (logo DAN
+ * teks nama aplikasi) berkedip lalu berganti ke milik showroom begitu
+ * context-nya sampai -- salah satu bug yang dilaporkan. Awalnya hanya
+ * lambangnya yang disembunyikan; teksnya ("Siata Mobilindo" dkk, dari
+ * brandConfig.appName yang memang selalu global) tetap kelihatan sendirian
+ * di sebelah kotak kosong, jadi tetap terlihat seperti header yang salah
+ * muncul duluan. Sekarang keduanya ditahan sebagai satu kesatuan: selama
+ * slug di URL belum cocok dengan showroom aktif di state, tidak ada logo
+ * ATAU teks apa pun yang tampil -- kotaknya tetap ada supaya tata letak
+ * header tidak ikut melompat begitu brand yang benar muncul.
  */
 function syncBrandMark(mark, copyNodes, currentPath) {
   if (!mark) {
     return;
   }
 
-  if (!showroomContextMatchesPath(currentPath)) {
+  const menahan = !showroomContextMatchesPath(currentPath);
+  copyNodes.forEach((node) => {
+    if (!node) {
+      return;
+    }
+    node.hidden = menahan;
+    if (menahan) {
+      node.style.display = "none";
+    } else {
+      node.style.removeProperty("display");
+    }
+  });
+
+  if (menahan) {
     mark.className = PUBLIC_MARK_CLASS;
     mark.replaceChildren();
     mark.style.visibility = "hidden";
