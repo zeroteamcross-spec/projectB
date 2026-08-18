@@ -22,13 +22,18 @@ const affiliateFormDraft = {
 let slugCheckTimer = null;
 
 function scheduleSlugCheck(actions, referralCode) {
-  if (slugCheckTimer) {
-    window.clearTimeout(slugCheckTimer);
-  }
+  clearSlugCheckTimer();
   slugCheckTimer = window.setTimeout(() => {
     slugCheckTimer = null;
     actions.checkSlug(referralCode);
   }, 400);
+}
+
+function clearSlugCheckTimer() {
+  if (slugCheckTimer) {
+    window.clearTimeout(slugCheckTimer);
+    slugCheckTimer = null;
+  }
 }
 const DEFAULT_RUNTIME = {
   saving: false,
@@ -483,6 +488,7 @@ function clearAffiliateFormDraft() {
   affiliateFormDraft.key = "";
   affiliateFormDraft.draft = null;
   affiliateFormDraft.dirty = false;
+  clearSlugCheckTimer();
 }
 
 function affiliateDraftKey(mode, affiliate) {
