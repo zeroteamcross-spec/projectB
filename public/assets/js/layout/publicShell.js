@@ -80,11 +80,8 @@ export class PublicShell {
 
     copy.append(title, subtitle);
 
-    renderBrandLockup(mark, [copy], {
-      markClass: PUBLIC_MARK_CLASS,
-      iconName: publicLogoIcon(),
-      logoUrlOverride: showroomLogoUrl(),
-    });
+    const bootPath = window.location.hash.replace(/^#/, "").split("?")[0] || "/";
+    syncBrandMark(mark, [copy], bootPath);
 
     brand.append(mark, copy);
 
@@ -132,11 +129,7 @@ export class PublicShell {
     this.actionLink.style.display = !isAuthenticated && tanpaTombolLogin() ? "none" : "";
     this.brandTitleNode && (this.brandTitleNode.textContent = brandConfig.appName);
     this.brandSubtitleNode && (this.brandSubtitleNode.textContent = brandConfig.appTagline || "Showroom mobil pilihan");
-    renderBrandLockup(this.brandMarkNode, [this.brandCopyNode], {
-      markClass: PUBLIC_MARK_CLASS,
-      iconName: publicLogoIcon(),
-      logoUrlOverride: showroomLogoUrl(),
-    });
+    syncBrandMark(this.brandMarkNode, [this.brandCopyNode], currentPath);
     this.actionLink.href = target;
     this.actionLink.title = isAuthenticated ? "Dashboard akun" : "Masuk";
     const isTargetBuyer = isAuthenticated && target === "#/buyer";
@@ -212,6 +205,55 @@ function publicLogoIcon() {
 function showroomLogoUrl() {
   const showroom = publicContextService.activeShowroom();
   return String(showroom?.showroom?.header_logo_url ?? "").trim();
+}
+
+function showroomSlugFromPath(path) {
+  const cocok = String(path ?? "").match(/^\/(?:showrooms|s)\/([^/]+)/);
+  return cocok ? cocok[1] : "";
+}
+
+/**
+ * Konteks showroom baru terisi setelah validateSlug() selesai di latar
+ * belakang -- tidak diblokir menunggu, sesuai desain SPA ini, tapi itu
+ * berarti render pertama header kadang terjadi sebelum konteksnya sampai.
+ * Dipakai syncBrandMark() untuk tahu kapan showroomLogoUrl() masih boleh
+ * dipercaya untuk path saat ini.
+ */
+function showroomContextMatchesPath(path) {
+  const slug = showroomSlugFromPath(path).toLowerCase();
+  if (!slug) {
+    return true;
+  }
+
+  return publicContextService.activeShowroom()?.slug?.toLowerCase?.() === slug;
+}
+
+/**
+ * Tanpa ini, pembuka halaman showroom sempat melihat logo global berkedip
+ * lalu berganti ke logo showroom begitu context-nya sampai -- salah satu
+ * bug yang dilaporkan. Selama slug di URL belum cocok dengan showroom aktif
+ * di state, lambangnya disembunyikan (bukan diisi logo global) supaya tidak
+ * ada logo yang salah sempat tampil sama sekali; kotaknya tetap ada supaya
+ * tata letak header tidak ikut melompat begitu logonya muncul.
+ */
+function syncBrandMark(mark, copyNodes, currentPath) {
+  if (!mark) {
+    return;
+  }
+
+  if (!showroomContextMatchesPath(currentPath)) {
+    mark.className = PUBLIC_MARK_CLASS;
+    mark.replaceChildren();
+    mark.style.visibility = "hidden";
+    return;
+  }
+
+  mark.style.removeProperty("visibility");
+  renderBrandLockup(mark, copyNodes, {
+    markClass: PUBLIC_MARK_CLASS,
+    iconName: publicLogoIcon(),
+    logoUrlOverride: showroomLogoUrl(),
+  });
 }
 
 function dashboardHash(role) {
