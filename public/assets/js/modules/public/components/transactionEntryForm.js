@@ -110,7 +110,10 @@ function paymentMethodBlock(value, onChange) {
 
   const grid = document.createElement("div");
   grid.className = "grid grid-cols-1 gap-2";
-  PAYMENT_METHOD_OPTIONS.forEach((option) => {
+  // Gopay dan QRIS sengaja disembunyikan dari pilihan; provider-nya masih
+  // dipertahankan di paymentMethodSupport.js untuk transaksi lama yang sudah
+  // memakainya.
+  PAYMENT_METHOD_OPTIONS.filter((option) => option.value !== "gopay" && option.value !== "qris").forEach((option) => {
     const card = radioCard("payment_method", option.value, option.label, option.description, value, onChange);
     grid.append(card);
   });

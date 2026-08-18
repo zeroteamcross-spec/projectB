@@ -123,8 +123,8 @@ class MidtransPaymentAdapter implements PaymentProviderInterface
                 'phone' => $customer['phone_number'] ?? null,
             ],
             'custom_expiry' => [
-                'expiry_duration' => 24,
-                'unit' => 'hour',
+                'expiry_duration' => 5,
+                'unit' => 'minute',
             ],
             'metadata' => [
                 'purpose' => $purpose,
@@ -184,7 +184,7 @@ class MidtransPaymentAdapter implements PaymentProviderInterface
             'gross_amount' => $amount,
             'midtrans_token' => $responsePayload['token'] ?? null,
             'midtrans_redirect_url' => $responsePayload['redirect_url'] ?? $this->redirectUrl($responsePayload),
-            'expires_at' => date('Y-m-d H:i:s', strtotime('+1 day')),
+            'expires_at' => date('Y-m-d H:i:s', strtotime('+5 minutes')),
             'payment_data' => $this->paymentData($responsePayload),
             'payload_request' => $requestPayload,
             'payload_response' => $responsePayload,

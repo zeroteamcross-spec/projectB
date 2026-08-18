@@ -17,7 +17,8 @@ const DEFAULT_QUERY = {
   keyword: "",
   status: "",
   paymentType: "",
-  period: "",
+  period: "this_month",
+  customMonth: "",
   transactionId: "",
   page: 1,
   pageSize: 10,
@@ -462,7 +463,9 @@ function transactionsFilterBar({ query, transactions, onChange }) {
   const paymentTypes = uniqueValues(transactions.map((transaction) => transaction.payment_type));
   const section = document.createElement("section");
   section.id = "slrtx_filter_section";
-  section.className = "grid gap-3 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white/80 p-4 shadow-[0_18px_55px_rgba(15,23,42,0.07)] backdrop-blur-xl md:grid-cols-[minmax(0,1fr)_190px_170px_170px] md:items-end";
+  section.className = query.period === "custom_month"
+    ? "grid gap-3 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white/80 p-4 shadow-[0_18px_55px_rgba(15,23,42,0.07)] backdrop-blur-xl md:grid-cols-[minmax(0,1fr)_190px_170px_170px_170px] md:items-end"
+    : "grid gap-3 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white/80 p-4 shadow-[0_18px_55px_rgba(15,23,42,0.07)] backdrop-blur-xl md:grid-cols-[minmax(0,1fr)_190px_170px_170px] md:items-end";
   section.dataset.ds = "seller.transactions.filters";
 
   const searchWrap = controlWrap("Cari transaksi");
@@ -502,15 +505,29 @@ function transactionsFilterBar({ query, transactions, onChange }) {
   period.id = "slrtx_period_filter";
   period.className = controlClassName();
   [
-    ["", "Semua periode"],
-    ["today", "Hari ini"],
-    ["7d", "7 hari"],
-    ["30d", "30 hari"],
+    ["this_month", "Bulan ini"],
+    ["last_month", "Bulan Kemarin"],
+    ["custom_month", "Pilih Bulan"],
+    ["", "Semua Periode"],
   ].forEach(([value, label]) => period.append(optionNode(value, label, value === query.period)));
-  period.addEventListener("change", () => onChange?.({ period: period.value }));
+  period.addEventListener("change", () => onChange?.({
+    period: period.value,
+    customMonth: period.value === "custom_month" ? (query.customMonth || currentMonthValue()) : "",
+  }));
   periodWrap.append(period);
 
-  section.append(searchWrap, statusWrap, paymentWrap, periodWrap);
+  const monthPickerWrap = query.period === "custom_month" ? controlWrap("Pilih bulan") : null;
+  if (monthPickerWrap) {
+    const monthInput = document.createElement("input");
+    monthInput.type = "month";
+    monthInput.id = "slrtx_period_month_input";
+    monthInput.className = controlClassName();
+    monthInput.value = query.customMonth || currentMonthValue();
+    monthInput.addEventListener("change", () => onChange?.({ customMonth: monthInput.value }));
+    monthPickerWrap.append(monthInput);
+  }
+
+  section.append(searchWrap, statusWrap, paymentWrap, periodWrap, ...(monthPickerWrap ? [monthPickerWrap] : []));
   return section;
 }
 
@@ -529,7 +546,7 @@ function filterTransactions(transactions = [], query = {}) {
       return false;
     }
 
-    if (period && !isInPeriod(transaction.created_at, period)) {
+    if (period && !isInPeriod(transaction.created_at, period, query.customMonth)) {
       return false;
     }
 
@@ -575,6 +592,7 @@ function buildTransactionsPath(query = {}) {
   if (query.status) params.set("status", query.status);
   if (query.paymentType) params.set("payment_type", query.paymentType);
   if (query.period) params.set("period", query.period);
+  if (query.customMonth) params.set("month", query.customMonth);
   if (query.transactionId) params.set("transaction_id", String(query.transactionId));
   if (Number(query.page) > 1) params.set("page", String(query.page));
   if (Number(query.pageSize) > 0 && Number(query.pageSize) !== DEFAULT_QUERY.pageSize) params.set("page_size", String(query.pageSize));
@@ -588,7 +606,8 @@ function createTransactionsQuery(query = {}) {
     keyword: query.keyword ?? "",
     status: query.status ?? "",
     paymentType: query.payment_type ?? query.paymentType ?? "",
-    period: query.period ?? "",
+    period: query.period ?? DEFAULT_QUERY.period,
+    customMonth: query.month ?? query.customMonth ?? "",
     transactionId: query.transaction_id ?? query.transactionId ?? "",
     page: Math.max(1, Number(query.page || DEFAULT_QUERY.page)),
     pageSize: Math.max(1, Number(query.page_size || query.pageSize || DEFAULT_QUERY.pageSize)),
@@ -609,25 +628,33 @@ function isAbortError(error) {
   return error?.name === "AbortError";
 }
 
-function isInPeriod(value, period) {
+function isInPeriod(value, period, customMonth = "") {
   const date = value ? new Date(value) : null;
   if (!date || Number.isNaN(date.getTime())) {
     return false;
   }
   const now = new Date();
-  const start = new Date(now);
-  if (period === "today") {
-    return date.toDateString() === now.toDateString();
+  if (period === "this_month") {
+    return date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth();
   }
-  if (period === "7d") {
-    start.setDate(now.getDate() - 7);
-    return date >= start;
+  if (period === "last_month") {
+    const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    return date.getFullYear() === lastMonth.getFullYear() && date.getMonth() === lastMonth.getMonth();
   }
-  if (period === "30d") {
-    start.setDate(now.getDate() - 30);
-    return date >= start;
+  if (period === "custom_month") {
+    const [yearStr, monthStr] = String(customMonth ?? "").split("-");
+    const year = Number(yearStr);
+    const month = Number(monthStr);
+    if (!year || !month) {
+      return true;
+    }
+    return date.getFullYear() === year && date.getMonth() === month - 1;
   }
   return true;
+}
+
+function currentMonthValue() {
+  return new Date().toISOString().slice(0, 7);
 }
 
 function uniqueValues(values = []) {

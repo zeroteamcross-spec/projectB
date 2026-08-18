@@ -122,6 +122,18 @@ class TransactionService
 
         try {
             $this->pdo->beginTransaction();
+
+            // Kunci mobilnya secara atomik sebelum membuat baris transaksi.
+            // UPDATE ... WHERE listing_status = 'published' ini terkunci di
+            // level baris oleh InnoDB, jadi kalau dua request datang hampir
+            // bersamaan untuk mobil yang sama, yang kedua akan menunggu lalu
+            // menemukan listing_status sudah bukan 'published' lagi -- tanpa
+            // ini keduanya bisa lolos SELECT awal dan sama-sama bikin
+            // transaksi untuk mobil yang sama.
+            if (! $this->transactions->updateCarListingStatus((int) $car['id'], 'reserved', ['published'])) {
+                throw new NotFoundException('Mobil ini baru saja dipesan pembeli lain. Silakan pilih mobil lain.');
+            }
+
             $transactionId = $this->transactions->create([
                 'transaction_code' => $transactionCode,
                 'buyer_user_id' => $buyerUserId,
@@ -138,7 +150,7 @@ class TransactionService
                 'midtrans_order_id' => null,
                 'midtrans_token' => null,
                 'midtrans_redirect_url' => null,
-                'expires_at' => date('Y-m-d H:i:s', strtotime('+1 day')),
+                'expires_at' => date('Y-m-d H:i:s', strtotime('+5 minutes')),
                 'paid_at' => null,
                 'created_at' => $now,
                 'updated_at' => null,
@@ -735,7 +747,7 @@ class TransactionService
     public function expirePendingTransactions(): array
     {
         $now = date('Y-m-d H:i:s');
-        $threshold = date('Y-m-d H:i:s', strtotime('-24 hours'));
+        $threshold = date('Y-m-d H:i:s', strtotime('-5 minutes'));
         $expiredTransactionIds = [];
 
         foreach ($this->transactions->listStalePending($threshold) as $transaction) {

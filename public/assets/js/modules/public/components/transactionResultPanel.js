@@ -27,19 +27,23 @@ export function TransactionResultPanel({ transaction, onOpenDashboard = null, on
   const details = document.createElement("div");
   details.className = `grid gap-2 ${tw.surface.insetGrid}`;
   const paymentDetails = resolvePaymentArtifacts(transaction);
+  const isPaid = ["paid", "dp_paid", "completed"].includes(String(transaction?.transaction_status ?? "").toLowerCase());
   details.append(
     row("ID transaksi", transaction?.id ? `#${transaction.id}` : "-", "pubtrx_result_transaction_id_value"),
     row("Kode transaksi", transaction?.transaction_code ?? "-"),
-    row("Tipe pembayaran", transaction?.payment_type === "dp" ? "DP" : "Full"),
-    row("Nominal utama", formatCurrency(primaryAmount(transaction))),
+    row("Booking Fee", formatCurrency(primaryAmount(transaction))),
     row("Status awal", normalize(transaction?.transaction_status)),
     row("Order provider", paymentDetails.providerOrderId),
     row("Metode", paymentMethodLabel(paymentDetails.method))
   );
 
+  if (!isPaid && paymentDetails.expiresAt) {
+    details.append(row("Kadaluarsa", formatExpiry(paymentDetails.expiresAt), null, "pubtrx_result_expires_at_row"));
+  }
+
   const paymentData = paymentDetails.paymentData ?? {};
   if (paymentData.va_number) {
-    details.append(row("VA", `${String(paymentData.bank ?? "").toUpperCase()} ${paymentData.va_number}`));
+    details.append(copyableRow("VA", `${String(paymentData.bank ?? "").toUpperCase()} ${paymentData.va_number}`, paymentData.va_number));
   }
 
   const instructions = paymentInstructionSummary(paymentDetails);
@@ -69,8 +73,11 @@ export function TransactionResultPanel({ transaction, onOpenDashboard = null, on
   return section;
 }
 
-function row(label, value, valueId) {
+function row(label, value, valueId, rowId) {
   const item = document.createElement("div");
+  if (rowId) {
+    item.id = rowId;
+  }
   item.className = "flex items-center justify-between gap-3 rounded-2xl bg-white/90 px-3 py-3 shadow-sm";
   const caption = document.createElement("span");
   caption.className = "text-gray-500";
@@ -83,6 +90,70 @@ function row(label, value, valueId) {
   content.textContent = value;
   item.append(caption, content);
   return item;
+}
+
+function copyableRow(label, displayValue, copyValue) {
+  const item = document.createElement("div");
+  item.id = "pubtrx_result_va_row";
+  item.className = "flex items-center justify-between gap-3 rounded-2xl bg-white/90 px-3 py-3 shadow-sm";
+  const caption = document.createElement("span");
+  caption.className = "text-gray-500";
+  caption.textContent = label;
+  const valueGroup = document.createElement("span");
+  valueGroup.className = "flex items-center gap-2";
+  const content = document.createElement("span");
+  content.className = "text-right font-semibold text-gray-900";
+  content.textContent = displayValue;
+  const copyButton = document.createElement("button");
+  copyButton.id = "pubtrx_result_va_copy_button";
+  copyButton.type = "button";
+  copyButton.className = "rounded-lg border border-[var(--pb-card-border)] bg-white px-2 py-1 text-[10px] font-bold text-[var(--pb-brand-secondary)] transition hover:brightness-95";
+  copyButton.textContent = "Copy";
+  copyButton.addEventListener("click", () => copyToClipboard(copyValue, copyButton));
+  valueGroup.append(content, copyButton);
+  item.append(caption, valueGroup);
+  return item;
+}
+
+function copyToClipboard(value, button) {
+  const restoreLabel = button.textContent;
+  const onDone = (ok) => {
+    button.textContent = ok ? "Tersalin" : "Gagal";
+    window.setTimeout(() => {
+      button.textContent = restoreLabel;
+    }, 1500);
+  };
+
+  if (navigator.clipboard?.writeText) {
+    navigator.clipboard.writeText(String(value ?? "")).then(() => onDone(true)).catch(() => onDone(false));
+    return;
+  }
+
+  try {
+    const helper = document.createElement("textarea");
+    helper.value = String(value ?? "");
+    helper.style.position = "fixed";
+    helper.style.opacity = "0";
+    document.body.append(helper);
+    helper.select();
+    document.execCommand("copy");
+    helper.remove();
+    onDone(true);
+  } catch {
+    onDone(false);
+  }
+}
+
+function formatExpiry(value) {
+  const time = Date.parse(value);
+  if (Number.isNaN(time)) {
+    return "-";
+  }
+
+  return new Date(time).toLocaleString("id-ID", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
 }
 
 function primaryAmount(transaction) {
