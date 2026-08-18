@@ -83,6 +83,7 @@ export class PublicShell {
     renderBrandLockup(mark, [copy], {
       markClass: PUBLIC_MARK_CLASS,
       iconName: publicLogoIcon(),
+      logoUrlOverride: showroomLogoUrl(),
     });
 
     brand.append(mark, copy);
@@ -134,6 +135,7 @@ export class PublicShell {
     renderBrandLockup(this.brandMarkNode, [this.brandCopyNode], {
       markClass: PUBLIC_MARK_CLASS,
       iconName: publicLogoIcon(),
+      logoUrlOverride: showroomLogoUrl(),
     });
     this.actionLink.href = target;
     this.actionLink.title = isAuthenticated ? "Dashboard akun" : "Masuk";
@@ -196,6 +198,17 @@ function tanpaTombolLogin() {
 
 function publicLogoIcon() {
   return brandConfig.logoIcon === "bell" ? "brandMark" : brandConfig.logoIcon;
+}
+
+/**
+ * Logo header pojok kiri atas milik showroom sendiri -- hanya dipakai kalau
+ * showroom itu sedang aktif (halaman #/showrooms/:slug dan sejenisnya) dan
+ * showroom itu memang sudah mengunggah icon_url-nya sendiri. Di luar itu,
+ * renderBrandLockup() jatuh kembali ke logo global Konfigurasi WEB.
+ */
+function showroomLogoUrl() {
+  const showroom = publicContextService.activeShowroom();
+  return String(showroom?.showroom?.icon_url ?? "").trim();
 }
 
 function dashboardHash(role) {

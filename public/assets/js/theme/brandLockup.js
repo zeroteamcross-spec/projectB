@@ -54,13 +54,18 @@ export function renderBrandLockup(mark, teks = [], {
   // akan setinggi 9px dan tidak terbaca, jadi pemanggil bisa meminta versi
   // icon meski logonya ada.
   pakaiLogo = true,
+  // Showroom bisa punya logo sendiri yang cuma tampil di halaman showroom
+  // itu -- kalau diisi, ini menang atas logo global Konfigurasi WEB, tapi
+  // tetap lewat getAsset() yang sama di bawah.
+  logoUrlOverride = "",
 } = {}) {
   if (!mark) {
     return false;
   }
 
   mark.replaceChildren();
-  const logo = pakaiLogo ? getAsset(brandConfig.uploadedLogoUrl) : "";
+  const logoSumber = logoUrlOverride || brandConfig.uploadedLogoUrl;
+  const logo = pakaiLogo ? getAsset(logoSumber) : "";
   const simpulTeks = teks.filter(Boolean);
 
   if (logo) {
