@@ -39,7 +39,11 @@ export class ShellHost {
 
     this.activeShellName = normalized;
     this.activeShellNode = this.shells[normalized].render();
-    this.root.replaceChildren(this.activeShellNode, this.releaseUpdateButton.element);
+    // Tombol "Muat Ulang" sengaja tidak lagi ditempel ke DOM -- pengecekan
+    // versi rilis di app.js tetap jalan di latar belakang (dipakai halaman
+    // lain), tapi FAB-nya sendiri terlalu sering muncul saat halaman baru
+    // dimuat dan mengganggu.
+    this.root.replaceChildren(this.activeShellNode);
   }
 
   normalize(shellName) {
