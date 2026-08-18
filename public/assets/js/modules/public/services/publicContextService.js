@@ -166,18 +166,28 @@ export const publicContextService = {
   },
 
   /**
-   * Safety net for showroom branding (tab title/favicon): the pages that
-   * activate a showroom's branding (catalog/car-detail/transaction-entry)
-   * are also the only ones that ever revert it via clear(). Routes outside
-   * that set (e.g. the plain landing page) never call syncRouteContext(),
-   * so branding would otherwise stay stuck after navigating away. Called
-   * from PublicShell on every hash change instead, using the raw path so
-   * it works regardless of which page component is mounted.
+   * Safety net for showroom branding (tab title/favicon/header logo): the
+   * pages that activate a showroom's branding (catalog/car-detail/
+   * transaction-entry) are also the only ones that ever revert it via
+   * clear(). Routes outside that set (e.g. the plain landing page) never
+   * call syncRouteContext(), so branding -- and the header logo, which
+   * reads activeShowroom() straight from state -- would otherwise stay
+   * stuck after navigating away. Called from PublicShell on every hash
+   * change instead, using the raw path so it works regardless of which
+   * page component is mounted.
    */
   syncBrandingFromPath(path = "") {
     const isShowroomPath = /^\/(?:showrooms|s)\//.test(String(path ?? ""));
-    if (!isShowroomPath && brandingShowroomId !== null) {
+    if (isShowroomPath) {
+      return;
+    }
+
+    if (brandingShowroomId !== null) {
       revertShowroomBranding();
+    }
+
+    if (publicContextState.activeShowroom()) {
+      publicContextState.setDefault();
     }
   },
 
