@@ -99,7 +99,7 @@ function renderBrand(mark, title) {
 }
 
 function currentRole(store) {
-  return store?.get("app.activeRole", "public") ?? "public";
+  return store?.get("auth.role", "") || store?.get("app.activeRole", "public") || "public";
 }
 
 /**
