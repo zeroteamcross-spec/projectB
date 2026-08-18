@@ -286,7 +286,7 @@ function registerPanel(state, actions, context) {
         id: "shr_register_showroom_phone_input",
         name: "showroom_phone_number",
         label: "Nomor WA Showroom",
-        placeholder: "0217654321",
+        placeholder: "08123456789",
         required: false,
         value: state.draft.showroom_phone_number,
         error: state.fieldErrors["showroom.phone_number"],
@@ -535,6 +535,29 @@ function selectField({ id, name, label, placeholder = "", options = [], required
   chevron.className = "pointer-events-none absolute right-3.5 top-1/2 flex -translate-y-1/2 text-[var(--pb-text-muted)]";
   chevron.append(createIcon("chevronRight", { className: "block h-3 w-3 rotate-90 leading-none" }));
 
+  // Ikon di dalam input sendiri, muncul begitu nilainya cocok dengan salah
+  // satu opsi yang punya ikon (mis. bank) -- bukan cuma di daftar dropdown.
+  const leadingIcon = document.createElement("span");
+  leadingIcon.className = "pointer-events-none absolute left-2.5 top-1/2 hidden h-6 w-6 -translate-y-1/2 items-center justify-center overflow-hidden rounded-lg border border-[var(--pb-border)] bg-white";
+  const leadingIconImg = document.createElement("img");
+  leadingIconImg.alt = "";
+  leadingIconImg.className = "h-full w-full object-contain p-0.5";
+  leadingIcon.append(leadingIconImg);
+
+  function syncLeadingIcon() {
+    const iconUrl = iconFor?.(input.value);
+    if (iconUrl) {
+      leadingIconImg.src = iconUrl;
+      leadingIcon.classList.remove("hidden");
+      leadingIcon.classList.add("flex");
+      input.classList.add("pl-11");
+    } else {
+      leadingIcon.classList.add("hidden");
+      leadingIcon.classList.remove("flex");
+      input.classList.remove("pl-11");
+    }
+  }
+
   const panel = document.createElement("div");
   panel.id = `${id}_listbox`;
   panel.setAttribute("role", "listbox");
@@ -605,6 +628,7 @@ function selectField({ id, name, label, placeholder = "", options = [], required
 
   function selectOption(option) {
     input.value = option;
+    syncLeadingIcon();
     // Menutup panel HARUS terakhir: listener "input" di bawah membuka lagi
     // panelnya (dipakai saat mengetik manual), jadi kalau closePanel() lebih
     // dulu, dispatch "input" ini langsung membukanya kembali.
@@ -620,6 +644,7 @@ function selectField({ id, name, label, placeholder = "", options = [], required
     renderOptions();
     panel.hidden = false;
     input.setAttribute("aria-expanded", "true");
+    syncLeadingIcon();
   });
   input.addEventListener("blur", closePanel);
   input.addEventListener("keydown", (event) => {
@@ -645,7 +670,7 @@ function selectField({ id, name, label, placeholder = "", options = [], required
     }
   });
 
-  comboWrap.append(input, chevron, panel);
+  comboWrap.append(input, leadingIcon, chevron, panel);
   wrap.append(comboWrap);
 
   // Render sekali di awal (tetap hidden) supaya opsinya sudah ada di DOM
@@ -653,6 +678,7 @@ function selectField({ id, name, label, placeholder = "", options = [], required
   // opsi lewat querySelector, dan menghindari kedipan kosong sesaat panel
   // pertama kali dibuka.
   renderOptions();
+  syncLeadingIcon();
 
   if (error) {
     wrap.append(errorNode(error));
