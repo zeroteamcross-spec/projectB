@@ -141,14 +141,14 @@ export function SellerAffiliateForm({
       id: "slraf_affiliate_password_input",
       name: "password",
       label: mode === "edit" ? "Password baru (opsional)" : "Password",
-      value: "",
+      value: draft.password ?? "",
       placeholder: mode === "edit" ? "Kosongkan jika tidak reset" : "Minimal 6 karakter",
     }),
     passwordInput({
       id: "slraf_affiliate_password_confirmation_input",
       name: "password_confirmation",
       label: "Konfirmasi password",
-      value: "",
+      value: draft.password_confirmation ?? "",
       placeholder: "Ulangi password",
     }),
   );
