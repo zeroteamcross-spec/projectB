@@ -19,6 +19,17 @@ const affiliateFormDraft = {
   draft: null,
   dirty: false,
 };
+let slugCheckTimer = null;
+
+function scheduleSlugCheck(actions, referralCode) {
+  if (slugCheckTimer) {
+    window.clearTimeout(slugCheckTimer);
+  }
+  slugCheckTimer = window.setTimeout(() => {
+    slugCheckTimer = null;
+    actions.checkSlug(referralCode);
+  }, 400);
+}
 const DEFAULT_RUNTIME = {
   saving: false,
   checkingSlug: false,
@@ -175,13 +186,9 @@ export function SellerAffiliatesModalPage() {
       const normalized = sellerAffiliateService.normalizeSlug(slug);
 
       if (!normalized) {
-        setRuntime({
-          checkingSlug: false,
-          slugState: {
-            is_available: false,
-            message: "Gunakan huruf, angka, underscore, atau dash untuk slug marketing.",
-          },
-        });
+        // Belum ada slug yang diketik -- bukan berarti sudah dipakai, jadi
+        // tidak ada apa-apa yang perlu ditampilkan sebagai galat.
+        setRuntime({ checkingSlug: false, slugState: null });
         return;
       }
 
@@ -382,7 +389,10 @@ function openAffiliateModal({ mode, selectedAffiliate, runtime, actions }) {
       error: runtime.error,
       slugState: runtime.slugState,
       onSubmit: (payload) => actions.submit(payload),
-      onDraftChange: (draft) => updateAffiliateFormDraft(draft),
+      onDraftChange: (draft) => {
+        updateAffiliateFormDraft(draft);
+        scheduleSlugCheck(actions, draft.referral_code);
+      },
       onCreateNew: () => actions.createNew(),
       onOpenLanding: (affiliate) => actions.openLanding(affiliate),
       onCopyLanding: (affiliate) => actions.copyLanding(affiliate),
