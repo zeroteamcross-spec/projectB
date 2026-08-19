@@ -29,14 +29,18 @@ const googleLoginRoutes = googleLoginService.routes().map((config) => ({
   // buyer-only page). publicContextPathFromRedirect() reads that first, and
   // returns the right kind of link (showroom catalog vs. marketing landing);
   // getLastViewedPublicContextPath() (localStorage, tracks whichever of the
-  // two was viewed most recently) only fills the remaining gap where `from`
-  // itself isn't scoped to either.
+  // two was viewed most recently) fills the gap where `from` itself isn't
+  // scoped to either. The button is unconditional either way -- falling
+  // back to "/" rather than disappearing keeps its presence predictable
+  // instead of depending on state the visitor can't see.
   page: (context) => GoogleLoginPage({
     roleSlug: config.slug,
-    ...(config.slug === "buyer" ? (() => {
-      const path = publicContextPathFromRedirect(context?.query?.from) || getLastViewedPublicContextPath();
-      return path ? { footerLink: { label: "Kembali ke Katalog", path } } : {};
-    })() : {}),
+    ...(config.slug === "buyer" ? {
+      footerLink: {
+        label: "Kembali ke Katalog",
+        path: publicContextPathFromRedirect(context?.query?.from) || getLastViewedPublicContextPath() || "/",
+      },
+    } : {}),
   }),
   workingStateKey: null,
 }));
