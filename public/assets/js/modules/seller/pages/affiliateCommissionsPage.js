@@ -354,7 +354,7 @@ function commissionsHero({ summary, actions }) {
 function heroActions(actions) {
   const wrap = document.createElement("section");
   wrap.id = "slrafc_header_actions_section";
-  wrap.className = "grid gap-2 sm:grid-cols-2 lg:min-w-[360px]";
+  wrap.className = "grid gap-2 sm:grid-cols-2 lg:min-w-[360px] mb-[5px]";
 
   const global = Button({ label: "Atur komisi umum", onClick: () => actions.openGlobalRule(), designHook: "shared.button.primary" });
   global.id = "slrafc_global_rule_button";
