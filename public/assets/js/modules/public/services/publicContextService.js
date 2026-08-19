@@ -115,6 +115,9 @@ export const publicContextService = {
 
     const activeAffiliate = this.activeAffiliate();
     if (activeAffiliate?.slug?.toLowerCase?.() === normalizedSlug && activeAffiliate.sellerUserId) {
+      if (activeAffiliate.showroom) {
+        applyShowroomBranding({ id: activeAffiliate.showroom.id, showroom: activeAffiliate.showroom });
+      }
       persistLastViewedAffiliate(activeAffiliate.slug);
       return activeAffiliate;
     }
@@ -136,6 +139,15 @@ export const publicContextService = {
     };
 
     publicContextState.setAffiliate(affiliate);
+    if (affiliate.showroom) {
+      // affiliate.showroom is the showroom the affiliate SELLS FOR -- same
+      // tab title/favicon/header-logo branding a direct showroom visit gets,
+      // shaped to what applyShowroomBranding() expects (a `showroom` field
+      // nested one level in, matching activateShowroomBySlug()'s object).
+      applyShowroomBranding({ id: affiliate.showroom.id, showroom: affiliate.showroom });
+    } else if (brandingShowroomId !== null) {
+      revertShowroomBranding();
+    }
     persistLastViewedAffiliate(affiliate.slug);
     return affiliate;
   },
@@ -185,17 +197,18 @@ export const publicContextService = {
   /**
    * Safety net for showroom branding (tab title/favicon/header logo): the
    * pages that activate a showroom's branding (catalog/car-detail/
-   * transaction-entry) are also the only ones that ever revert it via
-   * clear(). Routes outside that set (e.g. the plain landing page) never
-   * call syncRouteContext(), so branding -- and the header logo, which
-   * reads activeShowroom() straight from state -- would otherwise stay
-   * stuck after navigating away. Called from PublicShell on every hash
-   * change instead, using the raw path so it works regardless of which
-   * page component is mounted.
+   * transaction-entry, and now affiliate/marketing catalog pages too) are
+   * also the only ones that ever revert it via clear(). Routes outside that
+   * set (e.g. the plain landing page) never call syncRouteContext(), so
+   * branding -- and the header logo, which reads activeShowroom()/
+   * activeAffiliate() straight from state -- would otherwise stay stuck
+   * after navigating away. Called from PublicShell on every hash change
+   * instead, using the raw path so it works regardless of which page
+   * component is mounted.
    */
   syncBrandingFromPath(path = "") {
-    const isShowroomPath = /^\/(?:showrooms|s)\//.test(String(path ?? ""));
-    if (isShowroomPath) {
+    const isBrandedPath = /^\/(?:showrooms|s|af|a)\//.test(String(path ?? ""));
+    if (isBrandedPath) {
       return;
     }
 
@@ -203,7 +216,7 @@ export const publicContextService = {
       revertShowroomBranding();
     }
 
-    if (publicContextState.activeShowroom()) {
+    if (publicContextState.activeShowroom() || publicContextState.activeAffiliate()) {
       publicContextState.setDefault();
     }
   },

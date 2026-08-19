@@ -322,6 +322,8 @@ class AffiliateService
                     'address' => $affiliate['showroom_address'] ?? null,
                     'phone_number' => $affiliate['showroom_phone_number'] ?? null,
                     'header_logo_url' => $affiliate['showroom_header_logo_url'] ?? null,
+                    'icon_url' => $affiliate['showroom_icon_url'] ?? null,
+                    'tab_title' => $affiliate['showroom_tab_title'] ?? null,
                 ]
                 : null,
         ];
