@@ -110,7 +110,7 @@ export function SellerAffiliateCommissionsPage() {
       }
     },
     async saveOverride(payload) {
-      const mode = currentMode(currentContext);
+      const mode = modeFromQuery(currentContext?.query);
       const ruleId = currentContext?.query?.rule_id ?? "";
       setRuntime({ overrideSaving: true, overrideError: "" });
 
@@ -187,12 +187,22 @@ function render(root, context, actions) {
   const safePage = Math.min(Math.max(1, Number(query.page || 1)), totalPages);
   const pagedOverrides = filteredOverrides.slice((safePage - 1) * pageSize, safePage * pageSize);
   const summary = sellerAffiliateCommissionService.summary({ globalRule, overrides });
-  const mode = currentMode(context);
+  // Dibaca langsung dari hash, bukan context.query: menutup modal
+  // (closeModal() -> onClose() -> router.navigate() -> uiStore.closeModal())
+  // memicu appStore.subscribe() di sini beberapa kali secara sinkron, SEBELUM
+  // event hashchange sungguhan sempat diproses dan memperbarui context yang
+  // dipegang halaman ini. Kalau mode masih dibaca dari context yang basi itu,
+  // render ini menyimpulkan modal "seharusnya masih terbuka" dan membukanya
+  // lagi -- persis kedipan yang dilaporkan. window.location.hash sendiri
+  // sudah berubah sinkron begitu router.navigate() dipanggil, jadi ini selalu
+  // mencerminkan tujuan navigasi yang sebenarnya, bukan yang basi.
+  const routeQuery = liveHashQuery();
+  const mode = modeFromQuery(routeQuery);
   const selectedOverride = sellerAffiliateCommissionService.resolveSelectedOverride({
     overrides,
-    ruleId: context.query.rule_id ?? "",
+    ruleId: routeQuery.rule_id ?? "",
   });
-  const availableCars = sellerAffiliateCommissionService.eligibleCars(cars, overrides, context.query.rule_id ?? "");
+  const availableCars = sellerAffiliateCommissionService.eligibleCars(cars, overrides, routeQuery.rule_id ?? "");
 
   const frame = document.createElement("section");
   frame.id = "slrafc_page";
@@ -526,13 +536,29 @@ function buildPath({ ruleId = "", mode = "" } = {}) {
   return query ? `/seller/affiliate-commissions?${query}` : "/seller/affiliate-commissions";
 }
 
-function currentMode(context) {
-  const mode = String(context?.query?.mode ?? "");
+function modeFromQuery(query) {
+  const mode = String(query?.mode ?? "");
   if (mode === "global" || mode === "create" || mode === "edit" || mode === "detail") {
     return mode;
   }
 
-  return context?.query?.rule_id ? "detail" : "list";
+  return query?.rule_id ? "detail" : "list";
+}
+
+/**
+ * router.navigate() cuma mengubah window.location.hash -- itu berlaku
+ * sinkron seketika. Yang ASINKRON adalah reaksi Router-nya: leaveActivePage(),
+ * mountPage() dengan context baru, semuanya menunggu event hashchange yang
+ * baru diproses giliran berikutnya. Membaca hash langsung di sini (bukan
+ * context.query milik modul ini, yang baru diperbarui setelah hashchange
+ * itu selesai) berarti render() selalu melihat tujuan navigasi yang
+ * sebenarnya, bahkan saat dipanggil dari tengah rentetan render sinkron
+ * yang dipicu closeModal().
+ */
+function liveHashQuery() {
+  const hash = window.location.hash.replace(/^#/, "");
+  const queryString = hash.split("?")[1] ?? "";
+  return Object.fromEntries(new URLSearchParams(queryString));
 }
 
 function ensureSelectedCar(cars, selectedCar) {
