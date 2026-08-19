@@ -317,9 +317,11 @@ class AffiliateService
             'showroom' => $affiliate && isset($affiliate['showroom_id']) && $affiliate['showroom_id'] !== null
                 ? [
                     'id' => (int) $affiliate['showroom_id'],
+                    'slug' => $affiliate['showroom_slug'] ?? null,
                     'name' => $affiliate['showroom_name'] ?? null,
                     'address' => $affiliate['showroom_address'] ?? null,
                     'phone_number' => $affiliate['showroom_phone_number'] ?? null,
+                    'header_logo_url' => $affiliate['showroom_header_logo_url'] ?? null,
                 ]
                 : null,
         ];

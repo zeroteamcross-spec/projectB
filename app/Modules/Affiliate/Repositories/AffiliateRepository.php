@@ -119,7 +119,7 @@ class AffiliateRepository
             'SELECT a.id, a.user_id, a.seller_user_id, a.referral_code, a.status,
                     u.name AS affiliate_name, u.email AS affiliate_email, u.phone_number AS affiliate_phone_number,
                     s.name AS seller_name, s.email AS seller_email, s.phone_number AS seller_phone_number,
-                    sh.id AS showroom_id, sh.name AS showroom_name, sh.address AS showroom_address, sh.phone_number AS showroom_phone_number
+                    sh.id AS showroom_id, sh.slug AS showroom_slug, sh.name AS showroom_name, sh.address AS showroom_address, sh.phone_number AS showroom_phone_number, sh.header_logo_url AS showroom_header_logo_url
              FROM affiliates AS a
              INNER JOIN users AS u ON u.id = a.user_id
              INNER JOIN users AS s ON s.id = a.seller_user_id
