@@ -64,6 +64,7 @@ export class PublicShell {
     const brand = document.createElement("a");
     brand.href = "#/";
     brand.className = "flex min-w-0 flex-1 items-center gap-2.5 no-underline";
+    this.brandLinkNode = brand;
 
     const mark = document.createElement("span");
 
@@ -130,6 +131,9 @@ export class PublicShell {
     this.brandTitleNode && (this.brandTitleNode.textContent = brandConfig.appName);
     this.brandSubtitleNode && (this.brandSubtitleNode.textContent = brandConfig.appTagline || "Showroom mobil pilihan");
     syncBrandMark(this.brandMarkNode, [this.brandCopyNode], currentPath);
+    if (this.brandLinkNode) {
+      this.brandLinkNode.href = `#${ownCatalogHrefForPath(currentPath)}`;
+    }
     this.actionLink.href = target;
     this.actionLink.title = isAuthenticated ? "Dashboard akun" : "Masuk";
     const isTargetBuyer = isAuthenticated && target === "#/buyer";
@@ -271,6 +275,22 @@ function syncBrandMark(mark, copyNodes, currentPath) {
     iconName: publicLogoIcon(),
     logoUrlOverride: showroomLogoUrl(),
   });
+}
+
+/**
+ * Buyer yang belum login juga punya "showroom sendiri" -- showroom yang
+ * sedang mereka jelajahi. brand.href dulu selalu #/ , jadi klik logo di
+ * halaman showroom malah melempar pengunjung ke landing page, bukan
+ * mengembalikannya ke katalog showroom yang sama. catalogPath() sudah
+ * tahu jalur showroom/affiliate aktif; dipakai di sini juga supaya logo
+ * ikut pola yang sama seperti untuk buyer/marketing yang sudah login.
+ */
+function ownCatalogHrefForPath(currentPath) {
+  if (!showroomContextMatchesPath(currentPath)) {
+    return "/";
+  }
+
+  return publicContextService.catalogPath();
 }
 
 function dashboardHash(role) {
