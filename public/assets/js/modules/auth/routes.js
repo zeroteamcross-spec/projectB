@@ -4,7 +4,7 @@ import { GoogleLoginPage } from "./pages/googleLoginPage.js";
 import { RoleSpecificLoginPage } from "./pages/roleSpecificLoginPage.js";
 import { googleLoginService } from "./services/googleLoginService.js";
 import { roleSpecificLoginService } from "./services/roleSpecificLoginService.js";
-import { getLastViewedShowroomPath, showroomPathFromRedirect } from "../../utils/lastViewedShowroom.js";
+import { getLastViewedPublicContextPath, publicContextPathFromRedirect } from "../../utils/lastViewedPublicContext.js";
 
 const roleLoginRoutes = roleSpecificLoginService.routes().map((config) => ({
   name: `auth.login.${config.slug}`,
@@ -24,15 +24,17 @@ const googleLoginRoutes = googleLoginService.routes().map((config) => ({
   // the showroom-scoped /s/:slug/login route), but the actual URL usually
   // still carries one: the guard that bounces an unauthenticated visitor
   // here always appends ?from=<the page they were trying to reach>, and
-  // that path is showroom-scoped whenever the visitor was anywhere under a
-  // showroom (not just its bare catalog root -- car detail, checkout, any
-  // buyer-only page). showroomPathFromRedirect() reads that first;
-  // getLastViewedShowroomPath() (localStorage) only fills the remaining gap
-  // where `from` itself isn't showroom-scoped.
+  // that path is showroom- or marketing-scoped whenever the visitor was
+  // anywhere under one (not just its bare root -- car detail, checkout, any
+  // buyer-only page). publicContextPathFromRedirect() reads that first, and
+  // returns the right kind of link (showroom catalog vs. marketing landing);
+  // getLastViewedPublicContextPath() (localStorage, tracks whichever of the
+  // two was viewed most recently) only fills the remaining gap where `from`
+  // itself isn't scoped to either.
   page: (context) => GoogleLoginPage({
     roleSlug: config.slug,
     ...(config.slug === "buyer" ? (() => {
-      const path = showroomPathFromRedirect(context?.query?.from) || getLastViewedShowroomPath();
+      const path = publicContextPathFromRedirect(context?.query?.from) || getLastViewedPublicContextPath();
       return path ? { footerLink: { label: "Kembali ke Katalog", path } } : {};
     })() : {}),
   }),

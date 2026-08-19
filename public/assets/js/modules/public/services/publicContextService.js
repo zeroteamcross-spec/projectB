@@ -2,7 +2,7 @@ import { brandConfig } from "../../../theme/brandConfig.js";
 import { affiliatesResource } from "../../../resources/affiliatesResource.js";
 import { showroomsResource } from "../../../resources/showroomsResource.js";
 import { publicContextState } from "../state/publicContextState.js";
-import { persistLastViewedShowroom } from "../../../utils/lastViewedShowroom.js";
+import { persistLastViewedShowroom, persistLastViewedAffiliate } from "../../../utils/lastViewedPublicContext.js";
 
 const ICON_RELS = ["icon", "shortcut icon", "apple-touch-icon"];
 
@@ -115,6 +115,7 @@ export const publicContextService = {
 
     const activeAffiliate = this.activeAffiliate();
     if (activeAffiliate?.slug?.toLowerCase?.() === normalizedSlug && activeAffiliate.sellerUserId) {
+      persistLastViewedAffiliate(activeAffiliate.slug);
       return activeAffiliate;
     }
 
@@ -135,6 +136,7 @@ export const publicContextService = {
     };
 
     publicContextState.setAffiliate(affiliate);
+    persistLastViewedAffiliate(affiliate.slug);
     return affiliate;
   },
 
