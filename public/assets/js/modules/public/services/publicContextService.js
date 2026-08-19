@@ -2,6 +2,7 @@ import { brandConfig } from "../../../theme/brandConfig.js";
 import { affiliatesResource } from "../../../resources/affiliatesResource.js";
 import { showroomsResource } from "../../../resources/showroomsResource.js";
 import { publicContextState } from "../state/publicContextState.js";
+import { persistLastViewedShowroom } from "../../../utils/lastViewedShowroom.js";
 
 const ICON_RELS = ["icon", "shortcut icon", "apple-touch-icon"];
 
@@ -147,6 +148,7 @@ export const publicContextService = {
     const activeShowroom = this.activeShowroom();
     if (activeShowroom?.slug?.toLowerCase?.() === normalizedSlug && activeShowroom.sellerUserId) {
       applyShowroomBranding(activeShowroom);
+      persistLastViewedShowroom(activeShowroom.slug);
       return activeShowroom;
     }
 
@@ -167,6 +169,7 @@ export const publicContextService = {
 
     publicContextState.setShowroom(showroom);
     applyShowroomBranding(showroom);
+    persistLastViewedShowroom(showroom.slug);
     return showroom;
   },
 
