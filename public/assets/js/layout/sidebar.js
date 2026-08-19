@@ -6,7 +6,7 @@ import { applyDesignHook } from "../theme/designStudioHooks.js";
 import { adminMasterService } from "../modules/admin/services/adminMasterService.js";
 import { uiStore } from "../state/uiStore.js";
 import { designStudioV2MenuItem, isDesignStudioV2Allowed } from "../modules/designStudioV2/accessGuard.js";
-import { navigateToOwnShowroom } from "./sellerShowroomLink.js";
+import { navigateToOwnShowroom, hasOwnShowroomLink } from "./ownShowroomLink.js";
 
 // "Katalog" (#/buyer/cars) is intentionally absent: it lists cars across every
 // showroom, which is not how buyers browse. They arrive through a showroom or
@@ -178,13 +178,14 @@ export function sidebar(store = null, options = {}) {
  * dioperkan setiap kali, bukan disimpan.
  */
 /**
- * Untuk seller, klik logo sidebar langsung membuka halaman showroom publik
- * miliknya sendiri. Role lain tidak diubah, logo tetap dekoratif.
+ * Untuk buyer dan marketing, klik logo sidebar langsung membuka katalog
+ * publik showroom yang bersangkutan. Seller dikecualikan (dashboard sendiri
+ * sudah jadi tujuan defaultnya); role lain tidak diubah, logo tetap dekoratif.
  */
 function syncBrandLink(brandCopyNode, role) {
-  const isSeller = role === "seller";
-  brandCopyNode.classList.toggle("cursor-pointer", isSeller);
-  brandCopyNode.onclick = isSeller ? () => { navigateToOwnShowroom(); } : null;
+  const hasLink = hasOwnShowroomLink(role);
+  brandCopyNode.classList.toggle("cursor-pointer", hasLink);
+  brandCopyNode.onclick = hasLink ? () => { navigateToOwnShowroom(); } : null;
 }
 
 function renderBrandMark(mark, teks = [], markClass = "", collapsed = false) {

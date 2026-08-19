@@ -6,7 +6,7 @@ import { tw } from "../theme/tailwindClasses.js";
 import { adminSessionService } from "../modules/admin/services/adminSessionService.js";
 import { applyDesignHook } from "../theme/designStudioHooks.js";
 import { NotificationBell } from "../modules/notifications/components/notificationBell.js";
-import { navigateToOwnShowroom } from "./sellerShowroomLink.js";
+import { navigateToOwnShowroom, hasOwnShowroomLink } from "./ownShowroomLink.js";
 
 export function header(store) {
   const node = document.createElement("header");
@@ -103,14 +103,16 @@ function currentRole(store) {
 }
 
 /**
- * Untuk seller, klik logo (versi mobile-nya, yang tampil di header) langsung
- * membuka halaman showroom publik miliknya sendiri. Role lain tidak diubah,
- * logo tetap dekoratif seperti sebelumnya.
+ * Untuk buyer dan marketing, klik logo (versi mobile-nya, yang tampil di
+ * header) langsung membuka katalog publik showroom yang bersangkutan --
+ * showroom pelanggan buyer, atau showroom yang dipromosikan marketing.
+ * Seller sengaja dikecualikan (dashboard sendiri sudah jadi tujuan
+ * defaultnya); role lain tidak diubah, logo tetap dekoratif.
  */
 function syncBrandLink(titleWrap, role) {
-  const isSeller = role === "seller";
-  titleWrap.classList.toggle("cursor-pointer", isSeller);
-  titleWrap.onclick = isSeller ? () => { navigateToOwnShowroom(); } : null;
+  const hasLink = hasOwnShowroomLink(role);
+  titleWrap.classList.toggle("cursor-pointer", hasLink);
+  titleWrap.onclick = hasLink ? () => { navigateToOwnShowroom(); } : null;
 }
 
 function renderBanner(host, state) {
