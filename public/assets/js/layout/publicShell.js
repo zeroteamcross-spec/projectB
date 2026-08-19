@@ -205,10 +205,23 @@ function publicLogoIcon() {
  * untuk tab browser, logo header biasanya memanjang, jadi keduanya tidak
  * boleh berbagi satu gambar. Di luar itu, renderBrandLockup() jatuh kembali
  * ke logo global Konfigurasi WEB.
+ *
+ * Halaman marketing (#/af/:slug) tidak punya showroom-nya sendiri di
+ * publicContextState -- affiliate itu MEWAKILI sebuah showroom, bukan
+ * showroom itu sendiri -- tapi affiliate.showroom (dikembalikan bersama
+ * validateReferralCode()) berisi data showroom yang sama. Jatuhkan ke situ
+ * kalau tidak ada showroom aktif, supaya logo pojok kiri atas tetap
+ * menampilkan logo showroom pemilik affiliate itu, bukan logo default.
  */
 function showroomLogoUrl() {
   const showroom = publicContextService.activeShowroom();
-  return String(showroom?.showroom?.header_logo_url ?? "").trim();
+  const direct = String(showroom?.showroom?.header_logo_url ?? "").trim();
+  if (direct) {
+    return direct;
+  }
+
+  const affiliate = publicContextService.activeAffiliate();
+  return String(affiliate?.showroom?.header_logo_url ?? "").trim();
 }
 
 function showroomSlugFromPath(path) {
@@ -216,20 +229,30 @@ function showroomSlugFromPath(path) {
   return cocok ? cocok[1] : "";
 }
 
+function affiliateSlugFromPath(path) {
+  const cocok = String(path ?? "").match(/^\/(?:af|a)\/([^/]+)/);
+  return cocok ? cocok[1] : "";
+}
+
 /**
- * Konteks showroom baru terisi setelah validateSlug() selesai di latar
- * belakang -- tidak diblokir menunggu, sesuai desain SPA ini, tapi itu
- * berarti render pertama header kadang terjadi sebelum konteksnya sampai.
- * Dipakai syncBrandMark() untuk tahu kapan showroomLogoUrl() masih boleh
- * dipercaya untuk path saat ini.
+ * Konteks showroom/affiliate baru terisi setelah validateSlug()/
+ * validateReferralCode() selesai di latar belakang -- tidak diblokir
+ * menunggu, sesuai desain SPA ini, tapi itu berarti render pertama header
+ * kadang terjadi sebelum konteksnya sampai. Dipakai syncBrandMark() untuk
+ * tahu kapan showroomLogoUrl() masih boleh dipercaya untuk path saat ini.
  */
 function showroomContextMatchesPath(path) {
   const slug = showroomSlugFromPath(path).toLowerCase();
-  if (!slug) {
-    return true;
+  if (slug) {
+    return publicContextService.activeShowroom()?.slug?.toLowerCase?.() === slug;
   }
 
-  return publicContextService.activeShowroom()?.slug?.toLowerCase?.() === slug;
+  const affiliateSlug = affiliateSlugFromPath(path).toLowerCase();
+  if (affiliateSlug) {
+    return publicContextService.activeAffiliate()?.slug?.toLowerCase?.() === affiliateSlug;
+  }
+
+  return true;
 }
 
 /**
