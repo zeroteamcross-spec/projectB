@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Laporan Verifikasi Perubahan — Siata Mobilindo</title>
+<style>
+  :root{
+    --ink:#16232b;
+    --ink-muted:#5b6b74;
+    --ink-faint:#8a97a0;
+    --primary:#1e81b0;
+    --secondary:#17698f;
+    --accent:#eab676;
+    --cream:#faf4ed;
+    --cream-deep:#f2e9dc;
+    --border:#e3ddd0;
+    --border-soft:#ece6da;
+    --good:#2f855a;
+    --good-bg:#e7f5ec;
+    --danger:#b3401f;
+    --danger-bg:#fbeae3;
+    --surface:#ffffff;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    color:var(--ink);
+    background:var(--cream);
+    font-size:14px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .page{
+    max-width:920px;
+    margin:0 auto;
+    background:var(--surface);
+    box-shadow:0 1px 3px rgba(22,35,43,.06);
+    min-height:100vh;
+  }
+  @media (min-width:960px){
+    body{ padding:28px 0; }
+    .page{ border-radius:14px; box-shadow:0 12px 40px rgba(22,35,43,.12); min-height:0; }
+  }
+  h1,h2,h3{
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight:700;
+    margin:0;
+  }
+  .cover{
+    background:
+      radial-gradient(1100px 420px at 88% -12%, color-mix(in srgb, var(--accent) 32%, transparent), transparent 60%),
+      linear-gradient(135deg, var(--secondary) 0%, var(--primary) 62%, #2896c2 100%);
+    color:#fff;
+    padding:40px 44px 34px;
+    position:relative;
+    overflow:hidden;
+    border-radius:14px 14px 0 0;
+  }
+  .cover::after{
+    content:"";
+    position:absolute;
+    right:-70px; bottom:-100px;
+    width:300px; height:300px;
+    border-radius:50%;
+    background: color-mix(in srgb, var(--accent) 55%, transparent);
+    filter: blur(2px);
+    opacity:.35;
+  }
+  .cover-eyebrow{
+    font-size:12px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    font-weight:700;
+    color:color-mix(in srgb, #fff 78%, var(--accent));
+    margin-bottom:12px;
+  }
+  .cover h1{
+    font-size:32px;
+    line-height:1.15;
+    max-width:600px;
+    text-wrap:balance;
+  }
+  .cover-sub{
+    margin-top:12px;
+    font-size:14.5px;
+    color:color-mix(in srgb, #fff 88%, transparent);
+    max-width:640px;
+  }
+  .cover-meta{
+    margin-top:24px;
+    display:flex;
+    gap:30px;
+    flex-wrap:wrap;
+    position:relative;
+    z-index:1;
+  }
+  .cover-meta div{ min-width:130px; }
+  .cover-meta .k{
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:color-mix(in srgb, #fff 70%, transparent);
+    font-weight:700;
+  }
+  .cover-meta .v{
+    font-size:14px;
+    font-weight:700;
+    margin-top:3px;
+    font-family: ui-monospace, "Cascadia Mono", "Consolas", monospace;
+  }
+
+  .stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:14px;
+    padding:24px 44px 6px;
+  }
+  @media (max-width:640px){ .stats{ grid-template-columns:repeat(2,1fr); } }
+  .stat{
+    border:1px solid var(--border);
+    border-top:3px solid var(--primary);
+    border-radius:8px;
+    padding:14px 16px;
+    background:var(--cream);
+  }
+  .stat.accent{ border-top-color:var(--accent); }
+  .stat.good{ border-top-color:var(--good); }
+  .stat.ink{ border-top-color:var(--secondary); }
+  .stat .num{
+    font-family: Georgia, serif;
+    font-size:28px;
+    font-weight:700;
+    color:var(--secondary);
+    font-variant-numeric: tabular-nums;
+  }
+  .stat .lbl{
+    font-size:11.5px;
+    color:var(--ink-muted);
+    margin-top:4px;
+    line-height:1.4;
+  }
+
+  .body-pad{ padding:8px 44px 36px; }
+  @media (max-width:640px){
+    .cover{ padding:30px 22px 26px; }
+    .stats{ padding:20px 22px 4px; }
+    .body-pad{ padding:8px 22px 30px; }
+  }
+
+  .note{
+    margin:18px 0 6px;
+    padding:12px 16px;
+    background:var(--cream);
+    border:1px solid var(--border-soft);
+    border-radius:8px;
+    font-size:13px;
+    color:var(--ink-muted);
+  }
+  .note b{ color:var(--ink); }
+  .note a{ color:var(--secondary); font-weight:600; }
+
+  section.group{ margin-top:26px; }
+  .group-head{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    border-bottom:2px solid var(--secondary);
+    padding-bottom:8px;
+    margin-bottom:10px;
+    flex-wrap:wrap;
+  }
+  .group-head h2{ font-size:18px; color:var(--secondary); }
+  .group-head .range{
+    font-size:11.5px;
+    color:var(--ink-faint);
+    font-family: ui-monospace, "Cascadia Mono", "Consolas", monospace;
+  }
+
+  table{ width:100%; border-collapse:collapse; }
+  thead th{
+    text-align:left;
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:var(--ink-faint);
+    font-weight:700;
+    padding:5px 10px 7px;
+    border-bottom:1px solid var(--border);
+  }
+  th.c-link, td.link{ width:230px; }
+  tbody tr:nth-child(even){ background: color-mix(in srgb, var(--cream) 55%, white); }
+  tbody td{
+    padding:9px 10px;
+    vertical-align:top;
+    border-bottom:1px solid var(--border-soft);
+    font-size:13px;
+  }
+  td.num{
+    font-family: ui-monospace, "Cascadia Mono", "Consolas", monospace;
+    font-weight:700;
+    color:var(--secondary);
+    font-variant-numeric: tabular-nums;
+    white-space:nowrap;
+  }
+  td.link{
+    font-family: ui-monospace, "Cascadia Mono", "Consolas", monospace;
+    font-size:11.5px;
+    color:var(--ink-muted);
+    word-break: break-all;
+  }
+  td.link a{
+    color:var(--secondary);
+    text-decoration:none;
+    border-bottom:1px dashed color-mix(in srgb, var(--secondary) 45%, transparent);
+  }
+  td.link a:hover{ border-bottom-style:solid; }
+  .badge{
+    display:inline-block;
+    font-size:9.5px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    padding:2px 7px;
+    border-radius:20px;
+    margin-right:6px;
+    position:relative;
+    top:-1px;
+  }
+  .badge.new{ background:var(--good-bg); color:var(--good); }
+  .badge.fatal{ background:var(--danger-bg); color:var(--danger); }
+  .badge.manual{ background:var(--cream-deep); color:#8a6a2e; }
+
+  .found-section{
+    margin-top:30px;
+    background:linear-gradient(180deg, var(--cream), white 60%);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:20px 24px;
+  }
+  .found-section h2{ font-size:17px; color:var(--secondary); margin-bottom:3px; }
+  .found-section .sub{ font-size:12px; color:var(--ink-muted); margin-bottom:12px; }
+  .found-list{ margin:0; padding:0; list-style:none; }
+  .found-list li{
+    position:relative;
+    padding:7px 0 7px 18px;
+    font-size:13px;
+    border-bottom:1px dashed var(--border-soft);
+  }
+  .found-list li:last-child{ border-bottom:none; }
+  .found-list li::before{
+    content:"";
+    position:absolute; left:0; top:14px;
+    width:7px; height:7px;
+    border-radius:50%;
+    background:var(--accent);
+  }
+  .found-list b{ color:var(--ink); }
+
+  .closing{
+    margin-top:28px;
+    padding-top:16px;
+    border-top:1px solid var(--border);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+    font-size:11.5px;
+    color:var(--ink-faint);
+  }
+  .closing .pass{ color:var(--good); font-weight:700; }
+  .closing code{
+    font-family: ui-monospace, "Cascadia Mono", "Consolas", monospace;
+    background:var(--cream);
+    padding:2px 7px;
+    border-radius:4px;
+    color:var(--secondary);
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="cover">
+    <div class="cover-eyebrow">Siata Mobilindo &middot; carlynk.id</div>
+    <h1>Laporan Verifikasi Perubahan</h1>
+    <div class="cover-sub">46 permintaan perbaikan &amp; fitur, dikelompokkan per halaman. Semua sudah di-deploy ke carlynk.id dan dicek langsung satu per satu, bukan sekadar dilihat dari kode.</div>
+    <div class="cover-meta">
+      <div>
+        <div class="k">Cabang</div>
+        <div class="v">feature/full-business-flow-tester</div>
+      </div>
+      <div>
+        <div class="k">Domain</div>
+        <div class="v">carlynk.id</div>
+      </div>
+      <div>
+        <div class="k">Automated test</div>
+        <div class="v">27 / 27 lolos</div>
+      </div>
+      <div>
+        <div class="k">Tanggal</div>
+        <div class="v">29 Agustus 2026</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="num">46</div>
+      <div class="lbl">Total permintaan &amp; perbaikan</div>
+    </div>
+    <div class="stat good">
+      <div class="num">44</div>
+      <div class="lbl">Terverifikasi langsung di browser</div>
+    </div>
+    <div class="stat accent">
+      <div class="num">2</div>
+      <div class="lbl">Terverifikasi tak langsung (kendala teknis pengujian)</div>
+    </div>
+    <div class="stat ink">
+      <div class="num">6</div>
+      <div class="lbl">Bug ekstra ditemukan &amp; diperbaiki sambil jalan</div>
+    </div>
+  </div>
+
+  <div class="body-pad">
+    <div class="note">
+      Sebagian besar tautan meminta login sebagai <b>Seller</b> terlebih dahulu &mdash; login sekali, tautan lain di halaman yang sama akan langsung terbuka.
+    </div>
+
+    <section class="group">
+      <div class="group-head"><h2>Pendaftaran showroom publik</h2><span class="range">01&ndash;04</span></div>
+      <table>
+        <thead><tr><th>#</th><th>Perubahan</th><th class="c-link">Link</th></tr></thead>
+        <tbody>
+          <tr><td class="num">01</td><td>Label &quot;Nama Pemilik&quot; &rarr; &quot;Nama&quot;</td><td class="link"><a href="https://carlynk.id/#/daftar-showroom">carlynk.id/#/daftar-showroom</a></td></tr>
+          <tr><td class="num">02</td><td>Hapus field Nomor WhatsApp &amp; Alamat Pemilik</td><td class="link"><a href="https://carlynk.id/#/daftar-showroom">carlynk.id/#/daftar-showroom</a></td></tr>
+          <tr><td class="num">03</td><td>&quot;Alamat halaman showroom&quot; &rarr; &quot;Alamat URL Showroom&quot;</td><td class="link"><a href="https://carlynk.id/#/daftar-showroom">carlynk.id/#/daftar-showroom</a></td></tr>
+          <tr><td class="num">04</td><td>&quot;Telepon showroom&quot; &rarr; &quot;Nomor WA Showroom&quot;</td><td class="link"><a href="https://carlynk.id/#/daftar-showroom">carlynk.id/#/daftar-showroom</a></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="group">
+      <div class="group-head"><h2>Profil akun</h2><span class="range">05, 10</span></div>
+      <table>
+        <thead><tr><th>#</th><th>Perubahan</th><th class="c-link">Link</th></tr></thead>
+        <tbody>
+          <tr><td class="num">05</td><td>Card &quot;Informasi Akun&quot; showroom: kiri Nama/Email, kanan Nama Showroom/Nomor WA</td><td class="link"><a href="https://carlynk.id/#/profile">carlynk.id/#/profile</a></td></tr>
+          <tr><td class="num">10</td><td>Susun ulang card logout: Nama / Email / Status / Logout</td><td class="link"><a href="https://carlynk.id/#/profile">carlynk.id/#/profile</a></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="group">
+      <div class="group-head"><h2>Halaman showroom milik seller</h2><span class="range">06&ndash;09, 25, 26, 39, 40, 42</span></div>
+      <table>
+        <thead><tr><th>#</th><th>Perubahan</th><th class="c-link">Link</th></tr></thead>
+        <tbody>
+          <tr><td class="num">06</td><td>Setiap bank pakai ikon dari master data</td><td class="link"><a href="https://carlynk.id/#/seller/showroom">carlynk.id/#/seller/showroom</a> (Edit)</td></tr>
+          <tr><td class="num">07</td><td>Dropdown Kota sebelum field alamat</td><td class="link"><a href="https://carlynk.id/#/seller/showroom">carlynk.id/#/seller/showroom</a> (Edit)</td></tr>
+          <tr><td class="num">08</td><td>Hapus 3 card hero stat (Profil/Kontak/Rekening)</td><td class="link"><a href="https://carlynk.id/#/seller/showroom">carlynk.id/#/seller/showroom</a></td></tr>
+          <tr><td class="num">09</td><td>Hapus teks &quot;Siap Pakai&quot; / Showroom readiness</td><td class="link"><a href="https://carlynk.id/#/seller/showroom">carlynk.id/#/seller/showroom</a></td></tr>
+          <tr><td class="num">25</td><td>Showroom bisa upload favicon/icon header sendiri</td><td class="link"><a href="https://carlynk.id/#/seller/showroom">carlynk.id/#/seller/showroom</a> (Edit &rarr; Branding)</td></tr>
+          <tr><td class="num">26</td><td>Showroom bisa ubah judul tab browser</td><td class="link"><a href="https://carlynk.id/#/seller/showroom">carlynk.id/#/seller/showroom</a> (Edit)</td></tr>
+          <tr><td class="num">39</td><td>Klik logo header &rarr; halaman showroom sendiri (lihat 41, dipindah ke buyer/marketing)</td><td class="link"><a href="https://carlynk.id/#/seller">carlynk.id/#/seller</a></td></tr>
+          <tr><td class="num">40</td><td>Upload logo header terpisah dari favicon (favicon persegi, logo boleh memanjang)</td><td class="link"><a href="https://carlynk.id/#/seller/showroom">carlynk.id/#/seller/showroom</a> (Edit &rarr; Branding)</td></tr>
+          <tr><td class="num">42</td><td>Modal Edit showroom: tombol Batal/Simpan pindah ke footer, teks deskripsi header dihapus</td><td class="link"><a href="https://carlynk.id/#/seller/showroom">carlynk.id/#/seller/showroom</a> (Edit)</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="group">
+      <div class="group-head"><h2>Form tambah / edit mobil</h2><span class="range">11&ndash;19, 35</span></div>
+      <table>
+        <thead><tr><th>#</th><th>Perubahan</th><th class="c-link">Link</th></tr></thead>
+        <tbody>
+          <tr><td class="num">11</td><td>Hapus tombol duplikat &quot;Mobil Baru&quot; &mdash; mode tambah</td><td class="link"><a href="https://carlynk.id/#/seller/cars">carlynk.id/#/seller/cars</a></td></tr>
+          <tr><td class="num">12</td><td>Hapus tombol duplikat &mdash; mode edit</td><td class="link"><a href="https://carlynk.id/#/seller/cars">carlynk.id/#/seller/cars</a></td></tr>
+          <tr><td class="num">13</td><td>Hapus field warna kedua &amp; variasi warna &mdash; tambah</td><td class="link"><a href="https://carlynk.id/#/seller/cars">carlynk.id/#/seller/cars</a></td></tr>
+          <tr><td class="num">14</td><td>Hapus field warna kedua &amp; variasi warna &mdash; edit</td><td class="link"><a href="https://carlynk.id/#/seller/cars">carlynk.id/#/seller/cars</a></td></tr>
+          <tr><td class="num">16</td><td>Hapus nomor mesin &amp; nomor rangka</td><td class="link"><a href="https://carlynk.id/#/seller/cars">carlynk.id/#/seller/cars</a></td></tr>
+          <tr><td class="num">17</td><td>&quot;Tanggal registrasi&quot; &rarr; &quot;Tahun Registrasi&quot;</td><td class="link"><a href="https://carlynk.id/#/seller/cars">carlynk.id/#/seller/cars</a></td></tr>
+          <tr><td class="num">18/35</td><td>Hapus field Stok</td><td class="link"><a href="https://carlynk.id/#/seller/cars">carlynk.id/#/seller/cars</a></td></tr>
+          <tr><td class="num">19</td><td>&quot;Status listing&quot; jadi dropdown: Draft/Published/Sold/View Sold/Archived</td><td class="link"><a href="https://carlynk.id/#/seller/cars">carlynk.id/#/seller/cars</a></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="group">
+      <div class="group-head"><h2>Navigasi &amp; sidebar</h2><span class="range">15, 20, 36, 41, 43, 45</span></div>
+      <table>
+        <thead><tr><th>#</th><th>Perubahan</th><th class="c-link">Link</th></tr></thead>
+        <tbody>
+          <tr><td class="num">15</td><td>Teks tombol ciutkan sidebar &rarr; &quot;Sembunyikan Sidebar&quot;</td><td class="link"><a href="https://carlynk.id/#/seller">carlynk.id/#/seller</a></td></tr>
+          <tr><td class="num">20</td><td>Sembunyikan tombol Login di header seller</td><td class="link"><a href="https://carlynk.id/#/login/seller">carlynk.id/#/login/seller</a></td></tr>
+          <tr><td class="num">36</td><td>Bottom footer buyer di halaman showroom (mobile) + setelah login</td><td class="link"><a href="https://carlynk.id/#/showrooms/hakim-mobilindo">carlynk.id/#/showrooms/hakim-mobilindo</a></td></tr>
+          <tr><td class="num">41</td><td>Klik logo header/sidebar &rarr; katalog showroom, dipindah dari Seller ke Buyer &amp; Marketing (termasuk buyer belum login)</td><td class="link"><a href="https://carlynk.id/#/s/hakim-mobilindo">carlynk.id/#/s/hakim-mobilindo</a></td></tr>
+          <tr><td class="num">43</td><td>#/google-login/buyer: sembunyikan Login header, tambah tombol &quot;Kembali ke Katalog&quot;</td><td class="link"><a href="https://carlynk.id/#/google-login/buyer">carlynk.id/#/google-login/buyer</a></td></tr>
+          <tr><td class="num">45</td><td><span class="badge new">Baru</span>Tombol &quot;Kembali ke Katalog&quot; sekarang selalu tampil, walau dibuka langsung tanpa asal showroom/marketing (fallback ke halaman utama)</td><td class="link"><a href="https://carlynk.id/#/google-login/buyer">carlynk.id/#/google-login/buyer</a></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="group">
+      <div class="group-head"><h2>Transaksi &amp; pembayaran</h2><span class="range">28&ndash;34</span></div>
+      <table>
+        <thead><tr><th>#</th><th>Perubahan</th><th class="c-link">Link</th></tr></thead>
+        <tbody>
+          <tr><td class="num">28</td><td>Sembunyikan Gopay &amp; QRIS dari metode pembayaran</td><td class="link"><a href="https://carlynk.id/#/showrooms/hakim-mobilindo">carlynk.id/#/showrooms/hakim-mobilindo</a> (pilih mobil &rarr; Booking)</td></tr>
+          <tr><td class="num">29</td><td><span class="badge manual">Manual</span>Tombol Copy nomor VA &mdash; tidak bisa dibuktikan otomatis (clipboard sandbox), mohon dicoba manual</td><td class="link">halaman hasil transaksi BCA VA</td></tr>
+          <tr><td class="num">30</td><td>&quot;Nominal utama&quot; &rarr; &quot;Booking Fee&quot;</td><td class="link">halaman hasil transaksi</td></tr>
+          <tr><td class="num">31</td><td>Sembunyikan card &quot;DP&quot;</td><td class="link">halaman hasil transaksi</td></tr>
+          <tr><td class="num">32</td><td>Card Kadaluarsa hilang saat sudah dibayar + waktu jadi 5 menit</td><td class="link">halaman hasil transaksi</td></tr>
+          <tr><td class="num">33</td><td><span class="badge fatal">Bug fatal</span>Dua pembeli satu mobil &mdash; diperbaiki, diuji dengan proses paralel sungguhan</td><td class="link">perbaikan backend, tidak ada tampilan</td></tr>
+          <tr><td class="num">34</td><td>Filter periode: Bulan ini/Bulan Kemarin/Pilih Bulan/Semua Periode</td><td class="link"><a href="https://carlynk.id/#/seller/transactions">carlynk.id/#/seller/transactions</a></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="group">
+      <div class="group-head"><h2>Marketing / affiliate</h2><span class="range">37, 38, 44, 46</span></div>
+      <table>
+        <thead><tr><th>#</th><th>Perubahan</th><th class="c-link">Link</th></tr></thead>
+        <tbody>
+          <tr><td class="num">37</td><td>&quot;Slug marketing&quot; &rarr; &quot;URL marketing&quot; + preview URL live</td><td class="link"><a href="https://carlynk.id/#/seller/affiliates?mode=create">carlynk.id/#/seller/affiliates?mode=create</a></td></tr>
+          <tr><td class="num">38</td><td>Keterangan merah saat URL sudah dipakai (ganti teks statis lama)</td><td class="link"><a href="https://carlynk.id/#/seller/affiliates?mode=create">carlynk.id/#/seller/affiliates?mode=create</a></td></tr>
+          <tr><td class="num">44</td><td>Tombol &quot;Atur Komisi Umum&quot;/&quot;Tambah aturan khusus&quot; berkedip saat ditutup, sekarang langsung tertutup</td><td class="link"><a href="https://carlynk.id/#/seller/affiliate-commissions">carlynk.id/#/seller/affiliate-commissions</a></td></tr>
+          <tr><td class="num">46</td><td><span class="badge new">Baru</span>Logo, favicon, dan judul tab di halaman marketing #/af/:slug sekarang ikut showroom milik affiliate tersebut (sebelumnya selalu logo/favicon default)</td><td class="link"><a href="https://carlynk.id/#/af/rohim">carlynk.id/#/af/rohim</a></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <div class="found-section">
+      <h2>Ditemukan &amp; diperbaiki sambil jalan</h2>
+      <div class="sub">Tidak ada dalam daftar permintaan &mdash; ditemukan saat menguji, langsung diperbaiki di sumbernya.</div>
+      <ul class="found-list">
+        <li><b>Password marketing ikut terhapus</b> &mdash; efek samping pengecekan URL live (item 38): form sempat mengosongkan password setiap kali pengecekan berjalan di tengah pengetikan.</li>
+        <li><b>Logo seller sempat tidak bisa diklik</b> &mdash; deteksi role di header salah baca status login pada percobaan pertama item 39. Dicek ulang sampai berhasil.</li>
+        <li><b>Favicon showroom tidak pernah benar-benar berubah</b> &mdash; ditemukan saat memeriksa item 25: dua tag ikon tersembunyi di kepala halaman karena skrip awal jalan sebelum HTML server selesai dimuat.</li>
+        <li><b>Logo default berkedip sebelum logo showroom muncul</b> &mdash; saat buka/muat ulang halaman showroom. Diperbaiki dua tahap (gambar, lalu nama aplikasi di sebelahnya).</li>
+        <li><b>#/admin (dan #/seller, #/buyer) sempat salah arah ke katalog publik</b> &mdash; regresi dari percobaan mempercepat waktu muat halaman pertama. Ditemukan dari laporan Anda, langsung dikembalikan ke versi aman.</li>
+        <li><b>API validasi kode referral tidak pernah mengirim logo/favicon showroom</b> &mdash; ditemukan saat mengerjakan item 46: query backend tidak pernah mengambil kolom logo header, favicon, dan judul tab showroom untuk halaman marketing. Ditambahkan di sumbernya.</li>
+      </ul>
+    </div>
+
+    <div class="closing">
+      <div>Cabang <code>feature/full-business-flow-tester</code> &middot; setiap perubahan dicek langsung di carlynk.id, bukan hanya dari kode.</div>
+      <div class="pass">27 / 27 automated test lolos di setiap tahap deploy</div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
