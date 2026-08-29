@@ -328,7 +328,7 @@
 
   <div class="body-pad">
     <div class="note">
-      Sebagian besar tautan meminta login sebagai <b>Seller</b> terlebih dahulu &mdash; login sekali, tautan lain di halaman yang sama akan langsung terbuka.
+      Sebagian besar tautan meminta login sebagai <b>Showroom</b> terlebih dahulu &mdash; login sekali, tautan lain di halaman yang sama akan langsung terbuka.
     </div>
 
     <section class="group">
@@ -356,7 +356,7 @@
     </section>
 
     <section class="group">
-      <div class="group-head"><h2>Halaman showroom milik seller</h2><span class="range">06&ndash;09, 25, 26, 39, 40, 42</span></div>
+      <div class="group-head"><h2>Halaman showroom sendiri</h2><span class="range">06&ndash;09, 25, 26, 39, 40, 42</span></div>
       <table>
         <thead><tr><th>#</th><th>Perubahan</th><th class="c-link">Link</th></tr></thead>
         <tbody>
@@ -396,9 +396,9 @@
         <thead><tr><th>#</th><th>Perubahan</th><th class="c-link">Link</th></tr></thead>
         <tbody>
           <tr><td class="num">15</td><td>Teks tombol ciutkan sidebar &rarr; &quot;Sembunyikan Sidebar&quot;</td><td class="link"><a href="https://carlynk.id/#/seller">carlynk.id/#/seller</a></td></tr>
-          <tr><td class="num">20</td><td>Sembunyikan tombol Login di header seller</td><td class="link"><a href="https://carlynk.id/#/login/seller">carlynk.id/#/login/seller</a></td></tr>
+          <tr><td class="num">20</td><td>Sembunyikan tombol Login di header Showroom</td><td class="link"><a href="https://carlynk.id/#/login/seller">carlynk.id/#/login/seller</a></td></tr>
           <tr><td class="num">36</td><td>Bottom footer buyer di halaman showroom (mobile) + setelah login</td><td class="link"><a href="https://carlynk.id/#/showrooms/hakim-mobilindo">carlynk.id/#/showrooms/hakim-mobilindo</a></td></tr>
-          <tr><td class="num">41</td><td>Klik logo header/sidebar &rarr; katalog showroom, dipindah dari Seller ke Buyer &amp; Marketing (termasuk buyer belum login)</td><td class="link"><a href="https://carlynk.id/#/s/hakim-mobilindo">carlynk.id/#/s/hakim-mobilindo</a></td></tr>
+          <tr><td class="num">41</td><td>Klik logo header/sidebar &rarr; katalog showroom, dipindah dari Showroom ke Buyer &amp; Marketing (termasuk buyer belum login)</td><td class="link"><a href="https://carlynk.id/#/s/hakim-mobilindo">carlynk.id/#/s/hakim-mobilindo</a></td></tr>
           <tr><td class="num">43</td><td>#/google-login/buyer: sembunyikan Login header, tambah tombol &quot;Kembali ke Katalog&quot;</td><td class="link"><a href="https://carlynk.id/#/google-login/buyer">carlynk.id/#/google-login/buyer</a></td></tr>
           <tr><td class="num">45</td><td><span class="badge new">Baru</span>Tombol &quot;Kembali ke Katalog&quot; sekarang selalu tampil, walau dibuka langsung tanpa asal showroom/marketing (fallback ke halaman utama)</td><td class="link"><a href="https://carlynk.id/#/google-login/buyer">carlynk.id/#/google-login/buyer</a></td></tr>
         </tbody>
@@ -439,7 +439,7 @@
       <div class="sub">Tidak ada dalam daftar permintaan &mdash; ditemukan saat menguji, langsung diperbaiki di sumbernya.</div>
       <ul class="found-list">
         <li><b>Password marketing ikut terhapus</b> &mdash; efek samping pengecekan URL live (item 38): form sempat mengosongkan password setiap kali pengecekan berjalan di tengah pengetikan.</li>
-        <li><b>Logo seller sempat tidak bisa diklik</b> &mdash; deteksi role di header salah baca status login pada percobaan pertama item 39. Dicek ulang sampai berhasil.</li>
+        <li><b>Logo Showroom sempat tidak bisa diklik</b> &mdash; deteksi role di header salah baca status login pada percobaan pertama item 39. Dicek ulang sampai berhasil.</li>
         <li><b>Favicon showroom tidak pernah benar-benar berubah</b> &mdash; ditemukan saat memeriksa item 25: dua tag ikon tersembunyi di kepala halaman karena skrip awal jalan sebelum HTML server selesai dimuat.</li>
         <li><b>Logo default berkedip sebelum logo showroom muncul</b> &mdash; saat buka/muat ulang halaman showroom. Diperbaiki dua tahap (gambar, lalu nama aplikasi di sebelahnya).</li>
         <li><b>#/admin (dan #/seller, #/buyer) sempat salah arah ke katalog publik</b> &mdash; regresi dari percobaan mempercepat waktu muat halaman pertama. Ditemukan dari laporan Anda, langsung dikembalikan ke versi aman.</li>
