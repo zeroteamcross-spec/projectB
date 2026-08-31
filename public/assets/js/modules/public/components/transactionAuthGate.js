@@ -19,7 +19,7 @@ export function TransactionAuthGate({
   eyebrow.textContent = "Akun akses";
   const title = document.createElement("h2");
   title.className = "text-lg font-bold tracking-normal text-gray-950";
-  title.textContent = "Masuk";
+  title.textContent = mode === "register" ? "Daftar Pembeli" : "Masuk";
   const body = document.createElement("p");
   body.className = "text-xs leading-6 text-gray-600";
   body.textContent = "Transaksi membutuhkan akun aktif agar pesanan dan pembayaran tercatat aman.";
@@ -36,16 +36,16 @@ export function TransactionAuthGate({
     ? registerForm({ isSubmitting, onRegister })
     : loginForm({ isSubmitting, onLogin });
 
-  section.append(header);
+  section.append(header, tabs);
 
   if (error) {
     const message = document.createElement("p");
     message.className = tw.alert.error;
     message.textContent = error;
-    // section.append(message);
+    section.append(message);
   }
 
-  section.append(helperStrip(), form);
+  section.append(form);
   return section;
 }
 
@@ -144,17 +144,3 @@ function submitButton(label, disabled = false) {
   return button;
 }
 
-function helperStrip() {
-  const strip = document.createElement("div");
-  strip.className = "grid gap-2 border-t border-[var(--pb-card-border)] pt-4 text-xs text-gray-600";
-  [
-    "",
-    "",
-  ].forEach((copy) => {
-    const item = document.createElement("p");
-    item.className = "rounded-2xl bg-[var(--pb-surface-muted)] px-3 py-2";
-    item.textContent = copy;
-    strip.append(item);
-  });
-  return strip;
-}
