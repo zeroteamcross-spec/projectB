@@ -301,7 +301,7 @@
   <div class="cover">
     <div class="cover-eyebrow">Siata Mobilindo &middot; carlynk.id</div>
     <h1>Laporan Verifikasi Perubahan</h1>
-    <div class="cover-sub">49 permintaan perbaikan &amp; fitur, dikelompokkan per halaman. Semua sudah di-deploy ke carlynk.id dan dicek langsung satu per satu, bukan sekadar dilihat dari kode.</div>
+    <div class="cover-sub">50 permintaan perbaikan &amp; fitur, dikelompokkan per halaman. Semua sudah di-deploy ke carlynk.id dan dicek langsung satu per satu, bukan sekadar dilihat dari kode.</div>
     <div class="cover-meta">
       <div>
         <div class="k">Cabang</div>
@@ -324,11 +324,11 @@
 
   <div class="stats">
     <div class="stat">
-      <div class="num">49</div>
+      <div class="num">50</div>
       <div class="lbl">Total permintaan &amp; perbaikan</div>
     </div>
     <div class="stat good">
-      <div class="num">47</div>
+      <div class="num">48</div>
       <div class="lbl">Terverifikasi langsung di browser</div>
     </div>
     <div class="stat accent">
@@ -354,8 +354,25 @@
         <ul class="found-list">
           <li><b>48</b> &mdash; Admin bisa menandai mobil terjual di luar sistem (WhatsApp, transaksi langsung di showroom), dengan keterangan bebas yang ditulis sendiri oleh Admin (wajib diisi) untuk audit.</li>
           <li><b>49</b> &mdash; Marketing bisa membagikan link satu mobil tertentu (&quot;Bagikan Mobil&quot;), tetap terdeteksi dan tetap dapat komisi.</li>
+          <li><b>50</b> &mdash; <b>Perbaikan performa besar</b> &mdash; semua data dashboard selesai dimuat &lt;1 detik (sebelumnya 3+ detik). Lihat rincian di bawah.</li>
         </ul>
       </div>
+    </div>
+
+    <div class="found-section">
+      <h2>Perbaikan performa: pemuatan halaman &lt;1 detik (50)</h2>
+      <div class="sub">Ditemukan lewat pengukuran langsung di production, bukan dugaan.</div>
+      <p style="font-size:13px;line-height:1.7;color:var(--ink);margin:0 0 12px;">Setiap kali ada yang login, aplikasi memverifikasi ulang &quot;kunci masuk otomatis&quot; (remember-me) memakai metode enkripsi yang sengaja dibuat lambat (bcrypt) untuk melindungi kata sandi manusia dari tebakan paksa. Masalahnya, verifikasi ini berjalan di <b>setiap pemanggilan data yang butuh login</b> &mdash; bukan cuma sekali saat buka halaman &mdash; sehingga setiap panggilan ikut kena jeda &plusmn;1,2 detik, dan beberapa panggilan bahkan menunggu bergantian, bukan bersamaan. Diganti dengan metode verifikasi yang tetap aman (kuncinya kode acak yang sudah mustahil ditebak, bukan kata sandi manusia) tapi jauh lebih cepat.</p>
+      <table>
+        <thead><tr><th>Bagian</th><th>Sebelum</th><th>Sesudah</th></tr></thead>
+        <tbody>
+          <tr><td>Cek status login (autologin)</td><td class="link" style="color:var(--danger);">1,3 detik</td><td class="link" style="color:var(--good);font-weight:700;">0,2 detik</td></tr>
+          <tr><td>Ambil notifikasi</td><td class="link" style="color:var(--danger);">1,3 detik (menunggu giliran)</td><td class="link" style="color:var(--good);font-weight:700;">0,2 detik (barengan)</td></tr>
+          <tr><td>Halaman kosong termuat</td><td class="link" style="color:var(--danger);">0,75 detik</td><td class="link" style="color:var(--good);font-weight:700;">0,25 detik</td></tr>
+          <tr><td><b>Semua data dashboard siap</b></td><td class="link" style="color:var(--danger);"><b>3+ detik</b></td><td class="link" style="color:var(--good);font-weight:700;"><b>&lt;1 detik</b></td></tr>
+        </tbody>
+      </table>
+      <div class="sub" style="margin-top:12px;">Catatan: semua orang yang sedang login otomatis diminta login ulang satu kali setelah perbaikan ini (efek samping mengganti metode kuncinya), setelah itu berjalan normal dengan kecepatan baru.</div>
     </div>
 
     <section class="group">
