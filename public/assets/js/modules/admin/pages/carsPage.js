@@ -14,6 +14,7 @@ import { SellerCarsList } from "../../seller/components/sellerCarsList.js";
 
 const RUNTIME_KEY = "adminCars";
 const CAR_FORM_MODAL_KEY = "admin-cars-form-modal";
+const MARK_SOLD_EXTERNAL_MODAL_KEY = "admin-cars-mark-sold-external-modal";
 const DEFAULT_RUNTIME = {
   mode: "list",
   selectedCar: null,
@@ -31,6 +32,7 @@ const DEFAULT_RUNTIME = {
     pageSize: 10,
   },
   formStep: 1,
+  markSoldExternal: null,
 };
 
 export function AdminCarsPage() {
@@ -57,6 +59,7 @@ export function AdminCarsPage() {
     },
     dispose() {
       closeCarFormModal();
+      closeMarkSoldExternalModal();
       unsubscribe = null;
       appStore.destroyRuntimeState(RUNTIME_KEY);
     },
@@ -93,6 +96,7 @@ function render(root, router) {
     onArchive: (car) => archiveCar(car),
     onImages: (car) => router?.navigate(`/admin/cars/${car.id}/images`),
     onInspection: (car) => router?.navigate(`/admin/cars/${car.id}/inspection`),
+    onMarkSoldExternal: (car) => setRuntime({ markSoldExternal: { car, note: "", saving: false, error: "" } }),
     pagination: createCarsPagination(pagination),
   });
 
@@ -116,7 +120,105 @@ function render(root, router) {
     closeCarFormModal();
   }
 
+  if (runtime.markSoldExternal) {
+    openMarkSoldExternalModal(runtime.markSoldExternal);
+  } else {
+    closeMarkSoldExternalModal();
+  }
+
   startBackgroundLoad();
+}
+
+function openMarkSoldExternalModal(state) {
+  const content = document.createElement("section");
+  content.id = "adcars_mark_sold_external_modal_content_section";
+  content.className = "grid min-w-0 gap-3";
+
+  const carLabel = [state.car?.brand_name, state.car?.model_name, state.car?.sub_model_name].filter(Boolean).join(" ") || "Mobil";
+  content.append(textNode("p", "text-xs leading-6 text-gray-600", `${carLabel} akan ditandai Terjual dan disembunyikan dari katalog publik. Jelaskan alasannya (mis. laku lewat WhatsApp, transaksi langsung di showroom) untuk keperluan audit.`));
+
+  const label = document.createElement("label");
+  label.className = "grid gap-1.5 text-xs font-bold text-gray-700";
+  label.textContent = "Keterangan";
+  const textarea = document.createElement("textarea");
+  textarea.id = "adcars_mark_sold_external_note_input";
+  textarea.rows = 4;
+  textarea.value = state.note ?? "";
+  textarea.placeholder = "Contoh: Laku langsung ke pembeli di showroom pada 31 Agustus 2026, dibayar tunai.";
+  textarea.className = "min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-2.5 text-xs font-semibold text-[var(--pb-text)] outline-none transition duration-150 placeholder:text-[var(--pb-text-muted)] focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  textarea.addEventListener("input", () => {
+    setRuntime({ markSoldExternal: { ...runtimeState().markSoldExternal, note: textarea.value } });
+  });
+  label.append(textarea);
+  content.append(label);
+
+  const error = message("red", state.error);
+  error.id = "adcars_mark_sold_external_error_section";
+  content.append(error);
+
+  openModal(content, {
+    key: MARK_SOLD_EXTERNAL_MODAL_KEY,
+    title: "Tandai Terjual (Luar Sistem)",
+    description: "Untuk mobil yang laku tanpa transaksi di aplikasi.",
+    size: "md",
+    footer: "custom",
+    footerNode: markSoldExternalFooter(state),
+    panelId: "adcars_mark_sold_external_modal_section",
+    onClose: () => setRuntime({ markSoldExternal: null }),
+    preserveContentOnSameSignature: true,
+    contentSignature: [state.car?.id, state.saving ? "saving" : "idle", state.error ?? ""].join("|"),
+  });
+}
+
+function markSoldExternalFooter(state) {
+  const footer = document.createElement("section");
+  footer.className = "flex w-full flex-col-reverse gap-2 sm:flex-row sm:justify-end";
+
+  const cancel = Button({ label: "Batal", variant: "secondary", disabled: state.saving, onClick: () => setRuntime({ markSoldExternal: null }) });
+  cancel.id = "adcars_mark_sold_external_cancel_button";
+
+  const submit = Button({
+    label: state.saving ? "Menyimpan..." : "Tandai Terjual",
+    disabled: state.saving,
+    onClick: () => submitMarkSoldExternal(),
+  });
+  submit.id = "adcars_mark_sold_external_submit_button";
+
+  footer.append(cancel, submit);
+  return footer;
+}
+
+async function submitMarkSoldExternal() {
+  const state = runtimeState().markSoldExternal;
+  if (!state?.car?.id) {
+    return;
+  }
+
+  const note = String(state.note ?? "").trim();
+  if (note.length < 5) {
+    setRuntime({ markSoldExternal: { ...state, error: "Keterangan minimal 5 karakter." } });
+    return;
+  }
+
+  setRuntime({ markSoldExternal: { ...state, saving: true, error: "" } });
+
+  try {
+    const car = await carsResource.adminMarkSoldExternal(state.car.id, note);
+    upsertCarInWorkingList(car);
+    setRuntime({ markSoldExternal: null, notice: "Mobil berhasil ditandai terjual di luar sistem." });
+    showToast("Mobil berhasil ditandai terjual di luar sistem.", { type: "success" });
+  } catch (error) {
+    const messageText = error?.message ?? "Mobil gagal ditandai terjual.";
+    setRuntime({ markSoldExternal: { ...runtimeState().markSoldExternal, saving: false, error: messageText } });
+    showToast(messageText, { type: "error" });
+  }
+}
+
+function closeMarkSoldExternalModal() {
+  const modal = appStore.get("ui.modal", null);
+  if (modal?.key === MARK_SOLD_EXTERNAL_MODAL_KEY) {
+    closeModal({ notify: false });
+  }
 }
 
 function openCarFormModal({ runtime, brandOptions }) {

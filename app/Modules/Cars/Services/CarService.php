@@ -6,6 +6,7 @@ namespace App\Modules\Cars\Services;
 
 use App\Core\Exceptions\NotFoundException;
 use App\Core\Exceptions\ForbiddenException;
+use App\Core\Exceptions\ValidationException;
 use App\Modules\Cars\Mappers\CarMapper;
 use App\Modules\Cars\Policies\CarPolicy;
 use App\Modules\Cars\Repositories\CarRepository;
@@ -144,6 +145,33 @@ class CarService
             'id' => $id,
             'listing_status' => 'archived',
         ];
+    }
+
+    /**
+     * Mobil yang laku di luar aplikasi (WhatsApp, transaksi langsung di
+     * showroom) tidak pernah lewat alur transaksi normal, jadi tidak ada
+     * jejak otomatis kenapa listingnya hilang dari katalog. Ini jalur admin
+     * untuk menutup listing itu dengan keterangan wajib, supaya masih ada
+     * audit trail meski tanpa transaksi.
+     */
+    public function markSoldExternal(array $user, int $id, string $note): array
+    {
+        CarPolicy::requireAdmin($user);
+        $car = $this->cars->findById($id, true);
+
+        if (! $car) {
+            throw new NotFoundException('Mobil tidak ditemukan.');
+        }
+
+        $trimmedNote = trim($note);
+
+        if ($trimmedNote === '') {
+            throw new ValidationException(['note' => 'Keterangan wajib diisi.']);
+        }
+
+        $this->cars->markSoldExternal($id, $trimmedNote, (int) $user['id']);
+
+        return $this->detail($id, $user);
     }
 
     private function listWithMeta(array $filters, array $pagination): array

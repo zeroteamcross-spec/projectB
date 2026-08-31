@@ -24,5 +24,6 @@ return static function (Router $router): void {
         $router->post('', [CarController::class, 'create']);
         $router->patch('/{id}', [CarController::class, 'update']);
         $router->delete('/{id}', [CarController::class, 'archive']);
+        $router->post('/{id}/mark-sold-external', [CarController::class, 'markSoldExternal']);
     }, [AuthenticatedUserMiddleware::class]);
 };

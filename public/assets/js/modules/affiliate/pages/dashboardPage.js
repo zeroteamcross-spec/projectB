@@ -65,6 +65,9 @@ export function AffiliateDashboardPage({ notFound = false } = {}) {
     openSettlements() {
       currentContext?.router?.navigate("/affiliate/settlements");
     },
+    openCars() {
+      currentContext?.router?.navigate("/affiliate/cars");
+    },
   };
 
   return createPageLifecycle({
@@ -159,6 +162,7 @@ function render(root, context, notFound, actions) {
       onOpenActivity: () => actions.openActivity(),
       onOpenLedger: () => actions.openLedger(),
       onOpenSettlements: () => actions.openSettlements(),
+      onOpenCars: () => actions.openCars(),
     }), "affiliate.dashboard.quick_actions"),
   );
 

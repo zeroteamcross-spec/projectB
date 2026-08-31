@@ -70,4 +70,9 @@ export const carsResource = {
     const response = await apiClient.delete(`/admin/cars/${encodeURIComponent(id)}`, options);
     return response.data?.car ?? null;
   },
+
+  async adminMarkSoldExternal(id, note, options = {}) {
+    const response = await apiClient.post(`/admin/cars/${encodeURIComponent(id)}/mark-sold-external`, { note }, options);
+    return response.data?.car ?? null;
+  },
 };

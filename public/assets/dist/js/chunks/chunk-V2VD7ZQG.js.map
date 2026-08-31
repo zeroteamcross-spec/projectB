@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../../../js/utils/formatCurrency.js", "../../../js/ui/composites/card.js"],
-  "sourcesContent": ["export function formatCurrency(value, currency = \"IDR\") {\n  return new Intl.NumberFormat(\"id-ID\", {\n    style: \"currency\",\n    currency,\n    maximumFractionDigits: 0,\n  }).format(Number(value ?? 0));\n}\n", "import { cx, tw } from \"../theme/tailwindClasses.js\";\nimport { applyDesignHook } from \"../../theme/designStudioHooks.js\";\n\nexport function Card(children = [], options = {}) {\n  const node = document.createElement(\"article\");\n  node.className = cx(\n    options.variant === \"raised\" ? tw.surface.raisedCard : tw.surface.card,\n    options.className ?? \"\"\n  );\n  applyDesignHook(node, options.designHook ?? null);\n  node.append(...(Array.isArray(children) ? children : [children]));\n  return node;\n}\n"],
-  "mappings": "sDAAO,SAASA,EAAeC,EAAOC,EAAW,MAAO,CACtD,OAAO,IAAI,KAAK,aAAa,QAAS,CACpC,MAAO,WACP,SAAAA,EACA,sBAAuB,CACzB,CAAC,EAAE,OAAO,OAAOD,GAAS,CAAC,CAAC,CAC9B,CCHO,SAASE,EAAKC,EAAW,CAAC,EAAGC,EAAU,CAAC,EAAG,CAChD,IAAMC,EAAO,SAAS,cAAc,SAAS,EAC7C,OAAAA,EAAK,UAAYC,EACfF,EAAQ,UAAY,SAAWG,EAAG,QAAQ,WAAaA,EAAG,QAAQ,KAClEH,EAAQ,WAAa,EACvB,EACAI,EAAgBH,EAAMD,EAAQ,YAAc,IAAI,EAChDC,EAAK,OAAO,GAAI,MAAM,QAAQF,CAAQ,EAAIA,EAAW,CAACA,CAAQ,CAAE,EACzDE,CACT",
-  "names": ["formatCurrency", "value", "currency", "Card", "children", "options", "node", "cx", "tw", "applyDesignHook"]
-}

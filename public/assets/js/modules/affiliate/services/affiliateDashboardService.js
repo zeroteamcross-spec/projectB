@@ -32,6 +32,10 @@ export const affiliateDashboardService = {
     return sellerAffiliateService.landingPath(affiliate?.referral_code ?? "");
   },
 
+  carLandingUrl(affiliate = null, carId = "") {
+    return sellerAffiliateService.carLandingUrl(affiliate?.referral_code ?? "", carId);
+  },
+
   summaryCards(affiliate = null) {
     const summary = this.summary(affiliate);
 

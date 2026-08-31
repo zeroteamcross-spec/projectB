@@ -9,6 +9,7 @@ use App\Core\JsonResponse;
 use App\Core\Request;
 use App\Modules\Cars\Requests\CreateCarRequest;
 use App\Modules\Cars\Requests\ListCarsRequest;
+use App\Modules\Cars\Requests\MarkCarSoldExternalRequest;
 use App\Modules\Cars\Requests\UpdateCarRequest;
 use App\Modules\Cars\Services\CarService;
 
@@ -89,5 +90,15 @@ class CarController extends Controller
         return JsonResponse::success([
             'car' => $this->service->archive($user, (int) $request->routeParam('id')),
         ], 'Mobil berhasil diarsipkan.');
+    }
+
+    public function markSoldExternal(Request $request): JsonResponse
+    {
+        $user = $this->user($request);
+        $payload = (new MarkCarSoldExternalRequest($request))->validate();
+
+        return JsonResponse::success([
+            'car' => $this->service->markSoldExternal($user, (int) $request->routeParam('id'), $payload['note']),
+        ], 'Mobil berhasil ditandai terjual di luar sistem.');
     }
 }

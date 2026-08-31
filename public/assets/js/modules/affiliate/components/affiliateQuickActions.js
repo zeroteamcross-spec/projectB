@@ -11,6 +11,7 @@ export function AffiliateQuickActions({
   onOpenActivity = null,
   onOpenLedger = null,
   onOpenSettlements = null,
+  onOpenCars = null,
 } = {}) {
   const section = document.createElement("section");
   section.className = "grid min-w-0 gap-3 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5";
@@ -32,6 +33,12 @@ export function AffiliateQuickActions({
         disabled: copying,
         onClick: () => onCopyLanding?.(affiliate),
       })),
+    },
+    {
+      title: "Bagikan per mobil",
+      description: "Ambil link satu mobil tertentu untuk dibagikan ke calon pembeli, tetap teratribusi ke Anda.",
+      icon: "car",
+      action: idButton("aff_open_cars_button", Button({ label: "Bagikan mobil", variant: "secondary", onClick: () => onOpenCars?.() })),
     },
     {
       title: "Buka activity clicks",

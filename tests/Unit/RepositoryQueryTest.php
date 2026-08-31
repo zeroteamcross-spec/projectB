@@ -123,6 +123,7 @@ class RepositoryQueryTest extends TestCase
             description TEXT NULL, youtube_url TEXT NULL, price_cash INTEGER NULL, price_discount INTEGER NULL,
             price_credit INTEGER NULL,
             dp_amount INTEGER NULL, inspection_summary_status TEXT, published_at TEXT NULL,
+            external_sale_note TEXT NULL, external_sale_marked_at TEXT NULL, external_sale_marked_by INTEGER NULL,
             created_at TEXT, updated_at TEXT NULL, deleted_at TEXT NULL
         )');
         $pdo->exec('CREATE TABLE car_images (

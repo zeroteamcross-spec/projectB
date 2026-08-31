@@ -15,6 +15,7 @@ class CarRepository
         seat_count, previous_owner_count, has_service_book, key_count, description,
         youtube_url, price_cash, price_discount, price_credit, dp_amount,
         inspection_summary_status, published_at,
+        external_sale_note, external_sale_marked_at, external_sale_marked_by,
         created_at, updated_at,
         (
             SELECT cover_image.file_path
@@ -166,6 +167,27 @@ class CarRepository
         $stmt->execute([
             'id' => $id,
             'deleted_at' => $now,
+            'updated_at' => $now,
+        ]);
+    }
+
+    public function markSoldExternal(int $id, string $note, int $adminUserId): void
+    {
+        $stmt = $this->pdo->prepare(
+            "UPDATE cars
+             SET listing_status = 'sold',
+                 external_sale_note = :note,
+                 external_sale_marked_at = :marked_at,
+                 external_sale_marked_by = :marked_by,
+                 updated_at = :updated_at
+             WHERE id = :id"
+        );
+        $now = date('Y-m-d H:i:s');
+        $stmt->execute([
+            'id' => $id,
+            'note' => $note,
+            'marked_at' => $now,
+            'marked_by' => $adminUserId,
             'updated_at' => $now,
         ]);
     }

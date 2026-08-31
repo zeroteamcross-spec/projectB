@@ -107,6 +107,35 @@ export const sellerAffiliateService = {
       return "";
     }
 
+    return this.absoluteUrl(path);
+  },
+
+  // Link ke satu mobil tertentu di bawah context marketing -- klik di sini
+  // ikut mengaktifkan context yang sama dengan landing (lihat
+  // publicContextService.activateAffiliateBySlug()), jadi transaksi dari
+  // link ini tetap teratribusi ke marketing yang sama seperti link katalog.
+  carLandingPath(slug = "", carId = "") {
+    const base = this.landingPath(slug);
+    const normalizedCarId = String(carId ?? "").trim();
+
+    if (!base || !normalizedCarId) {
+      return "";
+    }
+
+    return `${base}/cars/${encodeURIComponent(normalizedCarId)}`;
+  },
+
+  carLandingUrl(slug = "", carId = "") {
+    const path = this.carLandingPath(slug, carId);
+
+    if (!path) {
+      return "";
+    }
+
+    return this.absoluteUrl(path);
+  },
+
+  absoluteUrl(path = "") {
     const hostname = window.location.hostname.replace(/^(showroom|marketing|admin)\./i, "");
     const origin = `${window.location.protocol}//${hostname}${window.location.port ? ":" + window.location.port : ""}`;
 

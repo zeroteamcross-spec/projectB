@@ -205,6 +205,9 @@ class FavoritesTest extends TestCase
             dp_amount INTEGER NULL,
             inspection_summary_status TEXT NULL,
             published_at TEXT NULL,
+            external_sale_note TEXT NULL,
+            external_sale_marked_at TEXT NULL,
+            external_sale_marked_by INTEGER NULL,
             created_at TEXT NULL,
             updated_at TEXT NULL,
             deleted_at TEXT NULL

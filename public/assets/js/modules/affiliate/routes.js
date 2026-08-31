@@ -3,11 +3,28 @@ import { affiliateActivityService } from "./services/affiliateActivityService.js
 import { affiliateLedgerService } from "./services/affiliateLedgerService.js";
 import { affiliateSettlementService } from "./services/affiliateSettlementService.js";
 import { AffiliateActivityPage } from "./pages/activityPage.js";
+import { AffiliateCarsPage } from "./pages/carsPage.js";
 import { AffiliateDashboardPage } from "./pages/dashboardPage.js";
 import { AffiliateLedgerPage } from "./pages/ledgerPage.js";
 import { AffiliateSettlementsPage } from "./pages/settlementsPage.js";
 
 export const affiliateRoutes = [
+  {
+    name: "affiliate.cars",
+    path: "/affiliate/cars",
+    shell: "app",
+    role: "affiliate_admin",
+    page: AffiliateCarsPage,
+    workingStateKey: "affiliateCars",
+    preload: {
+      working: [
+        {
+          key: "profile",
+          loader: ({ signal }) => affiliateDashboardService.me({ signal }).catch(() => null),
+        },
+      ],
+    },
+  },
   {
     name: "affiliate.settlements",
     path: "/affiliate/settlements",

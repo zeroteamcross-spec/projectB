@@ -12,6 +12,7 @@ export function SellerCarsList({
   onArchive = null,
   onImages = null,
   onInspection = null,
+  onMarkSoldExternal = null,
   pagination = null,
 } = {}) {
   const shell = document.createElement("section");
@@ -24,7 +25,7 @@ export function SellerCarsList({
     title: "Daftar mobil",
     subtitle: `${cars.length} listing cocok dengan filter aktif`,
     icon: tableIcon(),
-    columns: carColumns({ onEdit, onArchive, onImages, onInspection }),
+    columns: carColumns({ onEdit, onArchive, onImages, onInspection, onMarkSoldExternal }),
     rows: cars,
     emptyTitle: "Mobil belum tersedia",
     emptyDescription: "Buat listing mobil pertama agar buyer bisa melihat katalog dari showroom.",
@@ -42,8 +43,9 @@ export function SellerCarsList({
       { label: "Harga", value: formatCurrency(car.price_discount || car.price_cash || 0) },
       { label: "Mileage", value: `${Number(car.mileage_km ?? 0).toLocaleString("id-ID")} km` },
       { label: "Lokasi", value: car.location_name || "-" },
+      ...(car.external_sale_note ? [{ label: "Keterangan terjual (luar sistem)", value: car.external_sale_note }] : []),
     ],
-    mobileCardActions: (car) => actionButtons(car, { onEdit, onArchive, onImages, onInspection }),
+    mobileCardActions: (car) => actionButtons(car, { onEdit, onArchive, onImages, onInspection, onMarkSoldExternal }),
     pagination,
   }));
 
@@ -61,7 +63,7 @@ export function SellerCarsList({
   return shell;
 }
 
-function carColumns({ onEdit, onArchive, onImages, onInspection }) {
+function carColumns({ onEdit, onArchive, onImages, onInspection, onMarkSoldExternal }) {
   return [
     {
       label: "Mobil",
@@ -74,6 +76,11 @@ function carColumns({ onEdit, onArchive, onImages, onInspection }) {
           textNode("p", "break-words text-xs font-black text-gray-950", carTitle(car)),
           textNode("p", "break-words text-[10px] font-semibold leading-5 text-gray-500", carMeta(car)),
         );
+        if (car.external_sale_note) {
+          const note = textNode("p", "break-words text-[10px] font-semibold leading-5 text-[var(--pb-brand-secondary)]", `Terjual di luar sistem: ${car.external_sale_note}`);
+          note.id = `slrc_car_external_sale_note_${car.id}_section`;
+          wrap.append(note);
+        }
         return wrap;
       },
     },
@@ -110,12 +117,12 @@ function carColumns({ onEdit, onArchive, onImages, onInspection }) {
       label: "Aksi",
       key: "actions",
       cellClassName: "px-4 py-4 align-top",
-      render: (car) => actionButtons(car, { onEdit, onArchive, onImages, onInspection }),
+      render: (car) => actionButtons(car, { onEdit, onArchive, onImages, onInspection, onMarkSoldExternal }),
     },
   ];
 }
 
-function actionButtons(car, { onEdit, onArchive, onImages, onInspection }) {
+function actionButtons(car, { onEdit, onArchive, onImages, onInspection, onMarkSoldExternal }) {
   const carId = car?.id ?? "unknown";
   const actions = document.createElement("section");
   actions.id = `slrc_car_actions_${carId}_section`;
@@ -140,6 +147,13 @@ function actionButtons(car, { onEdit, onArchive, onImages, onInspection }) {
     archive.id = `slrc_archive_car_button_${carId}`;
     archive.prepend(createIcon("folder", { className: "h-4 w-4" }));
     actions.append(archive);
+  }
+
+  if (onMarkSoldExternal && car.listing_status !== "sold" && car.listing_status !== "archived") {
+    const markSold = Button({ label: "Tandai Terjual (Luar Sistem)", variant: "secondary", onClick: () => onMarkSoldExternal(car) });
+    markSold.id = `slrc_mark_sold_external_button_${carId}`;
+    markSold.prepend(createIcon("circleCheck", { className: "h-4 w-4" }));
+    actions.append(markSold);
   }
 
   return actions;
