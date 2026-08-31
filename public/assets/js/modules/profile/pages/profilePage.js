@@ -14,6 +14,7 @@ import { createIcon } from "../../../theme/iconRegistry.js";
 import { formatDate } from "../../../utils/formatDate.js";
 import { NotificationBell } from "../../notifications/components/notificationBell.js";
 import { BUYER_MOBILE_FOOTER_ITEMS, BuyerMobileFooterNav } from "../../buyer/components/buyerMobileFooterNav.js";
+import { getBuyerShowroomCatalogUrl } from "../../../utils/buyerShowroomUrl.js";
 import { AffiliateAccountLayout, affiliateAccountActions } from "../../affiliate/components/affiliateAccountShell.js";
 import { publicContextService } from "../../public/services/publicContextService.js";
 import { ModalHeaderFormActions } from "../../../ui/composites/modalHeaderFormActions.js";
@@ -398,15 +399,22 @@ function buyerDesktopNavLink(item, activePath, actions) {
   const active = isActiveBuyerNav(item, activePath);
   const link = item.disabled ? document.createElement("button") : document.createElement("a");
   link.id = `byr_profile_nav_desktop_${item.id}`;
+  const target = item.id === "catalog" ? getBuyerShowroomCatalogUrl() : item.path;
   if (item.disabled) {
     link.type = "button";
     link.disabled = true;
     link.setAttribute("aria-disabled", "true");
   } else {
-    link.href = item.path;
+    if (target) {
+      link.href = target;
+    } else {
+      link.setAttribute("aria-disabled", "true");
+    }
     link.addEventListener("click", (event) => {
       event.preventDefault();
-      actions.navigate(item.path);
+      if (target) {
+        actions.navigate(target);
+      }
     });
   }
   link.className = active
@@ -449,10 +457,14 @@ function buyerProfileAvatarButton(profile, actions, compact = false) {
 }
 
 function isActiveBuyerNav(item, activePath) {
+  const path = String(activePath ?? "");
   if (item.path === "/buyer") {
-    return activePath === "/buyer";
+    return path === "/buyer";
   }
-  return String(activePath ?? "").startsWith(item.path);
+  if (item.path === "/") {
+    return path === "/" || path === "/buyer/cars";
+  }
+  return path.startsWith(item.path);
 }
 
 function pageHeader() {
