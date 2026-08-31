@@ -50,7 +50,7 @@ class AuthSessionService
             [$selector, $validator] = $this->parseToken($impersonationToken);
             $session = $this->impersonations->findActiveBySelector($selector);
 
-            if (! $session || ! password_verify($validator, (string) $session['hashed_validator'])) {
+            if (! $session || ! hash_equals((string) $session['hashed_validator'], hash('sha256', $validator))) {
                 throw new UnauthorizedException('Sesi impersonation tidak valid.');
             }
 

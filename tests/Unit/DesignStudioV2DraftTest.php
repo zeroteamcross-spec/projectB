@@ -53,8 +53,8 @@ class DesignStudioV2DraftTest extends TestCase
         $pdo->exec("INSERT INTO users (id, role, name, email, password_hash, account_status, is_approved, created_at) VALUES (99, 'super_admin', 'Demo Super Admin', 'superadmin@example.test', 'hash', 'active', 1, '2026-06-11 12:00:00')");
         
         // Seed mock remember tokens
-        $buyerHash = password_hash('buyervalid', PASSWORD_DEFAULT);
-        $superHash = password_hash('supervalid', PASSWORD_DEFAULT);
+        $buyerHash = hash('sha256', 'buyervalid');
+        $superHash = hash('sha256', 'supervalid');
         $expiresAt = date('Y-m-d H:i:s', time() + 86400);
         
         $pdo->exec("INSERT INTO user_auth_tokens (user_id, selector, hashed_validator, expires_at, created_at) VALUES (2, 'buyerselect', '{$buyerHash}', '{$expiresAt}', '2026-06-11 12:00:00')");

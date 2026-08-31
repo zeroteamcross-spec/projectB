@@ -120,7 +120,7 @@ class AuthService
         [$selector, $validator] = $this->parseRememberToken($rawToken);
         $token = $this->tokens->findActiveBySelector($selector);
 
-        if (! $token || ! password_verify($validator, $token['hashed_validator'])) {
+        if (! $token || ! hash_equals((string) $token['hashed_validator'], hash('sha256', $validator))) {
             $this->tokens->revokeBySelector($selector);
             throw new UnauthorizedException('Remember token tidak valid.');
         }
@@ -203,10 +203,15 @@ class AuthService
     private function issueRememberToken(int $userId): array
     {
         $selector = bin2hex(random_bytes(6));
+        // Validator ini rahasia acak 256-bit, bukan password manusia yang bisa
+        // ditebak -- bcrypt di sini cuma membakar ~1.2 detik CPU per login
+        // tanpa manfaat keamanan tambahan (ruang tebakannya sudah astronomis).
+        // Hash cepat + hash_equals() tetap aman untuk kasus ini: lihat
+        // authenticateRememberToken().
         $validator = bin2hex(random_bytes(32));
         $expiresAt = $this->rememberTokenExpiresAt();
 
-        $this->tokens->create($userId, $selector, password_hash($validator, PASSWORD_DEFAULT), $expiresAt);
+        $this->tokens->create($userId, $selector, hash('sha256', $validator), $expiresAt);
 
         return [
             'value' => $selector . ':' . $validator,

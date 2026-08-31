@@ -637,10 +637,13 @@ class GoogleAuthService
     private function issueRememberToken(int $userId): array
     {
         $selector = bin2hex(random_bytes(6));
+        // Sama seperti AuthService::issueRememberToken() -- validator acak
+        // 256-bit tidak butuh bcrypt, dan keduanya diverifikasi lewat
+        // AuthService::authenticateRememberToken() yang sama.
         $validator = bin2hex(random_bytes(32));
         $expiresAt = $this->rememberTokenExpiresAt();
 
-        $this->tokens->create($userId, $selector, password_hash($validator, PASSWORD_DEFAULT), $expiresAt);
+        $this->tokens->create($userId, $selector, hash('sha256', $validator), $expiresAt);
 
         return [
             'value' => $selector . ':' . $validator,

@@ -79,6 +79,8 @@ class AdminImpersonationService
         $this->impersonations->endActiveByAdminUserId((int) $actor['id']);
 
         $selector = bin2hex(random_bytes(6));
+        // Validator acak 256-bit, sama alasannya seperti AuthService::issueRememberToken():
+        // bcrypt di sini tidak menambah keamanan, cuma menambah ~1.2 detik.
         $validator = bin2hex(random_bytes(32));
         $now = date('Y-m-d H:i:s');
         $expiresAt = (new DateTimeImmutable())
@@ -89,7 +91,7 @@ class AdminImpersonationService
             'admin_user_id' => (int) $actor['id'],
             'target_user_id' => (int) $target['id'],
             'selector' => $selector,
-            'hashed_validator' => password_hash($validator, PASSWORD_DEFAULT),
+            'hashed_validator' => hash('sha256', $validator),
             'started_at' => $now,
             'expires_at' => $expiresAt,
             'created_at' => $now,
