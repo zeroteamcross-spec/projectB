@@ -286,7 +286,7 @@
   <div class="cover">
     <div class="cover-eyebrow">Siata Mobilindo &middot; carlynk.id</div>
     <h1>Laporan Verifikasi Perubahan</h1>
-    <div class="cover-sub">47 permintaan perbaikan &amp; fitur, dikelompokkan per halaman. Semua sudah di-deploy ke carlynk.id dan dicek langsung satu per satu, bukan sekadar dilihat dari kode.</div>
+    <div class="cover-sub">49 permintaan perbaikan &amp; fitur, dikelompokkan per halaman. Semua sudah di-deploy ke carlynk.id dan dicek langsung satu per satu, bukan sekadar dilihat dari kode.</div>
     <div class="cover-meta">
       <div>
         <div class="k">Cabang</div>
@@ -309,11 +309,11 @@
 
   <div class="stats">
     <div class="stat">
-      <div class="num">47</div>
+      <div class="num">49</div>
       <div class="lbl">Total permintaan &amp; perbaikan</div>
     </div>
     <div class="stat good">
-      <div class="num">45</div>
+      <div class="num">47</div>
       <div class="lbl">Terverifikasi langsung di browser</div>
     </div>
     <div class="stat accent">
@@ -422,7 +422,17 @@
     </section>
 
     <section class="group">
-      <div class="group-head"><h2>Marketing / affiliate</h2><span class="range">37, 38, 44, 46, 47</span></div>
+      <div class="group-head"><h2>Admin</h2><span class="range">48</span></div>
+      <table>
+        <thead><tr><th>#</th><th>Perubahan</th><th class="c-link">Link</th></tr></thead>
+        <tbody>
+          <tr><td class="num">48</td><td><span class="badge new">Baru</span>Admin bisa menandai mobil terjual di luar sistem (WhatsApp, transaksi langsung di showroom) lewat tombol "Tandai Terjual (Luar Sistem)", dengan keterangan wajib diisi untuk audit</td><td class="link"><a href="https://carlynk.id/#/admin/cars">carlynk.id/#/admin/cars</a></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="group">
+      <div class="group-head"><h2>Marketing / affiliate</h2><span class="range">37, 38, 44, 46, 47, 49</span></div>
       <table>
         <thead><tr><th>#</th><th>Perubahan</th><th class="c-link">Link</th></tr></thead>
         <tbody>
@@ -430,7 +440,8 @@
           <tr><td class="num">38</td><td>Keterangan merah saat URL sudah dipakai (ganti teks statis lama)</td><td class="link"><a href="https://carlynk.id/#/seller/affiliates?mode=create">carlynk.id/#/seller/affiliates?mode=create</a></td></tr>
           <tr><td class="num">44</td><td>Tombol &quot;Atur Komisi Umum&quot;/&quot;Tambah aturan khusus&quot; berkedip saat ditutup, sekarang langsung tertutup</td><td class="link"><a href="https://carlynk.id/#/seller/affiliate-commissions">carlynk.id/#/seller/affiliate-commissions</a></td></tr>
           <tr><td class="num">46</td><td>Logo, favicon, dan judul tab di halaman marketing #/af/:slug sekarang ikut showroom milik affiliate tersebut (sebelumnya selalu logo/favicon default)</td><td class="link"><a href="https://carlynk.id/#/af/rohim">carlynk.id/#/af/rohim</a></td></tr>
-          <tr><td class="num">47</td><td><span class="badge new">Baru</span>Audit menyeluruh fitur Marketing: klik &rarr; registrasi buyer &rarr; transaksi &rarr; pembayaran &rarr; komisi diuji dengan transaksi sungguhan di production</td><td class="link">lihat rincian di bawah</td></tr>
+          <tr><td class="num">47</td><td>Audit menyeluruh fitur Marketing: klik &rarr; registrasi buyer &rarr; transaksi &rarr; pembayaran &rarr; komisi diuji dengan transaksi sungguhan di production</td><td class="link">lihat rincian di bawah</td></tr>
+          <tr><td class="num">49</td><td><span class="badge new">Baru</span>Marketing bisa membagikan link satu mobil tertentu ("Bagikan Mobil" di dashboard) &mdash; link ini tetap terdeteksi sebagai kunjungan marketing, jadi transaksi dari sana tetap dapat komisi</td><td class="link"><a href="https://carlynk.id/#/affiliate/cars">carlynk.id/#/affiliate/cars</a></td></tr>
         </tbody>
       </table>
     </section>
@@ -453,8 +464,16 @@
       </ul>
       <div class="sub" style="margin-top:14px;"><b>Catatan (bukan bug, untuk transparansi):</b></div>
       <ul class="found-list">
-        <li>Payout ke marketing (settlement batch oleh Admin) sudah diverifikasi lewat pembacaan kode &amp; struktur database, tapi belum dicoba klik langsung karena butuh akun Admin production yang belum tersedia untuk pengujian ini.</li>
+        <li>Payout ke marketing (settlement batch oleh Admin) sudah diverifikasi lewat pembacaan kode &amp; struktur database saat laporan ini pertama ditulis. Sudah dicoba klik langsung belakangan &mdash; lihat item 48 di bawah.</li>
         <li>Ada dua tempat pengaturan komisi di kode &mdash; satu di data akun marketing (tidak dipakai lagi), satu di halaman Komisi Marketing milik showroom (ini yang aktif). Sudah dipastikan lewat pengujian ini bahwa yang menentukan besar komisi adalah halaman Komisi Marketing.</li>
+      </ul>
+    </div>
+
+    <div class="found-section">
+      <h2>Fitur baru: Admin tandai terjual &amp; share per mobil (48, 49)</h2>
+      <ul class="found-list">
+        <li><b>48 &mdash; Admin menandai mobil terjual di luar sistem.</b> Diuji langsung login sebagai Admin di <code>#/admin/cars</code>: klik "Tandai Terjual (Luar Sistem)" pada mobil aktif, isi keterangan wajib, submit. Hasilnya: status mobil berubah jadi Terjual, keterangan tampil di daftar mobil admin, mobil langsung hilang dari katalog publik &mdash; dan dicek langsung di database, kolom keterangan, waktu, dan admin yang menandai semuanya tersimpan benar.</li>
+        <li><b>49 &mdash; Marketing bagikan link per mobil.</b> Halaman baru "Bagikan Mobil" di dashboard marketing menampilkan semua mobil showroom yang published, masing-masing dengan tombol Copy Link dan Bagikan WhatsApp. Diuji langsung: link yang dihasilkan dibuka di sesi tanpa login &mdash; halaman detail mobil terbuka, context marketing otomatis aktif, dan klik tercatat ke akun marketing yang sama (naik dari 4 ke 6 klik, dicek di database). Memakai jalur yang sama persis dengan yang sudah diuji sampai dapat komisi di item 47.</li>
       </ul>
     </div>
 
