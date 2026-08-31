@@ -1,4 +1,4 @@
-export const DESIGN_STUDIO_V2_ROUTE = "#/admin/design-studio-v2";
+export const DESIGN_STUDIO_V2_ROUTE = "/admin/design-studio-v2";
 
 export function isDesignStudioV2Allowed({ store = null, currentUser = null } = {}) {
   const user = currentUser ?? store?.get?.("auth.user", null) ?? null;

@@ -22,8 +22,8 @@ export function defaultLoginPath(role = "buyer") {
 
 export function defaultLoginHash(role = null) {
   if (authUxConfig.googleLoginDefaultEnabled && role === null) {
-    return "#/google-login";
+    return "/google-login";
   }
 
-  return `#${defaultLoginPath(role ?? "buyer")}`;
+  return defaultLoginPath(role ?? "buyer");
 }

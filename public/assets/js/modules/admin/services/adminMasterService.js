@@ -46,30 +46,30 @@ const DEFAULT_BRAND_SEED = [
 ];
 
 const DEFAULT_SIDEBAR_SEED = [
-  sidebarSeed("admin.dashboard", "admin", "Dashboard Admin", "#/admin", "dashboard", 10),
-  sidebarSeed("admin.approvals", "admin", "Approval Queue", "#/admin/approvals", "transaction", 20),
-  sidebarSeed("admin.users", "admin", "User Management", "#/admin/users", "transaction", 30),
-  sidebarSeed("admin.cars", "admin", "Katalog Mobil", "#/admin/cars", "car", 40),
-  sidebarSeed("admin.transactions", "admin", "Transactions", "#/admin/transactions", "transaction", 50),
-  sidebarSeed("admin.settlements", "admin", "Settlements", "#/admin/settlements", "commission", 60),
-  sidebarSeed("admin.sliders", "admin", "Slider", "#/admin/sliders", "image", 70),
+  sidebarSeed("admin.dashboard", "admin", "Dashboard Admin", "/admin", "dashboard", 10),
+  sidebarSeed("admin.approvals", "admin", "Approval Queue", "/admin/approvals", "transaction", 20),
+  sidebarSeed("admin.users", "admin", "User Management", "/admin/users", "transaction", 30),
+  sidebarSeed("admin.cars", "admin", "Katalog Mobil", "/admin/cars", "car", 40),
+  sidebarSeed("admin.transactions", "admin", "Transactions", "/admin/transactions", "transaction", 50),
+  sidebarSeed("admin.settlements", "admin", "Settlements", "/admin/settlements", "commission", 60),
+  sidebarSeed("admin.sliders", "admin", "Slider", "/admin/sliders", "image", 70),
   sidebarSeed("admin.master", "admin", "Master", "", "sort", 80, "", true),
-  sidebarSeed("admin.master_brand", "admin", "Master Brand", "#/admin/master-brand", "car", 10, "admin.master"),
-  sidebarSeed("admin.master_sidebar", "admin", "Master Sidebar", "#/admin/master-sidebar", "sitemap", 20, "admin.master"),
-  sidebarSeed("admin.master_bank", "admin", "Master Bank", "#/admin/master-bank", "bank", 30, "admin.master"),
-  sidebarSeed("admin.master_inspection", "admin", "Master Inspection", "#/admin/master-inspection", "clipboard", 40, "admin.master"),
-  sidebarSeed("admin.master_location", "admin", "Master Lokasi", "#/admin/master-location", "location", 50, "admin.master"),
-  sidebarSeed("admin.design_studio", "admin", "Design Studio", "#/admin/design-studio", "sparkles", 80),
-  sidebarSeed("seller.dashboard", "seller", "Dashboard Showroom", "#/seller", "dashboard", 10),
-  sidebarSeed("seller.showroom", "seller", "Showroom Saya", "#/seller/showroom", "showroom", 20),
-  sidebarSeed("seller.cars", "seller", "Katalog", "#/seller/cars", "car", 30),
-  sidebarSeed("seller.affiliates", "seller", "Marketing", "#/seller/affiliates", "affiliate", 40),
-  sidebarSeed("seller.affiliate_commissions", "seller", "Komisi Marketing", "#/seller/affiliate-commissions", "commission", 50),
-  sidebarSeed("seller.transactions", "seller", "Transaksi", "#/seller/transactions", "transaction", 60),
-  sidebarSeed("affiliate.dashboard", "affiliate", "Dashboard Marketing", "#/affiliate", "affiliate", 10),
-  sidebarSeed("affiliate.activity", "affiliate", "Activity Clicks", "#/affiliate/activity", "transaction", 20),
-  sidebarSeed("affiliate.ledger", "affiliate", "Ledger Komisi", "#/affiliate/ledger", "commission", 30),
-  sidebarSeed("affiliate.settlements", "affiliate", "Payout Settlement", "#/affiliate/settlements", "commission", 40),
+  sidebarSeed("admin.master_brand", "admin", "Master Brand", "/admin/master-brand", "car", 10, "admin.master"),
+  sidebarSeed("admin.master_sidebar", "admin", "Master Sidebar", "/admin/master-sidebar", "sitemap", 20, "admin.master"),
+  sidebarSeed("admin.master_bank", "admin", "Master Bank", "/admin/master-bank", "bank", 30, "admin.master"),
+  sidebarSeed("admin.master_inspection", "admin", "Master Inspection", "/admin/master-inspection", "clipboard", 40, "admin.master"),
+  sidebarSeed("admin.master_location", "admin", "Master Lokasi", "/admin/master-location", "location", 50, "admin.master"),
+  sidebarSeed("admin.design_studio", "admin", "Design Studio", "/admin/design-studio", "sparkles", 80),
+  sidebarSeed("seller.dashboard", "seller", "Dashboard Showroom", "/seller", "dashboard", 10),
+  sidebarSeed("seller.showroom", "seller", "Showroom Saya", "/seller/showroom", "showroom", 20),
+  sidebarSeed("seller.cars", "seller", "Katalog", "/seller/cars", "car", 30),
+  sidebarSeed("seller.affiliates", "seller", "Marketing", "/seller/affiliates", "affiliate", 40),
+  sidebarSeed("seller.affiliate_commissions", "seller", "Komisi Marketing", "/seller/affiliate-commissions", "commission", 50),
+  sidebarSeed("seller.transactions", "seller", "Transaksi", "/seller/transactions", "transaction", 60),
+  sidebarSeed("affiliate.dashboard", "affiliate", "Dashboard Marketing", "/affiliate", "affiliate", 10),
+  sidebarSeed("affiliate.activity", "affiliate", "Activity Clicks", "/affiliate/activity", "transaction", 20),
+  sidebarSeed("affiliate.ledger", "affiliate", "Ledger Komisi", "/affiliate/ledger", "commission", 30),
+  sidebarSeed("affiliate.settlements", "affiliate", "Payout Settlement", "/affiliate/settlements", "commission", 40),
 ];
 
 const DEFAULT_BANK_SEED = [
@@ -728,11 +728,11 @@ function ensureAdminMasterSidebarChildren(items = []) {
 
   if (!byKey.has("admin.sliders")) {
     const sliderOrder = master && Number.isFinite(Number(master.order)) ? Number(master.order) - 1 : 60;
-    next.push(sidebarSeed("admin.sliders", "admin", "Slider", "#/admin/sliders", "image", sliderOrder));
+    next.push(sidebarSeed("admin.sliders", "admin", "Slider", "/admin/sliders", "image", sliderOrder));
   }
 
   if (!byKey.has("admin.cars")) {
-    next.push(sidebarSeed("admin.cars", "admin", "Katalog Mobil", "#/admin/cars", "car", 40));
+    next.push(sidebarSeed("admin.cars", "admin", "Katalog Mobil", "/admin/cars", "car", 40));
   }
 
   if (!master || master.role !== "admin") {
@@ -752,27 +752,27 @@ function ensureAdminMasterSidebarChildren(items = []) {
     : item);
 
   if (!byKey.has("admin.master_brand")) {
-    normalized.push(sidebarSeed("admin.master_brand", "admin", "Master Brand", "#/admin/master-brand", "car", 10, "admin.master"));
+    normalized.push(sidebarSeed("admin.master_brand", "admin", "Master Brand", "/admin/master-brand", "car", 10, "admin.master"));
     normalized[normalized.length - 1].updated_at = now;
   }
 
   if (!byKey.has("admin.master_sidebar")) {
-    normalized.push(sidebarSeed("admin.master_sidebar", "admin", "Master Sidebar", "#/admin/master-sidebar", "sitemap", 20, "admin.master"));
+    normalized.push(sidebarSeed("admin.master_sidebar", "admin", "Master Sidebar", "/admin/master-sidebar", "sitemap", 20, "admin.master"));
     normalized[normalized.length - 1].updated_at = now;
   }
 
   if (!byKey.has("admin.master_bank")) {
-    normalized.push(sidebarSeed("admin.master_bank", "admin", "Master Bank", "#/admin/master-bank", "bank", 30, "admin.master"));
+    normalized.push(sidebarSeed("admin.master_bank", "admin", "Master Bank", "/admin/master-bank", "bank", 30, "admin.master"));
     normalized[normalized.length - 1].updated_at = now;
   }
 
   if (!byKey.has("admin.master_inspection")) {
-    normalized.push(sidebarSeed("admin.master_inspection", "admin", "Master Inspection", "#/admin/master-inspection", "clipboard", 40, "admin.master"));
+    normalized.push(sidebarSeed("admin.master_inspection", "admin", "Master Inspection", "/admin/master-inspection", "clipboard", 40, "admin.master"));
     normalized[normalized.length - 1].updated_at = now;
   }
 
   if (!byKey.has("admin.master_location")) {
-    normalized.push(sidebarSeed("admin.master_location", "admin", "Master Lokasi", "#/admin/master-location", "location", 50, "admin.master"));
+    normalized.push(sidebarSeed("admin.master_location", "admin", "Master Lokasi", "/admin/master-location", "location", 50, "admin.master"));
     normalized[normalized.length - 1].updated_at = now;
   }
 
@@ -781,7 +781,7 @@ function ensureAdminMasterSidebarChildren(items = []) {
       return {
         ...item,
         label: item.label || "Slider",
-        route: "#/admin/sliders",
+        route: "/admin/sliders",
         icon: item.icon || "image",
         parent_key: item.parent_key ?? "",
         role: "admin",
@@ -793,7 +793,7 @@ function ensureAdminMasterSidebarChildren(items = []) {
       return {
         ...item,
         label: item.label || "Katalog Mobil",
-        route: "#/admin/cars",
+        route: "/admin/cars",
         icon: item.icon || "car",
         parent_key: item.parent_key ?? "",
         role: "admin",
@@ -805,7 +805,7 @@ function ensureAdminMasterSidebarChildren(items = []) {
       return {
         ...item,
         label: item.label || "Master Brand",
-        route: "#/admin/master-brand",
+        route: "/admin/master-brand",
         icon: item.icon || "car",
         parent_key: "admin.master",
         role: "admin",
@@ -816,7 +816,7 @@ function ensureAdminMasterSidebarChildren(items = []) {
       return {
         ...item,
         label: item.label || "Master Sidebar",
-        route: "#/admin/master-sidebar",
+        route: "/admin/master-sidebar",
         icon: item.icon || "sitemap",
         parent_key: "admin.master",
         role: "admin",
@@ -827,7 +827,7 @@ function ensureAdminMasterSidebarChildren(items = []) {
       return {
         ...item,
         label: item.label || "Master Bank",
-        route: "#/admin/master-bank",
+        route: "/admin/master-bank",
         icon: item.icon || "bank",
         parent_key: "admin.master",
         role: "admin",
@@ -838,7 +838,7 @@ function ensureAdminMasterSidebarChildren(items = []) {
       return {
         ...item,
         label: item.label || "Master Inspection",
-        route: "#/admin/master-inspection",
+        route: "/admin/master-inspection",
         icon: item.icon || "clipboard",
         parent_key: "admin.master",
         role: "admin",
@@ -849,7 +849,7 @@ function ensureAdminMasterSidebarChildren(items = []) {
       return {
         ...item,
         label: item.label || "Master Lokasi",
-        route: "#/admin/master-location",
+        route: "/admin/master-location",
         icon: item.icon || "location",
         parent_key: "admin.master",
         role: "admin",
@@ -875,7 +875,7 @@ function hasParentCycle(item, byKey) {
 
 function isValidSidebarRoute(route) {
   const value = String(route ?? "").trim();
-  return /^#\/[a-z0-9/_-]+(?:\?[a-z0-9_=&%.-]+)?$/i.test(value);
+  return /^#?\/[a-z0-9/_-]+(?:\?[a-z0-9_=&%.-]+)?$/i.test(value);
 }
 
 function slugKey(value) {

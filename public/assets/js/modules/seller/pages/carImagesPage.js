@@ -874,5 +874,5 @@ function labelWrap(label, control) {
 }
 
 function isAdminCarsPath() {
-  return String(window.location.hash ?? "").startsWith("#/admin/cars/");
+  return String(window.location.pathname ?? "").startsWith("/admin/cars/");
 }

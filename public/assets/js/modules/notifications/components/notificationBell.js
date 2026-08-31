@@ -2,6 +2,7 @@ import { appStore } from "../../../state/store.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 import { notificationService } from "../services/notificationService.js";
 import { NotificationPopover } from "./notificationPopover.js";
+import { navigateToLink } from "../utils/navigateToLink.js";
 
 const STYLE_ID = "pb-notification-components-style";
 const OVERLAY_ROOT_ID = "notification_overlay_root";
@@ -100,7 +101,7 @@ export function NotificationBell({
         open,
         snapshot,
         onClose: close,
-        onNavigate: (link) => navigate(link, onNavigate),
+        onNavigate: (link) => navigateToLink(link, onNavigate),
       })
       : null;
 
@@ -122,13 +123,13 @@ export function NotificationBell({
   }
   render();
 
-  window.addEventListener("hashchange", handleRouteChange);
+  window.addEventListener("popstate", handleRouteChange);
   host.dispose = () => {
     disposed = true;
     detachOutsideClick();
     removeOverlayNodes();
     unsubscribeState?.();
-    window.removeEventListener("hashchange", handleRouteChange);
+    window.removeEventListener("popstate", handleRouteChange);
   };
 
   return host;
@@ -237,20 +238,6 @@ function syncPortalPopoverPosition(button, popover) {
 
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
-}
-
-function navigate(link, onNavigate) {
-  const value = String(link ?? "").trim();
-  if (!value) {
-    return;
-  }
-
-  if (typeof onNavigate === "function") {
-    onNavigate(value);
-    return;
-  }
-
-  window.location.hash = value.startsWith("#") ? value : `#${value.startsWith("/") ? value : `/${value}`}`;
 }
 
 function ensureNotificationStyles() {

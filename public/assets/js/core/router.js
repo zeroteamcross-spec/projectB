@@ -1,3 +1,97 @@
+/**
+ * Satu-satunya jalan menulis URL, dipakai router sendiri maupun modul lain
+ * yang tidak punya akses ke instance Router (banner, popover, dsb -- lihat
+ * publicShell.js, header.js, dkk). pushState tidak memicu apa pun sendirian,
+ * jadi popstate disintesis manual di sini supaya router.handleChange() ikut
+ * jalan, sama seperti hashchange dulu memicu otomatis.
+ *
+ * Navigasi ke path yang sama persis (termasuk query) tidak melakukan apa-apa
+ * -- meniru perilaku lama saat location.hash diisi nilai yang sudah sama
+ * (browser tidak memicu hashchange untuk itu).
+ */
+export function navigateTo(path) {
+  const target = normalizePathForNavigation(path);
+  const current = window.location.pathname + window.location.search;
+
+  if (target === current) {
+    return;
+  }
+
+  window.history.pushState(null, "", target);
+  window.dispatchEvent(new PopStateEvent("popstate"));
+}
+
+function normalizePathForNavigation(path) {
+  const raw = String(path ?? "").replace(/^#/, "");
+  return raw.startsWith("/") ? raw : `/${raw}`;
+}
+
+/**
+ * Dulu tiap `<a href="#/x">` otomatis "gratis" jadi navigasi SPA: klik pada
+ * fragment tidak pernah memicu muat ulang, jadi tidak satu pun tempat yang
+ * merender anchor (sidebar, publicShell, notifikasi, dll.) perlu event
+ * handler sendiri. Begitu href berisi path asli, browser akan memuat ulang
+ * halaman sungguhan pada setiap klik kecuali dicegat di sini -- jadi
+ * interceptor ini menggantikan "keuntungan gratis" yang hilang itu, dipasang
+ * sekali secara global saat app boot (lihat app.js).
+ *
+ * href berformat lama `#/x` (mis. dari data Master Sidebar yang disimpan
+ * admin sebelum migrasi ini) sengaja tetap diterima di sini selamanya --
+ * dibaca toleran, bukan dipaksa migrasi -- supaya menu custom yang sudah
+ * disimpan tidak mendadak diam.
+ */
+export function bindInternalLinkInterceptor(root = document) {
+  const handleClick = (event) => {
+    if (event.defaultPrevented || event.button !== 0) {
+      return;
+    }
+
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+      return;
+    }
+
+    const anchor = event.target.closest?.("a[href]");
+    if (!anchor || (anchor.target && anchor.target !== "_self") || anchor.hasAttribute("download")) {
+      return;
+    }
+
+    const rawHref = anchor.getAttribute("href") || "";
+
+    if (rawHref.startsWith("#/")) {
+      event.preventDefault();
+      navigateTo(rawHref);
+      return;
+    }
+
+    if (rawHref === "" || rawHref === "#") {
+      event.preventDefault();
+      return;
+    }
+
+    let url;
+    try {
+      url = new URL(anchor.href, window.location.href);
+    } catch {
+      return;
+    }
+
+    if (url.origin !== window.location.origin) {
+      return;
+    }
+
+    const samePage = url.pathname === window.location.pathname && url.search === window.location.search;
+    if (samePage && url.hash) {
+      return;
+    }
+
+    event.preventDefault();
+    navigateTo(url.pathname + url.search);
+  };
+
+  root.addEventListener("click", handleClick);
+  return () => root.removeEventListener("click", handleClick);
+}
+
 export class Router {
   constructor({ outlet, store, preloadManager, bus, notFound = null, guard = null, resolveMissing = null } = {}) {
     this.routes = [];
@@ -37,14 +131,14 @@ export class Router {
       window.history.scrollRestoration = "manual";
     }
 
-    window.addEventListener("hashchange", this.handleChange);
+    window.addEventListener("popstate", this.handleChange);
     this.handleChange();
 
     return () => this.dispose();
   }
 
   navigate(path) {
-    window.location.hash = path.startsWith("#") ? path : `#${path}`;
+    navigateTo(path);
   }
 
   async handleChange() {
@@ -240,8 +334,8 @@ export class Router {
   }
 
   location() {
-    const hash = window.location.hash.replace(/^#/, "") || "/";
-    const [path, queryString = ""] = hash.split("?");
+    const path = window.location.pathname || "/";
+    const queryString = window.location.search.replace(/^\?/, "");
     return {
       path: this.normalize(path),
       query: Object.fromEntries(new URLSearchParams(queryString)),
@@ -280,7 +374,7 @@ export class Router {
   }
 
   dispose() {
-    window.removeEventListener("hashchange", this.handleChange);
+    window.removeEventListener("popstate", this.handleChange);
     this.leaveActivePage();
   }
 }

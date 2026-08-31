@@ -116,13 +116,13 @@ function hero() {
     iconBox("home"),
     textNode("p", "text-[10px] font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", "Superadmin"),
     textNode("h1", "text-2xl font-black leading-tight text-gray-950", "Landing Page Utama"),
-    textNode("p", "max-w-2xl text-xs leading-6 text-gray-600", "Pilih halaman yang akan dipakai saat user membuka #/. Halaman lama tetap bisa diakses dari route aslinya."),
+    textNode("p", "max-w-2xl text-xs leading-6 text-gray-600", "Pilih halaman yang akan dipakai saat user membuka /. Halaman lama tetap bisa diakses dari route aslinya."),
   );
   const preview = document.createElement("section");
   preview.className = "grid min-w-[220px] gap-1 rounded-[1rem] border border-[var(--pb-border)] bg-white/82 p-4 shadow-sm";
   preview.append(
     textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", "Route target"),
-    textNode("p", "text-lg font-black text-gray-950", "#/"),
+    textNode("p", "text-lg font-black text-gray-950", "/"),
   );
   section.append(copy, preview);
   return section;

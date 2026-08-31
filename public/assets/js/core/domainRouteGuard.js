@@ -24,10 +24,10 @@ function hostTerdaftar(peta) {
 export function bindDomainRouteGuard({ locationRef = window.location, windowRef = window } = {}) {
   enforceDomainRoute({ locationRef });
 
-  const onHashChange = () => enforceDomainRoute({ locationRef });
-  windowRef.addEventListener("hashchange", onHashChange);
+  const onNavigate = () => enforceDomainRoute({ locationRef });
+  windowRef.addEventListener("popstate", onNavigate);
 
-  return () => windowRef.removeEventListener("hashchange", onHashChange);
+  return () => windowRef.removeEventListener("popstate", onNavigate);
 }
 
 export function enforceDomainRoute({ locationRef = window.location } = {}) {
@@ -43,7 +43,7 @@ export function enforceDomainRoute({ locationRef = window.location } = {}) {
     return false;
   }
 
-  const path = hashPath(locationRef.hash);
+  const path = currentPath(locationRef);
   const defaultPath = defaultPathForHost(peta, currentHost);
 
   if (path === "/" && defaultPath !== null) {
@@ -62,7 +62,7 @@ export function enforceDomainRoute({ locationRef = window.location } = {}) {
     // yang mengetik admin.carlynk.id akan berkeliling seluruh aplikasi dari
     // alamat yang bukan haknya.
     if (!isAdminPath(path) && !isAdminLoginPath(path) && !isSharedAuthenticatedPath(path)) {
-      locationRef.replace(`${locationRef.protocol}//${peta.default}${locationRef.pathname}${locationRef.search}${locationRef.hash}`);
+      locationRef.replace(`${locationRef.protocol}//${peta.default}${locationRef.pathname}${locationRef.search}`);
       return true;
     }
 
@@ -76,12 +76,12 @@ export function enforceDomainRoute({ locationRef = window.location } = {}) {
     return false;
   }
 
-  locationRef.replace(`${locationRef.protocol}//${targetHost}${locationRef.pathname}${locationRef.search}${locationRef.hash}`);
+  locationRef.replace(`${locationRef.protocol}//${targetHost}${locationRef.pathname}${locationRef.search}`);
   return true;
 }
 
 function pindah(locationRef, host, path) {
-  locationRef.replace(`${locationRef.protocol}//${host}${locationRef.pathname}${locationRef.search}#${path}`);
+  locationRef.replace(`${locationRef.protocol}//${host}${path}`);
 }
 
 /**
@@ -204,10 +204,9 @@ function loginRoleForPath(path) {
   return null;
 }
 
-function hashPath(hash) {
-  const cleanHash = String(hash || "").replace(/^#/, "") || "/";
-  const [path] = cleanHash.split("?");
-  const normalized = `/${String(path || "/").replace(/^\/?/, "")}`;
+function currentPath(locationRef) {
+  const raw = String(locationRef.pathname || "/");
+  const normalized = `/${raw.replace(/^\/?/, "")}`;
 
   return normalized === "/" ? "/" : normalized.replace(/\/$/, "");
 }

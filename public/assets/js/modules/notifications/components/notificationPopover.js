@@ -2,6 +2,7 @@ import { createIcon } from "../../../theme/iconRegistry.js";
 import { showToast } from "../../../ui/primitives/toast.js";
 import { notificationService } from "../services/notificationService.js";
 import { NotificationItem } from "./notificationItem.js";
+import { navigateToLink } from "../utils/navigateToLink.js";
 
 export function NotificationPopover({
   id = "ntf_popover",
@@ -70,11 +71,7 @@ export function NotificationPopover({
   footer.className = "pb-notification-popover__footer";
   footer.addEventListener("click", () => {
     onClose?.();
-    if (typeof onNavigate === "function") {
-      onNavigate("#/notifications");
-      return;
-    }
-    window.location.hash = "#/notifications";
+    navigateToLink("/notifications", onNavigate);
   });
 
   const footerLabel = document.createElement("span");

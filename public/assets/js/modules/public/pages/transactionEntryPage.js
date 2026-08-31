@@ -296,7 +296,7 @@ function heroTrustRow() {
 async function redirectToGoogleLogin() {
   await runAction(async () => {
     const config = googleLoginService.configForSlug("buyer");
-    const nextPath = window.location.hash.substring(1) || "/";
+    const nextPath = window.location.pathname + window.location.search || "/";
     const authUrl = await googleLoginService.begin(config, nextPath);
     window.location.assign(authUrl);
   });

@@ -7,6 +7,7 @@ import { adminSessionService } from "../modules/admin/services/adminSessionServi
 import { applyDesignHook } from "../theme/designStudioHooks.js";
 import { NotificationBell } from "../modules/notifications/components/notificationBell.js";
 import { navigateToOwnShowroom, hasOwnShowroomLink } from "./ownShowroomLink.js";
+import { navigateTo } from "../core/router.js";
 
 export function header(store) {
   const node = document.createElement("header");
@@ -155,7 +156,7 @@ function renderBanner(host, state) {
     try {
       await adminSessionService.stopImpersonation();
       showToast("Impersonation dihentikan.", { type: "success" });
-      window.location.hash = "#/admin/users";
+      navigateTo("/admin/users");
     } catch (error) {
       showToast(error.message || "Gagal menghentikan impersonation.", { type: "error" });
       button.disabled = false;
@@ -181,7 +182,7 @@ function profileButton(store) {
   };
   syncProfileButton(button, store?.get?.("auth.user", null) ?? null);
   button.addEventListener("click", () => {
-    window.location.hash = "#/profile";
+    navigateTo("/profile");
   });
 
   return button;

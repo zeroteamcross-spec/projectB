@@ -1,10 +1,10 @@
 export const BUYER_SHOWROOM_URL_STORAGE_KEY = "projectB:buyer:showroom-url";
 
-const SHOWROOM_URL_PATTERN = /^#\/s\/[^/?#]+$/;
+const SHOWROOM_URL_PATTERN = /^#?\/s\/[^/?#]+$/;
 
 export function buyerShowroomCatalogUrlFromSlug(slug) {
   const value = String(slug ?? "").trim();
-  return value ? `#/s/${encodeURIComponent(value)}` : "";
+  return value ? `/s/${encodeURIComponent(value)}` : "";
 }
 
 export function persistBuyerShowroomUrl(user) {

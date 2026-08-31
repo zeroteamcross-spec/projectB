@@ -1,4 +1,5 @@
 import { createPageLifecycle } from "../../../core/lifecycle.js";
+import { navigateTo } from "../../../core/router.js";
 import { authService } from "../../../core/auth.js";
 import { roleLabel } from "../../../core/roleLabels.js";
 import { profileResource } from "../../../resources/profileResource.js";
@@ -402,7 +403,7 @@ function buyerDesktopNavLink(item, activePath, actions) {
     link.disabled = true;
     link.setAttribute("aria-disabled", "true");
   } else {
-    link.href = `#${item.path}`;
+    link.href = item.path;
     link.addEventListener("click", (event) => {
       event.preventDefault();
       actions.navigate(item.path);
@@ -795,7 +796,7 @@ function openChangePasswordModal() {
 
 function openLogoutConfirmModal() {
   let processing = false;
-  const logoutHash = logoutRedirectHash(authStore.role());
+  const logoutPath = logoutRedirectPath(authStore.role());
 
   const renderModal = () => {
     const content = document.createElement("section");
@@ -832,7 +833,7 @@ function openLogoutConfirmModal() {
           await authService.logout();
           closeModal({ notify: false });
           showToast("Logout berhasil.", { type: "success" });
-          window.location.hash = logoutHash;
+          navigateTo(logoutPath);
         } catch (error) {
           processing = false;
           renderModal();
@@ -869,36 +870,36 @@ function openLogoutConfirmModal() {
  * Admin and seller (a showroom account) always go to the landing page —
  * their session doesn't belong to any one showroom the way a buyer's or a
  * marketing's does. Buyer and marketing return to the showroom they belong
- * to; otherwise they fall back to the landing page too, since "#/s/" without
+ * to; otherwise they fall back to the landing page too, since "/s/" without
  * a slug isn't a real page.
  */
-function logoutRedirectHash(role) {
+function logoutRedirectPath(role) {
   if (role === "buyer") {
     // The durable signal: which showroom this buyer is a customer of,
     // recorded in users.home_showroom_id the last time they logged in
-    // through that showroom's #/s/<slug>/login. This is what makes them
+    // through that showroom's /s/<slug>/login. This is what makes them
     // "a customer of that showroom" in the SaaS sense, not just whichever
     // catalog page happens to be open right now.
     const homeSlug = authStore.user()?.home_showroom_slug;
     if (homeSlug) {
-      return `#/s/${encodeURIComponent(homeSlug)}`;
+      return `/s/${encodeURIComponent(homeSlug)}`;
     }
 
     // Falls back to the in-session catalog context for buyers who never
     // logged in through a showroom link (e.g. a password account predating
     // this feature, or a generic Google login) but are browsing one now.
     const activeSlug = publicContextService.activeShowroom()?.slug;
-    return activeSlug ? `#/s/${encodeURIComponent(activeSlug)}` : "#/";
+    return activeSlug ? `/s/${encodeURIComponent(activeSlug)}` : "/";
   }
 
   if (role === "affiliate_admin") {
     // Preloaded at boot for every affiliate_admin session (preloadPlans.js),
     // so this is already in the store by the time Logout is reachable.
     const slug = appStore.get("snapshot.affiliate_admin.affiliateProfile.data.showroom.slug", null);
-    return slug ? `#/s/${encodeURIComponent(slug)}` : "#/";
+    return slug ? `/s/${encodeURIComponent(slug)}` : "/";
   }
 
-  return "#/";
+  return "/";
 }
 
 function formInput(label, id, type, value, onChange, error, disabled, hint = "") {

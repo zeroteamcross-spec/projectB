@@ -1,6 +1,7 @@
 import { notificationService } from "../services/notificationService.js";
 import { showToast } from "../../../ui/primitives/toast.js";
 import { NotificationIcon } from "./notificationIcon.js";
+import { navigateToLink } from "../utils/navigateToLink.js";
 
 export function NotificationItem({
   item = {},
@@ -25,7 +26,7 @@ export function NotificationItem({
       const link = item.linkUrl ?? item.link_url ?? "";
       if (link) {
         onClose?.();
-        navigate(link, onNavigate);
+        navigateToLink(link, onNavigate);
       }
     } catch (error) {
       showToast(error.message || "Gagal menandai notifikasi.", { type: "error" });
@@ -51,20 +52,6 @@ export function NotificationItem({
   button.append(dot, NotificationIcon({ item }), content, time);
   article.append(button);
   return article;
-}
-
-function navigate(link, onNavigate) {
-  const value = String(link ?? "").trim();
-  if (!value) {
-    return;
-  }
-
-  if (typeof onNavigate === "function") {
-    onNavigate(value);
-    return;
-  }
-
-  window.location.hash = value.startsWith("#") ? value : `#${value.startsWith("/") ? value : `/${value}`}`;
 }
 
 function readFlag(item = {}) {

@@ -1,4 +1,5 @@
 import { createPageLifecycle } from "../../../core/lifecycle.js";
+import { navigateTo } from "../../../core/router.js";
 import { appStore } from "../../../state/store.js";
 import { showToast } from "../../../ui/primitives/toast.js";
 import { Button } from "../../../ui/primitives/button.js";
@@ -107,7 +108,7 @@ export function AdminUsersPage() {
           try {
             await adminSessionService.startImpersonation(user.id, { reason, targetRole: user.role });
             showToast(`Login sebagai ${adminUserManagementService.impersonationLabel(user).toLowerCase()} aktif untuk ${user.name || user.email || `User #${user.id}`}.`, { type: "success" });
-            window.location.hash = user.role === "seller" ? "#/seller" : "#/affiliate";
+            navigateTo(user.role === "seller" ? "/seller" : "/affiliate");
           } catch (error) {
             state.activeUserId = null;
             rerender();

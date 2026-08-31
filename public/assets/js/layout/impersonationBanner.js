@@ -1,8 +1,9 @@
 import { adminSessionService } from "../modules/admin/services/adminSessionService.js";
 import { showToast } from "../ui/primitives/toast.js";
 import { tw } from "../theme/tailwindClasses.js";
+import { navigateTo } from "../core/router.js";
 
-export function renderImpersonationBanner(host, store, { redirectTo = "#/admin" } = {}) {
+export function renderImpersonationBanner(host, store, { redirectTo = "/admin" } = {}) {
   if (!host) {
     return;
   }
@@ -49,7 +50,7 @@ export function renderImpersonationBanner(host, store, { redirectTo = "#/admin" 
     try {
       await adminSessionService.stopImpersonation();
       showToast("Kembali ke akun admin.", { type: "success" });
-      window.location.hash = redirectTo;
+      navigateTo(redirectTo);
     } catch (error) {
       showToast(error.message || "Gagal menghentikan impersonation.", { type: "error" });
       button.disabled = false;

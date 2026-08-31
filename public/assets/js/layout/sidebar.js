@@ -12,44 +12,44 @@ import { navigateToOwnShowroom, hasOwnShowroomLink } from "./ownShowroomLink.js"
 // showroom, which is not how buyers browse. They arrive through a showroom or
 // marketing link instead. The route itself is still reachable directly.
 const BUYER_LINKS = [
-  { href: "#/buyer", label: "Buyer Home", icon: "dashboard" },
-  { href: "#/buyer/transactions", label: "Transaksi", icon: "transaction" },
-  { href: "#/profile", label: "Profil Saya", icon: "user" },
+  { href: "/buyer", label: "Buyer Home", icon: "dashboard" },
+  { href: "/buyer/transactions", label: "Transaksi", icon: "transaction" },
+  { href: "/profile", label: "Profil Saya", icon: "user" },
 ];
 
 const SELLER_LINKS = [
-  { href: "#/seller", label: "Dashboard Showroom", icon: "dashboard" },
-  { href: "#/profile", label: "Profil Saya", icon: "user" },
-  { href: "#/seller/showroom", label: "Showroom Saya", icon: "showroom" },
-  { href: "#/seller/cars", label: "Katalog", icon: "car" },
-  { href: "#/seller/inspection", label: "Inspeksi", icon: "clipboard" },
-  { href: "#/seller/affiliates", label: "Marketing", icon: "affiliate" },
-  { href: "#/seller/affiliate-commissions", label: "Komisi Marketing", icon: "commission" },
-  { href: "#/seller/transactions", label: "Transaksi", icon: "transaction" },
+  { href: "/seller", label: "Dashboard Showroom", icon: "dashboard" },
+  { href: "/profile", label: "Profil Saya", icon: "user" },
+  { href: "/seller/showroom", label: "Showroom Saya", icon: "showroom" },
+  { href: "/seller/cars", label: "Katalog", icon: "car" },
+  { href: "/seller/inspection", label: "Inspeksi", icon: "clipboard" },
+  { href: "/seller/affiliates", label: "Marketing", icon: "affiliate" },
+  { href: "/seller/affiliate-commissions", label: "Komisi Marketing", icon: "commission" },
+  { href: "/seller/transactions", label: "Transaksi", icon: "transaction" },
 ];
 
 const ADMIN_LINKS = [
-  { href: "#/admin", label: "Dashboard Admin", icon: "dashboard" },
-  { href: "#/profile", label: "Profil Saya", icon: "user" },
-  { href: "#/admin/approvals", label: "Approval Queue", icon: "transaction" },
-  { href: "#/admin/users", label: "User Management", icon: "transaction" },
-  { href: "#/admin/cars", label: "Katalog Mobil", icon: "car" },
-  { href: "#/admin/transactions", label: "Transactions", icon: "transaction" },
-  { href: "#/admin/settlements", label: "Settlements", icon: "commission" },
-  { href: "#/admin/sliders", label: "Slider", icon: "image" },
+  { href: "/admin", label: "Dashboard Admin", icon: "dashboard" },
+  { href: "/profile", label: "Profil Saya", icon: "user" },
+  { href: "/admin/approvals", label: "Approval Queue", icon: "transaction" },
+  { href: "/admin/users", label: "User Management", icon: "transaction" },
+  { href: "/admin/cars", label: "Katalog Mobil", icon: "car" },
+  { href: "/admin/transactions", label: "Transactions", icon: "transaction" },
+  { href: "/admin/settlements", label: "Settlements", icon: "commission" },
+  { href: "/admin/sliders", label: "Slider", icon: "image" },
   {
     href: "#",
     label: "Master",
     icon: "sort",
       children: [
-        { href: "#/admin/master-brand", label: "Master Brand", icon: "car" },
-        { href: "#/admin/master-sidebar", label: "Master Sidebar", icon: "sitemap" },
-        { href: "#/admin/master-bank", label: "Master Bank", icon: "bank" },
-        { href: "#/admin/master-inspection", label: "Master Inspection", icon: "clipboard" },
-        { href: "#/admin/master-location", label: "Master Lokasi", icon: "location" },
+        { href: "/admin/master-brand", label: "Master Brand", icon: "car" },
+        { href: "/admin/master-sidebar", label: "Master Sidebar", icon: "sitemap" },
+        { href: "/admin/master-bank", label: "Master Bank", icon: "bank" },
+        { href: "/admin/master-inspection", label: "Master Inspection", icon: "clipboard" },
+        { href: "/admin/master-location", label: "Master Lokasi", icon: "location" },
       ],
     },
-  { href: "#/admin/web-config", label: "Konfigurasi WEB", icon: "settings" },
+  { href: "/admin/web-config", label: "Konfigurasi WEB", icon: "settings" },
 ];
 
 /**
@@ -59,31 +59,31 @@ const ADMIN_LINKS = [
  * didaftarkan di sini, kalau tidak menunya tidak akan pernah muncul.
  */
 const SUPER_ADMIN_LINKS = [
-  { href: "#/super-admin", label: "Superadmin Dashboard", icon: "dashboard" },
-  { href: "#/super-admin/accounts", label: "Buat Akun", icon: "user" },
-  { href: "#/admin/web-config", label: "Konfigurasi WEB", icon: "settings" },
-  { href: "#/admin/landing-page", label: "Landing Page", icon: "home" },
-  { href: "#/admin/release-versions", label: "Release Version Manager", icon: "download" },
-  { href: "#/admin/migrations", label: "Migration Manager", icon: "database" },
+  { href: "/super-admin", label: "Superadmin Dashboard", icon: "dashboard" },
+  { href: "/super-admin/accounts", label: "Buat Akun", icon: "user" },
+  { href: "/admin/web-config", label: "Konfigurasi WEB", icon: "settings" },
+  { href: "/admin/landing-page", label: "Landing Page", icon: "home" },
+  { href: "/admin/release-versions", label: "Release Version Manager", icon: "download" },
+  { href: "/admin/migrations", label: "Migration Manager", icon: "database" },
   {
     href: "#",
     label: "Level User Switcher (Super)",
     icon: "user",
     children: [
-      { href: "#/admin", label: "Admin View", icon: "dashboard" },
-      { href: "#/buyer", label: "Buyer View", icon: "user" },
-      { href: "#/seller", label: "Showroom View", icon: "car" },
-      { href: "#/affiliate", label: "Marketing View", icon: "affiliate" },
+      { href: "/admin", label: "Admin View", icon: "dashboard" },
+      { href: "/buyer", label: "Buyer View", icon: "user" },
+      { href: "/seller", label: "Showroom View", icon: "car" },
+      { href: "/affiliate", label: "Marketing View", icon: "affiliate" },
     ],
   },
 ];
 
 const AFFILIATE_LINKS = [
-  { href: "#/affiliate", label: "Dashboard Marketing", icon: "affiliate" },
-  { href: "#/profile", label: "Profil Saya", icon: "user" },
-  { href: "#/affiliate/activity", label: "Activity Clicks", icon: "transaction" },
-  { href: "#/affiliate/ledger", label: "Ledger Komisi", icon: "commission" },
-  { href: "#/affiliate/settlements", label: "Payout Settlement", icon: "commission" },
+  { href: "/affiliate", label: "Dashboard Marketing", icon: "affiliate" },
+  { href: "/profile", label: "Profil Saya", icon: "user" },
+  { href: "/affiliate/activity", label: "Activity Clicks", icon: "transaction" },
+  { href: "/affiliate/ledger", label: "Ledger Komisi", icon: "commission" },
+  { href: "/affiliate/settlements", label: "Payout Settlement", icon: "commission" },
 ];
 
 export function sidebar(store = null, options = {}) {
@@ -389,7 +389,7 @@ function withDesignStudioV2Menu(links, role, store) {
     return links;
   }
 
-  if (links.some((link) => String(link.href ?? "") === "#/admin/design-studio-v2")) {
+  if (links.some((link) => String(link.href ?? "").replace(/^#/, "") === "/admin/design-studio-v2")) {
     return links;
   }
 

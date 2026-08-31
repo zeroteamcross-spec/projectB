@@ -43,9 +43,9 @@ export function AdminMasterSidebarForm({
   });
   const route = inputField({
     id: "admst_sidebar_form_route_input",
-    label: "Route/hash",
+    label: "Route",
     value: draft.route,
-    placeholder: "#/admin/users",
+    placeholder: "/admin/users",
   });
   const icon = iconSelectorField({
     id: "admst_sidebar_form_icon_input",

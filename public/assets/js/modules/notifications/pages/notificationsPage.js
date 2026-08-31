@@ -537,7 +537,7 @@ function buyerDesktopNavLink(item, activePath, actions) {
     link.disabled = true;
     link.setAttribute("aria-disabled", "true");
   } else {
-    link.href = `#${item.path}`;
+    link.href = item.path;
     link.addEventListener("click", (event) => {
       event.preventDefault();
       actions.navigate(item.path);

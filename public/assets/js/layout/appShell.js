@@ -95,7 +95,7 @@ export class AppShell {
   }
 
   renderImpersonationBanner() {
-    mountImpersonationBanner(this.bannerHost, this.store, { redirectTo: "#/admin" });
+    mountImpersonationBanner(this.bannerHost, this.store, { redirectTo: "/admin" });
   }
 
   syncBuyerShell() {

@@ -11,10 +11,10 @@
  */
 
 export const RUTE = Object.freeze({
-  daftar: "#/daftar-showroom",
+  daftar: "/daftar-showroom",
   // Landing ini menyasar pemilik showroom, jadi "Masuk" langsung ke form email
-  // dan password khusus seller, bukan ke #/auth yang masih meminta pilih role.
-  masuk: "#/login/seller",
+  // dan password khusus seller, bukan ke /auth yang masih meminta pilih role.
+  masuk: "/login/seller",
 });
 
 export function landingMarkup({ namaMerek, tagline, tautanWhatsapp, alamatEtalase, logoUrl = "" }) {

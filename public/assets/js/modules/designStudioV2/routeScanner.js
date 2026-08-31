@@ -24,8 +24,8 @@ export function scanRoute({ route = '', currentUser = null, designMode = false, 
 }
 
 export function scanCurrentRoute(options = {}) {
-    const currentHash = typeof window === 'undefined' ? '' : window.location.hash;
-    const route = options.route || currentHash || '';
+    const currentPath = typeof window === 'undefined' ? '' : window.location.pathname;
+    const route = options.route || currentPath || '';
 
     return scanRoute({ ...options, route });
 }

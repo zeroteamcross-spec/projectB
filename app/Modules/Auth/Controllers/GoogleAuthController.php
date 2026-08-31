@@ -117,7 +117,7 @@ class GoogleAuthController extends Controller
     private function redirectToFrontend(string $path): Response
     {
         return new Response('', 302, [
-            'Location' => '/#' . (strpos($path, '/') === 0 ? $path : '/' . $path),
+            'Location' => strpos($path, '/') === 0 ? $path : '/' . $path,
         ]);
     }
 }

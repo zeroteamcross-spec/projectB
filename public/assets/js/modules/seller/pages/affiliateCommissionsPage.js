@@ -546,19 +546,17 @@ function modeFromQuery(query) {
 }
 
 /**
- * router.navigate() cuma mengubah window.location.hash -- itu berlaku
- * sinkron seketika. Yang ASINKRON adalah reaksi Router-nya: leaveActivePage(),
- * mountPage() dengan context baru, semuanya menunggu event hashchange yang
- * baru diproses giliran berikutnya. Membaca hash langsung di sini (bukan
- * context.query milik modul ini, yang baru diperbarui setelah hashchange
- * itu selesai) berarti render() selalu melihat tujuan navigasi yang
- * sebenarnya, bahkan saat dipanggil dari tengah rentetan render sinkron
- * yang dipicu closeModal().
+ * router.navigate() cuma mengubah window.location.pathname/search -- itu
+ * berlaku sinkron seketika. Yang ASINKRON adalah reaksi Router-nya:
+ * leaveActivePage(), mountPage() dengan context baru, semuanya menunggu
+ * event popstate yang baru diproses giliran berikutnya. Membaca query
+ * langsung di sini (bukan context.query milik modul ini, yang baru
+ * diperbarui setelah popstate itu selesai) berarti render() selalu melihat
+ * tujuan navigasi yang sebenarnya, bahkan saat dipanggil dari tengah
+ * rentetan render sinkron yang dipicu closeModal().
  */
 function liveHashQuery() {
-  const hash = window.location.hash.replace(/^#/, "");
-  const queryString = hash.split("?")[1] ?? "";
-  return Object.fromEntries(new URLSearchParams(queryString));
+  return Object.fromEntries(new URLSearchParams(window.location.search));
 }
 
 function ensureSelectedCar(cars, selectedCar) {

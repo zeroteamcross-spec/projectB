@@ -2,6 +2,7 @@ import { createIcon } from "../../../theme/iconRegistry.js";
 import { showToast } from "../../../ui/primitives/toast.js";
 import { notificationService } from "../services/notificationService.js";
 import { NotificationIcon } from "./notificationIcon.js";
+import { navigateToLink } from "../utils/navigateToLink.js";
 
 export function NotificationsPageList({
   items = [],
@@ -68,7 +69,7 @@ function NotificationPageItem({ item, marking = false, onNavigate = null, onChan
       }
 
       if (item.linkUrl) {
-        navigate(item.linkUrl, onNavigate);
+        navigateToLink(item.linkUrl, onNavigate);
       }
     } catch (error) {
       showToast(error.message || "Gagal menandai notifikasi.", { type: "error" });
@@ -104,19 +105,6 @@ function typeBadge(item) {
   return badge;
 }
 
-function navigate(link, onNavigate) {
-  const value = String(link ?? "").trim();
-  if (!value) {
-    return;
-  }
-
-  if (typeof onNavigate === "function") {
-    onNavigate(value);
-    return;
-  }
-
-  window.location.hash = value.startsWith("#") ? value : `#${value.startsWith("/") ? value : `/${value}`}`;
-}
 
 function relativeTime(value) {
   if (!value) {

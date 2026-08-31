@@ -219,7 +219,7 @@ function affiliateTopNavigation({ activePath, title, icon, actions }) {
 function desktopNavLink(item, activePath, actions) {
   const active = isActiveNav(item, activePath);
   const link = document.createElement("a");
-  link.href = `#${item.path}`;
+  link.href = item.path;
   link.id = `afacc_nav_desktop_${item.id}`;
   link.className = active
     ? "inline-flex min-w-0 items-center justify-center gap-2 rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_12%,white)] px-3 py-2 text-xs font-black text-[var(--pb-brand-secondary)] no-underline shadow-[var(--pb-shadow-soft)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)] xl:px-4"

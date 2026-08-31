@@ -1,6 +1,7 @@
 import { authStore } from "../state/authStore.js";
 import { affiliateDashboardResource } from "../resources/affiliateDashboardResource.js";
 import { getBuyerShowroomCatalogUrl } from "../utils/buyerShowroomUrl.js";
+import { navigateTo } from "../core/router.js";
 
 /**
  * Klik logo header/sidebar membuka katalog publik showroom -- tapi "showroom
@@ -23,9 +24,9 @@ export async function navigateToOwnShowroom() {
 
   if (role === "buyer") {
     const slug = String(authStore.user()?.home_showroom_slug ?? "").trim();
-    const hash = slug ? `#/s/${encodeURIComponent(slug)}` : getBuyerShowroomCatalogUrl();
-    if (hash) {
-      window.location.hash = hash;
+    const path = slug ? `/s/${encodeURIComponent(slug)}` : getBuyerShowroomCatalogUrl();
+    if (path) {
+      navigateTo(path);
     }
     return;
   }
@@ -33,7 +34,7 @@ export async function navigateToOwnShowroom() {
   if (role === "affiliate_admin") {
     const slug = await resolveAffiliateShowroomSlug();
     if (slug) {
-      window.location.hash = `#/showrooms/${encodeURIComponent(slug)}`;
+      navigateTo(`/showrooms/${encodeURIComponent(slug)}`);
     }
   }
 }

@@ -1,5 +1,6 @@
 import { Button } from "../primitives/button.js";
 import { createIcon } from "../../theme/iconRegistry.js";
+import { navigateTo } from "../../core/router.js";
 
 const TEMPLATE_LABELS = {
   elegant_gradient: "Elegant Gradient Hero",
@@ -331,8 +332,20 @@ function ctaButton(slider, { idPrefix, onNavigate, resolveCtaUrl }) {
     onClick: () => {
       if (!url) return;
       if (url.startsWith("#/")) {
-        onNavigate?.(url.slice(1));
-        if (!onNavigate) window.location.hash = url;
+        const path = url.slice(1);
+        if (onNavigate) {
+          onNavigate(path);
+        } else {
+          navigateTo(path);
+        }
+        return;
+      }
+      if (url.startsWith("/")) {
+        if (onNavigate) {
+          onNavigate(url);
+        } else {
+          navigateTo(url);
+        }
         return;
       }
       window.location.href = url;

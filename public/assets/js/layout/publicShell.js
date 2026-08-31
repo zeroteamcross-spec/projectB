@@ -6,6 +6,7 @@ import { tw } from "../theme/tailwindClasses.js";
 import { applyDesignHook } from "../theme/designStudioHooks.js";
 import { renderImpersonationBanner as mountImpersonationBanner } from "./impersonationBanner.js";
 import { loginPathForCurrentHost } from "../core/roleGuard.js";
+import { navigateTo } from "../core/router.js";
 import { BuyerMobileFooterNav } from "../modules/buyer/components/buyerMobileFooterNav.js";
 import { publicContextService } from "../modules/public/services/publicContextService.js";
 
@@ -45,7 +46,7 @@ export class PublicShell {
       this.mobileFooterContainer = document.createElement("div");
       this.root.append(this.headerNode, this.alertHost, this.outlet, this.mobileFooterContainer);
       this.unsubscribe = this.store?.subscribe?.(() => this.syncActionLink()) ?? null;
-      window.addEventListener("hashchange", () => this.syncActionLink());
+      window.addEventListener("popstate", () => this.syncActionLink());
     }
 
     this.syncActionLink();
@@ -62,7 +63,7 @@ export class PublicShell {
     inner.className = "mx-auto flex min-w-0 w-full max-w-[1200px] flex-wrap items-center justify-between gap-2 px-4 py-3 sm:gap-3 sm:px-6 2xl:max-w-[1240px]";
 
     const brand = document.createElement("a");
-    brand.href = "#/";
+    brand.href = "/";
     brand.className = "flex min-w-0 flex-1 items-center gap-2.5 no-underline";
     this.brandLinkNode = brand;
 
@@ -81,7 +82,7 @@ export class PublicShell {
 
     copy.append(title, subtitle);
 
-    const bootPath = window.location.hash.replace(/^#/, "").split("?")[0] || "/";
+    const bootPath = window.location.pathname || "/";
     syncBrandMark(mark, [copy], bootPath);
 
     brand.append(mark, copy);
@@ -114,7 +115,7 @@ export class PublicShell {
   }
 
   syncActionLink() {
-    const currentPath = window.location.hash.replace(/^#/, "").split("?")[0] || "/";
+    const currentPath = window.location.pathname || "/";
     publicContextService.syncBrandingFromPath(currentPath);
 
     if (!this.actionLink) {
@@ -132,11 +133,11 @@ export class PublicShell {
     this.brandSubtitleNode && (this.brandSubtitleNode.textContent = brandConfig.appTagline || "Showroom mobil pilihan");
     syncBrandMark(this.brandMarkNode, [this.brandCopyNode], currentPath);
     if (this.brandLinkNode) {
-      this.brandLinkNode.href = `#${ownCatalogHrefForPath(currentPath)}`;
+      this.brandLinkNode.href = ownCatalogHrefForPath(currentPath);
     }
     this.actionLink.href = target;
     this.actionLink.title = isAuthenticated ? "Dashboard akun" : "Masuk";
-    const isTargetBuyer = isAuthenticated && target === "#/buyer";
+    const isTargetBuyer = isAuthenticated && target === "/buyer";
     this.actionLink.classList.toggle("w-10", isAuthenticated && !isTargetBuyer);
     this.actionLink.classList.toggle("px-0", isAuthenticated && !isTargetBuyer);
     this.actionLink.classList.toggle("px-3", !isAuthenticated || isTargetBuyer);
@@ -165,15 +166,15 @@ export class PublicShell {
     if (this.mobileFooterContainer) {
       this.mobileFooterContainer.replaceChildren();
       if (showMobileFooter) {
-        const activePath = window.location.hash.replace(/^#/, "") || "/";
+        const activePath = window.location.pathname || "/";
         const footer = BuyerMobileFooterNav({
           activePath,
           onNavigate: (path) => {
             if (!isBuyerLoggedIn) {
-              window.location.hash = loginHashForShowroomRoute() ?? loginHashForCurrentHost();
+              navigateTo(loginHashForShowroomRoute() ?? loginHashForCurrentHost());
               return;
             }
-            window.location.hash = `#${path}`;
+            navigateTo(path);
           }
         });
         this.mobileFooterContainer.append(footer);
@@ -187,7 +188,7 @@ export class PublicShell {
 }
 
 function tanpaTombolLogin() {
-  const jalur = window.location.hash.replace(/^#/, "").split("?")[0] || "/";
+  const jalur = window.location.pathname || "/";
   const dinormalkan = jalur.length > 1 ? jalur.replace(/\/$/, "") : jalur;
 
   return RUTE_TANPA_TOMBOL_LOGIN.includes(dinormalkan);
@@ -318,22 +319,22 @@ function ownCatalogHrefForPath(currentPath) {
 
 function dashboardHash(role) {
   if (role === "admin") {
-    return "#/admin";
+    return "/admin";
   }
 
   if (role === "affiliate_admin") {
-    return "#/affiliate";
+    return "/affiliate";
   }
 
   if (role === "seller") {
-    return "#/seller";
+    return "/seller";
   }
 
   if (role === "buyer") {
-    return "#/buyer";
+    return "/buyer";
   }
 
-  return "#/";
+  return "/";
 }
 
 /**
@@ -342,10 +343,10 @@ function dashboardHash(role) {
  * that route so the caller falls back to loginHashForCurrentHost().
  */
 function loginHashForShowroomRoute() {
-  const jalur = window.location.hash.replace(/^#/, "").split("?")[0] || "/";
+  const jalur = window.location.pathname || "/";
   const cocok = jalur.match(/^\/(?:s|showrooms)\/([^/]+)$/);
 
-  return cocok ? `#/s/${cocok[1]}/login` : null;
+  return cocok ? `/s/${cocok[1]}/login` : null;
 }
 
 /**
@@ -354,11 +355,11 @@ function loginHashForShowroomRoute() {
  * berganti tombol Login berhenti mengenali host mana pun.
  */
 function loginHashForCurrentHost() {
-  return `#${loginPathForCurrentHost()}`;
+  return loginPathForCurrentHost();
 }
 
 PublicShell.prototype.renderImpersonationBanner = function renderImpersonationBanner() {
-  mountImpersonationBanner(this.bannerHost, this.store, { redirectTo: "#/admin" });
+  mountImpersonationBanner(this.bannerHost, this.store, { redirectTo: "/admin" });
 };
 
 PublicShell.prototype.renderHydrateAlert = function renderHydrateAlert() {
