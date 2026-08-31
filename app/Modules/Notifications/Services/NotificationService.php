@@ -159,7 +159,7 @@ class NotificationService
                 'title' => 'Pembayaran Berhasil',
                 'body' => sprintf('Pembayaran untuk transaksi %s sudah diterima.', $carLabel ?: $code),
                 'data' => $data,
-                'link_url' => '#/buyer/transactions/' . $transactionId,
+                'link_url' => '/buyer/transactions/' . $transactionId,
                 'icon_key' => 'payment',
                 'priority' => 'high',
             ]));
@@ -173,7 +173,7 @@ class NotificationService
                 'title' => 'Transaksi Dibayar',
                 'body' => sprintf('Buyer telah menyelesaikan pembayaran untuk %s. Segera proses transaksi.', $carLabel ?: $code),
                 'data' => $data,
-                'link_url' => '#/seller/transactions',
+                'link_url' => '/seller/transactions',
                 'icon_key' => 'transaction',
                 'priority' => 'high',
             ]));
@@ -186,7 +186,7 @@ class NotificationService
                 'title' => 'Pembayaran Transaksi Masuk',
                 'body' => sprintf('Transaksi %s untuk %s sudah berstatus paid.', $code, $carLabel ?: 'unit terkait'),
                 'data' => $data,
-                'link_url' => '#/admin/transactions',
+                'link_url' => '/admin/transactions',
                 'icon_key' => 'payment',
                 'priority' => 'normal',
             ]));
@@ -212,7 +212,7 @@ class NotificationService
             'title' => 'Bukti Transfer Manual Masuk',
             'body' => sprintf('Buyer mengunggah bukti transfer untuk %s. Cek mutasi rekening lalu konfirmasi.', $carLabel ?: $code),
             'data' => $this->transactionNotificationData($transaction),
-            'link_url' => '#/seller/transactions',
+            'link_url' => '/seller/transactions',
             'icon_key' => 'payment',
             'priority' => 'high',
         ]);
@@ -238,7 +238,7 @@ class NotificationService
                 ? sprintf('Bukti transfer untuk %s ditolak: %s. Unggah ulang buktinya.', $carLabel ?: $code, $reason)
                 : sprintf('Bukti transfer untuk %s ditolak showroom. Unggah ulang buktinya.', $carLabel ?: $code),
             'data' => $this->transactionNotificationData($transaction),
-            'link_url' => '#/buyer/transactions',
+            'link_url' => '/buyer/transactions',
             'icon_key' => 'payment',
             'priority' => 'high',
         ]);
@@ -271,7 +271,7 @@ class NotificationService
                     ? (float) $ledger['commission_amount']
                     : (isset($ledger['amount']) ? (float) $ledger['amount'] : null),
             ],
-            'link_url' => '#/affiliate/ledger',
+            'link_url' => '/affiliate/ledger',
             'icon_key' => 'commission',
             'priority' => 'normal',
             'source_type' => 'affiliate_commission',
@@ -317,7 +317,7 @@ class NotificationService
             'title' => 'Inspeksi Perlu Dilengkapi',
             'body' => sprintf('Lengkapi inspeksi untuk %s agar listing lebih siap diproses.', $this->carLabel($car) ?: ('mobil #' . $carId)),
             'data' => $this->carNotificationData($car),
-            'link_url' => '#/seller/inspection',
+            'link_url' => '/seller/inspection',
             'icon_key' => 'inspection',
             'priority' => 'normal',
             'source_type' => 'car_inspection',
@@ -350,7 +350,7 @@ class NotificationService
                 'title' => 'Transaksi Selesai',
                 'body' => sprintf('Transaksi %s untuk %s sudah selesai.', $code, $carLabel ?: 'unit terkait'),
                 'data' => $data,
-                'link_url' => '#/buyer/transactions/' . $transactionId,
+                'link_url' => '/buyer/transactions/' . $transactionId,
                 'icon_key' => 'transaction',
                 'priority' => 'normal',
             ]));
@@ -364,7 +364,7 @@ class NotificationService
                 'title' => 'Transaksi Selesai',
                 'body' => sprintf('Transaksi %s untuk %s sudah selesai.', $code, $carLabel ?: 'unit terkait'),
                 'data' => $data,
-                'link_url' => '#/seller/transactions',
+                'link_url' => '/seller/transactions',
                 'icon_key' => 'transaction',
                 'priority' => 'normal',
             ]));
@@ -394,7 +394,7 @@ class NotificationService
                 'requested_amount' => isset($settlement['requested_amount']) ? (float) $settlement['requested_amount'] : null,
                 'ledger_count' => isset($settlement['ledger_count']) ? (int) $settlement['ledger_count'] : null,
             ],
-            'link_url' => '#/affiliate/settlements',
+            'link_url' => '/affiliate/settlements',
             'icon_key' => 'settlement',
             'priority' => 'normal',
             'source_type' => 'affiliate_settlement',
@@ -522,7 +522,7 @@ class NotificationService
             'title' => $title,
             'body' => $body,
             'data' => $this->carNotificationData($car),
-            'link_url' => '#/seller/cars',
+            'link_url' => '/seller/cars',
             'icon_key' => 'listing',
             'priority' => $priority,
             'source_type' => 'car',

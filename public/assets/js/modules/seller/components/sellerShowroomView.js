@@ -128,6 +128,6 @@ function showroomPublicUrl(showroom = {}) {
   const origin = `${window.location.protocol}//${hostname}${window.location.port ? ":" + window.location.port : ""}`;
 
   // Alias pendek, sama dengan yang dijanjikan landing page dan panel sukses
-  // pendaftaran. Menuju halaman yang sama dengan /#/showrooms/<slug>.
-  return `${origin}${window.location.pathname}#/s/${encodeURIComponent(slug)}`;
+  // pendaftaran. Menuju halaman yang sama dengan /showrooms/<slug>.
+  return `${origin}/s/${encodeURIComponent(slug)}`;
 }

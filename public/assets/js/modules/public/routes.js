@@ -133,7 +133,7 @@ export const publicRoutes = [
   },
   {
     // Buyer-only Google login scoped to one showroom, e.g. the "Masuk" link
-    // on a catalog page a buyer reached via /#/s/<slug>. Login always returns
+    // on a catalog page a buyer reached via /s/<slug>. Login always returns
     // here, to this same showroom, instead of the generic buyer home — and
     // records it as the showroom this buyer belongs to, so a later logout
     // (from any session) returns them here too.

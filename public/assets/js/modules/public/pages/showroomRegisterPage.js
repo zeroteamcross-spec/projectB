@@ -213,7 +213,7 @@ function registerPanel(state, actions, context) {
   const paintSlugPreview = (value) => {
     const normalized = normalizeSlug(value);
     slugPreview.textContent = normalized
-      ? `Halaman Anda: ${window.location.origin}/#/s/${normalized}`
+      ? `Halaman Anda: ${window.location.origin}/s/${normalized}`
       : "Halaman Anda akan muncul di sini setelah slug diisi.";
   };
   paintSlugPreview(state.draft.showroom_slug ?? "");
@@ -423,8 +423,8 @@ function successPanel(registered, actions, context) {
   detail.append(
     detailRow("Email masuk", registered.email),
     // Alias pendek, sama dengan yang dijanjikan landing page. Menuju halaman
-    // yang sama dengan /#/showrooms/<slug>.
-    detailRow("Halaman showroom", `${window.location.origin}/#/s/${registered.slug}`),
+    // yang sama dengan /showrooms/<slug>.
+    detailRow("Halaman showroom", `${window.location.origin}/s/${registered.slug}`),
   );
 
   const login = Button({ label: "Masuk sekarang", variant: "primary" });

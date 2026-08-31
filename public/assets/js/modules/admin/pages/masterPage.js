@@ -1071,9 +1071,8 @@ function createMasterQuery(query = {}, pageType = "brand") {
 }
 
 function syncMasterUrl(query, pageType = "brand") {
-  const url = new URL(window.location.href);
-  url.hash = `#${buildMasterPath(pageType, query)}`;
-  window.history.replaceState(window.history.state, "", url);
+  const target = new URL(buildMasterPath(pageType, query), window.location.origin);
+  window.history.replaceState(window.history.state, "", target);
 }
 
 function paginate(items, filters) {

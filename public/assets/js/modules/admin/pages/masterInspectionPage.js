@@ -488,9 +488,8 @@ function syncUrl(query) {
   if (query.status) params.set("status", query.status);
   if (query.page && Number(query.page) > 1) params.set("page", String(query.page));
   if (query.pageSize && Number(query.pageSize) !== 10) params.set("page_size", String(query.pageSize));
-  const url = new URL(window.location.href);
-  url.hash = `#/admin/master-inspection${params.toString() ? `?${params.toString()}` : ""}`;
-  window.history.replaceState(window.history.state, "", url);
+  const target = `/admin/master-inspection${params.toString() ? `?${params.toString()}` : ""}`;
+  window.history.replaceState(window.history.state, "", new URL(target, window.location.origin));
 }
 
 function paginate(items, filters) {

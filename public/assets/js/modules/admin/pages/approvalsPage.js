@@ -372,10 +372,8 @@ function createApprovalsQuery(query = {}) {
 }
 
 function syncApprovalsUrl(query) {
-  const nextHash = `#${buildApprovalsPath(query)}`;
-  const url = new URL(window.location.href);
-  url.hash = nextHash;
-  window.history.replaceState(window.history.state, "", url);
+  const target = new URL(buildApprovalsPath(query), window.location.origin);
+  window.history.replaceState(window.history.state, "", target);
 }
 
 async function hydrateApprovalDetail(userId) {

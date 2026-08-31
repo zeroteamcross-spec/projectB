@@ -102,12 +102,9 @@ function tautanWhatsapp() {
 const HOST_CONTOH = "carlynk.id";
 
 /**
- * Bentuk alamat etalase di aplikasi ini memakai hash routing, jadi berbeda
- * dari "carlynk.id/showroom-anda" pada paket asli.
- *
- * Yang dipajang adalah alias pendek /#/s/<slug>, bukan /#/showrooms/<slug>,
+ * Yang dipajang adalah alias pendek /s/<slug>, bukan /showrooms/<slug>,
  * supaya tautannya enak dibagikan. Keduanya menuju halaman yang sama.
  */
 function alamatEtalase() {
-  return `${HOST_CONTOH}/#/s/showroom-anda`;
+  return `${HOST_CONTOH}/s/showroom-anda`;
 }

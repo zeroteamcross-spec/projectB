@@ -420,7 +420,7 @@ function resolvePublicSliders() {
 }
 
 function affiliateSliderCtaUrl(url, affiliateSlug) {
-  const catalogUrl = `#/af/${encodeURIComponent(affiliateSlug)}`;
+  const catalogUrl = `/af/${encodeURIComponent(affiliateSlug)}`;
   const value = String(url || "").trim();
 
   if (!value) {
@@ -434,22 +434,22 @@ function affiliateSliderCtaUrl(url, affiliateSlug) {
   }
 
   if (hashPath.startsWith("/cars/")) {
-    return `#/af/${encodeURIComponent(affiliateSlug)}${hashPath}`;
+    return `/af/${encodeURIComponent(affiliateSlug)}${hashPath}`;
   }
 
   if (hashPath.startsWith("/transactions/")) {
-    return `#/af/${encodeURIComponent(affiliateSlug)}${hashPath}`;
+    return `/af/${encodeURIComponent(affiliateSlug)}${hashPath}`;
   }
 
   if (hashPath.startsWith("/af/") || hashPath.startsWith("/a/")) {
-    return `#${hashPath}`;
+    return hashPath;
   }
 
   return catalogUrl;
 }
 
 function showroomSliderCtaUrl(url, showroomSlug) {
-  const catalogUrl = `#/showrooms/${encodeURIComponent(showroomSlug)}`;
+  const catalogUrl = `/showrooms/${encodeURIComponent(showroomSlug)}`;
   const value = String(url || "").trim();
 
   if (!value) {
@@ -463,11 +463,11 @@ function showroomSliderCtaUrl(url, showroomSlug) {
   }
 
   if (hashPath.startsWith("/cars/") || hashPath.startsWith("/transactions/")) {
-    return `#/showrooms/${encodeURIComponent(showroomSlug)}${hashPath}`;
+    return `/showrooms/${encodeURIComponent(showroomSlug)}${hashPath}`;
   }
 
   if (hashPath.startsWith("/showrooms/") || hashPath.startsWith("/s/")) {
-    return `#${hashPath}`;
+    return hashPath;
   }
 
   return catalogUrl;

@@ -615,9 +615,8 @@ function createTransactionsQuery(query = {}) {
 }
 
 function syncTransactionsUrl(query) {
-  const url = new URL(window.location.href);
-  url.hash = `#${buildTransactionsPath(query)}`;
-  window.history.replaceState(window.history.state, "", url);
+  const target = new URL(buildTransactionsPath(query), window.location.origin);
+  window.history.replaceState(window.history.state, "", target);
 }
 
 function isDocumentHidden() {

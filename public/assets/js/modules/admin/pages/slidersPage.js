@@ -923,9 +923,8 @@ function syncUrl(query) {
   if (query.status) params.set("status", query.status);
   if (Number(query.page) > 1) params.set("page", String(query.page));
   if (Number(query.pageSize) !== 10) params.set("page_size", String(query.pageSize));
-  const url = new URL(window.location.href);
-  url.hash = params.toString() ? `#/admin/sliders?${params.toString()}` : "#/admin/sliders";
-  window.history.replaceState(window.history.state, "", url);
+  const target = params.toString() ? `/admin/sliders?${params.toString()}` : "/admin/sliders";
+  window.history.replaceState(window.history.state, "", new URL(target, window.location.origin));
 }
 
 function validateImageFile(file) {

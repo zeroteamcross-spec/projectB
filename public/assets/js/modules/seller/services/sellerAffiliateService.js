@@ -139,7 +139,7 @@ export const sellerAffiliateService = {
     const hostname = window.location.hostname.replace(/^(showroom|marketing|admin)\./i, "");
     const origin = `${window.location.protocol}//${hostname}${window.location.port ? ":" + window.location.port : ""}`;
 
-    return `${origin}${window.location.pathname}#${path}`;
+    return `${origin}${path}`;
   },
 
 };

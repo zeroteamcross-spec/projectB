@@ -417,10 +417,8 @@ function tanpaSuperAdmin(users) {
 }
 
 function syncUsersUrl(query) {
-  const nextHash = `#${buildUsersPath(query)}`;
-  const url = new URL(window.location.href);
-  url.hash = nextHash;
-  window.history.replaceState(window.history.state, "", url);
+  const target = new URL(buildUsersPath(query), window.location.origin);
+  window.history.replaceState(window.history.state, "", target);
 }
 
 async function hydrateUserDetail(userId) {

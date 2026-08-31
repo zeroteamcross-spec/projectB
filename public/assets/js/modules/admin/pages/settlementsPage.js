@@ -469,10 +469,8 @@ function createSettlementsQuery(query = {}) {
 }
 
 function syncSettlementsUrl(query) {
-  const nextHash = `#${buildSettlementsPath(query)}`;
-  const url = new URL(window.location.href);
-  url.hash = nextHash;
-  window.history.replaceState(window.history.state, "", url);
+  const target = new URL(buildSettlementsPath(query), window.location.origin);
+  window.history.replaceState(window.history.state, "", target);
 }
 
 function contextNavigate(context, path) {

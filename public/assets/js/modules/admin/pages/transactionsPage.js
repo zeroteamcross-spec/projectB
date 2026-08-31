@@ -293,10 +293,8 @@ function createTransactionsQuery(query = {}) {
 }
 
 function syncTransactionsUrl(query) {
-  const nextHash = `#${buildTransactionsPath(query)}`;
-  const url = new URL(window.location.href);
-  url.hash = nextHash;
-  window.history.replaceState(window.history.state, "", url);
+  const target = new URL(buildTransactionsPath(query), window.location.origin);
+  window.history.replaceState(window.history.state, "", target);
 }
 
 function textNode(tagName, className, text) {
