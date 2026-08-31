@@ -271,7 +271,7 @@
     color:var(--ink-faint);
   }
   .closing .pass{ color:var(--good); font-weight:700; }
-  .closing code{
+  code{
     font-family: ui-monospace, "Cascadia Mono", "Consolas", monospace;
     background:var(--cream);
     padding:2px 7px;
@@ -286,7 +286,7 @@
   <div class="cover">
     <div class="cover-eyebrow">Siata Mobilindo &middot; carlynk.id</div>
     <h1>Laporan Verifikasi Perubahan</h1>
-    <div class="cover-sub">46 permintaan perbaikan &amp; fitur, dikelompokkan per halaman. Semua sudah di-deploy ke carlynk.id dan dicek langsung satu per satu, bukan sekadar dilihat dari kode.</div>
+    <div class="cover-sub">47 permintaan perbaikan &amp; fitur, dikelompokkan per halaman. Semua sudah di-deploy ke carlynk.id dan dicek langsung satu per satu, bukan sekadar dilihat dari kode.</div>
     <div class="cover-meta">
       <div>
         <div class="k">Cabang</div>
@@ -302,18 +302,18 @@
       </div>
       <div>
         <div class="k">Tanggal</div>
-        <div class="v">29 Agustus 2026</div>
+        <div class="v">31 Agustus 2026</div>
       </div>
     </div>
   </div>
 
   <div class="stats">
     <div class="stat">
-      <div class="num">46</div>
+      <div class="num">47</div>
       <div class="lbl">Total permintaan &amp; perbaikan</div>
     </div>
     <div class="stat good">
-      <div class="num">44</div>
+      <div class="num">45</div>
       <div class="lbl">Terverifikasi langsung di browser</div>
     </div>
     <div class="stat accent">
@@ -321,7 +321,7 @@
       <div class="lbl">Terverifikasi tak langsung (kendala teknis pengujian)</div>
     </div>
     <div class="stat ink">
-      <div class="num">6</div>
+      <div class="num">7</div>
       <div class="lbl">Bug ekstra ditemukan &amp; diperbaiki sambil jalan</div>
     </div>
   </div>
@@ -422,17 +422,41 @@
     </section>
 
     <section class="group">
-      <div class="group-head"><h2>Marketing / affiliate</h2><span class="range">37, 38, 44, 46</span></div>
+      <div class="group-head"><h2>Marketing / affiliate</h2><span class="range">37, 38, 44, 46, 47</span></div>
       <table>
         <thead><tr><th>#</th><th>Perubahan</th><th class="c-link">Link</th></tr></thead>
         <tbody>
           <tr><td class="num">37</td><td>&quot;Slug marketing&quot; &rarr; &quot;URL marketing&quot; + preview URL live</td><td class="link"><a href="https://carlynk.id/#/seller/affiliates?mode=create">carlynk.id/#/seller/affiliates?mode=create</a></td></tr>
           <tr><td class="num">38</td><td>Keterangan merah saat URL sudah dipakai (ganti teks statis lama)</td><td class="link"><a href="https://carlynk.id/#/seller/affiliates?mode=create">carlynk.id/#/seller/affiliates?mode=create</a></td></tr>
           <tr><td class="num">44</td><td>Tombol &quot;Atur Komisi Umum&quot;/&quot;Tambah aturan khusus&quot; berkedip saat ditutup, sekarang langsung tertutup</td><td class="link"><a href="https://carlynk.id/#/seller/affiliate-commissions">carlynk.id/#/seller/affiliate-commissions</a></td></tr>
-          <tr><td class="num">46</td><td><span class="badge new">Baru</span>Logo, favicon, dan judul tab di halaman marketing #/af/:slug sekarang ikut showroom milik affiliate tersebut (sebelumnya selalu logo/favicon default)</td><td class="link"><a href="https://carlynk.id/#/af/rohim">carlynk.id/#/af/rohim</a></td></tr>
+          <tr><td class="num">46</td><td>Logo, favicon, dan judul tab di halaman marketing #/af/:slug sekarang ikut showroom milik affiliate tersebut (sebelumnya selalu logo/favicon default)</td><td class="link"><a href="https://carlynk.id/#/af/rohim">carlynk.id/#/af/rohim</a></td></tr>
+          <tr><td class="num">47</td><td><span class="badge new">Baru</span>Audit menyeluruh fitur Marketing: klik &rarr; registrasi buyer &rarr; transaksi &rarr; pembayaran &rarr; komisi diuji dengan transaksi sungguhan di production</td><td class="link">lihat rincian di bawah</td></tr>
         </tbody>
       </table>
     </section>
+
+    <div class="found-section">
+      <h2>Audit menyeluruh fitur Marketing (47)</h2>
+      <div class="sub">Diuji dengan showroom, marketing, dan buyer uji coba baru (bukan akun asli) &mdash; satu transaksi sungguhan dijalankan dari klik link referral sampai komisi tercatat di ledger.</div>
+      <ul class="found-list">
+        <li>Showroom membuat akun Marketing baru (nama, email, password, nomor WA, slug referral) &mdash; akun dan link <code>#/af/&lt;slug&gt;</code> langsung aktif.</li>
+        <li>Showroom mengatur komisi umum 5% di halaman Komisi Marketing.</li>
+        <li>Pengunjung membuka link referral &mdash; katalog otomatis tersaring ke mobil showroom itu saja, setiap kunjungan tercatat sebagai klik.</li>
+        <li>Pengunjung memilih mobil (Rp 100.000.000), mendaftar sebagai buyer baru langsung di halaman transaksi, lalu membuat Booking Fee Rp 3.000.000 &mdash; kode referral tersimpan otomatis di transaksinya.</li>
+        <li>Buyer transfer manual dan unggah bukti; showroom mengonfirmasi bukti transfer.</li>
+        <li><b>Begitu status transaksi jadi "dp_paid", komisi langsung terbit otomatis:</b> Rp 5.000.000 (5% &times; Rp 100.000.000) tercatat di ledger komisi.</li>
+        <li>Marketing login dan melihat semuanya benar: Dashboard (total klik/transaksi/komisi), Komisi (rincian ledger), Settlement (status belum dibayar), Notifikasi ("Komisi Affiliate Masuk").</li>
+      </ul>
+      <div class="sub" style="margin-top:14px;"><b>Bug ditemukan &amp; langsung diperbaiki:</b></div>
+      <ul class="found-list">
+        <li><b>Tombol "Daftar Pembeli" tidak pernah muncul</b> saat buyer belum login di halaman transaksi &mdash; kode sudah membuat tombolnya tapi lupa menempelkannya ke halaman, jadi pengunjung baru dari link marketing hanya bisa lihat tombol "Login dengan Google". Pesan error saat login/daftar gagal juga ikut tidak pernah tampil. Diperbaiki di sumbernya.</li>
+      </ul>
+      <div class="sub" style="margin-top:14px;"><b>Catatan (bukan bug, untuk transparansi):</b></div>
+      <ul class="found-list">
+        <li>Payout ke marketing (settlement batch oleh Admin) sudah diverifikasi lewat pembacaan kode &amp; struktur database, tapi belum dicoba klik langsung karena butuh akun Admin production yang belum tersedia untuk pengujian ini.</li>
+        <li>Ada dua tempat pengaturan komisi di kode &mdash; satu di data akun marketing (tidak dipakai lagi), satu di halaman Komisi Marketing milik showroom (ini yang aktif). Sudah dipastikan lewat pengujian ini bahwa yang menentukan besar komisi adalah halaman Komisi Marketing.</li>
+      </ul>
+    </div>
 
     <div class="found-section">
       <h2>Ditemukan &amp; diperbaiki sambil jalan</h2>
@@ -444,6 +468,7 @@
         <li><b>Logo default berkedip sebelum logo showroom muncul</b> &mdash; saat buka/muat ulang halaman showroom. Diperbaiki dua tahap (gambar, lalu nama aplikasi di sebelahnya).</li>
         <li><b>#/admin (dan #/seller, #/buyer) sempat salah arah ke katalog publik</b> &mdash; regresi dari percobaan mempercepat waktu muat halaman pertama. Ditemukan dari laporan Anda, langsung dikembalikan ke versi aman.</li>
         <li><b>API validasi kode referral tidak pernah mengirim logo/favicon showroom</b> &mdash; ditemukan saat mengerjakan item 46: query backend tidak pernah mengambil kolom logo header, favicon, dan judul tab showroom untuk halaman marketing. Ditambahkan di sumbernya.</li>
+        <li><b>Tombol "Daftar Pembeli" tidak pernah muncul di halaman transaksi</b> &mdash; ditemukan saat audit item 47: kode tombolnya sudah dibuat tapi tidak pernah ditempelkan ke halaman, plus pesan error login/daftar ikut disembunyikan. Diperbaiki di sumbernya.</li>
       </ul>
     </div>
 
