@@ -355,8 +355,18 @@
           <li><b>48</b> &mdash; Admin bisa menandai mobil terjual di luar sistem (WhatsApp, transaksi langsung di showroom), dengan keterangan bebas yang ditulis sendiri oleh Admin (wajib diisi) untuk audit.</li>
           <li><b>49</b> &mdash; Marketing bisa membagikan link satu mobil tertentu (&quot;Bagikan Mobil&quot;), tetap terdeteksi dan tetap dapat komisi.</li>
           <li><b>50</b> &mdash; <b>Perbaikan performa besar</b> &mdash; semua data dashboard selesai dimuat &lt;1 detik (sebelumnya 3+ detik). Lihat rincian di bawah.</li>
+          <li><b>51</b> &mdash; <b>Migrasi Fase 1: URL tanpa tanda #.</b> Navigasi di dalam aplikasi sekarang memakai URL bersih (mis. <code>carlynk.id/seller/cars</code>), bukan lagi <code>carlynk.id/#/seller/cars</code>. Tautan lama tetap berfungsi. Lihat rincian di bawah.</li>
         </ul>
       </div>
+    </div>
+
+    <div class="found-section">
+      <h2>Migrasi Fase 1: URL tanpa tanda # (51)</h2>
+      <div class="sub">Langkah lanjutan dari perbaikan performa di item 50.</div>
+      <p style="font-size:13px;line-height:1.7;color:var(--ink);margin:0 0 12px;">Client meminta URL yang lebih bersih dan mudah dibagikan. Arsitektur navigasi lama (berbasis tanda <code>#</code>) diganti dengan cara modern yang sama dipakai browser untuk website biasa (History API), sambil tetap mempertahankan kecepatan SPA &mdash; halaman tidak reload penuh setiap pindah menu.</p>
+      <p style="font-size:13px;line-height:1.7;color:var(--ink);margin:0 0 12px;"><b>Yang berubah:</b> semua link internal (sidebar, header, tombol profil, notifikasi, kembali dari impersonation) sekarang mengarah ke URL bersih. Login lewat Google diperbarui supaya tetap mendarat dengan benar. Reload langsung di halaman dalam (bukan cuma beranda) tetap berfungsi normal.</p>
+      <p style="font-size:13px;line-height:1.7;color:var(--ink);margin:0 0 12px;"><b>Yang tetap aman:</b> tautan lama yang sudah dibagikan (referral marketing, link showroom, notifikasi lama, bookmark) semuanya tetap terbuka dengan benar &mdash; otomatis diperbarui ke format baru begitu dibuka, tidak ada yang perlu dikirim ulang ke pelanggan. Link showroom/marketing yang dibagikan lewat WhatsApp untuk sementara masih format lama; direncanakan sebagai Fase 2 berikutnya.</p>
+      <div class="sub" style="margin-top:12px;">Sudah dicek langsung di production: login tiap level user, tombol kembali/maju browser, reload di halaman dalam, logout, login lewat Google (pindah domain carlynk.id &rarr; admin.carlynk.id), klik menu sidebar dengan data lama, klik notifikasi.</div>
     </div>
 
     <div class="found-section">
