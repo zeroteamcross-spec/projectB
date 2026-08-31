@@ -221,7 +221,15 @@ export class ProjectBApp {
      */
     await this.muatManifestUntukRole(authStore.role());
     await this.bootstrapDesignStudioV2();
-    await notificationService.ensureSnapshot({ force: true, store: appStore });
+
+    // Badge lonceng notifikasi bukan syarat route mana pun untuk bisa
+    // dirender -- ia dibaca reaktif dari appStore seperti panel async
+    // lainnya di app ini (lihat NotificationBell). Menunggunya di sini,
+    // sejajar dengan langkah yang memang wajib (auth, manifest role),
+    // menahan render pertama tanpa alasan. ensureSnapshot() sudah menangani
+    // errornya sendiri (lihat catch di dalamnya), jadi aman dilepas begitu
+    // saja -- badge-nya tetap update begitu responsnya datang.
+    notificationService.ensureSnapshot({ force: true, store: appStore });
 
     // Kalau ternyata login (role berubah dari "public"), preload awal tadi
     // sudah memuat plan yang salah -- susulkan plan yang benar. Untuk tamu
