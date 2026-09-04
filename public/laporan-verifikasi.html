@@ -324,7 +324,7 @@
         '<tr>' +
           '<td class="no">' + String(index + 1).padStart(2, "0") + '</td>' +
           '<td><span class="pill ' + kind + '">' + escapeHtml(kindLabel) + '</span></td>' +
-          '<td class="task-name">' + escapeHtml(row.task) + (row.ref ? ' <span style="color:var(--ink-faint);font-weight:400;">(' + escapeHtml(row.ref) + ')</span>' : '') + '</td>' +
+          '<td class="task-name">' + escapeHtml(row.task) + '</td>' +
           '<td class="task-detail">' + escapeHtml(row.detail) + '</td>' +
           statusCell +
         '</tr>'
