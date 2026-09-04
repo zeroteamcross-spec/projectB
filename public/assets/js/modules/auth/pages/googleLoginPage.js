@@ -204,7 +204,14 @@ function glassLoginActionContent(root, context, config, state, options = {}) {
 
   if (!config.googleEnabled) {
     actionWrap.append(messageBox(config.warning || "Google Login tidak tersedia untuk level user ini.", "info"));
-    appendFooterLink(actionWrap, context, options);
+    appendFooterLink(actionWrap, context, {
+      ...options,
+      // Peran seperti admin/showroom tidak dikirim footerLink eksplisit dari
+      // routes.js (itu cuma dipasang untuk buyer, lihat auth/routes.js) --
+      // tanpa fallback ini pengguna terdampar di halaman info tanpa jalan
+      // menuju form email/password yang sebenarnya masih berfungsi.
+      footerLink: options.footerLink ?? { label: "Masuk dengan Email & Password", path: `/login/${config.slug}` },
+    });
     fragment.append(actionWrap);
     return fragment;
   }

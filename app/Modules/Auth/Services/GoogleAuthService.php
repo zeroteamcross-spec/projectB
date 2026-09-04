@@ -41,8 +41,16 @@ class GoogleAuthService
             'missing_config' => $this->missingConfig(),
             'roles' => [
                 'buyer' => ['enabled' => true, 'auto_register' => true],
-                'admin' => ['enabled' => true, 'auto_register' => false],
-                'seller' => ['enabled' => true, 'auto_register' => true],
+                'admin' => [
+                    'enabled' => false,
+                    'auto_register' => false,
+                    'message' => 'Admin tetap menggunakan login user/password untuk saat ini.',
+                ],
+                'seller' => [
+                    'enabled' => false,
+                    'auto_register' => true,
+                    'message' => 'Showroom tetap menggunakan login user/password untuk saat ini.',
+                ],
                 'affiliate' => [
                     'enabled' => false,
                     'auto_register' => false,

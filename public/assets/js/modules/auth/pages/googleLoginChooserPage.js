@@ -60,10 +60,10 @@ function roleCard(context, config) {
 
   const body = document.createElement("p");
   body.className = "min-h-[3rem] text-xs leading-6 text-gray-600";
-  body.textContent = config.googleEnabled ? config.subtitle : "Marketing tetap menggunakan login user/password.";
+  body.textContent = config.googleEnabled ? config.subtitle : config.warning;
 
   const button = Button({
-    label: config.googleEnabled ? `Google Login ${config.label}` : "Buka Policy Marketing",
+    label: config.googleEnabled ? `Google Login ${config.label}` : `Login ${config.label}`,
     variant: config.googleEnabled ? "primary" : "secondary",
     onClick: () => context.router.navigate(`/google-login/${config.slug}`),
   });

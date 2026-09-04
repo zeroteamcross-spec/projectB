@@ -18,9 +18,9 @@ const ROLE_CONFIG = Object.freeze({
     label: "Admin",
     title: "Google Login Admin",
     subtitle: "Masuk sebagai Admin yang sudah terdaftar.",
-    warning: "Admin tidak bisa auto-register dari Google.",
+    warning: "Admin tetap menggunakan login user/password untuk saat ini.",
     home: "/admin",
-    googleEnabled: true,
+    googleEnabled: false,
   },
   seller: {
     role: "seller",
@@ -28,9 +28,9 @@ const ROLE_CONFIG = Object.freeze({
     label: "Showroom",
     title: "Google Login Showroom",
     subtitle: "Masuk atau daftar sebagai Showroom dengan Google.",
-    warning: "Showroom baru wajib melengkapi WhatsApp format 62 dan data showroom.",
+    warning: "Showroom tetap menggunakan login user/password untuk saat ini.",
     home: "/seller",
-    googleEnabled: true,
+    googleEnabled: false,
   },
   affiliate: {
     role: "affiliate_admin",
