@@ -164,16 +164,15 @@
     font-weight:800;
     color:rgba(255,255,255,.85);
   }
-  .sum-count{ position:relative; z-index:1; display:flex; align-items:baseline; gap:9px; margin-top:6px; }
+  .sum-count{ position:relative; z-index:1; display:flex; flex-direction:column; gap:2px; margin-top:10px; }
   .sum-count .n{
     font-family: Georgia, serif;
-    font-size:42px;
+    font-size:76px;
     font-weight:700;
     line-height:1;
     font-variant-numeric: tabular-nums;
   }
-  .sum-count .l{ font-size:12.5px; color:rgba(255,255,255,.92); max-width:19ch; line-height:1.4; }
-  .sum-desc{ position:relative; z-index:1; margin-top:10px; font-size:12.5px; line-height:1.6; color:rgba(255,255,255,.92); max-width:38ch; }
+  .sum-count .l{ font-size:13px; color:rgba(255,255,255,.92); max-width:26ch; line-height:1.4; }
 
   .table-wrap{ margin-top:28px; overflow-x:auto; border:1px solid var(--border); border-radius:12px; }
   table.tasks{ width:100%; border-collapse:collapse; min-width:640px; }
@@ -311,7 +310,6 @@
       '<div class="sum-card ' + kind + '">' +
         '<div class="sum-eyebrow">' + escapeHtml(label) + '</div>' +
         '<div class="sum-count"><span class="n">' + escapeHtml(group.count) + '</span><span class="l">' + escapeHtml(group.label) + '</span></div>' +
-        '<div class="sum-desc">' + escapeHtml(group.description) + '</div>' +
       '</div>'
     );
   }
@@ -340,7 +338,6 @@
     .then(function (data) {
       coverMeta.innerHTML =
         '<div><div class="k">Periode</div><div class="v">' + escapeHtml(data.week_range) + '</div></div>' +
-        '<div><div class="k">Cabang</div><div class="v">' + escapeHtml(data.branch) + '</div></div>' +
         '<div><div class="k">Automated test</div><div class="v">' + escapeHtml(data.tests) + '</div></div>';
 
       var totalTasks = (data.development.count || 0) + (data.maintenance.count || 0);
@@ -366,7 +363,7 @@
         '<div class="note">Ini laporan minggu berjalan (' + escapeHtml(data.week_range) + '). Untuk riwayat lengkap seluruh permintaan sejak awal proyek per nomor item, lihat <a href="' + escapeHtml(data.archive_url) + '">halaman arsip</a>.</div>' +
 
         '<div class="closing">' +
-          '<div>Cabang <code>' + escapeHtml(data.branch) + '</code> &middot; total ' + totalTasks + ' tugas minggu ini.</div>' +
+          '<div>Total ' + totalTasks + ' tugas minggu ini.</div>' +
           '<div class="pass">' + escapeHtml(data.tests) + '</div>' +
         '</div>';
     })
