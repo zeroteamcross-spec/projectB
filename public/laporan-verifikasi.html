@@ -318,9 +318,8 @@
 
   function taskRows(rows, kind, kindLabel) {
     return rows.map(function (row, index) {
-      var statusCell = kind === "maint"
-        ? '<td><span class="pill ' + statusClass(row.status) + '">' + statusLabel(row.status) + '</span></td>'
-        : '<td><span class="pill done">Selesai</span></td>';
+      var status = row.status || "done";
+      var statusCell = '<td><span class="pill ' + statusClass(status) + '">' + statusLabel(status) + '</span></td>';
       return (
         '<tr>' +
           '<td class="no">' + String(index + 1).padStart(2, "0") + '</td>' +

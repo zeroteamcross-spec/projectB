@@ -4,32 +4,19 @@
   "tests": "27 / 27 lolos",
   "archive_url": "laporan-verifikasi-arsip.html",
   "development": {
-    "count": 4,
-    "label": "fitur baru dikerjakan minggu ini",
-    "description": "Perubahan yang langsung terlihat & dipakai pengguna — form, halaman, tombol, alur baru.",
+    "count": 16,
+    "label": "fitur & pekerjaan baru minggu ini",
+    "description": "Membangun sesuatu yang baru — fitur, halaman, alur, maupun infrastruktur.",
     "rows": [
-      { "task": "Bangun fitur Admin tandai mobil terjual di luar sistem", "detail": "Modal \"Tandai Terjual (Luar Sistem)\" dengan keterangan bebas yang wajib diisi Admin, tersimpan untuk audit.", "ref": "48" },
-      { "task": "Verifikasi fitur tandai terjual di production", "detail": "Diuji langsung: status mobil berubah, keterangan tersimpan persis, mobil hilang dari katalog publik.", "ref": "48" },
-      { "task": "Bangun halaman \"Bagikan Mobil\" untuk Marketing", "detail": "Setiap mobil published dapat tombol Copy Link & Bagikan WhatsApp, tetap terdeteksi sebagai kunjungan marketing.", "ref": "49" },
-      { "task": "Verifikasi share per mobil di production", "detail": "Link dibuka tanpa login, context marketing otomatis aktif, klik tercatat ke akun yang benar.", "ref": "49" }
-    ]
-  },
-  "maintenance": {
-    "count": 18,
-    "label": "pekerjaan performa, migrasi & perbaikan",
-    "description": "Kerja di balik layar — tidak selalu terlihat, tapi menentukan kecepatan & keamanan jangka panjang.",
-    "rows": [
-      { "task": "Audit performa production", "detail": "Ukur waktu muat & respons API langsung di production, bukan dugaan.", "status": "done" },
-      { "task": "Temukan akar masalah lambat", "detail": "Token remember-me diverifikasi ulang dengan metode lambat di setiap request berlogin.", "status": "done" },
-      { "task": "Ganti metode verifikasi token", "detail": "Tetap aman, tapi jauh lebih cepat — tidak lagi memakai metode yang dirancang untuk kata sandi manusia.", "status": "done" },
-      { "task": "Rapikan urutan muat awal aplikasi", "detail": "Pengambilan notifikasi tidak lagi memblokir tampilnya halaman pertama.", "status": "done" },
-      { "task": "Verifikasi ulang performa di production", "detail": "Bandingkan sebelum/sesudah: semua data dashboard dari 3+ detik menjadi <1 detik.", "status": "done" },
+      { "task": "Bangun fitur Admin tandai mobil terjual di luar sistem", "detail": "Modal \"Tandai Terjual (Luar Sistem)\" dengan keterangan bebas yang wajib diisi Admin, tersimpan untuk audit.", "ref": "48", "status": "done" },
+      { "task": "Verifikasi fitur tandai terjual di production", "detail": "Diuji langsung: status mobil berubah, keterangan tersimpan persis, mobil hilang dari katalog publik.", "ref": "48", "status": "done" },
+      { "task": "Bangun halaman \"Bagikan Mobil\" untuk Marketing", "detail": "Setiap mobil published dapat tombol Copy Link & Bagikan WhatsApp, tetap terdeteksi sebagai kunjungan marketing.", "ref": "49", "status": "done" },
+      { "task": "Verifikasi share per mobil di production", "detail": "Link dibuka tanpa login, context marketing otomatis aktif, klik tercatat ke akun yang benar.", "ref": "49", "status": "done" },
       { "task": "Audit risiko migrasi URL", "detail": "Dua putaran riset menyeluruh sebelum eksekusi, memetakan semua titik yang terdampak.", "status": "done" },
       { "task": "Migrasi URL Fase 1 — navigasi internal", "detail": "Sidebar, header, notifikasi, login Google dipindah ke URL bersih tanpa tanda #.", "status": "done" },
       { "task": "Migrasi URL Fase 2 — link ke luar aplikasi", "detail": "Link showroom & referral marketing yang dibagikan lewat WhatsApp ikut dibersihkan.", "status": "done" },
       { "task": "Migrasi URL Fase 3 — data lama & bookmark", "detail": "8 halaman filter/bookmark diperbaiki; notifikasi lama tetap terbuka tanpa migrasi data.", "status": "done" },
       { "task": "Migrasi URL Fase 4 — beres-beres", "detail": "Data baru langsung memakai format bersih; konvensi lama dikonfirmasi ulang aman.", "status": "done" },
-      { "task": "Perbaiki bug tombol Katalog salah arah", "detail": "Ditemukan setelah migrasi (top nav profil buyer): tombol Katalog sempat membawa ke halaman utama, bukan showroom buyer. Langsung diperbaiki.", "status": "done" },
       { "task": "Rencana pemisahan subdomain per peran", "detail": "Peta subdomain disusun: showroom, app (buyer), marketing, admin — masing-masing dashboard punya alamat sendiri.", "status": "done" },
       { "task": "Nonaktifkan sementara Google Login Admin & Showroom", "detail": "Persiapan subdomain — untuk saat ini hanya Buyer yang memakai Google Login, Admin/Showroom tetap email & password.", "status": "done" },
       { "task": "Setup DNS & nginx 3 subdomain baru", "detail": "showroom.carlynk.id, app.carlynk.id, marketing.carlynk.id sudah resolve dan terhubung ke server.", "status": "done" },
@@ -37,6 +24,19 @@
       { "task": "Daftarkan redirect URI Google OAuth", "detail": "Menambahkan URI callback subdomain showroom & app ke Google Cloud Console.", "status": "progress" },
       { "task": "Penyesuaian kode routing lintas-subdomain", "detail": "Generalisasi logika penjaga domain supaya berlaku untuk semua subdomain baru, tidak hanya admin.", "status": "planned" },
       { "task": "Uji coba bertahap per peran", "detail": "Aktifkan satu peran dulu, verifikasi penuh, baru lanjut ke peran berikutnya.", "status": "planned" }
+    ]
+  },
+  "maintenance": {
+    "count": 6,
+    "label": "bug & perbaikan minggu ini",
+    "description": "Memperbaiki sesuatu yang sudah ada tapi bermasalah — bug dan performa.",
+    "rows": [
+      { "task": "Audit performa production", "detail": "Ukur waktu muat & respons API langsung di production, bukan dugaan.", "status": "done" },
+      { "task": "Temukan akar masalah lambat", "detail": "Token remember-me diverifikasi ulang dengan metode lambat di setiap request berlogin.", "status": "done" },
+      { "task": "Ganti metode verifikasi token", "detail": "Tetap aman, tapi jauh lebih cepat — tidak lagi memakai metode yang dirancang untuk kata sandi manusia.", "status": "done" },
+      { "task": "Rapikan urutan muat awal aplikasi", "detail": "Pengambilan notifikasi tidak lagi memblokir tampilnya halaman pertama.", "status": "done" },
+      { "task": "Verifikasi ulang performa di production", "detail": "Bandingkan sebelum/sesudah: semua data dashboard dari 3+ detik menjadi <1 detik.", "status": "done" },
+      { "task": "Perbaiki bug tombol Katalog salah arah", "detail": "Ditemukan setelah migrasi (top nav profil buyer): tombol Katalog sempat membawa ke halaman utama, bukan showroom buyer. Langsung diperbaiki.", "status": "done" }
     ]
   }
 }
