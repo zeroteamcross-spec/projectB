@@ -4,26 +4,18 @@
   "tests": "27 / 27 lolos",
   "archive_url": "laporan-verifikasi-arsip.html",
   "development": {
-    "count": 42,
-    "label": "permintaan fitur & tampilan dikerjakan",
+    "count": 4,
+    "label": "fitur baru dikerjakan minggu ini",
     "description": "Perubahan yang langsung terlihat & dipakai pengguna — form, halaman, tombol, alur baru.",
     "rows": [
-      { "task": "Rapikan form pendaftaran showroom", "detail": "Ganti label \"Nama Pemilik\" → \"Nama\", hapus field Nomor WhatsApp & Alamat Pemilik, perjelas label URL showroom.", "ref": "01–04" },
-      { "task": "Rapikan halaman Profil showroom", "detail": "Card informasi akun (Nama/Email/Nama Showroom/WA) & urutan logout disusun ulang.", "ref": "05, 10" },
-      { "task": "Ikon bank & dropdown kota", "detail": "Dropdown bank pakai ikon dari master data; dropdown kota ditaruh sebelum field alamat.", "ref": "06–07" },
-      { "task": "Sederhanakan hero showroom", "detail": "Hapus 3 card statistik (Profil/Kontak/Rekening) dan teks \"Siap Pakai\" yang tidak perlu.", "ref": "08–09" },
-      { "task": "Upload favicon & logo header showroom", "detail": "Showroom bisa unggah favicon dan logo header sendiri, dua berkas terpisah (tidak lagi dipotong paksa).", "ref": "25, 26, 40" },
-      { "task": "Klik logo → showroom sendiri", "detail": "Logo header/sidebar mengarah ke showroom sendiri; modal edit showroom dirapikan (tombol pindah ke footer).", "ref": "39, 42" },
-      { "task": "Bersihkan form tambah/edit mobil", "detail": "Hapus tombol duplikat, field warna kedua, nomor mesin & nomor rangka.", "ref": "11–14, 16" },
-      { "task": "Rapikan field & status listing mobil", "detail": "Label \"Tahun Registrasi\", hapus field Stok, status listing jadi 5 pilihan (Draft/Published/Sold/View Sold/Archived).", "ref": "17–19" },
-      { "task": "Navigasi sidebar & footer buyer", "detail": "Teks tombol sidebar, footer mobile buyer, logo menuju katalog showroom/marketing yang benar.", "ref": "15, 20, 36, 41, 43, 45" },
-      { "task": "Rapikan alur pembayaran", "detail": "Sembunyikan Gopay/QRIS, label \"Booking Fee\", kadaluarsa transaksi 5 menit, filter periode transaksi.", "ref": "28–32, 34" },
-      { "task": "Admin tandai mobil terjual di luar sistem", "detail": "Tombol \"Tandai Terjual (Luar Sistem)\" dengan keterangan bebas yang wajib diisi Admin untuk audit.", "ref": "48" },
-      { "task": "URL marketing & share per mobil", "detail": "Preview URL marketing live, logo/favicon halaman marketing ikut showroom, fitur bagikan link per mobil.", "ref": "37, 38, 44, 46, 49" }
+      { "task": "Bangun fitur Admin tandai mobil terjual di luar sistem", "detail": "Modal \"Tandai Terjual (Luar Sistem)\" dengan keterangan bebas yang wajib diisi Admin, tersimpan untuk audit.", "ref": "48" },
+      { "task": "Verifikasi fitur tandai terjual di production", "detail": "Diuji langsung: status mobil berubah, keterangan tersimpan persis, mobil hilang dari katalog publik.", "ref": "48" },
+      { "task": "Bangun halaman \"Bagikan Mobil\" untuk Marketing", "detail": "Setiap mobil published dapat tombol Copy Link & Bagikan WhatsApp, tetap terdeteksi sebagai kunjungan marketing.", "ref": "49" },
+      { "task": "Verifikasi share per mobil di production", "detail": "Link dibuka tanpa login, context marketing otomatis aktif, klik tercatat ke akun yang benar.", "ref": "49" }
     ]
   },
   "maintenance": {
-    "count": 27,
+    "count": 18,
     "label": "pekerjaan performa, migrasi & perbaikan",
     "description": "Kerja di balik layar — tidak selalu terlihat, tapi menentukan kecepatan & keamanan jangka panjang.",
     "rows": [
@@ -38,9 +30,6 @@
       { "task": "Migrasi URL Fase 3 — data lama & bookmark", "detail": "8 halaman filter/bookmark diperbaiki; notifikasi lama tetap terbuka tanpa migrasi data.", "status": "done" },
       { "task": "Migrasi URL Fase 4 — beres-beres", "detail": "Data baru langsung memakai format bersih; konvensi lama dikonfirmasi ulang aman.", "status": "done" },
       { "task": "Perbaiki bug tombol Katalog salah arah", "detail": "Ditemukan setelah migrasi (top nav profil buyer): tombol Katalog sempat membawa ke halaman utama, bukan showroom buyer. Langsung diperbaiki.", "status": "done" },
-      { "task": "Perbaiki bug fatal: dua pembeli satu mobil", "detail": "Diuji dengan dua proses yang benar-benar berjalan bersamaan, bukan satu per satu.", "status": "done" },
-      { "task": "Audit menyeluruh alur Marketing", "detail": "Satu transaksi sungguhan dijalankan dari klik link referral sampai komisi tercatat di ledger.", "status": "done" },
-      { "task": "Perbaiki 7 bug kecil sambil jalan", "detail": "Logo showroom, favicon, API validasi referral, dan lainnya — ditemukan & diperbaiki di sumbernya.", "status": "done" },
       { "task": "Rencana pemisahan subdomain per peran", "detail": "Peta subdomain disusun: showroom, app (buyer), marketing, admin — masing-masing dashboard punya alamat sendiri.", "status": "done" },
       { "task": "Nonaktifkan sementara Google Login Admin & Showroom", "detail": "Persiapan subdomain — untuk saat ini hanya Buyer yang memakai Google Login, Admin/Showroom tetap email & password.", "status": "done" },
       { "task": "Setup DNS & nginx 3 subdomain baru", "detail": "showroom.carlynk.id, app.carlynk.id, marketing.carlynk.id sudah resolve dan terhubung ke server.", "status": "done" },
