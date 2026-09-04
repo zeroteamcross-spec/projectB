@@ -22,7 +22,7 @@
       { "task": "Setup DNS & nginx 3 subdomain baru", "detail": "showroom.carlynk.id, app.carlynk.id, marketing.carlynk.id sudah resolve dan terhubung ke server.", "status": "done" },
       { "task": "Perluas sertifikat SSL", "detail": "Satu sertifikat mencakup carlynk.id, admin, showroom, app, dan marketing sekaligus.", "status": "done" },
       { "task": "Daftarkan redirect URI Google OAuth", "detail": "Menambahkan URI callback subdomain showroom & app ke Google Cloud Console.", "status": "progress" },
-      { "task": "Penyesuaian kode routing lintas-subdomain", "detail": "Generalisasi logika penjaga domain supaya berlaku untuk semua subdomain baru, tidak hanya admin.", "status": "planned" },
+      { "task": "Penyesuaian kode routing lintas-subdomain", "detail": "Generalisasi logika penjaga domain supaya berlaku untuk semua subdomain baru, tidak hanya admin. Sekalian ditemukan & diperbaiki: halaman publik (katalog, detail mobil) sempat berisiko ikut terdorong ke subdomain buyer begitu diaktifkan.", "status": "done" },
       { "task": "Uji coba bertahap per peran", "detail": "Aktifkan satu peran dulu, verifikasi penuh, baru lanjut ke peran berikutnya.", "status": "planned" }
     ]
   },
