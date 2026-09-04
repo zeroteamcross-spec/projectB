@@ -1,4 +1,5 @@
 import { affiliatesResource } from "../../../resources/affiliatesResource.js";
+import { hostForRole } from "../../../core/roleHosts.js";
 
 const STATUS_META = {
   active: { label: "Aktif", variant: "success" },
@@ -135,9 +136,15 @@ export const sellerAffiliateService = {
     return this.absoluteUrl(path);
   },
 
+  // Link showroom/referral yang dibagikan harus selalu mengarah ke host
+  // publik (default), bukan ke subdomain apa pun tempat halaman ini sedang
+  // dibuka -- seller bisa saja membuat link ini dari showroom.carlynk.id.
+  // hostForRole("default") datang dari konfigurasi server yang sama dipakai
+  // domainRouteGuard.js, jadi tidak perlu ditambal lagi kalau nama subdomain
+  // berubah di masa depan.
   absoluteUrl(path = "") {
-    const hostname = window.location.hostname.replace(/^(showroom|marketing|admin)\./i, "");
-    const origin = `${window.location.protocol}//${hostname}${window.location.port ? ":" + window.location.port : ""}`;
+    const host = hostForRole("default") || window.location.host;
+    const origin = `${window.location.protocol}//${host}`;
 
     return `${origin}${path}`;
   },

@@ -3,6 +3,7 @@ import { Button } from "../../../ui/primitives/button.js";
 import { EmptyState } from "../../../ui/primitives/emptyState.js";
 import { tw } from "../../../ui/theme/tailwindClasses.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
+import { hostForRole } from "../../../core/roleHosts.js";
 
 const FIELDS = [
   { key: "name", label: "Nama showroom", icon: "showroom" },
@@ -124,8 +125,12 @@ function showroomPublicUrl(showroom = {}) {
     return "";
   }
 
-  const hostname = window.location.hostname.replace(/^(showroom|marketing|admin)\./i, "");
-  const origin = `${window.location.protocol}//${hostname}${window.location.port ? ":" + window.location.port : ""}`;
+  // Host publik (default) diambil dari roleHosts() -- sama seperti
+  // sellerAffiliateService.absoluteUrl() -- supaya link ini benar dibuat dari
+  // subdomain seller (showroom.carlynk.id) manapun tanpa perlu ditambal lagi
+  // kalau nama subdomain berubah.
+  const host = hostForRole("default") || window.location.host;
+  const origin = `${window.location.protocol}//${host}`;
 
   // Alias pendek, sama dengan yang dijanjikan landing page dan panel sukses
   // pendaftaran. Menuju halaman yang sama dengan /showrooms/<slug>.
