@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Laporan Verifikasi Perubahan — Siata Mobilindo</title>
+<title>Laporan Mingguan — Siata Mobilindo</title>
 <style>
   :root{
     --ink:#16232b;
@@ -11,20 +11,28 @@
     --ink-faint:#8a97a0;
     --primary:#1e81b0;
     --secondary:#17698f;
-    --accent:#eab676;
     --cream:#faf4ed;
     --cream-deep:#f2e9dc;
     --border:#e3ddd0;
     --border-soft:#ece6da;
-    --good:#2f855a;
-    --good-bg:#e7f5ec;
-    --danger:#b3401f;
-    --danger-bg:#fbeae3;
     --surface:#ffffff;
-    --slate:#3c4a56;
-    --slate-deep:#2a343d;
-    --slate-bg:#eef1f3;
-    --slate-border:#dde3e7;
+
+    --dev-a:#155e91;
+    --dev-b:#1fb1a4;
+    --dev-bg:#e8f6f4;
+    --dev-ink:#0c5c6e;
+
+    --maint-a:#c9660f;
+    --maint-b:#eaa93b;
+    --maint-bg:#fdf1e2;
+    --maint-ink:#8a4a09;
+
+    --ok:#2f855a;
+    --ok-bg:#e7f5ec;
+    --warn:#b3760f;
+    --warn-bg:#fbf0da;
+    --wait:#6b7684;
+    --wait-bg:#eef1f3;
   }
   *{ box-sizing:border-box; }
   html,body{ margin:0; padding:0; }
@@ -37,13 +45,13 @@
     -webkit-font-smoothing:antialiased;
   }
   .page{
-    max-width:920px;
+    max-width:960px;
     margin:0 auto;
     background:var(--surface);
     box-shadow:0 1px 3px rgba(22,35,43,.06);
     min-height:100vh;
   }
-  @media (min-width:960px){
+  @media (min-width:1000px){
     body{ padding:28px 0; }
     .page{ border-radius:14px; box-shadow:0 12px 40px rgba(22,35,43,.12); min-height:0; }
   }
@@ -54,345 +62,188 @@
   }
   .cover{
     background:
-      radial-gradient(1100px 420px at 88% -12%, color-mix(in srgb, var(--accent) 32%, transparent), transparent 60%),
-      linear-gradient(135deg, var(--secondary) 0%, var(--primary) 62%, #2896c2 100%);
+      radial-gradient(900px 360px at 92% -20%, color-mix(in srgb, var(--dev-b) 30%, transparent), transparent 60%),
+      radial-gradient(700px 320px at -6% 110%, color-mix(in srgb, var(--maint-b) 26%, transparent), transparent 60%),
+      linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
     color:#fff;
-    padding:40px 44px 34px;
+    padding:38px 44px 30px;
     position:relative;
     overflow:hidden;
     border-radius:14px 14px 0 0;
-  }
-  .cover::after{
-    content:"";
-    position:absolute;
-    right:-70px; bottom:-100px;
-    width:300px; height:300px;
-    border-radius:50%;
-    background: color-mix(in srgb, var(--accent) 55%, transparent);
-    filter: blur(2px);
-    opacity:.35;
   }
   .cover-eyebrow{
     font-size:12px;
     letter-spacing:.14em;
     text-transform:uppercase;
     font-weight:700;
-    color:color-mix(in srgb, #fff 78%, var(--accent));
-    margin-bottom:12px;
+    color:color-mix(in srgb, #fff 78%, var(--dev-b));
+    margin-bottom:10px;
   }
   .cover h1{
-    font-size:32px;
+    font-size:30px;
     line-height:1.15;
     max-width:600px;
-    text-wrap:balance;
   }
   .cover-sub{
-    margin-top:12px;
-    font-size:14.5px;
+    margin-top:10px;
+    font-size:14px;
     color:color-mix(in srgb, #fff 88%, transparent);
-    max-width:640px;
+    max-width:620px;
   }
-  .cover-meta{
-    margin-top:24px;
+  .cover-row{
+    margin-top:20px;
     display:flex;
-    gap:30px;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
     flex-wrap:wrap;
     position:relative;
     z-index:1;
   }
-  .cover-meta div{ min-width:130px; }
+  .cover-meta{ display:flex; gap:26px; flex-wrap:wrap; }
+  .cover-meta div{ min-width:110px; }
   .cover-meta .k{
-    font-size:10.5px;
+    font-size:10px;
     text-transform:uppercase;
     letter-spacing:.08em;
     color:color-mix(in srgb, #fff 70%, transparent);
     font-weight:700;
   }
   .cover-meta .v{
-    font-size:14px;
+    font-size:13px;
     font-weight:700;
     margin-top:3px;
     font-family: ui-monospace, "Cascadia Mono", "Consolas", monospace;
   }
-
-  .stats{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:14px;
-    padding:24px 44px 6px;
-  }
-  @media (max-width:640px){ .stats{ grid-template-columns:repeat(2,1fr); } }
-  .stat{
-    border:1px solid var(--border);
-    border-top:3px solid var(--primary);
-    border-radius:8px;
-    padding:14px 16px;
-    background:var(--cream);
-  }
-  .stat.accent{ border-top-color:var(--accent); }
-  .stat.good{ border-top-color:var(--good); }
-  .stat.ink{ border-top-color:var(--secondary); }
-  .stat .num{
-    font-family: Georgia, serif;
-    font-size:28px;
+  .archive-link{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-size:12px;
     font-weight:700;
-    color:var(--secondary);
-    font-variant-numeric: tabular-nums;
-  }
-  .stat .lbl{
-    font-size:11.5px;
-    color:var(--ink-muted);
-    margin-top:4px;
-    line-height:1.4;
-  }
-
-  .body-pad{ padding:8px 44px 36px; }
-  @media (max-width:640px){
-    .cover{ padding:30px 22px 26px; }
-    .stats{ padding:20px 22px 4px; }
-    .body-pad{ padding:8px 22px 30px; }
-  }
-
-  /* --- Ringkasan Development / Maintenance --- */
-  .summary{ margin-top:22px; }
-  .summary-head{
-    display:flex;
-    align-items:baseline;
-    justify-content:space-between;
-    gap:12px;
-    flex-wrap:wrap;
-    margin-bottom:12px;
-  }
-  .summary-head h2{ font-size:19px; color:var(--ink); }
-  .summary-head .sub{ font-size:12px; color:var(--ink-muted); }
-  .summary-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:16px;
-  }
-  @media (max-width:720px){ .summary-grid{ grid-template-columns:1fr; } }
-  .summary-card{
-    border:1px solid var(--border);
-    border-radius:12px;
-    background:var(--surface);
-    overflow:hidden;
-  }
-  .summary-card .card-top{
-    padding:18px 20px 16px;
     color:#fff;
-  }
-  .summary-card.dev .card-top{ background:linear-gradient(135deg, var(--secondary), var(--primary)); }
-  .summary-card.maint .card-top{ background:linear-gradient(135deg, var(--slate-deep), var(--slate)); }
-  .summary-card .card-eyebrow{
-    font-size:10.5px;
-    text-transform:uppercase;
-    letter-spacing:.12em;
-    font-weight:700;
-    color:color-mix(in srgb, #fff 75%, transparent);
-  }
-  .summary-card .card-count{
-    display:flex;
-    align-items:baseline;
-    gap:8px;
-    margin-top:4px;
-  }
-  .summary-card .card-count .n{
-    font-family: Georgia, serif;
-    font-size:34px;
-    font-weight:700;
-    font-variant-numeric: tabular-nums;
-    line-height:1;
-  }
-  .summary-card .card-count .n-lbl{ font-size:12.5px; color:color-mix(in srgb, #fff 88%, transparent); }
-  .summary-card .card-desc{
-    margin-top:8px;
-    font-size:12px;
-    line-height:1.55;
-    color:color-mix(in srgb, #fff 90%, transparent);
-    max-width:34ch;
-  }
-  .summary-card .card-body{ padding:14px 20px 18px; }
-  .sum-group{ margin-top:14px; }
-  .sum-group:first-child{ margin-top:0; }
-  .sum-group-head{
-    display:flex;
-    align-items:baseline;
-    justify-content:space-between;
-    gap:8px;
-    font-size:12px;
-    font-weight:700;
-    color:var(--ink);
-    padding-bottom:4px;
-    border-bottom:1px solid var(--border-soft);
-    margin-bottom:6px;
-  }
-  .sum-group-head .tally{
-    font-family: ui-monospace, "Cascadia Mono", "Consolas", monospace;
-    font-weight:700;
-    color:var(--ink-faint);
-    font-size:11px;
-  }
-  .sum-list{ margin:0; padding:0; list-style:none; }
-  .sum-list li{
-    position:relative;
-    padding:4px 0 4px 20px;
-    font-size:12.5px;
-    color:var(--ink-muted);
-    line-height:1.5;
-  }
-  .sum-list li::before{
-    position:absolute; left:0; top:5px;
-    font-size:11px;
-    font-weight:700;
-    line-height:1.3;
-  }
-  .sum-list li.done::before{ content:"\2713"; color:var(--good); }
-  .sum-list li.progress::before{ content:"\25CF"; color:var(--accent); font-size:8px; top:8px; }
-  .sum-list li.planned::before{ content:"\25CB"; color:var(--ink-faint); font-size:9px; top:7px; }
-  .sum-status{
-    display:inline-block;
-    font-size:9px;
-    font-weight:700;
-    text-transform:uppercase;
-    letter-spacing:.03em;
-    padding:1px 6px;
+    text-decoration:none;
+    background:color-mix(in srgb, #fff 16%, transparent);
+    padding:8px 14px;
     border-radius:20px;
-    margin-left:6px;
+    white-space:nowrap;
+  }
+  .archive-link:hover{ background:color-mix(in srgb, #fff 24%, transparent); }
+
+  .body-pad{ padding:26px 44px 36px; }
+  @media (max-width:680px){
+    .cover{ padding:28px 22px 24px; }
+    .body-pad{ padding:22px 22px 30px; }
+  }
+
+  .card-grid{ display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:8px; }
+  @media (max-width:760px){ .card-grid{ grid-template-columns:1fr; } }
+  .sum-card{
+    border-radius:16px;
+    padding:20px 22px;
+    color:#fff;
     position:relative;
-    top:-1px;
+    overflow:hidden;
+    box-shadow:0 10px 26px rgba(22,35,43,.12);
   }
-  .sum-status.progress{ background:var(--cream-deep); color:#8a6a2e; }
-  .sum-status.planned{ background:var(--slate-bg); color:var(--slate); }
-  .summary-jump{ font-size:11px; color:var(--ink-faint); margin-top:10px; }
-  .summary-jump a{ color:var(--secondary); text-decoration:none; border-bottom:1px dashed color-mix(in srgb, var(--secondary) 45%, transparent); }
+  .sum-card.dev{ background:linear-gradient(135deg, var(--dev-a), var(--dev-b)); }
+  .sum-card.maint{ background:linear-gradient(135deg, var(--maint-a), var(--maint-b)); }
+  .sum-card::after{
+    content:"";
+    position:absolute;
+    right:-40px; bottom:-60px;
+    width:170px; height:170px;
+    border-radius:50%;
+    background:rgba(255,255,255,.14);
+  }
+  .sum-eyebrow{
+    position:relative; z-index:1;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.14em;
+    font-weight:800;
+    color:rgba(255,255,255,.85);
+  }
+  .sum-count{ position:relative; z-index:1; display:flex; align-items:baseline; gap:9px; margin-top:6px; }
+  .sum-count .n{
+    font-family: Georgia, serif;
+    font-size:42px;
+    font-weight:700;
+    line-height:1;
+    font-variant-numeric: tabular-nums;
+  }
+  .sum-count .l{ font-size:12.5px; color:rgba(255,255,255,.92); max-width:19ch; line-height:1.4; }
+  .sum-desc{ position:relative; z-index:1; margin-top:10px; font-size:12.5px; line-height:1.6; color:rgba(255,255,255,.92); max-width:38ch; }
 
-  .note{
-    margin:18px 0 6px;
-    padding:12px 16px;
-    background:var(--cream);
-    border:1px solid var(--border-soft);
-    border-radius:8px;
-    font-size:13px;
-    color:var(--ink-muted);
-  }
-  .note b{ color:var(--ink); }
-  .note a{ color:var(--secondary); font-weight:600; }
-
-  section.group{ margin-top:26px; }
-  .group-head{
-    display:flex;
-    align-items:baseline;
-    gap:10px;
-    border-bottom:2px solid var(--secondary);
-    padding-bottom:8px;
-    margin-bottom:10px;
-    flex-wrap:wrap;
-  }
-  .group-head h2{ font-size:18px; color:var(--secondary); }
-  .group-head .range{
-    font-size:11.5px;
-    color:var(--ink-faint);
-    font-family: ui-monospace, "Cascadia Mono", "Consolas", monospace;
-  }
-
-  table{ width:100%; border-collapse:collapse; }
-  thead th{
+  .table-wrap{ margin-top:28px; overflow-x:auto; border:1px solid var(--border); border-radius:12px; }
+  table.tasks{ width:100%; border-collapse:collapse; min-width:640px; }
+  table.tasks thead th{
     text-align:left;
     font-size:10.5px;
     text-transform:uppercase;
     letter-spacing:.06em;
     color:var(--ink-faint);
     font-weight:700;
-    padding:5px 10px 7px;
+    padding:11px 14px;
+    background:var(--cream);
     border-bottom:1px solid var(--border);
+    white-space:nowrap;
   }
-  th.c-link, td.link{ width:230px; }
-  tbody tr:nth-child(even){ background: color-mix(in srgb, var(--cream) 55%, white); }
-  tbody td{
-    padding:9px 10px;
+  table.tasks tbody td{
+    padding:11px 14px;
     vertical-align:top;
     border-bottom:1px solid var(--border-soft);
     font-size:13px;
   }
-  td.num{
-    font-family: ui-monospace, "Cascadia Mono", "Consolas", monospace;
-    font-weight:700;
-    color:var(--secondary);
-    font-variant-numeric: tabular-nums;
+  table.tasks tbody tr:last-child td{ border-bottom:none; }
+  table.tasks tbody tr:nth-child(even){ background:color-mix(in srgb, var(--cream) 45%, white); }
+  td.no{ font-family: ui-monospace, "Cascadia Mono", "Consolas", monospace; color:var(--ink-faint); font-size:12px; white-space:nowrap; }
+  td.task-name{ font-weight:700; color:var(--ink); white-space:nowrap; }
+  td.task-detail{ color:var(--ink-muted); }
+  .pill{
+    display:inline-block;
+    font-size:10px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    padding:3px 9px;
+    border-radius:20px;
     white-space:nowrap;
   }
-  td.link{
-    font-family: ui-monospace, "Cascadia Mono", "Consolas", monospace;
-    font-size:11.5px;
-    color:var(--ink-muted);
-    word-break: break-all;
-  }
-  td.link a{
-    color:var(--secondary);
-    text-decoration:none;
-    border-bottom:1px dashed color-mix(in srgb, var(--secondary) 45%, transparent);
-  }
-  td.link a:hover{ border-bottom-style:solid; }
-  .badge{
-    display:inline-block;
-    font-size:9.5px;
-    font-weight:700;
-    text-transform:uppercase;
-    letter-spacing:.04em;
-    padding:2px 7px;
-    border-radius:20px;
-    margin-right:6px;
-    position:relative;
-    top:-1px;
-  }
-  .badge.new{ background:var(--good-bg); color:var(--good); }
-  .badge.fatal{ background:var(--danger-bg); color:var(--danger); }
-  .badge.manual{ background:var(--cream-deep); color:#8a6a2e; }
+  .pill.dev{ background:var(--dev-bg); color:var(--dev-ink); }
+  .pill.maint{ background:var(--maint-bg); color:var(--maint-ink); }
+  .pill.done{ background:var(--ok-bg); color:var(--ok); }
+  .pill.progress{ background:var(--warn-bg); color:var(--warn); }
+  .pill.planned{ background:var(--wait-bg); color:var(--wait); }
 
-  .found-section{
-    margin-top:30px;
-    background:linear-gradient(180deg, var(--cream), white 60%);
-    border:1px solid var(--border);
-    border-radius:10px;
-    padding:20px 24px;
-  }
-  .found-section h2{ font-size:17px; color:var(--secondary); margin-bottom:3px; }
-  .found-section .sub{ font-size:12px; color:var(--ink-muted); margin-bottom:12px; }
-
-  .changelog-section{ margin-top:18px; }
-  .changelog-entry{ margin-top:14px; }
-  .changelog-entry:first-of-type{ margin-top:2px; }
-  .changelog-date{
-    display:inline-block;
+  .section-lbl{
+    margin:30px 0 10px;
     font-family: Georgia, serif;
+    font-size:15px;
     font-weight:700;
+    color:var(--ink);
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .section-lbl .dot{ width:9px; height:9px; border-radius:50%; display:inline-block; }
+  .section-lbl.dev .dot{ background:linear-gradient(135deg,var(--dev-a),var(--dev-b)); }
+  .section-lbl.maint .dot{ background:linear-gradient(135deg,var(--maint-a),var(--maint-b)); }
+
+  .note{
+    margin:22px 0 0;
+    padding:12px 16px;
+    background:var(--cream);
+    border:1px solid var(--border-soft);
+    border-radius:8px;
     font-size:12.5px;
-    color:var(--secondary);
-    background:var(--cream-deep);
-    padding:4px 12px;
-    border-radius:20px;
-    margin-bottom:8px;
+    color:var(--ink-muted);
   }
-  .found-list{ margin:0; padding:0; list-style:none; }
-  .found-list li{
-    position:relative;
-    padding:7px 0 7px 18px;
-    font-size:13px;
-    border-bottom:1px dashed var(--border-soft);
-  }
-  .found-list li:last-child{ border-bottom:none; }
-  .found-list li::before{
-    content:"";
-    position:absolute; left:0; top:14px;
-    width:7px; height:7px;
-    border-radius:50%;
-    background:var(--accent);
-  }
-  .found-list b{ color:var(--ink); }
+  .note a{ color:var(--secondary); font-weight:600; text-decoration:none; border-bottom:1px dashed color-mix(in srgb, var(--secondary) 45%, transparent); }
 
   .closing{
-    margin-top:28px;
-    padding-top:16px;
+    margin-top:26px;
+    padding-top:14px;
     border-top:1px solid var(--border);
     display:flex;
     justify-content:space-between;
@@ -402,7 +253,7 @@
     font-size:11.5px;
     color:var(--ink-faint);
   }
-  .closing .pass{ color:var(--good); font-weight:700; }
+  .closing .pass{ color:var(--ok); font-weight:700; }
   code{
     font-family: ui-monospace, "Cascadia Mono", "Consolas", monospace;
     background:var(--cream);
@@ -410,6 +261,7 @@
     border-radius:4px;
     color:var(--secondary);
   }
+  .loading, .load-error{ padding:30px 0; text-align:center; color:var(--ink-faint); font-size:13px; }
 </style>
 </head>
 <body>
@@ -417,376 +269,113 @@
 
   <div class="cover">
     <div class="cover-eyebrow">Siata Mobilindo &middot; carlynk.id</div>
-    <h1>Laporan Verifikasi Perubahan</h1>
-    <div class="cover-sub">50 permintaan perbaikan &amp; fitur, dikelompokkan per halaman. Semua sudah di-deploy ke carlynk.id dan dicek langsung satu per satu, bukan sekadar dilihat dari kode.</div>
-    <div class="cover-meta">
-      <div>
-        <div class="k">Cabang</div>
-        <div class="v">feature/full-business-flow-tester</div>
-      </div>
-      <div>
-        <div class="k">Domain</div>
-        <div class="v">carlynk.id</div>
-      </div>
-      <div>
-        <div class="k">Automated test</div>
-        <div class="v">27 / 27 lolos</div>
-      </div>
-      <div>
-        <div class="k">Tanggal</div>
-        <div class="v">31 Agustus 2026</div>
-      </div>
+    <h1>Laporan Pekerjaan Mingguan</h1>
+    <div class="cover-sub">Ringkasan tugas Development &amp; Maintenance yang dikerjakan minggu ini. Riwayat lengkap sejak awal proyek ada di halaman arsip.</div>
+    <div class="cover-row">
+      <div class="cover-meta" id="cover-meta"></div>
+      <a class="archive-link" href="laporan-verifikasi-arsip.html">Lihat arsip lengkap &rarr;</a>
     </div>
   </div>
 
-  <div class="stats">
-    <div class="stat">
-      <div class="num">50</div>
-      <div class="lbl">Total permintaan &amp; perbaikan</div>
-    </div>
-    <div class="stat good">
-      <div class="num">48</div>
-      <div class="lbl">Terverifikasi langsung di browser</div>
-    </div>
-    <div class="stat accent">
-      <div class="num">2</div>
-      <div class="lbl">Terverifikasi tak langsung (kendala teknis pengujian)</div>
-    </div>
-    <div class="stat ink">
-      <div class="num">7</div>
-      <div class="lbl">Bug ekstra ditemukan &amp; diperbaiki sambil jalan</div>
-    </div>
-  </div>
-
-  <div class="body-pad">
-    <div class="summary">
-      <div class="summary-head">
-        <h2>Ringkasan Pekerjaan Minggu Ini</h2>
-        <span class="sub">31 Agustus &ndash; 4 September 2026</span>
-      </div>
-      <div class="summary-grid">
-
-        <div class="summary-card dev">
-          <div class="card-top">
-            <div class="card-eyebrow">Development</div>
-            <div class="card-count"><span class="n">42</span><span class="n-lbl">permintaan fitur &amp; tampilan dikerjakan</span></div>
-            <div class="card-desc">Perubahan yang langsung terlihat &amp; dipakai pengguna &mdash; form, halaman, tombol, alur baru.</div>
-          </div>
-          <div class="card-body">
-            <div class="sum-group">
-              <div class="sum-group-head"><span>Pendaftaran &amp; profil showroom</span><span class="tally">6</span></div>
-              <ul class="sum-list">
-                <li class="done">Rapikan label &amp; field form pendaftaran showroom (01&ndash;04)</li>
-                <li class="done">Card informasi akun &amp; urutan logout di halaman Profil (05, 10)</li>
-              </ul>
-            </div>
-            <div class="sum-group">
-              <div class="sum-group-head"><span>Halaman showroom sendiri</span><span class="tally">9</span></div>
-              <ul class="sum-list">
-                <li class="done">Ikon bank dari master data, dropdown kota, hapus 3 card hero (06&ndash;09)</li>
-                <li class="done">Upload favicon &amp; logo header sendiri, terpisah dari favicon (25, 26, 40)</li>
-                <li class="done">Klik logo &rarr; showroom sendiri, modal edit dirapikan (39, 42)</li>
-              </ul>
-            </div>
-            <div class="sum-group">
-              <div class="sum-group-head"><span>Form tambah / edit mobil</span><span class="tally">8</span></div>
-              <ul class="sum-list">
-                <li class="done">Hapus tombol &amp; field duplikat, nomor mesin/rangka (11&ndash;14, 16)</li>
-                <li class="done">Label tahun registrasi, hapus field Stok, status listing 5 pilihan (17&ndash;19)</li>
-              </ul>
-            </div>
-            <div class="sum-group">
-              <div class="sum-group-head"><span>Navigasi, transaksi &amp; pembayaran</span><span class="tally">12</span></div>
-              <ul class="sum-list">
-                <li class="done">Sidebar, footer buyer, logo &rarr; katalog showroom/marketing (15, 20, 36, 41, 43, 45)</li>
-                <li class="done">Sembunyikan Gopay/QRIS, label Booking Fee, kadaluarsa 5 menit, filter periode (28&ndash;32, 34)</li>
-              </ul>
-            </div>
-            <div class="sum-group">
-              <div class="sum-group-head"><span>Admin &amp; Marketing</span><span class="tally">7</span></div>
-              <ul class="sum-list">
-                <li class="done">Admin menandai mobil terjual di luar sistem (48)</li>
-                <li class="done">URL marketing + preview live, logo/favicon ikut showroom, share per mobil (37, 38, 44, 46, 49)</li>
-              </ul>
-            </div>
-            <div class="summary-jump">Rincian lengkap tiap nomor &rarr; <a href="#detail-permintaan">daftar per halaman di bawah</a>.</div>
-          </div>
-        </div>
-
-        <div class="summary-card maint">
-          <div class="card-top">
-            <div class="card-eyebrow">Maintenance</div>
-            <div class="card-count"><span class="n">27</span><span class="n-lbl">pekerjaan performa, migrasi &amp; perbaikan</span></div>
-            <div class="card-desc">Kerja di balik layar &mdash; tidak selalu terlihat, tapi menentukan kecepatan &amp; keamanan jangka panjang.</div>
-          </div>
-          <div class="card-body">
-            <div class="sum-group">
-              <div class="sum-group-head"><span>Perbaikan performa halaman</span><span class="tally">5</span></div>
-              <ul class="sum-list">
-                <li class="done">Audit performa langsung di production (bukan dugaan)</li>
-                <li class="done">Temukan akar masalah: verifikasi ulang token di setiap request</li>
-                <li class="done">Ganti metode verifikasi, tetap aman &amp; jauh lebih cepat</li>
-                <li class="done">Rapikan urutan muat awal aplikasi (notifikasi tidak lagi menghalangi)</li>
-                <li class="done">Ukur ulang &amp; verifikasi hasil di production (lihat tabel di bawah)</li>
-              </ul>
-            </div>
-            <div class="sum-group">
-              <div class="sum-group-head"><span>Migrasi URL bersih (tanpa #)</span><span class="tally">6</span></div>
-              <ul class="sum-list">
-                <li class="done">Audit risiko menyeluruh sebelum eksekusi (2 putaran)</li>
-                <li class="done">Fase 1 &mdash; navigasi internal (sidebar, notifikasi, login Google)</li>
-                <li class="done">Fase 2 &mdash; link showroom &amp; referral yang dibagikan ke luar</li>
-                <li class="done">Fase 3 &mdash; 8 halaman filter/bookmark &amp; data lama tetap kompatibel</li>
-                <li class="done">Fase 4 &mdash; beres-beres format data baru</li>
-                <li class="done">Bug ekstra: tombol Katalog di profil buyer salah arah &mdash; ditemukan &amp; diperbaiki</li>
-              </ul>
-            </div>
-            <div class="sum-group">
-              <div class="sum-group-head"><span>Bug &amp; audit ekstra sambil jalan</span><span class="tally">9</span></div>
-              <ul class="sum-list">
-                <li class="done">Bug fatal: dua pembeli satu mobil &mdash; diuji dengan proses paralel sungguhan (33)</li>
-                <li class="done">Audit menyeluruh alur Marketing dengan transaksi sungguhan (47)</li>
-                <li class="done">7 bug kecil lain ditemukan &amp; diperbaiki di sumbernya (logo, favicon, API referral, dll)</li>
-              </ul>
-            </div>
-            <div class="sum-group">
-              <div class="sum-group-head"><span>Persiapan pemisahan subdomain per peran</span><span class="tally">7</span></div>
-              <ul class="sum-list">
-                <li class="done">Rencana &amp; peta subdomain: showroom, app, marketing, admin</li>
-                <li class="done">Nonaktifkan sementara Google Login Admin &amp; Showroom<span class="sum-status planned">Persiapan</span></li>
-                <li class="done">DNS &amp; nginx untuk 3 subdomain baru</li>
-                <li class="done">Sertifikat SSL diperluas mencakup semua subdomain</li>
-                <li class="progress">Redirect URI Google OAuth per subdomain<span class="sum-status progress">Berjalan</span></li>
-                <li class="planned">Penyesuaian kode routing lintas-subdomain<span class="sum-status planned">Berikutnya</span></li>
-                <li class="planned">Uji coba bertahap per peran sebelum aktif penuh<span class="sum-status planned">Berikutnya</span></li>
-              </ul>
-            </div>
-            <div class="summary-jump">Rincian &rarr; <a href="#detail-performa">performa</a>, <a href="#detail-migrasi-url">migrasi URL</a> di bawah.</div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <div class="note">
-      Sebagian besar tautan meminta login sebagai <b>Showroom</b> terlebih dahulu &mdash; login sekali, tautan lain di halaman yang sama akan langsung terbuka.
-    </div>
-
-    <div class="changelog-section">
-      <h2 style="font-family:Georgia,serif;font-size:18px;color:var(--ink);margin-bottom:4px;">Riwayat Pembaruan</h2>
-      <div class="sub" style="font-size:12px;color:var(--ink-muted);margin-bottom:4px;">Log perubahan per tanggal, terbaru di paling atas. Rincian lengkap tiap item nomor ada di daftar per halaman di bawah.</div>
-      <div class="changelog-entry">
-        <div class="changelog-date">4 September 2026</div>
-        <ul class="found-list">
-          <li>Google Login <b>Admin</b> &amp; <b>Showroom</b> disembunyikan sementara &mdash; keduanya tetap login lewat email/password; hanya Buyer yang memakai Google Login untuk saat ini.</li>
-          <li>DNS, nginx, dan sertifikat SSL untuk 3 subdomain baru (<code>showroom.</code>, <code>app.</code>, <code>marketing.carlynk.id</code>) sudah aktif &mdash; persiapan memisahkan dashboard tiap peran ke domainnya sendiri.</li>
-        </ul>
-      </div>
-      <div class="changelog-entry">
-        <div class="changelog-date">31 Agustus 2026</div>
-        <ul class="found-list">
-          <li><b>48</b> &mdash; Admin bisa menandai mobil terjual di luar sistem (WhatsApp, transaksi langsung di showroom), dengan keterangan bebas yang ditulis sendiri oleh Admin (wajib diisi) untuk audit.</li>
-          <li><b>49</b> &mdash; Marketing bisa membagikan link satu mobil tertentu (&quot;Bagikan Mobil&quot;), tetap terdeteksi dan tetap dapat komisi.</li>
-          <li><b>50</b> &mdash; <b>Perbaikan performa besar</b> &mdash; semua data dashboard selesai dimuat &lt;1 detik (sebelumnya 3+ detik). Lihat rincian di bawah.</li>
-          <li><b>51</b> &mdash; <b>Migrasi URL tanpa tanda # (Fase 1&ndash;4, selesai semua).</b> Navigasi di dalam aplikasi maupun link yang dibagikan ke luar sekarang memakai URL bersih (mis. <code>carlynk.id/seller/cars</code>), bukan lagi <code>carlynk.id/#/seller/cars</code>. Tautan lama tetap berfungsi. Lihat rincian di bawah.</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="found-section" id="detail-migrasi-url">
-      <h2>Migrasi URL tanpa tanda # &mdash; Fase 1&ndash;4, selesai semua (51)</h2>
-      <div class="sub">Langkah lanjutan dari perbaikan performa di item 50. Dikerjakan bertahap, diverifikasi di production sebelum lanjut ke tahap berikutnya.</div>
-      <p style="font-size:13px;line-height:1.7;color:var(--ink);margin:0 0 12px;">Client meminta URL yang lebih bersih dan mudah dibagikan. Arsitektur navigasi lama (berbasis tanda <code>#</code>) diganti dengan cara modern yang sama dipakai browser untuk website biasa (History API), sambil tetap mempertahankan kecepatan SPA &mdash; halaman tidak reload penuh setiap pindah menu.</p>
-      <p style="font-size:13px;line-height:1.7;color:var(--ink);margin:0 0 12px;"><b>Fase 1 &mdash; Navigasi internal:</b> semua link internal (sidebar, header, tombol profil, notifikasi, kembali dari impersonation) mengarah ke URL bersih. Login lewat Google diperbarui supaya tetap mendarat dengan benar. Reload langsung di halaman dalam (bukan cuma beranda) tetap berfungsi normal.</p>
-      <p style="font-size:13px;line-height:1.7;color:var(--ink);margin:0 0 12px;"><b>Fase 2 &mdash; Link ke luar aplikasi:</b> link showroom dan link referral marketing yang dibagikan lewat WhatsApp (tombol &quot;Bagikan&quot;, preview URL pendaftaran showroom) sekarang juga bersih tanpa <code>#</code>.</p>
-      <p style="font-size:13px;line-height:1.7;color:var(--ink);margin:0 0 12px;"><b>Fase 3 &mdash; Data lama &amp; bookmark filter:</b> notifikasi lama tersimpan tetap terbuka dengan benar (dibaca toleran, tanpa migrasi data). 8 halaman admin/seller yang menyimpan filter untuk bookmark (User Management, Approval Queue, Master Brand/Sidebar/Bank/Inspeksi/Lokasi, Slider, Settlements, Transactions admin &amp; seller) diperbaiki &mdash; sebelumnya filter aktif hilang setiap refresh/bookmark karena tersimpan di tempat yang sudah tidak dibaca sistem; sekarang bertahan dengan benar.</p>
-      <p style="font-size:13px;line-height:1.7;color:var(--ink);margin:0 0 12px;"><b>Fase 4 &mdash; Beres-beres:</b> notifikasi baru langsung dibuat dengan format bersih (notifikasi lama tetap terbaca). Konvensi internal Design Studio V2 dicek ulang &mdash; sudah dari awal tidak bergantung tanda <code>#</code>, tidak perlu diubah.</p>
-      <p style="font-size:13px;line-height:1.7;color:var(--ink);margin:0 0 12px;"><b>Yang tetap aman di semua fase:</b> tautan lama yang sudah dibagikan sebelumnya (referral, showroom, notifikasi lama, bookmark) semuanya tetap terbuka dengan benar &mdash; otomatis diperbarui ke format baru begitu dibuka, tidak ada yang perlu dikirim ulang ke pelanggan.</p>
-      <div class="sub" style="margin-top:12px;">Sudah dicek langsung di production: login tiap level user, tombol kembali/maju browser, reload di halaman dalam, logout, login lewat Google (pindah domain carlynk.id &rarr; admin.carlynk.id), klik menu sidebar dengan data lama, klik notifikasi, filter User Management yang tetap bertahan setelah reload/bookmark.</div>
-    </div>
-
-    <div class="found-section" id="detail-performa">
-      <h2>Perbaikan performa: pemuatan halaman &lt;1 detik (50)</h2>
-      <div class="sub">Ditemukan lewat pengukuran langsung di production, bukan dugaan.</div>
-      <p style="font-size:13px;line-height:1.7;color:var(--ink);margin:0 0 12px;">Setiap kali ada yang login, aplikasi memverifikasi ulang &quot;kunci masuk otomatis&quot; (remember-me) memakai metode enkripsi yang sengaja dibuat lambat (bcrypt) untuk melindungi kata sandi manusia dari tebakan paksa. Masalahnya, verifikasi ini berjalan di <b>setiap pemanggilan data yang butuh login</b> &mdash; bukan cuma sekali saat buka halaman &mdash; sehingga setiap panggilan ikut kena jeda &plusmn;1,2 detik, dan beberapa panggilan bahkan menunggu bergantian, bukan bersamaan. Diganti dengan metode verifikasi yang tetap aman (kuncinya kode acak yang sudah mustahil ditebak, bukan kata sandi manusia) tapi jauh lebih cepat.</p>
-      <table>
-        <thead><tr><th>Bagian</th><th>Sebelum</th><th>Sesudah</th></tr></thead>
-        <tbody>
-          <tr><td>Cek status login (autologin)</td><td class="link" style="color:var(--danger);">1,3 detik</td><td class="link" style="color:var(--good);font-weight:700;">0,2 detik</td></tr>
-          <tr><td>Ambil notifikasi</td><td class="link" style="color:var(--danger);">1,3 detik (menunggu giliran)</td><td class="link" style="color:var(--good);font-weight:700;">0,2 detik (barengan)</td></tr>
-          <tr><td>Halaman kosong termuat</td><td class="link" style="color:var(--danger);">0,75 detik</td><td class="link" style="color:var(--good);font-weight:700;">0,25 detik</td></tr>
-          <tr><td><b>Semua data dashboard siap</b></td><td class="link" style="color:var(--danger);"><b>3+ detik</b></td><td class="link" style="color:var(--good);font-weight:700;"><b>&lt;1 detik</b></td></tr>
-        </tbody>
-      </table>
-      <div class="sub" style="margin-top:12px;">Catatan: semua orang yang sedang login otomatis diminta login ulang satu kali setelah perbaikan ini (efek samping mengganti metode kuncinya), setelah itu berjalan normal dengan kecepatan baru.</div>
-    </div>
-
-    <section class="group" id="detail-permintaan">
-      <div class="group-head"><h2>Pendaftaran showroom publik</h2><span class="range">01&ndash;04</span></div>
-      <table>
-        <thead><tr><th>#</th><th>Perubahan</th><th class="c-link">Link</th></tr></thead>
-        <tbody>
-          <tr><td class="num">01</td><td>Label &quot;Nama Pemilik&quot; &rarr; &quot;Nama&quot;</td><td class="link"><a href="https://carlynk.id/#/daftar-showroom">carlynk.id/#/daftar-showroom</a></td></tr>
-          <tr><td class="num">02</td><td>Hapus field Nomor WhatsApp &amp; Alamat Pemilik</td><td class="link"><a href="https://carlynk.id/#/daftar-showroom">carlynk.id/#/daftar-showroom</a></td></tr>
-          <tr><td class="num">03</td><td>&quot;Alamat halaman showroom&quot; &rarr; &quot;Alamat URL Showroom&quot;</td><td class="link"><a href="https://carlynk.id/#/daftar-showroom">carlynk.id/#/daftar-showroom</a></td></tr>
-          <tr><td class="num">04</td><td>&quot;Telepon showroom&quot; &rarr; &quot;Nomor WA Showroom&quot;</td><td class="link"><a href="https://carlynk.id/#/daftar-showroom">carlynk.id/#/daftar-showroom</a></td></tr>
-        </tbody>
-      </table>
-    </section>
-
-    <section class="group">
-      <div class="group-head"><h2>Profil akun</h2><span class="range">05, 10</span></div>
-      <table>
-        <thead><tr><th>#</th><th>Perubahan</th><th class="c-link">Link</th></tr></thead>
-        <tbody>
-          <tr><td class="num">05</td><td>Card &quot;Informasi Akun&quot; showroom: kiri Nama/Email, kanan Nama Showroom/Nomor WA</td><td class="link"><a href="https://carlynk.id/#/profile">carlynk.id/#/profile</a></td></tr>
-          <tr><td class="num">10</td><td>Susun ulang card logout: Nama / Email / Status / Logout</td><td class="link"><a href="https://carlynk.id/#/profile">carlynk.id/#/profile</a></td></tr>
-        </tbody>
-      </table>
-    </section>
-
-    <section class="group">
-      <div class="group-head"><h2>Halaman showroom sendiri</h2><span class="range">06&ndash;09, 25, 26, 39, 40, 42</span></div>
-      <table>
-        <thead><tr><th>#</th><th>Perubahan</th><th class="c-link">Link</th></tr></thead>
-        <tbody>
-          <tr><td class="num">06</td><td>Setiap bank pakai ikon dari master data</td><td class="link"><a href="https://carlynk.id/#/seller/showroom">carlynk.id/#/seller/showroom</a> (Edit)</td></tr>
-          <tr><td class="num">07</td><td>Dropdown Kota sebelum field alamat</td><td class="link"><a href="https://carlynk.id/#/seller/showroom">carlynk.id/#/seller/showroom</a> (Edit)</td></tr>
-          <tr><td class="num">08</td><td>Hapus 3 card hero stat (Profil/Kontak/Rekening)</td><td class="link"><a href="https://carlynk.id/#/seller/showroom">carlynk.id/#/seller/showroom</a></td></tr>
-          <tr><td class="num">09</td><td>Hapus teks &quot;Siap Pakai&quot; / Showroom readiness</td><td class="link"><a href="https://carlynk.id/#/seller/showroom">carlynk.id/#/seller/showroom</a></td></tr>
-          <tr><td class="num">25</td><td>Showroom bisa upload favicon/icon header sendiri</td><td class="link"><a href="https://carlynk.id/#/seller/showroom">carlynk.id/#/seller/showroom</a> (Edit &rarr; Branding)</td></tr>
-          <tr><td class="num">26</td><td>Showroom bisa ubah judul tab browser</td><td class="link"><a href="https://carlynk.id/#/seller/showroom">carlynk.id/#/seller/showroom</a> (Edit)</td></tr>
-          <tr><td class="num">39</td><td>Klik logo header &rarr; halaman showroom sendiri (lihat 41, dipindah ke buyer/marketing)</td><td class="link"><a href="https://carlynk.id/#/seller">carlynk.id/#/seller</a></td></tr>
-          <tr><td class="num">40</td><td>Upload logo header terpisah dari favicon (favicon persegi, logo boleh memanjang)</td><td class="link"><a href="https://carlynk.id/#/seller/showroom">carlynk.id/#/seller/showroom</a> (Edit &rarr; Branding)</td></tr>
-          <tr><td class="num">42</td><td>Modal Edit showroom: tombol Batal/Simpan pindah ke footer, teks deskripsi header dihapus</td><td class="link"><a href="https://carlynk.id/#/seller/showroom">carlynk.id/#/seller/showroom</a> (Edit)</td></tr>
-        </tbody>
-      </table>
-    </section>
-
-    <section class="group">
-      <div class="group-head"><h2>Form tambah / edit mobil</h2><span class="range">11&ndash;19, 35</span></div>
-      <table>
-        <thead><tr><th>#</th><th>Perubahan</th><th class="c-link">Link</th></tr></thead>
-        <tbody>
-          <tr><td class="num">11</td><td>Hapus tombol duplikat &quot;Mobil Baru&quot; &mdash; mode tambah</td><td class="link"><a href="https://carlynk.id/#/seller/cars">carlynk.id/#/seller/cars</a></td></tr>
-          <tr><td class="num">12</td><td>Hapus tombol duplikat &mdash; mode edit</td><td class="link"><a href="https://carlynk.id/#/seller/cars">carlynk.id/#/seller/cars</a></td></tr>
-          <tr><td class="num">13</td><td>Hapus field warna kedua &amp; variasi warna &mdash; tambah</td><td class="link"><a href="https://carlynk.id/#/seller/cars">carlynk.id/#/seller/cars</a></td></tr>
-          <tr><td class="num">14</td><td>Hapus field warna kedua &amp; variasi warna &mdash; edit</td><td class="link"><a href="https://carlynk.id/#/seller/cars">carlynk.id/#/seller/cars</a></td></tr>
-          <tr><td class="num">16</td><td>Hapus nomor mesin &amp; nomor rangka</td><td class="link"><a href="https://carlynk.id/#/seller/cars">carlynk.id/#/seller/cars</a></td></tr>
-          <tr><td class="num">17</td><td>&quot;Tanggal registrasi&quot; &rarr; &quot;Tahun Registrasi&quot;</td><td class="link"><a href="https://carlynk.id/#/seller/cars">carlynk.id/#/seller/cars</a></td></tr>
-          <tr><td class="num">18/35</td><td>Hapus field Stok</td><td class="link"><a href="https://carlynk.id/#/seller/cars">carlynk.id/#/seller/cars</a></td></tr>
-          <tr><td class="num">19</td><td>&quot;Status listing&quot; jadi dropdown: Draft/Published/Sold/View Sold/Archived</td><td class="link"><a href="https://carlynk.id/#/seller/cars">carlynk.id/#/seller/cars</a></td></tr>
-        </tbody>
-      </table>
-    </section>
-
-    <section class="group">
-      <div class="group-head"><h2>Navigasi &amp; sidebar</h2><span class="range">15, 20, 36, 41, 43, 45</span></div>
-      <table>
-        <thead><tr><th>#</th><th>Perubahan</th><th class="c-link">Link</th></tr></thead>
-        <tbody>
-          <tr><td class="num">15</td><td>Teks tombol ciutkan sidebar &rarr; &quot;Sembunyikan Sidebar&quot;</td><td class="link"><a href="https://carlynk.id/#/seller">carlynk.id/#/seller</a></td></tr>
-          <tr><td class="num">20</td><td>Sembunyikan tombol Login di header Showroom</td><td class="link"><a href="https://carlynk.id/#/login/seller">carlynk.id/#/login/seller</a></td></tr>
-          <tr><td class="num">36</td><td>Bottom footer buyer di halaman showroom (mobile) + setelah login</td><td class="link"><a href="https://carlynk.id/#/showrooms/hakim-mobilindo">carlynk.id/#/showrooms/hakim-mobilindo</a></td></tr>
-          <tr><td class="num">41</td><td>Klik logo header/sidebar &rarr; katalog showroom, dipindah dari Showroom ke Buyer &amp; Marketing (termasuk buyer belum login)</td><td class="link"><a href="https://carlynk.id/#/s/hakim-mobilindo">carlynk.id/#/s/hakim-mobilindo</a></td></tr>
-          <tr><td class="num">43</td><td>#/google-login/buyer: sembunyikan Login header, tambah tombol &quot;Kembali ke Katalog&quot;</td><td class="link"><a href="https://carlynk.id/#/google-login/buyer">carlynk.id/#/google-login/buyer</a></td></tr>
-          <tr><td class="num">45</td><td><span class="badge new">Baru</span>Tombol &quot;Kembali ke Katalog&quot; sekarang selalu tampil, walau dibuka langsung tanpa asal showroom/marketing (fallback ke halaman utama)</td><td class="link"><a href="https://carlynk.id/#/google-login/buyer">carlynk.id/#/google-login/buyer</a></td></tr>
-        </tbody>
-      </table>
-    </section>
-
-    <section class="group">
-      <div class="group-head"><h2>Transaksi &amp; pembayaran</h2><span class="range">28&ndash;34</span></div>
-      <table>
-        <thead><tr><th>#</th><th>Perubahan</th><th class="c-link">Link</th></tr></thead>
-        <tbody>
-          <tr><td class="num">28</td><td>Sembunyikan Gopay &amp; QRIS dari metode pembayaran</td><td class="link"><a href="https://carlynk.id/#/showrooms/hakim-mobilindo">carlynk.id/#/showrooms/hakim-mobilindo</a> (pilih mobil &rarr; Booking)</td></tr>
-          <tr><td class="num">29</td><td><span class="badge manual">Manual</span>Tombol Copy nomor VA &mdash; tidak bisa dibuktikan otomatis (clipboard sandbox), mohon dicoba manual</td><td class="link">halaman hasil transaksi BCA VA</td></tr>
-          <tr><td class="num">30</td><td>&quot;Nominal utama&quot; &rarr; &quot;Booking Fee&quot;</td><td class="link">halaman hasil transaksi</td></tr>
-          <tr><td class="num">31</td><td>Sembunyikan card &quot;DP&quot;</td><td class="link">halaman hasil transaksi</td></tr>
-          <tr><td class="num">32</td><td>Card Kadaluarsa hilang saat sudah dibayar + waktu jadi 5 menit</td><td class="link">halaman hasil transaksi</td></tr>
-          <tr><td class="num">33</td><td><span class="badge fatal">Bug fatal</span>Dua pembeli satu mobil &mdash; diperbaiki, diuji dengan proses paralel sungguhan</td><td class="link">perbaikan backend, tidak ada tampilan</td></tr>
-          <tr><td class="num">34</td><td>Filter periode: Bulan ini/Bulan Kemarin/Pilih Bulan/Semua Periode</td><td class="link"><a href="https://carlynk.id/#/seller/transactions">carlynk.id/#/seller/transactions</a></td></tr>
-        </tbody>
-      </table>
-    </section>
-
-    <section class="group">
-      <div class="group-head"><h2>Admin</h2><span class="range">48</span></div>
-      <table>
-        <thead><tr><th>#</th><th>Perubahan</th><th class="c-link">Link</th></tr></thead>
-        <tbody>
-          <tr><td class="num">48</td><td><span class="badge new">Baru</span>Admin bisa menandai mobil terjual di luar sistem (WhatsApp, transaksi langsung di showroom) lewat tombol "Tandai Terjual (Luar Sistem)", dengan keterangan bebas yang ditulis sendiri oleh Admin (wajib diisi) untuk audit</td><td class="link"><a href="https://carlynk.id/#/admin/cars">carlynk.id/#/admin/cars</a></td></tr>
-        </tbody>
-      </table>
-    </section>
-
-    <section class="group">
-      <div class="group-head"><h2>Marketing / affiliate</h2><span class="range">37, 38, 44, 46, 47, 49</span></div>
-      <table>
-        <thead><tr><th>#</th><th>Perubahan</th><th class="c-link">Link</th></tr></thead>
-        <tbody>
-          <tr><td class="num">37</td><td>&quot;Slug marketing&quot; &rarr; &quot;URL marketing&quot; + preview URL live</td><td class="link"><a href="https://carlynk.id/#/seller/affiliates?mode=create">carlynk.id/#/seller/affiliates?mode=create</a></td></tr>
-          <tr><td class="num">38</td><td>Keterangan merah saat URL sudah dipakai (ganti teks statis lama)</td><td class="link"><a href="https://carlynk.id/#/seller/affiliates?mode=create">carlynk.id/#/seller/affiliates?mode=create</a></td></tr>
-          <tr><td class="num">44</td><td>Tombol &quot;Atur Komisi Umum&quot;/&quot;Tambah aturan khusus&quot; berkedip saat ditutup, sekarang langsung tertutup</td><td class="link"><a href="https://carlynk.id/#/seller/affiliate-commissions">carlynk.id/#/seller/affiliate-commissions</a></td></tr>
-          <tr><td class="num">46</td><td>Logo, favicon, dan judul tab di halaman marketing #/af/:slug sekarang ikut showroom milik affiliate tersebut (sebelumnya selalu logo/favicon default)</td><td class="link"><a href="https://carlynk.id/#/af/rohim">carlynk.id/#/af/rohim</a></td></tr>
-          <tr><td class="num">47</td><td>Audit menyeluruh fitur Marketing: klik &rarr; registrasi buyer &rarr; transaksi &rarr; pembayaran &rarr; komisi diuji dengan transaksi sungguhan di production</td><td class="link">lihat rincian di bawah</td></tr>
-          <tr><td class="num">49</td><td><span class="badge new">Baru</span>Marketing bisa membagikan link satu mobil tertentu ("Bagikan Mobil" di dashboard) &mdash; link ini tetap terdeteksi sebagai kunjungan marketing, jadi transaksi dari sana tetap dapat komisi</td><td class="link"><a href="https://carlynk.id/#/affiliate/cars">carlynk.id/#/affiliate/cars</a></td></tr>
-        </tbody>
-      </table>
-    </section>
-
-    <div class="found-section">
-      <h2>Audit menyeluruh fitur Marketing (47)</h2>
-      <div class="sub">Diuji dengan showroom, marketing, dan buyer uji coba baru (bukan akun asli) &mdash; satu transaksi sungguhan dijalankan dari klik link referral sampai komisi tercatat di ledger.</div>
-      <ul class="found-list">
-        <li>Showroom membuat akun Marketing baru (nama, email, password, nomor WA, slug referral) &mdash; akun dan link <code>#/af/&lt;slug&gt;</code> langsung aktif.</li>
-        <li>Showroom mengatur komisi umum 5% di halaman Komisi Marketing.</li>
-        <li>Pengunjung membuka link referral &mdash; katalog otomatis tersaring ke mobil showroom itu saja, setiap kunjungan tercatat sebagai klik.</li>
-        <li>Pengunjung memilih mobil (Rp 100.000.000), mendaftar sebagai buyer baru langsung di halaman transaksi, lalu membuat Booking Fee Rp 3.000.000 &mdash; kode referral tersimpan otomatis di transaksinya.</li>
-        <li>Buyer transfer manual dan unggah bukti; showroom mengonfirmasi bukti transfer.</li>
-        <li><b>Begitu status transaksi jadi "dp_paid", komisi langsung terbit otomatis:</b> Rp 5.000.000 (5% &times; Rp 100.000.000) tercatat di ledger komisi.</li>
-        <li>Marketing login dan melihat semuanya benar: Dashboard (total klik/transaksi/komisi), Komisi (rincian ledger), Settlement (status belum dibayar), Notifikasi ("Komisi Affiliate Masuk").</li>
-      </ul>
-      <div class="sub" style="margin-top:14px;"><b>Bug ditemukan &amp; langsung diperbaiki:</b></div>
-      <ul class="found-list">
-        <li><b>Tombol "Daftar Pembeli" tidak pernah muncul</b> saat buyer belum login di halaman transaksi &mdash; kode sudah membuat tombolnya tapi lupa menempelkannya ke halaman, jadi pengunjung baru dari link marketing hanya bisa lihat tombol "Login dengan Google". Pesan error saat login/daftar gagal juga ikut tidak pernah tampil. Diperbaiki di sumbernya.</li>
-      </ul>
-      <div class="sub" style="margin-top:14px;"><b>Catatan (bukan bug, untuk transparansi):</b></div>
-      <ul class="found-list">
-        <li>Payout ke marketing (settlement batch oleh Admin) sudah diverifikasi lewat pembacaan kode &amp; struktur database saat laporan ini pertama ditulis. Sudah dicoba klik langsung belakangan &mdash; lihat item 48 di bawah.</li>
-        <li>Ada dua tempat pengaturan komisi di kode &mdash; satu di data akun marketing (tidak dipakai lagi), satu di halaman Komisi Marketing milik showroom (ini yang aktif). Sudah dipastikan lewat pengujian ini bahwa yang menentukan besar komisi adalah halaman Komisi Marketing.</li>
-      </ul>
-    </div>
-
-    <div class="found-section">
-      <h2>Fitur baru: Admin tandai terjual &amp; share per mobil (48, 49)</h2>
-      <ul class="found-list">
-        <li><b>48 &mdash; Admin menandai mobil terjual di luar sistem.</b> Diuji langsung login sebagai Admin di <code>#/admin/cars</code>: klik "Tandai Terjual (Luar Sistem)" pada mobil aktif, ketik sendiri keterangan bebas di kotak teks (bukan pilihan dari daftar, murni tulisan Admin sendiri), submit. Hasilnya: status mobil berubah jadi Terjual, keterangan yang ditulis Admin tampil di daftar mobil admin, mobil langsung hilang dari katalog publik &mdash; dan dicek langsung di database, kolom keterangan, waktu, dan admin yang menandai semuanya tersimpan persis seperti yang diketik.</li>
-        <li><b>49 &mdash; Marketing bagikan link per mobil.</b> Halaman baru "Bagikan Mobil" di dashboard marketing menampilkan semua mobil showroom yang published, masing-masing dengan tombol Copy Link dan Bagikan WhatsApp. Diuji langsung: link yang dihasilkan dibuka di sesi tanpa login &mdash; halaman detail mobil terbuka, context marketing otomatis aktif, dan klik tercatat ke akun marketing yang sama (naik dari 4 ke 6 klik, dicek di database). Memakai jalur yang sama persis dengan yang sudah diuji sampai dapat komisi di item 47.</li>
-      </ul>
-    </div>
-
-    <div class="found-section">
-      <h2>Ditemukan &amp; diperbaiki sambil jalan</h2>
-      <div class="sub">Tidak ada dalam daftar permintaan &mdash; ditemukan saat menguji, langsung diperbaiki di sumbernya.</div>
-      <ul class="found-list">
-        <li><b>Password marketing ikut terhapus</b> &mdash; efek samping pengecekan URL live (item 38): form sempat mengosongkan password setiap kali pengecekan berjalan di tengah pengetikan.</li>
-        <li><b>Logo Showroom sempat tidak bisa diklik</b> &mdash; deteksi role di header salah baca status login pada percobaan pertama item 39. Dicek ulang sampai berhasil.</li>
-        <li><b>Favicon showroom tidak pernah benar-benar berubah</b> &mdash; ditemukan saat memeriksa item 25: dua tag ikon tersembunyi di kepala halaman karena skrip awal jalan sebelum HTML server selesai dimuat.</li>
-        <li><b>Logo default berkedip sebelum logo showroom muncul</b> &mdash; saat buka/muat ulang halaman showroom. Diperbaiki dua tahap (gambar, lalu nama aplikasi di sebelahnya).</li>
-        <li><b>#/admin (dan #/seller, #/buyer) sempat salah arah ke katalog publik</b> &mdash; regresi dari percobaan mempercepat waktu muat halaman pertama. Ditemukan dari laporan Anda, langsung dikembalikan ke versi aman.</li>
-        <li><b>API validasi kode referral tidak pernah mengirim logo/favicon showroom</b> &mdash; ditemukan saat mengerjakan item 46: query backend tidak pernah mengambil kolom logo header, favicon, dan judul tab showroom untuk halaman marketing. Ditambahkan di sumbernya.</li>
-        <li><b>Tombol "Daftar Pembeli" tidak pernah muncul di halaman transaksi</b> &mdash; ditemukan saat audit item 47: kode tombolnya sudah dibuat tapi tidak pernah ditempelkan ke halaman, plus pesan error login/daftar ikut disembunyikan. Diperbaiki di sumbernya.</li>
-      </ul>
-    </div>
-
-    <div class="closing">
-      <div>Cabang <code>feature/full-business-flow-tester</code> &middot; setiap perubahan dicek langsung di carlynk.id, bukan hanya dari kode.</div>
-      <div class="pass">27 / 27 automated test lolos di setiap tahap deploy</div>
-    </div>
+  <div class="body-pad" id="report-root">
+    <div class="loading">Memuat laporan&hellip;</div>
   </div>
 
 </div>
+
+<script>
+(function () {
+  var root = document.getElementById("report-root");
+  var coverMeta = document.getElementById("cover-meta");
+
+  function escapeHtml(value) {
+    return String(value == null ? "" : value).replace(/[&<>"']/g, function (ch) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch];
+    });
+  }
+
+  function statusLabel(status) {
+    if (status === "progress") return "Berjalan";
+    if (status === "planned") return "Berikutnya";
+    return "Selesai";
+  }
+
+  function statusClass(status) {
+    if (status === "progress") return "progress";
+    if (status === "planned") return "planned";
+    return "done";
+  }
+
+  function summaryCard(kind, label, group) {
+    return (
+      '<div class="sum-card ' + kind + '">' +
+        '<div class="sum-eyebrow">' + escapeHtml(label) + '</div>' +
+        '<div class="sum-count"><span class="n">' + escapeHtml(group.count) + '</span><span class="l">' + escapeHtml(group.label) + '</span></div>' +
+        '<div class="sum-desc">' + escapeHtml(group.description) + '</div>' +
+      '</div>'
+    );
+  }
+
+  function taskRows(rows, kind, kindLabel) {
+    return rows.map(function (row, index) {
+      var statusCell = kind === "maint"
+        ? '<td><span class="pill ' + statusClass(row.status) + '">' + statusLabel(row.status) + '</span></td>'
+        : '<td><span class="pill done">Selesai</span></td>';
+      return (
+        '<tr>' +
+          '<td class="no">' + String(index + 1).padStart(2, "0") + '</td>' +
+          '<td><span class="pill ' + kind + '">' + escapeHtml(kindLabel) + '</span></td>' +
+          '<td class="task-name">' + escapeHtml(row.task) + (row.ref ? ' <span style="color:var(--ink-faint);font-weight:400;">(' + escapeHtml(row.ref) + ')</span>' : '') + '</td>' +
+          '<td class="task-detail">' + escapeHtml(row.detail) + '</td>' +
+          statusCell +
+        '</tr>'
+      );
+    }).join("");
+  }
+
+  fetch("laporan-data.json", { cache: "no-store" })
+    .then(function (res) {
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return res.json();
+    })
+    .then(function (data) {
+      coverMeta.innerHTML =
+        '<div><div class="k">Periode</div><div class="v">' + escapeHtml(data.week_range) + '</div></div>' +
+        '<div><div class="k">Cabang</div><div class="v">' + escapeHtml(data.branch) + '</div></div>' +
+        '<div><div class="k">Automated test</div><div class="v">' + escapeHtml(data.tests) + '</div></div>';
+
+      var totalTasks = (data.development.count || 0) + (data.maintenance.count || 0);
+
+      root.innerHTML =
+        '<div class="card-grid">' +
+          summaryCard("dev", "Development", data.development) +
+          summaryCard("maint", "Maintenance", data.maintenance) +
+        '</div>' +
+
+        '<div class="section-lbl dev"><span class="dot"></span>Development &mdash; ' + escapeHtml(data.development.count) + ' tugas</div>' +
+        '<div class="table-wrap"><table class="tasks">' +
+          '<thead><tr><th>#</th><th>Kategori</th><th>Tugas</th><th>Keterangan</th><th>Status</th></tr></thead>' +
+          '<tbody>' + taskRows(data.development.rows, "dev", "Development") + '</tbody>' +
+        '</table></div>' +
+
+        '<div class="section-lbl maint"><span class="dot"></span>Maintenance &mdash; ' + escapeHtml(data.maintenance.count) + ' tugas</div>' +
+        '<div class="table-wrap"><table class="tasks">' +
+          '<thead><tr><th>#</th><th>Kategori</th><th>Tugas</th><th>Keterangan</th><th>Status</th></tr></thead>' +
+          '<tbody>' + taskRows(data.maintenance.rows, "maint", "Maintenance") + '</tbody>' +
+        '</table></div>' +
+
+        '<div class="note">Ini laporan minggu berjalan (' + escapeHtml(data.week_range) + '). Untuk riwayat lengkap seluruh permintaan sejak awal proyek per nomor item, lihat <a href="' + escapeHtml(data.archive_url) + '">halaman arsip</a>.</div>' +
+
+        '<div class="closing">' +
+          '<div>Cabang <code>' + escapeHtml(data.branch) + '</code> &middot; total ' + totalTasks + ' tugas minggu ini.</div>' +
+          '<div class="pass">' + escapeHtml(data.tests) + '</div>' +
+        '</div>';
+    })
+    .catch(function (err) {
+      root.innerHTML = '<div class="load-error">Laporan tidak bisa dimuat (' + escapeHtml(err.message) + '). Coba muat ulang halaman.</div>';
+    });
+})();
+</script>
+
 </body>
 </html>

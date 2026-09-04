@@ -1,0 +1,53 @@
+{
+  "week_range": "31 Agustus – 4 September 2026",
+  "branch": "feature/full-business-flow-tester",
+  "tests": "27 / 27 lolos",
+  "archive_url": "laporan-verifikasi-arsip.html",
+  "development": {
+    "count": 42,
+    "label": "permintaan fitur & tampilan dikerjakan",
+    "description": "Perubahan yang langsung terlihat & dipakai pengguna — form, halaman, tombol, alur baru.",
+    "rows": [
+      { "task": "Rapikan form pendaftaran showroom", "detail": "Ganti label \"Nama Pemilik\" → \"Nama\", hapus field Nomor WhatsApp & Alamat Pemilik, perjelas label URL showroom.", "ref": "01–04" },
+      { "task": "Rapikan halaman Profil showroom", "detail": "Card informasi akun (Nama/Email/Nama Showroom/WA) & urutan logout disusun ulang.", "ref": "05, 10" },
+      { "task": "Ikon bank & dropdown kota", "detail": "Dropdown bank pakai ikon dari master data; dropdown kota ditaruh sebelum field alamat.", "ref": "06–07" },
+      { "task": "Sederhanakan hero showroom", "detail": "Hapus 3 card statistik (Profil/Kontak/Rekening) dan teks \"Siap Pakai\" yang tidak perlu.", "ref": "08–09" },
+      { "task": "Upload favicon & logo header showroom", "detail": "Showroom bisa unggah favicon dan logo header sendiri, dua berkas terpisah (tidak lagi dipotong paksa).", "ref": "25, 26, 40" },
+      { "task": "Klik logo → showroom sendiri", "detail": "Logo header/sidebar mengarah ke showroom sendiri; modal edit showroom dirapikan (tombol pindah ke footer).", "ref": "39, 42" },
+      { "task": "Bersihkan form tambah/edit mobil", "detail": "Hapus tombol duplikat, field warna kedua, nomor mesin & nomor rangka.", "ref": "11–14, 16" },
+      { "task": "Rapikan field & status listing mobil", "detail": "Label \"Tahun Registrasi\", hapus field Stok, status listing jadi 5 pilihan (Draft/Published/Sold/View Sold/Archived).", "ref": "17–19" },
+      { "task": "Navigasi sidebar & footer buyer", "detail": "Teks tombol sidebar, footer mobile buyer, logo menuju katalog showroom/marketing yang benar.", "ref": "15, 20, 36, 41, 43, 45" },
+      { "task": "Rapikan alur pembayaran", "detail": "Sembunyikan Gopay/QRIS, label \"Booking Fee\", kadaluarsa transaksi 5 menit, filter periode transaksi.", "ref": "28–32, 34" },
+      { "task": "Admin tandai mobil terjual di luar sistem", "detail": "Tombol \"Tandai Terjual (Luar Sistem)\" dengan keterangan bebas yang wajib diisi Admin untuk audit.", "ref": "48" },
+      { "task": "URL marketing & share per mobil", "detail": "Preview URL marketing live, logo/favicon halaman marketing ikut showroom, fitur bagikan link per mobil.", "ref": "37, 38, 44, 46, 49" }
+    ]
+  },
+  "maintenance": {
+    "count": 27,
+    "label": "pekerjaan performa, migrasi & perbaikan",
+    "description": "Kerja di balik layar — tidak selalu terlihat, tapi menentukan kecepatan & keamanan jangka panjang.",
+    "rows": [
+      { "task": "Audit performa production", "detail": "Ukur waktu muat & respons API langsung di production, bukan dugaan.", "status": "done" },
+      { "task": "Temukan akar masalah lambat", "detail": "Token remember-me diverifikasi ulang dengan metode lambat di setiap request berlogin.", "status": "done" },
+      { "task": "Ganti metode verifikasi token", "detail": "Tetap aman, tapi jauh lebih cepat — tidak lagi memakai metode yang dirancang untuk kata sandi manusia.", "status": "done" },
+      { "task": "Rapikan urutan muat awal aplikasi", "detail": "Pengambilan notifikasi tidak lagi memblokir tampilnya halaman pertama.", "status": "done" },
+      { "task": "Verifikasi ulang performa di production", "detail": "Bandingkan sebelum/sesudah: semua data dashboard dari 3+ detik menjadi <1 detik.", "status": "done" },
+      { "task": "Audit risiko migrasi URL", "detail": "Dua putaran riset menyeluruh sebelum eksekusi, memetakan semua titik yang terdampak.", "status": "done" },
+      { "task": "Migrasi URL Fase 1 — navigasi internal", "detail": "Sidebar, header, notifikasi, login Google dipindah ke URL bersih tanpa tanda #.", "status": "done" },
+      { "task": "Migrasi URL Fase 2 — link ke luar aplikasi", "detail": "Link showroom & referral marketing yang dibagikan lewat WhatsApp ikut dibersihkan.", "status": "done" },
+      { "task": "Migrasi URL Fase 3 — data lama & bookmark", "detail": "8 halaman filter/bookmark diperbaiki; notifikasi lama tetap terbuka tanpa migrasi data.", "status": "done" },
+      { "task": "Migrasi URL Fase 4 — beres-beres", "detail": "Data baru langsung memakai format bersih; konvensi lama dikonfirmasi ulang aman.", "status": "done" },
+      { "task": "Perbaiki bug tombol Katalog salah arah", "detail": "Ditemukan setelah migrasi (top nav profil buyer): tombol Katalog sempat membawa ke halaman utama, bukan showroom buyer. Langsung diperbaiki.", "status": "done" },
+      { "task": "Perbaiki bug fatal: dua pembeli satu mobil", "detail": "Diuji dengan dua proses yang benar-benar berjalan bersamaan, bukan satu per satu.", "status": "done" },
+      { "task": "Audit menyeluruh alur Marketing", "detail": "Satu transaksi sungguhan dijalankan dari klik link referral sampai komisi tercatat di ledger.", "status": "done" },
+      { "task": "Perbaiki 7 bug kecil sambil jalan", "detail": "Logo showroom, favicon, API validasi referral, dan lainnya — ditemukan & diperbaiki di sumbernya.", "status": "done" },
+      { "task": "Rencana pemisahan subdomain per peran", "detail": "Peta subdomain disusun: showroom, app (buyer), marketing, admin — masing-masing dashboard punya alamat sendiri.", "status": "done" },
+      { "task": "Nonaktifkan sementara Google Login Admin & Showroom", "detail": "Persiapan subdomain — untuk saat ini hanya Buyer yang memakai Google Login, Admin/Showroom tetap email & password.", "status": "done" },
+      { "task": "Setup DNS & nginx 3 subdomain baru", "detail": "showroom.carlynk.id, app.carlynk.id, marketing.carlynk.id sudah resolve dan terhubung ke server.", "status": "done" },
+      { "task": "Perluas sertifikat SSL", "detail": "Satu sertifikat mencakup carlynk.id, admin, showroom, app, dan marketing sekaligus.", "status": "done" },
+      { "task": "Daftarkan redirect URI Google OAuth", "detail": "Menambahkan URI callback subdomain showroom & app ke Google Cloud Console.", "status": "progress" },
+      { "task": "Penyesuaian kode routing lintas-subdomain", "detail": "Generalisasi logika penjaga domain supaya berlaku untuk semua subdomain baru, tidak hanya admin.", "status": "planned" },
+      { "task": "Uji coba bertahap per peran", "detail": "Aktifkan satu peran dulu, verifikasi penuh, baru lanjut ke peran berikutnya.", "status": "planned" }
+    ]
+  }
+}
