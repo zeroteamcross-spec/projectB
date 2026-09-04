@@ -21,6 +21,10 @@
     --danger:#b3401f;
     --danger-bg:#fbeae3;
     --surface:#ffffff;
+    --slate:#3c4a56;
+    --slate-deep:#2a343d;
+    --slate-bg:#eef1f3;
+    --slate-border:#dde3e7;
   }
   *{ box-sizing:border-box; }
   html,body{ margin:0; padding:0; }
@@ -148,6 +152,119 @@
     .stats{ padding:20px 22px 4px; }
     .body-pad{ padding:8px 22px 30px; }
   }
+
+  /* --- Ringkasan Development / Maintenance --- */
+  .summary{ margin-top:22px; }
+  .summary-head{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-bottom:12px;
+  }
+  .summary-head h2{ font-size:19px; color:var(--ink); }
+  .summary-head .sub{ font-size:12px; color:var(--ink-muted); }
+  .summary-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+  }
+  @media (max-width:720px){ .summary-grid{ grid-template-columns:1fr; } }
+  .summary-card{
+    border:1px solid var(--border);
+    border-radius:12px;
+    background:var(--surface);
+    overflow:hidden;
+  }
+  .summary-card .card-top{
+    padding:18px 20px 16px;
+    color:#fff;
+  }
+  .summary-card.dev .card-top{ background:linear-gradient(135deg, var(--secondary), var(--primary)); }
+  .summary-card.maint .card-top{ background:linear-gradient(135deg, var(--slate-deep), var(--slate)); }
+  .summary-card .card-eyebrow{
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:.12em;
+    font-weight:700;
+    color:color-mix(in srgb, #fff 75%, transparent);
+  }
+  .summary-card .card-count{
+    display:flex;
+    align-items:baseline;
+    gap:8px;
+    margin-top:4px;
+  }
+  .summary-card .card-count .n{
+    font-family: Georgia, serif;
+    font-size:34px;
+    font-weight:700;
+    font-variant-numeric: tabular-nums;
+    line-height:1;
+  }
+  .summary-card .card-count .n-lbl{ font-size:12.5px; color:color-mix(in srgb, #fff 88%, transparent); }
+  .summary-card .card-desc{
+    margin-top:8px;
+    font-size:12px;
+    line-height:1.55;
+    color:color-mix(in srgb, #fff 90%, transparent);
+    max-width:34ch;
+  }
+  .summary-card .card-body{ padding:14px 20px 18px; }
+  .sum-group{ margin-top:14px; }
+  .sum-group:first-child{ margin-top:0; }
+  .sum-group-head{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:8px;
+    font-size:12px;
+    font-weight:700;
+    color:var(--ink);
+    padding-bottom:4px;
+    border-bottom:1px solid var(--border-soft);
+    margin-bottom:6px;
+  }
+  .sum-group-head .tally{
+    font-family: ui-monospace, "Cascadia Mono", "Consolas", monospace;
+    font-weight:700;
+    color:var(--ink-faint);
+    font-size:11px;
+  }
+  .sum-list{ margin:0; padding:0; list-style:none; }
+  .sum-list li{
+    position:relative;
+    padding:4px 0 4px 20px;
+    font-size:12.5px;
+    color:var(--ink-muted);
+    line-height:1.5;
+  }
+  .sum-list li::before{
+    position:absolute; left:0; top:5px;
+    font-size:11px;
+    font-weight:700;
+    line-height:1.3;
+  }
+  .sum-list li.done::before{ content:"\2713"; color:var(--good); }
+  .sum-list li.progress::before{ content:"\25CF"; color:var(--accent); font-size:8px; top:8px; }
+  .sum-list li.planned::before{ content:"\25CB"; color:var(--ink-faint); font-size:9px; top:7px; }
+  .sum-status{
+    display:inline-block;
+    font-size:9px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    padding:1px 6px;
+    border-radius:20px;
+    margin-left:6px;
+    position:relative;
+    top:-1px;
+  }
+  .sum-status.progress{ background:var(--cream-deep); color:#8a6a2e; }
+  .sum-status.planned{ background:var(--slate-bg); color:var(--slate); }
+  .summary-jump{ font-size:11px; color:var(--ink-faint); margin-top:10px; }
+  .summary-jump a{ color:var(--secondary); text-decoration:none; border-bottom:1px dashed color-mix(in srgb, var(--secondary) 45%, transparent); }
 
   .note{
     margin:18px 0 6px;
@@ -342,6 +459,115 @@
   </div>
 
   <div class="body-pad">
+    <div class="summary">
+      <div class="summary-head">
+        <h2>Ringkasan Pekerjaan Minggu Ini</h2>
+        <span class="sub">31 Agustus &ndash; 4 September 2026</span>
+      </div>
+      <div class="summary-grid">
+
+        <div class="summary-card dev">
+          <div class="card-top">
+            <div class="card-eyebrow">Development</div>
+            <div class="card-count"><span class="n">42</span><span class="n-lbl">permintaan fitur &amp; tampilan dikerjakan</span></div>
+            <div class="card-desc">Perubahan yang langsung terlihat &amp; dipakai pengguna &mdash; form, halaman, tombol, alur baru.</div>
+          </div>
+          <div class="card-body">
+            <div class="sum-group">
+              <div class="sum-group-head"><span>Pendaftaran &amp; profil showroom</span><span class="tally">6</span></div>
+              <ul class="sum-list">
+                <li class="done">Rapikan label &amp; field form pendaftaran showroom (01&ndash;04)</li>
+                <li class="done">Card informasi akun &amp; urutan logout di halaman Profil (05, 10)</li>
+              </ul>
+            </div>
+            <div class="sum-group">
+              <div class="sum-group-head"><span>Halaman showroom sendiri</span><span class="tally">9</span></div>
+              <ul class="sum-list">
+                <li class="done">Ikon bank dari master data, dropdown kota, hapus 3 card hero (06&ndash;09)</li>
+                <li class="done">Upload favicon &amp; logo header sendiri, terpisah dari favicon (25, 26, 40)</li>
+                <li class="done">Klik logo &rarr; showroom sendiri, modal edit dirapikan (39, 42)</li>
+              </ul>
+            </div>
+            <div class="sum-group">
+              <div class="sum-group-head"><span>Form tambah / edit mobil</span><span class="tally">8</span></div>
+              <ul class="sum-list">
+                <li class="done">Hapus tombol &amp; field duplikat, nomor mesin/rangka (11&ndash;14, 16)</li>
+                <li class="done">Label tahun registrasi, hapus field Stok, status listing 5 pilihan (17&ndash;19)</li>
+              </ul>
+            </div>
+            <div class="sum-group">
+              <div class="sum-group-head"><span>Navigasi, transaksi &amp; pembayaran</span><span class="tally">12</span></div>
+              <ul class="sum-list">
+                <li class="done">Sidebar, footer buyer, logo &rarr; katalog showroom/marketing (15, 20, 36, 41, 43, 45)</li>
+                <li class="done">Sembunyikan Gopay/QRIS, label Booking Fee, kadaluarsa 5 menit, filter periode (28&ndash;32, 34)</li>
+              </ul>
+            </div>
+            <div class="sum-group">
+              <div class="sum-group-head"><span>Admin &amp; Marketing</span><span class="tally">7</span></div>
+              <ul class="sum-list">
+                <li class="done">Admin menandai mobil terjual di luar sistem (48)</li>
+                <li class="done">URL marketing + preview live, logo/favicon ikut showroom, share per mobil (37, 38, 44, 46, 49)</li>
+              </ul>
+            </div>
+            <div class="summary-jump">Rincian lengkap tiap nomor &rarr; <a href="#detail-permintaan">daftar per halaman di bawah</a>.</div>
+          </div>
+        </div>
+
+        <div class="summary-card maint">
+          <div class="card-top">
+            <div class="card-eyebrow">Maintenance</div>
+            <div class="card-count"><span class="n">27</span><span class="n-lbl">pekerjaan performa, migrasi &amp; perbaikan</span></div>
+            <div class="card-desc">Kerja di balik layar &mdash; tidak selalu terlihat, tapi menentukan kecepatan &amp; keamanan jangka panjang.</div>
+          </div>
+          <div class="card-body">
+            <div class="sum-group">
+              <div class="sum-group-head"><span>Perbaikan performa halaman</span><span class="tally">5</span></div>
+              <ul class="sum-list">
+                <li class="done">Audit performa langsung di production (bukan dugaan)</li>
+                <li class="done">Temukan akar masalah: verifikasi ulang token di setiap request</li>
+                <li class="done">Ganti metode verifikasi, tetap aman &amp; jauh lebih cepat</li>
+                <li class="done">Rapikan urutan muat awal aplikasi (notifikasi tidak lagi menghalangi)</li>
+                <li class="done">Ukur ulang &amp; verifikasi hasil di production (lihat tabel di bawah)</li>
+              </ul>
+            </div>
+            <div class="sum-group">
+              <div class="sum-group-head"><span>Migrasi URL bersih (tanpa #)</span><span class="tally">6</span></div>
+              <ul class="sum-list">
+                <li class="done">Audit risiko menyeluruh sebelum eksekusi (2 putaran)</li>
+                <li class="done">Fase 1 &mdash; navigasi internal (sidebar, notifikasi, login Google)</li>
+                <li class="done">Fase 2 &mdash; link showroom &amp; referral yang dibagikan ke luar</li>
+                <li class="done">Fase 3 &mdash; 8 halaman filter/bookmark &amp; data lama tetap kompatibel</li>
+                <li class="done">Fase 4 &mdash; beres-beres format data baru</li>
+                <li class="done">Bug ekstra: tombol Katalog di profil buyer salah arah &mdash; ditemukan &amp; diperbaiki</li>
+              </ul>
+            </div>
+            <div class="sum-group">
+              <div class="sum-group-head"><span>Bug &amp; audit ekstra sambil jalan</span><span class="tally">9</span></div>
+              <ul class="sum-list">
+                <li class="done">Bug fatal: dua pembeli satu mobil &mdash; diuji dengan proses paralel sungguhan (33)</li>
+                <li class="done">Audit menyeluruh alur Marketing dengan transaksi sungguhan (47)</li>
+                <li class="done">7 bug kecil lain ditemukan &amp; diperbaiki di sumbernya (logo, favicon, API referral, dll)</li>
+              </ul>
+            </div>
+            <div class="sum-group">
+              <div class="sum-group-head"><span>Persiapan pemisahan subdomain per peran</span><span class="tally">7</span></div>
+              <ul class="sum-list">
+                <li class="done">Rencana &amp; peta subdomain: showroom, app, marketing, admin</li>
+                <li class="done">Nonaktifkan sementara Google Login Admin &amp; Showroom<span class="sum-status planned">Persiapan</span></li>
+                <li class="done">DNS &amp; nginx untuk 3 subdomain baru</li>
+                <li class="done">Sertifikat SSL diperluas mencakup semua subdomain</li>
+                <li class="progress">Redirect URI Google OAuth per subdomain<span class="sum-status progress">Berjalan</span></li>
+                <li class="planned">Penyesuaian kode routing lintas-subdomain<span class="sum-status planned">Berikutnya</span></li>
+                <li class="planned">Uji coba bertahap per peran sebelum aktif penuh<span class="sum-status planned">Berikutnya</span></li>
+              </ul>
+            </div>
+            <div class="summary-jump">Rincian &rarr; <a href="#detail-performa">performa</a>, <a href="#detail-migrasi-url">migrasi URL</a> di bawah.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
     <div class="note">
       Sebagian besar tautan meminta login sebagai <b>Showroom</b> terlebih dahulu &mdash; login sekali, tautan lain di halaman yang sama akan langsung terbuka.
     </div>
@@ -349,6 +575,13 @@
     <div class="changelog-section">
       <h2 style="font-family:Georgia,serif;font-size:18px;color:var(--ink);margin-bottom:4px;">Riwayat Pembaruan</h2>
       <div class="sub" style="font-size:12px;color:var(--ink-muted);margin-bottom:4px;">Log perubahan per tanggal, terbaru di paling atas. Rincian lengkap tiap item nomor ada di daftar per halaman di bawah.</div>
+      <div class="changelog-entry">
+        <div class="changelog-date">4 September 2026</div>
+        <ul class="found-list">
+          <li>Google Login <b>Admin</b> &amp; <b>Showroom</b> disembunyikan sementara &mdash; keduanya tetap login lewat email/password; hanya Buyer yang memakai Google Login untuk saat ini.</li>
+          <li>DNS, nginx, dan sertifikat SSL untuk 3 subdomain baru (<code>showroom.</code>, <code>app.</code>, <code>marketing.carlynk.id</code>) sudah aktif &mdash; persiapan memisahkan dashboard tiap peran ke domainnya sendiri.</li>
+        </ul>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-date">31 Agustus 2026</div>
         <ul class="found-list">
@@ -360,7 +593,7 @@
       </div>
     </div>
 
-    <div class="found-section">
+    <div class="found-section" id="detail-migrasi-url">
       <h2>Migrasi URL tanpa tanda # &mdash; Fase 1&ndash;4, selesai semua (51)</h2>
       <div class="sub">Langkah lanjutan dari perbaikan performa di item 50. Dikerjakan bertahap, diverifikasi di production sebelum lanjut ke tahap berikutnya.</div>
       <p style="font-size:13px;line-height:1.7;color:var(--ink);margin:0 0 12px;">Client meminta URL yang lebih bersih dan mudah dibagikan. Arsitektur navigasi lama (berbasis tanda <code>#</code>) diganti dengan cara modern yang sama dipakai browser untuk website biasa (History API), sambil tetap mempertahankan kecepatan SPA &mdash; halaman tidak reload penuh setiap pindah menu.</p>
@@ -372,7 +605,7 @@
       <div class="sub" style="margin-top:12px;">Sudah dicek langsung di production: login tiap level user, tombol kembali/maju browser, reload di halaman dalam, logout, login lewat Google (pindah domain carlynk.id &rarr; admin.carlynk.id), klik menu sidebar dengan data lama, klik notifikasi, filter User Management yang tetap bertahan setelah reload/bookmark.</div>
     </div>
 
-    <div class="found-section">
+    <div class="found-section" id="detail-performa">
       <h2>Perbaikan performa: pemuatan halaman &lt;1 detik (50)</h2>
       <div class="sub">Ditemukan lewat pengukuran langsung di production, bukan dugaan.</div>
       <p style="font-size:13px;line-height:1.7;color:var(--ink);margin:0 0 12px;">Setiap kali ada yang login, aplikasi memverifikasi ulang &quot;kunci masuk otomatis&quot; (remember-me) memakai metode enkripsi yang sengaja dibuat lambat (bcrypt) untuk melindungi kata sandi manusia dari tebakan paksa. Masalahnya, verifikasi ini berjalan di <b>setiap pemanggilan data yang butuh login</b> &mdash; bukan cuma sekali saat buka halaman &mdash; sehingga setiap panggilan ikut kena jeda &plusmn;1,2 detik, dan beberapa panggilan bahkan menunggu bergantian, bukan bersamaan. Diganti dengan metode verifikasi yang tetap aman (kuncinya kode acak yang sudah mustahil ditebak, bukan kata sandi manusia) tapi jauh lebih cepat.</p>
@@ -388,7 +621,7 @@
       <div class="sub" style="margin-top:12px;">Catatan: semua orang yang sedang login otomatis diminta login ulang satu kali setelah perbaikan ini (efek samping mengganti metode kuncinya), setelah itu berjalan normal dengan kecepatan baru.</div>
     </div>
 
-    <section class="group">
+    <section class="group" id="detail-permintaan">
       <div class="group-head"><h2>Pendaftaran showroom publik</h2><span class="range">01&ndash;04</span></div>
       <table>
         <thead><tr><th>#</th><th>Perubahan</th><th class="c-link">Link</th></tr></thead>
