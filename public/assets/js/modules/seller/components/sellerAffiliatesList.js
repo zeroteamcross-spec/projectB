@@ -4,6 +4,7 @@ import { createIcon } from "../../../theme/iconRegistry.js";
 import { formatCurrency } from "../../../utils/formatCurrency.js";
 import { SellerAffiliateStatusBadge } from "./sellerAffiliateStatusBadge.js";
 import { sellerAffiliateService } from "../services/sellerAffiliateService.js";
+import { sellerState } from "../state/sellerState.js";
 
 export function SellerAffiliatesList({
   affiliates = [],
@@ -187,7 +188,7 @@ function landingBlock(affiliate, compact = false) {
   wrap.className = "grid min-w-0 gap-1";
   wrap.append(
     textNode("p", "break-words text-xs font-black text-gray-950", affiliate.referral_code || "-"),
-    textNode("p", `${compact ? "break-words" : "max-w-[260px] truncate"} text-[10px] font-semibold text-gray-500`, sellerAffiliateService.landingUrl(affiliate.referral_code) || "-"),
+    textNode("p", `${compact ? "break-words" : "max-w-[260px] truncate"} text-[10px] font-semibold text-gray-500`, sellerAffiliateService.landingUrl(affiliate.referral_code, sellerState.snapshot("showroom", null)?.slug ?? "") || "-"),
   );
   return wrap;
 }

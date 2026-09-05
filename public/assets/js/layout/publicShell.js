@@ -238,14 +238,39 @@ function showroomLogoUrl() {
   return String(affiliate?.showroom?.header_logo_url ?? "").trim();
 }
 
+// Kata yang sudah dipakai showroom sendiri persis satu segmen sesudah
+// slug-nya -- kalau segmen kedua path BUKAN salah satu ini, path itu rute
+// marketing-di-root ("/{showroom}/{marketingSlug}"), bukan rute showroom.
+const SHOWROOM_SUBPATH_WORDS = new Set(["cars", "transactions", "login"]);
+
 function showroomSlugFromPath(path) {
-  const cocok = String(path ?? "").match(/^\/(?:showrooms|s)\/([^/]+)/);
-  return cocok ? cocok[1] : bareShowroomSlugFromPath(path);
+  const value = String(path ?? "");
+  const legacy = value.match(/^\/(?:showrooms|s)\/([^/]+)/);
+  if (legacy) {
+    return legacy[1];
+  }
+
+  const bareMatch = value.match(/^\/([^/]+)(?:\/([^/]+))?/);
+  if (bareMatch && (!bareMatch[2] || SHOWROOM_SUBPATH_WORDS.has(bareMatch[2]))) {
+    return bareShowroomSlugFromPath(value);
+  }
+
+  return "";
 }
 
 function affiliateSlugFromPath(path) {
-  const cocok = String(path ?? "").match(/^\/(?:af|a)\/([^/]+)/);
-  return cocok ? cocok[1] : "";
+  const value = String(path ?? "");
+  const legacy = value.match(/^\/(?:af|a)\/([^/]+)/);
+  if (legacy) {
+    return legacy[1];
+  }
+
+  const bareMatch = value.match(/^\/([^/]+)\/([^/]+)/);
+  if (bareMatch && !RESERVED_ROOT_WORD_PATTERN.test(bareMatch[1]) && !SHOWROOM_SUBPATH_WORDS.has(bareMatch[2])) {
+    return bareMatch[2];
+  }
+
+  return "";
 }
 
 /**

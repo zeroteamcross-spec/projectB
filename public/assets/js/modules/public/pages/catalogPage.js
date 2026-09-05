@@ -247,7 +247,7 @@ function render(root, context, flags) {
           idPrefix: "pubcat",
           context: "public",
           onNavigate: (path) => context.router?.navigate(path),
-          resolveCtaUrl: (url) => isAffiliateRoute ? affiliateSliderCtaUrl(url, affiliateSlug) : isShowroomRoute ? showroomSliderCtaUrl(url, showroomSlug) : url,
+          resolveCtaUrl: (url) => isAffiliateRoute ? affiliateSliderCtaUrl(url, affiliateSlug, affiliate?.showroom?.slug ?? "") : isShowroomRoute ? showroomSliderCtaUrl(url, showroomSlug) : url,
           fallback: () => sliderSkeletonPlaceholder(),
         })
       : sliderSkeletonPlaceholder());
@@ -419,8 +419,10 @@ function resolvePublicSliders() {
   return publicSliderCache;
 }
 
-function affiliateSliderCtaUrl(url, affiliateSlug) {
-  const catalogUrl = `/af/${encodeURIComponent(affiliateSlug)}`;
+function affiliateSliderCtaUrl(url, affiliateSlug, showroomSlug = "") {
+  const catalogUrl = showroomSlug
+    ? `/${encodeURIComponent(showroomSlug)}/${encodeURIComponent(affiliateSlug)}`
+    : `/af/${encodeURIComponent(affiliateSlug)}`;
   const value = String(url || "").trim();
 
   if (!value) {
@@ -433,12 +435,8 @@ function affiliateSliderCtaUrl(url, affiliateSlug) {
     return catalogUrl;
   }
 
-  if (hashPath.startsWith("/cars/")) {
-    return `/af/${encodeURIComponent(affiliateSlug)}${hashPath}`;
-  }
-
-  if (hashPath.startsWith("/transactions/")) {
-    return `/af/${encodeURIComponent(affiliateSlug)}${hashPath}`;
+  if (hashPath.startsWith("/cars/") || hashPath.startsWith("/transactions/")) {
+    return `${catalogUrl}${hashPath}`;
   }
 
   if (hashPath.startsWith("/af/") || hashPath.startsWith("/a/")) {

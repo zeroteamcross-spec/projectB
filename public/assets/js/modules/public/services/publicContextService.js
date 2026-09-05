@@ -120,7 +120,7 @@ export const publicContextService = {
       if (activeAffiliate.showroom) {
         applyShowroomBranding({ id: activeAffiliate.showroom.id, showroom: activeAffiliate.showroom });
       }
-      persistLastViewedAffiliate(activeAffiliate.slug);
+      persistLastViewedAffiliate(activeAffiliate.slug, activeAffiliate.showroom?.slug ?? "");
       return activeAffiliate;
     }
 
@@ -150,7 +150,7 @@ export const publicContextService = {
     } else if (brandingShowroomId !== null) {
       revertShowroomBranding();
     }
-    persistLastViewedAffiliate(affiliate.slug);
+    persistLastViewedAffiliate(affiliate.slug, affiliate.showroom?.slug ?? "");
     return affiliate;
   },
 
@@ -244,27 +244,44 @@ export const publicContextService = {
     this.clear();
   },
 
+  // Rute marketing-di-root ("/{showroom}/{marketingSlug}") membawa DUA slug
+  // named-group sekaligus -- params.slug adalah showroom yang muncul di URL,
+  // params.marketingSlug yang sebenarnya jadi context aktif. Rute lama
+  // (/af/:slug, /a/:slug) cuma redirect sekarang (lihat routes.js), jadi
+  // param.slug tunggal itu praktis tidak pernah lagi sampai ke sini, tapi
+  // fallback-nya dibiarkan sebagai jaring pengaman.
   routeAffiliateSlug(context = {}) {
-    const slug = String(context.params?.slug ?? "").trim().toLowerCase();
-    if (!slug) {
+    const name = String(context.name ?? context.route?.name ?? "");
+    const isAffiliateRoute = name.includes("affiliate");
+
+    if (!isAffiliateRoute) {
       return "";
     }
 
-    const path = String(context.path ?? "");
-    const name = String(context.name ?? context.route?.name ?? "");
-    const isAffiliatePath = path.startsWith(`/af/${slug}`) || path.startsWith(`/a/${slug}`);
-    const isAffiliateRoute = name.includes("affiliate");
-    return isAffiliatePath || isAffiliateRoute ? slug : "";
+    const slug = String(context.params?.marketingSlug ?? context.params?.slug ?? "").trim().toLowerCase();
+    return slug;
   },
 
+  // Cocok dengan catatan di routeAffiliateSlug() -- rute marketing juga
+  // punya params.slug (showroom yang tertulis di URL-nya), tapi itu bukan
+  // showroom yang sedang "aktif" untuk halaman ini (yang aktif adalah
+  // affiliate-nya). Dikembalikan langsung di awal supaya tidak keliru
+  // menyalakan activeShowroom() sekaligus activeAffiliate() -- keduanya
+  // saling menghapus satu sama lain di publicContextState (lihat
+  // setShowroom()/setAffiliate()), jadi dobel-aktifkan ini akan mematikan
+  // context marketing yang baru saja dinyalakan.
   routeShowroomSlug(context = {}) {
+    const name = String(context.name ?? context.route?.name ?? "");
+    if (name.includes("affiliate")) {
+      return "";
+    }
+
     const slug = String(context.params?.slug ?? "").trim().toLowerCase();
     if (!slug) {
       return "";
     }
 
     const path = String(context.path ?? "");
-    const name = String(context.name ?? context.route?.name ?? "");
     const isShowroomPath = path.startsWith(`/showrooms/${slug}`) || path.startsWith(`/s/${slug}`)
       || path === `/${slug}` || path.startsWith(`/${slug}/`);
     const isShowroomRoute = name.includes("showroom");
@@ -328,7 +345,9 @@ export const publicContextService = {
   catalogPath() {
     const affiliate = this.activeAffiliate();
     if (affiliate?.slug) {
-      return `/af/${encodeURIComponent(affiliate.slug)}`;
+      return affiliate.showroom?.slug
+        ? `/${encodeURIComponent(affiliate.showroom.slug)}/${encodeURIComponent(affiliate.slug)}`
+        : `/af/${encodeURIComponent(affiliate.slug)}`;
     }
 
     const showroom = this.activeShowroom();
@@ -338,7 +357,9 @@ export const publicContextService = {
   carDetailPath(carId) {
     const affiliate = this.activeAffiliate();
     if (affiliate?.slug) {
-      return `/af/${encodeURIComponent(affiliate.slug)}/cars/${encodeURIComponent(carId)}`;
+      return affiliate.showroom?.slug
+        ? `/${encodeURIComponent(affiliate.showroom.slug)}/${encodeURIComponent(affiliate.slug)}/cars/${encodeURIComponent(carId)}`
+        : `/af/${encodeURIComponent(affiliate.slug)}/cars/${encodeURIComponent(carId)}`;
     }
 
     const showroom = this.activeShowroom();
@@ -352,7 +373,10 @@ export const publicContextService = {
   transactionEntryPath(carId) {
     const affiliate = this.activeAffiliate();
     if (affiliate?.slug) {
-      return `/af/${encodeURIComponent(affiliate.slug)}/transactions/new?car_id=${encodeURIComponent(carId)}`;
+      const base = affiliate.showroom?.slug
+        ? `/${encodeURIComponent(affiliate.showroom.slug)}/${encodeURIComponent(affiliate.slug)}`
+        : `/af/${encodeURIComponent(affiliate.slug)}`;
+      return `${base}/transactions/new?car_id=${encodeURIComponent(carId)}`;
     }
 
     const showroom = this.activeShowroom();

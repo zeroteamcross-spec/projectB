@@ -7,6 +7,7 @@ import { tw } from "../../../theme/tailwindClasses.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 import { SellerAffiliateStatusBadge } from "./sellerAffiliateStatusBadge.js";
 import { sellerAffiliateService } from "../services/sellerAffiliateService.js";
+import { sellerState } from "../state/sellerState.js";
 
 export function SellerAffiliateForm({
   affiliate = null,
@@ -96,7 +97,7 @@ export function SellerAffiliateForm({
   urlPreview.id = "slraf_affiliate_url_preview";
   urlPreview.className = `text-xs ${tw.text.muted}`;
   urlPreview.textContent = draft.referral_code
-    ? `Halaman Anda: ${sellerAffiliateService.landingUrl(draft.referral_code)}`
+    ? `Halaman Anda: ${sellerAffiliateService.landingUrl(draft.referral_code, sellerState.snapshot("showroom", null)?.slug ?? "")}`
     : "Halaman Anda akan tampil di sini setelah URL diisi.";
   referralCodeField.append(urlPreview);
 
@@ -219,7 +220,7 @@ export function SellerAffiliateForm({
     landing.className = `grid gap-3 ${tw.surface.inset}`;
     landing.append(
       textBlock("text-[10px] font-semibold text-gray-500", "Link landing marketing"),
-      textBlock("break-all text-xs font-medium text-gray-900", sellerAffiliateService.landingUrl(draft.referral_code)),
+      textBlock("break-all text-xs font-medium text-gray-900", sellerAffiliateService.landingUrl(draft.referral_code, sellerState.snapshot("showroom", null)?.slug ?? "")),
     );
 
     const landingActions = document.createElement("div");

@@ -223,13 +223,13 @@ export function SellerAffiliatesModalPage() {
       }
     },
     openLanding(affiliate) {
-      const url = sellerAffiliateService.landingUrl(affiliate?.referral_code ?? "");
+      const url = sellerAffiliateService.landingUrl(affiliate?.referral_code ?? "", sellerState.snapshot("showroom", null)?.slug ?? "");
       if (url) {
         window.open(url, "_blank", "noopener,noreferrer");
       }
     },
     async copyLanding(affiliate) {
-      const url = sellerAffiliateService.landingUrl(affiliate?.referral_code ?? "");
+      const url = sellerAffiliateService.landingUrl(affiliate?.referral_code ?? "", sellerState.snapshot("showroom", null)?.slug ?? "");
       if (!url) {
         showToast("Link landing marketing belum tersedia.", { type: "info" });
         return;
@@ -663,7 +663,7 @@ function affiliateDetailPanel({ affiliate }) {
   facts.className = "grid gap-3 sm:grid-cols-2";
   [
     ["Slug", affiliate.referral_code || "-"],
-    ["Link", sellerAffiliateService.landingUrl(affiliate.referral_code) || "-"],
+    ["Link", sellerAffiliateService.landingUrl(affiliate.referral_code, sellerState.snapshot("showroom", null)?.slug ?? "") || "-"],
     ["Showroom", affiliate.showroom?.name || "-"],
     ["Seller", affiliate.seller?.name || "-"],
     ["Dibuat", affiliate.created_at || "-"],

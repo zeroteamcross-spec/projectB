@@ -140,14 +140,14 @@ export function SellerAffiliatesPage() {
       rerender();
     },
     openLanding(affiliate) {
-      const url = sellerAffiliateService.landingUrl(affiliate?.referral_code ?? "");
+      const url = sellerAffiliateService.landingUrl(affiliate?.referral_code ?? "", sellerState.snapshot("showroom", null)?.slug ?? "");
       if (!url) {
         return;
       }
       window.open(url, "_blank", "noopener,noreferrer");
     },
     async copyLanding(affiliate) {
-      const url = sellerAffiliateService.landingUrl(affiliate?.referral_code ?? "");
+      const url = sellerAffiliateService.landingUrl(affiliate?.referral_code ?? "", sellerState.snapshot("showroom", null)?.slug ?? "");
       if (!url) {
         showToast("Link landing marketing belum tersedia.", { type: "info" });
         return;

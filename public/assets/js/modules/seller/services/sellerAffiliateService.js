@@ -96,13 +96,23 @@ export const sellerAffiliateService = {
     return affiliates.find((affiliate) => Number(affiliate.id) === targetId) ?? null;
   },
 
-  landingPath(slug = "") {
+  // showroomSlug kosong sengaja jatuh ke bentuk lama /af/{slug} -- tetap
+  // jalan (lewat redirect otomatis di routes.js), dipakai hanya kalau
+  // pemanggilnya belum sempat tahu slug showroom-nya sendiri.
+  landingPath(slug = "", showroomSlug = "") {
     const normalized = this.normalizeSlug(slug);
-    return normalized ? `/af/${encodeURIComponent(normalized)}` : "";
+    if (!normalized) {
+      return "";
+    }
+
+    const normalizedShowroom = String(showroomSlug ?? "").trim();
+    return normalizedShowroom
+      ? `/${encodeURIComponent(normalizedShowroom)}/${encodeURIComponent(normalized)}`
+      : `/af/${encodeURIComponent(normalized)}`;
   },
 
-  landingUrl(slug = "") {
-    const path = this.landingPath(slug);
+  landingUrl(slug = "", showroomSlug = "") {
+    const path = this.landingPath(slug, showroomSlug);
 
     if (!path) {
       return "";
@@ -115,8 +125,8 @@ export const sellerAffiliateService = {
   // ikut mengaktifkan context yang sama dengan landing (lihat
   // publicContextService.activateAffiliateBySlug()), jadi transaksi dari
   // link ini tetap teratribusi ke marketing yang sama seperti link katalog.
-  carLandingPath(slug = "", carId = "") {
-    const base = this.landingPath(slug);
+  carLandingPath(slug = "", carId = "", showroomSlug = "") {
+    const base = this.landingPath(slug, showroomSlug);
     const normalizedCarId = String(carId ?? "").trim();
 
     if (!base || !normalizedCarId) {
@@ -126,8 +136,8 @@ export const sellerAffiliateService = {
     return `${base}/cars/${encodeURIComponent(normalizedCarId)}`;
   },
 
-  carLandingUrl(slug = "", carId = "") {
-    const path = this.carLandingPath(slug, carId);
+  carLandingUrl(slug = "", carId = "", showroomSlug = "") {
+    const path = this.carLandingPath(slug, carId, showroomSlug);
 
     if (!path) {
       return "";

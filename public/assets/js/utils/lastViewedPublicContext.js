@@ -3,6 +3,7 @@ import { publicReservedRoutePrefixes } from "../core/publicReservedRouteWords.js
 const STORAGE_KEY = "projectB:public:last-viewed-context";
 const SLUG_PATTERN = /^[a-z0-9-]+$/;
 const RESERVED_ROOT_WORD_PATTERN = new RegExp(`^(?:${publicReservedRoutePrefixes.join("|")})$`);
+const SHOWROOM_SUBPATH_WORDS = new Set(["cars", "transactions", "login"]);
 
 /**
  * A visitor -- logged in or not -- can wander off a showroom's or a
@@ -17,25 +18,36 @@ const RESERVED_ROOT_WORD_PATTERN = new RegExp(`^(?:${publicReservedRoutePrefixes
  * a marketing link (or vice versa) should offer a way back to whichever one
  * was actually visited last, not two stale, independently-tracked slugs.
  */
-function persist(type, slug) {
-  const value = String(slug ?? "").trim().toLowerCase();
-  if (!value || !SLUG_PATTERN.test(value) || typeof window === "undefined") {
+function persist(path) {
+  if (!path || typeof window === "undefined") {
     return;
   }
 
   try {
-    window.localStorage?.setItem(STORAGE_KEY, JSON.stringify({ type, slug: value }));
+    window.localStorage?.setItem(STORAGE_KEY, JSON.stringify({ path }));
   } catch (error) {
     // Storage can be unavailable in private browsing or restricted contexts.
   }
 }
 
 export function persistLastViewedShowroom(slug) {
-  persist("showroom", slug);
+  const value = String(slug ?? "").trim().toLowerCase();
+  if (SLUG_PATTERN.test(value)) {
+    persist(`/${value}`);
+  }
 }
 
-export function persistLastViewedAffiliate(slug) {
-  persist("affiliate", slug);
+// showroomSlug kosong (affiliate tanpa showroom, seharusnya tidak pernah
+// terjadi tapi dijaga) jatuh ke bentuk lama /af/{slug} -- tetap jalan lewat
+// redirect otomatis di routes.js.
+export function persistLastViewedAffiliate(slug, showroomSlug = "") {
+  const value = String(slug ?? "").trim().toLowerCase();
+  if (!SLUG_PATTERN.test(value)) {
+    return;
+  }
+
+  const showroom = String(showroomSlug ?? "").trim().toLowerCase();
+  persist(showroom && SLUG_PATTERN.test(showroom) ? `/${showroom}/${value}` : `/af/${value}`);
 }
 
 export function getLastViewedPublicContextPath() {
@@ -50,20 +62,7 @@ export function getLastViewedPublicContextPath() {
     }
 
     const parsed = JSON.parse(raw);
-    const slug = String(parsed?.slug ?? "");
-    if (!SLUG_PATTERN.test(slug)) {
-      return "";
-    }
-
-    if (parsed?.type === "affiliate") {
-      return `/af/${slug}`;
-    }
-
-    if (parsed?.type === "showroom") {
-      return `/${slug}`;
-    }
-
-    return "";
+    return String(parsed?.path ?? "");
   } catch (error) {
     return "";
   }
@@ -95,11 +94,17 @@ export function publicContextPathFromRedirect(fromPath) {
     return `/af/${affiliateMatch[1]}`;
   }
 
-  // Showroom di bentuk baru tidak punya prefix -- satu-satunya penanda
-  // adalah segmen pertamanya BUKAN kata cadangan (rute sistem lain semua
-  // mendaftarkan diri sebagai kata cadangan, lihat publicReservedRoutePrefixes).
-  const bareMatch = path.match(/^\/([^/]+)/);
+  // Showroom dan marketing di bentuk baru tidak punya prefix -- satu-satunya
+  // penanda adalah segmen pertamanya BUKAN kata cadangan (rute sistem lain
+  // semua terdaftar di publicReservedRoutePrefixes). Segmen kedua ikut
+  // dipertahankan kalau ada dan bukan sub-path showroom sendiri
+  // ("cars"/"transactions"/"login") -- itu tandanya segmen kedua itu slug
+  // marketing, bukan bagian dari halaman showroom.
+  const bareMatch = path.match(/^\/([^/]+)(?:\/([^/]+))?/);
   if (bareMatch && !RESERVED_ROOT_WORD_PATTERN.test(bareMatch[1])) {
+    if (bareMatch[2] && !SHOWROOM_SUBPATH_WORDS.has(bareMatch[2])) {
+      return `/${bareMatch[1]}/${bareMatch[2]}`;
+    }
     return `/${bareMatch[1]}`;
   }
 

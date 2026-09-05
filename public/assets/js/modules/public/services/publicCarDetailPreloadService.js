@@ -154,27 +154,41 @@ function normalizeId(value) {
   return id || "";
 }
 
+// Dibaca dari params rute yang sudah dicocokkan (app.currentRoute.params),
+// bukan diterka ulang dari string path -- lebih tahan terhadap bentuk URL
+// yang berubah (dulu /af/:slug, sekarang /{showroom}/{marketingSlug}) karena
+// params selalu diisi Router dari named group yang benar-benar cocok,
+// terlepas dari pola URL-nya.
 function isCurrentAffiliateRoute(slug) {
   const route = appStore.get("app.currentRoute", null);
-  const path = String(route?.path ?? "");
   const normalizedSlug = String(slug ?? "").trim().toLowerCase();
 
   if (!normalizedSlug) {
     return true;
   }
 
-  return path.startsWith(`/af/${normalizedSlug}`) || path.startsWith(`/a/${normalizedSlug}`);
+  const name = String(route?.name ?? "");
+  if (!name.includes("affiliate")) {
+    return false;
+  }
+
+  const currentSlug = String(route?.params?.marketingSlug ?? route?.params?.slug ?? "").trim().toLowerCase();
+  return currentSlug === normalizedSlug;
 }
 
 function isCurrentShowroomRoute(slug) {
   const route = appStore.get("app.currentRoute", null);
-  const path = String(route?.path ?? "");
   const normalizedSlug = String(slug ?? "").trim().toLowerCase();
 
   if (!normalizedSlug) {
     return true;
   }
 
-  return path.startsWith(`/showrooms/${normalizedSlug}`) || path.startsWith(`/s/${normalizedSlug}`)
-    || path.startsWith(`/${normalizedSlug}`);
+  const name = String(route?.name ?? "");
+  if (name.includes("affiliate")) {
+    return false;
+  }
+
+  const currentSlug = String(route?.params?.slug ?? "").trim().toLowerCase();
+  return currentSlug === normalizedSlug;
 }

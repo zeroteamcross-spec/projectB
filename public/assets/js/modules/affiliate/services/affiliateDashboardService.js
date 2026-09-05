@@ -25,15 +25,15 @@ export const affiliateDashboardService = {
   },
 
   landingUrl(affiliate = null) {
-    return sellerAffiliateService.landingUrl(affiliate?.referral_code ?? "");
+    return sellerAffiliateService.landingUrl(affiliate?.referral_code ?? "", affiliate?.showroom?.slug ?? "");
   },
 
   landingPath(affiliate = null) {
-    return sellerAffiliateService.landingPath(affiliate?.referral_code ?? "");
+    return sellerAffiliateService.landingPath(affiliate?.referral_code ?? "", affiliate?.showroom?.slug ?? "");
   },
 
   carLandingUrl(affiliate = null, carId = "") {
-    return sellerAffiliateService.carLandingUrl(affiliate?.referral_code ?? "", carId);
+    return sellerAffiliateService.carLandingUrl(affiliate?.referral_code ?? "", carId, affiliate?.showroom?.slug ?? "");
   },
 
   summaryCards(affiliate = null) {

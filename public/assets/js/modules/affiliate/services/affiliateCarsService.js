@@ -17,7 +17,7 @@ export const affiliateCarsService = {
   },
 
   shareUrl(affiliate = null, carId = "") {
-    return sellerAffiliateService.carLandingUrl(affiliate?.referral_code ?? "", carId);
+    return sellerAffiliateService.carLandingUrl(affiliate?.referral_code ?? "", carId, affiliate?.showroom?.slug ?? "");
   },
 
   whatsappShareUrl(affiliate = null, car = null) {
