@@ -4,7 +4,7 @@
   "tests": "27 / 27 lolos",
   "archive_url": "laporan-verifikasi-arsip.html",
   "development": {
-    "count": 26,
+    "count": 27,
     "label": "fitur & pekerjaan baru minggu ini",
     "description": "Membangun sesuatu yang baru — fitur, halaman, alur, maupun infrastruktur.",
     "rows": [
@@ -33,7 +33,8 @@
       { "task": "Temukan akar masalah lambat", "detail": "Token remember-me diverifikasi ulang dengan metode lambat di setiap request berlogin.", "status": "done" },
       { "task": "Ganti metode verifikasi token", "detail": "Tetap aman, tapi jauh lebih cepat — tidak lagi memakai metode yang dirancang untuk kata sandi manusia.", "status": "done" },
       { "task": "Rapikan urutan muat awal aplikasi", "detail": "Pengambilan notifikasi tidak lagi memblokir tampilnya halaman pertama.", "status": "done" },
-      { "task": "Verifikasi ulang performa di production", "detail": "Bandingkan sebelum/sesudah: semua data dashboard dari 3+ detik menjadi <1 detik.", "status": "done" }
+      { "task": "Verifikasi ulang performa di production", "detail": "Bandingkan sebelum/sesudah: semua data dashboard dari 3+ detik menjadi <1 detik.", "status": "done" },
+      { "task": "Pindahkan URL marketing ke carlynk.id/{showroom}/{marketing}", "detail": "Link marketing tidak lagi butuh prefix /af/ — sekarang membawa nama showroom di URL-nya. Link lama tetap jalan lewat redirect otomatis (dicari dulu showroom-nya via API), sudah diverifikasi end-to-end (katalog, detail mobil, transaksi, klik tercatat) di production.", "status": "done" }
     ]
   },
   "maintenance": {
