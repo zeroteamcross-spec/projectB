@@ -4,7 +4,7 @@
   "tests": "27 / 27 lolos",
   "archive_url": "laporan-verifikasi-arsip.html",
   "development": {
-    "count": 21,
+    "count": 26,
     "label": "fitur & pekerjaan baru minggu ini",
     "description": "Membangun sesuatu yang baru — fitur, halaman, alur, maupun infrastruktur.",
     "rows": [
@@ -28,19 +28,19 @@
       { "task": "Aktifkan & uji subdomain Buyer", "detail": "app.carlynk.id resmi melayani dashboard Buyer — login, sesi, login Google (redirect URI cocok), dan reload halaman dalam sudah diverifikasi di production.", "status": "done" },
       { "task": "Pindahkan URL showroom ke root (carlynk.id/{nama showroom})", "detail": "Halaman showroom tidak lagi butuh prefix /s/ atau /showrooms/ — link lama tetap jalan lewat redirect otomatis ke bentuk baru, sudah diverifikasi di production.", "status": "done" },
       { "task": "Samakan desain tombol \"Kembali ke katalog\" di login showroom", "detail": "Diubah dari teks bergaris bawah menjadi tombol pil, desain & posisi disamakan dengan tombol \"Kembali ke landing page\" di halaman login peran lain.", "status": "done" },
-      { "task": "Tampilkan logo showroom di top nav buyer", "detail": "Ikon generik di top nav desktop (Home, Portofolio, Notifikasi, Profil) diganti logo showroom tempat buyer jadi pelanggan, kalau ada — diverifikasi di keempat halaman di production.", "status": "done" }
-    ]
-  },
-  "maintenance": {
-    "count": 8,
-    "label": "bug & perbaikan minggu ini",
-    "description": "Memperbaiki sesuatu yang sudah ada tapi bermasalah — bug dan performa.",
-    "rows": [
+      { "task": "Tampilkan logo showroom di top nav buyer", "detail": "Ikon generik di top nav desktop (Home, Portofolio, Notifikasi, Profil) diganti logo showroom tempat buyer jadi pelanggan, kalau ada — diverifikasi di keempat halaman di production.", "status": "done" },
       { "task": "Audit performa production", "detail": "Ukur waktu muat & respons API langsung di production, bukan dugaan.", "status": "done" },
       { "task": "Temukan akar masalah lambat", "detail": "Token remember-me diverifikasi ulang dengan metode lambat di setiap request berlogin.", "status": "done" },
       { "task": "Ganti metode verifikasi token", "detail": "Tetap aman, tapi jauh lebih cepat — tidak lagi memakai metode yang dirancang untuk kata sandi manusia.", "status": "done" },
       { "task": "Rapikan urutan muat awal aplikasi", "detail": "Pengambilan notifikasi tidak lagi memblokir tampilnya halaman pertama.", "status": "done" },
-      { "task": "Verifikasi ulang performa di production", "detail": "Bandingkan sebelum/sesudah: semua data dashboard dari 3+ detik menjadi <1 detik.", "status": "done" },
+      { "task": "Verifikasi ulang performa di production", "detail": "Bandingkan sebelum/sesudah: semua data dashboard dari 3+ detik menjadi <1 detik.", "status": "done" }
+    ]
+  },
+  "maintenance": {
+    "count": 3,
+    "label": "bug & perbaikan minggu ini",
+    "description": "Memperbaiki sesuatu yang sudah ada tapi bermasalah — bug dan performa.",
+    "rows": [
       { "task": "Perbaiki bug tombol Katalog salah arah", "detail": "Ditemukan setelah migrasi (top nav profil buyer): tombol Katalog sempat membawa ke halaman utama, bukan showroom buyer. Langsung diperbaiki.", "status": "done" },
       { "task": "Perbaiki tombol Kembali ke landing page salah host", "detail": "Ditemukan setelah subdomain aktif: dari halaman login showroom/app/marketing, tombol ini hanya pindah halaman di subdomain yang sama, bukan ke carlynk.id. Langsung diperbaiki & diverifikasi di production.", "status": "done" },
       { "task": "Perbaiki katalog showroom macet loading di URL baru", "detail": "Ditemukan saat verifikasi menyeluruh halaman showroom baru: context showroom sempat terhapus otomatis begitu diaktifkan, membuat daftar mobil tidak pernah tampil walau datanya sudah ada. Langsung diperbaiki & diverifikasi ulang end-to-end (katalog, detail mobil, transaksi) di production.", "status": "done" }
