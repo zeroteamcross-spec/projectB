@@ -4,7 +4,7 @@
   "tests": "27 / 27 lolos",
   "archive_url": "laporan-verifikasi-arsip.html",
   "development": {
-    "count": 20,
+    "count": 21,
     "label": "fitur & pekerjaan baru minggu ini",
     "description": "Membangun sesuatu yang baru — fitur, halaman, alur, maupun infrastruktur.",
     "rows": [
@@ -27,7 +27,8 @@
       { "task": "Aktifkan & uji subdomain Showroom", "detail": "showroom.carlynk.id resmi melayani dashboard Seller — login, sesi, link showroom publik yang tetap mengarah ke domain utama, dan reload halaman dalam sudah diverifikasi di production.", "status": "done" },
       { "task": "Aktifkan & uji subdomain Buyer", "detail": "app.carlynk.id resmi melayani dashboard Buyer — login, sesi, login Google (redirect URI cocok), dan reload halaman dalam sudah diverifikasi di production.", "status": "done" },
       { "task": "Pindahkan URL showroom ke root (carlynk.id/{nama showroom})", "detail": "Halaman showroom tidak lagi butuh prefix /s/ atau /showrooms/ — link lama tetap jalan lewat redirect otomatis ke bentuk baru, sudah diverifikasi di production.", "status": "done" },
-      { "task": "Samakan desain tombol \"Kembali ke katalog\" di login showroom", "detail": "Diubah dari teks bergaris bawah menjadi tombol pil, desain & posisi disamakan dengan tombol \"Kembali ke landing page\" di halaman login peran lain.", "status": "done" }
+      { "task": "Samakan desain tombol \"Kembali ke katalog\" di login showroom", "detail": "Diubah dari teks bergaris bawah menjadi tombol pil, desain & posisi disamakan dengan tombol \"Kembali ke landing page\" di halaman login peran lain.", "status": "done" },
+      { "task": "Tampilkan logo showroom di top nav buyer", "detail": "Ikon generik di top nav desktop (Home, Portofolio, Notifikasi, Profil) diganti logo showroom tempat buyer jadi pelanggan, kalau ada — diverifikasi di keempat halaman di production.", "status": "done" }
     ]
   },
   "maintenance": {
