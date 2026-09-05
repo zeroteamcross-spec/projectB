@@ -30,7 +30,7 @@
     ]
   },
   "maintenance": {
-    "count": 7,
+    "count": 8,
     "label": "bug & perbaikan minggu ini",
     "description": "Memperbaiki sesuatu yang sudah ada tapi bermasalah — bug dan performa.",
     "rows": [
@@ -40,7 +40,8 @@
       { "task": "Rapikan urutan muat awal aplikasi", "detail": "Pengambilan notifikasi tidak lagi memblokir tampilnya halaman pertama.", "status": "done" },
       { "task": "Verifikasi ulang performa di production", "detail": "Bandingkan sebelum/sesudah: semua data dashboard dari 3+ detik menjadi <1 detik.", "status": "done" },
       { "task": "Perbaiki bug tombol Katalog salah arah", "detail": "Ditemukan setelah migrasi (top nav profil buyer): tombol Katalog sempat membawa ke halaman utama, bukan showroom buyer. Langsung diperbaiki.", "status": "done" },
-      { "task": "Perbaiki tombol Kembali ke landing page salah host", "detail": "Ditemukan setelah subdomain aktif: dari halaman login showroom/app/marketing, tombol ini hanya pindah halaman di subdomain yang sama, bukan ke carlynk.id. Langsung diperbaiki & diverifikasi di production.", "status": "done" }
+      { "task": "Perbaiki tombol Kembali ke landing page salah host", "detail": "Ditemukan setelah subdomain aktif: dari halaman login showroom/app/marketing, tombol ini hanya pindah halaman di subdomain yang sama, bukan ke carlynk.id. Langsung diperbaiki & diverifikasi di production.", "status": "done" },
+      { "task": "Perbaiki katalog showroom macet loading di URL baru", "detail": "Ditemukan saat verifikasi menyeluruh halaman showroom baru: context showroom sempat terhapus otomatis begitu diaktifkan, membuat daftar mobil tidak pernah tampil walau datanya sudah ada. Langsung diperbaiki & diverifikasi ulang end-to-end (katalog, detail mobil, transaksi) di production.", "status": "done" }
     ]
   }
 }
