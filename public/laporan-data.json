@@ -4,7 +4,7 @@
   "tests": "27 / 27 lolos",
   "archive_url": "laporan-verifikasi-arsip.html",
   "development": {
-    "count": 18,
+    "count": 19,
     "label": "fitur & pekerjaan baru minggu ini",
     "description": "Membangun sesuatu yang baru — fitur, halaman, alur, maupun infrastruktur.",
     "rows": [
@@ -25,7 +25,8 @@
       { "task": "Penyesuaian kode routing lintas-subdomain", "detail": "Generalisasi logika penjaga domain supaya berlaku untuk semua subdomain baru, tidak hanya admin. Sekalian ditemukan & diperbaiki: halaman publik (katalog, detail mobil) sempat berisiko ikut terdorong ke subdomain buyer begitu diaktifkan.", "status": "done" },
       { "task": "Aktifkan & uji subdomain Marketing", "detail": "marketing.carlynk.id resmi melayani dashboard Marketing — login, sesi, link landing yang tetap mengarah ke domain utama, dan reload halaman dalam sudah diverifikasi di production.", "status": "done" },
       { "task": "Aktifkan & uji subdomain Showroom", "detail": "showroom.carlynk.id resmi melayani dashboard Seller — login, sesi, link showroom publik yang tetap mengarah ke domain utama, dan reload halaman dalam sudah diverifikasi di production.", "status": "done" },
-      { "task": "Aktifkan & uji subdomain Buyer", "detail": "app.carlynk.id resmi melayani dashboard Buyer — login, sesi, login Google (redirect URI cocok), dan reload halaman dalam sudah diverifikasi di production.", "status": "done" }
+      { "task": "Aktifkan & uji subdomain Buyer", "detail": "app.carlynk.id resmi melayani dashboard Buyer — login, sesi, login Google (redirect URI cocok), dan reload halaman dalam sudah diverifikasi di production.", "status": "done" },
+      { "task": "Pindahkan URL showroom ke root (carlynk.id/{nama showroom})", "detail": "Halaman showroom tidak lagi butuh prefix /s/ atau /showrooms/ — link lama tetap jalan lewat redirect otomatis ke bentuk baru, sudah diverifikasi di production.", "status": "done" }
     ]
   },
   "maintenance": {
