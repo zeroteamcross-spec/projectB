@@ -5,6 +5,7 @@ import { createBackgroundVideoLayer } from "../../../ui/composites/backgroundVid
 import { showToast } from "../../../ui/primitives/toast.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 import { roleSpecificLoginService } from "../services/roleSpecificLoginService.js";
+import { hostForRole, currentHost } from "../../../core/roleHosts.js";
 
 const AUTH_FALLBACK = "bg-[radial-gradient(circle_at_12%_10%,color-mix(in_srgb,var(--pb-brand-primary)_18%,transparent),transparent_32%),radial-gradient(circle_at_88%_18%,color-mix(in_srgb,var(--pb-brand-accent)_16%,transparent),transparent_30%),linear-gradient(135deg,#faf4ed,#f8fafc_44%,#eaf4f9)]";
 
@@ -81,11 +82,24 @@ function render(root, context, config, state, getBackgroundVideoLayer) {
   runEntranceAnimation(frame);
 }
 
+// Host peran (showroom/app/marketing/admin) tidak melayani halaman landing
+// publik ("/") -- domainRouteGuard akan melempar path itu balik ke halaman
+// dashboard/login perannya sendiri begitu di-render, bukan ke landing yang
+// sebenarnya. Jadi dari host peran, tombol ini harus benar-benar pindah host
+// ke domain utama, bukan sekadar router.navigate("/") yang cuma pushState di
+// host yang sama.
 function backToLandingButton(router) {
   const button = Button({
     label: "Kembali ke landing page",
     variant: "secondary",
-    onClick: () => router.navigate("/"),
+    onClick: () => {
+      const defaultHost = hostForRole("default");
+      if (defaultHost && defaultHost !== currentHost()) {
+        window.location.href = `${window.location.protocol}//${defaultHost}/`;
+        return;
+      }
+      router.navigate("/");
+    },
   });
   button.id = "role_login_back_landing_button";
   button.classList.add("justify-self-start", "rounded-full", "bg-green/75", "px-4", "shadow-sm", "backdrop-blur", "transition", "duration-200", "hover:-translate-y-0.5");
