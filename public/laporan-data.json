@@ -4,7 +4,7 @@
   "tests": "27 / 27 lolos",
   "archive_url": "laporan-verifikasi-arsip.html",
   "development": {
-    "count": 16,
+    "count": 18,
     "label": "fitur & pekerjaan baru minggu ini",
     "description": "Membangun sesuatu yang baru — fitur, halaman, alur, maupun infrastruktur.",
     "rows": [
@@ -21,9 +21,11 @@
       { "task": "Nonaktifkan sementara Google Login Admin & Showroom", "detail": "Persiapan subdomain — untuk saat ini hanya Buyer yang memakai Google Login, Admin/Showroom tetap email & password.", "status": "done" },
       { "task": "Setup DNS & nginx 3 subdomain baru", "detail": "showroom.carlynk.id, app.carlynk.id, marketing.carlynk.id sudah resolve dan terhubung ke server.", "status": "done" },
       { "task": "Perluas sertifikat SSL", "detail": "Satu sertifikat mencakup carlynk.id, admin, showroom, app, dan marketing sekaligus.", "status": "done" },
-      { "task": "Daftarkan redirect URI Google OAuth", "detail": "Menambahkan URI callback subdomain showroom & app ke Google Cloud Console.", "status": "progress" },
+      { "task": "Daftarkan redirect URI Google OAuth", "detail": "URI callback subdomain showroom & app sudah ditambahkan ke Google Cloud Console, siap dipakai begitu subdomain itu diaktifkan.", "status": "done" },
       { "task": "Penyesuaian kode routing lintas-subdomain", "detail": "Generalisasi logika penjaga domain supaya berlaku untuk semua subdomain baru, tidak hanya admin. Sekalian ditemukan & diperbaiki: halaman publik (katalog, detail mobil) sempat berisiko ikut terdorong ke subdomain buyer begitu diaktifkan.", "status": "done" },
-      { "task": "Uji coba bertahap per peran", "detail": "Aktifkan satu peran dulu, verifikasi penuh, baru lanjut ke peran berikutnya.", "status": "planned" }
+      { "task": "Aktifkan & uji subdomain Marketing", "detail": "marketing.carlynk.id resmi melayani dashboard Marketing — login, sesi, link landing yang tetap mengarah ke domain utama, dan reload halaman dalam sudah diverifikasi di production.", "status": "done" },
+      { "task": "Aktifkan & uji subdomain Showroom", "detail": "showroom.carlynk.id untuk dashboard Seller, termasuk login Google.", "status": "planned" },
+      { "task": "Aktifkan & uji subdomain Buyer", "detail": "app.carlynk.id untuk dashboard Buyer, termasuk login Google.", "status": "planned" }
     ]
   },
   "maintenance": {
