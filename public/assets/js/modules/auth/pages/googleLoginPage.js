@@ -126,7 +126,12 @@ function render(root, context, config, state, getBackgroundVideoLayer = null, op
 function renderGlassLogin(root, context, config, state, getBackgroundVideoLayer, options = {}) {
   const frame = document.createElement("section");
   frame.id = `google_login_${config.slug}_panel`;
-  frame.className = "relative z-10 mx-auto grid min-h-screen w-full max-w-[400px] content-center overflow-hidden px-5 py-5 text-center sm:px-6 lg:mx-0 lg:ml-auto lg:mr-[8vw] lg:max-w-[420px]";
+  frame.className = "relative z-10 mx-auto grid min-h-screen w-full max-w-[400px] content-center gap-4 overflow-hidden px-5 py-5 text-center sm:px-6 lg:mx-0 lg:ml-auto lg:mr-[8vw] lg:max-w-[420px]";
+
+  const topButton = footerLinkButton(context, options.footerLink);
+  if (topButton) {
+    frame.append(topButton);
+  }
 
   const topWave = document.createElement("span");
   topWave.className = "hidden pointer-events-none absolute -left-20 top-28 h-44 w-[calc(100%+10rem)] rounded-[50%] bg-white/70 blur-sm";
@@ -240,9 +245,13 @@ function glassLoginActionContent(root, context, config, state, options = {}) {
 /**
  * Secondary way out, e.g. "Kembali ke katalog" for a showroom-scoped login.
  * Absent by default so the four existing role login pages render unchanged.
+ *
+ * A footerLink with variant "button" is rendered by footerLinkButton() above
+ * the card instead (see renderGlassLogin) -- skipped here so it doesn't show
+ * twice.
  */
 function appendFooterLink(actionWrap, context, options) {
-  if (!options.footerLink?.path) {
+  if (!options.footerLink?.path || options.footerLink.variant === "button") {
     return;
   }
 
@@ -253,6 +262,29 @@ function appendFooterLink(actionWrap, context, options) {
   link.textContent = options.footerLink.label || "Kembali";
   link.addEventListener("click", () => context.router.navigate(options.footerLink.path));
   actionWrap.append(link);
+}
+
+/**
+ * Same design & position as "Kembali ke landing page" on
+ * roleSpecificLoginPage.js -- a pill button sitting above the card, aligned
+ * to its left edge, visible in every state (loading/error/form). Only used
+ * where footerLink.variant is explicitly "button" (the showroom-scoped
+ * buyer login, see public.showroom.buyer-login in modules/public/routes.js);
+ * every other caller keeps the plain text link via appendFooterLink() above.
+ */
+function footerLinkButton(context, footerLink) {
+  if (!footerLink?.path || footerLink.variant !== "button") {
+    return null;
+  }
+
+  const button = Button({
+    label: footerLink.label || "Kembali",
+    variant: "secondary",
+    onClick: () => context.router.navigate(footerLink.path),
+  });
+  button.id = "google_login_footer_button";
+  button.classList.add("justify-self-start", "rounded-full", "bg-green/75", "px-4", "shadow-sm", "backdrop-blur", "transition", "duration-200", "hover:-translate-y-0.5");
+  return button;
 }
 
 function googleGlyph() {

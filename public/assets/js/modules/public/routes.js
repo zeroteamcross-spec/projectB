@@ -115,7 +115,7 @@ export const publicRoutes = [
       next: `/${encodeURIComponent(context.params.slug)}`,
       showroomSlug: context.params.slug,
       subtitle: "Masuk untuk melanjutkan ke katalog showroom ini.",
-      footerLink: { label: "Kembali ke katalog", path: `/${encodeURIComponent(context.params.slug)}` },
+      footerLink: { label: "Kembali ke katalog", path: `/${encodeURIComponent(context.params.slug)}`, variant: "button" },
     }),
     workingStateKey: null,
   },
