@@ -254,7 +254,8 @@ export const publicContextService = {
 
     const path = String(context.path ?? "");
     const name = String(context.name ?? context.route?.name ?? "");
-    const isShowroomPath = path.startsWith(`/showrooms/${slug}`) || path.startsWith(`/s/${slug}`);
+    const isShowroomPath = path.startsWith(`/showrooms/${slug}`) || path.startsWith(`/s/${slug}`)
+      || path === `/${slug}` || path.startsWith(`/${slug}/`);
     const isShowroomRoute = name.includes("showroom");
     return isShowroomPath || isShowroomRoute ? slug : "";
   },
@@ -320,7 +321,7 @@ export const publicContextService = {
     }
 
     const showroom = this.activeShowroom();
-    return showroom?.slug ? `/showrooms/${encodeURIComponent(showroom.slug)}` : "/";
+    return showroom?.slug ? `/${encodeURIComponent(showroom.slug)}` : "/";
   },
 
   carDetailPath(carId) {
@@ -331,7 +332,7 @@ export const publicContextService = {
 
     const showroom = this.activeShowroom();
     if (showroom?.slug) {
-      return `/showrooms/${encodeURIComponent(showroom.slug)}/cars/${encodeURIComponent(carId)}`;
+      return `/${encodeURIComponent(showroom.slug)}/cars/${encodeURIComponent(carId)}`;
     }
 
     return `/cars/${encodeURIComponent(carId)}`;
@@ -345,7 +346,7 @@ export const publicContextService = {
 
     const showroom = this.activeShowroom();
     if (showroom?.slug) {
-      return `/showrooms/${encodeURIComponent(showroom.slug)}/transactions/new?car_id=${encodeURIComponent(carId)}`;
+      return `/${encodeURIComponent(showroom.slug)}/transactions/new?car_id=${encodeURIComponent(carId)}`;
     }
 
     return `/transactions/new?car_id=${encodeURIComponent(carId)}`;

@@ -11,6 +11,21 @@ use App\Modules\Showrooms\Repositories\ShowroomRepository;
 
 class ShowroomService
 {
+    /**
+     * Kata yang tidak boleh jadi slug showroom karena URL-nya kini langsung
+     * di root ("carlynk.id/{slug}") -- bertabrakan dengan rute sistem yang
+     * juga hidup di root (dashboard peran, auth, path API, dst). Daftar ini
+     * harus sejalan dengan RESERVED_ROOT_SLUGS di
+     * public/assets/js/modules/public/routes.js.
+     */
+    private const RESERVED_SLUGS = [
+        'admin', 'super-admin', 'seller', 'buyer', 'affiliate',
+        'login', 'google-login', 'auth', 'api', 'cars', 'transactions',
+        'profile', 'notifications', 'public', 'showrooms', 'af', 'a', 's',
+        'daftar-showroom', 'saas-landing', 'contoh-katalog', 'health',
+        'uploads', 'assets', 'tester', 'app',
+    ];
+
     private ShowroomRepository $showrooms;
 
     public function __construct(ShowroomRepository $showrooms)
@@ -155,7 +170,12 @@ class ShowroomService
         }
 
         for ($attempt = 0; $attempt < 20; $attempt++) {
-            $suffix = $attempt === 0 ? '' : '-' . strtolower(bin2hex(random_bytes(2)));
+            // Kata cadangan diperlakukan sama seperti tabrakan slug lain --
+            // langsung dapat suffix acak di percobaan pertama juga, bukan
+            // cuma saat sudah dipakai showroom lain.
+            $suffix = ($attempt === 0 && ! in_array($base, self::RESERVED_SLUGS, true))
+                ? ''
+                : '-' . strtolower(bin2hex(random_bytes(2)));
             $slug = substr($base, 0, 60 - strlen($suffix)) . $suffix;
 
             if (! $this->showrooms->slugExists($slug, $ignoreShowroomId)) {

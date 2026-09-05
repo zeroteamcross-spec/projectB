@@ -1,5 +1,8 @@
+import { publicReservedRoutePrefixes } from "../core/publicReservedRouteWords.js";
+
 const STORAGE_KEY = "projectB:public:last-viewed-context";
 const SLUG_PATTERN = /^[a-z0-9-]+$/;
+const RESERVED_ROOT_WORD_PATTERN = new RegExp(`^(?:${publicReservedRoutePrefixes.join("|")})$`);
 
 /**
  * A visitor -- logged in or not -- can wander off a showroom's or a
@@ -57,7 +60,7 @@ export function getLastViewedPublicContextPath() {
     }
 
     if (parsed?.type === "showroom") {
-      return `/s/${slug}`;
+      return `/${slug}`;
     }
 
     return "";
@@ -84,12 +87,20 @@ export function publicContextPathFromRedirect(fromPath) {
 
   const showroomMatch = path.match(/^\/(?:showrooms|s)\/([^/]+)/);
   if (showroomMatch) {
-    return `/s/${showroomMatch[1]}`;
+    return `/${showroomMatch[1]}`;
   }
 
   const affiliateMatch = path.match(/^\/(?:af|a)\/([^/]+)/);
   if (affiliateMatch) {
     return `/af/${affiliateMatch[1]}`;
+  }
+
+  // Showroom di bentuk baru tidak punya prefix -- satu-satunya penanda
+  // adalah segmen pertamanya BUKAN kata cadangan (rute sistem lain semua
+  // mendaftarkan diri sebagai kata cadangan, lihat publicReservedRoutePrefixes).
+  const bareMatch = path.match(/^\/([^/]+)/);
+  if (bareMatch && !RESERVED_ROOT_WORD_PATTERN.test(bareMatch[1])) {
+    return `/${bareMatch[1]}`;
   }
 
   return "";

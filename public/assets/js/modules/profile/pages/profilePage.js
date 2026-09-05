@@ -894,21 +894,21 @@ function logoutRedirectPath(role) {
     // catalog page happens to be open right now.
     const homeSlug = authStore.user()?.home_showroom_slug;
     if (homeSlug) {
-      return `/s/${encodeURIComponent(homeSlug)}`;
+      return `/${encodeURIComponent(homeSlug)}`;
     }
 
     // Falls back to the in-session catalog context for buyers who never
     // logged in through a showroom link (e.g. a password account predating
     // this feature, or a generic Google login) but are browsing one now.
     const activeSlug = publicContextService.activeShowroom()?.slug;
-    return activeSlug ? `/s/${encodeURIComponent(activeSlug)}` : "/";
+    return activeSlug ? `/${encodeURIComponent(activeSlug)}` : "/";
   }
 
   if (role === "affiliate_admin") {
     // Preloaded at boot for every affiliate_admin session (preloadPlans.js),
     // so this is already in the store by the time Logout is reachable.
     const slug = appStore.get("snapshot.affiliate_admin.affiliateProfile.data.showroom.slug", null);
-    return slug ? `/s/${encodeURIComponent(slug)}` : "/";
+    return slug ? `/${encodeURIComponent(slug)}` : "/";
   }
 
   return "/";

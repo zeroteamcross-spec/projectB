@@ -10,20 +10,42 @@ import { publicCatalogService } from "./services/publicCatalogService.js";
 import { publicCarDetailPreloadService } from "./services/publicCarDetailPreloadService.js";
 import { slidersResource } from "../../resources/slidersResource.js";
 import { adminMasterService } from "../admin/services/adminMasterService.js";
+import { publicReservedRoutePrefixes } from "../../core/publicReservedRouteWords.js";
 
-export const publicReservedRoutePrefixes = Object.freeze([
-  "af",
-  "auth",
-  "cars",
-  "google-login",
-  "showrooms",
-  "transactions",
-]);
+export { publicReservedRoutePrefixes };
+
+/**
+ * Pola regex untuk rute showroom di root: segmen pertama path yang BUKAN
+ * salah satu kata di publicReservedRoutePrefixes. Named group-nya persis
+ * seperti yang dihasilkan Router.compile() untuk ":nama" biasa, supaya
+ * page/preload di bawah bisa membaca context.params tanpa tahu bedanya.
+ */
+const ROOT_SLUG_EXCLUSION = `(?!(?:${publicReservedRoutePrefixes.join("|")})(?:/|$))`;
+
+function compileRootSlugPattern(tail = "") {
+  return new RegExp(`^/${ROOT_SLUG_EXCLUSION}(?<slug>[^/]+)${tail}$`);
+}
+
+/**
+ * Dulu tiap redirect legacy ini adalah halaman sungguhan (PublicCatalogPage
+ * dkk dirender langsung di /showrooms/:slug atau /s/:slug). Sekarang alamat
+ * kanoniknya pindah ke root ("carlynk.id/{slug}") -- link lama yang sudah
+ * terlanjur dibagikan (WhatsApp, bookmark) tetap harus jalan, jadi keduanya
+ * dibiarkan hidup tapi cuma sebagai pengalih ke bentuk barunya. Reload penuh
+ * (bukan navigasi SPA) sengaja dipakai di sini -- ini jalur lama yang jarang
+ * dipakai, jadi kesederhanaan lebih penting daripada menghindari satu kali
+ * reload tambahan.
+ */
+function redirectToPath(path) {
+  window.location.replace(path);
+  return document.createElement("div");
+}
 
 export const publicRoutes = [
   {
     name: "public.showroom.catalog",
-    path: "/showrooms/:slug",
+    path: "/:slug",
+    pattern: compileRootSlugPattern(),
     shell: "public",
     page: PublicCatalogPage,
     workingStateKey: "publicCatalog",
@@ -46,7 +68,8 @@ export const publicRoutes = [
   },
   {
     name: "public.showroom.car-detail",
-    path: "/showrooms/:slug/cars/:id",
+    path: "/:slug/cars/:id",
+    pattern: compileRootSlugPattern("/cars/(?<id>[^/]+)"),
     shell: "public",
     page: PublicCarDetailPage,
     workingStateKey: "publicCarDetail",
@@ -61,62 +84,8 @@ export const publicRoutes = [
   },
   {
     name: "public.showroom.transaction-entry",
-    path: "/showrooms/:slug/transactions/new",
-    shell: "public",
-    page: TransactionEntryPage,
-    workingStateKey: "transactionEntry",
-    preload: {
-      working: [
-        {
-          key: "detail",
-          loader: ({ params, query, signal }) => query.car_id
-            ? publicCarDetailPreloadService.detailOrFetch(query.car_id, { signal, showroomSlug: params.slug }).catch(() => null)
-            : Promise.resolve(null),
-        },
-      ],
-    },
-  },
-  {
-    name: "public.showroom-legacy.catalog",
-    path: "/s/:slug",
-    shell: "public",
-    page: PublicCatalogPage,
-    workingStateKey: "publicCatalog",
-    preload: {
-      working: [
-        {
-          key: "catalog",
-          loader: ({ params, signal }) => publicCatalogService.list({ page: 1, limit: 12, showroomSlug: params.slug }, { signal }),
-        },
-        {
-          key: "masterLocation",
-          loader: ({ signal }) => adminMasterService.getLocationMaster({ signal }).catch(() => adminMasterService.normalizeLocationMaster(null)),
-        },
-        {
-          key: "sliders",
-          loader: ({ signal }) => loadPublicLandingSliders(signal),
-        },
-      ],
-    },
-  },
-  {
-    name: "public.showroom-legacy.car-detail",
-    path: "/s/:slug/cars/:id",
-    shell: "public",
-    page: PublicCarDetailPage,
-    workingStateKey: "publicCarDetail",
-    preload: {
-      working: [
-        {
-          key: "detail",
-          loader: ({ params, signal }) => publicCarDetailPreloadService.detailOrFetch(params.id, { signal, showroomSlug: params.slug }).catch(() => null),
-        },
-      ],
-    },
-  },
-  {
-    name: "public.showroom-legacy.transaction-entry",
-    path: "/s/:slug/transactions/new",
+    path: "/:slug/transactions/new",
+    pattern: compileRootSlugPattern("/transactions/new"),
     shell: "public",
     page: TransactionEntryPage,
     workingStateKey: "transactionEntry",
@@ -133,20 +102,78 @@ export const publicRoutes = [
   },
   {
     // Buyer-only Google login scoped to one showroom, e.g. the "Masuk" link
-    // on a catalog page a buyer reached via /s/<slug>. Login always returns
-    // here, to this same showroom, instead of the generic buyer home — and
-    // records it as the showroom this buyer belongs to, so a later logout
-    // (from any session) returns them here too.
-    name: "public.showroom-legacy.buyer-login",
-    path: "/s/:slug/login",
+    // on a catalog page a buyer reached via carlynk.id/<slug>. Login always
+    // returns here, to this same showroom, instead of the generic buyer home
+    // — and records it as the showroom this buyer belongs to, so a later
+    // logout (from any session) returns them here too.
+    name: "public.showroom.buyer-login",
+    path: "/:slug/login",
+    pattern: compileRootSlugPattern("/login"),
     shell: "public",
     page: (context) => GoogleLoginPage({
       roleSlug: "buyer",
-      next: `/s/${encodeURIComponent(context.params.slug)}`,
+      next: `/${encodeURIComponent(context.params.slug)}`,
       showroomSlug: context.params.slug,
       subtitle: "Masuk untuk melanjutkan ke katalog showroom ini.",
-      footerLink: { label: "Kembali ke katalog", path: `/s/${encodeURIComponent(context.params.slug)}` },
+      footerLink: { label: "Kembali ke katalog", path: `/${encodeURIComponent(context.params.slug)}` },
     }),
+    workingStateKey: null,
+  },
+  {
+    name: "public.showroom-legacy-showrooms.catalog",
+    path: "/showrooms/:slug",
+    shell: "public",
+    page: (context) => redirectToPath(`/${encodeURIComponent(context.params.slug)}`),
+    workingStateKey: null,
+  },
+  {
+    name: "public.showroom-legacy-showrooms.car-detail",
+    path: "/showrooms/:slug/cars/:id",
+    shell: "public",
+    page: (context) => redirectToPath(`/${encodeURIComponent(context.params.slug)}/cars/${encodeURIComponent(context.params.id)}`),
+    workingStateKey: null,
+  },
+  {
+    name: "public.showroom-legacy-showrooms.transaction-entry",
+    path: "/showrooms/:slug/transactions/new",
+    shell: "public",
+    page: (context) => redirectToPath(
+      context.query?.car_id
+        ? `/${encodeURIComponent(context.params.slug)}/transactions/new?car_id=${encodeURIComponent(context.query.car_id)}`
+        : `/${encodeURIComponent(context.params.slug)}/transactions/new`
+    ),
+    workingStateKey: null,
+  },
+  {
+    name: "public.showroom-legacy-s.catalog",
+    path: "/s/:slug",
+    shell: "public",
+    page: (context) => redirectToPath(`/${encodeURIComponent(context.params.slug)}`),
+    workingStateKey: null,
+  },
+  {
+    name: "public.showroom-legacy-s.car-detail",
+    path: "/s/:slug/cars/:id",
+    shell: "public",
+    page: (context) => redirectToPath(`/${encodeURIComponent(context.params.slug)}/cars/${encodeURIComponent(context.params.id)}`),
+    workingStateKey: null,
+  },
+  {
+    name: "public.showroom-legacy-s.transaction-entry",
+    path: "/s/:slug/transactions/new",
+    shell: "public",
+    page: (context) => redirectToPath(
+      context.query?.car_id
+        ? `/${encodeURIComponent(context.params.slug)}/transactions/new?car_id=${encodeURIComponent(context.query.car_id)}`
+        : `/${encodeURIComponent(context.params.slug)}/transactions/new`
+    ),
+    workingStateKey: null,
+  },
+  {
+    name: "public.showroom-legacy-s.buyer-login",
+    path: "/s/:slug/login",
+    shell: "public",
+    page: (context) => redirectToPath(`/${encodeURIComponent(context.params.slug)}/login`),
     workingStateKey: null,
   },
   {

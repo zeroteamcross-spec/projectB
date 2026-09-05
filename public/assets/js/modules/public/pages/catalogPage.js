@@ -449,7 +449,7 @@ function affiliateSliderCtaUrl(url, affiliateSlug) {
 }
 
 function showroomSliderCtaUrl(url, showroomSlug) {
-  const catalogUrl = `/showrooms/${encodeURIComponent(showroomSlug)}`;
+  const catalogUrl = `/${encodeURIComponent(showroomSlug)}`;
   const value = String(url || "").trim();
 
   if (!value) {
@@ -463,7 +463,7 @@ function showroomSliderCtaUrl(url, showroomSlug) {
   }
 
   if (hashPath.startsWith("/cars/") || hashPath.startsWith("/transactions/")) {
-    return `/showrooms/${encodeURIComponent(showroomSlug)}${hashPath}`;
+    return `/${encodeURIComponent(showroomSlug)}${hashPath}`;
   }
 
   if (hashPath.startsWith("/showrooms/") || hashPath.startsWith("/s/")) {

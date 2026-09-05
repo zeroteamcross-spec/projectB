@@ -132,7 +132,7 @@ function showroomPublicUrl(showroom = {}) {
   const host = hostForRole("default") || window.location.host;
   const origin = `${window.location.protocol}//${host}`;
 
-  // Alias pendek, sama dengan yang dijanjikan landing page dan panel sukses
-  // pendaftaran. Menuju halaman yang sama dengan /showrooms/<slug>.
-  return `${origin}/s/${encodeURIComponent(slug)}`;
+  // Showroom hidup langsung di root sejak URL-nya disederhanakan --
+  // carlynk.id/<slug> -- bukan lagi di bawah /s/ atau /showrooms/.
+  return `${origin}/${encodeURIComponent(slug)}`;
 }

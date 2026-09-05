@@ -114,10 +114,15 @@ export class Router {
     this.handleChange = this.handleChange.bind(this);
   }
 
+  // route.pattern (RegExp siap pakai, dengan named group lewat (?<nama>...))
+  // dipakai apa adanya kalau disediakan -- jalan keluar untuk rute yang
+  // butuh pengecualian tidak bisa diekspresikan lewat sintaks ":nama" biasa,
+  // mis. slug showroom di root yang harus menolak kata cadangan seperti
+  // "admin" (lihat public.showroom.catalog-root di modules/public/routes.js).
   add(route) {
     this.routes.push({
       ...route,
-      pattern: this.compile(route.path),
+      pattern: route.pattern ?? this.compile(route.path),
     });
 
     return this;

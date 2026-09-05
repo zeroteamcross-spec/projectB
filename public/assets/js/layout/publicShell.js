@@ -9,6 +9,7 @@ import { loginPathForCurrentHost } from "../core/roleGuard.js";
 import { navigateTo } from "../core/router.js";
 import { BuyerMobileFooterNav } from "../modules/buyer/components/buyerMobileFooterNav.js";
 import { publicContextService } from "../modules/public/services/publicContextService.js";
+import { publicReservedRoutePrefixes } from "../core/publicReservedRouteWords.js";
 
 /**
  * Rute publik yang sengaja tidak menampilkan tombol Login di header.
@@ -342,11 +343,22 @@ function dashboardHash(role) {
  * same showroom rather than to the generic buyer home. Returns null outside
  * that route so the caller falls back to loginHashForCurrentHost().
  */
+const RESERVED_ROOT_WORD_PATTERN = new RegExp(`^(?:${publicReservedRoutePrefixes.join("|")})$`);
+
 function loginHashForShowroomRoute() {
   const jalur = window.location.pathname || "/";
-  const cocok = jalur.match(/^\/(?:s|showrooms)\/([^/]+)$/);
 
-  return cocok ? `/s/${cocok[1]}/login` : null;
+  const legacy = jalur.match(/^\/(?:s|showrooms)\/([^/]+)$/);
+  if (legacy) {
+    return `/${legacy[1]}/login`;
+  }
+
+  const bare = jalur.match(/^\/([^/]+)$/);
+  if (bare && !RESERVED_ROOT_WORD_PATTERN.test(bare[1])) {
+    return `/${bare[1]}/login`;
+  }
+
+  return null;
 }
 
 /**

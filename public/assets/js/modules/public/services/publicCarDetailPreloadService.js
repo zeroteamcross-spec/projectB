@@ -175,5 +175,6 @@ function isCurrentShowroomRoute(slug) {
     return true;
   }
 
-  return path.startsWith(`/showrooms/${normalizedSlug}`) || path.startsWith(`/s/${normalizedSlug}`);
+  return path.startsWith(`/showrooms/${normalizedSlug}`) || path.startsWith(`/s/${normalizedSlug}`)
+    || path.startsWith(`/${normalizedSlug}`);
 }

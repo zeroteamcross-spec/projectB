@@ -24,7 +24,7 @@ export async function navigateToOwnShowroom() {
 
   if (role === "buyer") {
     const slug = String(authStore.user()?.home_showroom_slug ?? "").trim();
-    const path = slug ? `/s/${encodeURIComponent(slug)}` : getBuyerShowroomCatalogUrl();
+    const path = slug ? `/${encodeURIComponent(slug)}` : getBuyerShowroomCatalogUrl();
     if (path) {
       navigateTo(path);
     }
@@ -34,7 +34,7 @@ export async function navigateToOwnShowroom() {
   if (role === "affiliate_admin") {
     const slug = await resolveAffiliateShowroomSlug();
     if (slug) {
-      navigateTo(`/showrooms/${encodeURIComponent(slug)}`);
+      navigateTo(`/${encodeURIComponent(slug)}`);
     }
   }
 }
