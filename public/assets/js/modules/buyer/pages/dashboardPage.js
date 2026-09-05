@@ -22,6 +22,7 @@ import { buyerState } from "../state/buyerState.js";
 import { BUYER_MOBILE_FOOTER_ITEMS, BuyerMobileFooterNav } from "../components/buyerMobileFooterNav.js";
 import { PublicSearchFilterBar } from "../../public/components/publicSearchFilterBar.js";
 import { getBuyerShowroomCatalogUrl } from "../../../utils/buyerShowroomUrl.js";
+import { renderBuyerBrandIcon } from "../../../utils/buyerShowroomIcon.js";
 
 const CAR_MODAL_KEY = "byr-car-detail-modal";
 const FILTER_MODAL_KEY = "byr-local-filter-modal";
@@ -238,7 +239,7 @@ function buyerTopNavigation({ activePath, actions }) {
     textNode("span", "truncate text-xs font-bold text-[var(--pb-brand-secondary)]", `Halo, ${buyerName(user)}`),
   );
   brand.append(
-    iconBox({ size: "h-11 w-11", className: "bg-[linear-gradient(135deg,var(--pb-btn-primary-from),var(--pb-btn-primary-to))] text-white shadow-[var(--pb-shadow-soft)]", icon: "car", iconSize: "h-5 w-5" }),
+    renderBuyerBrandIcon({ size: "h-11 w-11", wrapperClassName: "bg-[linear-gradient(135deg,var(--pb-btn-primary-from),var(--pb-btn-primary-to))] text-white shadow-[var(--pb-shadow-soft)]", icon: "car", iconSize: "h-5 w-5" }),
     brandCopy,
   );
 

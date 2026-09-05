@@ -1,5 +1,6 @@
 import { appStore } from "./store.js";
 import { persistBuyerShowroomUrl } from "../utils/buyerShowroomUrl.js";
+import { persistBuyerShowroomIcon } from "../utils/buyerShowroomIcon.js";
 
 export const authStore = {
   setContext({ user = null, actor = null, impersonation = null } = {}) {
@@ -12,6 +13,7 @@ export const authStore = {
     }, "auth:set-context");
     appStore.patchState("app.activeRole", user?.role ?? "public", "auth:set-role");
     persistBuyerShowroomUrl(user);
+    persistBuyerShowroomIcon(user);
   },
 
   setUser(user) {

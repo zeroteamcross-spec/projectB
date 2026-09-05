@@ -11,6 +11,7 @@ import { NotificationsPageList } from "../components/notificationsPageList.js";
 import { NotificationBell } from "../components/notificationBell.js";
 import { BUYER_MOBILE_FOOTER_ITEMS, BuyerMobileFooterNav } from "../../buyer/components/buyerMobileFooterNav.js";
 import { AffiliateAccountLayout, affiliateAccountActions } from "../../affiliate/components/affiliateAccountShell.js";
+import { renderBuyerBrandIcon } from "../../../utils/buyerShowroomIcon.js";
 
 const PAGE_SIZE = 20;
 
@@ -396,7 +397,7 @@ function buyerTopNavigation({ activePath, user, actions }) {
   const brand = document.createElement("section");
   brand.className = "flex min-w-0 items-center gap-3 px-1";
   brand.append(
-    iconBox("bell", "h-11 w-11 rounded-full bg-[linear-gradient(135deg,var(--pb-btn-primary-from),var(--pb-btn-primary-to))] text-white shadow-[var(--pb-shadow-soft)]"),
+    renderBuyerBrandIcon({ size: "h-11 w-11", wrapperClassName: "rounded-full bg-[linear-gradient(135deg,var(--pb-btn-primary-from),var(--pb-btn-primary-to))] text-white shadow-[var(--pb-shadow-soft)]", icon: "bell", iconSize: "h-5 w-5" }),
     textNode("strong", "truncate text-sm font-black text-[var(--pb-text)]", "Notifikasi"),
   );
 

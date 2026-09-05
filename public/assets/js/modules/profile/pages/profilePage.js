@@ -15,6 +15,7 @@ import { formatDate } from "../../../utils/formatDate.js";
 import { NotificationBell } from "../../notifications/components/notificationBell.js";
 import { BUYER_MOBILE_FOOTER_ITEMS, BuyerMobileFooterNav } from "../../buyer/components/buyerMobileFooterNav.js";
 import { getBuyerShowroomCatalogUrl } from "../../../utils/buyerShowroomUrl.js";
+import { renderBuyerBrandIcon } from "../../../utils/buyerShowroomIcon.js";
 import { AffiliateAccountLayout, affiliateAccountActions } from "../../affiliate/components/affiliateAccountShell.js";
 import { publicContextService } from "../../public/services/publicContextService.js";
 import { ModalHeaderFormActions } from "../../../ui/composites/modalHeaderFormActions.js";
@@ -200,7 +201,7 @@ function buyerTopNavigation({ activePath, profile, actions }) {
   const brand = document.createElement("section");
   brand.className = "flex min-w-0 items-center gap-3 px-1";
   brand.append(
-    iconBox("user", "h-11 w-11 rounded-full bg-[linear-gradient(135deg,var(--pb-btn-primary-from),var(--pb-btn-primary-to))] text-white"),
+    renderBuyerBrandIcon({ size: "h-11 w-11", wrapperClassName: "rounded-full bg-[linear-gradient(135deg,var(--pb-btn-primary-from),var(--pb-btn-primary-to))] text-white", icon: "user", iconSize: "h-4 w-4" }),
     textNode("strong", "truncate text-sm font-black text-[var(--pb-text)]", "Profil Saya"),
   );
 

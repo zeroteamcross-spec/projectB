@@ -3,6 +3,7 @@ import { createIcon } from "../../../theme/iconRegistry.js";
 import { NotificationBell } from "../../notifications/components/notificationBell.js";
 import { BUYER_MOBILE_FOOTER_ITEMS } from "./buyerMobileFooterNav.js";
 import { getBuyerShowroomCatalogUrl } from "../../../utils/buyerShowroomUrl.js";
+import { renderBuyerBrandIcon } from "../../../utils/buyerShowroomIcon.js";
 
 export function BuyerDesktopTopNav({
   activePath = "/buyer",
@@ -19,9 +20,9 @@ export function BuyerDesktopTopNav({
   const brand = document.createElement("section");
   brand.className = "flex min-w-0 items-center gap-3 px-1";
   brand.append(
-    iconBox({
+    renderBuyerBrandIcon({
       size: "h-11 w-11",
-      className: "rounded-full bg-[linear-gradient(135deg,var(--pb-btn-primary-from),var(--pb-btn-primary-to))] text-white shadow-[var(--pb-shadow-soft)]",
+      wrapperClassName: "rounded-full bg-[linear-gradient(135deg,var(--pb-btn-primary-from),var(--pb-btn-primary-to))] text-white shadow-[var(--pb-shadow-soft)]",
       icon: brandIcon,
       iconSize: "h-5 w-5",
     }),
