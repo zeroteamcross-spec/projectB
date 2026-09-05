@@ -19,6 +19,18 @@ import { publicReservedRoutePrefixes } from "../core/publicReservedRouteWords.js
  */
 const RUTE_TANPA_TOMBOL_LOGIN = Object.freeze(["/daftar-showroom", "/login/seller", "/google-login/buyer"]);
 
+const RESERVED_ROOT_WORD_PATTERN = new RegExp(`^(?:${publicReservedRoutePrefixes.join("|")})$`);
+
+/**
+ * Slug showroom di bentuk baru (carlynk.id/{slug}) tidak punya prefix --
+ * satu-satunya penanda adalah segmen pertamanya BUKAN kata cadangan (rute
+ * sistem lain semua terdaftar di publicReservedRoutePrefixes).
+ */
+function bareShowroomSlugFromPath(path) {
+  const match = String(path ?? "").match(/^\/([^/]+)/);
+  return match && !RESERVED_ROOT_WORD_PATTERN.test(match[1]) ? match[1] : "";
+}
+
 // Kotak lambang saat belum ada logo yang diunggah. Begitu logonya ada, kelas
 // ini tidak dipakai sama sekali -- gambarnya berdiri sendiri tanpa kotak.
 const PUBLIC_MARK_CLASS = "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--pb-radius-xl)] bg-[linear-gradient(135deg,var(--pb-brand-primary),var(--pb-brand-accent),var(--pb-brand-secondary))] text-white leading-none shadow-[var(--pb-shadow-card)]";
@@ -156,7 +168,7 @@ export class PublicShell {
     // Bottom footer juga tampil di halaman showroom bahkan sebelum login,
     // supaya pengunjung mobile langsung punya navigasi -- klik menunya nanti
     // yang mengarahkan ke login buyer kalau memang belum masuk.
-    const isShowroomPage = /^\/(?:s|showrooms)\/[^/]+/.test(currentPath);
+    const isShowroomPage = /^\/(?:s|showrooms)\/[^/]+/.test(currentPath) || Boolean(bareShowroomSlugFromPath(currentPath));
     const showMobileFooter = isBuyerLoggedIn || isShowroomPage;
 
     if (this.headerNode) {
@@ -228,7 +240,7 @@ function showroomLogoUrl() {
 
 function showroomSlugFromPath(path) {
   const cocok = String(path ?? "").match(/^\/(?:showrooms|s)\/([^/]+)/);
-  return cocok ? cocok[1] : "";
+  return cocok ? cocok[1] : bareShowroomSlugFromPath(path);
 }
 
 function affiliateSlugFromPath(path) {
@@ -343,8 +355,6 @@ function dashboardHash(role) {
  * same showroom rather than to the generic buyer home. Returns null outside
  * that route so the caller falls back to loginHashForCurrentHost().
  */
-const RESERVED_ROOT_WORD_PATTERN = new RegExp(`^(?:${publicReservedRoutePrefixes.join("|")})$`);
-
 function loginHashForShowroomRoute() {
   const jalur = window.location.pathname || "/";
 

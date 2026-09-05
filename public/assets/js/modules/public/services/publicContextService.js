@@ -3,8 +3,10 @@ import { affiliatesResource } from "../../../resources/affiliatesResource.js";
 import { showroomsResource } from "../../../resources/showroomsResource.js";
 import { publicContextState } from "../state/publicContextState.js";
 import { persistLastViewedShowroom, persistLastViewedAffiliate } from "../../../utils/lastViewedPublicContext.js";
+import { publicReservedRoutePrefixes } from "../../../core/publicReservedRouteWords.js";
 
 const ICON_RELS = ["icon", "shortcut icon", "apple-touch-icon"];
+const RESERVED_ROOT_WORD_PATTERN = new RegExp(`^(?:${publicReservedRoutePrefixes.join("|")})$`);
 
 let brandingOriginal = null;
 let brandingShowroomId = null;
@@ -207,8 +209,17 @@ export const publicContextService = {
    * component is mounted.
    */
   syncBrandingFromPath(path = "") {
-    const isBrandedPath = /^\/(?:showrooms|s|af|a)\//.test(String(path ?? ""));
-    if (isBrandedPath) {
+    const value = String(path ?? "");
+    const isLegacyBrandedPath = /^\/(?:showrooms|s|af|a)\//.test(value);
+    // Showroom di bentuk baru tidak punya prefix -- satu-satunya penanda
+    // adalah segmen pertamanya BUKAN kata cadangan (rute sistem lain semua
+    // terdaftar di publicReservedRoutePrefixes). Tanpa ini, tiap
+    // pindah-path di halaman showroom-di-root langsung menghapus context
+    // yang baru saja diaktifkan activateShowroomBySlug() -- katalog jadi
+    // macet di loading terus-menerus.
+    const bareMatch = value.match(/^\/([^/]+)/);
+    const isBareShowroomPath = Boolean(bareMatch) && !RESERVED_ROOT_WORD_PATTERN.test(bareMatch[1]);
+    if (isLegacyBrandedPath || isBareShowroomPath) {
       return;
     }
 
