@@ -367,6 +367,17 @@
       <h2 style="font-family:Georgia,serif;font-size:18px;color:var(--ink);margin-bottom:4px;">Riwayat Pembaruan</h2>
       <div class="sub" style="font-size:12px;color:var(--ink-muted);margin-bottom:4px;">Log perubahan per tanggal, terbaru di paling atas. Rincian lengkap tiap item nomor ada di daftar per halaman di bawah.</div>
       <div class="changelog-entry">
+        <div class="changelog-date">6 September 2026</div>
+        <ul class="found-list">
+          <li>3 subdomain peran (<b>Showroom</b>, <b>Marketing</b>, <b>Buyer</b>) resmi diaktifkan &amp; diverifikasi di production, melengkapi Admin yang sudah lebih dulu aktif &mdash; setiap peran kini punya dashboard di domainnya sendiri.</li>
+          <li>Alamat URL showroom dipindah ke root tanpa prefix: <code>carlynk.id/{nama-showroom}</code> (sebelumnya <code>/s/</code> atau <code>/showrooms/</code>). Link lama tetap jalan lewat redirect otomatis.</li>
+          <li>Alamat URL marketing dipindah ke root: <code>carlynk.id/{nama-showroom}/{nama-marketing}</code> (sebelumnya <code>/af/</code>). Link lama tetap jalan lewat redirect otomatis (dicari dulu showroom-nya via API).</li>
+          <li>Logo showroom kini tampil di top nav desktop buyer (Home, Portofolio, Notifikasi, Profil), menggantikan ikon generik.</li>
+          <li>Tombol &quot;Kembali ke katalog&quot; di halaman login showroom disamakan desainnya dengan tombol &quot;Kembali ke landing page&quot; di halaman login peran lain.</li>
+        </ul>
+        <div class="sub" style="margin-top:6px;">Rincian lengkap minggu ini (30 item, termasuk 3 bug ekstra yang ditemukan &amp; diperbaiki sambil jalan) ada di <a href="#detail-minggu-31agu-6sep">bagian di bawah</a>.</div>
+      </div>
+      <div class="changelog-entry">
         <div class="changelog-date">4 September 2026</div>
         <ul class="found-list">
           <li>Google Login <b>Admin</b> &amp; <b>Showroom</b> disembunyikan sementara &mdash; keduanya tetap login lewat email/password; hanya Buyer yang memakai Google Login untuk saat ini.</li>
@@ -382,6 +393,36 @@
           <li><b>51</b> &mdash; <b>Migrasi URL tanpa tanda # (Fase 1&ndash;4, selesai semua).</b> Navigasi di dalam aplikasi maupun link yang dibagikan ke luar sekarang memakai URL bersih (mis. <code>carlynk.id/seller/cars</code>), bukan lagi <code>carlynk.id/#/seller/cars</code>. Tautan lama tetap berfungsi. Lihat rincian di bawah.</li>
         </ul>
       </div>
+    </div>
+
+    <div class="found-section" id="detail-minggu-31agu-6sep">
+      <h2>Rincian minggu 31 Agustus &ndash; 6 September 2026</h2>
+      <div class="sub">27 Development, 3 Maintenance &mdash; 27/27 automated test lolos di setiap tahap deploy.</div>
+      <p style="font-size:13px;line-height:1.7;color:var(--ink);margin:0 0 4px;"><b>Development</b></p>
+      <ul class="found-list">
+        <li>Bangun fitur Admin tandai mobil terjual di luar sistem &mdash; modal &quot;Tandai Terjual (Luar Sistem)&quot; dengan keterangan bebas yang wajib diisi Admin, tersimpan untuk audit.</li>
+        <li>Verifikasi fitur tandai terjual di production &mdash; status mobil berubah, keterangan tersimpan persis, mobil hilang dari katalog publik.</li>
+        <li>Bangun halaman &quot;Bagikan Mobil&quot; untuk Marketing &mdash; setiap mobil published dapat tombol Copy Link &amp; Bagikan WhatsApp, tetap terdeteksi sebagai kunjungan marketing.</li>
+        <li>Verifikasi share per mobil di production &mdash; link dibuka tanpa login, context marketing otomatis aktif, klik tercatat ke akun yang benar.</li>
+        <li>Audit risiko migrasi URL &mdash; dua putaran riset menyeluruh sebelum eksekusi, memetakan semua titik yang terdampak.</li>
+        <li>Migrasi URL Fase 1 (navigasi internal), Fase 2 (link ke luar aplikasi), Fase 3 (data lama &amp; bookmark), Fase 4 (beres-beres) &mdash; URL bersih tanpa tanda # untuk seluruh navigasi &amp; link yang dibagikan.</li>
+        <li>Rencana pemisahan subdomain per peran &mdash; peta subdomain disusun: showroom, app (buyer), marketing, admin.</li>
+        <li>Nonaktifkan sementara Google Login Admin &amp; Showroom &mdash; persiapan subdomain, keduanya tetap login lewat email/password; hanya Buyer yang memakai Google Login.</li>
+        <li>Setup DNS &amp; nginx 3 subdomain baru, perluas sertifikat SSL, daftarkan redirect URI Google OAuth.</li>
+        <li>Penyesuaian kode routing lintas-subdomain &mdash; generalisasi logika penjaga domain untuk semua subdomain baru; sekaligus ditemukan &amp; diperbaiki risiko halaman publik ikut terdorong ke subdomain buyer.</li>
+        <li>Aktifkan &amp; uji subdomain Marketing, Showroom, dan Buyer &mdash; ketiganya diverifikasi penuh (login, sesi, link publik, reload halaman dalam) di production.</li>
+        <li>Pindahkan URL showroom ke root (<code>carlynk.id/{nama-showroom}</code>) &mdash; link lama (<code>/s/</code>, <code>/showrooms/</code>) tetap jalan lewat redirect otomatis.</li>
+        <li>Samakan desain tombol &quot;Kembali ke katalog&quot; di login showroom dengan tombol &quot;Kembali ke landing page&quot; di halaman login peran lain.</li>
+        <li>Tampilkan logo showroom di top nav desktop buyer (Home, Portofolio, Notifikasi, Profil).</li>
+        <li>Audit performa production, temukan akar masalah lambat, ganti metode verifikasi token, rapikan urutan muat awal aplikasi, verifikasi ulang performa di production.</li>
+        <li>Pindahkan URL marketing ke root (<code>carlynk.id/{nama-showroom}/{nama-marketing}</code>) &mdash; link lama (<code>/af/</code>) tetap jalan lewat redirect otomatis, dicari dulu showroom-nya via API.</li>
+      </ul>
+      <p style="font-size:13px;line-height:1.7;color:var(--ink);margin:12px 0 4px;"><b>Maintenance &mdash; ditemukan &amp; diperbaiki sambil jalan</b></p>
+      <ul class="found-list">
+        <li><b>Tombol Katalog salah arah</b> &mdash; ditemukan setelah migrasi URL (top nav profil buyer): tombol Katalog sempat membawa ke halaman utama, bukan showroom buyer.</li>
+        <li><b>Tombol &quot;Kembali ke landing page&quot; salah host</b> &mdash; ditemukan setelah subdomain aktif: dari halaman login showroom/app/marketing, tombol ini hanya pindah halaman di subdomain yang sama, bukan ke carlynk.id.</li>
+        <li><b>Katalog showroom macet loading di URL baru</b> &mdash; ditemukan saat verifikasi menyeluruh halaman showroom baru: context showroom sempat terhapus otomatis begitu diaktifkan, membuat daftar mobil tidak pernah tampil walau datanya sudah ada.</li>
+      </ul>
     </div>
 
     <div class="found-section" id="detail-migrasi-url">

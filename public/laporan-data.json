@@ -1,50 +1,27 @@
 {
-  "week_range": "31 Agustus – 6 September 2026",
+  "week_range": "7 – 13 September 2026",
   "branch": "feature/full-business-flow-tester",
   "tests": "27 / 27 lolos",
   "archive_url": "laporan-verifikasi-arsip.html",
   "development": {
-    "count": 27,
+    "count": 8,
     "label": "fitur & pekerjaan baru minggu ini",
     "description": "Membangun sesuatu yang baru — fitur, halaman, alur, maupun infrastruktur.",
     "rows": [
-      { "task": "Bangun fitur Admin tandai mobil terjual di luar sistem", "detail": "Modal \"Tandai Terjual (Luar Sistem)\" dengan keterangan bebas yang wajib diisi Admin, tersimpan untuk audit.", "status": "done" },
-      { "task": "Verifikasi fitur tandai terjual di production", "detail": "Diuji langsung: status mobil berubah, keterangan tersimpan persis, mobil hilang dari katalog publik.", "status": "done" },
-      { "task": "Bangun halaman \"Bagikan Mobil\" untuk Marketing", "detail": "Setiap mobil published dapat tombol Copy Link & Bagikan WhatsApp, tetap terdeteksi sebagai kunjungan marketing.", "status": "done" },
-      { "task": "Verifikasi share per mobil di production", "detail": "Link dibuka tanpa login, context marketing otomatis aktif, klik tercatat ke akun yang benar.", "status": "done" },
-      { "task": "Audit risiko migrasi URL", "detail": "Dua putaran riset menyeluruh sebelum eksekusi, memetakan semua titik yang terdampak.", "status": "done" },
-      { "task": "Migrasi URL Fase 1 — navigasi internal", "detail": "Sidebar, header, notifikasi, login Google dipindah ke URL bersih tanpa tanda #.", "status": "done" },
-      { "task": "Migrasi URL Fase 2 — link ke luar aplikasi", "detail": "Link showroom & referral marketing yang dibagikan lewat WhatsApp ikut dibersihkan.", "status": "done" },
-      { "task": "Migrasi URL Fase 3 — data lama & bookmark", "detail": "8 halaman filter/bookmark diperbaiki; notifikasi lama tetap terbuka tanpa migrasi data.", "status": "done" },
-      { "task": "Migrasi URL Fase 4 — beres-beres", "detail": "Data baru langsung memakai format bersih; konvensi lama dikonfirmasi ulang aman.", "status": "done" },
-      { "task": "Rencana pemisahan subdomain per peran", "detail": "Peta subdomain disusun: showroom, app (buyer), marketing, admin — masing-masing dashboard punya alamat sendiri.", "status": "done" },
-      { "task": "Nonaktifkan sementara Google Login Admin & Showroom", "detail": "Persiapan subdomain — untuk saat ini hanya Buyer yang memakai Google Login, Admin/Showroom tetap email & password.", "status": "done" },
-      { "task": "Setup DNS & nginx 3 subdomain baru", "detail": "showroom.carlynk.id, app.carlynk.id, marketing.carlynk.id sudah resolve dan terhubung ke server.", "status": "done" },
-      { "task": "Perluas sertifikat SSL", "detail": "Satu sertifikat mencakup carlynk.id, admin, showroom, app, dan marketing sekaligus.", "status": "done" },
-      { "task": "Daftarkan redirect URI Google OAuth", "detail": "URI callback subdomain showroom & app sudah ditambahkan ke Google Cloud Console, siap dipakai begitu subdomain itu diaktifkan.", "status": "done" },
-      { "task": "Penyesuaian kode routing lintas-subdomain", "detail": "Generalisasi logika penjaga domain supaya berlaku untuk semua subdomain baru, tidak hanya admin. Sekalian ditemukan & diperbaiki: halaman publik (katalog, detail mobil) sempat berisiko ikut terdorong ke subdomain buyer begitu diaktifkan.", "status": "done" },
-      { "task": "Aktifkan & uji subdomain Marketing", "detail": "marketing.carlynk.id resmi melayani dashboard Marketing — login, sesi, link landing yang tetap mengarah ke domain utama, dan reload halaman dalam sudah diverifikasi di production.", "status": "done" },
-      { "task": "Aktifkan & uji subdomain Showroom", "detail": "showroom.carlynk.id resmi melayani dashboard Seller — login, sesi, link showroom publik yang tetap mengarah ke domain utama, dan reload halaman dalam sudah diverifikasi di production.", "status": "done" },
-      { "task": "Aktifkan & uji subdomain Buyer", "detail": "app.carlynk.id resmi melayani dashboard Buyer — login, sesi, login Google (redirect URI cocok), dan reload halaman dalam sudah diverifikasi di production.", "status": "done" },
-      { "task": "Pindahkan URL showroom ke root (carlynk.id/{nama showroom})", "detail": "Halaman showroom tidak lagi butuh prefix /s/ atau /showrooms/ — link lama tetap jalan lewat redirect otomatis ke bentuk baru, sudah diverifikasi di production.", "status": "done" },
-      { "task": "Samakan desain tombol \"Kembali ke katalog\" di login showroom", "detail": "Diubah dari teks bergaris bawah menjadi tombol pil, desain & posisi disamakan dengan tombol \"Kembali ke landing page\" di halaman login peran lain.", "status": "done" },
-      { "task": "Tampilkan logo showroom di top nav buyer", "detail": "Ikon generik di top nav desktop (Home, Portofolio, Notifikasi, Profil) diganti logo showroom tempat buyer jadi pelanggan, kalau ada — diverifikasi di keempat halaman di production.", "status": "done" },
-      { "task": "Audit performa production", "detail": "Ukur waktu muat & respons API langsung di production, bukan dugaan.", "status": "done" },
-      { "task": "Temukan akar masalah lambat", "detail": "Token remember-me diverifikasi ulang dengan metode lambat di setiap request berlogin.", "status": "done" },
-      { "task": "Ganti metode verifikasi token", "detail": "Tetap aman, tapi jauh lebih cepat — tidak lagi memakai metode yang dirancang untuk kata sandi manusia.", "status": "done" },
-      { "task": "Rapikan urutan muat awal aplikasi", "detail": "Pengambilan notifikasi tidak lagi memblokir tampilnya halaman pertama.", "status": "done" },
-      { "task": "Verifikasi ulang performa di production", "detail": "Bandingkan sebelum/sesudah: semua data dashboard dari 3+ detik menjadi <1 detik.", "status": "done" },
-      { "task": "Pindahkan URL marketing ke carlynk.id/{showroom}/{marketing}", "detail": "Link marketing tidak lagi butuh prefix /af/ — sekarang membawa nama showroom di URL-nya. Link lama tetap jalan lewat redirect otomatis (dicari dulu showroom-nya via API), sudah diverifikasi end-to-end (katalog, detail mobil, transaksi, klik tercatat) di production.", "status": "done" }
+      { "task": "Rancang skema Master Harga & rencana pembayaran", "detail": "Tentukan field paket (nama, harga, periode tagihan, fitur, badge rekomendasi), model data, dan bagaimana ini nanti tersambung ke pembayaran (memakai jalur transfer manual/Midtrans yang sudah ada untuk transaksi mobil).", "status": "planned" },
+      { "task": "Bangun halaman Master Harga di Admin", "detail": "Admin bisa tambah, edit, aktifkan/nonaktifkan, dan hapus paket harga — memakai pola Master Data yang sudah ada (Brand/Bank/Lokasi), tampil sebagai tab baru \"Harga\".", "status": "planned" },
+      { "task": "Verifikasi Master Harga di production", "detail": "Admin membuat beberapa paket, memastikan tersimpan dan tampil kembali dengan benar setelah reload.", "status": "planned" },
+      { "task": "Tambah penyimpanan pilihan paket showroom", "detail": "Kolom baru pada data showroom untuk mencatat paket yang dipilih saat mendaftar, tersambung ke endpoint yang sudah ada (bukan endpoint baru).", "status": "planned" },
+      { "task": "Bangun tampilan kartu pilihan harga di halaman registrasi showroom", "detail": "Paket dari Master Harga tampil sebagai kartu (bisa lebih dari satu), showroom wajib memilih salah satu sebelum lanjut.", "status": "planned" },
+      { "task": "Sambungkan pilihan harga ke alur registrasi", "detail": "Setelah showroom memilih paket, alur lanjut ke halaman pending approval seperti biasa; pilihan paket ikut tersimpan.", "status": "planned" },
+      { "task": "Tampilkan paket yang dipilih showroom di sisi Admin", "detail": "Admin yang meninjau pendaftaran showroom bisa melihat paket harga apa yang dipilih calon showroom tersebut.", "status": "planned" },
+      { "task": "Verifikasi alur registrasi + pilihan harga end-to-end di production", "detail": "Daftar showroom baru dari awal sampai pending approval, memastikan kartu harga tampil benar dan pilihannya tersimpan & terlihat di Admin.", "status": "planned" }
     ]
   },
   "maintenance": {
-    "count": 3,
+    "count": 0,
     "label": "bug & perbaikan minggu ini",
     "description": "Memperbaiki sesuatu yang sudah ada tapi bermasalah — bug dan performa.",
-    "rows": [
-      { "task": "Perbaiki bug tombol Katalog salah arah", "detail": "Ditemukan setelah migrasi (top nav profil buyer): tombol Katalog sempat membawa ke halaman utama, bukan showroom buyer. Langsung diperbaiki.", "status": "done" },
-      { "task": "Perbaiki tombol Kembali ke landing page salah host", "detail": "Ditemukan setelah subdomain aktif: dari halaman login showroom/app/marketing, tombol ini hanya pindah halaman di subdomain yang sama, bukan ke carlynk.id. Langsung diperbaiki & diverifikasi di production.", "status": "done" },
-      { "task": "Perbaiki katalog showroom macet loading di URL baru", "detail": "Ditemukan saat verifikasi menyeluruh halaman showroom baru: context showroom sempat terhapus otomatis begitu diaktifkan, membuat daftar mobil tidak pernah tampil walau datanya sudah ada. Langsung diperbaiki & diverifikasi ulang end-to-end (katalog, detail mobil, transaksi) di production.", "status": "done" }
-    ]
+    "rows": []
   }
 }
