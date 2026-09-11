@@ -167,10 +167,14 @@ export function ShowroomRegisterPage() {
   return createPageLifecycle({
     async bootstrap() {
       const [bankMaster, locationMaster, pricingMaster, destinationMaster] = await Promise.all([
-        adminMasterService.getBankMaster().catch(() => null),
-        adminMasterService.getLocationMaster().catch(() => null),
-        adminMasterService.getPricingMaster().catch(() => null),
-        adminMasterService.getSubscriptionDestinationMaster().catch(() => null),
+        // Fallback ke normalize<X>Master(null), bukan null mentah -- itu yang
+        // mengembalikan seed default (mis. daftar bank/kota bawaan) saat
+        // master key ini belum pernah disimpan Admin sama sekali. Fallback ke
+        // null polos berarti pendaftar melihat form kosong tanpa penjelasan.
+        adminMasterService.getBankMaster().catch(() => adminMasterService.normalizeBankMaster(null)),
+        adminMasterService.getLocationMaster().catch(() => adminMasterService.normalizeLocationMaster(null)),
+        adminMasterService.getPricingMaster().catch(() => adminMasterService.normalizePricingMaster(null)),
+        adminMasterService.getSubscriptionDestinationMaster().catch(() => adminMasterService.normalizeSubscriptionDestinationMaster(null)),
       ]);
 
       state.plans = (pricingMaster?.data?.plans ?? [])
