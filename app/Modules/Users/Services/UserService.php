@@ -132,6 +132,10 @@ class UserService
             'bank_account_number' => $showroom['bank_account_number'],
             'bank_type' => $showroom['bank_type'],
             'bank_account_name' => $showroom['bank_account_name'],
+            'selected_plan_name' => $showroom['selected_plan_name'] ?? null,
+            'selected_plan_price' => isset($showroom['selected_plan_price']) ? (float) $showroom['selected_plan_price'] : null,
+            'selected_plan_billing_period' => $showroom['selected_plan_billing_period'] ?? null,
+            'selected_plan_selected_at' => $showroom['selected_plan_selected_at'] ?? null,
             'created_at' => $showroom['created_at'],
             'updated_at' => $showroom['updated_at'],
         ];

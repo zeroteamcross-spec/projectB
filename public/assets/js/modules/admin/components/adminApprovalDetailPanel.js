@@ -3,6 +3,7 @@ import { roleLabel } from "../../../core/roleLabels.js";
 import { Button } from "../../../ui/primitives/button.js";
 import { EmptyState } from "../../../ui/primitives/emptyState.js";
 import { formatDate } from "../../../utils/formatDate.js";
+import { formatCurrency } from "../../../utils/formatCurrency.js";
 import { tw } from "../../../theme/tailwindClasses.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 import { adminApprovalQueueService } from "../services/adminApprovalQueueService.js";
@@ -77,6 +78,11 @@ export function AdminApprovalDetailPanel({
     facts.append(infoRow("Showroom", user.showroom.name || "-"));
     facts.append(infoRow("Alamat showroom", user.showroom.address || "-"));
     facts.append(infoRow("Telepon showroom", user.showroom.phone_number || "-"));
+
+    const planLabel = user.showroom.selected_plan_name
+      ? `${user.showroom.selected_plan_name} (${formatCurrency(user.showroom.selected_plan_price || 0)}${user.showroom.selected_plan_billing_period ? " " + user.showroom.selected_plan_billing_period : ""})`
+      : "Belum memilih paket";
+    facts.append(infoRow("Paket harga dipilih", planLabel));
   }
 
   const actions = document.createElement("div");

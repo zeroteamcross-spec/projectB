@@ -63,7 +63,9 @@ class UserRepository
 
         $stmt = $this->pdo->prepare(
             'SELECT id, user_id, name, address, phone_number, bank_account_number,
-                    bank_type, bank_account_name, created_at, updated_at
+                    bank_type, bank_account_name,
+                    selected_plan_name, selected_plan_price, selected_plan_billing_period, selected_plan_selected_at,
+                    created_at, updated_at
              FROM showrooms
              WHERE user_id = :user_id
              AND deleted_at IS NULL
