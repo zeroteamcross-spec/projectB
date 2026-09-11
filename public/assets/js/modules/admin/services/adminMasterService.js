@@ -5,6 +5,7 @@ export const MASTER_BRANDS_KEY = "cars.brands";
 export const MASTER_SIDEBAR_KEY = "app.sidebar";
 export const MASTER_BANKS_KEY = "payments.banks";
 export const MASTER_LOCATIONS_KEY = "locations.cities";
+export const MASTER_PRICING_KEY = "pricing.plans";
 
 const DEFAULT_BRAND_SEED = [
   brandSeed("brand_toyota", "Toyota", "toyota", "MPV, SUV, dan city car populer untuk pasar keluarga Indonesia.", [
@@ -59,6 +60,7 @@ const DEFAULT_SIDEBAR_SEED = [
   sidebarSeed("admin.master_bank", "admin", "Master Bank", "/admin/master-bank", "bank", 30, "admin.master"),
   sidebarSeed("admin.master_inspection", "admin", "Master Inspection", "/admin/master-inspection", "clipboard", 40, "admin.master"),
   sidebarSeed("admin.master_location", "admin", "Master Lokasi", "/admin/master-location", "location", 50, "admin.master"),
+  sidebarSeed("admin.master_pricing", "admin", "Master Harga", "/admin/master-pricing", "tag", 60, "admin.master"),
   sidebarSeed("admin.design_studio", "admin", "Design Studio", "/admin/design-studio", "sparkles", 80),
   sidebarSeed("seller.dashboard", "seller", "Dashboard Showroom", "/seller", "dashboard", 10),
   sidebarSeed("seller.showroom", "seller", "Showroom Saya", "/seller/showroom", "showroom", 20),
@@ -104,6 +106,18 @@ const DEFAULT_LOCATION_SEED = [
   citySeed("city_bekasi", "Bekasi", "bekasi", "Jawa Barat", "jawa-barat"),
   citySeed("city_bogor", "Bogor", "bogor", "Jawa Barat", "jawa-barat"),
   citySeed("city_depok", "Depok", "depok", "Jawa Barat", "jawa-barat"),
+];
+
+const DEFAULT_PRICING_SEED = [
+  pricingSeed("plan_basic", "Basic", 500000, "/bulan", [
+    "1 showroom aktif", "Sampai 10 listing mobil", "Dukungan email",
+  ], false),
+  pricingSeed("plan_pro", "Pro", 1500000, "/bulan", [
+    "1 showroom aktif", "Listing mobil tanpa batas", "Fitur Marketing/Affiliate", "Dukungan prioritas",
+  ], true),
+  pricingSeed("plan_enterprise", "Enterprise", 3500000, "/bulan", [
+    "Semua fitur Pro", "Multi-cabang", "Manajer akun khusus",
+  ], false),
 ];
 
 export const adminMasterService = {
@@ -181,14 +195,34 @@ export const adminMasterService = {
     return normalizeLocationMaster(master);
   },
 
+  async getPricingMaster(options = {}) {
+    const master = await masterDataResource.get(MASTER_PRICING_KEY, options);
+    return normalizePricingMaster(master);
+  },
+
+  async savePricingMaster(plans = [], options = {}) {
+    const master = await masterDataResource.save(MASTER_PRICING_KEY, {
+      schema: "admin.master.pricing.v1",
+      type: "pricing",
+      plans: normalizePlans(plans),
+    }, {
+      displayName: "Master Harga",
+      bumpVersion: true,
+      ...options,
+    });
+    return normalizePricingMaster(master);
+  },
+
   normalizeMaster,
   normalizeSidebarMaster,
   normalizeBankMaster,
   normalizeLocationMaster,
+  normalizePricingMaster,
   normalizeBrands,
   normalizeSidebarItems,
   normalizeBanks,
   normalizeCities,
+  normalizePlans,
   validateSidebarItems,
   assertValidSidebarItems,
   getSidebarChildren,
@@ -197,6 +231,7 @@ export const adminMasterService = {
   createEmptySidebarItem,
   createEmptyBank,
   createEmptyCity,
+  createEmptyPlan,
 
   filterBrands(brands = [], filters = {}) {
     const keyword = String(filters.keyword ?? "").trim().toLowerCase();
@@ -306,6 +341,28 @@ export const adminMasterService = {
       ].filter(Boolean).join(" ").toLowerCase().includes(keyword);
     });
   },
+
+  filterPlans(plans = [], filters = {}) {
+    const keyword = String(filters.keyword ?? "").trim().toLowerCase();
+    const status = String(filters.status ?? "").trim().toLowerCase();
+
+    return plans.filter((plan) => {
+      if (status && plan.status !== status) {
+        return false;
+      }
+
+      if (!keyword) {
+        return true;
+      }
+
+      return [
+        plan.name,
+        plan.slug,
+        plan.billing_period,
+        ...(plan.features ?? []),
+      ].filter(Boolean).join(" ").toLowerCase().includes(keyword);
+    });
+  },
 };
 
 function normalizeMaster(master = null) {
@@ -380,6 +437,24 @@ function normalizeLocationMaster(master = null) {
   };
 }
 
+function normalizePricingMaster(master = null) {
+  const hasPersistedPlans = Array.isArray(master?.data?.plans);
+  const data = master?.data ?? {};
+  return {
+    id: master?.id ?? null,
+    master_key: master?.master_key ?? MASTER_PRICING_KEY,
+    data: {
+      schema: data.schema ?? "admin.master.pricing.v1",
+      type: data.type ?? "pricing",
+      plans: normalizePlans(hasPersistedPlans ? data.plans : DEFAULT_PRICING_SEED),
+    },
+    version: master?.version ?? null,
+    created_at: master?.created_at ?? null,
+    updated_at: master?.updated_at ?? null,
+    seeded: !hasPersistedPlans,
+  };
+}
+
 function normalizeBrands(brands = []) {
   return brands.map((brand, index) => ({
     id: String(brand.id || `brand_${Date.now()}_${index}`),
@@ -446,6 +521,40 @@ function normalizeCities(cities = []) {
     seen.add(normalized.slug);
     return normalized;
   }).filter(Boolean);
+}
+
+function normalizePlans(plans = []) {
+  const seen = new Set();
+  return plans.map((plan, index) => {
+    const name = String(plan.name ?? "").trim();
+    const slug = slugify(plan.slug || name || `plan-${index + 1}`);
+    const normalized = {
+      id: String(plan.id || `plan_${Date.now()}_${index}`),
+      slug,
+      name,
+      price: Math.max(0, Number(plan.price) || 0),
+      billing_period: String(plan.billing_period ?? "").trim(),
+      features: normalizePlanFeatures(plan.features),
+      is_recommended: Boolean(plan.is_recommended),
+      status: ["active", "inactive"].includes(plan.status) ? plan.status : "active",
+      updated_at: plan.updated_at ?? null,
+    };
+    if (!normalized.name || seen.has(normalized.slug)) {
+      return null;
+    }
+    seen.add(normalized.slug);
+    return normalized;
+  }).filter(Boolean);
+}
+
+function normalizePlanFeatures(features) {
+  if (Array.isArray(features)) {
+    return features.map((feature) => String(feature ?? "").trim()).filter(Boolean);
+  }
+  return String(features ?? "")
+    .split("\n")
+    .map((feature) => feature.trim())
+    .filter(Boolean);
 }
 
 function normalizeSidebarItems(items = [], { repair = true } = {}) {
@@ -518,6 +627,19 @@ function createEmptyBank() {
     bank_code: "",
     icon_path: "",
     icon_asset: {},
+    status: "active",
+  };
+}
+
+function createEmptyPlan() {
+  return {
+    id: `plan_${Date.now()}`,
+    slug: "",
+    name: "",
+    price: 0,
+    billing_period: "/bulan",
+    features: [],
+    is_recommended: false,
     status: "active",
   };
 }
@@ -598,6 +720,20 @@ function citySeed(id, name, slug, provinceName = "", provinceSlug = "") {
     province_name: provinceName,
     province_slug: provinceSlug,
     updated_at: "2026-06-18T00:00:00.000Z",
+  };
+}
+
+function pricingSeed(id, name, price, billingPeriod, features = [], isRecommended = false) {
+  return {
+    id,
+    slug: slugify(name),
+    name,
+    price,
+    billing_period: billingPeriod,
+    features,
+    is_recommended: isRecommended,
+    status: "active",
+    updated_at: "2026-09-11T00:00:00.000Z",
   };
 }
 
@@ -776,6 +912,11 @@ function ensureAdminMasterSidebarChildren(items = []) {
     normalized[normalized.length - 1].updated_at = now;
   }
 
+  if (!byKey.has("admin.master_pricing")) {
+    normalized.push(sidebarSeed("admin.master_pricing", "admin", "Master Harga", "/admin/master-pricing", "tag", 60, "admin.master"));
+    normalized[normalized.length - 1].updated_at = now;
+  }
+
   return normalized.map((item) => {
     if (item.key === "admin.sliders") {
       return {
@@ -851,6 +992,17 @@ function ensureAdminMasterSidebarChildren(items = []) {
         label: item.label || "Master Lokasi",
         route: "/admin/master-location",
         icon: item.icon || "location",
+        parent_key: "admin.master",
+        role: "admin",
+        is_parent: false,
+      };
+    }
+    if (item.key === "admin.master_pricing") {
+      return {
+        ...item,
+        label: item.label || "Master Harga",
+        route: "/admin/master-pricing",
+        icon: item.icon || "tag",
         parent_key: "admin.master",
         role: "admin",
         is_parent: false,

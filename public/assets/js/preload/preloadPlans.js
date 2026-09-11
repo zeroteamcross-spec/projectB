@@ -225,6 +225,12 @@ export const preloadPlans = {
         version: "admin-master-inspection-v1",
         loader: ({ signal }) => inspectionsResource.adminTemplates({ signal }).catch(() => []),
       },
+      {
+        key: "masterPricing",
+        ttl: 120,
+        version: "admin-master-pricing-v1",
+        loader: ({ signal }) => adminMasterService.getPricingMaster({ signal }).catch(() => adminMasterService.normalizePricingMaster(null)),
+      },
       { key: "monitoringSummary", version: "admin-monitoring-summary-v1", fallback: null },
     ],
   },

@@ -15,10 +15,12 @@ import { AdminMasterLocationList } from "../components/adminMasterLocationList.j
 import { AdminMasterLocationForm } from "../components/adminMasterLocationForm.js";
 import { AdminMasterSidebarList } from "../components/adminMasterSidebarList.js";
 import { AdminMasterSidebarForm } from "../components/adminMasterSidebarForm.js";
+import { AdminMasterPricingList } from "../components/adminMasterPricingList.js";
+import { AdminMasterPricingForm } from "../components/adminMasterPricingForm.js";
 import { adminMasterService } from "../services/adminMasterService.js";
 import { masterDataResource } from "../../../resources/masterDataResource.js";
 
-const MASTER_PAGES = ["brand", "sidebar", "bank", "location"];
+const MASTER_PAGES = ["brand", "sidebar", "bank", "location", "pricing"];
 
 export function AdminMasterBrandPage() {
   return createAdminMasterPage("brand");
@@ -34,6 +36,10 @@ export function AdminMasterBankPage() {
 
 export function AdminMasterLocationPage() {
   return createAdminMasterPage("location");
+}
+
+export function AdminMasterPricingPage() {
+  return createAdminMasterPage("pricing");
 }
 
 export function AdminMasterPage() {
@@ -363,6 +369,61 @@ function createAdminMasterPage(pageType = "brand") {
         status: city.status === "active" ? "inactive" : "active",
       }, cities);
     },
+    openCreatePricing(plans) {
+      openPricingModal({ mode: "create", plan: null, plans, actions, state });
+    },
+    openEditPricing(plan, plans) {
+      openPricingModal({ mode: "edit", plan, plans, actions, state });
+    },
+    async savePricing(nextPlan, plans) {
+      state.saving = true;
+      state.error = "";
+      rerender();
+      try {
+        const nextPlans = upsertPlan(plans, nextPlan);
+        const master = await adminMasterService.savePricingMaster(nextPlans);
+        patchPricingMaster(master);
+        closeModal({ notify: false });
+        showToast("Master harga berhasil disimpan.", { type: "success" });
+      } catch (error) {
+        state.error = error.message || "Gagal menyimpan master harga.";
+        showToast(state.error, { type: "error" });
+      } finally {
+        state.saving = false;
+        rerender();
+      }
+    },
+    async deletePricing(plan, plans) {
+      const confirmed = await confirmDialog({
+        title: "Hapus paket harga",
+        message: "Yakin mau hapus paket harga ini?",
+        confirmLabel: "Hapus",
+        key: `admstpr-delete-plan-${plan.id}`,
+      });
+      if (!confirmed) {
+        return;
+      }
+      state.saving = true;
+      rerender();
+      try {
+        const master = await adminMasterService.savePricingMaster(plans.filter((item) => item.id !== plan.id));
+        patchPricingMaster(master);
+        closeModal({ notify: false });
+        showToast("Master harga berhasil dihapus.", { type: "success" });
+      } catch (error) {
+        state.error = error.message || "Gagal menghapus master harga.";
+        showToast(state.error, { type: "error" });
+      } finally {
+        state.saving = false;
+        rerender();
+      }
+    },
+    async togglePricingStatus(plan, plans) {
+      await actions.savePricing({
+        ...plan,
+        status: plan.status === "active" ? "inactive" : "active",
+      }, plans);
+    },
   };
 
   return createPageLifecycle({
@@ -433,15 +494,25 @@ function render(root, context, state, actions, activePage = "brand") {
   const hasLocationSource = Boolean(snapshotLocationMaster || workingLocationMaster);
   const cities = locationMaster.data.cities ?? [];
 
+  const isPricing = activePage === "pricing";
+  const snapshotPricingMaster = appStore.get("snapshot.admin.masterPricing.data", null);
+  const workingPricingMaster = appStore.get("working.adminMaster.pricing.data", null);
+  const pricingMaster = adminMasterService.normalizePricingMaster(workingPricingMaster ?? snapshotPricingMaster);
+  const pricingHydratedAt = appStore.get("working.adminMaster.pricing.hydratedAt", 0) ?? 0;
+  const hasPricingSource = Boolean(snapshotPricingMaster || workingPricingMaster);
+  const plans = pricingMaster.data.plans ?? [];
+
   const layout = document.createElement("section");
-  layout.id = isLocation ? "admstloc_page_section" : isBank ? "admstbk_page_section" : isSidebar ? "admst_sidebar_page_section" : "admst_brand_page_section";
+  layout.id = isPricing ? "admstpr_page_section" : isLocation ? "admstloc_page_section" : isBank ? "admstbk_page_section" : isSidebar ? "admst_sidebar_page_section" : "admst_brand_page_section";
   layout.className = "grid min-w-0 gap-6";
-  layout.dataset.ds = isLocation ? "admin.master.location.page" : isBank ? "admin.master.bank.page" : isSidebar ? "admin.master.sidebar.page" : "admin.master.brand.page";
+  layout.dataset.ds = isPricing ? "admin.master.pricing.page" : isLocation ? "admin.master.location.page" : isBank ? "admin.master.bank.page" : isSidebar ? "admin.master.sidebar.page" : "admin.master.brand.page";
 
   const createButton = Button({
-    label: isLocation ? "Tambah Kota" : isBank ? "Tambah Bank" : isSidebar ? "Tambah Menu" : "Tambah Brand",
+    label: isPricing ? "Tambah Paket" : isLocation ? "Tambah Kota" : isBank ? "Tambah Bank" : isSidebar ? "Tambah Menu" : "Tambah Brand",
     variant: "primary",
-    onClick: () => isLocation
+    onClick: () => isPricing
+      ? actions.openCreatePricing(plans)
+      : isLocation
       ? actions.openCreateCity(cities)
       : isBank
       ? actions.openCreateBank(banks)
@@ -450,11 +521,11 @@ function render(root, context, state, actions, activePage = "brand") {
       : actions.openCreateBrand(brands),
     designHook: "shared.button.primary",
   });
-  createButton.id = isLocation ? "admstloc_create_city_button" : isBank ? "admstbk_create_bank_button" : isSidebar ? "admst_create_sidebar_button" : "admst_create_brand_button";
+  createButton.id = isPricing ? "admstpr_create_plan_button" : isLocation ? "admstloc_create_city_button" : isBank ? "admstbk_create_bank_button" : isSidebar ? "admst_create_sidebar_button" : "admst_create_brand_button";
   createButton.prepend(createIcon("sparkles", { className: "h-4 w-4" }));
 
   layout.append(
-    masterHero({ action: createButton, pageType: activePage, brands, sidebarItems, banks, cities, master: isLocation ? locationMaster : isBank ? bankMaster : isSidebar ? sidebarMaster : brandMaster }),
+    masterHero({ action: createButton, pageType: activePage, brands, sidebarItems, banks, cities, plans, master: isPricing ? pricingMaster : isLocation ? locationMaster : isBank ? bankMaster : isSidebar ? sidebarMaster : brandMaster }),
   );
 
   if (state.error) {
@@ -465,7 +536,14 @@ function render(root, context, state, actions, activePage = "brand") {
     layout.append(error);
   }
 
-  if (isLocation) {
+  if (isPricing) {
+    layout.append(...renderPricingPage({
+      state,
+      actions,
+      plans,
+      loading: !pricingHydratedAt && !hasPricingSource,
+    }));
+  } else if (isLocation) {
     layout.append(...renderLocationPage({
       state,
       actions,
@@ -496,6 +574,28 @@ function render(root, context, state, actions, activePage = "brand") {
   }
 
   root.replaceChildren(layout);
+}
+
+function renderPricingPage({ state, actions, plans, loading }) {
+  const filters = { ...state.query };
+  const filteredPlans = adminMasterService.filterPlans(plans, filters);
+  const pagination = paginate(filteredPlans, filters);
+
+  return [
+    masterPricingFilterBar({ filters, plans, onSubmit: actions.applyFilters }),
+    applyDesignHook(AdminMasterPricingList({
+      loading,
+      plans: pagination.items,
+      page: pagination.page,
+      perPage: pagination.pageSize,
+      totalItems: filteredPlans.length,
+      onEdit: (plan) => actions.openEditPricing(plan, plans),
+      onToggleStatus: (plan) => actions.togglePricingStatus(plan, plans),
+      onDelete: (plan) => actions.deletePricing(plan, plans),
+      onPageChange: actions.changePage,
+      onPerPageChange: actions.changePerPage,
+    }), "admin.master.pricing.table"),
+  ];
 }
 
 function renderBankPage({ state, actions, banks, loading }) {
@@ -592,12 +692,13 @@ function renderSidebarTab({ state, actions, items, loading }) {
   ];
 }
 
-function masterHero({ action, pageType, brands = [], sidebarItems = [], banks = [], cities = [], master = {} }) {
+function masterHero({ action, pageType, brands = [], sidebarItems = [], banks = [], cities = [], plans = [], master = {} }) {
   const isSidebar = pageType === "sidebar";
   const isBank = pageType === "bank";
   const isLocation = pageType === "location";
+  const isPricing = pageType === "pricing";
   const section = document.createElement("section");
-  section.id = isLocation ? "admstloc_hero_section" : isBank ? "admstbk_hero_section" : "admst_hero_section";
+  section.id = isPricing ? "admstpr_hero_section" : isLocation ? "admstloc_hero_section" : isBank ? "admstbk_hero_section" : "admst_hero_section";
   section.className = "relative overflow-hidden rounded-[2rem] border border-[var(--pb-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.95),rgba(250,244,237,0.86),rgba(234,244,249,0.72))] p-5 shadow-[0_24px_80px_rgba(15,23,42,0.10)] backdrop-blur-xl transition-shadow duration-150 sm:p-6 lg:p-7";
   section.dataset.ds = "admin.master.hero";
 
@@ -607,25 +708,25 @@ function masterHero({ action, pageType, brands = [], sidebarItems = [], banks = 
   copy.className = "grid min-w-0 gap-3";
   const icon = document.createElement("div");
   icon.className = "grid h-12 w-12 place-items-center rounded-2xl bg-[linear-gradient(135deg,#1e81b0,#1e81b0)] text-white shadow-[0_16px_40px_rgba(30,129,176,0.22)]";
-  icon.append(createIcon(isLocation ? "location" : isBank ? "bank" : isSidebar ? "sort" : "car", { className: "h-5 w-5" }));
+  icon.append(createIcon(isPricing ? "tag" : isLocation ? "location" : isBank ? "bank" : isSidebar ? "sort" : "car", { className: "h-5 w-5" }));
   copy.append(
     icon,
-    textNode("p", "text-[10px] font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", isLocation ? "" : isBank ? "" : isSidebar ? "" : ""),
-    textNode("h1", "text-2xl font-black leading-tight tracking-normal text-gray-950 sm:text-3xl", isLocation ? "Master Lokasi" : isBank ? "Master Bank" : isSidebar ? "Master Sidebar" : "Master Brand"),
-    textNode("p", "max-w-2xl text-xs leading-6 text-gray-600", isLocation
-      ? ""
-      : isBank
-      ? ""
-      : isSidebar
-      ? ""
-      : ""),
+    textNode("p", "text-[10px] font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", ""),
+    textNode("h1", "text-2xl font-black leading-tight tracking-normal text-gray-950 sm:text-3xl", isPricing ? "Master Harga" : isLocation ? "Master Lokasi" : isBank ? "Master Bank" : isSidebar ? "Master Sidebar" : "Master Brand"),
+    textNode("p", "max-w-2xl text-xs leading-6 text-gray-600", isPricing ? "Paket harga yang tampil sebagai kartu pilihan saat showroom mendaftar." : ""),
   );
 
   const stats = document.createElement("section");
-  stats.id = isLocation ? "admstloc_hero_stats_section" : isBank ? "admstbk_hero_stats_section" : "admst_hero_stats_section";
+  stats.id = isPricing ? "admstpr_hero_stats_section" : isLocation ? "admstloc_hero_stats_section" : isBank ? "admstbk_hero_stats_section" : "admst_hero_stats_section";
   stats.className = "grid gap-2 sm:grid-cols-3 lg:min-w-[380px]";
   const provinceCount = new Set(cities.map((city) => city.province_slug || city.province_name).filter(Boolean)).size;
-  const statItems = isLocation
+  const statItems = isPricing
+    ? [
+      ["Paket", plans.length],
+      ["Aktif", plans.filter((plan) => plan.status === "active").length],
+      ["Rekomendasi", plans.filter((plan) => plan.is_recommended).length],
+    ]
+    : isLocation
     ? [
       ["Kota", cities.length],
       ["Aktif", cities.filter((city) => city.status === "active").length],
@@ -650,7 +751,7 @@ function masterHero({ action, pageType, brands = [], sidebarItems = [], banks = 
     ];
   statItems.forEach(([label, value]) => {
     const card = document.createElement("section");
-    card.id = `${isLocation ? "admstloc" : isBank ? "admstbk" : "admst"}_hero_stat_${String(label).toLowerCase()}_section`;
+    card.id = `${isPricing ? "admstpr" : isLocation ? "admstloc" : isBank ? "admstbk" : "admst"}_hero_stat_${String(label).toLowerCase()}_section`;
     card.className = "rounded-[1.25rem] border border-[var(--pb-card-border)] bg-white/78 p-3 shadow-sm";
     card.append(
       textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label),
@@ -665,6 +766,36 @@ function masterHero({ action, pageType, brands = [], sidebarItems = [], banks = 
   side.append(stats, action, textNode("p", "text-[10px] font-semibold text-gray-500", `master_key: ${master.master_key ?? "-"}`));
   grid.append(copy, side);
   section.append(grid);
+  return section;
+}
+
+function masterPricingFilterBar({ filters, plans, onSubmit }) {
+  const section = baseFilterSection("admstpr_filter_section", "admin.master.pricing.filters");
+  const form = document.createElement("form");
+  form.id = "admstpr_filter_form_section";
+  form.className = "grid gap-3 lg:grid-cols-[minmax(0,1fr)_220px_auto]";
+
+  const keyword = inputField("admstpr_keyword_input", filters.keyword ?? "", "Cari nama paket atau fitur");
+  const status = selectField("admstpr_status_input", filters.status ?? "", [
+    ["", "Semua status"],
+    ["active", "Aktif"],
+    ["inactive", "Nonaktif"],
+  ]);
+  const actions = filterActions({
+    idPrefix: "admstpr",
+    onReset: () => onSubmit?.({ keyword: "", status: "" }),
+  });
+  form.append(labelWrap("Keyword", keyword), labelWrap("Status", status), actions.wrap);
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    onSubmit?.({ keyword: keyword.value.trim(), status: status.value });
+  });
+
+  section.append(form, filterChips("admstpr_filter_chips_section", [
+    `${plans.length} paket`,
+    `${plans.filter((plan) => plan.status === "active").length} aktif`,
+    `${plans.filter((plan) => plan.is_recommended).length} rekomendasi`,
+  ]));
   return section;
 }
 
@@ -862,6 +993,28 @@ function openSidebarModal({ mode, item, items, actions }) {
   });
 }
 
+function openPricingModal({ mode, plan, plans, actions, state }) {
+  const isi = applyDesignHook(AdminMasterPricingForm({
+    plan,
+    mode,
+    saving: state.saving,
+    onSubmit: (nextPlan) => actions.savePricing(nextPlan, plans),
+    onDelete: (targetPlan) => actions.deletePricing(targetPlan, plans),
+    onCancel: () => closeModal(),
+  }), "admin.master.pricing.form");
+
+  openModal(isi, {
+    key: `admstpr-plan-${mode}-${plan?.id ?? "new"}`,
+    title: mode === "edit" ? "Edit Paket Harga" : "Tambah Paket Harga",
+    description: "Data paket disimpan dalam payload JSON master pricing.plans.",
+    size: "xl",
+    panelId: "admstpr_plan_modal_section",
+    headerId: "admstpr_plan_modal_header_section",
+    bodyId: "admstpr_plan_modal_body_section",
+    footerNode: () => aksiModalDari(isi),
+  });
+}
+
 function openBankModal({ mode, bank, banks, actions, state }) {
   const isi = applyDesignHook(AdminMasterBankForm({
     bank,
@@ -965,6 +1118,20 @@ function upsertBank(banks, nextBank) {
     : [...banks, normalized];
 }
 
+function upsertPlan(plans, nextPlan) {
+  const exists = plans.some((plan) => plan.id === nextPlan.id);
+  const normalized = {
+    ...nextPlan,
+    slug: slugify(nextPlan.slug || nextPlan.name),
+    price: Math.max(0, Number(nextPlan.price) || 0),
+    updated_at: new Date().toISOString(),
+  };
+
+  return exists
+    ? plans.map((plan) => plan.id === nextPlan.id ? normalized : plan)
+    : [...plans, normalized];
+}
+
 function upsertCity(cities, nextCity) {
   const exists = cities.some((city) => city.id === nextCity.id);
   const normalized = {
@@ -1037,6 +1204,17 @@ function patchBankMaster(master) {
   }, "admin-master:bank-snapshot-synced");
 }
 
+function patchPricingMaster(master) {
+  appStore.patchState("working.adminMaster.pricing", {
+    data: master,
+    hydratedAt: Date.now(),
+  }, "admin-master:pricing-saved");
+  appStore.patchState("snapshot.admin.masterPricing", {
+    data: master,
+    hydratedAt: Date.now(),
+  }, "admin-master:pricing-snapshot-synced");
+}
+
 function patchLocationMaster(master) {
   appStore.patchState("working.adminMaster.location", {
     data: master,
@@ -1056,7 +1234,7 @@ function buildMasterPath(pageType = "brand", { keyword = "", status = "", role =
   if (page && Number(page) > 1) params.set("page", String(page));
   if (pageSize && Number(pageSize) > 0) params.set("page_size", String(pageSize));
   const query = params.toString();
-  const basePath = pageType === "location" ? "/admin/master-location" : pageType === "bank" ? "/admin/master-bank" : pageType === "sidebar" ? "/admin/master-sidebar" : "/admin/master-brand";
+  const basePath = pageType === "pricing" ? "/admin/master-pricing" : pageType === "location" ? "/admin/master-location" : pageType === "bank" ? "/admin/master-bank" : pageType === "sidebar" ? "/admin/master-sidebar" : "/admin/master-brand";
   return query ? `${basePath}?${query}` : basePath;
 }
 

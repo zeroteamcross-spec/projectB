@@ -10,7 +10,7 @@ import { AdminSettlementsPage } from "./pages/settlementsPage.js";
 import { AdminAffiliateCommissionsPage } from "./pages/affiliateCommissionsPage.js";
 import { AdminTransactionsPage } from "./pages/transactionsPage.js";
 import { AdminSlidersPage } from "./pages/slidersPage.js";
-import { AdminMasterBankPage, AdminMasterBrandPage, AdminMasterLocationPage, AdminMasterSidebarPage } from "./pages/masterPage.js";
+import { AdminMasterBankPage, AdminMasterBrandPage, AdminMasterLocationPage, AdminMasterSidebarPage, AdminMasterPricingPage } from "./pages/masterPage.js";
 import { AdminMasterInspectionPage } from "./pages/masterInspectionPage.js";
 import { AdminMigrationManagerPage } from "./pages/migrationManagerPage.js";
 import { AdminLandingPageConfigPage } from "./pages/landingPageConfigPage.js";
@@ -343,6 +343,22 @@ export const adminRoutes = [
         {
           key: "location",
           loader: ({ signal }) => adminMasterService.getLocationMaster({ signal }).catch(() => adminMasterService.normalizeLocationMaster(null)),
+        },
+      ],
+    },
+  },
+  {
+    name: "admin.master-pricing",
+    path: "/admin/master-pricing",
+    shell: "app",
+    role: "admin",
+    page: AdminMasterPricingPage,
+    workingStateKey: "adminMaster",
+    preload: {
+      working: [
+        {
+          key: "pricing",
+          loader: ({ signal }) => adminMasterService.getPricingMaster({ signal }).catch(() => adminMasterService.normalizePricingMaster(null)),
         },
       ],
     },
