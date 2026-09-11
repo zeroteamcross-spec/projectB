@@ -17,6 +17,14 @@ load_env(base_path('.env'));
 
 require_once __DIR__ . '/autoload.php';
 
+// display_errors di production membocorkan path file server & isi variabel
+// langsung ke body response (ditemukan lewat warning PHP yang tercampur ke
+// JSON API sungguhan) -- error tetap harus terlihat di local/staging untuk
+// debugging, jadi ini environment-aware, bukan dimatikan total selamanya.
+error_reporting(E_ALL);
+ini_set('display_errors', config('app.env') === 'production' ? '0' : '1');
+ini_set('log_errors', '1');
+
 $app = new Application(base_path(), config('app', []));
 // Container mengenali dirinya sendiri, supaya kelas yang perlu menyelesaikan
 // dependensi secara malas bisa memintanya lewat konstruktor. Dipakai

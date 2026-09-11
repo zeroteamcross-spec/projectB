@@ -243,9 +243,12 @@ class ShowroomRepository
     public function findDueSubscriptions(): array
     {
         $stmt = $this->pdo->prepare(
-            'SELECT sh.id, sh.user_id, sh.slug, sh.name,
-                    sh.selected_plan_name, sh.selected_plan_price, sh.selected_plan_billing_period,
+            'SELECT sh.id, sh.user_id, sh.slug, sh.name, sh.address, sh.city_name, sh.phone_number,
+                    sh.bank_account_number, sh.bank_type, sh.bank_account_name,
+                    sh.icon_url, sh.header_logo_url, sh.tab_title,
+                    sh.selected_plan_name, sh.selected_plan_price, sh.selected_plan_billing_period, sh.selected_plan_selected_at,
                     ' . self::SUBSCRIPTION_COLUMNS . ',
+                    sh.created_at, sh.updated_at,
                     u.name AS seller_name, u.email AS seller_email
              FROM showrooms AS sh
              INNER JOIN users AS u ON u.id = sh.user_id
