@@ -5,6 +5,8 @@ import { createBackgroundVideoLayer } from "../../../ui/composites/backgroundVid
 import { createIcon } from "../../../theme/iconRegistry.js";
 import { tw } from "../../../theme/tailwindClasses.js";
 import { adminMasterService } from "../../admin/services/adminMasterService.js";
+import { showroomsResource } from "../../../resources/showroomsResource.js";
+import { formatCurrency } from "../../../utils/formatCurrency.js";
 
 const SHOWROOM_REGISTER_FALLBACK = "bg-[radial-gradient(circle_at_12%_10%,color-mix(in_srgb,var(--pb-brand-primary)_18%,transparent),transparent_32%),radial-gradient(circle_at_88%_18%,color-mix(in_srgb,var(--pb-brand-accent)_16%,transparent),transparent_30%),linear-gradient(135deg,#faf4ed,#f8fafc_44%,#eaf4f9)]";
 
@@ -29,6 +31,14 @@ export function ShowroomRegisterPage() {
     // Keeps the typed values across re-renders so a failed submit never wipes
     // a long form.
     draft: {},
+    plans: [],
+    selectedPlanId: null,
+    isSelectingPlan: false,
+    planError: "",
+    // Cuma menahan di kartu pilihan kalau memang ada paket aktif untuk
+    // dipilih -- showroom yang mendaftar sebelum Admin sempat membuat satu
+    // pun paket tidak boleh terjebak tanpa jalan keluar.
+    planConfirmed: false,
   };
 
   const getBackgroundVideoLayer = () => {
@@ -56,6 +66,13 @@ export function ShowroomRegisterPage() {
           slug: payload.showroom.slug,
           email: payload.email,
         };
+        // register() masuk juga sekalian (lihat AuthService::register() --
+        // seller boleh login walau masih pending approval), jadi endpoint
+        // showroom yang butuh sesi aktif (dipakai confirmPlan() di bawah)
+        // sudah bisa dipanggil sekarang, tanpa langkah login terpisah.
+        if (!state.plans.length) {
+          state.planConfirmed = true;
+        }
       } catch (error) {
         state.fieldErrors = normalizeFieldErrors(error);
         // "Validation failed" is the transport-level message; when the server
@@ -71,6 +88,34 @@ export function ShowroomRegisterPage() {
     updateDraft(patch) {
       Object.assign(state.draft, patch);
     },
+    selectPlan(context, planId) {
+      state.selectedPlanId = planId;
+      rerender(context);
+    },
+    async confirmPlan(context) {
+      const plan = state.plans.find((item) => item.id === state.selectedPlanId);
+      if (!plan) {
+        return;
+      }
+
+      state.isSelectingPlan = true;
+      state.planError = "";
+      rerender(context);
+
+      try {
+        await showroomsResource.updateMine({
+          selected_plan_name: plan.name,
+          selected_plan_price: plan.price,
+          selected_plan_billing_period: plan.billing_period,
+        });
+        state.planConfirmed = true;
+      } catch (error) {
+        state.planError = error?.message || "Gagal menyimpan pilihan paket harga.";
+      } finally {
+        state.isSelectingPlan = false;
+        rerender(context);
+      }
+    },
     goToLogin(context) {
       context?.router?.navigate("/auth?role=seller");
     },
@@ -81,10 +126,15 @@ export function ShowroomRegisterPage() {
 
   return createPageLifecycle({
     async bootstrap() {
-      const [bankMaster, locationMaster] = await Promise.all([
+      const [bankMaster, locationMaster, pricingMaster] = await Promise.all([
         adminMasterService.getBankMaster().catch(() => null),
         adminMasterService.getLocationMaster().catch(() => null),
+        adminMasterService.getPricingMaster().catch(() => null),
       ]);
+
+      state.plans = (pricingMaster?.data?.plans ?? [])
+        .filter((plan) => (plan?.status ?? "active") === "active")
+        .sort((a, b) => Number(a.price ?? 0) - Number(b.price ?? 0));
 
       const activeBanks = (bankMaster?.data?.banks ?? bankMaster?.banks ?? [])
         .filter((bank) => (bank?.status ?? "active") === "active");
@@ -131,9 +181,13 @@ export function ShowroomRegisterPage() {
     const frame = document.createElement("div");
     frame.className = "relative z-10 mx-auto grid w-full max-w-[720px] gap-5 px-4 py-8 sm:px-6";
     frame.append(pageHeader(actions, context));
-    frame.append(pageState.registered
-      ? successPanel(pageState.registered, actions, context)
-      : registerPanel(pageState, actions, context));
+    if (!pageState.registered) {
+      frame.append(registerPanel(pageState, actions, context));
+    } else if (!pageState.planConfirmed) {
+      frame.append(plansPanel(pageState, actions, context));
+    } else {
+      frame.append(successPanel(pageState.registered, actions, context));
+    }
 
     shell.append(frame);
     target.replaceChildren(shell);
@@ -399,6 +453,97 @@ function registerPanel(state, actions, context) {
   function render() {
     section.replaceWith(registerPanel(state, actions, context));
   }
+}
+
+function plansPanel(state, actions, context) {
+  const section = document.createElement("section");
+  section.id = "shr_register_plans_section";
+  section.className = "grid gap-4 rounded-[2rem] border border-[var(--pb-card-border)] bg-white/85 p-5 shadow-[0_30px_90px_rgba(15,23,42,0.14)] backdrop-blur-xl sm:p-6";
+
+  const badge = document.createElement("span");
+  badge.className = "inline-flex w-fit items-center gap-2 rounded-full bg-[color-mix(in_srgb,var(--pb-success)_16%,white)] px-3 py-1.5 text-xs font-bold text-[var(--pb-success)]";
+  badge.append(createIcon("shield", { className: "block h-4 w-4 leading-none" }), document.createTextNode("Akun berhasil dibuat"));
+
+  const title = document.createElement("h2");
+  title.className = "text-lg font-black tracking-normal text-gray-950";
+  title.textContent = "Pilih paket harga";
+
+  const body = document.createElement("p");
+  body.className = "text-xs leading-6 text-gray-600";
+  body.textContent = "Pilih salah satu paket untuk melanjutkan ke pendaftaran. Anda bisa mengubah paket ini nanti.";
+
+  const grid = document.createElement("div");
+  grid.id = "shr_register_plan_cards_section";
+  grid.className = "grid gap-3 sm:grid-cols-2 lg:grid-cols-3";
+  grid.append(...state.plans.map((plan) => planCard(plan, state, actions, context)));
+
+  if (state.planError) {
+    const message = document.createElement("p");
+    message.id = "shr_register_plan_error_message";
+    message.className = "rounded-xl border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-3 py-2 text-xs font-medium text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
+    message.textContent = state.planError;
+    section.append(badge, title, body, grid, message);
+  } else {
+    section.append(badge, title, body, grid);
+  }
+
+  const submit = Button({
+    label: state.isSelectingPlan ? "Menyimpan..." : "Lanjutkan",
+    variant: "primary",
+    disabled: state.isSelectingPlan || !state.selectedPlanId,
+    onClick: () => actions.confirmPlan(context),
+  });
+  submit.id = "shr_register_plan_confirm_button";
+  submit.classList.add("w-full", "shadow-[0_16px_34px_rgba(30,129,176,0.24)]", "transition", "duration-200");
+  section.append(submit);
+
+  return section;
+}
+
+function planCard(plan, state, actions, context) {
+  const isSelected = state.selectedPlanId === plan.id;
+  const card = document.createElement("button");
+  card.type = "button";
+  card.id = `shr_register_plan_card_${plan.id}`;
+  card.className = [
+    "relative grid gap-3 rounded-[1.5rem] border p-4 text-left transition duration-150",
+    isSelected
+      ? "border-[var(--pb-brand-primary)] bg-[color-mix(in_srgb,var(--pb-brand-primary)_8%,white)] shadow-[0_16px_34px_rgba(30,129,176,0.18)]"
+      : "border-[var(--pb-card-border)] bg-white/70 hover:border-[color-mix(in_srgb,var(--pb-brand-primary)_35%,var(--pb-card-border))]",
+  ].join(" ");
+  card.setAttribute("aria-pressed", String(isSelected));
+  card.addEventListener("click", () => actions.selectPlan(context, plan.id));
+
+  if (plan.is_recommended) {
+    const ribbon = document.createElement("span");
+    ribbon.className = "absolute -top-2.5 left-4 rounded-full bg-[var(--pb-brand-primary)] px-3 py-1 text-[10px] font-black uppercase tracking-wide text-white shadow-sm";
+    ribbon.textContent = "Rekomendasi";
+    card.append(ribbon);
+  }
+
+  const name = document.createElement("p");
+  name.className = "text-sm font-black text-gray-950";
+  name.textContent = plan.name;
+
+  const price = document.createElement("p");
+  price.className = "text-lg font-black text-[var(--pb-brand-secondary)]";
+  price.textContent = `${formatCurrency(plan.price)}${plan.billing_period ? ` ${plan.billing_period}` : ""}`;
+
+  card.append(name, price);
+
+  if (plan.features?.length) {
+    const list = document.createElement("ul");
+    list.className = "grid gap-1.5 text-xs leading-5 text-gray-600";
+    plan.features.forEach((feature) => {
+      const item = document.createElement("li");
+      item.className = "flex items-start gap-1.5";
+      item.append(createIcon("circleCheck", { className: "mt-0.5 block h-3.5 w-3.5 shrink-0 leading-none text-[var(--pb-success)]" }), document.createTextNode(feature));
+      list.append(item);
+    });
+    card.append(list);
+  }
+
+  return card;
 }
 
 function successPanel(registered, actions, context) {
