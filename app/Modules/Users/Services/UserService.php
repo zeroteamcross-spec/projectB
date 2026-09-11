@@ -136,6 +136,13 @@ class UserService
             'selected_plan_price' => isset($showroom['selected_plan_price']) ? (float) $showroom['selected_plan_price'] : null,
             'selected_plan_billing_period' => $showroom['selected_plan_billing_period'] ?? null,
             'selected_plan_selected_at' => $showroom['selected_plan_selected_at'] ?? null,
+            'subscription_payment_status' => $showroom['subscription_payment_status'] ?? 'unpaid',
+            'subscription_proof_path' => $showroom['subscription_proof_path'] ?? null,
+            'subscription_proof_note' => $showroom['subscription_proof_note'] ?? null,
+            'subscription_proof_submitted_at' => $showroom['subscription_proof_submitted_at'] ?? null,
+            'subscription_confirmed_at' => $showroom['subscription_confirmed_at'] ?? null,
+            'subscription_rejected_at' => $showroom['subscription_rejected_at'] ?? null,
+            'subscription_rejected_reason' => $showroom['subscription_rejected_reason'] ?? null,
             'created_at' => $showroom['created_at'],
             'updated_at' => $showroom['updated_at'],
         ];

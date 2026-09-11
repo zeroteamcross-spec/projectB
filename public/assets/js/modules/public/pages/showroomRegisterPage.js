@@ -39,6 +39,14 @@ export function ShowroomRegisterPage() {
     // dipilih -- showroom yang mendaftar sebelum Admin sempat membuat satu
     // pun paket tidak boleh terjebak tanpa jalan keluar.
     planConfirmed: false,
+    subscriptionDestination: null,
+    paymentProofFile: null,
+    paymentNote: "",
+    isSubmittingProof: false,
+    paymentError: "",
+    // Sama seperti planConfirmed -- kalau memang tidak ada paket untuk
+    // dipilih, tidak ada juga yang perlu dibayar, jadi langkah ini dilewati.
+    paymentSubmitted: false,
   };
 
   const getBackgroundVideoLayer = () => {
@@ -72,6 +80,7 @@ export function ShowroomRegisterPage() {
         // sudah bisa dipanggil sekarang, tanpa langkah login terpisah.
         if (!state.plans.length) {
           state.planConfirmed = true;
+          state.paymentSubmitted = true;
         }
       } catch (error) {
         state.fieldErrors = normalizeFieldErrors(error);
@@ -118,6 +127,35 @@ export function ShowroomRegisterPage() {
         rerender(context);
       }
     },
+    updateProofFile(context, file) {
+      state.paymentProofFile = file;
+      state.paymentError = "";
+      rerender(context);
+    },
+    updateProofNote(note) {
+      state.paymentNote = note;
+    },
+    async submitProof(context) {
+      if (!state.paymentProofFile) {
+        state.paymentError = "Pilih file bukti transfer terlebih dahulu.";
+        rerender(context);
+        return;
+      }
+
+      state.isSubmittingProof = true;
+      state.paymentError = "";
+      rerender(context);
+
+      try {
+        await showroomsResource.submitSubscriptionProof(state.paymentProofFile, state.paymentNote);
+        state.paymentSubmitted = true;
+      } catch (error) {
+        state.paymentError = error?.message || "Gagal mengunggah bukti transfer.";
+      } finally {
+        state.isSubmittingProof = false;
+        rerender(context);
+      }
+    },
     goToLogin(context) {
       context?.router?.navigate("/auth?role=seller");
     },
@@ -128,15 +166,18 @@ export function ShowroomRegisterPage() {
 
   return createPageLifecycle({
     async bootstrap() {
-      const [bankMaster, locationMaster, pricingMaster] = await Promise.all([
+      const [bankMaster, locationMaster, pricingMaster, destinationMaster] = await Promise.all([
         adminMasterService.getBankMaster().catch(() => null),
         adminMasterService.getLocationMaster().catch(() => null),
         adminMasterService.getPricingMaster().catch(() => null),
+        adminMasterService.getSubscriptionDestinationMaster().catch(() => null),
       ]);
 
       state.plans = (pricingMaster?.data?.plans ?? [])
         .filter((plan) => (plan?.status ?? "active") === "active")
         .sort((a, b) => Number(a.price ?? 0) - Number(b.price ?? 0));
+
+      state.subscriptionDestination = destinationMaster?.data ?? null;
 
       const activeBanks = (bankMaster?.data?.banks ?? bankMaster?.banks ?? [])
         .filter((bank) => (bank?.status ?? "active") === "active");
@@ -187,8 +228,10 @@ export function ShowroomRegisterPage() {
       frame.append(registerPanel(pageState, actions, context));
     } else if (!pageState.planConfirmed) {
       frame.append(plansPanel(pageState, actions, context));
+    } else if (!pageState.paymentSubmitted) {
+      frame.append(paymentPanel(pageState, actions, context));
     } else {
-      frame.append(successPanel(pageState.registered, actions, context));
+      frame.append(successPanel(pageState, actions, context));
     }
 
     shell.append(frame);
@@ -548,7 +591,88 @@ function planCard(plan, state, actions, context) {
   return card;
 }
 
-function successPanel(registered, actions, context) {
+function paymentPanel(state, actions, context) {
+  const section = document.createElement("section");
+  section.id = "shr_register_payment_section";
+  section.className = "grid gap-4 rounded-[2rem] border border-[var(--pb-card-border)] bg-white/85 p-5 shadow-[0_30px_90px_rgba(15,23,42,0.14)] backdrop-blur-xl sm:p-6";
+
+  const plan = state.plans.find((item) => item.id === state.selectedPlanId);
+
+  const badge = document.createElement("span");
+  badge.className = "inline-flex w-fit items-center gap-2 rounded-full bg-[color-mix(in_srgb,var(--pb-success)_16%,white)] px-3 py-1.5 text-xs font-bold text-[var(--pb-success)]";
+  badge.append(createIcon("shield", { className: "block h-4 w-4 leading-none" }), document.createTextNode("Paket dipilih"));
+
+  const title = document.createElement("h2");
+  title.className = "text-lg font-black tracking-normal text-gray-950";
+  title.textContent = "Unggah bukti transfer";
+
+  const body = document.createElement("p");
+  body.className = "text-xs leading-6 text-gray-600";
+  body.textContent = "Transfer sesuai paket yang dipilih ke rekening tujuan di bawah, lalu unggah bukti transfernya. Admin akan memeriksa sebelum akun showroom Anda disetujui.";
+
+  const recap = document.createElement("div");
+  recap.className = "grid gap-2 rounded-2xl border border-[var(--pb-card-border)] bg-gray-50 p-3 text-xs";
+  if (plan) {
+    recap.append(
+      detailRow("Paket", plan.name),
+      detailRow("Jumlah transfer", `${formatCurrency(plan.price)}${plan.billing_period ? ` ${plan.billing_period}` : ""}`),
+    );
+  }
+  if (state.subscriptionDestination?.account_number) {
+    recap.append(
+      detailRow("Bank tujuan", state.subscriptionDestination.bank_name || "-"),
+      detailRow("Nomor rekening", state.subscriptionDestination.account_number),
+      detailRow("Atas nama", state.subscriptionDestination.account_holder || "-"),
+    );
+  }
+
+  const fileLabel = document.createElement("label");
+  fileLabel.className = "grid gap-1 text-xs font-semibold text-gray-700";
+  fileLabel.textContent = "Bukti transfer (JPG, PNG, atau PDF, maks. 5 MB)";
+  const fileInput = document.createElement("input");
+  fileInput.id = "shr_register_proof_file_input";
+  fileInput.type = "file";
+  fileInput.accept = "image/jpeg,image/png,image/webp,application/pdf";
+  fileInput.className = "min-h-10 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-white px-3 py-2 text-xs text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  fileInput.addEventListener("change", (event) => actions.updateProofFile(context, event.target.files?.[0] ?? null));
+  fileLabel.append(fileInput);
+
+  const noteLabel = document.createElement("label");
+  noteLabel.className = "grid gap-1 text-xs font-semibold text-gray-700";
+  noteLabel.textContent = "Catatan (opsional)";
+  const noteInput = document.createElement("textarea");
+  noteInput.id = "shr_register_proof_note_input";
+  noteInput.rows = 2;
+  noteInput.className = "min-h-10 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-white px-3 py-2 text-xs text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  noteInput.value = state.paymentNote;
+  noteInput.addEventListener("input", (event) => actions.updateProofNote(event.target.value));
+  noteLabel.append(noteInput);
+
+  section.append(badge, title, body, recap, fileLabel, noteLabel);
+
+  if (state.paymentError) {
+    const message = document.createElement("p");
+    message.id = "shr_register_payment_error_message";
+    message.className = "rounded-xl border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-3 py-2 text-xs font-medium text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
+    message.textContent = state.paymentError;
+    section.append(message);
+  }
+
+  const submit = Button({
+    label: state.isSubmittingProof ? "Mengunggah..." : "Kirim bukti transfer",
+    variant: "primary",
+    disabled: state.isSubmittingProof || !state.paymentProofFile,
+    onClick: () => actions.submitProof(context),
+  });
+  submit.id = "shr_register_payment_submit_button";
+  submit.classList.add("w-full", "shadow-[0_16px_34px_rgba(30,129,176,0.24)]", "transition", "duration-200");
+  section.append(submit);
+
+  return section;
+}
+
+function successPanel(state, actions, context) {
+  const registered = state.registered;
   const section = document.createElement("section");
   section.id = "shr_register_success_section";
   section.className = "grid gap-4 rounded-[2rem] border border-[var(--pb-card-border)] bg-white/85 p-5 shadow-[0_30px_90px_rgba(15,23,42,0.14)] backdrop-blur-xl sm:p-6";
@@ -563,7 +687,9 @@ function successPanel(registered, actions, context) {
 
   const body = document.createElement("p");
   body.className = "text-xs leading-6 text-gray-600";
-  body.textContent = "Akun Anda menunggu persetujuan admin. Anda sudah bisa masuk dan menyiapkan showroom, tetapi sebagian fitur baru terbuka penuh setelah disetujui.";
+  body.textContent = state.plans.length
+    ? "Akun Anda menunggu persetujuan admin, termasuk verifikasi bukti transfer yang baru saja Anda unggah. Anda sudah bisa masuk dan menyiapkan showroom, tetapi sebagian fitur baru terbuka penuh setelah disetujui."
+    : "Akun Anda menunggu persetujuan admin. Anda sudah bisa masuk dan menyiapkan showroom, tetapi sebagian fitur baru terbuka penuh setelah disetujui.";
 
   const detail = document.createElement("div");
   detail.className = "grid gap-2 rounded-2xl border border-[var(--pb-card-border)] bg-gray-50 p-3 text-xs";

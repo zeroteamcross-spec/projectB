@@ -15,12 +15,17 @@ class ShowroomRepository
         $this->pdo = $pdo;
     }
 
+    private const SUBSCRIPTION_COLUMNS = 'subscription_payment_status, subscription_proof_path, subscription_proof_note,
+                    subscription_proof_submitted_at, subscription_confirmed_at, subscription_confirmed_by,
+                    subscription_rejected_at, subscription_rejected_reason';
+
     public function findById(int $id): ?array
     {
         $stmt = $this->pdo->prepare(
             'SELECT id, user_id, slug, name, address, city_name, phone_number, bank_account_number,
                     bank_type, bank_account_name, icon_url, header_logo_url, tab_title,
                     selected_plan_name, selected_plan_price, selected_plan_billing_period, selected_plan_selected_at,
+                    ' . self::SUBSCRIPTION_COLUMNS . ',
                     created_at, updated_at
              FROM showrooms
              WHERE id = :id
@@ -39,6 +44,7 @@ class ShowroomRepository
             'SELECT id, user_id, slug, name, address, city_name, phone_number, bank_account_number,
                     bank_type, bank_account_name, icon_url, header_logo_url, tab_title,
                     selected_plan_name, selected_plan_price, selected_plan_billing_period, selected_plan_selected_at,
+                    ' . self::SUBSCRIPTION_COLUMNS . ',
                     created_at, updated_at
              FROM showrooms
              WHERE user_id = :user_id
@@ -137,6 +143,14 @@ class ShowroomRepository
                  selected_plan_price = :selected_plan_price,
                  selected_plan_billing_period = :selected_plan_billing_period,
                  selected_plan_selected_at = :selected_plan_selected_at,
+                 subscription_payment_status = :subscription_payment_status,
+                 subscription_proof_path = :subscription_proof_path,
+                 subscription_proof_note = :subscription_proof_note,
+                 subscription_proof_submitted_at = :subscription_proof_submitted_at,
+                 subscription_confirmed_at = :subscription_confirmed_at,
+                 subscription_confirmed_by = :subscription_confirmed_by,
+                 subscription_rejected_at = :subscription_rejected_at,
+                 subscription_rejected_reason = :subscription_rejected_reason,
                  updated_at = :updated_at
              WHERE id = :id
              AND deleted_at IS NULL'
@@ -159,7 +173,80 @@ class ShowroomRepository
             'selected_plan_price' => $data['selected_plan_price'] ?? null,
             'selected_plan_billing_period' => $data['selected_plan_billing_period'] ?? null,
             'selected_plan_selected_at' => $data['selected_plan_selected_at'] ?? null,
+            'subscription_payment_status' => $data['subscription_payment_status'] ?? 'unpaid',
+            'subscription_proof_path' => $data['subscription_proof_path'] ?? null,
+            'subscription_proof_note' => $data['subscription_proof_note'] ?? null,
+            'subscription_proof_submitted_at' => $data['subscription_proof_submitted_at'] ?? null,
+            'subscription_confirmed_at' => $data['subscription_confirmed_at'] ?? null,
+            'subscription_confirmed_by' => $data['subscription_confirmed_by'] ?? null,
+            'subscription_rejected_at' => $data['subscription_rejected_at'] ?? null,
+            'subscription_rejected_reason' => $data['subscription_rejected_reason'] ?? null,
             'updated_at' => date('Y-m-d H:i:s'),
+        ]);
+    }
+
+    public function updateSubscriptionSubmission(int $id, array $data): void
+    {
+        $stmt = $this->pdo->prepare(
+            'UPDATE showrooms
+             SET subscription_payment_status = \'pending_verification\',
+                 subscription_proof_path = :subscription_proof_path,
+                 subscription_proof_note = :subscription_proof_note,
+                 subscription_proof_submitted_at = :subscription_proof_submitted_at,
+                 subscription_rejected_at = NULL,
+                 subscription_rejected_reason = NULL,
+                 updated_at = :updated_at
+             WHERE id = :id
+             AND deleted_at IS NULL'
+        );
+
+        $stmt->execute([
+            'id' => $id,
+            'subscription_proof_path' => $data['subscription_proof_path'],
+            'subscription_proof_note' => $data['subscription_proof_note'] ?? null,
+            'subscription_proof_submitted_at' => $data['subscription_proof_submitted_at'],
+            'updated_at' => $data['updated_at'],
+        ]);
+    }
+
+    public function updateSubscriptionConfirmation(int $id, array $data): void
+    {
+        $stmt = $this->pdo->prepare(
+            'UPDATE showrooms
+             SET subscription_payment_status = \'paid\',
+                 subscription_confirmed_at = :subscription_confirmed_at,
+                 subscription_confirmed_by = :subscription_confirmed_by,
+                 updated_at = :updated_at
+             WHERE id = :id
+             AND deleted_at IS NULL'
+        );
+
+        $stmt->execute([
+            'id' => $id,
+            'subscription_confirmed_at' => $data['subscription_confirmed_at'],
+            'subscription_confirmed_by' => $data['subscription_confirmed_by'],
+            'updated_at' => $data['updated_at'],
+        ]);
+    }
+
+    public function updateSubscriptionRejection(int $id, array $data): void
+    {
+        $stmt = $this->pdo->prepare(
+            'UPDATE showrooms
+             SET subscription_payment_status = \'rejected\',
+                 subscription_proof_path = NULL,
+                 subscription_rejected_at = :subscription_rejected_at,
+                 subscription_rejected_reason = :subscription_rejected_reason,
+                 updated_at = :updated_at
+             WHERE id = :id
+             AND deleted_at IS NULL'
+        );
+
+        $stmt->execute([
+            'id' => $id,
+            'subscription_rejected_at' => $data['subscription_rejected_at'],
+            'subscription_rejected_reason' => $data['subscription_rejected_reason'],
+            'updated_at' => $data['updated_at'],
         ]);
     }
 }

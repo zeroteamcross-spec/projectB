@@ -7,8 +7,11 @@ namespace App\Modules\Showrooms\Services;
 use App\Core\Exceptions\ForbiddenException;
 use App\Core\Exceptions\NotFoundException;
 use App\Core\Exceptions\ValidationException;
+use App\Infrastructure\Storage\StorageServiceInterface;
+use App\Modules\Auth\Policies\AuthPolicy;
 use App\Modules\MasterData\Services\MasterDataService;
 use App\Modules\Showrooms\Repositories\ShowroomRepository;
+use Throwable;
 
 class ShowroomService
 {
@@ -31,10 +34,13 @@ class ShowroomService
 
     private MasterDataService $masterData;
 
-    public function __construct(ShowroomRepository $showrooms, MasterDataService $masterData)
+    private StorageServiceInterface $storage;
+
+    public function __construct(ShowroomRepository $showrooms, MasterDataService $masterData, StorageServiceInterface $storage)
     {
         $this->showrooms = $showrooms;
         $this->masterData = $masterData;
+        $this->storage = $storage;
     }
 
     public function mine(array $user): array
@@ -78,6 +84,10 @@ class ShowroomService
             // bukan dari $data.
             $hasPlanSelection = array_key_exists('selected_plan_name', $data);
             $plan = $hasPlanSelection ? $this->resolveSelectedPlan($data['selected_plan_name']) : null;
+            // Ganti paket (mis. upgrade/downgrade) berarti harga berubah, jadi
+            // pembayaran & bukti transfer yang lama tidak lagi berlaku untuk
+            // paket yang baru -- harus bayar ulang, bukan otomatis "sudah lunas".
+            $planChanged = $hasPlanSelection && ($plan['name'] ?? null) !== $existing['selected_plan_name'];
 
             $payload = [
                 'slug' => $existing['slug'] ?: $this->generateSlug((string) ($data['name'] ?? $existing['name']), (int) $existing['id']),
@@ -110,6 +120,14 @@ class ShowroomService
                     ? $plan['billing_period']
                     : $existing['selected_plan_billing_period'],
                 'selected_plan_selected_at' => $hasPlanSelection ? date('Y-m-d H:i:s') : $existing['selected_plan_selected_at'],
+                'subscription_payment_status' => $planChanged ? 'unpaid' : $existing['subscription_payment_status'],
+                'subscription_proof_path' => $planChanged ? null : $existing['subscription_proof_path'],
+                'subscription_proof_note' => $planChanged ? null : $existing['subscription_proof_note'],
+                'subscription_proof_submitted_at' => $planChanged ? null : $existing['subscription_proof_submitted_at'],
+                'subscription_confirmed_at' => $planChanged ? null : $existing['subscription_confirmed_at'],
+                'subscription_confirmed_by' => $planChanged ? null : $existing['subscription_confirmed_by'],
+                'subscription_rejected_at' => $planChanged ? null : $existing['subscription_rejected_at'],
+                'subscription_rejected_reason' => $planChanged ? null : $existing['subscription_rejected_reason'],
             ];
 
             $this->showrooms->update((int) $existing['id'], $payload);
@@ -121,6 +139,126 @@ class ShowroomService
         $showroomId = $this->showrooms->create((int) $user['id'], $data);
 
         return $this->show((int) $showroomId, $user);
+    }
+
+    /**
+     * Showroom mengunggah bukti transfer untuk paket yang sudah dipilih.
+     * Bisa dipanggil ulang selama belum dikonfirmasi Admin -- upload baru
+     * menimpa bukti lama dan mencabut penolakan sebelumnya, sama seperti
+     * pola transfer manual transaksi mobil.
+     */
+    public function submitSubscriptionProof(array $user, array $data): array
+    {
+        $this->ensureSeller($user);
+        $showroom = $this->showrooms->findByUserId((int) $user['id']);
+
+        if (! $showroom) {
+            throw new NotFoundException('Showroom belum tersedia.');
+        }
+
+        if (($showroom['selected_plan_name'] ?? null) === null) {
+            throw new ValidationException([
+                'selected_plan_name' => 'Pilih paket harga dulu sebelum mengunggah bukti transfer.',
+            ]);
+        }
+
+        if (($showroom['subscription_payment_status'] ?? 'unpaid') === 'paid') {
+            throw new ValidationException([
+                'subscription_payment_status' => 'Pembayaran paket ini sudah dikonfirmasi.',
+            ]);
+        }
+
+        $showroomId = (int) $showroom['id'];
+        $stored = $this->storage->storeUploadedFile($data['proof'], 'showrooms/' . $showroomId . '/subscription');
+        $now = date('Y-m-d H:i:s');
+
+        try {
+            $this->showrooms->updateSubscriptionSubmission($showroomId, [
+                'subscription_proof_path' => $stored['file_path'],
+                'subscription_proof_note' => ($data['note'] ?? '') !== '' ? $data['note'] : null,
+                'subscription_proof_submitted_at' => $now,
+                'updated_at' => $now,
+            ]);
+        } catch (Throwable $exception) {
+            $this->storage->delete($stored['file_path']);
+            throw $exception;
+        }
+
+        return $this->mine($user);
+    }
+
+    /**
+     * Admin mengonfirmasi bukti transfer paket sudah dicek. Dipisah dari
+     * approval akun showroom (lihat AuthService::approveUsers()) -- keduanya
+     * dua keputusan berbeda yang kebetulan sering diambil bersamaan.
+     */
+    public function confirmSubscriptionPayment(array $actor, int $showroomId): array
+    {
+        AuthPolicy::requireAdmin($actor);
+        $showroom = $this->showrooms->findById($showroomId);
+
+        if (! $showroom) {
+            throw new NotFoundException('Showroom tidak ditemukan.');
+        }
+
+        if (trim((string) ($showroom['subscription_proof_path'] ?? '')) === '') {
+            throw new ValidationException([
+                'subscription_proof_path' => 'Showroom belum mengunggah bukti transfer.',
+            ]);
+        }
+
+        if (($showroom['subscription_payment_status'] ?? null) === 'paid') {
+            throw new ValidationException([
+                'subscription_payment_status' => 'Pembayaran paket ini sudah dikonfirmasi sebelumnya.',
+            ]);
+        }
+
+        $this->showrooms->updateSubscriptionConfirmation($showroomId, [
+            'subscription_confirmed_at' => date('Y-m-d H:i:s'),
+            'subscription_confirmed_by' => (int) $actor['id'],
+            'updated_at' => date('Y-m-d H:i:s'),
+        ]);
+
+        return $this->serializeShowroom($this->showrooms->findById($showroomId));
+    }
+
+    /**
+     * Admin menolak bukti transfer -- nominal tidak cocok, bukti tidak
+     * jelas, dsb. Bukti lama dihapus dari kolomnya supaya showroom harus
+     * unggah yang baru, bukan sekadar menimpa bukti yang sama.
+     */
+    public function rejectSubscriptionPayment(array $actor, int $showroomId, array $data): array
+    {
+        AuthPolicy::requireAdmin($actor);
+        $showroom = $this->showrooms->findById($showroomId);
+
+        if (! $showroom) {
+            throw new NotFoundException('Showroom tidak ditemukan.');
+        }
+
+        if (trim((string) ($showroom['subscription_proof_path'] ?? '')) === '') {
+            throw new ValidationException([
+                'subscription_proof_path' => 'Showroom belum mengunggah bukti transfer.',
+            ]);
+        }
+
+        $reason = trim((string) ($data['reason'] ?? ''));
+
+        if ($reason === '') {
+            throw new ValidationException(['reason' => 'Alasan penolakan wajib diisi.']);
+        }
+
+        $proofPath = (string) $showroom['subscription_proof_path'];
+        $now = date('Y-m-d H:i:s');
+
+        $this->showrooms->updateSubscriptionRejection($showroomId, [
+            'subscription_rejected_at' => $now,
+            'subscription_rejected_reason' => $reason,
+            'updated_at' => $now,
+        ]);
+        $this->storage->delete($proofPath);
+
+        return $this->serializeShowroom($this->showrooms->findById($showroomId));
     }
 
     public function validateSlug(string $slug): array
@@ -223,6 +361,14 @@ class ShowroomService
             'selected_plan_price' => isset($showroom['selected_plan_price']) ? (float) $showroom['selected_plan_price'] : null,
             'selected_plan_billing_period' => $showroom['selected_plan_billing_period'] ?? null,
             'selected_plan_selected_at' => $showroom['selected_plan_selected_at'] ?? null,
+            'subscription_payment_status' => $showroom['subscription_payment_status'] ?? 'unpaid',
+            'subscription_proof_path' => $showroom['subscription_proof_path'] ?? null,
+            'subscription_proof_note' => $showroom['subscription_proof_note'] ?? null,
+            'subscription_proof_submitted_at' => $showroom['subscription_proof_submitted_at'] ?? null,
+            'subscription_confirmed_at' => $showroom['subscription_confirmed_at'] ?? null,
+            'subscription_confirmed_by' => isset($showroom['subscription_confirmed_by']) ? (int) $showroom['subscription_confirmed_by'] : null,
+            'subscription_rejected_at' => $showroom['subscription_rejected_at'] ?? null,
+            'subscription_rejected_reason' => $showroom['subscription_rejected_reason'] ?? null,
             'created_at' => $showroom['created_at'],
             'updated_at' => $showroom['updated_at'],
         ];

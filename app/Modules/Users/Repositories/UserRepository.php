@@ -65,6 +65,9 @@ class UserRepository
             'SELECT id, user_id, name, address, phone_number, bank_account_number,
                     bank_type, bank_account_name,
                     selected_plan_name, selected_plan_price, selected_plan_billing_period, selected_plan_selected_at,
+                    subscription_payment_status, subscription_proof_path, subscription_proof_note,
+                    subscription_proof_submitted_at, subscription_confirmed_at, subscription_confirmed_by,
+                    subscription_rejected_at, subscription_rejected_reason,
                     created_at, updated_at
              FROM showrooms
              WHERE user_id = :user_id

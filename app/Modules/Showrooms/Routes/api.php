@@ -17,6 +17,9 @@ return static function (Router $router): void {
         $router->patch('/me', [ShowroomController::class, 'upsertMine']);
         $router->post('/me/branding-icon', [ShowroomController::class, 'uploadBrandingIcon']);
         $router->post('/me/branding-logo', [ShowroomController::class, 'uploadBrandingLogo']);
+        $router->post('/me/subscription/proof', [ShowroomController::class, 'submitSubscriptionProof']);
+        $router->post('/{id}/subscription/confirm', [ShowroomController::class, 'confirmSubscriptionPayment']);
+        $router->post('/{id}/subscription/reject', [ShowroomController::class, 'rejectSubscriptionPayment']);
         $router->get('/{id}', [ShowroomController::class, 'show']);
     }, [AuthenticatedUserMiddleware::class]);
 };

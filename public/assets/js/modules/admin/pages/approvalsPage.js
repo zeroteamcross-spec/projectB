@@ -7,6 +7,7 @@ import { openModal, closeModal } from "../../../ui/primitives/modal.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 import { adminSessionService } from "../services/adminSessionService.js";
 import { adminApprovalQueueService } from "../services/adminApprovalQueueService.js";
+import { showroomsResource } from "../../../resources/showroomsResource.js";
 import { AdminApprovalFilterBar } from "../components/adminApprovalFilterBar.js";
 import { AdminApprovalQueueList } from "../components/adminApprovalQueueList.js";
 import { AdminApprovalDetailPanel } from "../components/adminApprovalDetailPanel.js";
@@ -18,6 +19,7 @@ export function AdminApprovalsPage() {
   let currentContext = null;
   const state = {
     approvingUserId: null,
+    confirmingPaymentUserId: null,
     reviewingUserId: null,
     closingReview: false,
     query: createApprovalsQuery(),
@@ -78,14 +80,69 @@ export function AdminApprovalsPage() {
 
       try {
         const result = await adminSessionService.approveUsers([user.id]);
-        showToast(`Approval selesai untuk ${result.approvedCount} user.`, { type: "success" });
-        await refreshWorkingState();
-        syncSelectionAfterApproval(user);
+
+        if (result.blocked.length > 0) {
+          state.error = result.blocked[0]?.reason || "Approval belum bisa diproses.";
+          showToast(state.error, { type: "error" });
+        } else {
+          showToast(`Approval selesai untuk ${result.approvedCount} user.`, { type: "success" });
+          await refreshWorkingState();
+          syncSelectionAfterApproval(user);
+        }
       } catch (error) {
         state.error = error.message || "Approval user gagal diproses.";
         showToast(state.error, { type: "error" });
       } finally {
         state.approvingUserId = null;
+        rerender();
+      }
+    },
+    async confirmPayment(user) {
+      const showroomId = user?.showroom?.id;
+      if (!showroomId) {
+        return;
+      }
+
+      state.confirmingPaymentUserId = user.id;
+      state.error = "";
+      rerender();
+
+      try {
+        await showroomsResource.confirmSubscriptionPayment(showroomId);
+        showToast("Pembayaran paket berhasil dikonfirmasi.", { type: "success" });
+        await refreshWorkingState();
+      } catch (error) {
+        state.error = error.message || "Gagal mengonfirmasi pembayaran.";
+        showToast(state.error, { type: "error" });
+      } finally {
+        state.confirmingPaymentUserId = null;
+        rerender();
+      }
+    },
+    async rejectPayment(user) {
+      const showroomId = user?.showroom?.id;
+      if (!showroomId) {
+        return;
+      }
+
+      const reason = window.prompt("Alasan penolakan bukti transfer (minimal 5 karakter)", "");
+      if (reason === null) {
+        return;
+      }
+
+      state.confirmingPaymentUserId = user.id;
+      state.error = "";
+      rerender();
+
+      try {
+        await showroomsResource.rejectSubscriptionPayment(showroomId, reason);
+        showToast("Bukti transfer ditolak.", { type: "success" });
+        await refreshWorkingState();
+      } catch (error) {
+        state.error = error.message || "Gagal menolak bukti transfer.";
+        showToast(state.error, { type: "error" });
+      } finally {
+        state.confirmingPaymentUserId = null;
         rerender();
       }
     },
@@ -270,7 +327,10 @@ function render(root, context, state, actions) {
       isHydrating: Boolean(hasRequestedUser && !detailHydratedAt && !selectedUser),
       hasRequestedUser,
       approvingUserId: state.approvingUserId,
+      confirmingPaymentUserId: state.confirmingPaymentUserId,
       onApprove: (user) => actions.approve(user),
+      onConfirmPayment: (user) => actions.confirmPayment(user),
+      onRejectPayment: (user) => actions.rejectPayment(user),
       onOpenUserManagement: (user) => context.router?.navigate(`/admin/users?status=pending_approval&user_id=${encodeURIComponent(user.id)}`),
     }), "admin.approvals.detail"), {
       key: `adpv-review-${filters.userId}`,

@@ -11,6 +11,8 @@ use App\Modules\MasterData\Requests\UploadAppIconRequest;
 use App\Modules\MasterData\Services\MasterAssetService;
 use App\Modules\Showrooms\Requests\UpsertShowroomRequest;
 use App\Modules\Showrooms\Services\ShowroomService;
+use App\Modules\Transactions\Requests\RejectManualTransferRequest;
+use App\Modules\Transactions\Requests\SubmitManualTransferProofRequest;
 
 class ShowroomController extends Controller
 {
@@ -51,6 +53,35 @@ class ShowroomController extends Controller
         return JsonResponse::success([
             'showroom' => $this->service->show((int) $request->routeParam('id'), $user),
         ], 'Showroom berhasil diambil.');
+    }
+
+    public function submitSubscriptionProof(Request $request): JsonResponse
+    {
+        $user = $this->user($request);
+        $payload = (new SubmitManualTransferProofRequest($request))->validate();
+
+        return JsonResponse::success([
+            'showroom' => $this->service->submitSubscriptionProof($user, $payload),
+        ], 'Bukti transfer berhasil diunggah.');
+    }
+
+    public function confirmSubscriptionPayment(Request $request): JsonResponse
+    {
+        $user = $this->user($request);
+
+        return JsonResponse::success([
+            'showroom' => $this->service->confirmSubscriptionPayment($user, (int) $request->routeParam('id')),
+        ], 'Pembayaran paket berhasil dikonfirmasi.');
+    }
+
+    public function rejectSubscriptionPayment(Request $request): JsonResponse
+    {
+        $user = $this->user($request);
+        $payload = (new RejectManualTransferRequest($request))->validate();
+
+        return JsonResponse::success([
+            'showroom' => $this->service->rejectSubscriptionPayment($user, (int) $request->routeParam('id'), $payload),
+        ], 'Bukti transfer ditolak.');
     }
 
     public function validateSlug(Request $request): JsonResponse

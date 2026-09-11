@@ -8,12 +8,29 @@ import { tw } from "../../../theme/tailwindClasses.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 import { adminApprovalQueueService } from "../services/adminApprovalQueueService.js";
 
+const SUBSCRIPTION_STATUS_LABEL = {
+  unpaid: "Belum bayar",
+  pending_verification: "Menunggu verifikasi",
+  paid: "Lunas",
+  rejected: "Bukti ditolak",
+};
+
+const SUBSCRIPTION_STATUS_VARIANT = {
+  unpaid: "default",
+  pending_verification: "warning",
+  paid: "success",
+  rejected: "danger",
+};
+
 export function AdminApprovalDetailPanel({
   user = null,
   isHydrating = false,
   hasRequestedUser = false,
   approvingUserId = null,
+  confirmingPaymentUserId = null,
   onApprove = null,
+  onConfirmPayment = null,
+  onRejectPayment = null,
   onOpenUserManagement = null,
 } = {}) {
   const panel = document.createElement("section");
@@ -83,6 +100,65 @@ export function AdminApprovalDetailPanel({
       ? `${user.showroom.selected_plan_name} (${formatCurrency(user.showroom.selected_plan_price || 0)}${user.showroom.selected_plan_billing_period ? " " + user.showroom.selected_plan_billing_period : ""})`
       : "Belum memilih paket";
     facts.append(infoRow("Paket harga dipilih", planLabel));
+
+    const paymentStatus = user.showroom.subscription_payment_status || "unpaid";
+    const paymentRow = document.createElement("div");
+    paymentRow.className = "flex flex-col gap-1 rounded-2xl border border-[var(--pb-card-border)] bg-white/90 px-3 py-3 shadow-sm sm:col-span-2";
+    const paymentHeader = document.createElement("div");
+    paymentHeader.className = "flex flex-wrap items-center justify-between gap-2";
+    paymentHeader.append(
+      textBlock("text-gray-500", "Status pembayaran paket"),
+      Badge({
+        label: SUBSCRIPTION_STATUS_LABEL[paymentStatus] || paymentStatus,
+        variant: SUBSCRIPTION_STATUS_VARIANT[paymentStatus] || "default",
+      }),
+    );
+    paymentRow.append(paymentHeader);
+
+    if (user.showroom.subscription_proof_path) {
+      const proofLink = document.createElement("a");
+      proofLink.href = user.showroom.subscription_proof_path;
+      proofLink.target = "_blank";
+      proofLink.rel = "noopener";
+      proofLink.className = "text-xs font-semibold text-[var(--pb-brand-secondary)] underline underline-offset-2";
+      proofLink.textContent = "Lihat bukti transfer";
+      paymentRow.append(proofLink);
+    }
+
+    if (user.showroom.subscription_proof_note) {
+      paymentRow.append(textBlock("text-xs text-gray-600", `Catatan showroom: ${user.showroom.subscription_proof_note}`));
+    }
+
+    if (paymentStatus === "rejected" && user.showroom.subscription_rejected_reason) {
+      paymentRow.append(textBlock("text-xs text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]", `Alasan ditolak: ${user.showroom.subscription_rejected_reason}`));
+    }
+
+    if (paymentStatus === "pending_verification") {
+      const paymentActions = document.createElement("div");
+      paymentActions.className = "flex flex-wrap gap-2";
+      const isBusy = confirmingPaymentUserId === user.id;
+
+      const confirm = Button({
+        label: isBusy ? "Memproses..." : "Konfirmasi pembayaran",
+        variant: "primary",
+        disabled: isBusy,
+        onClick: () => onConfirmPayment?.(user),
+      });
+      confirm.id = `adpv_confirm_payment_button_${user.id}`;
+
+      const reject = Button({
+        label: "Tolak bukti",
+        variant: "secondary",
+        disabled: isBusy,
+        onClick: () => onRejectPayment?.(user),
+      });
+      reject.id = `adpv_reject_payment_button_${user.id}`;
+
+      paymentActions.append(confirm, reject);
+      paymentRow.append(paymentActions);
+    }
+
+    facts.append(paymentRow);
   }
 
   const actions = document.createElement("div");

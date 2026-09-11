@@ -10,6 +10,7 @@ use App\Modules\Auth\Repositories\AuthTokenRepository;
 use App\Modules\Auth\Repositories\AuthUserRepository;
 use App\Modules\Auth\Requests\RegisterRequest;
 use App\Modules\Auth\Services\AuthService;
+use App\Modules\Showrooms\Repositories\ShowroomRepository;
 use PDO;
 use Tests\TestCase;
 
@@ -261,7 +262,8 @@ class ShowroomRegistrationTest extends TestCase
         $service = new AuthService(
             $pdo,
             new AuthUserRepository($pdo),
-            new AuthTokenRepository($pdo)
+            new AuthTokenRepository($pdo),
+            new ShowroomRepository($pdo)
         );
 
         return [$pdo, $service];

@@ -424,6 +424,22 @@ function createAdminMasterPage(pageType = "brand") {
         status: plan.status === "active" ? "inactive" : "active",
       }, plans);
     },
+    async saveSubscriptionDestination(destination) {
+      state.saving = true;
+      state.error = "";
+      rerender();
+      try {
+        const master = await adminMasterService.saveSubscriptionDestinationMaster(destination);
+        patchSubscriptionDestinationMaster(master);
+        showToast("Rekening tujuan pembayaran berhasil disimpan.", { type: "success" });
+      } catch (error) {
+        state.error = error.message || "Gagal menyimpan rekening tujuan pembayaran.";
+        showToast(state.error, { type: "error" });
+      } finally {
+        state.saving = false;
+        rerender();
+      }
+    },
   };
 
   return createPageLifecycle({
@@ -502,6 +518,11 @@ function render(root, context, state, actions, activePage = "brand") {
   const hasPricingSource = Boolean(snapshotPricingMaster || workingPricingMaster);
   const plans = pricingMaster.data.plans ?? [];
 
+  const snapshotDestinationMaster = appStore.get("snapshot.admin.masterSubscriptionDestination.data", null);
+  const workingDestinationMaster = appStore.get("working.adminMaster.subscriptionDestination.data", null);
+  const destinationMaster = adminMasterService.normalizeSubscriptionDestinationMaster(workingDestinationMaster ?? snapshotDestinationMaster);
+  const destination = destinationMaster.data;
+
   const layout = document.createElement("section");
   layout.id = isPricing ? "admstpr_page_section" : isLocation ? "admstloc_page_section" : isBank ? "admstbk_page_section" : isSidebar ? "admst_sidebar_page_section" : "admst_brand_page_section";
   layout.className = "grid min-w-0 gap-6";
@@ -541,6 +562,7 @@ function render(root, context, state, actions, activePage = "brand") {
       state,
       actions,
       plans,
+      destination,
       loading: !pricingHydratedAt && !hasPricingSource,
     }));
   } else if (isLocation) {
@@ -576,12 +598,13 @@ function render(root, context, state, actions, activePage = "brand") {
   root.replaceChildren(layout);
 }
 
-function renderPricingPage({ state, actions, plans, loading }) {
+function renderPricingPage({ state, actions, plans, destination, loading }) {
   const filters = { ...state.query };
   const filteredPlans = adminMasterService.filterPlans(plans, filters);
   const pagination = paginate(filteredPlans, filters);
 
   return [
+    subscriptionDestinationCard({ destination, saving: state.saving, onSave: actions.saveSubscriptionDestination }),
     masterPricingFilterBar({ filters, plans, onSubmit: actions.applyFilters }),
     applyDesignHook(AdminMasterPricingList({
       loading,
@@ -766,6 +789,50 @@ function masterHero({ action, pageType, brands = [], sidebarItems = [], banks = 
   side.append(stats, action, textNode("p", "text-[10px] font-semibold text-gray-500", `master_key: ${master.master_key ?? "-"}`));
   grid.append(copy, side);
   section.append(grid);
+  return section;
+}
+
+function subscriptionDestinationCard({ destination, saving, onSave }) {
+  const section = baseFilterSection("admstpr_destination_section", "admin.master.pricing.destination");
+
+  section.append(
+    textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-[var(--pb-brand-secondary)]", "Rekening tujuan pembayaran"),
+    textNode("p", "text-xs leading-6 text-gray-600", "Ditampilkan ke showroom saat mengunggah bukti transfer paket, sebelum akunnya di-approve."),
+  );
+
+  const form = document.createElement("form");
+  form.id = "admstpr_destination_form_section";
+  form.className = "grid gap-3 sm:grid-cols-3 sm:items-end";
+
+  const bankName = inputField("admstpr_destination_bank_name_input", destination.bank_name ?? "", "Nama bank, mis. BCA");
+  const accountNumber = inputField("admstpr_destination_account_number_input", destination.account_number ?? "", "Nomor rekening");
+  const accountHolder = inputField("admstpr_destination_account_holder_input", destination.account_holder ?? "", "Nama pemilik rekening");
+
+  const submit = Button({ label: saving ? "Menyimpan..." : "Simpan rekening", variant: "primary", disabled: saving });
+  submit.id = "admstpr_destination_save_button";
+  submit.type = "submit";
+
+  form.append(
+    labelWrap("Bank", bankName),
+    labelWrap("Nomor rekening", accountNumber),
+    labelWrap("Atas nama", accountHolder),
+  );
+
+  const actionsRow = document.createElement("div");
+  actionsRow.className = "sm:col-span-3";
+  actionsRow.append(submit);
+  form.append(actionsRow);
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    onSave?.({
+      bank_name: bankName.value.trim(),
+      account_number: accountNumber.value.trim(),
+      account_holder: accountHolder.value.trim(),
+    });
+  });
+
+  section.append(form);
   return section;
 }
 
@@ -1213,6 +1280,17 @@ function patchPricingMaster(master) {
     data: master,
     hydratedAt: Date.now(),
   }, "admin-master:pricing-snapshot-synced");
+}
+
+function patchSubscriptionDestinationMaster(master) {
+  appStore.patchState("working.adminMaster.subscriptionDestination", {
+    data: master,
+    hydratedAt: Date.now(),
+  }, "admin-master:subscription-destination-saved");
+  appStore.patchState("snapshot.admin.masterSubscriptionDestination", {
+    data: master,
+    hydratedAt: Date.now(),
+  }, "admin-master:subscription-destination-snapshot-synced");
 }
 
 function patchLocationMaster(master) {

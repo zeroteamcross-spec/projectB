@@ -10,6 +10,7 @@ use App\Core\Exceptions\ValidationException;
 use App\Modules\Auth\Repositories\AuthTokenRepository;
 use App\Modules\Auth\Repositories\AuthUserRepository;
 use App\Modules\Auth\Policies\AuthPolicy;
+use App\Modules\Showrooms\Repositories\ShowroomRepository;
 use DateInterval;
 use DateTimeImmutable;
 use PDO;
@@ -28,11 +29,14 @@ class AuthService
 
     private AuthTokenRepository $tokens;
 
-    public function __construct(PDO $pdo, AuthUserRepository $users, AuthTokenRepository $tokens)
+    private ShowroomRepository $showrooms;
+
+    public function __construct(PDO $pdo, AuthUserRepository $users, AuthTokenRepository $tokens, ShowroomRepository $showrooms)
     {
         $this->pdo = $pdo;
         $this->users = $users;
         $this->tokens = $tokens;
+        $this->showrooms = $showrooms;
     }
 
     public function register(array $data): array
@@ -205,9 +209,41 @@ class AuthService
         $ids = array_values(array_unique(array_map('intval', $userIds)));
         $ids = array_filter($ids, fn (int $id): bool => $id > 0);
 
+        // Showroom (seller) tidak boleh di-approve sebelum pembayaran paketnya
+        // dikonfirmasi Admin -- kalau tidak, approval jadi jalan pintas yang
+        // melewati keputusan pembayaran sama sekali. Peran lain (buyer,
+        // affiliate) tidak punya paket, jadi tidak kena syarat ini.
+        $approvableIds = [];
+        $blocked = [];
+
+        foreach ($ids as $id) {
+            $user = $this->users->findById($id);
+
+            if (! $user) {
+                continue;
+            }
+
+            if (($user['role'] ?? null) === 'seller') {
+                $showroom = $this->showrooms->findByUserId($id);
+                $isPaid = $showroom && ($showroom['subscription_payment_status'] ?? null) === 'paid';
+
+                if (! $isPaid) {
+                    $blocked[] = [
+                        'user_id' => $id,
+                        'reason' => 'Pembayaran paket showroom ini belum dikonfirmasi.',
+                    ];
+
+                    continue;
+                }
+            }
+
+            $approvableIds[] = $id;
+        }
+
         return [
-            'approved_count' => $this->users->approveUsers($ids),
-            'user_ids' => array_values($ids),
+            'approved_count' => $this->users->approveUsers($approvableIds),
+            'user_ids' => $approvableIds,
+            'blocked' => $blocked,
         ];
     }
 

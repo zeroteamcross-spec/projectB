@@ -360,6 +360,10 @@ export const adminRoutes = [
           key: "pricing",
           loader: ({ signal }) => adminMasterService.getPricingMaster({ signal }).catch(() => adminMasterService.normalizePricingMaster(null)),
         },
+        {
+          key: "subscriptionDestination",
+          loader: ({ signal }) => adminMasterService.getSubscriptionDestinationMaster({ signal }).catch(() => adminMasterService.normalizeSubscriptionDestinationMaster(null)),
+        },
       ],
     },
   },

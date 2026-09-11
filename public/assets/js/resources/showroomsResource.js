@@ -29,4 +29,24 @@ export const showroomsResource = {
     const response = await apiClient.post("/showrooms/me/branding-logo", formData, options);
     return response.data?.asset ?? null;
   },
+
+  async submitSubscriptionProof(file, note = "", options = {}) {
+    const formData = new FormData();
+    formData.append("proof", file);
+    if (note) {
+      formData.append("note", note);
+    }
+    const response = await apiClient.post("/showrooms/me/subscription/proof", formData, options);
+    return response.data?.showroom ?? null;
+  },
+
+  async confirmSubscriptionPayment(showroomId, options = {}) {
+    const response = await apiClient.post(`/showrooms/${encodeURIComponent(showroomId)}/subscription/confirm`, {}, options);
+    return response.data?.showroom ?? null;
+  },
+
+  async rejectSubscriptionPayment(showroomId, reason, options = {}) {
+    const response = await apiClient.post(`/showrooms/${encodeURIComponent(showroomId)}/subscription/reject`, { reason }, options);
+    return response.data?.showroom ?? null;
+  },
 };

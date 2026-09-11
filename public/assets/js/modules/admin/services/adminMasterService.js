@@ -6,6 +6,13 @@ export const MASTER_SIDEBAR_KEY = "app.sidebar";
 export const MASTER_BANKS_KEY = "payments.banks";
 export const MASTER_LOCATIONS_KEY = "locations.cities";
 export const MASTER_PRICING_KEY = "pricing.plans";
+export const MASTER_SUBSCRIPTION_DESTINATION_KEY = "payments.subscription_destination";
+
+const DEFAULT_SUBSCRIPTION_DESTINATION_SEED = {
+  bank_name: "BCA",
+  account_number: "1234567890",
+  account_holder: "PT Siata Mobilindo",
+};
 
 const DEFAULT_BRAND_SEED = [
   brandSeed("brand_toyota", "Toyota", "toyota", "MPV, SUV, dan city car populer untuk pasar keluarga Indonesia.", [
@@ -213,11 +220,32 @@ export const adminMasterService = {
     return normalizePricingMaster(master);
   },
 
+  async getSubscriptionDestinationMaster(options = {}) {
+    const master = await masterDataResource.get(MASTER_SUBSCRIPTION_DESTINATION_KEY, options);
+    return normalizeSubscriptionDestinationMaster(master);
+  },
+
+  async saveSubscriptionDestinationMaster(destination = {}, options = {}) {
+    const master = await masterDataResource.save(MASTER_SUBSCRIPTION_DESTINATION_KEY, {
+      schema: "admin.master.subscription_destination.v1",
+      type: "subscription_destination",
+      bank_name: String(destination.bank_name ?? "").trim(),
+      account_number: String(destination.account_number ?? "").trim(),
+      account_holder: String(destination.account_holder ?? "").trim(),
+    }, {
+      displayName: "Rekening Tujuan Pembayaran",
+      bumpVersion: true,
+      ...options,
+    });
+    return normalizeSubscriptionDestinationMaster(master);
+  },
+
   normalizeMaster,
   normalizeSidebarMaster,
   normalizeBankMaster,
   normalizeLocationMaster,
   normalizePricingMaster,
+  normalizeSubscriptionDestinationMaster,
   normalizeBrands,
   normalizeSidebarItems,
   normalizeBanks,
@@ -452,6 +480,28 @@ function normalizePricingMaster(master = null) {
     created_at: master?.created_at ?? null,
     updated_at: master?.updated_at ?? null,
     seeded: !hasPersistedPlans,
+  };
+}
+
+function normalizeSubscriptionDestinationMaster(master = null) {
+  const data = master?.data ?? {};
+  const hasPersisted = String(data.account_number ?? "").trim() !== "";
+  const source = hasPersisted ? data : DEFAULT_SUBSCRIPTION_DESTINATION_SEED;
+
+  return {
+    id: master?.id ?? null,
+    master_key: master?.master_key ?? MASTER_SUBSCRIPTION_DESTINATION_KEY,
+    data: {
+      schema: data.schema ?? "admin.master.subscription_destination.v1",
+      type: data.type ?? "subscription_destination",
+      bank_name: String(source.bank_name ?? "").trim(),
+      account_number: String(source.account_number ?? "").trim(),
+      account_holder: String(source.account_holder ?? "").trim(),
+    },
+    version: master?.version ?? null,
+    created_at: master?.created_at ?? null,
+    updated_at: master?.updated_at ?? null,
+    seeded: !hasPersisted,
   };
 }
 

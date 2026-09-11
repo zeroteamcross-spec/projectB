@@ -50,6 +50,7 @@ export const adminSessionService = {
     return {
       approvedCount: response.data?.approved_count ?? 0,
       userIds: response.data?.user_ids ?? [],
+      blocked: response.data?.blocked ?? [],
     };
   },
 
