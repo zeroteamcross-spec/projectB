@@ -84,6 +84,25 @@ class ShowroomService
                     ? $data['header_logo_url']
                     : $existing['header_logo_url'],
                 'tab_title' => array_key_exists('tab_title', $data) ? $data['tab_title'] : $existing['tab_title'],
+                // Paket harga dipilih persis sekali, sesaat setelah showroom
+                // mendaftar (lihat routes.js public.showroom-register alur
+                // pilih-paket) -- namanya dan harganya disalin (snapshot) ke
+                // sini, bukan disimpan sebagai referensi ke Master Harga,
+                // supaya kalau Admin nanti mengubah/menghapus paket itu di
+                // Master Harga, riwayat pilihan showroom lama tidak ikut
+                // berubah.
+                'selected_plan_name' => array_key_exists('selected_plan_name', $data)
+                    ? $data['selected_plan_name']
+                    : $existing['selected_plan_name'],
+                'selected_plan_price' => array_key_exists('selected_plan_price', $data)
+                    ? $data['selected_plan_price']
+                    : $existing['selected_plan_price'],
+                'selected_plan_billing_period' => array_key_exists('selected_plan_billing_period', $data)
+                    ? $data['selected_plan_billing_period']
+                    : $existing['selected_plan_billing_period'],
+                'selected_plan_selected_at' => array_key_exists('selected_plan_name', $data)
+                    ? date('Y-m-d H:i:s')
+                    : $existing['selected_plan_selected_at'],
             ];
 
             $this->showrooms->update((int) $existing['id'], $payload);
@@ -151,6 +170,10 @@ class ShowroomService
             'icon_url' => $showroom['icon_url'] ?? null,
             'header_logo_url' => $showroom['header_logo_url'] ?? null,
             'tab_title' => $showroom['tab_title'] ?? null,
+            'selected_plan_name' => $showroom['selected_plan_name'] ?? null,
+            'selected_plan_price' => isset($showroom['selected_plan_price']) ? (float) $showroom['selected_plan_price'] : null,
+            'selected_plan_billing_period' => $showroom['selected_plan_billing_period'] ?? null,
+            'selected_plan_selected_at' => $showroom['selected_plan_selected_at'] ?? null,
             'created_at' => $showroom['created_at'],
             'updated_at' => $showroom['updated_at'],
         ];

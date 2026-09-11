@@ -19,7 +19,9 @@ class ShowroomRepository
     {
         $stmt = $this->pdo->prepare(
             'SELECT id, user_id, slug, name, address, city_name, phone_number, bank_account_number,
-                    bank_type, bank_account_name, icon_url, header_logo_url, tab_title, created_at, updated_at
+                    bank_type, bank_account_name, icon_url, header_logo_url, tab_title,
+                    selected_plan_name, selected_plan_price, selected_plan_billing_period, selected_plan_selected_at,
+                    created_at, updated_at
              FROM showrooms
              WHERE id = :id
              AND deleted_at IS NULL
@@ -35,7 +37,9 @@ class ShowroomRepository
     {
         $stmt = $this->pdo->prepare(
             'SELECT id, user_id, slug, name, address, city_name, phone_number, bank_account_number,
-                    bank_type, bank_account_name, icon_url, header_logo_url, tab_title, created_at, updated_at
+                    bank_type, bank_account_name, icon_url, header_logo_url, tab_title,
+                    selected_plan_name, selected_plan_price, selected_plan_billing_period, selected_plan_selected_at,
+                    created_at, updated_at
              FROM showrooms
              WHERE user_id = :user_id
              AND deleted_at IS NULL
@@ -129,6 +133,10 @@ class ShowroomRepository
                  icon_url = :icon_url,
                  header_logo_url = :header_logo_url,
                  tab_title = :tab_title,
+                 selected_plan_name = :selected_plan_name,
+                 selected_plan_price = :selected_plan_price,
+                 selected_plan_billing_period = :selected_plan_billing_period,
+                 selected_plan_selected_at = :selected_plan_selected_at,
                  updated_at = :updated_at
              WHERE id = :id
              AND deleted_at IS NULL'
@@ -147,6 +155,10 @@ class ShowroomRepository
             'icon_url' => $data['icon_url'] ?? null,
             'header_logo_url' => $data['header_logo_url'] ?? null,
             'tab_title' => $data['tab_title'] ?? null,
+            'selected_plan_name' => $data['selected_plan_name'] ?? null,
+            'selected_plan_price' => $data['selected_plan_price'] ?? null,
+            'selected_plan_billing_period' => $data['selected_plan_billing_period'] ?? null,
+            'selected_plan_selected_at' => $data['selected_plan_selected_at'] ?? null,
             'updated_at' => date('Y-m-d H:i:s'),
         ]);
     }
