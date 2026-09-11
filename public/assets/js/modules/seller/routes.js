@@ -13,6 +13,7 @@ import { SellerCarImagesPage } from "./pages/carImagesPage.js";
 import { SellerCarInspectionPage } from "./pages/carInspectionPage.js";
 import { SellerInspectionPage } from "./pages/inspectionPage.js";
 import { SellerShowroomPage } from "./pages/showroomPage.js";
+import { SellerBillingPage } from "./pages/billingPage.js";
 import { SellerTransactionDetailPage } from "./pages/transactionDetailPage.js";
 import { SellerTransactionsPage } from "./pages/transactionsPage.js";
 
@@ -57,6 +58,26 @@ export const sellerRoutes = [
         {
           key: "masterBank",
           loader: ({ signal }) => adminMasterService.getBankMaster({ signal }).catch(() => adminMasterService.normalizeBankMaster(null)),
+        },
+      ],
+    },
+  },
+  {
+    name: "seller.billing",
+    path: "/seller/billing",
+    shell: "app",
+    role: "seller",
+    page: SellerBillingPage,
+    workingStateKey: "sellerBilling",
+    preload: {
+      working: [
+        {
+          key: "showroom",
+          loader: ({ signal }) => showroomsResource.mine({ signal }).catch(() => null),
+        },
+        {
+          key: "destination",
+          loader: ({ signal }) => adminMasterService.getSubscriptionDestinationMaster({ signal }).catch(() => adminMasterService.normalizeSubscriptionDestinationMaster(null)),
         },
       ],
     },

@@ -12,6 +12,8 @@ import { AdminTransactionsPage } from "./pages/transactionsPage.js";
 import { AdminSlidersPage } from "./pages/slidersPage.js";
 import { AdminMasterBankPage, AdminMasterBrandPage, AdminMasterLocationPage, AdminMasterSidebarPage, AdminMasterPricingPage } from "./pages/masterPage.js";
 import { AdminMasterInspectionPage } from "./pages/masterInspectionPage.js";
+import { AdminDueSubscriptionsPage } from "./pages/dueSubscriptionsPage.js";
+import { showroomsResource } from "../../resources/showroomsResource.js";
 import { AdminMigrationManagerPage } from "./pages/migrationManagerPage.js";
 import { AdminLandingPageConfigPage } from "./pages/landingPageConfigPage.js";
 import { AdminReleaseVersionManagerPage } from "./pages/releaseVersionManagerPage.js";
@@ -363,6 +365,22 @@ export const adminRoutes = [
         {
           key: "subscriptionDestination",
           loader: ({ signal }) => adminMasterService.getSubscriptionDestinationMaster({ signal }).catch(() => adminMasterService.normalizeSubscriptionDestinationMaster(null)),
+        },
+      ],
+    },
+  },
+  {
+    name: "admin.subscriptions-due",
+    path: "/admin/subscriptions-due",
+    shell: "app",
+    role: "admin",
+    page: AdminDueSubscriptionsPage,
+    workingStateKey: "adminDueSubscriptions",
+    preload: {
+      working: [
+        {
+          key: "list",
+          loader: ({ signal }) => showroomsResource.dueSubscriptions({ signal }).catch(() => []),
         },
       ],
     },

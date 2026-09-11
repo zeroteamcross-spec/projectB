@@ -14,6 +14,7 @@ return static function (Router $router): void {
 
     $router->group('/api/showrooms', static function (Router $router): void {
         $router->get('/me', [ShowroomController::class, 'mine']);
+        $router->get('/subscriptions/due', [ShowroomController::class, 'dueSubscriptions']);
         $router->patch('/me', [ShowroomController::class, 'upsertMine']);
         $router->post('/me/branding-icon', [ShowroomController::class, 'uploadBrandingIcon']);
         $router->post('/me/branding-logo', [ShowroomController::class, 'uploadBrandingLogo']);

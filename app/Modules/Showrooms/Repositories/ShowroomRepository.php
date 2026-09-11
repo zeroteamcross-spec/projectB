@@ -17,7 +17,7 @@ class ShowroomRepository
 
     private const SUBSCRIPTION_COLUMNS = 'subscription_payment_status, subscription_proof_path, subscription_proof_note,
                     subscription_proof_submitted_at, subscription_confirmed_at, subscription_confirmed_by,
-                    subscription_rejected_at, subscription_rejected_reason';
+                    subscription_rejected_at, subscription_rejected_reason, subscription_next_due_at';
 
     public function findById(int $id): ?array
     {
@@ -151,6 +151,7 @@ class ShowroomRepository
                  subscription_confirmed_by = :subscription_confirmed_by,
                  subscription_rejected_at = :subscription_rejected_at,
                  subscription_rejected_reason = :subscription_rejected_reason,
+                 subscription_next_due_at = :subscription_next_due_at,
                  updated_at = :updated_at
              WHERE id = :id
              AND deleted_at IS NULL'
@@ -181,6 +182,7 @@ class ShowroomRepository
             'subscription_confirmed_by' => $data['subscription_confirmed_by'] ?? null,
             'subscription_rejected_at' => $data['subscription_rejected_at'] ?? null,
             'subscription_rejected_reason' => $data['subscription_rejected_reason'] ?? null,
+            'subscription_next_due_at' => $data['subscription_next_due_at'] ?? null,
             'updated_at' => date('Y-m-d H:i:s'),
         ]);
     }
@@ -216,6 +218,7 @@ class ShowroomRepository
              SET subscription_payment_status = \'paid\',
                  subscription_confirmed_at = :subscription_confirmed_at,
                  subscription_confirmed_by = :subscription_confirmed_by,
+                 subscription_next_due_at = :subscription_next_due_at,
                  updated_at = :updated_at
              WHERE id = :id
              AND deleted_at IS NULL'
@@ -225,8 +228,40 @@ class ShowroomRepository
             'id' => $id,
             'subscription_confirmed_at' => $data['subscription_confirmed_at'],
             'subscription_confirmed_by' => $data['subscription_confirmed_by'],
+            'subscription_next_due_at' => $data['subscription_next_due_at'],
             'updated_at' => $data['updated_at'],
         ]);
+    }
+
+    /**
+     * Showroom yang sudah disetujui Admin, siklus tagihannya sudah jatuh
+     * tempo (subscription_next_due_at terlewati) atau sedang menunggu
+     * verifikasi bukti transfer perpanjangan. Sengaja dibatasi ke showroom
+     * yang SUDAH disetujui -- pembayaran pertama (sebelum approval) sudah
+     * tertangani lewat Approval Queue, bukan halaman ini.
+     */
+    public function findDueSubscriptions(): array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT sh.id, sh.user_id, sh.slug, sh.name,
+                    sh.selected_plan_name, sh.selected_plan_price, sh.selected_plan_billing_period,
+                    ' . self::SUBSCRIPTION_COLUMNS . ',
+                    u.name AS seller_name, u.email AS seller_email
+             FROM showrooms AS sh
+             INNER JOIN users AS u ON u.id = sh.user_id
+             WHERE sh.deleted_at IS NULL
+             AND u.deleted_at IS NULL
+             AND u.account_status = \'active\'
+             AND u.is_approved = 1
+             AND (
+                 (sh.subscription_next_due_at IS NOT NULL AND sh.subscription_next_due_at <= NOW())
+                 OR sh.subscription_payment_status = \'pending_verification\'
+             )
+             ORDER BY sh.subscription_next_due_at ASC'
+        );
+        $stmt->execute();
+
+        return $stmt->fetchAll();
     }
 
     public function updateSubscriptionRejection(int $id, array $data): void

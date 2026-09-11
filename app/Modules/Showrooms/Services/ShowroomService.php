@@ -128,6 +128,7 @@ class ShowroomService
                 'subscription_confirmed_by' => $planChanged ? null : $existing['subscription_confirmed_by'],
                 'subscription_rejected_at' => $planChanged ? null : $existing['subscription_rejected_at'],
                 'subscription_rejected_reason' => $planChanged ? null : $existing['subscription_rejected_reason'],
+                'subscription_next_due_at' => $planChanged ? null : $existing['subscription_next_due_at'],
             ];
 
             $this->showrooms->update((int) $existing['id'], $payload);
@@ -162,7 +163,10 @@ class ShowroomService
             ]);
         }
 
-        if (($showroom['subscription_payment_status'] ?? 'unpaid') === 'paid') {
+        // "paid" cuma menahan upload ulang kalau siklus tagihan saat ini
+        // belum jatuh tempo -- begitu jatuh tempo (perpanjangan berikutnya),
+        // showroom yang sama harus bisa unggah bukti transfer lagi.
+        if (($showroom['subscription_payment_status'] ?? 'unpaid') === 'paid' && ! $this->isSubscriptionDue($showroom)) {
             throw new ValidationException([
                 'subscription_payment_status' => 'Pembayaran paket ini sudah dikonfirmasi.',
             ]);
@@ -207,19 +211,43 @@ class ShowroomService
             ]);
         }
 
-        if (($showroom['subscription_payment_status'] ?? null) === 'paid') {
+        if (($showroom['subscription_payment_status'] ?? null) === 'paid' && ! $this->isSubscriptionDue($showroom)) {
             throw new ValidationException([
                 'subscription_payment_status' => 'Pembayaran paket ini sudah dikonfirmasi sebelumnya.',
             ]);
         }
 
+        $now = date('Y-m-d H:i:s');
+        // Siklus berikutnya dihitung dari due date SEBELUMNYA (kalau ada),
+        // bukan dari "sekarang" -- supaya tanggal jatuh tempo tetap di
+        // tanggal yang sama tiap bulan/tahun walau konfirmasinya telat
+        // beberapa hari, tidak makin bergeser tiap siklus.
+        $anchor = $showroom['subscription_next_due_at'] ?? $showroom['subscription_confirmed_at'] ?? $now;
+        $nextDueAt = $this->addBillingInterval($anchor, $showroom['selected_plan_billing_period'] ?? null);
+
         $this->showrooms->updateSubscriptionConfirmation($showroomId, [
-            'subscription_confirmed_at' => date('Y-m-d H:i:s'),
+            'subscription_confirmed_at' => $now,
             'subscription_confirmed_by' => (int) $actor['id'],
-            'updated_at' => date('Y-m-d H:i:s'),
+            'subscription_next_due_at' => $nextDueAt,
+            'updated_at' => $now,
         ]);
 
         return $this->serializeShowroom($this->showrooms->findById($showroomId));
+    }
+
+    /**
+     * Semua showroom yang sudah disetujui Admin dan siklus tagihannya perlu
+     * ditinjau -- sudah jatuh tempo, atau sudah unggah bukti perpanjangan
+     * dan menunggu dikonfirmasi.
+     */
+    public function dueSubscriptions(array $actor): array
+    {
+        AuthPolicy::requireAdmin($actor);
+
+        return array_map(
+            fn (array $showroom): array => $this->serializeShowroom($showroom),
+            $this->showrooms->findDueSubscriptions()
+        );
     }
 
     /**
@@ -334,6 +362,40 @@ class ShowroomService
         ]);
     }
 
+    /**
+     * true kalau siklus tagihan saat ini sudah lewat tanggal jatuh temponya.
+     * Sengaja dihitung langsung di sini (bukan lewat cron yang menulis ulang
+     * status), supaya tidak ada proses terjadwal yang perlu dijaga -- setiap
+     * kali data showroom ini dibaca, "jatuh tempo atau tidak" selalu akurat.
+     */
+    private function isSubscriptionDue(array $showroom): bool
+    {
+        $dueAt = $showroom['subscription_next_due_at'] ?? null;
+
+        if ($dueAt === null) {
+            return false;
+        }
+
+        return strtotime((string) $dueAt) <= time();
+    }
+
+    /**
+     * Tanggal jatuh tempo berikutnya, dihitung dari $anchor + satu periode
+     * tagihan. selected_plan_billing_period nilainya bebas teks dari Master
+     * Harga ("/bulan", "/tahun", dst) -- cuma dicocokkan kata kuncinya di
+     * sini, default ke bulanan kalau tidak dikenali supaya tetap ada tanggal
+     * jatuh tempo daripada gagal diam-diam.
+     */
+    private function addBillingInterval(string $anchor, ?string $billingPeriod): string
+    {
+        $normalized = strtolower((string) $billingPeriod);
+        $interval = str_contains($normalized, 'tahun') ? 'P1Y' : 'P1M';
+
+        $date = new \DateTimeImmutable($anchor);
+
+        return $date->add(new \DateInterval($interval))->format('Y-m-d H:i:s');
+    }
+
     private function ensureSeller(array $user): void
     {
         if (! in_array(($user['role'] ?? null), ['seller', 'super_admin'], true)) {
@@ -369,6 +431,10 @@ class ShowroomService
             'subscription_confirmed_by' => isset($showroom['subscription_confirmed_by']) ? (int) $showroom['subscription_confirmed_by'] : null,
             'subscription_rejected_at' => $showroom['subscription_rejected_at'] ?? null,
             'subscription_rejected_reason' => $showroom['subscription_rejected_reason'] ?? null,
+            'subscription_next_due_at' => $showroom['subscription_next_due_at'] ?? null,
+            'subscription_is_due' => $this->isSubscriptionDue($showroom),
+            'seller_name' => $showroom['seller_name'] ?? null,
+            'seller_email' => $showroom['seller_email'] ?? null,
             'created_at' => $showroom['created_at'],
             'updated_at' => $showroom['updated_at'],
         ];

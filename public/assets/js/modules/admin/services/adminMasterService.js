@@ -68,6 +68,7 @@ const DEFAULT_SIDEBAR_SEED = [
   sidebarSeed("admin.master_inspection", "admin", "Master Inspection", "/admin/master-inspection", "clipboard", 40, "admin.master"),
   sidebarSeed("admin.master_location", "admin", "Master Lokasi", "/admin/master-location", "location", 50, "admin.master"),
   sidebarSeed("admin.master_pricing", "admin", "Master Harga", "/admin/master-pricing", "tag", 60, "admin.master"),
+  sidebarSeed("admin.subscriptions_due", "admin", "Tagihan Berulang", "/admin/subscriptions-due", "creditCard", 25),
   sidebarSeed("admin.design_studio", "admin", "Design Studio", "/admin/design-studio", "sparkles", 80),
   sidebarSeed("seller.dashboard", "seller", "Dashboard Showroom", "/seller", "dashboard", 10),
   sidebarSeed("seller.showroom", "seller", "Showroom Saya", "/seller/showroom", "showroom", 20),
@@ -75,6 +76,7 @@ const DEFAULT_SIDEBAR_SEED = [
   sidebarSeed("seller.affiliates", "seller", "Marketing", "/seller/affiliates", "affiliate", 40),
   sidebarSeed("seller.affiliate_commissions", "seller", "Komisi Marketing", "/seller/affiliate-commissions", "commission", 50),
   sidebarSeed("seller.transactions", "seller", "Transaksi", "/seller/transactions", "transaction", 60),
+  sidebarSeed("seller.billing", "seller", "Langganan", "/seller/billing", "creditCard", 70),
   sidebarSeed("affiliate.dashboard", "affiliate", "Dashboard Marketing", "/affiliate", "affiliate", 10),
   sidebarSeed("affiliate.activity", "affiliate", "Activity Clicks", "/affiliate/activity", "transaction", 20),
   sidebarSeed("affiliate.ledger", "affiliate", "Ledger Komisi", "/affiliate/ledger", "commission", 30),
@@ -919,6 +921,14 @@ function ensureAdminMasterSidebarChildren(items = []) {
 
   if (!byKey.has("admin.cars")) {
     next.push(sidebarSeed("admin.cars", "admin", "Katalog Mobil", "/admin/cars", "car", 40));
+  }
+
+  if (!byKey.has("admin.subscriptions_due")) {
+    next.push(sidebarSeed("admin.subscriptions_due", "admin", "Tagihan Berulang", "/admin/subscriptions-due", "creditCard", 25));
+  }
+
+  if (!byKey.has("seller.billing")) {
+    next.push(sidebarSeed("seller.billing", "seller", "Langganan", "/seller/billing", "creditCard", 70));
   }
 
   if (!master || master.role !== "admin") {

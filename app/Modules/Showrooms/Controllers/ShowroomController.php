@@ -84,6 +84,15 @@ class ShowroomController extends Controller
         ], 'Bukti transfer ditolak.');
     }
 
+    public function dueSubscriptions(Request $request): JsonResponse
+    {
+        $user = $this->user($request);
+
+        return JsonResponse::success([
+            'showrooms' => $this->service->dueSubscriptions($user),
+        ], 'Tagihan berulang berhasil diambil.');
+    }
+
     public function validateSlug(Request $request): JsonResponse
     {
         return JsonResponse::success([

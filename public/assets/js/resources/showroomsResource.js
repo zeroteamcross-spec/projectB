@@ -49,4 +49,9 @@ export const showroomsResource = {
     const response = await apiClient.post(`/showrooms/${encodeURIComponent(showroomId)}/subscription/reject`, { reason }, options);
     return response.data?.showroom ?? null;
   },
+
+  async dueSubscriptions(options = {}) {
+    const response = await apiClient.get("/showrooms/subscriptions/due", options);
+    return response.data?.showrooms ?? [];
+  },
 };
