@@ -4,7 +4,7 @@
   "tests": "27 / 27 lolos",
   "archive_url": "laporan-verifikasi-arsip.html",
   "development": {
-    "count": 8,
+    "count": 13,
     "label": "fitur & pekerjaan baru minggu ini",
     "description": "Membangun sesuatu yang baru — fitur, halaman, alur, maupun infrastruktur.",
     "rows": [
@@ -15,15 +15,23 @@
       { "task": "Bangun tampilan kartu pilihan harga di halaman registrasi showroom", "detail": "Paket dari Master Harga tampil sebagai kartu setelah akun berhasil dibuat (bisa lebih dari satu), badge \"Rekomendasi\" ikut tampil, showroom wajib memilih salah satu sebelum lanjut. Kalau Admin belum sempat membuat paket aktif sama sekali, langkah ini otomatis dilewati.", "status": "done" },
       { "task": "Sambungkan pilihan harga ke alur registrasi", "detail": "Setelah showroom memilih paket dan menekan \"Lanjutkan\", pilihan tersimpan lalu alur lanjut ke halaman pending approval seperti biasa.", "status": "done" },
       { "task": "Tampilkan paket yang dipilih showroom di sisi Admin", "detail": "Panel review approval sekarang menampilkan paket harga yang dipilih calon showroom (nama, harga, periode tagihan) langsung di detail dossier-nya.", "status": "done" },
-      { "task": "Verifikasi alur registrasi + pilihan harga end-to-end di production", "detail": "Diuji langsung di production dari nol: daftar showroom baru, kartu 3 paket harga tampil, pilih paket Enterprise, tersimpan dan lanjut ke halaman pending approval — lalu dicek dari sisi Admin, paket \"Enterprise (Rp 3.500.000 /bulan)\" tampil benar di panel review approval-nya.", "status": "done" }
+      { "task": "Verifikasi alur registrasi + pilihan harga end-to-end di production", "detail": "Diuji langsung di production dari nol: daftar showroom baru, kartu 3 paket harga tampil, pilih paket Enterprise, tersimpan dan lanjut ke halaman pending approval — lalu dicek dari sisi Admin, paket \"Enterprise (Rp 3.500.000 /bulan)\" tampil benar di panel review approval-nya.", "status": "done" },
+      { "task": "Bangun alur pembayaran paket showroom (bukti transfer manual)", "detail": "Showroom yang sudah pilih paket mengunggah bukti transfer, Admin memverifikasi (konfirmasi/tolak), dan akun showroom baru bisa di-approve setelah pembayarannya dikonfirmasi — meniru pola transfer manual yang sudah dipakai untuk DP transaksi mobil (upload bukti → verifikasi → lunas), termasuk service upload generik yang sama. Rekening tujuan pembayaran jadi Master Data baru yang bisa diedit Admin dari halaman Master Harga.", "status": "done" },
+      { "task": "Rancang skema Tagihan Berulang", "detail": "Siklus tagihan berikutnya (bulan/tahun sesuai paket) dihitung dari tanggal pembayaran dikonfirmasi, dilacak lewat kolom due date baru — dihitung langsung saat data dibaca, tanpa cron terjadwal, supaya tidak ada proses berjalan di latar belakang yang perlu dijaga.", "status": "done" },
+      { "task": "Bangun alur perpanjangan pembayaran showroom", "detail": "Endpoint upload bukti transfer yang sama dipakai ulang untuk perpanjangan — begitu siklus jatuh tempo, showroom bisa unggah bukti lagi walau paketnya berstatus \"lunas\" dari siklus sebelumnya. Konfirmasi Admin menghitung tanggal jatuh tempo berikutnya dari jatuh tempo SEBELUMNYA (bukan dari waktu konfirmasi), supaya tanggalnya tidak bergeser tiap siklus walau konfirmasinya telat.", "status": "done" },
+      { "task": "Bangun halaman Tagihan Berulang di Admin & Langganan di sisi Showroom", "detail": "Admin punya halaman baru \"Tagihan Berulang\" yang cuma menampilkan showroom yang SUDAH disetujui dan siklus tagihannya perlu ditinjau (terpisah dari Approval Queue yang menangani pembayaran pertama). Showroom punya halaman baru \"Langganan\" untuk melihat status pembayaran & mengunggah bukti transfer perpanjangan.", "status": "done" },
+      { "task": "Verifikasi alur pembayaran & Tagihan Berulang end-to-end di production", "detail": "Diuji langsung di production: daftar showroom → pilih paket → unggah bukti transfer → coba di-approve sebelum pembayaran dikonfirmasi (ditolak sistem, benar) → Admin konfirmasi pembayaran → approve berhasil. Lanjut simulasi siklus jatuh tempo: showroom unggah bukti perpanjangan, Admin konfirmasi, tanggal jatuh tempo berikutnya maju tepat satu bulan dari jatuh tempo sebelumnya (bukan dari waktu konfirmasi) — sesuai rancangan, tidak ada pergeseran tanggal.", "status": "done" }
     ]
   },
   "maintenance": {
-    "count": 1,
+    "count": 4,
     "label": "bug & perbaikan minggu ini",
     "description": "Memperbaiki sesuatu yang sudah ada tapi bermasalah — bug dan performa.",
     "rows": [
-      { "task": "Perbaiki showroom baru daftar belum benar-benar punya sesi login", "detail": "Ditemukan saat verifikasi langsung di production: mendaftar sebagai showroom ternyata tidak otomatis memberi sesi login, jadi langkah pilih paket harga (yang butuh sesi aktif) gagal. Sekarang pendaftaran showroom langsung disertai sesi login, tanpa mengubah alur login manual untuk buyer/affiliate.", "status": "done" }
+      { "task": "Perbaiki showroom baru daftar belum benar-benar punya sesi login", "detail": "Ditemukan saat verifikasi langsung di production: mendaftar sebagai showroom ternyata tidak otomatis memberi sesi login, jadi langkah pilih paket harga (yang butuh sesi aktif) gagal. Sekarang pendaftaran showroom langsung disertai sesi login, tanpa mengubah alur login manual untuk buyer/affiliate.", "status": "done" },
+      { "task": "Perbaiki keamanan: harga paket showroom bisa dikarang lewat request manual", "detail": "Ditemukan saat testing keamanan langsung di production: endpoint pilih paket menerima begitu saja harga & periode tagihan dari klien — request yang diutak-atik manual bisa mengaku pilih paket apa saja dengan harga karangan (termasuk Rp 0 atau negatif), dan nilai itu tersimpan lalu tampil ke Admin sebagai \"paket yang dipilih\". Sekarang harga & periode tagihan selalu diambil ulang dari Master Harga di server berdasarkan nama paket, bukan dipercaya dari klien.", "status": "done" },
+      { "task": "Perbaiki: rekening tujuan pembayaran tidak tampil kalau belum pernah disimpan Admin", "detail": "Ditemukan saat verifikasi live: begitu Master Harga/Bank/Lokasi/rekening tujuan belum pernah disimpan Admin sama sekali, halaman registrasi showroom fallback ke data kosong (bukan data contoh bawaan), jadi showroom tidak tahu harus transfer ke mana. Fallback sekarang selalu mengembalikan data contoh bawaan untuk kasus ini.", "status": "done" },
+      { "task": "Perbaiki: warning PHP bocor ke response API + kolom hilang di query Tagihan Berulang", "detail": "Ditemukan saat verifikasi live: query daftar Tagihan Berulang tidak menyertakan sebagian kolom showroom, jadi memicu warning PHP yang — karena pengaturan server saat itu — tercetak sebagai teks mentah (termasuk path file server) di depan isi response API. Query dilengkapi, dan pengaturan servernya disesuaikan supaya warning seperti ini tidak lagi bocor ke response API mana pun, cukup tercatat di log.", "status": "done" }
     ]
   }
 }
