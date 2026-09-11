@@ -52,13 +52,23 @@ class SubmitManualTransferProofRequest
             }
         }
 
+        $note = trim((string) $this->request->input('note', ''));
+
+        // Kolom manual_transfer_note/subscription_proof_note keduanya
+        // varchar(255) dengan STRICT_TRANS_TABLES aktif -- tanpa batas di
+        // sini, catatan yang lebih panjang bikin INSERT/UPDATE gagal dengan
+        // PDOException mentah alih-alih pesan validasi yang jelas.
+        if (mb_strlen($note) > 255) {
+            $errors['note'] = 'Catatan maksimal 255 karakter.';
+        }
+
         if ($errors !== []) {
             throw new ValidationException($errors);
         }
 
         return [
             'proof' => $file,
-            'note' => trim((string) $this->request->input('note', '')),
+            'note' => $note,
         ];
     }
 
