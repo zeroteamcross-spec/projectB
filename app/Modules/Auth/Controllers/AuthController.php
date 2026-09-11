@@ -35,8 +35,12 @@ class AuthController extends Controller
     {
         $payload = (new RegisterRequest($request))->validate();
         $result = $this->service->register($payload);
+        $response = JsonResponse::success([
+            'user' => $result['user'],
+            'remember_expires_at' => $result['remember_token']['expires_at'] ?? null,
+        ], 'Registrasi berhasil.', [], 201);
 
-        return JsonResponse::success($result, 'Registrasi berhasil.', [], 201);
+        return $this->withRememberCookie($response, $result['remember_token'] ?? null);
     }
 
     public function login(Request $request): JsonResponse

@@ -90,9 +90,20 @@ class AuthService
 
         $user = $this->users->findById($userId);
 
-        return [
+        $result = [
             'user' => $this->serializeUser($user),
         ];
+
+        // Seller boleh login walau masih pending approval (lihat
+        // canAuthenticate()), jadi begitu daftar langsung diberi sesi supaya
+        // bisa lanjut memilih paket harga (showroomRegisterPage.js) tanpa
+        // langkah login terpisah. Peran lain tetap harus login manual seperti
+        // biasa.
+        if ($data['role'] === 'seller') {
+            $result['remember_token'] = $this->issueRememberToken($userId);
+        }
+
+        return $result;
     }
 
     public function login(array $data): array

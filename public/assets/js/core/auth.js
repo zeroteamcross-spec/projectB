@@ -19,7 +19,18 @@ export class AuthService {
   }
 
   async register(payload) {
-    return this.client.post("/auth/register", payload);
+    const response = await this.client.post("/auth/register", payload);
+
+    // Backend hanya memberi sesi (cookie) untuk role seller, ditandai lewat
+    // remember_expires_at (lihat AuthService::register()). Role lain (mis.
+    // buyer/affiliate lewat halaman ini) tidak dapat cookie di sini -- mereka
+    // login manual terpisah seperti sebelumnya, jadi authStore dibiarkan apa
+    // adanya supaya tidak terlihat "sudah login" padahal sesinya tidak ada.
+    if (response.data?.remember_expires_at) {
+      this.setUser(response.data?.user ?? null);
+    }
+
+    return response;
   }
 
   async logout() {
