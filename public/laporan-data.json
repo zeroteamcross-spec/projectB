@@ -11,17 +11,19 @@
       { "task": "Rancang skema Master Harga & rencana pembayaran", "detail": "Field paket ditentukan: nama, harga, periode tagihan, daftar fitur, badge rekomendasi, status aktif/nonaktif. Ditemukan juga: showroom yang baru daftar ternyata sudah punya sesi aktif walau masih pending approval, jadi pilihan paket bisa disimpan lewat endpoint yang sudah ada. Rencana pembayaran: memakai jalur transfer manual/Midtrans yang sudah ada untuk transaksi mobil, sebagai pekerjaan lanjutan terpisah.", "status": "done" },
       { "task": "Bangun halaman Master Harga di Admin", "detail": "Admin bisa tambah, edit, aktifkan/nonaktifkan, dan hapus paket harga — memakai pola Master Data yang sudah ada (Brand/Bank/Lokasi), tampil sebagai menu baru \"Master Harga\" di sidebar Admin.", "status": "done" },
       { "task": "Verifikasi Master Harga di production", "detail": "Diuji langsung sebagai Admin: tambah paket baru, tersimpan dan tampil benar (3→4 paket), lalu hapus paket ujinya — statistik paket/aktif/rekomendasi ikut update dengan benar.", "status": "done" },
-      { "task": "Tambah penyimpanan pilihan paket showroom", "detail": "Kolom baru pada data showroom untuk mencatat paket yang dipilih saat mendaftar, tersambung ke endpoint yang sudah ada (bukan endpoint baru).", "status": "planned" },
-      { "task": "Bangun tampilan kartu pilihan harga di halaman registrasi showroom", "detail": "Paket dari Master Harga tampil sebagai kartu (bisa lebih dari satu), showroom wajib memilih salah satu sebelum lanjut.", "status": "planned" },
-      { "task": "Sambungkan pilihan harga ke alur registrasi", "detail": "Setelah showroom memilih paket, alur lanjut ke halaman pending approval seperti biasa; pilihan paket ikut tersimpan.", "status": "planned" },
+      { "task": "Tambah penyimpanan pilihan paket showroom", "detail": "4 kolom baru pada data showroom (nama paket, harga, periode tagihan, waktu dipilih) — disalin (snapshot) saat showroom memilih, bukan referensi ke Master Harga, supaya perubahan paket di Admin nanti tidak mengubah riwayat pilihan showroom lama. Tersambung ke endpoint yang sudah ada (PATCH showroom saya), bukan endpoint baru.", "status": "done" },
+      { "task": "Bangun tampilan kartu pilihan harga di halaman registrasi showroom", "detail": "Paket dari Master Harga tampil sebagai kartu setelah akun berhasil dibuat (bisa lebih dari satu), badge \"Rekomendasi\" ikut tampil, showroom wajib memilih salah satu sebelum lanjut. Kalau Admin belum sempat membuat paket aktif sama sekali, langkah ini otomatis dilewati.", "status": "done" },
+      { "task": "Sambungkan pilihan harga ke alur registrasi", "detail": "Setelah showroom memilih paket dan menekan \"Lanjutkan\", pilihan tersimpan lalu alur lanjut ke halaman pending approval seperti biasa.", "status": "done" },
       { "task": "Tampilkan paket yang dipilih showroom di sisi Admin", "detail": "Admin yang meninjau pendaftaran showroom bisa melihat paket harga apa yang dipilih calon showroom tersebut.", "status": "planned" },
       { "task": "Verifikasi alur registrasi + pilihan harga end-to-end di production", "detail": "Daftar showroom baru dari awal sampai pending approval, memastikan kartu harga tampil benar dan pilihannya tersimpan & terlihat di Admin.", "status": "planned" }
     ]
   },
   "maintenance": {
-    "count": 0,
+    "count": 1,
     "label": "bug & perbaikan minggu ini",
     "description": "Memperbaiki sesuatu yang sudah ada tapi bermasalah — bug dan performa.",
-    "rows": []
+    "rows": [
+      { "task": "Perbaiki showroom baru daftar belum benar-benar punya sesi login", "detail": "Ditemukan saat verifikasi langsung di production: mendaftar sebagai showroom ternyata tidak otomatis memberi sesi login, jadi langkah pilih paket harga (yang butuh sesi aktif) gagal. Sekarang pendaftaran showroom langsung disertai sesi login, tanpa mengubah alur login manual untuk buyer/affiliate.", "status": "done" }
+    ]
   }
 }
