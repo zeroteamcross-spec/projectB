@@ -20,9 +20,11 @@ class UpsertShowroomRequest extends FormRequest
             'icon_url' => 'nullable|string|max:255',
             'header_logo_url' => 'nullable|string|max:255',
             'tab_title' => 'nullable|string|max:70',
+            // Harga & periode tagihan sengaja TIDAK diterima dari klien --
+            // keduanya selalu diambil ulang dari Master Harga berdasarkan
+            // selected_plan_name (lihat ShowroomService::resolveSelectedPlan()),
+            // supaya klien tidak bisa mengaku pilih paket dengan harga karangan.
             'selected_plan_name' => 'nullable|string|max:120',
-            'selected_plan_price' => 'nullable|numeric',
-            'selected_plan_billing_period' => 'nullable|string|max:40',
         ];
     }
 
@@ -39,8 +41,6 @@ class UpsertShowroomRequest extends FormRequest
             'header_logo_url',
             'tab_title',
             'selected_plan_name',
-            'selected_plan_price',
-            'selected_plan_billing_period',
         ];
 
         if (array_intersect(array_keys($data), $allowedFields) === []) {

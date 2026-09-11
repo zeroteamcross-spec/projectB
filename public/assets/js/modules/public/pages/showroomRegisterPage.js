@@ -103,10 +103,12 @@ export function ShowroomRegisterPage() {
       rerender(context);
 
       try {
+        // Harga & periode tagihan tidak dikirim -- server yang menentukan
+        // keduanya dari Master Harga berdasarkan nama paket ini, supaya
+        // request yang diutak-atik manual tidak bisa mengaku pilih paket
+        // dengan harga karangan (lihat ShowroomService::resolveSelectedPlan()).
         await showroomsResource.updateMine({
           selected_plan_name: plan.name,
-          selected_plan_price: plan.price,
-          selected_plan_billing_period: plan.billing_period,
         });
         state.planConfirmed = true;
       } catch (error) {

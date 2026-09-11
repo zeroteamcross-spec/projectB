@@ -7,6 +7,7 @@ namespace App\Modules\Showrooms\Services;
 use App\Core\Exceptions\ForbiddenException;
 use App\Core\Exceptions\NotFoundException;
 use App\Core\Exceptions\ValidationException;
+use App\Modules\MasterData\Services\MasterDataService;
 use App\Modules\Showrooms\Repositories\ShowroomRepository;
 
 class ShowroomService
@@ -28,9 +29,12 @@ class ShowroomService
 
     private ShowroomRepository $showrooms;
 
-    public function __construct(ShowroomRepository $showrooms)
+    private MasterDataService $masterData;
+
+    public function __construct(ShowroomRepository $showrooms, MasterDataService $masterData)
     {
         $this->showrooms = $showrooms;
+        $this->masterData = $masterData;
     }
 
     public function mine(array $user): array
@@ -66,6 +70,15 @@ class ShowroomService
         $existing = $this->showrooms->findByUserId((int) $user['id']);
 
         if ($existing) {
+            // Harga/periode tagihan TIDAK BOLEH dipercaya dari klien -- kalau
+            // tidak, showroom bisa mengaku pilih paket apa saja dengan harga
+            // berapa saja (termasuk 0 atau negatif) lewat request yang
+            // dimodifikasi manual. Begitu selected_plan_name dikirim, nilai
+            // harga & periode selalu diambil ulang dari Master Harga di sini,
+            // bukan dari $data.
+            $hasPlanSelection = array_key_exists('selected_plan_name', $data);
+            $plan = $hasPlanSelection ? $this->resolveSelectedPlan($data['selected_plan_name']) : null;
+
             $payload = [
                 'slug' => $existing['slug'] ?: $this->generateSlug((string) ($data['name'] ?? $existing['name']), (int) $existing['id']),
                 'name' => $data['name'] ?? $existing['name'],
@@ -91,18 +104,12 @@ class ShowroomService
                 // supaya kalau Admin nanti mengubah/menghapus paket itu di
                 // Master Harga, riwayat pilihan showroom lama tidak ikut
                 // berubah.
-                'selected_plan_name' => array_key_exists('selected_plan_name', $data)
-                    ? $data['selected_plan_name']
-                    : $existing['selected_plan_name'],
-                'selected_plan_price' => array_key_exists('selected_plan_price', $data)
-                    ? $data['selected_plan_price']
-                    : $existing['selected_plan_price'],
-                'selected_plan_billing_period' => array_key_exists('selected_plan_billing_period', $data)
-                    ? $data['selected_plan_billing_period']
+                'selected_plan_name' => $hasPlanSelection ? $plan['name'] : $existing['selected_plan_name'],
+                'selected_plan_price' => $hasPlanSelection ? $plan['price'] : $existing['selected_plan_price'],
+                'selected_plan_billing_period' => $hasPlanSelection
+                    ? $plan['billing_period']
                     : $existing['selected_plan_billing_period'],
-                'selected_plan_selected_at' => array_key_exists('selected_plan_name', $data)
-                    ? date('Y-m-d H:i:s')
-                    : $existing['selected_plan_selected_at'],
+                'selected_plan_selected_at' => $hasPlanSelection ? date('Y-m-d H:i:s') : $existing['selected_plan_selected_at'],
             ];
 
             $this->showrooms->update((int) $existing['id'], $payload);
@@ -145,6 +152,48 @@ class ShowroomService
                 'tab_title' => $showroom['tab_title'] ?? null,
             ] : null,
         ];
+    }
+
+    /**
+     * Cari paket yang namanya cocok & aktif di Master Harga, lalu kembalikan
+     * harga/periode tagihan dari sana -- satu-satunya sumber kebenaran untuk
+     * nilai yang di-snapshot ke showroom. Nama paket yang tidak ditemukan
+     * (typo, sudah dihapus admin, atau dikarang manual) ditolak, bukan
+     * diterima apa adanya.
+     */
+    private function resolveSelectedPlan($planName): array
+    {
+        $planName = is_string($planName) ? trim($planName) : '';
+
+        if ($planName === '') {
+            return ['name' => null, 'price' => null, 'billing_period' => null];
+        }
+
+        $plans = [];
+
+        try {
+            $master = $this->masterData->get('pricing.plans');
+            $plans = $master['data']['plans'] ?? [];
+        } catch (NotFoundException $exception) {
+            $plans = [];
+        }
+
+        foreach ($plans as $candidate) {
+            $isMatch = ($candidate['name'] ?? null) === $planName;
+            $isActive = ($candidate['status'] ?? 'active') === 'active';
+
+            if ($isMatch && $isActive) {
+                return [
+                    'name' => $candidate['name'],
+                    'price' => (float) ($candidate['price'] ?? 0),
+                    'billing_period' => $candidate['billing_period'] ?? null,
+                ];
+            }
+        }
+
+        throw new ValidationException([
+            'selected_plan_name' => "Paket '{$planName}' tidak ditemukan atau sudah tidak aktif.",
+        ]);
     }
 
     private function ensureSeller(array $user): void
