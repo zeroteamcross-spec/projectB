@@ -31,14 +31,18 @@ const googleLoginRoutes = googleLoginService.routes().map((config) => ({
   // getLastViewedPublicContextPath() (localStorage, tracks whichever of the
   // two was viewed most recently) fills the gap where `from` itself isn't
   // scoped to either. The button is unconditional either way -- falling
-  // back to "/" rather than disappearing keeps its presence predictable
-  // instead of depending on state the visitor can't see.
+  // back to "/public" (the public catalog alias, see landingPageRegistry.js)
+  // rather than disappearing keeps its presence predictable instead of
+  // depending on state the visitor can't see. It used to fall back to "/",
+  // but "/" is the SaaS marketing landing page (or, on the buyer subdomain,
+  // bounces straight to the buyer dashboard's login wall) -- neither is a
+  // catalog.
   page: (context) => GoogleLoginPage({
     roleSlug: config.slug,
     ...(config.slug === "buyer" ? {
       footerLink: {
         label: "Kembali ke Katalog",
-        path: publicContextPathFromRedirect(context?.query?.from) || getLastViewedPublicContextPath() || "/",
+        path: publicContextPathFromRedirect(context?.query?.from) || getLastViewedPublicContextPath() || "/public",
       },
     } : {}),
   }),

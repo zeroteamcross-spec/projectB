@@ -235,21 +235,9 @@ async function submitRoleLogin(payload, context, config, state, root, getBackgro
       dedupeMs: 3000,
     });
 
-    // Kalau tujuannya ada di subdomain lain, pindah langsung lewat navigasi
-    // browser sungguhan -- JANGAN lewat context.router.navigate() dulu.
-    // navigate() men-dispatch popstate secara sinkron, yang membuat Router
-    // SPA (masih hidup di halaman login ini) ikut memproses path tujuan
-    // SEBELUM location.replace() di bawah benar-benar berpindah host --
-    // termasuk kemungkinan guard-nya sendiri memutuskan "belum login di host
-    // ini" dan memasang ulang halaman login ini sekilas. Baris ini
-    // memotong race itu: begitu host tujuan beda, tidak ada lagi yang
-    // disentuh di SPA ini, cuma satu kali pindah alamat.
-    const targetHost = hostForRole(result.role);
-    if (targetHost && targetHost !== currentHost()) {
-      window.location.replace(`${window.location.protocol}//${targetHost}${result.target}`);
-      return;
-    }
-
+    // Kalau tujuannya ada di subdomain lain, navigateTo() (dipanggil oleh
+    // router.navigate() di bawah) sudah menangani ini sendiri lewat
+    // location.replace() langsung -- lihat core/router.js.
     context.router.navigate(result.target);
     // Router.navigate() only sets location.hash; the actual page swap runs on
     // the next hashchange tick, and can take a while since it waits for the

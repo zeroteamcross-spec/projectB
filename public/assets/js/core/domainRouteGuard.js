@@ -67,34 +67,66 @@ export function enforceDomainRoute({ locationRef = window.location } = {}) {
 
   const hostRole = roleForHost(peta, currentHost);
 
-  if (hostRole) {
-    if (enforceOwnLoginRoute({ locationRef, path, host: currentHost, role: hostRole })) {
-      return true;
-    }
+  if (hostRole && enforceOwnLoginRoute({ locationRef, path, host: currentHost, role: hostRole })) {
+    return true;
+  }
 
+  const target = resolveCrossDomainTarget(path, { locationRef, peta, currentHost });
+
+  if (!target) {
+    return false;
+  }
+
+  locationRef.replace(target);
+  return true;
+}
+
+/**
+ * Pure resolver -- tidak melakukan redirect sendiri, cuma menghitung ke host
+ * mana (kalau ada) `path` seharusnya dibuka. Kembalikan URL tujuan lengkap,
+ * atau null kalau host saat ini sudah benar.
+ *
+ * Dipakai DUA tempat: enforceDomainRoute() di atas (menjaga navigasi lewat
+ * back/forward, klik link biasa, atau muat halaman pertama kali) dan
+ * navigateTo() di router.js, yang memanggilnya LEBIH DULU sebelum
+ * pushState/dispatchEvent(popstate) -- supaya navigasi SPA yang kebetulan
+ * menyasar path milik host lain (mis. tombol "Kembali ke Katalog" di
+ * halaman login buyer, dipanggil dari subdomain buyer) langsung
+ * location.replace() tanpa pernah memicu popstate/Router SPA di host yang
+ * salah sama sekali. Itu race yang sebelumnya membuat halaman atau form
+ * sempat ter-render sesaat di host yang salah sebelum benar-benar pindah --
+ * terlihat sebagai "berkedip" atau "muncul dua kali".
+ */
+export function resolveCrossDomainTarget(path, { locationRef = window.location, peta = petaHost(), currentHost: host = normalizeHost(locationRef.hostname || locationRef.host) } = {}) {
+  if (!peta.default || !hostTerdaftar(peta).has(host)) {
+    return null;
+  }
+
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  const hostRole = roleForHost(peta, host);
+
+  if (hostRole) {
     // Host peran (admin/seller/buyer/affiliate) hanya melayani rute
     // perannya sendiri. Apa pun selain itu -- dashboard peran lain, katalog
     // publik, halaman mobil -- dikembalikan ke host utama, bukan dibiarkan
     // tampil di alamat yang bukan haknya. Pola ini awalnya cuma berlaku untuk
     // admin.carlynk.id; sekarang berlaku sama untuk semua host peran yang
     // sudah dikonfigurasi lewat ROLE_HOST_*.
-    if (!isOwnPath(hostRole, path) && !isOwnLoginPath(hostRole, path) && !isSharedAuthenticatedPath(path)) {
-      locationRef.replace(`${locationRef.protocol}//${peta.default}${locationRef.pathname}${locationRef.search}`);
-      return true;
+    if (isOwnPath(hostRole, normalizedPath) || isOwnLoginPath(hostRole, normalizedPath) || isSharedAuthenticatedPath(normalizedPath)) {
+      return null;
     }
 
-    return false;
+    return `${locationRef.protocol}//${peta.default}${normalizedPath}`;
   }
 
-  const targetRole = roleForHashPath(path);
+  const targetRole = roleForHashPath(normalizedPath);
   const targetHost = targetRole ? hostUntukPeran(peta, targetRole) : null;
 
-  if (!targetHost || targetHost === currentHost) {
-    return false;
+  if (!targetHost || targetHost === host) {
+    return null;
   }
 
-  locationRef.replace(`${locationRef.protocol}//${targetHost}${locationRef.pathname}${locationRef.search}`);
-  return true;
+  return `${locationRef.protocol}//${targetHost}${normalizedPath}`;
 }
 
 function pindah(locationRef, host, path) {

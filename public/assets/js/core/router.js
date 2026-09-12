@@ -1,3 +1,5 @@
+import { resolveCrossDomainTarget } from "./domainRouteGuard.js";
+
 /**
  * Satu-satunya jalan menulis URL, dipakai router sendiri maupun modul lain
  * yang tidak punya akses ke instance Router (banner, popover, dsb -- lihat
@@ -8,9 +10,25 @@
  * Navigasi ke path yang sama persis (termasuk query) tidak melakukan apa-apa
  * -- meniru perilaku lama saat location.hash diisi nilai yang sudah sama
  * (browser tidak memicu hashchange untuk itu).
+ *
+ * Kalau `path` ternyata rute milik host lain (mis. tombol "Kembali ke
+ * Katalog" di halaman login buyer, dipanggil dari subdomain buyer),
+ * location.replace() LANGSUNG ke situ -- tidak lewat pushState/popstate sama
+ * sekali. Tanpa ini, popstate yang disintesis di bawah membuat Router SPA
+ * (masih hidup di halaman ini) ikut memproses path itu di host yang SALAH
+ * sebelum domainRouteGuard (juga mendengarkan popstate yang sama) sempat
+ * pindah host -- race itulah yang terlihat sebagai halaman/form yang
+ * berkedip atau muncul dua kali.
  */
 export function navigateTo(path) {
   const target = normalizePathForNavigation(path);
+
+  const crossDomainUrl = resolveCrossDomainTarget(target);
+  if (crossDomainUrl) {
+    window.location.replace(crossDomainUrl);
+    return;
+  }
+
   const current = window.location.pathname + window.location.search;
 
   if (target === current) {

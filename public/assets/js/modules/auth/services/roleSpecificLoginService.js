@@ -92,7 +92,6 @@ export const roleSpecificLoginService = {
 
     return {
       user: authStore.user(),
-      role: authStore.role(),
       target: homeForAuthenticatedRole(authStore.role(), config),
     };
   },
