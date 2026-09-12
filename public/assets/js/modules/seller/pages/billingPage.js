@@ -8,6 +8,7 @@ import { formatDate } from "../../../utils/formatDate.js";
 import { formatCurrency } from "../../../utils/formatCurrency.js";
 import { showroomsResource } from "../../../resources/showroomsResource.js";
 import { adminMasterService } from "../../admin/services/adminMasterService.js";
+import { SubscriptionMidtransPanel } from "../../../ui/composites/subscriptionMidtransPanel.js";
 
 const STATUS_LABEL = {
   unpaid: "Belum bayar",
@@ -32,11 +33,34 @@ export function SellerBillingPage() {
     note: "",
     isSubmitting: false,
     error: "",
+    // "midtrans" (Virtual Account, instan -- ditampilkan lebih dulu) atau
+    // "manual" (transfer + upload bukti, alur lama, tetap tersedia).
+    paymentMethodTab: "midtrans",
+    midtransShowroom: null,
+    midtransPanelWidget: null,
   };
 
   const rerender = () => render(root, currentContext, state, actions);
 
   const actions = {
+    switchPaymentMethodTab(tab) {
+      state.paymentMethodTab = tab;
+      rerender();
+    },
+    handleMidtransPaid(showroom) {
+      state.midtransShowroom = showroom;
+      if (showroom) {
+        appStore.patchState("working.sellerBilling.showroom", {
+          data: showroom,
+          hydratedAt: Date.now(),
+        }, "seller-billing:midtrans-updated");
+        appStore.patchState("snapshot.seller.showroom", {
+          ...(appStore.get("snapshot.seller.showroom", {}) ?? {}),
+          data: showroom,
+        }, "seller-billing:snapshot-synced");
+      }
+      rerender();
+    },
     updateProofFile(file) {
       state.proofFile = file;
       state.error = "";
@@ -104,6 +128,8 @@ export function SellerBillingPage() {
     },
     dispose() {
       unsubscribe = null;
+      state.midtransPanelWidget?.dispose?.();
+      state.midtransPanelWidget = null;
       root = null;
     },
   });
@@ -209,7 +235,20 @@ function paymentForm(state, actions, destinationMaster) {
   section.id = "slrbil_payment_section";
   section.className = "grid gap-3 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white/85 p-5 shadow-sm";
 
-  section.append(textNode("h2", "text-sm font-black text-gray-950", "Unggah bukti transfer"));
+  section.append(
+    textNode("h2", "text-sm font-black text-gray-950", "Bayar paket showroom"),
+    billingPaymentMethodTabs(state, actions),
+  );
+
+  if (state.paymentMethodTab === "midtrans") {
+    state.midtransPanelWidget?.dispose?.();
+    state.midtransPanelWidget = SubscriptionMidtransPanel({
+      getShowroom: () => state.midtransShowroom,
+      onPaid: (showroom) => actions.handleMidtransPaid(showroom),
+    });
+    section.append(state.midtransPanelWidget.element);
+    return section;
+  }
 
   const destination = destinationMaster?.data;
   if (destination?.account_number) {
@@ -264,6 +303,33 @@ function paymentForm(state, actions, destinationMaster) {
   section.append(submit);
 
   return section;
+}
+
+function billingPaymentMethodTabs(state, actions) {
+  const wrap = document.createElement("div");
+  wrap.id = "slrbil_payment_method_tabs";
+  wrap.className = "grid grid-cols-2 gap-2";
+
+  [
+    { value: "midtrans", label: "Virtual Account (Instan)" },
+    { value: "manual", label: "Transfer Manual" },
+  ].forEach(({ value, label }) => {
+    const tab = document.createElement("button");
+    tab.type = "button";
+    tab.dataset.paymentMethodTab = value;
+    const isActive = state.paymentMethodTab === value;
+    tab.className = [
+      "rounded-xl border px-3 py-2 text-xs font-bold transition",
+      isActive
+        ? "border-[var(--pb-brand-primary)] bg-[color-mix(in_srgb,var(--pb-brand-primary)_8%,white)] text-[var(--pb-brand-secondary)]"
+        : "border-[var(--pb-card-border)] bg-white text-gray-700 hover:border-[color-mix(in_srgb,var(--pb-brand-primary)_35%,var(--pb-card-border))]",
+    ].join(" ");
+    tab.textContent = label;
+    tab.addEventListener("click", () => actions.switchPaymentMethodTab(value));
+    wrap.append(tab);
+  });
+
+  return wrap;
 }
 
 function textNode(tagName, className, text) {

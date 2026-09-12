@@ -54,4 +54,9 @@ export const showroomsResource = {
     const response = await apiClient.get("/showrooms/subscriptions/due", options);
     return response.data?.showrooms ?? [];
   },
+
+  async createSubscriptionMidtransCharge(bank, options = {}) {
+    const response = await apiClient.post("/showrooms/me/subscription/midtrans/charge", { bank }, options);
+    return response.data?.showroom ?? null;
+  },
 };

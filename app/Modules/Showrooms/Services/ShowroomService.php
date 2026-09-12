@@ -7,6 +7,7 @@ namespace App\Modules\Showrooms\Services;
 use App\Core\Exceptions\ForbiddenException;
 use App\Core\Exceptions\NotFoundException;
 use App\Core\Exceptions\ValidationException;
+use App\Infrastructure\Payment\Midtrans\MidtransHttpClient;
 use App\Infrastructure\Storage\StorageServiceInterface;
 use App\Modules\Auth\Policies\AuthPolicy;
 use App\Modules\MasterData\Services\MasterDataService;
@@ -15,6 +16,13 @@ use Throwable;
 
 class ShowroomService
 {
+    /**
+     * Sama seperti bank yang didukung untuk pembayaran transaksi mobil (lihat
+     * MidtransPaymentAdapter::applyPaymentMethod()) -- Virtual Account saja,
+     * sesuai cakupan yang disepakati untuk pembayaran paket SaaS ini.
+     */
+    private const MIDTRANS_VA_BANKS = ['bca', 'bni', 'bri', 'mandiri'];
+
     /**
      * Kata yang tidak boleh jadi slug showroom karena URL-nya kini langsung
      * di root ("carlynk.id/{slug}") -- bertabrakan dengan rute sistem yang
@@ -36,11 +44,18 @@ class ShowroomService
 
     private StorageServiceInterface $storage;
 
-    public function __construct(ShowroomRepository $showrooms, MasterDataService $masterData, StorageServiceInterface $storage)
-    {
+    private MidtransHttpClient $midtransHttp;
+
+    public function __construct(
+        ShowroomRepository $showrooms,
+        MasterDataService $masterData,
+        StorageServiceInterface $storage,
+        MidtransHttpClient $midtransHttp
+    ) {
         $this->showrooms = $showrooms;
         $this->masterData = $masterData;
         $this->storage = $storage;
+        $this->midtransHttp = $midtransHttp;
     }
 
     public function mine(array $user): array
@@ -129,6 +144,16 @@ class ShowroomService
                 'subscription_rejected_at' => $planChanged ? null : $existing['subscription_rejected_at'],
                 'subscription_rejected_reason' => $planChanged ? null : $existing['subscription_rejected_reason'],
                 'subscription_next_due_at' => $planChanged ? null : $existing['subscription_next_due_at'],
+                // Sesi VA lama menagih harga PAKET LAMA -- kalau tetap
+                // dibiarkan, membayarnya tidak akan pernah cocok dengan paket
+                // yang baru dipilih. Diputus sama seperti bukti transfer
+                // manual di atas.
+                'subscription_payment_method' => $planChanged ? 'manual' : ($existing['subscription_payment_method'] ?? 'manual'),
+                'subscription_midtrans_order_id' => $planChanged ? null : $existing['subscription_midtrans_order_id'],
+                'subscription_midtrans_transaction_id' => $planChanged ? null : $existing['subscription_midtrans_transaction_id'],
+                'subscription_midtrans_payment_data' => $planChanged ? null : $existing['subscription_midtrans_payment_data'],
+                'subscription_midtrans_expires_at' => $planChanged ? null : $existing['subscription_midtrans_expires_at'],
+                'subscription_midtrans_paid_at' => $planChanged ? null : $existing['subscription_midtrans_paid_at'],
             ];
 
             $this->showrooms->update((int) $existing['id'], $payload);
@@ -205,15 +230,14 @@ class ShowroomService
             throw new NotFoundException('Showroom tidak ditemukan.');
         }
 
-        if (trim((string) ($showroom['subscription_proof_path'] ?? '')) === '') {
+        // Dulu memeriksa subscription_proof_path secara langsung -- tidak lagi
+        // cukup sejak pembayaran Midtrans otomatis juga bisa berujung ke
+        // status ini TANPA file bukti (lihat updateSubscriptionMidtransPaid()).
+        // "pending_verification" sudah berarti ada sesuatu untuk ditinjau,
+        // baik itu bukti transfer manual maupun VA yang sudah dibayar.
+        if (($showroom['subscription_payment_status'] ?? null) !== 'pending_verification') {
             throw new ValidationException([
-                'subscription_proof_path' => 'Showroom belum mengunggah bukti transfer.',
-            ]);
-        }
-
-        if (($showroom['subscription_payment_status'] ?? null) === 'paid' && ! $this->isSubscriptionDue($showroom)) {
-            throw new ValidationException([
-                'subscription_payment_status' => 'Pembayaran paket ini sudah dikonfirmasi sebelumnya.',
+                'subscription_payment_status' => 'Showroom belum mengunggah bukti transfer atau membayar via Midtrans.',
             ]);
         }
 
@@ -264,9 +288,12 @@ class ShowroomService
             throw new NotFoundException('Showroom tidak ditemukan.');
         }
 
-        if (trim((string) ($showroom['subscription_proof_path'] ?? '')) === '') {
+        // Sama seperti confirmSubscriptionPayment() -- proof_path saja tidak
+        // lagi cukup sejak pembayaran Midtrans bisa masuk ke status ini tanpa
+        // file bukti.
+        if (($showroom['subscription_payment_status'] ?? null) !== 'pending_verification') {
             throw new ValidationException([
-                'subscription_proof_path' => 'Showroom belum mengunggah bukti transfer.',
+                'subscription_payment_status' => 'Showroom belum mengunggah bukti transfer atau membayar via Midtrans.',
             ]);
         }
 
@@ -276,7 +303,7 @@ class ShowroomService
             throw new ValidationException(['reason' => 'Alasan penolakan wajib diisi.']);
         }
 
-        $proofPath = (string) $showroom['subscription_proof_path'];
+        $proofPath = trim((string) ($showroom['subscription_proof_path'] ?? ''));
         $now = date('Y-m-d H:i:s');
 
         $this->showrooms->updateSubscriptionRejection($showroomId, [
@@ -284,9 +311,183 @@ class ShowroomService
             'subscription_rejected_reason' => $reason,
             'updated_at' => $now,
         ]);
-        $this->storage->delete($proofPath);
+
+        if ($proofPath !== '') {
+            $this->storage->delete($proofPath);
+        }
 
         return $this->serializeShowroom($this->showrooms->findById($showroomId));
+    }
+
+    /**
+     * Showroom memilih bayar via Virtual Account Midtrans, sebagai alternatif
+     * transfer manual -- dipakai baik saat registrasi (pilih paket pertama
+     * kali) maupun perpanjangan (siklus berikutnya di halaman Langganan).
+     * Belum mengubah subscription_payment_status: itu baru terjadi kalau
+     * pembayarannya benar-benar dikonfirmasi lewat callback Midtrans (lihat
+     * handleSubscriptionMidtransCallback()), bukan begitu VA dibuat.
+     */
+    public function createSubscriptionMidtransPayment(array $user, string $bank): array
+    {
+        $this->ensureSeller($user);
+        $showroom = $this->showrooms->findByUserId((int) $user['id']);
+
+        if (! $showroom) {
+            throw new NotFoundException('Showroom belum tersedia.');
+        }
+
+        if (($showroom['selected_plan_name'] ?? null) === null) {
+            throw new ValidationException([
+                'selected_plan_name' => 'Pilih paket harga dulu sebelum membuat pembayaran.',
+            ]);
+        }
+
+        if (($showroom['subscription_payment_status'] ?? 'unpaid') === 'paid' && ! $this->isSubscriptionDue($showroom)) {
+            throw new ValidationException([
+                'subscription_payment_status' => 'Pembayaran paket ini sudah dikonfirmasi.',
+            ]);
+        }
+
+        $bank = strtolower(trim($bank));
+        if (! in_array($bank, self::MIDTRANS_VA_BANKS, true)) {
+            throw new ValidationException([
+                'bank' => 'Bank Virtual Account tidak didukung.',
+            ]);
+        }
+
+        $showroomId = (int) $showroom['id'];
+        $amount = (int) round((float) $showroom['selected_plan_price']);
+        $orderId = 'SUBSCR-' . $showroomId . '-' . time() . '-' . strtoupper(bin2hex(random_bytes(2)));
+
+        $payload = [
+            'payment_type' => 'bank_transfer',
+            'transaction_details' => [
+                'order_id' => $orderId,
+                'gross_amount' => $amount,
+            ],
+            'bank_transfer' => [
+                'bank' => $bank,
+            ],
+            'customer_details' => [
+                'first_name' => $user['name'] ?? $showroom['name'] ?? 'Showroom',
+                'email' => $user['email'] ?? null,
+                'phone' => $showroom['phone_number'] ?? null,
+            ],
+            // Tagihan paket, bukan transaksi mobil yang perlu "sekarang juga" --
+            // 24 jam supaya showroom sempat transfer tanpa terburu-buru,
+            // konsisten dengan cara orang membayar tagihan bulanan.
+            'custom_expiry' => [
+                'expiry_duration' => 24,
+                'unit' => 'hour',
+            ],
+            'item_details' => [[
+                'id' => 'SUBSCRIPTION-' . $showroomId,
+                'price' => $amount,
+                'quantity' => 1,
+                'name' => 'Paket ' . $showroom['selected_plan_name'],
+            ]],
+            'metadata' => [
+                'purpose' => 'showroom_subscription',
+                'showroom_id' => $showroomId,
+                'plan_name' => $showroom['selected_plan_name'],
+            ],
+        ];
+
+        $response = $this->midtransHttp->post('/v2/charge', $payload);
+        $paymentData = $this->extractVaPaymentData($response);
+        $now = date('Y-m-d H:i:s');
+        $expiresAt = date('Y-m-d H:i:s', strtotime('+24 hours'));
+
+        $this->showrooms->updateSubscriptionMidtransCharge($showroomId, [
+            'subscription_midtrans_order_id' => $orderId,
+            'subscription_midtrans_transaction_id' => $response['transaction_id'] ?? null,
+            'subscription_midtrans_payment_data' => json_encode($paymentData, JSON_UNESCAPED_SLASHES),
+            'subscription_midtrans_expires_at' => $expiresAt,
+            'updated_at' => $now,
+        ]);
+
+        return $this->serializeShowroom($this->showrooms->findById($showroomId));
+    }
+
+    /**
+     * Callback Midtrans untuk pembayaran paket showroom -- endpoint TERPISAH
+     * dari callback transaksi mobil (lihat TransactionController::providerCallback())
+     * supaya order_id-nya tidak pernah perlu disatukan dengan tabel transaksi
+     * mobil. Sengaja selalu "acknowledged" walau order_id-nya tidak dikenali
+     * (Midtrans akan mengulang kalau responsnya bukan 2xx).
+     */
+    public function handleSubscriptionMidtransCallback(array $payload): array
+    {
+        $orderId = (string) ($payload['order_id'] ?? '');
+        $showroom = $orderId !== '' ? $this->showrooms->findBySubscriptionMidtransOrderId($orderId) : null;
+
+        if (! $showroom) {
+            return [
+                'acknowledged' => true,
+                'processed' => false,
+                'order_id' => $orderId,
+            ];
+        }
+
+        $status = (string) ($payload['transaction_status'] ?? '');
+        $isSuccess = in_array($status, ['capture', 'settlement'], true)
+            && in_array((string) ($payload['fraud_status'] ?? 'accept'), ['accept', ''], true);
+
+        if (! $isSuccess) {
+            return [
+                'acknowledged' => true,
+                'processed' => false,
+                'order_id' => $orderId,
+                'transaction_status' => $status,
+            ];
+        }
+
+        $showroomId = (int) $showroom['id'];
+        $now = date('Y-m-d H:i:s');
+        $paymentData = $this->decodeMidtransPaymentData($showroom['subscription_midtrans_payment_data'] ?? null);
+        $paymentData['transaction_status'] = $status;
+
+        $this->showrooms->updateSubscriptionMidtransPaid($showroomId, [
+            'subscription_proof_submitted_at' => $now,
+            'subscription_midtrans_transaction_id' => $payload['transaction_id'] ?? $showroom['subscription_midtrans_transaction_id'] ?? null,
+            'subscription_midtrans_payment_data' => json_encode($paymentData, JSON_UNESCAPED_SLASHES),
+            'subscription_midtrans_paid_at' => $now,
+            'updated_at' => $now,
+        ]);
+
+        return [
+            'acknowledged' => true,
+            'processed' => true,
+            'order_id' => $orderId,
+            'showroom' => $this->serializeShowroom($this->showrooms->findById($showroomId)),
+        ];
+    }
+
+    private function extractVaPaymentData(array $response): array
+    {
+        $data = [
+            'va_number' => null,
+            'bank' => null,
+        ];
+
+        if (isset($response['va_numbers'][0])) {
+            $data['bank'] = $response['va_numbers'][0]['bank'] ?? null;
+            $data['va_number'] = $response['va_numbers'][0]['va_number'] ?? null;
+        }
+
+        if (isset($response['permata_va_number'])) {
+            $data['bank'] = 'permata';
+            $data['va_number'] = $response['permata_va_number'];
+        }
+
+        return $data;
+    }
+
+    private function decodeMidtransPaymentData($raw): array
+    {
+        $decoded = is_string($raw) ? json_decode($raw, true) : null;
+
+        return is_array($decoded) ? $decoded : [];
     }
 
     public function validateSlug(string $slug): array
@@ -433,6 +634,11 @@ class ShowroomService
             'subscription_rejected_reason' => $showroom['subscription_rejected_reason'] ?? null,
             'subscription_next_due_at' => $showroom['subscription_next_due_at'] ?? null,
             'subscription_is_due' => $this->isSubscriptionDue($showroom),
+            'subscription_payment_method' => $showroom['subscription_payment_method'] ?? 'manual',
+            'subscription_midtrans_order_id' => $showroom['subscription_midtrans_order_id'] ?? null,
+            'subscription_midtrans_payment_data' => $this->decodeMidtransPaymentData($showroom['subscription_midtrans_payment_data'] ?? null),
+            'subscription_midtrans_expires_at' => $showroom['subscription_midtrans_expires_at'] ?? null,
+            'subscription_midtrans_paid_at' => $showroom['subscription_midtrans_paid_at'] ?? null,
             'seller_name' => $showroom['seller_name'] ?? null,
             'seller_email' => $showroom['seller_email'] ?? null,
             'created_at' => $showroom['created_at'],

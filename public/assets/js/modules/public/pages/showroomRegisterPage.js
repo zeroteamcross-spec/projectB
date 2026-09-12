@@ -7,6 +7,7 @@ import { tw } from "../../../theme/tailwindClasses.js";
 import { adminMasterService } from "../../admin/services/adminMasterService.js";
 import { showroomsResource } from "../../../resources/showroomsResource.js";
 import { formatCurrency } from "../../../utils/formatCurrency.js";
+import { SubscriptionMidtransPanel } from "../../../ui/composites/subscriptionMidtransPanel.js";
 
 const SHOWROOM_REGISTER_FALLBACK = "bg-[radial-gradient(circle_at_12%_10%,color-mix(in_srgb,var(--pb-brand-primary)_18%,transparent),transparent_32%),radial-gradient(circle_at_88%_18%,color-mix(in_srgb,var(--pb-brand-accent)_16%,transparent),transparent_30%),linear-gradient(135deg,#faf4ed,#f8fafc_44%,#eaf4f9)]";
 
@@ -47,6 +48,11 @@ export function ShowroomRegisterPage() {
     // Sama seperti planConfirmed -- kalau memang tidak ada paket untuk
     // dipilih, tidak ada juga yang perlu dibayar, jadi langkah ini dilewati.
     paymentSubmitted: false,
+    // "midtrans" (Virtual Account, instan -- ditampilkan lebih dulu) atau
+    // "manual" (transfer + upload bukti, alur lama, tetap tersedia).
+    paymentMethodTab: "midtrans",
+    midtransShowroom: null,
+    midtransPanelWidget: null,
   };
 
   const getBackgroundVideoLayer = () => {
@@ -162,6 +168,17 @@ export function ShowroomRegisterPage() {
     goHome(context) {
       context?.router?.navigate("/");
     },
+    switchPaymentMethodTab(context, tab) {
+      state.paymentMethodTab = tab;
+      rerender(context);
+    },
+    handleMidtransPaid(context, showroom) {
+      state.midtransShowroom = showroom;
+      if (showroom && showroom.subscription_payment_status !== "unpaid") {
+        state.paymentSubmitted = true;
+      }
+      rerender(context);
+    },
   };
 
   return createPageLifecycle({
@@ -208,6 +225,8 @@ export function ShowroomRegisterPage() {
     dispose() {
       backgroundVideoLayer?.dispose?.();
       backgroundVideoLayer = null;
+      state.midtransPanelWidget?.dispose?.();
+      state.midtransPanelWidget = null;
       root = null;
     },
   });
@@ -608,11 +627,11 @@ function paymentPanel(state, actions, context) {
 
   const title = document.createElement("h2");
   title.className = "text-lg font-black tracking-normal text-gray-950";
-  title.textContent = "Unggah bukti transfer";
+  title.textContent = "Bayar paket showroom";
 
   const body = document.createElement("p");
   body.className = "text-xs leading-6 text-gray-600";
-  body.textContent = "Transfer sesuai paket yang dipilih ke rekening tujuan di bawah, lalu unggah bukti transfernya. Admin akan memeriksa sebelum akun showroom Anda disetujui.";
+  body.textContent = "Bayar instan lewat Virtual Account, atau transfer manual dan unggah buktinya. Admin akan memeriksa sebelum akun showroom Anda disetujui.";
 
   const recap = document.createElement("div");
   recap.className = "grid gap-2 rounded-2xl border border-[var(--pb-card-border)] bg-gray-50 p-3 text-xs";
@@ -622,6 +641,19 @@ function paymentPanel(state, actions, context) {
       detailRow("Jumlah transfer", `${formatCurrency(plan.price)}${plan.billing_period ? ` ${plan.billing_period}` : ""}`),
     );
   }
+
+  section.append(badge, title, body, recap, paymentMethodTabs(state, actions, context));
+
+  if (state.paymentMethodTab === "midtrans") {
+    state.midtransPanelWidget?.dispose?.();
+    state.midtransPanelWidget = SubscriptionMidtransPanel({
+      getShowroom: () => state.midtransShowroom,
+      onPaid: (showroom) => actions.handleMidtransPaid(context, showroom),
+    });
+    section.append(state.midtransPanelWidget.element);
+    return section;
+  }
+
   if (state.subscriptionDestination?.account_number) {
     recap.append(
       detailRow("Bank tujuan", state.subscriptionDestination.bank_name || "-"),
@@ -652,7 +684,7 @@ function paymentPanel(state, actions, context) {
   noteInput.addEventListener("input", (event) => actions.updateProofNote(event.target.value));
   noteLabel.append(noteInput);
 
-  section.append(badge, title, body, recap, fileLabel, noteLabel);
+  section.append(fileLabel, noteLabel);
 
   if (state.paymentError) {
     const message = document.createElement("p");
@@ -675,6 +707,33 @@ function paymentPanel(state, actions, context) {
   return section;
 }
 
+function paymentMethodTabs(state, actions, context) {
+  const wrap = document.createElement("div");
+  wrap.id = "shr_register_payment_method_tabs";
+  wrap.className = "grid grid-cols-2 gap-2";
+
+  [
+    { value: "midtrans", label: "Virtual Account (Instan)" },
+    { value: "manual", label: "Transfer Manual" },
+  ].forEach(({ value, label }) => {
+    const tab = document.createElement("button");
+    tab.type = "button";
+    tab.dataset.paymentMethodTab = value;
+    const isActive = state.paymentMethodTab === value;
+    tab.className = [
+      "rounded-xl border px-3 py-2 text-xs font-bold transition",
+      isActive
+        ? "border-[var(--pb-brand-primary)] bg-[color-mix(in_srgb,var(--pb-brand-primary)_8%,white)] text-[var(--pb-brand-secondary)]"
+        : "border-[var(--pb-card-border)] bg-white text-gray-700 hover:border-[color-mix(in_srgb,var(--pb-brand-primary)_35%,var(--pb-card-border))]",
+    ].join(" ");
+    tab.textContent = label;
+    tab.addEventListener("click", () => actions.switchPaymentMethodTab(context, value));
+    wrap.append(tab);
+  });
+
+  return wrap;
+}
+
 function successPanel(state, actions, context) {
   const registered = state.registered;
   const section = document.createElement("section");
@@ -692,7 +751,7 @@ function successPanel(state, actions, context) {
   const body = document.createElement("p");
   body.className = "text-xs leading-6 text-gray-600";
   body.textContent = state.plans.length
-    ? "Akun Anda menunggu persetujuan admin, termasuk verifikasi bukti transfer yang baru saja Anda unggah. Anda sudah bisa masuk dan menyiapkan showroom, tetapi sebagian fitur baru terbuka penuh setelah disetujui."
+    ? "Akun Anda menunggu persetujuan admin, termasuk verifikasi pembayaran paket yang baru saja Anda lakukan. Anda sudah bisa masuk dan menyiapkan showroom, tetapi sebagian fitur baru terbuka penuh setelah disetujui."
     : "Akun Anda menunggu persetujuan admin. Anda sudah bisa masuk dan menyiapkan showroom, tetapi sebagian fitur baru terbuka penuh setelah disetujui.";
 
   const detail = document.createElement("div");

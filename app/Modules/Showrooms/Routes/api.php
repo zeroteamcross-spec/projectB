@@ -12,6 +12,14 @@ return static function (Router $router): void {
         [ShowroomController::class, 'validateSlug']
     );
 
+    // Dipanggil server-to-server oleh Midtrans, bukan dari SPA -- di luar
+    // AuthenticatedUserMiddleware, sama seperti pola callback transaksi mobil
+    // di app/Modules/Transactions/Routes/api.php.
+    $router->post(
+        '/api/payments/midtrans/subscription-callbacks',
+        [ShowroomController::class, 'providerCallback']
+    );
+
     $router->group('/api/showrooms', static function (Router $router): void {
         $router->get('/me', [ShowroomController::class, 'mine']);
         $router->get('/subscriptions/due', [ShowroomController::class, 'dueSubscriptions']);
@@ -19,6 +27,7 @@ return static function (Router $router): void {
         $router->post('/me/branding-icon', [ShowroomController::class, 'uploadBrandingIcon']);
         $router->post('/me/branding-logo', [ShowroomController::class, 'uploadBrandingLogo']);
         $router->post('/me/subscription/proof', [ShowroomController::class, 'submitSubscriptionProof']);
+        $router->post('/me/subscription/midtrans/charge', [ShowroomController::class, 'createSubscriptionMidtransPayment']);
         $router->post('/{id}/subscription/confirm', [ShowroomController::class, 'confirmSubscriptionPayment']);
         $router->post('/{id}/subscription/reject', [ShowroomController::class, 'rejectSubscriptionPayment']);
         $router->get('/{id}', [ShowroomController::class, 'show']);

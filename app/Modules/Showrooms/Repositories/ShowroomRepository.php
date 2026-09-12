@@ -17,7 +17,9 @@ class ShowroomRepository
 
     private const SUBSCRIPTION_COLUMNS = 'subscription_payment_status, subscription_proof_path, subscription_proof_note,
                     subscription_proof_submitted_at, subscription_confirmed_at, subscription_confirmed_by,
-                    subscription_rejected_at, subscription_rejected_reason, subscription_next_due_at';
+                    subscription_rejected_at, subscription_rejected_reason, subscription_next_due_at,
+                    subscription_payment_method, subscription_midtrans_order_id, subscription_midtrans_transaction_id,
+                    subscription_midtrans_payment_data, subscription_midtrans_expires_at, subscription_midtrans_paid_at';
 
     public function findById(int $id): ?array
     {
@@ -152,6 +154,12 @@ class ShowroomRepository
                  subscription_rejected_at = :subscription_rejected_at,
                  subscription_rejected_reason = :subscription_rejected_reason,
                  subscription_next_due_at = :subscription_next_due_at,
+                 subscription_payment_method = :subscription_payment_method,
+                 subscription_midtrans_order_id = :subscription_midtrans_order_id,
+                 subscription_midtrans_transaction_id = :subscription_midtrans_transaction_id,
+                 subscription_midtrans_payment_data = :subscription_midtrans_payment_data,
+                 subscription_midtrans_expires_at = :subscription_midtrans_expires_at,
+                 subscription_midtrans_paid_at = :subscription_midtrans_paid_at,
                  updated_at = :updated_at
              WHERE id = :id
              AND deleted_at IS NULL'
@@ -183,7 +191,91 @@ class ShowroomRepository
             'subscription_rejected_at' => $data['subscription_rejected_at'] ?? null,
             'subscription_rejected_reason' => $data['subscription_rejected_reason'] ?? null,
             'subscription_next_due_at' => $data['subscription_next_due_at'] ?? null,
+            'subscription_payment_method' => $data['subscription_payment_method'] ?? 'manual',
+            'subscription_midtrans_order_id' => $data['subscription_midtrans_order_id'] ?? null,
+            'subscription_midtrans_transaction_id' => $data['subscription_midtrans_transaction_id'] ?? null,
+            'subscription_midtrans_payment_data' => $data['subscription_midtrans_payment_data'] ?? null,
+            'subscription_midtrans_expires_at' => $data['subscription_midtrans_expires_at'] ?? null,
+            'subscription_midtrans_paid_at' => $data['subscription_midtrans_paid_at'] ?? null,
             'updated_at' => date('Y-m-d H:i:s'),
+        ]);
+    }
+
+    /**
+     * Sesi VA baru dibuat lewat Midtrans -- belum tentu sudah dibayar,
+     * status pembayaran sengaja TIDAK disentuh di sini (tetap seperti
+     * sebelumnya) sampai callback Midtrans mengonfirmasi.
+     */
+    public function updateSubscriptionMidtransCharge(int $id, array $data): void
+    {
+        $stmt = $this->pdo->prepare(
+            'UPDATE showrooms
+             SET subscription_payment_method = \'midtrans\',
+                 subscription_midtrans_order_id = :subscription_midtrans_order_id,
+                 subscription_midtrans_transaction_id = :subscription_midtrans_transaction_id,
+                 subscription_midtrans_payment_data = :subscription_midtrans_payment_data,
+                 subscription_midtrans_expires_at = :subscription_midtrans_expires_at,
+                 updated_at = :updated_at
+             WHERE id = :id
+             AND deleted_at IS NULL'
+        );
+
+        $stmt->execute([
+            'id' => $id,
+            'subscription_midtrans_order_id' => $data['subscription_midtrans_order_id'],
+            'subscription_midtrans_transaction_id' => $data['subscription_midtrans_transaction_id'] ?? null,
+            'subscription_midtrans_payment_data' => $data['subscription_midtrans_payment_data'] ?? null,
+            'subscription_midtrans_expires_at' => $data['subscription_midtrans_expires_at'] ?? null,
+            'updated_at' => $data['updated_at'],
+        ]);
+    }
+
+    public function findBySubscriptionMidtransOrderId(string $orderId): ?array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT id, user_id, slug, name, selected_plan_name, selected_plan_price, selected_plan_billing_period,
+                    ' . self::SUBSCRIPTION_COLUMNS . '
+             FROM showrooms
+             WHERE subscription_midtrans_order_id = :order_id
+             AND deleted_at IS NULL
+             LIMIT 1'
+        );
+        $stmt->execute(['order_id' => $orderId]);
+        $showroom = $stmt->fetch();
+
+        return $showroom ?: null;
+    }
+
+    /**
+     * Midtrans mengonfirmasi VA sudah dibayar -- disamakan dengan alur
+     * unggah bukti transfer manual (status jadi pending_verification) supaya
+     * masuk ke antrean tinjau Admin yang sama, cuma sumbernya beda. Admin
+     * tetap harus konfirmasi manual (lihat ShowroomService::confirmSubscriptionPayment()),
+     * pembayaran otomatis TIDAK langsung meloloskan showroom.
+     */
+    public function updateSubscriptionMidtransPaid(int $id, array $data): void
+    {
+        $stmt = $this->pdo->prepare(
+            'UPDATE showrooms
+             SET subscription_payment_status = \'pending_verification\',
+                 subscription_proof_submitted_at = :subscription_proof_submitted_at,
+                 subscription_midtrans_transaction_id = :subscription_midtrans_transaction_id,
+                 subscription_midtrans_payment_data = :subscription_midtrans_payment_data,
+                 subscription_midtrans_paid_at = :subscription_midtrans_paid_at,
+                 subscription_rejected_at = NULL,
+                 subscription_rejected_reason = NULL,
+                 updated_at = :updated_at
+             WHERE id = :id
+             AND deleted_at IS NULL'
+        );
+
+        $stmt->execute([
+            'id' => $id,
+            'subscription_proof_submitted_at' => $data['subscription_proof_submitted_at'],
+            'subscription_midtrans_transaction_id' => $data['subscription_midtrans_transaction_id'] ?? null,
+            'subscription_midtrans_payment_data' => $data['subscription_midtrans_payment_data'] ?? null,
+            'subscription_midtrans_paid_at' => $data['subscription_midtrans_paid_at'],
+            'updated_at' => $data['updated_at'],
         ]);
     }
 
@@ -273,6 +365,11 @@ class ShowroomRepository
             'UPDATE showrooms
              SET subscription_payment_status = \'rejected\',
                  subscription_proof_path = NULL,
+                 subscription_midtrans_order_id = NULL,
+                 subscription_midtrans_transaction_id = NULL,
+                 subscription_midtrans_payment_data = NULL,
+                 subscription_midtrans_expires_at = NULL,
+                 subscription_midtrans_paid_at = NULL,
                  subscription_rejected_at = :subscription_rejected_at,
                  subscription_rejected_reason = :subscription_rejected_reason,
                  updated_at = :updated_at

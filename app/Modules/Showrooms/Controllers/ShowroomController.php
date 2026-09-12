@@ -7,10 +7,12 @@ namespace App\Modules\Showrooms\Controllers;
 use App\Core\Controller;
 use App\Core\JsonResponse;
 use App\Core\Request;
+use App\Infrastructure\Payment\Midtrans\MidtransCallbackHandler;
 use App\Modules\MasterData\Requests\UploadAppIconRequest;
 use App\Modules\MasterData\Services\MasterAssetService;
 use App\Modules\Showrooms\Requests\UpsertShowroomRequest;
 use App\Modules\Showrooms\Services\ShowroomService;
+use App\Modules\Transactions\Requests\ProviderCallbackRequest;
 use App\Modules\Transactions\Requests\RejectManualTransferRequest;
 use App\Modules\Transactions\Requests\SubmitManualTransferProofRequest;
 
@@ -18,13 +20,15 @@ class ShowroomController extends Controller
 {
     private ShowroomService $service;
     private MasterAssetService $assets;
+    private MidtransCallbackHandler $callbackHandler;
 
-    public function __construct(ShowroomService $service, MasterAssetService $assets)
+    public function __construct(ShowroomService $service, MasterAssetService $assets, MidtransCallbackHandler $callbackHandler)
     {
         parent::__construct();
 
         $this->service = $service;
         $this->assets = $assets;
+        $this->callbackHandler = $callbackHandler;
     }
 
     public function mine(Request $request): JsonResponse
@@ -91,6 +95,39 @@ class ShowroomController extends Controller
         return JsonResponse::success([
             'showrooms' => $this->service->dueSubscriptions($user),
         ], 'Tagihan berulang berhasil diambil.');
+    }
+
+    public function createSubscriptionMidtransPayment(Request $request): JsonResponse
+    {
+        $user = $this->user($request);
+        $bank = (string) ($request->input()['bank'] ?? '');
+
+        return JsonResponse::success([
+            'showroom' => $this->service->createSubscriptionMidtransPayment($user, $bank),
+        ], 'Pembayaran Virtual Account berhasil dibuat.');
+    }
+
+    /**
+     * Endpoint callback Midtrans khusus pembayaran paket showroom -- TERPISAH
+     * dari /api/payments/midtrans/callbacks milik transaksi mobil (lihat
+     * ShowroomService::handleSubscriptionMidtransCallback()).
+     */
+    public function providerCallback(Request $request): JsonResponse
+    {
+        if ($request->input() === []) {
+            return JsonResponse::success(
+                ['acknowledged' => true, 'processed' => false],
+                'Midtrans subscription callback endpoint is ready.'
+            );
+        }
+
+        $payload = (new ProviderCallbackRequest($request))->validate();
+        $payload = $this->callbackHandler->normalize($payload);
+
+        return JsonResponse::success(
+            $this->service->handleSubscriptionMidtransCallback($payload),
+            'Callback provider berhasil diproses.'
+        );
     }
 
     public function validateSlug(Request $request): JsonResponse
