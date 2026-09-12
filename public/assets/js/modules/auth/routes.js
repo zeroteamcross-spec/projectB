@@ -43,6 +43,9 @@ const googleLoginRoutes = googleLoginService.routes().map((config) => ({
       footerLink: {
         label: "Kembali ke Katalog",
         path: publicContextPathFromRedirect(context?.query?.from) || getLastViewedPublicContextPath() || "/public",
+        // "button", bukan teks bergaris bawah -- tiru desain & posisi tombol
+        // "Kembali ke landing page" di /login/seller (roleSpecificLoginPage.js).
+        variant: "button",
       },
     } : {}),
   }),

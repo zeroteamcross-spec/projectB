@@ -186,7 +186,14 @@ function render(root, context, flags) {
 
   const isAuthenticated = authStore.isAuthenticated();
   const role = authStore.role();
-  const hasBuyerMobileFooter = isAuthenticated && role === "buyer" && isLandingRoute(context);
+  // Harus sejalan dengan showMobileFooter di publicShell.js (isBuyerLoggedIn
+  // || isShowroomPage) -- sebelumnya cuma mengecek buyer+landing route, jadi
+  // halaman showroom/marketing (footer-nya tetap tampil, bahkan untuk
+  // pengunjung anonim) tidak dapat padding bawah ini sama sekali, dan tombol
+  // "Muat lebih banyak" di ujung katalog tertutup footer itu.
+  const hasBuyerMobileFooter = (isAuthenticated && role === "buyer" && isLandingRoute(context))
+    || isShowroomRoute
+    || isAffiliateRoute;
 
   const frame = document.createElement("div");
   frame.className = hasBuyerMobileFooter

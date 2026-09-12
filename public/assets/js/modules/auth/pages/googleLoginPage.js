@@ -217,6 +217,7 @@ function glassLoginActionContent(root, context, config, state, options = {}) {
       // menuju form email/password yang sebenarnya masih berfungsi.
       footerLink: options.footerLink ?? { label: "Masuk dengan Email & Password", path: `/login/${config.slug}` },
     });
+    appendMarketingLoginButton(actionWrap, context, config);
     fragment.append(actionWrap);
     return fragment;
   }
@@ -224,6 +225,7 @@ function glassLoginActionContent(root, context, config, state, options = {}) {
   if (!state.status?.enabled) {
     actionWrap.append(messageBox("Google Login belum dikonfigurasi.", "info"));
     appendFooterLink(actionWrap, context, options);
+    appendMarketingLoginButton(actionWrap, context, config);
     fragment.append(actionWrap);
     return fragment;
   }
@@ -238,8 +240,31 @@ function glassLoginActionContent(root, context, config, state, options = {}) {
 
   actionWrap.append(button, divider());
   appendFooterLink(actionWrap, context, options);
+  appendMarketingLoginButton(actionWrap, context, config);
   fragment.append(actionWrap);
   return fragment;
+}
+
+/**
+ * "Login sebagai Marketing" -- cuma di /google-login/buyer, mengarah ke form
+ * email/password marketing (Google Login memang dimatikan untuk peran itu,
+ * lihat roleSpecificLoginService.js). Ditambahkan di setiap state halaman ini
+ * (bukan cuma jalur normal) supaya tetap ada jalan ke login marketing walau
+ * Google Login sedang tidak dikonfigurasi.
+ */
+function appendMarketingLoginButton(actionWrap, context, config) {
+  if (config.slug !== "buyer") {
+    return;
+  }
+
+  const button = Button({
+    label: "Login sebagai Marketing",
+    variant: "secondary",
+    onClick: () => context.router.navigate("/login/affiliate"),
+  });
+  button.id = "google_login_buyer_marketing_button";
+  button.classList.add("w-full", "justify-center");
+  actionWrap.append(button);
 }
 
 /**
