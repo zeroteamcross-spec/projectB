@@ -21,13 +21,27 @@ function hostTerdaftar(peta) {
   return new Set(Object.values(peta));
 }
 
+/**
+ * `redirected: true` berarti enforceDomainRoute() barusan memanggil
+ * locationRef.replace() -- navigasi sungguhan sedang berjalan menuju host
+ * lain. locationRef.replace() TIDAK menghentikan eksekusi skrip saat itu
+ * juga; kode ini masih terus jalan sampai browser benar-benar berpindah
+ * halaman. Pemanggil (app.js) memakai flag ini untuk membatalkan boot SPA
+ * sama sekali saat redirect sedang berjalan -- tanpa ini, seluruh app
+ * (termasuk halaman login) sempat ter-mount di host yang salah lalu
+ * langsung terpotong navigasi, yang terlihat sebagai halaman/form yang
+ * berkedip atau muncul dua kali.
+ */
 export function bindDomainRouteGuard({ locationRef = window.location, windowRef = window } = {}) {
-  enforceDomainRoute({ locationRef });
+  const redirected = enforceDomainRoute({ locationRef });
 
   const onNavigate = () => enforceDomainRoute({ locationRef });
   windowRef.addEventListener("popstate", onNavigate);
 
-  return () => windowRef.removeEventListener("popstate", onNavigate);
+  return {
+    redirected,
+    dispose: () => windowRef.removeEventListener("popstate", onNavigate),
+  };
 }
 
 export function enforceDomainRoute({ locationRef = window.location } = {}) {
