@@ -57,10 +57,106 @@ function serveSpaShell(string $basePath, string $publicPath, string $path): bool
         $html = str_replace('__ASSET_VER__', assetVersionToken($publicPath), $html);
         $html = str_replace('__ROLE_HOSTS__', roleHostsJson(), $html);
         $html = str_replace('__THEME_CONFIG__', themeConfigJson($theme), $html);
-        echo injectPublicMetadata($html, loadPublicWebConfigMetadata($theme));
+        $metadata = loadPublicWebConfigMetadata($theme);
+        $ownBranding = array_filter(
+            loadShowroomShareMetadata($basePath, $path),
+            static fn ($value) => $value !== ''
+        );
+        echo injectPublicMetadata($html, array_merge($metadata, $ownBranding));
     }
 
     return true;
+}
+
+/**
+ * Kalau path ini milik showroom atau afiliasi (mis. "/hakim-mobilindo" atau
+ * "/hakim-mobilindo/rohim"), kembalikan judul & ikon MILIK MEREKA SENDIRI --
+ * bukan ikon aplikasi generik -- supaya link showroom/afiliasi yang dibagikan
+ * (WhatsApp dsb) menampilkan identitas showroom itu di pratinjaunya, bukan
+ * ikon carlynk.id. Ini murni untuk crawler/pratinjau: begitu JS SPA jalan di
+ * peramban, publicContextService.js sudah menangani judul & favicon dengan
+ * caranya sendiri -- fungsi ini cuma mengisi apa yang dilihat SEBELUM JS itu
+ * sempat jalan.
+ *
+ * Daftar kata yang dilewati harus sejalan dengan
+ * ShowroomService::RESERVED_SLUGS -- itu yang mencegah showroom memilih slug
+ * yang bentrok dengan rute sistem ini sejak awal.
+ */
+function loadShowroomShareMetadata(string $basePath, string $path): array
+{
+    static $reservedSlugs = [
+        'admin', 'super-admin', 'seller', 'buyer', 'affiliate',
+        'login', 'google-login', 'auth', 'api', 'cars', 'transactions',
+        'profile', 'notifications', 'public', 'showrooms', 'af', 'a', 's',
+        'daftar-showroom', 'saas-landing', 'contoh-katalog', 'health',
+        'uploads', 'assets', 'tester', 'app',
+    ];
+    static $showroomOnlySubPaths = ['cars', 'transactions', 'login'];
+
+    $segments = array_values(array_filter(explode('/', $path), static fn ($segment) => $segment !== ''));
+    if ($segments === []) {
+        return [];
+    }
+
+    $slug = null;
+    $referralCode = null;
+
+    if (in_array($segments[0], ['showrooms', 's'], true) && isset($segments[1])) {
+        $slug = rawurldecode($segments[1]);
+    } elseif (in_array($segments[0], ['af', 'a'], true) && isset($segments[1])) {
+        $referralCode = rawurldecode($segments[1]);
+    } elseif (! in_array($segments[0], $reservedSlugs, true)) {
+        $slug = rawurldecode($segments[0]);
+        if (isset($segments[1]) && ! in_array($segments[1], $showroomOnlySubPaths, true)) {
+            $referralCode = rawurldecode($segments[1]);
+        }
+    }
+
+    if ($slug === null && $referralCode === null) {
+        return [];
+    }
+
+    try {
+        require_once $basePath . DIRECTORY_SEPARATOR . 'bootstrap' . DIRECTORY_SEPARATOR . 'helpers.php';
+        load_env($basePath . DIRECTORY_SEPARATOR . '.env');
+        require_once $basePath . DIRECTORY_SEPARATOR . 'bootstrap' . DIRECTORY_SEPARATOR . 'autoload.php';
+
+        $pdo = \App\Infrastructure\Database\ConnectionFactory::make();
+
+        if ($referralCode !== null) {
+            $affiliates = new \App\Modules\Affiliate\Repositories\AffiliateRepository($pdo);
+            $context = $affiliates->findPublicContextByReferralCode($referralCode);
+
+            if (! $context) {
+                return [];
+            }
+
+            $title = trim((string) ($context['showroom_tab_title'] ?? '')) ?: (string) ($context['showroom_name'] ?? '');
+
+            return [
+                'app_name' => $title,
+                'tagline' => (string) ($context['showroom_name'] ?? ''),
+                'icon_url' => (string) ($context['showroom_icon_url'] ?? '') ?: (string) ($context['showroom_header_logo_url'] ?? ''),
+            ];
+        }
+
+        $showrooms = new \App\Modules\Showrooms\Repositories\ShowroomRepository($pdo);
+        $context = $showrooms->findPublicContextBySlug((string) $slug);
+
+        if (! $context) {
+            return [];
+        }
+
+        $title = trim((string) ($context['tab_title'] ?? '')) ?: (string) ($context['name'] ?? '');
+
+        return [
+            'app_name' => $title,
+            'tagline' => (string) ($context['name'] ?? ''),
+            'icon_url' => (string) ($context['icon_url'] ?? '') ?: (string) ($context['header_logo_url'] ?? ''),
+        ];
+    } catch (Throwable $exception) {
+        return [];
+    }
 }
 
 /**
