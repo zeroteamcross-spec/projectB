@@ -25,7 +25,7 @@
     ]
   },
   "maintenance": {
-    "count": 5,
+    "count": 7,
     "label": "bug & perbaikan minggu ini",
     "description": "Memperbaiki sesuatu yang sudah ada tapi bermasalah — bug dan performa.",
     "rows": [
@@ -33,7 +33,9 @@
       { "task": "Perbaiki keamanan: harga paket showroom bisa dikarang lewat request manual", "detail": "Ditemukan saat testing keamanan langsung di production: endpoint pilih paket menerima begitu saja harga & periode tagihan dari klien — request yang diutak-atik manual bisa mengaku pilih paket apa saja dengan harga karangan (termasuk Rp 0 atau negatif), dan nilai itu tersimpan lalu tampil ke Admin sebagai \"paket yang dipilih\". Sekarang harga & periode tagihan selalu diambil ulang dari Master Harga di server berdasarkan nama paket, bukan dipercaya dari klien.", "status": "done" },
       { "task": "Perbaiki: rekening tujuan pembayaran tidak tampil kalau belum pernah disimpan Admin", "detail": "Ditemukan saat verifikasi live: begitu Master Harga/Bank/Lokasi/rekening tujuan belum pernah disimpan Admin sama sekali, halaman registrasi showroom fallback ke data kosong (bukan data contoh bawaan), jadi showroom tidak tahu harus transfer ke mana. Fallback sekarang selalu mengembalikan data contoh bawaan untuk kasus ini.", "status": "done" },
       { "task": "Perbaiki: warning PHP bocor ke response API + kolom hilang di query Tagihan Berulang", "detail": "Ditemukan saat verifikasi live: query daftar Tagihan Berulang tidak menyertakan sebagian kolom showroom, jadi memicu warning PHP yang — karena pengaturan server saat itu — tercetak sebagai teks mentah (termasuk path file server) di depan isi response API. Query dilengkapi, dan pengaturan servernya disesuaikan supaya warning seperti ini tidak lagi bocor ke response API mana pun, cukup tercatat di log.", "status": "done" },
-      { "task": "Perbaiki: catatan bukti transfer tanpa batas panjang bisa gagalkan simpan", "detail": "Ditemukan saat audit keamanan: kolom catatan bukti transfer (dipakai transaksi mobil maupun pembayaran paket showroom) cuma varchar(255) tanpa validasi panjang di sisi request, jadi catatan lebih dari 255 karakter bikin penyimpanan gagal dengan error mentah alih-alih pesan yang jelas. Sekarang divalidasi maksimal 255 karakter untuk kedua alur sekaligus.", "status": "done" }
+      { "task": "Perbaiki: catatan bukti transfer tanpa batas panjang bisa gagalkan simpan", "detail": "Ditemukan saat audit keamanan: kolom catatan bukti transfer (dipakai transaksi mobil maupun pembayaran paket showroom) cuma varchar(255) tanpa validasi panjang di sisi request, jadi catatan lebih dari 255 karakter bikin penyimpanan gagal dengan error mentah alih-alih pesan yang jelas. Sekarang divalidasi maksimal 255 karakter untuk kedua alur sekaligus.", "status": "done" },
+      { "task": "Perbaiki form login berkedip/muncul dua kali saat login lintas subdomain", "detail": "Dilaporkan pengguna: login yang tujuannya beda subdomain (showroom/admin/buyer/marketing) sempat memunculkan form login lagi sekilas sebelum benar-benar berpindah host. Penyebabnya balapan (race) antara navigasi internal SPA dan pengalihan subdomain — begitu tujuan login ada di subdomain lain, sekarang langsung berpindah host tanpa melewati navigasi SPA sama sekali.", "status": "done" },
+      { "task": "Perbaiki akar masalah: aplikasi tetap boot walau pengalihan subdomain sudah berjalan", "detail": "Ditemukan saat menelusuri bug di atas: bukan cuma di alur login, SETIAP kunjungan pertama ke rute peran (mis. /admin, /login/seller) dari subdomain yang salah membuat aplikasi sempat memuat & merender sesaat di host yang salah sebelum benar-benar berpindah ke host yang benar — itu akar dari kesan \"berkedip\". Sekarang begitu pengalihan subdomain terdeteksi harus terjadi, aplikasi berhenti total tanpa memuat apa pun, membiarkan perpindahan host berjalan bersih.", "status": "done" }
     ]
   }
 }
