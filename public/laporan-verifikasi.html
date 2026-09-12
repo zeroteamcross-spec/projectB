@@ -27,6 +27,11 @@
     --maint-bg:#fdf1e2;
     --maint-ink:#8a4a09;
 
+    --gap-a:#5b4b8a;
+    --gap-b:#8f7fc7;
+    --gap-bg:#efecf9;
+    --gap-ink:#4a3d72;
+
     --ok:#2f855a;
     --ok-bg:#e7f5ec;
     --warn:#b3760f;
@@ -136,8 +141,9 @@
     .body-pad{ padding:22px 22px 30px; }
   }
 
-  .card-grid{ display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:8px; }
-  @media (max-width:760px){ .card-grid{ grid-template-columns:1fr; } }
+  .card-grid{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px; margin-bottom:8px; }
+  @media (max-width:900px){ .card-grid{ grid-template-columns:1fr 1fr; } }
+  @media (max-width:560px){ .card-grid{ grid-template-columns:1fr; } }
   .sum-card{
     border-radius:16px;
     padding:20px 22px;
@@ -148,6 +154,7 @@
   }
   .sum-card.dev{ background:linear-gradient(135deg, var(--dev-a), var(--dev-b)); }
   .sum-card.maint{ background:linear-gradient(135deg, var(--maint-a), var(--maint-b)); }
+  .sum-card.gap{ background:linear-gradient(135deg, var(--gap-a), var(--gap-b)); }
   .sum-card::after{
     content:"";
     position:absolute;
@@ -211,6 +218,7 @@
   }
   .pill.dev{ background:var(--dev-bg); color:var(--dev-ink); }
   .pill.maint{ background:var(--maint-bg); color:var(--maint-ink); }
+  .pill.gap{ background:var(--gap-bg); color:var(--gap-ink); }
   .pill.done{ background:var(--ok-bg); color:var(--ok); }
   .pill.progress{ background:var(--warn-bg); color:var(--warn); }
   .pill.planned{ background:var(--wait-bg); color:var(--wait); }
@@ -228,6 +236,7 @@
   .section-lbl .dot{ width:9px; height:9px; border-radius:50%; display:inline-block; }
   .section-lbl.dev .dot{ background:linear-gradient(135deg,var(--dev-a),var(--dev-b)); }
   .section-lbl.maint .dot{ background:linear-gradient(135deg,var(--maint-a),var(--maint-b)); }
+  .section-lbl.gap .dot{ background:linear-gradient(135deg,var(--gap-a),var(--gap-b)); }
 
   .note{
     margin:22px 0 0;
@@ -330,6 +339,18 @@
     }).join("");
   }
 
+  function gapRows(rows) {
+    return rows.map(function (row, index) {
+      return (
+        '<tr>' +
+          '<td class="no">' + String(index + 1).padStart(2, "0") + '</td>' +
+          '<td class="task-name">' + escapeHtml(row.task) + '</td>' +
+          '<td class="task-detail">' + escapeHtml(row.detail) + '</td>' +
+        '</tr>'
+      );
+    }).join("");
+  }
+
   fetch("laporan-data.json", { cache: "no-store" })
     .then(function (res) {
       if (!res.ok) throw new Error("HTTP " + res.status);
@@ -341,11 +362,22 @@
         '<div><div class="k">Automated test</div><div class="v">' + escapeHtml(data.tests) + '</div></div>';
 
       var totalTasks = (data.development.count || 0) + (data.maintenance.count || 0);
+      var gapSection = "";
+      if (data.gaps && data.gaps.rows && data.gaps.rows.length) {
+        gapSection =
+          '<div class="section-lbl gap"><span class="dot"></span>Belum Dikerjakan &mdash; ' + escapeHtml(data.gaps.count) + ' item</div>' +
+          '<div class="table-wrap"><table class="tasks">' +
+            '<thead><tr><th>#</th><th>Fitur</th><th>Kenapa dianggap penting untuk SaaS</th></tr></thead>' +
+            '<tbody>' + gapRows(data.gaps.rows) + '</tbody>' +
+          '</table></div>' +
+          '<div class="note" style="margin-top:14px;">Daftar di atas hasil audit langsung ke kode (bukan asumsi), bukan tugas minggu ini &mdash; dicatat sebagai backlog pekerjaan lanjutan.</div>';
+      }
 
       root.innerHTML =
         '<div class="card-grid">' +
           summaryCard("dev", "Development", data.development) +
           summaryCard("maint", "Maintenance", data.maintenance) +
+          (data.gaps ? summaryCard("gap", "Belum Dikerjakan", { count: data.gaps.count, label: data.gaps.label }) : "") +
         '</div>' +
 
         '<div class="section-lbl dev"><span class="dot"></span>Development &mdash; ' + escapeHtml(data.development.count) + ' tugas</div>' +
@@ -359,6 +391,8 @@
           '<thead><tr><th>#</th><th>Kategori</th><th>Tugas</th><th>Keterangan</th><th>Status</th></tr></thead>' +
           '<tbody>' + taskRows(data.maintenance.rows, "maint", "Maintenance") + '</tbody>' +
         '</table></div>' +
+
+        gapSection +
 
         '<div class="note">Ini laporan minggu berjalan (' + escapeHtml(data.week_range) + '). Untuk riwayat lengkap seluruh permintaan sejak awal proyek per nomor item, lihat <a href="' + escapeHtml(data.archive_url) + '">halaman arsip</a>.</div>' +
 
