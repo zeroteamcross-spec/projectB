@@ -191,6 +191,15 @@ export class PublicShell {
           }
         });
         this.mobileFooterContainer.append(footer);
+        // Halaman lain di bawah shell ini (mis. sticky CTA "Booking Sekarang"
+        // di detail mobil) juga fixed di dasar layar dengan bottom:0 --
+        // tanpa variabel ini, footer nav (z-index lebih tinggi) menutupi
+        // tombolnya begitu saja. Diukur dari elemen sungguhan, bukan angka
+        // tetap, supaya tetap benar walau tinggi footer berubah nanti.
+        const footerHeight = footer.getBoundingClientRect().height;
+        document.documentElement.style.setProperty("--pb-mobile-footer-height", `${footerHeight}px`);
+      } else {
+        document.documentElement.style.setProperty("--pb-mobile-footer-height", "0px");
       }
     }
   }

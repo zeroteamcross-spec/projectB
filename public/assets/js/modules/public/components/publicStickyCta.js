@@ -4,7 +4,12 @@ import { getListingLockStatus } from "../../../utils/transactionStatus.js";
 
 export function PublicStickyCta({ car, onStartTransaction = null, onConsult = null } = {}) {
   const bar = document.createElement("div");
-  bar.className = "fixed inset-x-0 bottom-0 z-20 border-t border-[var(--pb-card-border)] bg-white/95 px-4 py-3 shadow-card backdrop-blur sm:hidden";
+  bar.className = "fixed inset-x-0 z-20 border-t border-[var(--pb-card-border)] bg-white/95 px-4 py-3 shadow-card backdrop-blur sm:hidden";
+  // Bukan bottom-0 tetap -- kalau navigasi bawah buyer (atau showroom, lihat
+  // publicShell.js) sedang tampil, bar ini harus duduk DI ATASNYA, bukan di
+  // bawahnya (yang membuat tombol Booking/WhatsApp tertutup nav itu).
+  // Variabelnya diisi publicShell.js, selalu 0px kalau nav itu tidak tampil.
+  bar.style.bottom = "var(--pb-mobile-footer-height, 0px)";
   applyDesignHook(bar, "public.car_detail.sticky_cta");
   const lock = getListingLockStatus({ car });
 
