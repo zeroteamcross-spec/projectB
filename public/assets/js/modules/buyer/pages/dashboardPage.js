@@ -553,7 +553,7 @@ function creditPromoBanner(actions) {
     benefit.append(row);
   });
 
-  const cta = Button({ label: "Ajukan Sekarang", onClick: () => actions.navigate("/"), designHook: "shared.button.primary" });
+  const cta = Button({ label: "Ajukan Sekarang", onClick: () => actions.navigate(getBuyerShowroomCatalogUrl() || "/public"), designHook: "shared.button.primary" });
   cta.id = "byr_credit_apply_button";
   cta.classList.add("mt-2", "w-full", "py-3");
   cta.append(createIcon("arrowRight", { className: "block h-4 w-4 leading-none" }));

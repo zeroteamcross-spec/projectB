@@ -189,7 +189,7 @@ function loadingState(context) {
   wrap.className = "mx-auto grid w-full max-w-[1180px] gap-6 px-3 py-6 sm:px-6 sm:py-8 lg:grid-cols-[minmax(0,1fr)_minmax(360px,400px)]";
   const left = document.createElement("div");
   left.className = "grid gap-4";
-  left.append(Button({ label: "Kembali", variant: "secondary", onClick: () => context.router.navigate("/") }), Skeleton({ lines: 6 }));
+  left.append(Button({ label: "Kembali", variant: "secondary", onClick: () => context.router.navigate(publicContextService.catalogPath()) }), Skeleton({ lines: 6 }));
   const right = document.createElement("div");
   right.append(Skeleton({ lines: 8 }));
   wrap.append(left, right);

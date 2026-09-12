@@ -217,7 +217,7 @@ function render(root, context, flags) {
       affiliate: activeContext,
       onClear: () => {
         publicContextService.clear();
-        context.router.navigate("/");
+        context.router.navigate("/public");
       },
     });
 

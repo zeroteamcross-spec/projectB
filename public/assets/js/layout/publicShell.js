@@ -349,7 +349,7 @@ function syncBrandMark(mark, copyNodes, currentPath) {
  */
 function ownCatalogHrefForPath(currentPath) {
   if (!showroomContextMatchesPath(currentPath)) {
-    return "/";
+    return "/public";
   }
 
   return publicContextService.catalogPath();

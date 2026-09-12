@@ -342,6 +342,10 @@ export const publicContextService = {
     };
   },
 
+  // "/public" (alias katalog publik), BUKAN "/" -- "/" adalah landing page
+  // SaaS untuk mitra showroom (lihat landingPageRegistry.js), bukan katalog
+  // apa pun. Sempat salah dipakai sebagai fallback di banyak tempat karena
+  // dulu, sebelum ada landing page SaaS, "/" memang katalog buyer.
   catalogPath() {
     const affiliate = this.activeAffiliate();
     if (affiliate?.slug) {
@@ -351,7 +355,7 @@ export const publicContextService = {
     }
 
     const showroom = this.activeShowroom();
-    return showroom?.slug ? `/${encodeURIComponent(showroom.slug)}` : "/";
+    return showroom?.slug ? `/${encodeURIComponent(showroom.slug)}` : "/public";
   },
 
   carDetailPath(carId) {
