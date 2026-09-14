@@ -542,6 +542,9 @@ function canBuyerCancel(transaction) {
 
 function isPaymentExpired(transaction) {
   const status = String(transaction?.transaction_status ?? "").toLowerCase();
+  if (["dp_paid", "paid", "completed", "cancelled", "returned"].includes(status)) {
+    return false;
+  }
   return status === "expired" || isExpiredDate(transaction?.expires_at);
 }
 
