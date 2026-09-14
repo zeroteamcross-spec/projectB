@@ -1,4 +1,5 @@
 import { affiliateDashboardResource } from "../../../resources/affiliateDashboardResource.js";
+import { publicReservedRoutePrefixes } from "../../../core/publicReservedRouteWords.js";
 
 export const affiliateActivityService = {
   list(params = {}, options = {}) {
@@ -69,13 +70,56 @@ function parseLanding(url = "") {
     };
   }
 
-  const hash = String(url).split("#")[1] ?? "";
-  const path = hash.startsWith("/") ? hash : `/${hash}`;
-  const normalized = path.split("?")[0];
+  // landing_url yang benar-benar tersimpan adalah URL absolut biasa
+  // ("https://carlynk.id/{showroom}/{marketing}/cars/9"), BUKAN URL dengan
+  // fragment hash -- fungsi ini dulu selalu membaca String(url).split("#")[1],
+  // yang untuk URL absolut manapun selalu kosong. Akibatnya parsing di bawah
+  // TIDAK PERNAH cocok untuk data nyata (bukan cuma untuk skema baru), dan
+  // "Target belum dipetakan" muncul untuk semua click tanpa kecuali. Kalau
+  // ada fragment hash (format lama, kalau-kalau masih ada di data historis),
+  // itu tetap dipakai; kalau tidak ada, pathname URL itu sendiri yang dibaca.
+  const hashFragment = String(url).split("#")[1] ?? "";
+  let pathname = "";
+  if (hashFragment) {
+    pathname = hashFragment.startsWith("/") ? hashFragment : `/${hashFragment}`;
+  } else {
+    try {
+      pathname = new URL(url, window.location.origin).pathname;
+    } catch {
+      pathname = String(url).startsWith("/") ? String(url) : `/${url}`;
+    }
+  }
+  const normalized = pathname.split("?")[0];
   const segments = normalized.split("/").filter(Boolean);
-  const slug = segments[0] === "af" ? segments[1] ?? "" : "";
 
-  if (segments[0] === "af" && segments.length === 2) {
+  // Skema URL lama, "/af/:slug/..." -- link lama yang mungkin masih beredar
+  // tetap harus terbaca benar.
+  const isLegacyAfScheme = segments[0] === "af";
+  // Skema baru, "/{showroom-slug}/{marketing-slug}/..." -- showroom hidup
+  // langsung di root sejak URL disederhanakan (lihat routes.js modul public),
+  // jadi satu-satunya penanda "ini bukan rute sistem" adalah segmen pertamanya
+  // BUKAN kata cadangan (sama seperti publicShell.js mendeteksi halaman
+  // showroom). Fungsi ini dulu cuma mengenali skema lama, jadi SEMUA click
+  // dari link marketing yang sudah dipindah ke skema baru selalu jatuh ke
+  // fallback "Target belum dipetakan" -- padahal slug-nya ada di URL.
+  const isNewScheme = ! isLegacyAfScheme
+    && segments.length >= 2
+    && ! publicReservedRoutePrefixes.includes(segments[0]);
+
+  if (! isLegacyAfScheme && ! isNewScheme) {
+    return {
+      label: normalized || url,
+      sourceLabel: "Context marketing",
+      targetLabel: "Target belum dipetakan",
+      slugLabel: "-",
+    };
+  }
+
+  // Kedua skema punya bentuk segmen yang sama persis dari posisi ini:
+  // [0]=showroom-slug-atau-"af", [1]=slug marketing, [2]="cars"/"transactions", [3]=id/"new".
+  const slug = segments[1] ?? "";
+
+  if (segments.length === 2) {
     return {
       label: "Landing katalog",
       sourceLabel: "Landing marketing",
@@ -84,7 +128,7 @@ function parseLanding(url = "") {
     };
   }
 
-  if (segments[0] === "af" && segments[2] === "cars" && segments[3]) {
+  if (segments[2] === "cars" && segments[3]) {
     return {
       label: `Detail mobil #${segments[3]}`,
       sourceLabel: "Detail mobil marketing",
@@ -93,7 +137,7 @@ function parseLanding(url = "") {
     };
   }
 
-  if (segments[0] === "af" && segments[2] === "transactions" && segments[3] === "new") {
+  if (segments[2] === "transactions" && segments[3] === "new") {
     return {
       label: "Entry transaksi",
       sourceLabel: "Transaction entry marketing",
