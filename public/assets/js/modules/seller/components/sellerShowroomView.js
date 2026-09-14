@@ -10,9 +10,9 @@ const FIELDS = [
   { key: "public_url", label: "Halaman publik", icon: "link", wide: true },
   { key: "address", label: "Alamat", icon: "location", wide: true },
   { key: "phone_number", label: "Nomor telepon", icon: "phone" },
-  { key: "bank_type", label: "Bank type", icon: "bank" },
-  { key: "bank_account_number", label: "Bank account number", icon: "creditCard" },
-  { key: "bank_account_name", label: "Bank account name", icon: "idCard" },
+  { key: "bank_type", label: "Bank", icon: "bank" },
+  { key: "bank_account_number", label: "Nomor rekening", icon: "creditCard" },
+  { key: "bank_account_name", label: "Atas nama rekening", icon: "idCard" },
 ];
 
 export function SellerShowroomView({ showroom = null, onEdit = null } = {}) {

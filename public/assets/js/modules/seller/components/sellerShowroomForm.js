@@ -122,9 +122,9 @@ export function SellerShowroomForm({ showroom = null, saving = false, error = ""
   const bankSection = fieldGroup("slrsr_bank_fields_section", "Rekening pembayaran", "bank");
   bankSection.body.className = "grid min-w-0 gap-4";
   bankSection.body.append(
-    bankSelectField({ id: "slrsr_bank_type_input", name: "bank_type", label: "Bank type", value: showroom?.bank_type ?? "", banks: bankOptions }),
-    inputField({ id: "slrsr_bank_account_number_input", name: "bank_account_number", label: "Bank account number", value: showroom?.bank_account_number ?? "", placeholder: "Nomor rekening" }),
-    inputField({ id: "slrsr_bank_account_name_input", name: "bank_account_name", label: "Bank account name", value: showroom?.bank_account_name ?? "", placeholder: "Nama pemilik rekening" })
+    bankSelectField({ id: "slrsr_bank_type_input", name: "bank_type", label: "Bank", value: showroom?.bank_type ?? "", banks: bankOptions }),
+    inputField({ id: "slrsr_bank_account_number_input", name: "bank_account_number", label: "Nomor rekening", value: showroom?.bank_account_number ?? "", placeholder: "Nomor rekening" }),
+    inputField({ id: "slrsr_bank_account_name_input", name: "bank_account_name", label: "Atas nama rekening", value: showroom?.bank_account_name ?? "", placeholder: "Nama pemilik rekening" })
   );
 
   // Batal/Simpan showroom live in the modal header (see showroomPage.js),
