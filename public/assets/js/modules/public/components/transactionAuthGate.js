@@ -111,7 +111,6 @@ function registerForm({ isSubmitting, onRegister }) {
       phone_number: data.phone_number,
       email: data.email,
       password: data.password,
-      address: "Buyer registration from transaction entry",
     });
   });
   return form;
