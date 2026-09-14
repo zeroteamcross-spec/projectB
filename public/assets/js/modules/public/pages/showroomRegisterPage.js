@@ -1,5 +1,6 @@
 import { createPageLifecycle } from "../../../core/lifecycle.js";
 import { authService } from "../../../core/auth.js";
+import { authStore } from "../../../state/authStore.js";
 import { Button } from "../../../ui/primitives/button.js";
 import { createBackgroundVideoLayer } from "../../../ui/composites/backgroundVideo.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
@@ -213,6 +214,8 @@ export function ShowroomRegisterPage() {
         .filter((city) => (city?.status ?? "active") === "active")
         .map((city) => String(city?.name ?? "").trim())
         .filter(Boolean);
+
+      await resumeExistingRegistration(state);
     },
     mount(context) {
       root = document.createElement("div");
@@ -1126,4 +1129,56 @@ function normalizeFieldErrors(error) {
 function emptyToNull(value) {
   const text = String(value ?? "").trim();
   return text === "" ? null : text;
+}
+
+/**
+ * Seller yang akunnya sudah dibuat tapi belum disetujui (mis. sesi terputus
+ * sebelum sempat bayar) kembali ke "/daftar-showroom" lewat roleGuard.js.
+ * Tanpa ini, state di memori (registered/planConfirmed/paymentSubmitted)
+ * selalu kosong lagi setelah reload, dan halaman menampilkan form
+ * pendaftaran kosong dari awal alih-alih melanjutkan ke langkah bayar yang
+ * sebenarnya masih tertunda.
+ */
+async function resumeExistingRegistration(state) {
+  if (!authStore.isAuthenticated() || authStore.role() !== "seller") {
+    return;
+  }
+
+  const user = authStore.user() ?? {};
+  if (user.is_approved) {
+    return;
+  }
+
+  let showroom = null;
+  try {
+    showroom = await showroomsResource.mine();
+  } catch {
+    return;
+  }
+
+  if (!showroom) {
+    return;
+  }
+
+  state.registered = {
+    showroomName: showroom.name ?? "",
+    slug: showroom.slug ?? "",
+    email: user.email ?? "",
+  };
+
+  if (!state.plans.length) {
+    state.planConfirmed = true;
+    state.paymentSubmitted = true;
+    return;
+  }
+
+  const selectedPlan = state.plans.find((plan) => plan.name === showroom.selected_plan_name);
+  if (!selectedPlan) {
+    return;
+  }
+
+  state.selectedPlanId = selectedPlan.id;
+  state.planConfirmed = true;
+  state.midtransShowroom = showroom;
+  state.paymentSubmitted = showroom.subscription_payment_status !== "unpaid";
 }

@@ -292,7 +292,7 @@ function pendingApprovalPanel(context, state, root, startPolling) {
   infoBox.innerHTML = `
     <p class="font-semibold text-gray-900">Halo, ${user.name || "Seller"}!</p>
     <p>Akun Anda${emailStr} berhasil didaftarkan dan data showroom telah disimpan.</p>
-    <p>Saat ini pendaftaran Anda sedang dalam antrean verifikasi oleh Administrator.</p>
+    <p>Saat ini pendaftaran Anda sedang dalam antrean verifikasi oleh Administrator. Jika Anda belum menyelesaikan pembayaran paket, gunakan tombol "Lanjutkan Pembayaran" di bawah.</p>
     <p class="text-[10px] font-semibold text-[var(--pb-brand-secondary)] flex items-center justify-center gap-1.5 mt-1 animate-pulse">
       <span class="h-2 w-2 rounded-full bg-[var(--pb-brand-primary)]"></span>
       Mengecek persetujuan secara otomatis...
@@ -353,7 +353,15 @@ function pendingApprovalPanel(context, state, root, startPolling) {
   btnLogout.id = "pending_approval_logout_button";
   btnLogout.classList.add("w-full", "justify-center");
 
-  btnGroup.append(btnCheck, btnLogout);
+  const btnPay = Button({
+    label: "Lanjutkan Pembayaran",
+    variant: "secondary",
+    onClick: () => context.router.navigate("/daftar-showroom"),
+  });
+  btnPay.id = "pending_approval_continue_payment_button";
+  btnPay.classList.add("w-full", "justify-center");
+
+  btnGroup.append(btnCheck, btnPay, btnLogout);
   wrap.append(pulseContainer, title, infoBox, btnGroup);
 
   startPolling(context);

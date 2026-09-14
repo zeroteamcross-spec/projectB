@@ -25,7 +25,12 @@ export function createRoleGuard({ auth } = {}) {
     const currentRole = auth?.role?.() ?? PUBLIC_ROLE;
 
     if (isAuthenticated && !user.is_approved && currentRole === "seller") {
-      if (location.path !== "/google-login/complete") {
+      // "/daftar-showroom" dikecualikan supaya seller yang akunnya sudah
+      // dibuat tapi belum bayar paket (mis. sesi terputus sebelum sempat
+      // unggah bukti transfer) tetap bisa kembali ke langkah pembayaran --
+      // tanpa ini mereka terjebak permanen di panel "Menunggu Persetujuan
+      // Admin" tanpa cara membayar sama sekali.
+      if (location.path !== "/google-login/complete" && location.path !== "/daftar-showroom") {
         return {
           type: "redirect",
           path: "/google-login/complete?status=pending_approval&role=seller",
