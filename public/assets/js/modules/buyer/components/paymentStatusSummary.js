@@ -38,9 +38,11 @@ export function PaymentStatusSummary({ transaction } = {}) {
     row("Harga mobil", formatCurrency(transaction?.car_price)),
     row("Nominal utama", formatCurrency(primaryAmount(transaction))),
     row("DP", transaction?.dp_amount ? formatCurrency(transaction.dp_amount) : "-"),
-    row("Sisa pembayaran", transaction?.remaining_amount ? formatCurrency(transaction.remaining_amount) : "-"),
-    row("Kadaluarsa", transaction?.expires_at ?? "-")
+    row("Sisa pembayaran", transaction?.remaining_amount ? formatCurrency(transaction.remaining_amount) : "-")
   );
+  if (transaction?.transaction_status === "pending_payment") {
+    grid.append(row("Kadaluarsa", transaction?.expires_at ?? "-"));
+  }
 
   section.append(header, grid);
   return section;
