@@ -124,7 +124,7 @@ function progressBar(progress = {}) {
 
   const label = document.createElement("div");
   label.className = "flex items-center justify-between text-[10px] font-bold text-gray-600";
-  label.append(document.createTextNode("Progress item"), document.createTextNode(`${completed}/${total}`));
+  label.append(document.createTextNode("Progress item "), document.createTextNode(`${completed}/${total}`));
 
   const track = document.createElement("div");
   track.className = "h-2 overflow-hidden rounded-full bg-gray-100";
