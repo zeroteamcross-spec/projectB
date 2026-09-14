@@ -65,12 +65,17 @@ export const adminTransactionMonitoringService = {
 
     if (transaction?.payment_type === "dp") {
       if (["dp_paid", "paid", "completed"].includes(status)) {
+        // "dp_paid" cuma berarti DP-nya lunas -- BUKAN harga mobil penuh.
+        // Sisanya diselesaikan langsung dengan showroom, di luar aplikasi.
+        // Dulu paid/remaining keliru memakai total/0, seolah harga penuh
+        // sudah lunas begitu DP dikonfirmasi (lihat sellerTransactionService.js
+        // untuk bug yang sama, ditambal bersamaan).
         return {
           total,
-          paid: total,
-          remaining: 0,
+          paid: dpAmount,
+          remaining,
           dueNow: 0,
-          dueNowLabel: "Sudah dibayar",
+          dueNowLabel: "Sisa ditagih langsung",
         };
       }
 

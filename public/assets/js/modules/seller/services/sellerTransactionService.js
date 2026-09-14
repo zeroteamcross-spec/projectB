@@ -69,12 +69,18 @@ export const sellerTransactionService = {
 
     if (transaction?.payment_type === "dp") {
       if (isPaidStatus(status)) {
+        // "dp_paid" cuma berarti DP-nya lunas -- BUKAN harga mobil penuh.
+        // Sisanya (remainingAmount) diselesaikan langsung dengan showroom,
+        // di luar aplikasi (lihat teks instruksi pembayaran buyer), jadi
+        // tetap "belum dibayar via aplikasi" sampai transaksi ditandai
+        // selesai. paid/remaining di sini dulu keliru memakai carPrice/0,
+        // seolah harga penuh sudah lunas begitu DP dikonfirmasi.
         return {
           total: carPrice,
-          paid: carPrice,
-          remaining: 0,
+          paid: dpAmount,
+          remaining: remainingAmount,
           dueNow: 0,
-          dueNowLabel: "Sudah dibayar",
+          dueNowLabel: "Sisa ditagih langsung",
         };
       }
 
