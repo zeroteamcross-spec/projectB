@@ -59,4 +59,14 @@ export const showroomsResource = {
     const response = await apiClient.post("/showrooms/me/subscription/midtrans/charge", { bank }, options);
     return response.data?.showroom ?? null;
   },
+
+  async subscriptionHistory(options = {}) {
+    const response = await apiClient.get("/showrooms/me/subscription/history", options);
+    return response.data?.history ?? [];
+  },
+
+  async subscriptionHistoryFor(showroomId, options = {}) {
+    const response = await apiClient.get(`/showrooms/${encodeURIComponent(showroomId)}/subscription/history`, options);
+    return response.data?.history ?? [];
+  },
 };

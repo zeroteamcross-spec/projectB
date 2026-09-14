@@ -249,6 +249,11 @@ class ShowroomService
         $anchor = $showroom['subscription_next_due_at'] ?? $showroom['subscription_confirmed_at'] ?? $now;
         $nextDueAt = $this->addBillingInterval($anchor, $showroom['selected_plan_billing_period'] ?? null);
 
+        // Disalin ke riwayat SEBELUM kolom siklus-berjalan di bawah menimpanya
+        // -- sekali ditimpa, bukti/detail VA siklus ini tidak bisa dilihat lagi
+        // lewat showrooms saja (lihat findSubscriptionPaymentHistory()).
+        $this->recordSubscriptionPaymentHistory($showroom, 'paid', $now, (int) $actor['id'], null);
+
         $this->showrooms->updateSubscriptionConfirmation($showroomId, [
             'subscription_confirmed_at' => $now,
             'subscription_confirmed_by' => (int) $actor['id'],
@@ -257,6 +262,84 @@ class ShowroomService
         ]);
 
         return $this->serializeShowroom($this->showrooms->findById($showroomId));
+    }
+
+    /**
+     * Riwayat pembayaran paket showroom -- siklus-siklus SEBELUMNYA, bukan
+     * yang sedang berjalan (itu sudah ada di serializeShowroom() lewat
+     * subscription_payment_status dkk).
+     */
+    public function subscriptionHistory(array $user): array
+    {
+        $this->ensureSeller($user);
+        $showroom = $this->showrooms->findByUserId((int) $user['id']);
+
+        if (! $showroom) {
+            throw new NotFoundException('Showroom belum tersedia.');
+        }
+
+        return $this->serializeSubscriptionHistory($this->showrooms->findSubscriptionPaymentHistory((int) $showroom['id']));
+    }
+
+    public function subscriptionHistoryForAdmin(array $actor, int $showroomId): array
+    {
+        AuthPolicy::requireAdmin($actor);
+
+        if (! $this->showrooms->findById($showroomId)) {
+            throw new NotFoundException('Showroom tidak ditemukan.');
+        }
+
+        return $this->serializeSubscriptionHistory($this->showrooms->findSubscriptionPaymentHistory($showroomId));
+    }
+
+    private function recordSubscriptionPaymentHistory(array $showroom, string $status, string $decidedAt, int $decidedBy, ?string $rejectedReason): void
+    {
+        $this->showrooms->insertSubscriptionPaymentHistory([
+            'showroom_id' => (int) $showroom['id'],
+            'plan_name' => $showroom['selected_plan_name'] ?? null,
+            'plan_price' => $showroom['selected_plan_price'] ?? null,
+            'plan_billing_period' => $showroom['selected_plan_billing_period'] ?? null,
+            'payment_method' => $showroom['subscription_payment_method'] ?? 'manual',
+            'proof_path' => $showroom['subscription_proof_path'] ?? null,
+            'proof_note' => $showroom['subscription_proof_note'] ?? null,
+            'proof_submitted_at' => $showroom['subscription_proof_submitted_at'] ?? null,
+            'midtrans_order_id' => $showroom['subscription_midtrans_order_id'] ?? null,
+            'midtrans_transaction_id' => $showroom['subscription_midtrans_transaction_id'] ?? null,
+            'midtrans_payment_data' => $showroom['subscription_midtrans_payment_data'] ?? null,
+            'midtrans_paid_at' => $showroom['subscription_midtrans_paid_at'] ?? null,
+            'status' => $status,
+            'decided_at' => $decidedAt,
+            'decided_by' => $decidedBy,
+            'rejected_reason' => $rejectedReason,
+            'created_at' => $decidedAt,
+        ]);
+    }
+
+    private function serializeSubscriptionHistory(array $rows): array
+    {
+        return array_map(static function (array $row): array {
+            $paymentData = is_string($row['midtrans_payment_data'] ?? null)
+                ? (json_decode((string) $row['midtrans_payment_data'], true) ?: [])
+                : [];
+
+            return [
+                'id' => (int) $row['id'],
+                'plan_name' => $row['plan_name'] ?? null,
+                'plan_price' => isset($row['plan_price']) ? (float) $row['plan_price'] : null,
+                'plan_billing_period' => $row['plan_billing_period'] ?? null,
+                'payment_method' => $row['payment_method'] ?? 'manual',
+                'proof_path' => $row['proof_path'] ?? null,
+                'proof_note' => $row['proof_note'] ?? null,
+                'proof_submitted_at' => $row['proof_submitted_at'] ?? null,
+                'midtrans_order_id' => $row['midtrans_order_id'] ?? null,
+                'midtrans_payment_data' => $paymentData,
+                'midtrans_paid_at' => $row['midtrans_paid_at'] ?? null,
+                'status' => $row['status'],
+                'decided_at' => $row['decided_at'],
+                'decided_by_name' => $row['decided_by_name'] ?? null,
+                'rejected_reason' => $row['rejected_reason'] ?? null,
+            ];
+        }, $rows);
     }
 
     /**
@@ -276,8 +359,10 @@ class ShowroomService
 
     /**
      * Admin menolak bukti transfer -- nominal tidak cocok, bukti tidak
-     * jelas, dsb. Bukti lama dihapus dari kolomnya supaya showroom harus
-     * unggah yang baru, bukan sekadar menimpa bukti yang sama.
+     * jelas, dsb. Kolom siklus-berjalan (subscription_proof_path dkk)
+     * dikosongkan supaya showroom harus unggah yang baru, tapi datanya
+     * tersimpan permanen di showroom_subscription_payments sebelum itu
+     * terjadi -- lihat recordSubscriptionPaymentHistory().
      */
     public function rejectSubscriptionPayment(array $actor, int $showroomId, array $data): array
     {
@@ -303,18 +388,21 @@ class ShowroomService
             throw new ValidationException(['reason' => 'Alasan penolakan wajib diisi.']);
         }
 
-        $proofPath = trim((string) ($showroom['subscription_proof_path'] ?? ''));
         $now = date('Y-m-d H:i:s');
+
+        // Disalin ke riwayat SEBELUM kolom siklus-berjalan di bawah menimpanya
+        // -- sama seperti confirmSubscriptionPayment(). File buktinya SENGAJA
+        // TIDAK dihapus lagi (beda dari perilaku sebelum ada riwayat ini) --
+        // baris riwayat di atas menyimpan proof_path yang sama, jadi
+        // menghapus filenya sekarang akan membuat link "Lihat bukti transfer"
+        // di riwayat menunjuk ke file yang sudah tidak ada.
+        $this->recordSubscriptionPaymentHistory($showroom, 'rejected', $now, (int) $actor['id'], $reason);
 
         $this->showrooms->updateSubscriptionRejection($showroomId, [
             'subscription_rejected_at' => $now,
             'subscription_rejected_reason' => $reason,
             'updated_at' => $now,
         ]);
-
-        if ($proofPath !== '') {
-            $this->storage->delete($proofPath);
-        }
 
         return $this->serializeShowroom($this->showrooms->findById($showroomId));
     }

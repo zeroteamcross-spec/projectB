@@ -193,6 +193,9 @@ function render(root, context, state, actions) {
     layout.append(paymentForm(state, actions, destinationMaster));
   }
 
+  const history = appStore.get("working.sellerBilling.history.data", null);
+  layout.append(historySection(history));
+
   root.replaceChildren(layout);
 
   if (!appStore.get("working.sellerBilling.showroom.hydratedAt", 0)) {
@@ -205,6 +208,13 @@ function render(root, context, state, actions) {
       .catch(() => adminMasterService.normalizeSubscriptionDestinationMaster(null))
       .then((master) => {
         appStore.patchState("working.sellerBilling.destination", { data: master, hydratedAt: Date.now() }, "seller-billing:destination-loaded");
+      });
+  }
+  if (!appStore.get("working.sellerBilling.history.hydratedAt", 0)) {
+    showroomsResource.subscriptionHistory()
+      .catch(() => [])
+      .then((data) => {
+        appStore.patchState("working.sellerBilling.history", { data, hydratedAt: Date.now() }, "seller-billing:history-loaded");
       });
   }
 }
@@ -303,6 +313,84 @@ function paymentForm(state, actions, destinationMaster) {
   section.append(submit);
 
   return section;
+}
+
+const HISTORY_STATUS_LABEL = {
+  paid: "Lunas",
+  rejected: "Ditolak",
+};
+
+const HISTORY_STATUS_VARIANT = {
+  paid: "success",
+  rejected: "danger",
+};
+
+/**
+ * Siklus-siklus SEBELUMNYA -- terpisah dari status siklus BERJALAN di atas
+ * (card "slrbil_status_card"). Ditulis oleh Admin tiap kali konfirmasi/tolak
+ * (lihat ShowroomService::recordSubscriptionPaymentHistory()), jadi daftar
+ * ini tidak berubah walau siklus berjalan sudah ditimpa perpanjangan baru.
+ */
+function historySection(history) {
+  const section = document.createElement("section");
+  section.id = "slrbil_history_section";
+  section.className = "grid gap-3 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white/85 p-5 shadow-sm";
+
+  section.append(textNode("h2", "text-sm font-black text-gray-950", "Riwayat Pembayaran"));
+
+  if (history === null) {
+    section.append(textNode("p", "text-xs text-gray-500", "Memuat riwayat..."));
+    return section;
+  }
+
+  if (!history.length) {
+    section.append(textNode("p", "text-xs text-gray-500", "Belum ada siklus pembayaran yang selesai ditinjau Admin."));
+    return section;
+  }
+
+  const list = document.createElement("div");
+  list.id = "slrbil_history_list";
+  list.className = "grid gap-2";
+  list.append(...history.map(historyRow));
+  section.append(list);
+
+  return section;
+}
+
+function historyRow(entry) {
+  const row = document.createElement("div");
+  row.className = "grid gap-1 rounded-2xl border border-[var(--pb-card-border)] bg-gray-50 p-3 text-xs";
+
+  const top = document.createElement("div");
+  top.className = "flex flex-wrap items-center gap-2";
+  top.append(
+    textNode("p", "font-black text-gray-900", entry.plan_name || "-"),
+    Badge({ label: HISTORY_STATUS_LABEL[entry.status] || entry.status, variant: HISTORY_STATUS_VARIANT[entry.status] || "default" }),
+  );
+  row.append(top);
+
+  row.append(textNode("p", "text-gray-600", `${formatCurrency(entry.plan_price || 0)}${entry.plan_billing_period ? ` ${entry.plan_billing_period}` : ""} · ${entry.payment_method === "midtrans" ? "Virtual Account" : "Transfer manual"}`));
+  row.append(textNode("p", "text-gray-600", `Diputuskan: ${formatDate(entry.decided_at)}${entry.decided_by_name ? ` oleh ${entry.decided_by_name}` : ""}`));
+
+  if (entry.status === "rejected" && entry.rejected_reason) {
+    row.append(textNode("p", "text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]", `Alasan ditolak: ${entry.rejected_reason}`));
+  }
+
+  if (entry.payment_method === "midtrans" && entry.midtrans_payment_data?.va_number) {
+    row.append(textNode("p", "text-gray-500", `VA ${String(entry.midtrans_payment_data.bank || "").toUpperCase()} ${entry.midtrans_payment_data.va_number}`));
+  }
+
+  if (entry.proof_path) {
+    const link = document.createElement("a");
+    link.href = entry.proof_path;
+    link.target = "_blank";
+    link.rel = "noopener";
+    link.className = "w-fit text-xs font-semibold text-[var(--pb-brand-secondary)] underline underline-offset-2";
+    link.textContent = "Lihat bukti transfer";
+    row.append(link);
+  }
+
+  return row;
 }
 
 function billingPaymentMethodTabs(state, actions) {

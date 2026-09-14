@@ -23,6 +23,16 @@ const STATUS_VARIANT = {
   rejected: "danger",
 };
 
+const HISTORY_STATUS_LABEL = {
+  paid: "Lunas",
+  rejected: "Ditolak",
+};
+
+const HISTORY_STATUS_VARIANT = {
+  paid: "success",
+  rejected: "danger",
+};
+
 export function AdminDueSubscriptionsPage() {
   let root = null;
   let unsubscribe = null;
@@ -30,6 +40,10 @@ export function AdminDueSubscriptionsPage() {
   const state = {
     processingShowroomId: null,
     error: "",
+    // Showroom id -> array riwayat (atau null selagi dimuat). Dipisah dari
+    // daftar tagihan due utama -- kebanyakan admin tidak perlu buka riwayat
+    // tiap showroom, jadi baru diambil begitu tombolnya diklik.
+    expandedHistoryByShowroomId: {},
   };
 
   const rerender = () => render(root, currentContext, state, actions);
@@ -68,6 +82,30 @@ export function AdminDueSubscriptionsPage() {
         showToast(state.error, { type: "error" });
       } finally {
         state.processingShowroomId = null;
+        rerender();
+      }
+    },
+    async toggleHistory(showroom) {
+      if (state.expandedHistoryByShowroomId[showroom.id] !== undefined) {
+        const next = { ...state.expandedHistoryByShowroomId };
+        delete next[showroom.id];
+        state.expandedHistoryByShowroomId = next;
+        rerender();
+        return;
+      }
+
+      state.expandedHistoryByShowroomId = { ...state.expandedHistoryByShowroomId, [showroom.id]: null };
+      rerender();
+
+      try {
+        const history = await showroomsResource.subscriptionHistoryFor(showroom.id);
+        state.expandedHistoryByShowroomId = { ...state.expandedHistoryByShowroomId, [showroom.id]: history };
+      } catch (error) {
+        showToast(error.message || "Gagal memuat riwayat pembayaran.", { type: "error" });
+        const next = { ...state.expandedHistoryByShowroomId };
+        delete next[showroom.id];
+        state.expandedHistoryByShowroomId = next;
+      } finally {
         rerender();
       }
     },
@@ -257,8 +295,86 @@ function subscriptionCard(showroom, state, actions) {
     actionsWrap.append(textNode("p", "text-xs text-gray-500", "Menunggu showroom mengunggah bukti transfer perpanjangan."));
   }
 
+  const isHistoryOpen = state.expandedHistoryByShowroomId[showroom.id] !== undefined;
+  const historyToggle = document.createElement("button");
+  historyToggle.type = "button";
+  historyToggle.id = `admdue_history_toggle_${showroom.id}`;
+  historyToggle.className = "w-fit text-xs font-semibold text-[var(--pb-brand-secondary)] underline underline-offset-2";
+  historyToggle.textContent = isHistoryOpen ? "Sembunyikan riwayat" : "Lihat riwayat";
+  historyToggle.addEventListener("click", () => actions.toggleHistory(showroom));
+  actionsWrap.append(historyToggle);
+
   card.append(info, actionsWrap);
+
+  if (isHistoryOpen) {
+    const historyPanel = document.createElement("div");
+    historyPanel.id = `admdue_history_panel_${showroom.id}`;
+    historyPanel.className = "grid gap-2 sm:col-span-2";
+    historyPanel.append(historySection(state.expandedHistoryByShowroomId[showroom.id]));
+    card.append(historyPanel);
+  }
+
   return card;
+}
+
+/**
+ * Riwayat siklus-siklus SEBELUMNYA untuk satu showroom -- terpisah dari
+ * status siklus BERJALAN yang sudah ditampilkan di kartu utama. Sama seperti
+ * bagian riwayat di halaman Langganan showroom (billingPage.js), cuma dilihat
+ * dari sisi Admin dan bisa untuk showroom mana pun.
+ */
+function historySection(history) {
+  const wrap = document.createElement("div");
+  wrap.className = "grid gap-2 rounded-2xl border border-[var(--pb-card-border)] bg-gray-50/70 p-3";
+
+  if (history === null) {
+    wrap.append(textNode("p", "text-xs text-gray-500", "Memuat riwayat..."));
+    return wrap;
+  }
+
+  if (!history.length) {
+    wrap.append(textNode("p", "text-xs text-gray-500", "Belum ada siklus pembayaran yang selesai ditinjau."));
+    return wrap;
+  }
+
+  wrap.append(...history.map(historyRow));
+  return wrap;
+}
+
+function historyRow(entry) {
+  const row = document.createElement("div");
+  row.className = "grid gap-1 rounded-xl border border-[var(--pb-card-border)] bg-white p-3 text-xs";
+
+  const top = document.createElement("div");
+  top.className = "flex flex-wrap items-center gap-2";
+  top.append(
+    textNode("p", "font-black text-gray-900", entry.plan_name || "-"),
+    Badge({ label: HISTORY_STATUS_LABEL[entry.status] || entry.status, variant: HISTORY_STATUS_VARIANT[entry.status] || "default" }),
+  );
+  row.append(top);
+
+  row.append(textNode("p", "text-gray-600", `${formatCurrency(entry.plan_price || 0)}${entry.plan_billing_period ? ` ${entry.plan_billing_period}` : ""} · ${entry.payment_method === "midtrans" ? "Virtual Account" : "Transfer manual"}`));
+  row.append(textNode("p", "text-gray-600", `Diputuskan: ${formatDate(entry.decided_at)}${entry.decided_by_name ? ` oleh ${entry.decided_by_name}` : ""}`));
+
+  if (entry.status === "rejected" && entry.rejected_reason) {
+    row.append(textNode("p", "text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]", `Alasan ditolak: ${entry.rejected_reason}`));
+  }
+
+  if (entry.payment_method === "midtrans" && entry.midtrans_payment_data?.va_number) {
+    row.append(textNode("p", "text-gray-500", `VA ${String(entry.midtrans_payment_data.bank || "").toUpperCase()} ${entry.midtrans_payment_data.va_number}`));
+  }
+
+  if (entry.proof_path) {
+    const link = document.createElement("a");
+    link.href = entry.proof_path;
+    link.target = "_blank";
+    link.rel = "noopener";
+    link.className = "w-fit text-xs font-semibold text-[var(--pb-brand-secondary)] underline underline-offset-2";
+    link.textContent = "Lihat bukti transfer";
+    row.append(link);
+  }
+
+  return row;
 }
 
 function textNode(tagName, className, text) {

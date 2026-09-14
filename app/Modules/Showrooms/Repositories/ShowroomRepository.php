@@ -384,4 +384,64 @@ class ShowroomRepository
             'updated_at' => $data['updated_at'],
         ]);
     }
+
+    /**
+     * Menyimpan satu baris riwayat -- dipanggil tepat sebelum kolom
+     * subscription_* di showrooms ditimpa siklus berikutnya (lihat
+     * ShowroomService::confirmSubscriptionPayment()/rejectSubscriptionPayment()),
+     * supaya data siklus yang baru diputuskan tidak hilang.
+     */
+    public function insertSubscriptionPaymentHistory(array $data): void
+    {
+        $stmt = $this->pdo->prepare(
+            'INSERT INTO showroom_subscription_payments
+                (showroom_id, plan_name, plan_price, plan_billing_period, payment_method,
+                 proof_path, proof_note, proof_submitted_at,
+                 midtrans_order_id, midtrans_transaction_id, midtrans_payment_data, midtrans_paid_at,
+                 status, decided_at, decided_by, rejected_reason, created_at)
+             VALUES
+                (:showroom_id, :plan_name, :plan_price, :plan_billing_period, :payment_method,
+                 :proof_path, :proof_note, :proof_submitted_at,
+                 :midtrans_order_id, :midtrans_transaction_id, :midtrans_payment_data, :midtrans_paid_at,
+                 :status, :decided_at, :decided_by, :rejected_reason, :created_at)'
+        );
+
+        $stmt->execute([
+            'showroom_id' => $data['showroom_id'],
+            'plan_name' => $data['plan_name'] ?? null,
+            'plan_price' => $data['plan_price'] ?? null,
+            'plan_billing_period' => $data['plan_billing_period'] ?? null,
+            'payment_method' => $data['payment_method'] ?? 'manual',
+            'proof_path' => $data['proof_path'] ?? null,
+            'proof_note' => $data['proof_note'] ?? null,
+            'proof_submitted_at' => $data['proof_submitted_at'] ?? null,
+            'midtrans_order_id' => $data['midtrans_order_id'] ?? null,
+            'midtrans_transaction_id' => $data['midtrans_transaction_id'] ?? null,
+            'midtrans_payment_data' => $data['midtrans_payment_data'] ?? null,
+            'midtrans_paid_at' => $data['midtrans_paid_at'] ?? null,
+            'status' => $data['status'],
+            'decided_at' => $data['decided_at'],
+            'decided_by' => $data['decided_by'] ?? null,
+            'rejected_reason' => $data['rejected_reason'] ?? null,
+            'created_at' => $data['created_at'],
+        ]);
+    }
+
+    public function findSubscriptionPaymentHistory(int $showroomId): array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT sp.id, sp.showroom_id, sp.plan_name, sp.plan_price, sp.plan_billing_period, sp.payment_method,
+                    sp.proof_path, sp.proof_note, sp.proof_submitted_at,
+                    sp.midtrans_order_id, sp.midtrans_transaction_id, sp.midtrans_payment_data, sp.midtrans_paid_at,
+                    sp.status, sp.decided_at, sp.decided_by, sp.rejected_reason, sp.created_at,
+                    u.name AS decided_by_name
+             FROM showroom_subscription_payments AS sp
+             LEFT JOIN users AS u ON u.id = sp.decided_by
+             WHERE sp.showroom_id = :showroom_id
+             ORDER BY sp.decided_at DESC'
+        );
+        $stmt->execute(['showroom_id' => $showroomId]);
+
+        return $stmt->fetchAll();
+    }
 }

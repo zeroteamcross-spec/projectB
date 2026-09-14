@@ -28,8 +28,10 @@ return static function (Router $router): void {
         $router->post('/me/branding-logo', [ShowroomController::class, 'uploadBrandingLogo']);
         $router->post('/me/subscription/proof', [ShowroomController::class, 'submitSubscriptionProof']);
         $router->post('/me/subscription/midtrans/charge', [ShowroomController::class, 'createSubscriptionMidtransPayment']);
+        $router->get('/me/subscription/history', [ShowroomController::class, 'subscriptionHistory']);
         $router->post('/{id}/subscription/confirm', [ShowroomController::class, 'confirmSubscriptionPayment']);
         $router->post('/{id}/subscription/reject', [ShowroomController::class, 'rejectSubscriptionPayment']);
+        $router->get('/{id}/subscription/history', [ShowroomController::class, 'subscriptionHistoryForAdmin']);
         $router->get('/{id}', [ShowroomController::class, 'show']);
     }, [AuthenticatedUserMiddleware::class]);
 };

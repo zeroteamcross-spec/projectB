@@ -97,6 +97,24 @@ class ShowroomController extends Controller
         ], 'Tagihan berulang berhasil diambil.');
     }
 
+    public function subscriptionHistory(Request $request): JsonResponse
+    {
+        $user = $this->user($request);
+
+        return JsonResponse::success([
+            'history' => $this->service->subscriptionHistory($user),
+        ], 'Riwayat pembayaran berhasil diambil.');
+    }
+
+    public function subscriptionHistoryForAdmin(Request $request): JsonResponse
+    {
+        $user = $this->user($request);
+
+        return JsonResponse::success([
+            'history' => $this->service->subscriptionHistoryForAdmin($user, (int) $request->routeParam('id')),
+        ], 'Riwayat pembayaran berhasil diambil.');
+    }
+
     public function createSubscriptionMidtransPayment(Request $request): JsonResponse
     {
         $user = $this->user($request);
