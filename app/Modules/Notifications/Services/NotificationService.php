@@ -137,7 +137,14 @@ class NotificationService
     public function createTransactionPaidNotifications(array $transaction): array
     {
         $transactionId = (int) ($transaction['id'] ?? 0);
-        if ($transactionId <= 0 || ($transaction['transaction_status'] ?? null) !== 'paid') {
+        // Booking Fee menutup kewajiban bayar sejak dp_paid jadi status akhir
+        // (lihat TransactionService::applyStatus() dan
+        // AffiliateService::accrueCommissionForPaidTransaction() -- pola yang
+        // sama). Guard ini dulu cuma menerima 'paid' (status legacy yang nyaris
+        // tidak pernah tercapai lagi), jadi buyer/seller/admin nyaris TIDAK
+        // PERNAH mendapat notifikasi pembayaran untuk transaksi modern manapun.
+        $statusFinal = ['dp_paid', 'paid'];
+        if ($transactionId <= 0 || ! in_array($transaction['transaction_status'] ?? null, $statusFinal, true)) {
             return [];
         }
 
