@@ -91,7 +91,7 @@ export function AdminUsersPage() {
       try {
         const result = await adminSessionService.approveUsers([user.id]);
         showToast(`Approval selesai untuk ${result.approvedCount} user.`, { type: "success" });
-        await refreshWorkingState(currentContext);
+        await refreshWorkingState(currentContext, state.query.userId);
         clearSelectionIfApprovedLeavesQueue(state, user);
         rerender();
       } catch (error) {
@@ -131,7 +131,7 @@ export function AdminUsersPage() {
         await showroomsResource.deactivate(user.showroom.id, reason);
         showToast(`Showroom ${user.showroom.name || ""} berhasil dinonaktifkan.`, { type: "success" });
         state.confirmDeactivateUserId = null;
-        await refreshWorkingState(currentContext);
+        await refreshWorkingState(currentContext, String(user.id));
         rerender();
       } catch (error) {
         state.error = error.message || "Gagal menonaktifkan showroom.";
@@ -150,7 +150,7 @@ export function AdminUsersPage() {
       try {
         await showroomsResource.activate(user.showroom.id);
         showToast(`Showroom ${user.showroom.name || ""} berhasil diaktifkan kembali.`, { type: "success" });
-        await refreshWorkingState(currentContext);
+        await refreshWorkingState(currentContext, String(user.id));
         rerender();
       } catch (error) {
         state.error = error.message || "Gagal mengaktifkan showroom.";
@@ -418,13 +418,23 @@ function textNode(tagName, className, text) {
   return node;
 }
 
-async function refreshWorkingState(context) {
+async function refreshWorkingState(context, userId = "") {
   if (!context) {
     return;
   }
 
+  // userId eksplisit, BUKAN context.query.user_id -- context di sini adalah
+  // objek yang diterima saat halaman mount/hydrate terakhir kali, dan
+  // history.replaceState() (dipakai syncUsersUrl() setiap pilih/tutup user)
+  // tidak pernah membuatnya ikut ter-update karena bukan navigasi SPA
+  // sungguhan. Mengandalkan context.query.user_id di sini berarti hampir
+  // selalu membaca id user yang SALAH (kosong, dari saat halaman pertama
+  // dibuka) -- detail-nya diam-diam jatuh balik ke objek user versi list
+  // (lihat resolveSelectedUser()), yang tidak membawa field showroom sama
+  // sekali. Efeknya baru kelihatan di modal setelah approve/nonaktifkan:
+  // showroom-nya seolah hilang padahal cuma detail-nya yang tidak ke-refresh.
   const filters = {
-    userId: context.query.user_id ?? "",
+    userId: userId || "",
   };
 
   const [users, pendingUsers, detail] = await Promise.all([
