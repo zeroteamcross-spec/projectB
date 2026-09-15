@@ -10,6 +10,7 @@ use App\Core\Exceptions\ValidationException;
 use App\Infrastructure\Payment\Midtrans\MidtransHttpClient;
 use App\Infrastructure\Storage\StorageServiceInterface;
 use App\Modules\Auth\Policies\AuthPolicy;
+use App\Modules\Auth\Repositories\AuthUserRepository;
 use App\Modules\MasterData\Services\MasterDataService;
 use App\Modules\Showrooms\Repositories\ShowroomRepository;
 use Throwable;
@@ -46,16 +47,20 @@ class ShowroomService
 
     private MidtransHttpClient $midtransHttp;
 
+    private AuthUserRepository $users;
+
     public function __construct(
         ShowroomRepository $showrooms,
         MasterDataService $masterData,
         StorageServiceInterface $storage,
-        MidtransHttpClient $midtransHttp
+        MidtransHttpClient $midtransHttp,
+        AuthUserRepository $users
     ) {
         $this->showrooms = $showrooms;
         $this->masterData = $masterData;
         $this->storage = $storage;
         $this->midtransHttp = $midtransHttp;
+        $this->users = $users;
     }
 
     public function mine(array $user): array
@@ -333,7 +338,7 @@ class ShowroomService
         return $this->serializeSubscriptionHistory($this->showrooms->findSubscriptionPaymentHistory($showroomId));
     }
 
-    private function recordSubscriptionPaymentHistory(array $showroom, string $status, string $decidedAt, int $decidedBy, ?string $rejectedReason): void
+    private function recordSubscriptionPaymentHistory(array $showroom, string $status, string $decidedAt, ?int $decidedBy, ?string $rejectedReason): void
     {
         $this->showrooms->insertSubscriptionPaymentHistory([
             'showroom_id' => (int) $showroom['id'],
@@ -544,6 +549,15 @@ class ShowroomService
      * supaya order_id-nya tidak pernah perlu disatukan dengan tabel transaksi
      * mobil. Sengaja selalu "acknowledged" walau order_id-nya tidak dikenali
      * (Midtrans akan mengulang kalau responsnya bukan 2xx).
+     *
+     * Beda dari transfer manual (yang statusnya berhenti di
+     * "pending_verification" sampai Admin mengecek foto bukti transfer secara
+     * manual): signature callback ini sudah diverifikasi HMAC dengan server
+     * key (lihat MidtransCallbackHandler::verifySignature()), jadi pembayaran
+     * ini sudah pasti nyata begitu sampai di sini -- tidak ada foto yang bisa
+     * dipalsukan untuk diperiksa manusia. Pembayaran langsung dikonfirmasi
+     * ("paid") dan akun showroom langsung disetujui di sini juga, tanpa
+     * menunggu klik Admin.
      */
     public function handleSubscriptionMidtransCallback(array $payload): array
     {
@@ -583,6 +597,35 @@ class ShowroomService
             'subscription_midtrans_paid_at' => $now,
             'updated_at' => $now,
         ]);
+
+        // Anchor & riwayat sama persis seperti confirmSubscriptionPayment()
+        // (jalur konfirmasi manual Admin) -- bedanya cuma decided_by null,
+        // menandai ini keputusan sistem/otomatis, bukan admin tertentu.
+        $showroom = $this->showrooms->findById($showroomId);
+        $anchor = $showroom['subscription_next_due_at'] ?? $showroom['subscription_confirmed_at'] ?? $now;
+        $nextDueAt = $this->addBillingInterval($anchor, $showroom['selected_plan_billing_period'] ?? null);
+
+        $this->recordSubscriptionPaymentHistory($showroom, 'paid', $now, null, null);
+
+        // is_active (nonaktifkan showroom oleh Admin, lihat deactivate()) TIDAK
+        // disentuh di sini dengan sengaja -- itu keputusan Admin yang berdiri
+        // sendiri (mis. showroom melanggar aturan), pembayaran yang lunas
+        // tidak boleh diam-diam menghidupkan lagi showroom yang sudah
+        // dinonaktifkan admin untuk alasan lain.
+        $this->showrooms->updateSubscriptionConfirmation($showroomId, [
+            'subscription_confirmed_at' => $now,
+            'subscription_confirmed_by' => null,
+            'subscription_next_due_at' => $nextDueAt,
+            'updated_at' => $now,
+        ]);
+
+        // Approval akun cuma relevan untuk pendaftaran PERTAMA KALI (belum
+        // is_approved) -- pembayaran perpanjangan (akun sudah aktif) tidak
+        // menyentuh ini sama sekali.
+        $user = $this->users->findById((int) $showroom['user_id']);
+        if ($user && ! (bool) ($user['is_approved'] ?? false)) {
+            $this->users->approveUsers([(int) $showroom['user_id']]);
+        }
 
         return [
             'acknowledged' => true,
