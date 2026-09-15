@@ -127,7 +127,7 @@ export function SubscriptionMidtransPanel({ getShowroom, onPaid = null } = {}) {
 
     card.append(
       row("Bank", bankLabel || "-"),
-      row("Nomor Virtual Account", vaNumber),
+      copyableRow("Nomor Virtual Account", vaNumber),
     );
 
     if (showroom.subscription_midtrans_expires_at) {
@@ -212,6 +212,65 @@ export function SubscriptionMidtransPanel({ getShowroom, onPaid = null } = {}) {
     content.textContent = value;
     node.append(caption, content);
     return node;
+  }
+
+  function copyableRow(label, value) {
+    const node = document.createElement("div");
+    node.id = "sub_midtrans_va_row";
+    node.className = "flex items-center justify-between gap-3 text-xs";
+    const caption = document.createElement("span");
+    caption.className = "text-gray-500";
+    caption.textContent = label;
+    const valueGroup = document.createElement("span");
+    valueGroup.className = "flex items-center gap-2";
+    const content = document.createElement("span");
+    content.className = "font-bold text-gray-900";
+    content.textContent = value;
+    const copyButton = document.createElement("button");
+    copyButton.id = "sub_midtrans_va_copy_button";
+    copyButton.type = "button";
+    copyButton.className = "rounded-lg border border-[var(--pb-card-border)] bg-white px-2 py-1 text-[10px] font-bold text-[var(--pb-brand-secondary)] transition hover:brightness-95";
+    copyButton.textContent = "Copy";
+    copyButton.addEventListener("click", () => copyToClipboard(value, copyButton));
+    valueGroup.append(content, copyButton);
+    node.append(caption, valueGroup);
+    return node;
+  }
+
+  function copyToClipboard(value, button) {
+    const restoreLabel = button.textContent;
+    const onDone = (ok) => {
+      button.textContent = ok ? "Tersalin" : "Gagal";
+      window.setTimeout(() => {
+        button.textContent = restoreLabel;
+      }, 1500);
+    };
+
+    const fallbackCopy = () => {
+      try {
+        const helper = document.createElement("textarea");
+        helper.value = String(value ?? "");
+        helper.style.position = "fixed";
+        helper.style.opacity = "0";
+        document.body.append(helper);
+        helper.select();
+        const ok = document.execCommand("copy");
+        helper.remove();
+        onDone(ok);
+      } catch {
+        onDone(false);
+      }
+    };
+
+    if (navigator.clipboard?.writeText) {
+      // Beberapa environment (mis. iframe dengan permission policy ketat) punya
+      // navigator.clipboard.writeText tapi menolaknya -- jangan langsung
+      // menyerah, coba execCommand sebagai jalan kedua.
+      navigator.clipboard.writeText(String(value ?? "")).then(() => onDone(true)).catch(fallbackCopy);
+      return;
+    }
+
+    fallbackCopy();
   }
 
   function formatDateTime(value) {
