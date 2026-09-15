@@ -552,7 +552,12 @@ function deactivateShowroomConfirmForm({ user, processing, reasonValue, onReason
   form.className = "grid min-w-0 gap-4";
   form.addEventListener("submit", (event) => {
     event.preventDefault();
-    const reason = reasonValue.trim();
+    // Baca langsung dari elemen textarea (di bawah), bukan dari parameter
+    // reasonValue -- fungsi ini sengaja TIDAK dipanggil ulang tiap keystroke
+    // (lihat komentar di onReasonChange di usersPage.js), jadi reasonValue di
+    // closure ini selalu nilai saat form pertama dirender, bukan nilai
+    // terkini yang sedang diketik admin.
+    const reason = textarea.value.trim();
     if (reason.length < 5) {
       showToast("Alasan menonaktifkan showroom minimal 5 karakter.", { type: "error" });
       return;
