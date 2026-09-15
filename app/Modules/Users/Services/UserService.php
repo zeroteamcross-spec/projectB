@@ -143,6 +143,9 @@ class UserService
             'subscription_confirmed_at' => $showroom['subscription_confirmed_at'] ?? null,
             'subscription_rejected_at' => $showroom['subscription_rejected_at'] ?? null,
             'subscription_rejected_reason' => $showroom['subscription_rejected_reason'] ?? null,
+            'is_active' => (bool) ($showroom['is_active'] ?? 1),
+            'deactivated_reason' => $showroom['deactivated_reason'] ?? null,
+            'deactivated_at' => $showroom['deactivated_at'] ?? null,
             'created_at' => $showroom['created_at'],
             'updated_at' => $showroom['updated_at'],
         ];

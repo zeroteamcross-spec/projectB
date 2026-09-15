@@ -11,8 +11,11 @@ export function AdminUserDetailPanel({
   isHydrating = false,
   activeUserId = null,
   approvingUserId = null,
+  togglingShowroomId = null,
   onApprove = null,
   onImpersonate = null,
+  onDeactivateShowroom = null,
+  onActivateShowroom = null,
   presentation = "panel",
 } = {}) {
   const panel = document.createElement("section");
@@ -61,6 +64,10 @@ export function AdminUserDetailPanel({
 
   if (user.showroom) {
     facts.append(infoRow("Showroom", user.showroom.name || "-"));
+    facts.append(infoRow("Status Showroom", user.showroom.is_active === false ? "Nonaktif" : "Aktif"));
+    if (user.showroom.is_active === false && user.showroom.deactivated_reason) {
+      facts.append(infoRow("Alasan Nonaktif", user.showroom.deactivated_reason));
+    }
   }
 
   const actions = document.createElement("div");
@@ -94,6 +101,23 @@ export function AdminUserDetailPanel({
   if (adminUserManagementService.isPendingApproval(user)) {
     actions.append(textBlock("text-xs leading-6 text-[color-mix(in_srgb,var(--pb-warning)_84%,black)] sm:col-span-2",
       "Approval showroom akan mengubah akun menjadi active dan approved sebelum user dipakai normal di flow showroom."));
+  }
+
+  if (user.showroom) {
+    const isTogglingThis = togglingShowroomId === user.showroom.id;
+    const isActive = user.showroom.is_active !== false;
+
+    const toggle = Button({
+      label: isTogglingThis
+        ? "Memproses..."
+        : (isActive ? "Nonaktifkan Showroom" : "Aktifkan Showroom"),
+      variant: isActive ? "danger" : "secondary",
+      disabled: isTogglingThis,
+      onClick: () => (isActive ? onDeactivateShowroom?.(user) : onActivateShowroom?.(user)),
+    });
+    toggle.id = `adusr_modal_${isActive ? "deactivate" : "activate"}_showroom_button_${user.id}`;
+    toggle.prepend(createIcon(isActive ? "circleXmark" : "sparkles", { className: "h-4 w-4" }));
+    actions.append(toggle);
   }
 
   panel.append(heading, facts, actions);

@@ -10,6 +10,7 @@ use App\Core\Request;
 use App\Infrastructure\Payment\Midtrans\MidtransCallbackHandler;
 use App\Modules\MasterData\Requests\UploadAppIconRequest;
 use App\Modules\MasterData\Services\MasterAssetService;
+use App\Modules\Showrooms\Requests\DeactivateShowroomRequest;
 use App\Modules\Showrooms\Requests\UpsertShowroomRequest;
 use App\Modules\Showrooms\Services\ShowroomService;
 use App\Modules\Transactions\Requests\ProviderCallbackRequest;
@@ -57,6 +58,25 @@ class ShowroomController extends Controller
         return JsonResponse::success([
             'showroom' => $this->service->show((int) $request->routeParam('id'), $user),
         ], 'Showroom berhasil diambil.');
+    }
+
+    public function deactivate(Request $request): JsonResponse
+    {
+        $user = $this->user($request);
+        $payload = (new DeactivateShowroomRequest($request))->validate();
+
+        return JsonResponse::success([
+            'showroom' => $this->service->deactivate($user, (int) $request->routeParam('id'), $payload['reason']),
+        ], 'Showroom berhasil dinonaktifkan.');
+    }
+
+    public function activate(Request $request): JsonResponse
+    {
+        $user = $this->user($request);
+
+        return JsonResponse::success([
+            'showroom' => $this->service->activate($user, (int) $request->routeParam('id')),
+        ], 'Showroom berhasil diaktifkan kembali.');
     }
 
     public function submitSubscriptionProof(Request $request): JsonResponse

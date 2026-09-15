@@ -17,6 +17,7 @@ import { markGopayAutoOpened, resolvePaymentArtifacts, shouldAutoOpenGopay } fro
 import { publicAffiliateTrackingService } from "../services/publicAffiliateTrackingService.js";
 import { publicContextService } from "../services/publicContextService.js";
 import { publicTransactionService } from "../services/publicTransactionService.js";
+import { MaintenancePage } from "./maintenancePage.js";
 import { googleLoginService } from "../../auth/services/googleLoginService.js";
 import { transactionEntryState } from "../state/transactionEntryState.js";
 import { tw } from "../../../theme/tailwindClasses.js";
@@ -42,9 +43,14 @@ export function TransactionEntryPage() {
     async bootstrap(context) {
       publicContextService.syncRouteContext(context);
       const affiliateSlug = publicContextService.routeAffiliateSlug(context);
+      const showroomSlug = publicContextService.routeShowroomSlug(context);
 
       if (affiliateSlug) {
         await publicContextService.activateAffiliateBySlug(affiliateSlug).catch(() => null);
+      }
+
+      if (showroomSlug) {
+        await publicContextService.activateShowroomBySlug(showroomSlug).catch(() => null);
       }
     },
     mount(context) {
@@ -87,6 +93,15 @@ function render(root, context, getBackgroundVideoLayer) {
   const user = authStore.user();
   const isBuyer = authStore.isAuthenticated() && authStore.role() === "buyer";
   const affiliate = publicContextService.activeAffiliate();
+
+  if (publicContextService.routeAffiliateSlug(context) || publicContextService.routeShowroomSlug(context)) {
+    const maintenance = publicContextService.inactiveShowroomContext();
+    if (maintenance.isInactive) {
+      root.replaceChildren(MaintenancePage({ showroomName: maintenance.showroomName }));
+      return;
+    }
+  }
+
   const backgroundVideoLayer = isPublicTransactionEntryRoute(context) ? getBackgroundVideoLayer?.() : null;
 
   maybeAutoOpenGopayResult(entry.result);

@@ -7,6 +7,7 @@ import { openModal, closeModal } from "../../../ui/primitives/modal.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 import { adminSessionService } from "../services/adminSessionService.js";
 import { adminUserManagementService } from "../services/adminUserManagementService.js";
+import { showroomsResource } from "../../../resources/showroomsResource.js";
 import { AdminUsersFilterBar } from "../components/adminUsersFilterBar.js";
 import { AdminUsersList } from "../components/adminUsersList.js";
 import { AdminUserDetailPanel } from "../components/adminUserDetailPanel.js";
@@ -19,6 +20,7 @@ export function AdminUsersPage() {
   const state = {
     activeUserId: null,
     approvingUserId: null,
+    togglingShowroomId: null,
     closingDetail: false,
     query: createUsersQuery(),
     error: "",
@@ -95,6 +97,48 @@ export function AdminUsersPage() {
         showToast(state.error, { type: "error" });
       } finally {
         state.approvingUserId = null;
+        rerender();
+      }
+    },
+    deactivateShowroom(user) {
+      openDeactivateShowroomModal({
+        user,
+        onConfirm: async (reason) => {
+          state.togglingShowroomId = user.showroom.id;
+          state.error = "";
+          rerender();
+
+          try {
+            await showroomsResource.deactivate(user.showroom.id, reason);
+            showToast(`Showroom ${user.showroom.name || ""} berhasil dinonaktifkan.`, { type: "success" });
+            await refreshWorkingState(currentContext);
+            rerender();
+          } catch (error) {
+            state.error = error.message || "Gagal menonaktifkan showroom.";
+            showToast(state.error, { type: "error" });
+            throw error;
+          } finally {
+            state.togglingShowroomId = null;
+            rerender();
+          }
+        },
+      });
+    },
+    async activateShowroom(user) {
+      state.togglingShowroomId = user.showroom.id;
+      state.error = "";
+      rerender();
+
+      try {
+        await showroomsResource.activate(user.showroom.id);
+        showToast(`Showroom ${user.showroom.name || ""} berhasil diaktifkan kembali.`, { type: "success" });
+        await refreshWorkingState(currentContext);
+        rerender();
+      } catch (error) {
+        state.error = error.message || "Gagal mengaktifkan showroom.";
+        showToast(state.error, { type: "error" });
+      } finally {
+        state.togglingShowroomId = null;
         rerender();
       }
     },
@@ -260,8 +304,11 @@ function render(root, context, state, actions) {
       isHydrating: Boolean(filters.userId && !detailHydratedAt && !selectedUser),
       activeUserId: state.activeUserId,
       approvingUserId: state.approvingUserId,
+      togglingShowroomId: state.togglingShowroomId,
       onApprove: (user) => actions.approveUser(user),
       onImpersonate: (user) => actions.openImpersonation(user),
+      onDeactivateShowroom: (user) => actions.deactivateShowroom(user),
+      onActivateShowroom: (user) => actions.activateShowroom(user),
       presentation: "modal",
     }), "admin.users.detail"), {
       key: `adusr-detail-${filters.userId}`,
@@ -442,6 +489,97 @@ async function hydrateUserDetail(userId) {
     data: detail,
     hydratedAt: Date.now(),
   }, "admin-users:detail-hydrated");
+}
+
+function openDeactivateShowroomModal({ user, onConfirm }) {
+  let processing = false;
+  let mounted = true;
+  const draft = { reason: "" };
+  const showroomName = user.showroom?.name || `Showroom #${user.showroom?.id ?? "-"}`;
+
+  const renderModal = () => {
+    const form = document.createElement("form");
+    form.className = "grid min-w-0 gap-4";
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const reason = draft.reason.trim();
+      if (reason.length < 5) {
+        showToast("Alasan menonaktifkan showroom minimal 5 karakter.", { type: "error" });
+        return;
+      }
+
+      processing = true;
+      renderModal();
+
+      try {
+        await onConfirm?.(reason);
+        mounted = false;
+        closeModal({ notify: false });
+      } catch (error) {
+        processing = false;
+        if (mounted) {
+          renderModal();
+        }
+      }
+    });
+
+    const note = document.createElement("div");
+    note.className = "grid gap-2 rounded-2xl border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-xs text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
+    note.append(
+      textNode("strong", "break-words", `Nonaktifkan ${showroomName}`),
+      textNode("p", "break-words text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]", "Halaman showroom publik dan katalog mobilnya akan menampilkan halaman maintenance ke buyer. Seller tetap bisa masuk ke dashboard untuk melihat alasan ini."),
+    );
+
+    const reasonField = document.createElement("label");
+    reasonField.className = "grid min-w-0 gap-1 text-xs font-bold text-[var(--pb-text-strong)]";
+    const textarea = document.createElement("textarea");
+    textarea.id = "adusr_deactivate_showroom_reason_input";
+    textarea.rows = 3;
+    textarea.value = draft.reason;
+    textarea.disabled = processing;
+    textarea.placeholder = "Mis. menunggak pembayaran paket, melanggar aturan platform, dsb.";
+    textarea.className = "min-h-24 w-full resize-y rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-xs font-semibold text-[var(--pb-text)] outline-none focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)] disabled:opacity-60";
+    textarea.addEventListener("input", () => {
+      draft.reason = textarea.value;
+    });
+    reasonField.append(textNode("span", "", "Alasan (wajib)"), textarea);
+
+    const actions = document.createElement("section");
+    actions.className = "flex flex-col-reverse gap-2 border-t border-[var(--pb-border)] pt-4 sm:flex-row sm:justify-end";
+    const cancel = Button({
+      label: "Batal",
+      variant: "secondary",
+      disabled: processing,
+      onClick: () => {
+        mounted = false;
+        closeModal({ notify: false });
+      },
+    });
+    cancel.id = "adusr_deactivate_showroom_cancel_button";
+    const confirm = Button({
+      label: processing ? "Memproses..." : "Nonaktifkan Showroom",
+      disabled: processing,
+    });
+    confirm.type = "submit";
+    confirm.id = "adusr_deactivate_showroom_confirm_button";
+
+    actions.append(cancel, confirm);
+    form.append(note, reasonField, actions);
+
+    openModal(form, {
+      key: "admin-deactivate-showroom-confirm",
+      title: "Konfirmasi Nonaktifkan Showroom",
+      description: "Tindakan ini bisa dibatalkan lagi kapan saja lewat tombol Aktifkan Showroom.",
+      size: "lg",
+      footer: null,
+      panelId: "adusr_deactivate_showroom_modal",
+      headerId: "adusr_deactivate_showroom_modal_header",
+      bodyId: "adusr_deactivate_showroom_modal_body",
+      closeButtonId: "adusr_deactivate_showroom_modal_close_button",
+    });
+  };
+
+  renderModal();
 }
 
 function openImpersonationModal({ user, onConfirm }) {

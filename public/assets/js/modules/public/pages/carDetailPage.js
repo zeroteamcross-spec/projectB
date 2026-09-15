@@ -16,6 +16,7 @@ import { publicAffiliateTrackingService } from "../services/publicAffiliateTrack
 import { publicContactService } from "../services/publicContactService.js";
 import { publicContextService } from "../services/publicContextService.js";
 import { publicCatalogState } from "../state/publicCatalogState.js";
+import { MaintenancePage } from "./maintenancePage.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 import { applyDesignHook } from "../../../theme/designStudioHooks.js";
 import { getListingLockStatus } from "../../../utils/transactionStatus.js";
@@ -85,6 +86,15 @@ function render(root, context, getBackgroundVideoLayer) {
   const affiliate = publicContextService.activeAffiliate();
   const showroom = publicContextService.activeShowroom();
   const activeContext = affiliate || showroom;
+
+  if (publicContextService.routeAffiliateSlug(context) || publicContextService.routeShowroomSlug(context)) {
+    const maintenance = publicContextService.inactiveShowroomContext();
+    if (maintenance.isInactive) {
+      root.replaceChildren(MaintenancePage({ showroomName: maintenance.showroomName }));
+      return;
+    }
+  }
+
   const summary = publicCatalogState.selectedCarSummary(context.params.id, {
     affiliateSlug: publicContextService.routeAffiliateSlug(context),
     showroomSlug: publicContextService.routeShowroomSlug(context),

@@ -31,6 +31,11 @@ class CarService
         // yang sudah laku tapi tetap ditampilkan dengan badge Sold. Beda
         // dengan `sold` biasa yang disembunyikan seperti draft/archived.
         $filters['listing_status'] = ['published', 'view_sold'];
+        // Showroom yang dinonaktifkan admin diarahkan ke halaman maintenance
+        // di halaman showroom-nya sendiri -- katalog publik/agregat juga
+        // tidak boleh tetap menawarkan mobilnya, itu setengah-setengah dan
+        // buyer masih bisa checkout dari showroom yang sudah "ditutup".
+        $filters['active_showroom_only'] = true;
 
         return $this->listWithMeta($filters, $pagination);
     }

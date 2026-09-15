@@ -85,6 +85,47 @@ class ShowroomService
         return $this->serializeShowroom($showroom);
     }
 
+    /**
+     * Admin menonaktifkan showroom -- mis. menunggak lama, melanggar aturan.
+     * Sengaja TIDAK menyentuh account_status seller (login tetap jalan)
+     * supaya seller masih bisa masuk dashboard dan melihat alasannya, tapi
+     * halaman showroom publik & katalog mobilnya diarahkan ke halaman
+     * maintenance (lihat ShowroomController::validateSlug() dan
+     * CarService::catalog()).
+     */
+    public function deactivate(array $actor, int $showroomId, string $reason): array
+    {
+        AuthPolicy::requireAdmin($actor);
+        $showroom = $this->showrooms->findById($showroomId);
+
+        if (! $showroom) {
+            throw new NotFoundException('Showroom tidak ditemukan.');
+        }
+
+        $reason = trim($reason);
+        if ($reason === '') {
+            throw new ValidationException(['reason' => 'Alasan menonaktifkan showroom wajib diisi.']);
+        }
+
+        $this->showrooms->updateActivation($showroomId, false, $reason, (int) $actor['id'], date('Y-m-d H:i:s'));
+
+        return $this->serializeShowroom($this->showrooms->findById($showroomId));
+    }
+
+    public function activate(array $actor, int $showroomId): array
+    {
+        AuthPolicy::requireAdmin($actor);
+        $showroom = $this->showrooms->findById($showroomId);
+
+        if (! $showroom) {
+            throw new NotFoundException('Showroom tidak ditemukan.');
+        }
+
+        $this->showrooms->updateActivation($showroomId, true, null, null, date('Y-m-d H:i:s'));
+
+        return $this->serializeShowroom($this->showrooms->findById($showroomId));
+    }
+
     public function upsertMine(array $user, array $data): array
     {
         $this->ensureSeller($user);
@@ -605,6 +646,10 @@ class ShowroomService
                 'icon_url' => $showroom['icon_url'] ?? null,
                 'header_logo_url' => $showroom['header_logo_url'] ?? null,
                 'tab_title' => $showroom['tab_title'] ?? null,
+                // Dipakai buat mengalihkan halaman showroom publik ke halaman
+                // maintenance -- alasannya sengaja tidak disertakan di sini,
+                // itu catatan internal admin, bukan untuk buyer.
+                'is_active' => (bool) ($showroom['is_active'] ?? 1),
             ] : null,
         ];
     }
@@ -727,6 +772,9 @@ class ShowroomService
             'subscription_midtrans_payment_data' => $this->decodeMidtransPaymentData($showroom['subscription_midtrans_payment_data'] ?? null),
             'subscription_midtrans_expires_at' => $showroom['subscription_midtrans_expires_at'] ?? null,
             'subscription_midtrans_paid_at' => $showroom['subscription_midtrans_paid_at'] ?? null,
+            'is_active' => (bool) ($showroom['is_active'] ?? 1),
+            'deactivated_reason' => $showroom['deactivated_reason'] ?? null,
+            'deactivated_at' => $showroom['deactivated_at'] ?? null,
             'seller_name' => $showroom['seller_name'] ?? null,
             'seller_email' => $showroom['seller_email'] ?? null,
             'created_at' => $showroom['created_at'],

@@ -239,6 +239,15 @@ class CarRepository
             $params['keyword'] = '%' . $filters['keyword'] . '%';
         }
 
+        if (! empty($filters['active_showroom_only'])) {
+            // showroom_id IS NULL dibiarkan lolos -- mobil tanpa showroom
+            // (kalau ada) bukan tanggung jawab flag ini, cuma yang benar-benar
+            // terhubung ke showroom yang dinonaktifkan admin yang disaring.
+            $conditions[] = '(showroom_id IS NULL OR showroom_id IN (
+                SELECT id FROM showrooms WHERE is_active = 1 AND deleted_at IS NULL
+            ))';
+        }
+
         return ['WHERE ' . implode(' AND ', $conditions), $params];
     }
 }

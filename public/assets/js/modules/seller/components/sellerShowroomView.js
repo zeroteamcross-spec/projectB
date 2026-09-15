@@ -42,6 +42,25 @@ export function SellerShowroomView({ showroom = null, onEdit = null } = {}) {
   section.className = "grid gap-5 rounded-[2rem] border border-[var(--pb-card-border)] bg-white/86 p-5 shadow-[0_22px_70px_rgba(15,23,42,0.09)] backdrop-blur-xl transition duration-150 sm:p-6";
   section.dataset.ds = "seller.showroom.view";
 
+  if (showroom.is_active === false) {
+    const warning = document.createElement("section");
+    warning.id = "slrsr_deactivated_notice_section";
+    warning.className = "grid gap-1 rounded-[1.25rem] border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-xs leading-6 text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
+    const warningTitle = document.createElement("p");
+    warningTitle.className = "font-black";
+    warningTitle.textContent = "Showroom Anda dinonaktifkan admin";
+    warning.append(warningTitle);
+    if (showroom.deactivated_reason) {
+      const warningBody = document.createElement("p");
+      warningBody.textContent = `Alasan: ${showroom.deactivated_reason}`;
+      warning.append(warningBody);
+    }
+    const warningHint = document.createElement("p");
+    warningHint.textContent = "Halaman showroom publik dan katalog mobil Anda untuk sementara menampilkan halaman maintenance ke buyer. Hubungi admin untuk mengaktifkannya kembali.";
+    warning.append(warningHint);
+    section.append(warning);
+  }
+
   const header = document.createElement("section");
   header.id = "slrsr_view_header_section";
   header.className = "flex flex-col gap-3 border-b border-[var(--pb-card-border)] pb-5 sm:flex-row sm:items-start sm:justify-between";

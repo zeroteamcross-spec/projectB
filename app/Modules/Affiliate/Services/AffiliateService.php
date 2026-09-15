@@ -324,6 +324,7 @@ class AffiliateService
                     'header_logo_url' => $affiliate['showroom_header_logo_url'] ?? null,
                     'icon_url' => $affiliate['showroom_icon_url'] ?? null,
                     'tab_title' => $affiliate['showroom_tab_title'] ?? null,
+                    'is_active' => (bool) ($affiliate['showroom_is_active'] ?? 1),
                 ]
                 : null,
         ];

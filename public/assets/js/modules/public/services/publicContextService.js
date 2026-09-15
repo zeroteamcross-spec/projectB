@@ -108,6 +108,31 @@ export const publicContextService = {
     return publicContextState.invalidSlug();
   },
 
+  /**
+   * true kalau context showroom/affiliate yang sedang aktif menunjuk ke
+   * showroom yang dinonaktifkan admin -- dipakai halaman katalog/detail
+   * mobil/entry transaksi untuk beralih menampilkan MaintenancePage alih-alih
+   * konten normalnya. Nama showroom disertakan supaya pesannya bisa
+   * menyebut showroom mana, bukan generik.
+   */
+  inactiveShowroomContext() {
+    const affiliate = this.activeAffiliate();
+    if (affiliate) {
+      return affiliate.isActive === false
+        ? { isInactive: true, showroomName: affiliate.showroom?.name ?? "" }
+        : { isInactive: false };
+    }
+
+    const showroom = this.activeShowroom();
+    if (showroom) {
+      return showroom.isActive === false
+        ? { isInactive: true, showroomName: showroom.showroom?.name ?? "" }
+        : { isInactive: false };
+    }
+
+    return { isInactive: false };
+  },
+
   async activateAffiliateBySlug(slug, options = {}) {
     const normalizedSlug = String(slug ?? "").trim().toLowerCase();
     if (!normalizedSlug) {
@@ -138,6 +163,7 @@ export const publicContextService = {
       profile: result.affiliate ?? null,
       seller: result.seller ?? null,
       showroom: result.showroom ?? null,
+      isActive: result.showroom?.is_active !== false,
     };
 
     publicContextState.setAffiliate(affiliate);
@@ -181,6 +207,7 @@ export const publicContextService = {
       contactWhatsapp: result.contact_whatsapp ?? result?.showroom?.phone_number ?? result?.seller?.phone_number ?? "",
       seller: result.seller ?? null,
       showroom: result.showroom ?? null,
+      isActive: result.showroom?.is_active !== false,
     };
 
     publicContextState.setShowroom(showroom);

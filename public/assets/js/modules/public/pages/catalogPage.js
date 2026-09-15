@@ -14,6 +14,7 @@ import { publicCatalogService } from "../services/publicCatalogService.js";
 import { publicCarDetailPreloadService } from "../services/publicCarDetailPreloadService.js";
 import { publicAffiliateTrackingService } from "../services/publicAffiliateTrackingService.js";
 import { publicContextService } from "../services/publicContextService.js";
+import { MaintenancePage } from "./maintenancePage.js";
 import { publicCatalogState } from "../state/publicCatalogState.js";
 import { PublicAffiliateContextBanner } from "../components/publicAffiliateContextBanner.js";
 import { PublicCarCard } from "../components/publicCarCard.js";
@@ -134,6 +135,15 @@ function render(root, context, flags) {
   const invalidAffiliateRoute = isAffiliateRoute && publicContextService.invalidSlug() === affiliateSlug;
   const invalidShowroomRoute = isShowroomRoute && publicContextService.invalidSlug() === showroomSlug;
   const activeContext = affiliate || showroom;
+
+  if (isAffiliateRoute || isShowroomRoute) {
+    const maintenance = publicContextService.inactiveShowroomContext();
+    if (maintenance.isInactive) {
+      root.replaceChildren(MaintenancePage({ showroomName: maintenance.showroomName }));
+      return;
+    }
+  }
+
   const catalogState = publicCatalogState.get();
   const filters = catalogState.filters ?? {};
   const catalogScope = {

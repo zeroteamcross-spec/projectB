@@ -68,6 +68,7 @@ class UserRepository
                     subscription_payment_status, subscription_proof_path, subscription_proof_note,
                     subscription_proof_submitted_at, subscription_confirmed_at, subscription_confirmed_by,
                     subscription_rejected_at, subscription_rejected_reason,
+                    is_active, deactivated_reason, deactivated_at,
                     created_at, updated_at
              FROM showrooms
              WHERE user_id = :user_id

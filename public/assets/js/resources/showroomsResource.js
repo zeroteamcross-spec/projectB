@@ -40,6 +40,16 @@ export const showroomsResource = {
     return response.data?.showroom ?? null;
   },
 
+  async deactivate(showroomId, reason, options = {}) {
+    const response = await apiClient.post(`/showrooms/${encodeURIComponent(showroomId)}/deactivate`, { reason }, options);
+    return response.data?.showroom ?? null;
+  },
+
+  async activate(showroomId, options = {}) {
+    const response = await apiClient.post(`/showrooms/${encodeURIComponent(showroomId)}/activate`, {}, options);
+    return response.data?.showroom ?? null;
+  },
+
   async confirmSubscriptionPayment(showroomId, options = {}) {
     const response = await apiClient.post(`/showrooms/${encodeURIComponent(showroomId)}/subscription/confirm`, {}, options);
     return response.data?.showroom ?? null;

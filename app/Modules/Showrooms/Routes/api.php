@@ -29,6 +29,8 @@ return static function (Router $router): void {
         $router->post('/me/subscription/proof', [ShowroomController::class, 'submitSubscriptionProof']);
         $router->post('/me/subscription/midtrans/charge', [ShowroomController::class, 'createSubscriptionMidtransPayment']);
         $router->get('/me/subscription/history', [ShowroomController::class, 'subscriptionHistory']);
+        $router->post('/{id}/deactivate', [ShowroomController::class, 'deactivate']);
+        $router->post('/{id}/activate', [ShowroomController::class, 'activate']);
         $router->post('/{id}/subscription/confirm', [ShowroomController::class, 'confirmSubscriptionPayment']);
         $router->post('/{id}/subscription/reject', [ShowroomController::class, 'rejectSubscriptionPayment']);
         $router->get('/{id}/subscription/history', [ShowroomController::class, 'subscriptionHistoryForAdmin']);

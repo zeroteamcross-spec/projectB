@@ -28,6 +28,7 @@ class ShowroomRepository
                     bank_type, bank_account_name, icon_url, header_logo_url, tab_title,
                     selected_plan_name, selected_plan_price, selected_plan_billing_period, selected_plan_selected_at,
                     ' . self::SUBSCRIPTION_COLUMNS . ',
+                    is_active, deactivated_reason, deactivated_at, deactivated_by,
                     created_at, updated_at
              FROM showrooms
              WHERE id = :id
@@ -47,6 +48,7 @@ class ShowroomRepository
                     bank_type, bank_account_name, icon_url, header_logo_url, tab_title,
                     selected_plan_name, selected_plan_price, selected_plan_billing_period, selected_plan_selected_at,
                     ' . self::SUBSCRIPTION_COLUMNS . ',
+                    is_active, deactivated_reason, deactivated_at, deactivated_by,
                     created_at, updated_at
              FROM showrooms
              WHERE user_id = :user_id
@@ -59,11 +61,17 @@ class ShowroomRepository
         return $showroom ?: null;
     }
 
+    /**
+     * Dipakai halaman showroom publik -- is_active DISERTAKAN (supaya
+     * frontend bisa mengarahkan ke halaman maintenance) tapi
+     * deactivated_reason SENGAJA TIDAK, itu catatan internal admin, bukan
+     * untuk dibaca buyer.
+     */
     public function findPublicContextBySlug(string $slug): ?array
     {
         $stmt = $this->pdo->prepare(
             'SELECT sh.id, sh.user_id, sh.slug, sh.name, sh.address, sh.city_name, sh.phone_number,
-                    sh.icon_url, sh.header_logo_url, sh.tab_title,
+                    sh.icon_url, sh.header_logo_url, sh.tab_title, sh.is_active,
                     u.name AS seller_name, u.email AS seller_email, u.phone_number AS seller_phone_number
              FROM showrooms AS sh
              INNER JOIN users AS u ON u.id = sh.user_id
@@ -424,6 +432,34 @@ class ShowroomRepository
             'decided_by' => $data['decided_by'] ?? null,
             'rejected_reason' => $data['rejected_reason'] ?? null,
             'created_at' => $data['created_at'],
+        ]);
+    }
+
+    /**
+     * Menonaktifkan/mengaktifkan kembali showroom -- $reason cuma dipakai
+     * saat menonaktifkan (dikosongkan lagi otomatis saat diaktifkan, supaya
+     * catatan lama tidak nyangkut seolah-olah masih berlaku).
+     */
+    public function updateActivation(int $id, bool $isActive, ?string $reason, ?int $actorUserId, string $updatedAt): void
+    {
+        $stmt = $this->pdo->prepare(
+            'UPDATE showrooms
+             SET is_active = :is_active,
+                 deactivated_reason = :deactivated_reason,
+                 deactivated_at = :deactivated_at,
+                 deactivated_by = :deactivated_by,
+                 updated_at = :updated_at
+             WHERE id = :id
+             AND deleted_at IS NULL'
+        );
+
+        $stmt->execute([
+            'id' => $id,
+            'is_active' => $isActive ? 1 : 0,
+            'deactivated_reason' => $isActive ? null : $reason,
+            'deactivated_at' => $isActive ? null : $updatedAt,
+            'deactivated_by' => $isActive ? null : $actorUserId,
+            'updated_at' => $updatedAt,
         ]);
     }
 
