@@ -49,7 +49,7 @@ export function PaymentStatusPage() {
   return createPageLifecycle({
     mount(context) {
       root = document.createElement("div");
-      root.className = "grid gap-6";
+      root.className = "grid gap-6 pb-28 sm:pb-6";
       scrollToPageTop();
       render(root, context, flags);
       syncAutoStatusPolling(context, flags, poller);
