@@ -21,6 +21,8 @@ export function AdminUsersPage() {
     activeUserId: null,
     approvingUserId: null,
     togglingShowroomId: null,
+    confirmDeactivateUserId: null,
+    deactivateReasonDraft: "",
     closingDetail: false,
     query: createUsersQuery(),
     error: "",
@@ -101,28 +103,44 @@ export function AdminUsersPage() {
       }
     },
     deactivateShowroom(user) {
-      openDeactivateShowroomModal({
-        user,
-        onConfirm: async (reason) => {
-          state.togglingShowroomId = user.showroom.id;
-          state.error = "";
-          rerender();
+      // Cuma membuka langkah konfirmasi -- API baru dipanggil dari
+      // confirmDeactivateShowroom(). Disimpan sebagai state halaman (bukan
+      // openModal() langsung dari sini) supaya modalnya ikut siklus render()
+      // yang sama dengan modal "Review user" -- kalau tidak, openModal() di
+      // sini memicu appStore berubah, usersPage.js re-render karena
+      // subscribe-nya, dan render() itu SELALU membuka ulang modal review
+      // ketika shouldOpenDetailModal true, langsung menimpa modal konfirmasi
+      // yang baru saja terbuka.
+      state.confirmDeactivateUserId = user.id;
+      state.deactivateReasonDraft = "";
+      rerender();
+    },
+    updateDeactivateReasonDraft(value) {
+      state.deactivateReasonDraft = value;
+    },
+    cancelDeactivateShowroom() {
+      state.confirmDeactivateUserId = null;
+      rerender();
+    },
+    async confirmDeactivateShowroom(user, reason) {
+      state.togglingShowroomId = user.showroom.id;
+      state.error = "";
+      rerender();
 
-          try {
-            await showroomsResource.deactivate(user.showroom.id, reason);
-            showToast(`Showroom ${user.showroom.name || ""} berhasil dinonaktifkan.`, { type: "success" });
-            await refreshWorkingState(currentContext);
-            rerender();
-          } catch (error) {
-            state.error = error.message || "Gagal menonaktifkan showroom.";
-            showToast(state.error, { type: "error" });
-            throw error;
-          } finally {
-            state.togglingShowroomId = null;
-            rerender();
-          }
-        },
-      });
+      try {
+        await showroomsResource.deactivate(user.showroom.id, reason);
+        showToast(`Showroom ${user.showroom.name || ""} berhasil dinonaktifkan.`, { type: "success" });
+        state.confirmDeactivateUserId = null;
+        await refreshWorkingState(currentContext);
+        rerender();
+      } catch (error) {
+        state.error = error.message || "Gagal menonaktifkan showroom.";
+        showToast(state.error, { type: "error" });
+        throw error;
+      } finally {
+        state.togglingShowroomId = null;
+        rerender();
+      }
     },
     async activateShowroom(user) {
       state.togglingShowroomId = user.showroom.id;
@@ -298,7 +316,37 @@ function render(root, context, state, actions) {
   layout.append(main);
   root.replaceChildren(layout);
 
-  if (shouldOpenDetailModal) {
+  const isConfirmingDeactivate = shouldOpenDetailModal
+    && selectedUser
+    && state.confirmDeactivateUserId === selectedUser.id;
+
+  if (isConfirmingDeactivate) {
+    // Modal ini SENGAJA bagian dari render() yang sama dengan modal review
+    // (bukan openModal() berdiri sendiri dipanggil dari actions.*) -- kalau
+    // dipanggil terpisah, ui.modal di appStore berubah, usersPage.js
+    // re-render lewat subscribe di bawah, lalu blok shouldOpenDetailModal
+    // selalu membuka ulang modal review dan langsung menimpa modal
+    // konfirmasi yang baru saja terbuka.
+    openModal(deactivateShowroomConfirmForm({
+      user: selectedUser,
+      processing: state.togglingShowroomId === selectedUser.showroom?.id,
+      reasonValue: state.deactivateReasonDraft,
+      onReasonChange: (value) => actions.updateDeactivateReasonDraft(value),
+      onCancel: () => actions.cancelDeactivateShowroom(),
+      onSubmit: (reason) => actions.confirmDeactivateShowroom(selectedUser, reason),
+    }), {
+      key: `adusr-deactivate-confirm-${selectedUser.id}`,
+      title: "Konfirmasi Nonaktifkan Showroom",
+      description: "Tindakan ini bisa dibatalkan lagi kapan saja lewat tombol Aktifkan Showroom.",
+      size: "lg",
+      footer: null,
+      panelId: "adusr_deactivate_showroom_modal",
+      headerId: "adusr_deactivate_showroom_modal_header",
+      bodyId: "adusr_deactivate_showroom_modal_body",
+      closeButtonId: "adusr_deactivate_showroom_modal_close_button",
+      onClose: () => actions.cancelDeactivateShowroom(),
+    });
+  } else if (shouldOpenDetailModal) {
     openModal(applyDesignHook(AdminUserDetailPanel({
       user: selectedUser,
       isHydrating: Boolean(filters.userId && !detailHydratedAt && !selectedUser),
@@ -327,7 +375,7 @@ function render(root, context, state, actions) {
       state.closingDetail = false;
     }
     const activeModal = appStore.get("ui.modal", null);
-    if (String(activeModal?.key ?? "").startsWith("adusr-detail-")) {
+    if (String(activeModal?.key ?? "").startsWith("adusr-detail-") || String(activeModal?.key ?? "").startsWith("adusr-deactivate-confirm-")) {
       closeModal({ notify: false });
     }
   }
@@ -491,95 +539,67 @@ async function hydrateUserDetail(userId) {
   }, "admin-users:detail-hydrated");
 }
 
-function openDeactivateShowroomModal({ user, onConfirm }) {
-  let processing = false;
-  let mounted = true;
-  const draft = { reason: "" };
+/**
+ * Fungsi render murni (bukan pemilik state/openModal sendiri) -- dipanggil
+ * ulang dari render() halaman setiap kali state.deactivateReasonDraft atau
+ * state.togglingShowroomId berubah, supaya modal ini ikut siklus reaktif
+ * yang sama dengan modal "Review user" alih-alih bersaing dengannya.
+ */
+function deactivateShowroomConfirmForm({ user, processing, reasonValue, onReasonChange, onCancel, onSubmit }) {
   const showroomName = user.showroom?.name || `Showroom #${user.showroom?.id ?? "-"}`;
 
-  const renderModal = () => {
-    const form = document.createElement("form");
-    form.className = "grid min-w-0 gap-4";
-    form.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const reason = draft.reason.trim();
-      if (reason.length < 5) {
-        showToast("Alasan menonaktifkan showroom minimal 5 karakter.", { type: "error" });
-        return;
-      }
+  const form = document.createElement("form");
+  form.className = "grid min-w-0 gap-4";
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const reason = reasonValue.trim();
+    if (reason.length < 5) {
+      showToast("Alasan menonaktifkan showroom minimal 5 karakter.", { type: "error" });
+      return;
+    }
 
-      processing = true;
-      renderModal();
+    onSubmit?.(reason);
+  });
 
-      try {
-        await onConfirm?.(reason);
-        mounted = false;
-        closeModal({ notify: false });
-      } catch (error) {
-        processing = false;
-        if (mounted) {
-          renderModal();
-        }
-      }
-    });
+  const note = document.createElement("div");
+  note.className = "grid gap-2 rounded-2xl border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-xs text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
+  note.append(
+    textNode("strong", "break-words", `Nonaktifkan ${showroomName}`),
+    textNode("p", "break-words text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]", "Halaman showroom publik dan katalog mobilnya akan menampilkan halaman maintenance ke buyer. Seller tetap bisa masuk ke dashboard untuk melihat alasan ini."),
+  );
 
-    const note = document.createElement("div");
-    note.className = "grid gap-2 rounded-2xl border border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] px-4 py-3 text-xs text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
-    note.append(
-      textNode("strong", "break-words", `Nonaktifkan ${showroomName}`),
-      textNode("p", "break-words text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]", "Halaman showroom publik dan katalog mobilnya akan menampilkan halaman maintenance ke buyer. Seller tetap bisa masuk ke dashboard untuk melihat alasan ini."),
-    );
+  const reasonField = document.createElement("label");
+  reasonField.className = "grid min-w-0 gap-1 text-xs font-bold text-[var(--pb-text-strong)]";
+  const textarea = document.createElement("textarea");
+  textarea.id = "adusr_deactivate_showroom_reason_input";
+  textarea.rows = 3;
+  textarea.value = reasonValue;
+  textarea.disabled = processing;
+  textarea.placeholder = "Mis. menunggak pembayaran paket, melanggar aturan platform, dsb.";
+  textarea.className = "min-h-24 w-full resize-y rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-xs font-semibold text-[var(--pb-text)] outline-none focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)] disabled:opacity-60";
+  textarea.addEventListener("input", () => onReasonChange?.(textarea.value));
+  reasonField.append(textNode("span", "", "Alasan (wajib)"), textarea);
 
-    const reasonField = document.createElement("label");
-    reasonField.className = "grid min-w-0 gap-1 text-xs font-bold text-[var(--pb-text-strong)]";
-    const textarea = document.createElement("textarea");
-    textarea.id = "adusr_deactivate_showroom_reason_input";
-    textarea.rows = 3;
-    textarea.value = draft.reason;
-    textarea.disabled = processing;
-    textarea.placeholder = "Mis. menunggak pembayaran paket, melanggar aturan platform, dsb.";
-    textarea.className = "min-h-24 w-full resize-y rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-xs font-semibold text-[var(--pb-text)] outline-none focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)] disabled:opacity-60";
-    textarea.addEventListener("input", () => {
-      draft.reason = textarea.value;
-    });
-    reasonField.append(textNode("span", "", "Alasan (wajib)"), textarea);
+  const actions = document.createElement("section");
+  actions.className = "flex flex-col-reverse gap-2 border-t border-[var(--pb-border)] pt-4 sm:flex-row sm:justify-end";
+  const cancel = Button({
+    label: "Batal",
+    variant: "secondary",
+    disabled: processing,
+    onClick: () => onCancel?.(),
+  });
+  cancel.id = "adusr_deactivate_showroom_cancel_button";
+  const confirm = Button({
+    label: processing ? "Memproses..." : "Nonaktifkan Showroom",
+    disabled: processing,
+  });
+  confirm.type = "submit";
+  confirm.id = "adusr_deactivate_showroom_confirm_button";
 
-    const actions = document.createElement("section");
-    actions.className = "flex flex-col-reverse gap-2 border-t border-[var(--pb-border)] pt-4 sm:flex-row sm:justify-end";
-    const cancel = Button({
-      label: "Batal",
-      variant: "secondary",
-      disabled: processing,
-      onClick: () => {
-        mounted = false;
-        closeModal({ notify: false });
-      },
-    });
-    cancel.id = "adusr_deactivate_showroom_cancel_button";
-    const confirm = Button({
-      label: processing ? "Memproses..." : "Nonaktifkan Showroom",
-      disabled: processing,
-    });
-    confirm.type = "submit";
-    confirm.id = "adusr_deactivate_showroom_confirm_button";
+  actions.append(cancel, confirm);
+  form.append(note, reasonField, actions);
 
-    actions.append(cancel, confirm);
-    form.append(note, reasonField, actions);
-
-    openModal(form, {
-      key: "admin-deactivate-showroom-confirm",
-      title: "Konfirmasi Nonaktifkan Showroom",
-      description: "Tindakan ini bisa dibatalkan lagi kapan saja lewat tombol Aktifkan Showroom.",
-      size: "lg",
-      footer: null,
-      panelId: "adusr_deactivate_showroom_modal",
-      headerId: "adusr_deactivate_showroom_modal_header",
-      bodyId: "adusr_deactivate_showroom_modal_body",
-      closeButtonId: "adusr_deactivate_showroom_modal_close_button",
-    });
-  };
-
-  renderModal();
+  return form;
 }
 
 function openImpersonationModal({ user, onConfirm }) {
