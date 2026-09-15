@@ -11,7 +11,7 @@ import { navigateTo } from "../core/router.js";
 
 export function header(store) {
   const node = document.createElement("header");
-  node.className = `${tw.layout.header} relative z-[79] overflow-visible`;
+  node.className = `${tw.layout.header} relative z-[79] overflow-visible shrink-0`;
   applyDesignHook(node, "shell.app.header");
 
   const topRow = document.createElement("div");

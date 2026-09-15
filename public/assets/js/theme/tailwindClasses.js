@@ -33,7 +33,14 @@ export const tw = {
     navLink: "flex min-w-0 items-center gap-3 rounded-[var(--pb-radius-xl)] px-3 py-2.5 text-xs font-semibold text-[var(--pb-shell-nav-text)] no-underline transition hover:bg-white/12 focus:outline-none focus:ring-2 focus:ring-white/40",
     navLinkActive: "bg-[var(--pb-shell-nav-active)] shadow-[var(--pb-shadow-soft)] ring-1 ring-white/10",
     navIcon: "h-4 w-4 shrink-0",
-    main: "grid min-w-0 grid-rows-[auto_1fr] bg-[var(--pb-page-bg)]",
+    // Dulu "grid grid-rows-[auto_1fr]" -- tapi anak main ada 4 (header, banner
+    // impersonation, alert host, konten) sementara template cuma 2 baris,
+    // jadi baris "1fr" jatuh ke alert host yang biasanya kosong, bukan ke
+    // konten. Akibatnya di halaman berkonten pendek muncul jarak kosong besar
+    // sebelum konten (baru kelihatan kalau kontennya pendek, makanya lolos
+    // lama). Flex column + content pakai flex-1 membuat sisa ruang selalu
+    // jatuh ke konten, apa pun jumlah baris opsional (banner/alert) di atasnya.
+    main: "flex min-w-0 flex-col bg-[var(--pb-page-bg)]",
     header: "flex min-h-16 min-w-0 items-center justify-between gap-3 border-b border-[var(--pb-border)] bg-[var(--pb-shell-app-header)] px-4 py-3 text-[var(--pb-text)] shadow-[var(--pb-shadow-soft)] backdrop-blur md:px-6 xl:px-8",
     pageFrame: "relative mx-auto grid min-w-0 w-full max-w-[1240px] gap-[var(--pb-space-xl)] overflow-x-clip px-[var(--pb-page-x)] py-[var(--pb-page-y)] xl:max-w-[1320px] xl:px-8 2xl:max-w-[1400px]",
     publicRoot: "min-h-screen bg-[linear-gradient(180deg,var(--pb-public-canvas-start),var(--pb-public-canvas-mid),var(--pb-public-canvas-end))] text-[var(--pb-text)]",

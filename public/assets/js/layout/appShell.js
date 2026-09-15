@@ -14,7 +14,10 @@ export class AppShell {
     this.store = store;
     this.root = null;
     this.content = pageFrame();
-    this.defaultContentClassName = this.content.className;
+    // main sekarang flex column (lihat syncBuyerShell/tw.layout.main) supaya
+    // sisa ruang vertikal selalu jatuh ke konten, bukan ke banner/alert host
+    // yang opsional -- flex-1 di sini yang mewujudkannya.
+    this.defaultContentClassName = `${this.content.className} flex-1`;
     this.sidebarNode = null;
     this.mobileSidebarNode = null;
     this.mobileSidebarContentNode = null;
@@ -24,11 +27,11 @@ export class AppShell {
     this.mainNode = null;
     this.backgroundVideoNode = null;
     this.alertHost = document.createElement("div");
-    this.alertHost.className = "px-4 pt-4 md:px-6";
+    this.alertHost.className = "px-4 pt-4 md:px-6 shrink-0";
     this.defaultAlertHostClassName = this.alertHost.className;
     this.bannerHost = document.createElement("div");
     this.bannerHost.id = "app_impersonation_banner_host";
-    this.bannerHost.className = "px-4 pt-4 md:px-6 hidden";
+    this.bannerHost.className = "px-4 pt-4 md:px-6 hidden shrink-0";
     this.unsubscribe = null;
   }
 
@@ -132,7 +135,7 @@ export class AppShell {
     }
     if (this.mainNode) {
       this.mainNode.className = isAccountShell
-        ? "relative z-10 grid min-w-0 grid-rows-[auto_1fr] bg-transparent"
+        ? "relative z-10 flex min-w-0 flex-col bg-transparent"
         : `${tw.layout.main} ${tw.layout.contentBackdrop}`;
     }
 
@@ -140,9 +143,9 @@ export class AppShell {
     this.sidebarNode.style.display = hasSidebarShell ? "" : "none";
     this.sidebarNode.setAttribute("aria-hidden", hasSidebarShell ? "false" : "true");
     this.content.className = isAccountShell
-      ? "pb-bgv-buyer-content relative mx-auto grid min-w-0 w-full max-w-[1180px] gap-[var(--pb-space-xl)] overflow-x-clip px-3 py-4 pb-28 sm:px-5 md:px-6 md:py-6 md:pb-8 xl:px-8"
+      ? "pb-bgv-buyer-content relative mx-auto grid min-w-0 w-full max-w-[1180px] flex-1 gap-[var(--pb-space-xl)] overflow-x-clip px-3 py-4 pb-28 sm:px-5 md:px-6 md:py-6 md:pb-8 xl:px-8"
       : isSuperAdminTool
-        ? "relative mx-auto grid min-w-0 w-full max-w-[1240px] gap-[var(--pb-space-xl)] overflow-x-clip px-[var(--pb-page-x)] pb-[var(--pb-page-y)] xl:max-w-[1320px] xl:px-8 2xl:max-w-[1400px]"
+        ? "relative mx-auto grid min-w-0 w-full max-w-[1240px] flex-1 gap-[var(--pb-space-xl)] overflow-x-clip px-[var(--pb-page-x)] pb-[var(--pb-page-y)] xl:max-w-[1320px] xl:px-8 2xl:max-w-[1400px]"
       : this.defaultContentClassName;
     this.content.style.paddingTop = isAccountShell ? "" : isSuperAdminTool ? "0.75rem" : "";
     if (this.headerNode) {
@@ -151,11 +154,11 @@ export class AppShell {
       this.headerNode.setAttribute("aria-hidden", isAccountShell ? "true" : "false");
     }
     this.alertHost.className = isAccountShell
-      ? "px-3 pt-3 sm:px-5 md:px-6"
+      ? "px-3 pt-3 sm:px-5 md:px-6 shrink-0"
       : isSuperAdminTool && !this.store?.get("app.routeHydrateError", null)
-        ? "hidden"
+        ? "hidden shrink-0"
         : isSuperAdminTool
-          ? "px-4 pt-2 md:px-6"
+          ? "px-4 pt-2 md:px-6 shrink-0"
           : this.defaultAlertHostClassName;
 
     if (!hasSidebarShell && this.store?.get("ui.sidebarOpen", false)) {
