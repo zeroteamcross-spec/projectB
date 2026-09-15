@@ -5,7 +5,11 @@ const BASE = "runtime.transactionEntry";
 const DEFAULT_FORM = {
   payment_type: "dp",
   dp_amount: "",
-  payment_method: "bca_va",
+  // Metode default HARUS salah satu yang benar-benar ditampilkan (lihat
+  // filter di transactionEntryForm.js) -- "bca_va" disembunyikan tapi
+  // dipertahankan kodenya, jadi kalau tetap jadi default di sini, radio
+  // card yang tampil (manual_transfer) tidak pernah ke-checked lebih dulu.
+  payment_method: "manual_transfer",
 };
 
 export const transactionEntryState = {

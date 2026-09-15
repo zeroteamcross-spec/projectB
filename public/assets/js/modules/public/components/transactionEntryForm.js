@@ -34,7 +34,7 @@ export function TransactionEntryForm({
   // ada lagi pilihan tipe pembayaran maupun input nominal.
   node.append(
     bookingFeeBlock(car),
-    paymentMethodBlock(form.payment_method ?? "bca_va", onChange)
+    paymentMethodBlock(form.payment_method ?? "manual_transfer", onChange)
   );
 
   if (error) {
@@ -110,10 +110,12 @@ function paymentMethodBlock(value, onChange) {
 
   const grid = document.createElement("div");
   grid.className = "grid grid-cols-1 gap-2";
-  // Gopay dan QRIS sengaja disembunyikan dari pilihan; provider-nya masih
-  // dipertahankan di paymentMethodSupport.js untuk transaksi lama yang sudah
-  // memakainya.
-  PAYMENT_METHOD_OPTIONS.filter((option) => option.value !== "gopay" && option.value !== "qris").forEach((option) => {
+  // Gopay, QRIS, dan BCA Virtual Account (Midtrans) sengaja disembunyikan
+  // dari pilihan buyer atas permintaan -- provider-nya TETAP dipertahankan
+  // utuh di paymentMethodSupport.js (bukan dihapus) supaya bisa dipakai lagi
+  // begitu dibutuhkan, dan transaksi lama yang sudah memakai salah satunya
+  // tidak terpengaruh sama sekali.
+  PAYMENT_METHOD_OPTIONS.filter((option) => ! ["gopay", "qris", "bca_va"].includes(option.value)).forEach((option) => {
     const card = radioCard("payment_method", option.value, option.label, option.description, value, onChange);
     grid.append(card);
   });

@@ -56,7 +56,10 @@ export function TransactionEntryPage() {
     mount(context) {
       transactionEntryState.ensureForm();
       root = document.createElement("div");
-      root.className = "min-h-screen";
+      // pb-24 di mobile -- sama seperti carDetailPage.js -- supaya tombol
+      // "Buat transaksi" di akhir form tidak ketutupan footer nav bawah yang
+      // fixed. sm:pb-0 karena footer itu cuma tampil di layar sempit.
+      root.className = "min-h-screen pb-24 sm:pb-0";
       render(root, context, getBackgroundVideoLayer);
       publicAffiliateTrackingService.trackCurrentPage();
       return root;
