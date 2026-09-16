@@ -216,9 +216,17 @@ export class AppShell {
     const role = routeRole && routeRole !== "public" ? routeRole : activeRole;
     const hasSidebarShell = this.hasSidebarShell(role, path);
     const open = hasSidebarShell && Boolean(this.store?.get("ui.sidebarOpen", false));
+    // FAB ini z-[90], lebih tinggi dari overlay modal (z-[80] -- lihat
+    // tw.modal.root), jadi kalau tetap tampil saat modal terbuka dia
+    // menutupi (dan mencuri klik dari) tombol apa pun di modal yang
+    // kebetulan jatuh di pojok kanan bawah layar, mis. "Approve user" di
+    // Approval Queue. Modal juga sudah punya tombol close sendiri, jadi
+    // tidak ada gunanya FAB ini tetap terlihat selagi modal terbuka.
+    const modalOpen = Boolean(this.store?.get("ui.modal", null));
+    const showToggle = hasSidebarShell && !modalOpen;
 
-    this.mobileToggleNode.classList.toggle("hidden", !hasSidebarShell);
-    this.mobileToggleNode.classList.toggle("flex", hasSidebarShell);
+    this.mobileToggleNode.classList.toggle("hidden", !showToggle);
+    this.mobileToggleNode.classList.toggle("flex", showToggle);
     this.mobileToggleNode.setAttribute("aria-expanded", open ? "true" : "false");
     this.mobileToggleNode.setAttribute("aria-label", open ? "Tutup sidebar" : "Buka sidebar");
     this.mobileToggleNode.title = open ? "Tutup sidebar" : "Buka sidebar";
