@@ -131,6 +131,15 @@ class CarService
         $payload['inspection_summary_status'] = $data['inspection_summary_status'] ?? $car['inspection_summary_status'];
         $payload['updated_at'] = date('Y-m-d H:i:s');
 
+        // Jaring pengaman untuk data yang sempat kena bug archive() lama (yang
+        // ikut mengisi deleted_at): begitu status diubah keluar dari
+        // 'archived', pastikan deleted_at ikut dikosongkan lagi -- kalau
+        // tidak, mobilnya tetap tersembunyi dari semua query list meski
+        // listing_status-nya sudah bukan archived lagi.
+        if ($car['listing_status'] === 'archived' && $payload['listing_status'] !== 'archived') {
+            $payload['deleted_at'] = null;
+        }
+
         $this->cars->update($id, $payload);
         $updated = $this->cars->findById($id, true) ?? array_merge($car, $payload, ['id' => $id]);
 

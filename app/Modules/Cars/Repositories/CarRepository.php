@@ -158,16 +158,21 @@ class CarRepository
 
     public function archive(int $id): void
     {
+        // Sengaja TIDAK menyentuh deleted_at -- listing_status = 'archived'
+        // sudah cukup untuk disembunyikan dari katalog publik lewat filter
+        // status di findById()/buildWhere(). deleted_at IS NULL dipakai
+        // sebagai syarat WHERE di semua query list (admin, seller, publik),
+        // jadi kalau ikut diisi di sini mobilnya malah hilang total bahkan
+        // dari daftar admin/seller sendiri -- padahal UI menjanjikan mobil
+        // yang diarsipkan masih bisa dimunculkan lagi lewat form edit.
         $stmt = $this->pdo->prepare(
             "UPDATE cars
-             SET listing_status = 'archived', deleted_at = :deleted_at, updated_at = :updated_at
+             SET listing_status = 'archived', updated_at = :updated_at
              WHERE id = :id"
         );
-        $now = date('Y-m-d H:i:s');
         $stmt->execute([
             'id' => $id,
-            'deleted_at' => $now,
-            'updated_at' => $now,
+            'updated_at' => date('Y-m-d H:i:s'),
         ]);
     }
 
