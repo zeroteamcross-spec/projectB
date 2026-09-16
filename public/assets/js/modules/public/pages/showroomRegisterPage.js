@@ -676,6 +676,20 @@ function paymentPanel(state, actions, context) {
   fileInput.addEventListener("change", (event) => actions.updateProofFile(context, event.target.files?.[0] ?? null));
   fileLabel.append(fileInput);
 
+  // Memilih file men-trigger rerender() penuh, yang membuat <input type=file>
+  // baru -- input file tidak bisa membawa nilai "file terpilih" lintas
+  // re-render (native browser tidak mengizinkan .files diisi ulang lewat
+  // script), jadi labelnya selalu balik ke "No file chosen" walau
+  // state.paymentProofFile-nya benar. Nama file di sini sumbernya dari state,
+  // bukan dari elemen input, jadi konfirmasinya tetap terlihat.
+  if (state.paymentProofFile) {
+    const fileName = document.createElement("p");
+    fileName.id = "shr_register_proof_file_name";
+    fileName.className = "text-[11px] font-medium text-[var(--pb-success)]";
+    fileName.textContent = `File dipilih: ${state.paymentProofFile.name}`;
+    fileLabel.append(fileName);
+  }
+
   const noteLabel = document.createElement("label");
   noteLabel.className = "grid gap-1 text-xs font-semibold text-gray-700";
   noteLabel.textContent = "Catatan (opsional)";

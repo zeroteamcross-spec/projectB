@@ -80,7 +80,11 @@ function galleryCaption(car, count) {
 
   const countChip = document.createElement("div");
   countChip.className = "inline-flex items-center gap-2 rounded-full border border-white/15 bg-[rgba(28,25,23,0.62)] px-3 py-1.5 text-[10px] font-semibold text-white backdrop-blur";
-  countChip.append(createIcon("image", { className: "block h-3.5 w-3.5 leading-none" }), document.createTextNode(`${Math.max(count, 1)} foto`));
+  // Dulu Math.max(count, 1) supaya placeholder ikut terhitung -- tapi itu
+  // bikin mobil TANPA foto sungguhan tetap menampilkan "1 foto", membuat
+  // buyer mengira sudah ada foto padahal yang tampil cuma ilustrasi generik.
+  const countLabel = count > 0 ? `${count} foto` : "Belum ada foto";
+  countChip.append(createIcon("image", { className: "block h-3.5 w-3.5 leading-none" }), document.createTextNode(countLabel));
 
   floating.append(titleChip, countChip);
   return floating;
