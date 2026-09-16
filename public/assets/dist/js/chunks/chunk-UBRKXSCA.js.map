@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../js/utils/formatDate.js"],
+  "sourcesContent": ["export function formatDate(value) {\n  if (!value) {\n    return \"-\";\n  }\n\n  return new Intl.DateTimeFormat(\"id-ID\", {\n    dateStyle: \"medium\",\n    timeStyle: \"short\",\n  }).format(new Date(value));\n}\n"],
+  "mappings": "AAAO,SAASA,EAAWC,EAAO,CAChC,OAAKA,EAIE,IAAI,KAAK,eAAe,QAAS,CACtC,UAAW,SACX,UAAW,OACb,CAAC,EAAE,OAAO,IAAI,KAAKA,CAAK,CAAC,EANhB,GAOX",
+  "names": ["formatDate", "value"]
+}
