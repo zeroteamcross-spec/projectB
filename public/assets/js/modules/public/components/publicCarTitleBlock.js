@@ -1,5 +1,5 @@
 import { Badge } from "../../../ui/primitives/badge.js";
-import { getListingStatusMeta } from "../../../utils/transactionStatus.js";
+import { getListingLockStatus } from "../../../utils/transactionStatus.js";
 
 export function PublicCarTitleBlock({ car } = {}) {
   const section = document.createElement("section");
@@ -7,10 +7,13 @@ export function PublicCarTitleBlock({ car } = {}) {
 
   const statusRow = document.createElement("div");
   statusRow.className = "flex flex-wrap items-center gap-2";
-  const listingMeta = getListingStatusMeta(car?.listing_status ?? "draft");
+  // getListingLockStatus (bukan getListingStatusMeta) supaya label yang
+  // dilihat buyer konsisten dengan badge di kartu katalog ("Terjual", bukan
+  // istilah internal admin "Terjual (Tampil)").
+  const lock = getListingLockStatus({ car });
   statusRow.append(Badge({
-    label: listingMeta.label,
-    variant: listingMeta.variant,
+    label: lock.label,
+    variant: lock.variant,
   }));
 
   if (car?.stock !== null && car?.stock !== undefined) {

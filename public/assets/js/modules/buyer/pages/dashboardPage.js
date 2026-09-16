@@ -1035,7 +1035,9 @@ function normalizeCars(cars) {
 }
 
 function marketableCars(cars = []) {
-  return (Array.isArray(cars) ? cars : []).filter((car) => String(car?.listing_status ?? "").toLowerCase() === "published");
+  // view_sold sengaja ikut ditampilkan (dengan badge "Terjual") -- beda dari
+  // status sold biasa yang memang disembunyikan seperti draft/archived.
+  return (Array.isArray(cars) ? cars : []).filter((car) => ["published", "view_sold"].includes(String(car?.listing_status ?? "").toLowerCase()));
 }
 
 function normalizeTransactions(payload) {

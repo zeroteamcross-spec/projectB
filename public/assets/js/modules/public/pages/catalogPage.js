@@ -991,7 +991,10 @@ function selectedLocations(filters) {
 }
 
 function marketableCars(cars = []) {
-  return (Array.isArray(cars) ? cars : []).filter((car) => String(car?.listing_status ?? "").toLowerCase() === "published");
+  // view_sold sengaja ikut ditampilkan (dengan badge "Terjual") -- itu
+  // tujuannya beda dari status sold biasa yang memang disembunyikan seperti
+  // draft/archived. Lihat komentar CarService::catalog() di backend.
+  return (Array.isArray(cars) ? cars : []).filter((car) => ["published", "view_sold"].includes(String(car?.listing_status ?? "").toLowerCase()));
 }
 
 function effectivePrice(car) {
