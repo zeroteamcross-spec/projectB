@@ -111,12 +111,17 @@ export function bindInternalLinkInterceptor(root = document) {
 }
 
 export class Router {
-  constructor({ outlet, store, preloadManager, bus, notFound = null, guard = null, resolveMissing = null } = {}) {
+  constructor({ outlet, store, preloadManager, bus, notFound = null, guard = null, resolveMissing = null, resolveArea = null } = {}) {
     this.routes = [];
     // Dipanggil bila sebuah path tidak cocok dengan rute mana pun. Dipakai
     // untuk memuat manifest role secara malas, supaya tamu tidak ikut
     // mengunduh graf modul admin, seller, dan marketing.
     this.resolveMissing = resolveMissing;
+    // Dipanggil saat path tidak cocok dengan rute mana pun, untuk mengetahui
+    // area (shell + role) yang seharusnya dipakai, supaya halaman 404 tetap
+    // tampil di dalam shell area tersebut (mis. sidebar admin), bukan jatuh
+    // diam-diam ke shell publik.
+    this.resolveArea = resolveArea;
     this.outletResolver = outlet;
     this.store = store;
     this.preloadManager = preloadManager;
@@ -205,6 +210,8 @@ export class Router {
       return;
     }
 
+    const area = !route ? (this.resolveArea?.(location.path) ?? null) : null;
+
     const context = {
       name: route?.name ?? null,
       path: location.path,
@@ -212,6 +219,7 @@ export class Router {
       query: location.query,
       route,
       requestedRoute,
+      area,
       access,
       store: this.store,
       router: this,
@@ -231,6 +239,12 @@ export class Router {
         shell: route.shell ?? "public",
         role: route.role ?? "public",
         workingStateKey: route.workingStateKey ?? null,
+      } : area ? {
+        name: null,
+        path: location.path,
+        shell: area.shell ?? "app",
+        role: area.role ?? "public",
+        workingStateKey: null,
       } : null,
     }, "route:change");
     this.bus?.emit("route:change", context);
