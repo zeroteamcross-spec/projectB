@@ -38,6 +38,13 @@ export function SellerTransactionsPage() {
     query: { ...DEFAULT_QUERY },
     checklistDraft: {},
     checklistSavingId: null,
+    // Sama seperti flags di transactionDetailPage.js -- modal transaksi di
+    // halaman ini memakai SellerTransactionDetailPanel yang sama, jadi butuh
+    // flag proses yang sama juga supaya tombol Konfirmasi/Tolak/Batalkan/Retur
+    // bisa menampilkan status "memproses" dan tidak diklik dobel.
+    isCancelling: false,
+    isReturning: false,
+    isConfirmingManualTransfer: false,
   };
 
   const rerender = () => render(root, currentContext, state, actions);
@@ -186,6 +193,120 @@ export function SellerTransactionsPage() {
     },
     goDashboard() {
       currentContext?.router?.navigate("/seller");
+    },
+    getFlags() {
+      return state;
+    },
+    async cancelTransaction(transaction) {
+      if (!transaction?.id || state.isCancelling || !canSellerCancel(transaction)) {
+        return;
+      }
+
+      const cancelReason = window.prompt("Alasan pembatalan transaksi", "");
+      if (cancelReason === null) {
+        return;
+      }
+
+      if (!window.confirm("Batalkan transaksi ini? Listing mobil akan kembali published.")) {
+        return;
+      }
+
+      state.isCancelling = true;
+      rerender();
+
+      try {
+        const updated = await sellerTransactionService.cancel(transaction.id, { cancel_reason: cancelReason });
+        if (updated) {
+          syncBusinessTransaction(updated, { primaryRole: "seller", source: "seller-transactions:cancel" });
+        }
+        showToast("Transaksi berhasil dibatalkan.", { type: "success" });
+      } catch (error) {
+        showToast(error.message || "Gagal membatalkan transaksi.", { type: "error" });
+      } finally {
+        state.isCancelling = false;
+        rerender();
+      }
+    },
+    async returnTransaction(transaction) {
+      if (!transaction?.id || state.isReturning || !canSellerReturn(transaction)) {
+        return;
+      }
+
+      const reason = window.prompt("Alasan retur transaksi (minimal 5 karakter)", "");
+      if (reason === null) {
+        return;
+      }
+
+      if (!window.confirm("Retur transaksi ini? Mobil kembali dijual dan komisi marketing dibatalkan.")) {
+        return;
+      }
+
+      state.isReturning = true;
+      rerender();
+
+      try {
+        const updated = await sellerTransactionService.returnTransaction(transaction.id, { return_reason: reason });
+        if (updated) {
+          syncBusinessTransaction(updated, { primaryRole: "seller", source: "seller-transactions:return" });
+        }
+        showToast("Transaksi berhasil diretur.", { type: "success" });
+      } catch (error) {
+        showToast(error.message || "Gagal meretur transaksi.", { type: "error" });
+      } finally {
+        state.isReturning = false;
+        rerender();
+      }
+    },
+    async confirmManualTransfer(transaction) {
+      if (!transaction?.id || state.isConfirmingManualTransfer) {
+        return;
+      }
+
+      if (!window.confirm("Konfirmasi transfer manual ini sudah dicek di mutasi rekening showroom?")) {
+        return;
+      }
+
+      state.isConfirmingManualTransfer = true;
+      rerender();
+
+      try {
+        const updated = await sellerTransactionService.confirmManualTransfer(transaction.id);
+        if (updated) {
+          syncBusinessTransaction(updated, { primaryRole: "seller", source: "seller-transactions:manual-transfer-confirm" });
+        }
+        showToast("Transfer manual berhasil dikonfirmasi.", { type: "success" });
+      } catch (error) {
+        showToast(error.message || "Gagal mengonfirmasi transfer manual.", { type: "error" });
+      } finally {
+        state.isConfirmingManualTransfer = false;
+        rerender();
+      }
+    },
+    async rejectManualTransfer(transaction) {
+      if (!transaction?.id || state.isConfirmingManualTransfer) {
+        return;
+      }
+
+      const reason = window.prompt("Alasan penolakan bukti transfer (minimal 5 karakter)", "");
+      if (reason === null) {
+        return;
+      }
+
+      state.isConfirmingManualTransfer = true;
+      rerender();
+
+      try {
+        const updated = await sellerTransactionService.rejectManualTransfer(transaction.id, reason);
+        if (updated) {
+          syncBusinessTransaction(updated, { primaryRole: "seller", source: "seller-transactions:manual-transfer-reject" });
+        }
+        showToast("Bukti transfer ditolak.", { type: "success" });
+      } catch (error) {
+        showToast(error.message || "Gagal menolak bukti transfer.", { type: "error" });
+      } finally {
+        state.isConfirmingManualTransfer = false;
+        rerender();
+      }
     },
   };
 
@@ -366,7 +487,16 @@ function composeHandoverNotes(notes = "", handoverDate = "") {
   ].filter(Boolean).join("\n");
 }
 
+function canSellerCancel(transaction) {
+  return ["pending_payment", "dp_paid"].includes(String(transaction?.transaction_status ?? "").toLowerCase());
+}
+
+function canSellerReturn(transaction) {
+  return String(transaction?.transaction_status ?? "").toLowerCase() === "dp_paid";
+}
+
 function openTransactionModal({ transaction, actions }) {
+  const flags = actions.getFlags?.() ?? {};
   const content = document.createElement("section");
   content.id = "slrtx_detail_modal_content_section";
   content.className = "grid min-w-0 gap-4 pb-24 sm:pb-4";
@@ -378,6 +508,17 @@ function openTransactionModal({ transaction, actions }) {
     onChecklistNote: (key, notes) => actions.patchChecklist?.(key, { notes }, false),
     onChecklistDate: (key, handoverDate) => actions.patchChecklist?.(key, { handover_date: handoverDate }, false),
     onChecklistSave: () => actions.saveChecklist?.(transaction),
+    // Sebelumnya empat prop ini tidak pernah dikirim ke panel, jadi tombol
+    // Konfirmasi/Tolak/Batalkan/Retur di modal ini render tapi onClick-nya
+    // null -- diklik tidak terjadi apa-apa sama sekali (beda dengan
+    // /seller/transactions/:id yang sudah benar mem-wiring ini).
+    isCancelling: Boolean(flags.isCancelling),
+    onCancel: () => actions.cancelTransaction?.(transaction),
+    isReturning: Boolean(flags.isReturning),
+    onReturn: () => actions.returnTransaction?.(transaction),
+    isConfirmingManualTransfer: Boolean(flags.isConfirmingManualTransfer),
+    onConfirmManualTransfer: () => actions.confirmManualTransfer?.(transaction),
+    onRejectManualTransfer: () => actions.rejectManualTransfer?.(transaction),
   }), "seller.transactions.detail"));
 
   openModal(content, {
