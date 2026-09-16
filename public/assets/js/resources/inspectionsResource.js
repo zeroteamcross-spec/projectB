@@ -32,6 +32,11 @@ export const inspectionsResource = {
     return response.data?.report ?? null;
   },
 
+  async adminByCar(carId, options = {}) {
+    const response = await apiClient.get(`/admin/cars/${encodeURIComponent(carId)}/inspection-report`, options);
+    return response.data?.report ?? null;
+  },
+
   async createReport(carId, payload = {}, options = {}) {
     const response = await apiClient.post(`/cars/${encodeURIComponent(carId)}/inspection-reports`, payload, options);
     return response.data?.report ?? null;

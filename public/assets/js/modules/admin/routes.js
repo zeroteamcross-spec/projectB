@@ -185,7 +185,15 @@ export const adminRoutes = [
         },
         {
           key: "report",
-          loader: ({ params, signal }) => inspectionsResource.byCar(params.id, { signal }).catch(() => null),
+          // byCar() (bukan adminByCar()) memanggil endpoint publik tanpa
+          // middleware auth -- request.user() selalu null di sana, jadi
+          // policy-nya menolak (403) laporan yang belum published, dan admin
+          // yang membuka mobil dengan inspeksi draft selalu melihat form
+          // kosong seolah belum pernah diisi. Risikonya bukan cuma tampilan:
+          // halaman ini menentukan create vs update laporan dari ada/tidaknya
+          // report.id, jadi laporan draft yang "hilang" ini bisa berujung
+          // laporan duplikat kalau admin lanjut mengisi checklist.
+          loader: ({ params, signal }) => inspectionsResource.adminByCar(params.id, { signal }).catch(() => null),
         },
       ],
     },
