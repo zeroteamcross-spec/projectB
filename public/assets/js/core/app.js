@@ -18,6 +18,7 @@ import { bindModal } from "../ui/primitives/modal.js";
 import { bindToastContainer } from "../ui/primitives/toast.js";
 import { showToast } from "../ui/primitives/toast.js";
 import { createRoleGuard } from "./roleGuard.js";
+import { NotFoundPage } from "./pages/notFoundPage.js";
 import { bindDesignStudioPreviewRuntime } from "../theme/designStudioPreviewRuntime.js";
 import { bindDesignStudioStyleLoader } from "../theme/designStudioStyleLoader.js";
 import { bindUniqueControlIds } from "../utils/controlIds.js";
@@ -35,24 +36,28 @@ const MANIFEST_TERTUNDA = [
     kunci: "buyer",
     awalan: ["/buyer"],
     role: ["buyer"],
+    label: "Buyer",
     muat: () => import("../modules/buyer/manifest.js").then((m) => m.buyerManifest),
   },
   {
     kunci: "seller",
     awalan: ["/seller"],
     role: ["seller"],
+    label: "Seller",
     muat: () => import("../modules/seller/manifest.js").then((m) => m.sellerManifest),
   },
   {
     kunci: "admin",
     awalan: ["/admin", "/super-admin"],
     role: ["admin", "super_admin"],
+    label: "Admin",
     muat: () => import("../modules/admin/manifest.js").then((m) => m.adminManifest),
   },
   {
     kunci: "affiliate",
     awalan: ["/affiliate"],
     role: ["affiliate_admin"],
+    label: "Marketing",
     muat: () => import("../modules/affiliate/manifest.js").then((m) => m.affiliateManifest),
   },
   {
@@ -94,9 +99,10 @@ export class ProjectBApp {
       store: appStore,
       preloadManager: this.preloadManager,
       bus: this.bus,
-      notFound: () => publicManifest.pages.notFound(),
+      notFound: (context) => this.renderNotFoundPage(context),
       guard: createRoleGuard({ auth: authStore }),
       resolveMissing: (path) => this.muatManifestUntukPath(path),
+      resolveArea: (path) => this.resolveArea(path),
     });
     this.cleanup = [];
     this.manifestTermuat = new Set();
@@ -118,6 +124,48 @@ export class ProjectBApp {
     }
 
     return this.muatManifest(entri);
+  }
+
+  /**
+   * Menentukan area (shell + role + halaman dashboard) milik sebuah path,
+   * dipakai saat path tidak cocok dengan rute mana pun supaya halaman 404
+   * tetap tampil di dalam shell area tersebut, bukan jatuh ke shell publik.
+   */
+  resolveArea(path) {
+    const jalur = String(path || "");
+    const entri = MANIFEST_TERTUNDA.find((m) => m.label && m.awalan.some(
+      (awalan) => jalur === awalan || jalur.startsWith(`${awalan}/`)
+    ));
+
+    if (!entri) {
+      return null;
+    }
+
+    const homePath = entri.awalan.find(
+      (awalan) => jalur === awalan || jalur.startsWith(`${awalan}/`)
+    ) ?? entri.awalan[0];
+
+    return {
+      shell: "app",
+      role: entri.role[0] ?? "public",
+      label: entri.label,
+      homePath,
+    };
+  }
+
+  renderNotFoundPage(context) {
+    const area = context.area ?? this.resolveArea(context.path);
+
+    if (!area) {
+      return publicManifest.pages.notFound();
+    }
+
+    return NotFoundPage({
+      eyebrow: `Area ${area.label}`,
+      description: `Alamat yang Anda buka tidak tersedia di area ${area.label}.`,
+      backLabel: "Kembali ke dashboard",
+      backPath: area.homePath,
+    });
   }
 
   async muatManifest(entri) {
