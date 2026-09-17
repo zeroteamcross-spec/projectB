@@ -2,11 +2,19 @@ import { currentThemeConfig } from "../../theme/themeRuntime.js";
 import { appStore } from "../../state/store.js";
 import { AuthLandingPage } from "./pages/authLandingPage.js";
 import { PublicCatalogPage } from "./pages/catalogPage.js";
+import { CarlynkLandingPage } from "./pages/carlynkLandingPage.js";
 import { SaasLandingPage } from "./pages/saasLandingPage.js";
 
-export const DEFAULT_LANDING_PAGE = "public.saas-landing";
+export const DEFAULT_LANDING_PAGE = "public.carlynk-landing";
 
 export const LANDING_PAGE_OPTIONS = Object.freeze([
+  {
+    name: "public.carlynk-landing",
+    label: "Landing Carlynk",
+    path: "/carlynk-landing",
+    description: "Halaman marketing Carlynk mengikuti berkas desain, menyasar pemilik showroom.",
+    page: CarlynkLandingPage,
+  },
   {
     name: "public.saas-landing",
     label: "Landing SaaS Jual Beli Mobil",

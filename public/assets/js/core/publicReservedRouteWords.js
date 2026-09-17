@@ -35,6 +35,7 @@ export const publicReservedRoutePrefixes = Object.freeze([
   "s",
   "daftar-showroom",
   "saas-landing",
+  "carlynk-landing",
   "contoh-katalog",
   "health",
   "uploads",

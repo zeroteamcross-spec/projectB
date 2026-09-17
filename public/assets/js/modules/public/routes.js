@@ -1,6 +1,7 @@
 import { PublicCatalogPage } from "./pages/catalogPage.js";
 import { PublicCarDetailPage } from "./pages/carDetailPage.js";
 import { AuthLandingPage } from "./pages/authLandingPage.js";
+import { CarlynkLandingPage } from "./pages/carlynkLandingPage.js";
 import { LandingPageSwitcher } from "./pages/landingPageSwitcher.js";
 import { SaasLandingPage } from "./pages/saasLandingPage.js";
 import { ShowroomRegisterPage } from "./pages/showroomRegisterPage.js";
@@ -320,6 +321,13 @@ export const publicRoutes = [
       context.params.slug,
       context.query?.car_id ? `/transactions/new?car_id=${encodeURIComponent(context.query.car_id)}` : "/transactions/new"
     ),
+    workingStateKey: null,
+  },
+  {
+    name: "public.carlynk-landing",
+    path: "/carlynk-landing",
+    shell: "public",
+    page: CarlynkLandingPage,
     workingStateKey: null,
   },
   {
