@@ -2,10 +2,15 @@
  * Perakit markup landing Carlynk.
  *
  * Tidak ada satu pun kalimat di berkas ini -- semuanya datang dari content.js.
- * Tidak ada pula atribut style="..."; seluruh tampilan diatur styles.js lewat
- * kelas. Keduanya disengaja: landing sebelumnya mencampur kopi, warna, dan
- * struktur di dalam satu string 30 KB, dan mengubah satu kata berarti menyisir
- * tag.
+ * Tampilannya pun seluruhnya diatur styles.js lewat kelas. Keduanya disengaja:
+ * landing sebelumnya mencampur kopi, warna, dan struktur di dalam satu string
+ * 30 KB, dan mengubah satu kata berarti menyisir tag.
+ *
+ * Satu-satunya atribut style di sini menitipkan alamat gambar latar sebagai
+ * variabel --ck-latar, bukan sebagai background-image langsung. Deklarasi
+ * inline mengalahkan stylesheet, jadi background-image inline membuat media
+ * query tidak bisa mematikannya -- itu yang membuat navbar tetap bergambar di
+ * layar 320 px padahal seharusnya putih polos.
  */
 
 import { KONTEN } from "./content.js";
@@ -30,7 +35,7 @@ function nav({ daftar, masuk }) {
   const { logoTeal } = KONTEN.nav;
 
   return `
-<header class="ck-nav" data-nav style="background-image:url('${KONTEN.masalah.latar}')">
+<header class="ck-nav" data-nav style="--ck-latar:url('${KONTEN.masalah.latar}')">
   ${lengkungNav()}
   <div class="ck-lajur ck-nav__isi">
     <a href="#/" aria-label="Carlynk">
@@ -48,16 +53,20 @@ function nav({ daftar, masuk }) {
  * Bidang putih navbar. Tepi kanannya bukan busur tunggal, jadi border-radius
  * tidak cukup.
  *
- * Titik beloknya mengikuti proporsi mendatar dari PDF desain (54% di atas,
- * 60% di bawah), tapi viewBox-nya ditulis pada tinggi navbar jadi -- bukan
- * tinggi pita di PDF. Dengan preserveAspectRatio="none", busur setinggi 278
- * yang dipadatkan ke 104 px kehilangan lengkungnya dan terbaca sebagai garis
- * diagonal.
+ * Koordinatnya hasil melacak batas putih/teal pada gambar desain baris demi
+ * baris, bukan taksiran: sudut membulat kecil di 55,2%, lalu tepinya nyaris
+ * lurus sampai sekitar sepertiga tinggi, baru melebar makin cepat dan
+ * berakhir di 67% lebar. Tebakan sebelumnya membelok terlalu dini dan
+ * berhenti terlalu kiri.
+ *
+ * viewBox-nya memakai proporsi pita desain, dan preserveAspectRatio="none"
+ * membuatnya mengisi navbar berapa pun tingginya. Perbandingan mendatarnya --
+ * yang paling terlihat -- karena itu selalu tepat.
  */
 function lengkungNav() {
   return `
-<svg class="ck-nav__lengkung" viewBox="0 0 1440 104" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-  <path d="M0 14 H766 Q781 14 781 32 C781 62 852 104 923 104 H0 Z" fill="#ffffff"/>
+<svg class="ck-nav__lengkung" viewBox="0 0 2000 126" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+  <path d="M0 17 H1105 Q1125 17 1125 37 C1130 92 1272 126 1352 126 H0 Z" fill="#ffffff"/>
 </svg>`;
 }
 
@@ -85,7 +94,7 @@ function masalah() {
   const slides = m.slides.map((slide) => slide.map(kartuMasalah).join("")).join("|");
 
   return `
-<section class="ck-masalah" style="background-image:url('${m.latar}')">
+<section class="ck-masalah" style="--ck-latar:url('${m.latar}')">
   <div class="ck-lajur">
     <h2 data-reveal>${judul(m.judul)}</h2>
     <p class="ck-masalah__subjudul" data-reveal>${teks(m.subjudul)}</p>
@@ -184,7 +193,7 @@ function partner() {
   const p = KONTEN.partner;
 
   return `
-<section class="ck-partner" style="background-image:url('${p.latar}')">
+<section class="ck-partner" style="--ck-latar:url('${p.latar}')">
   <div class="ck-lajur">
     <div class="ck-partner__label">${teks(p.label)}</div>
     <div class="ck-partner__daftar" data-reveal>
@@ -216,7 +225,7 @@ function footer(rute) {
   const f = KONTEN.footer;
 
   return `
-<footer class="ck-footer" style="background-image:url('${f.latar}')">
+<footer class="ck-footer" style="--ck-latar:url('${f.latar}')">
   <div class="ck-lajur ck-footer__kisi">
     <div>
       <img class="ck-footer__logo" src="${KONTEN.nav.logoPutih}" alt="Carlynk" loading="lazy" width="1412" height="267">

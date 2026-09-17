@@ -97,10 +97,17 @@ body.${KELAS_AKTIF}{background:#f3fafc;overflow-x:clip}
    lebih dulu, tapi tepi kanannya bukan busur tunggal. */
 #carlynk_landing_root .ck-nav{
   position:sticky;top:0;z-index:70;height:var(--ck-nav);
-  background:var(--ck-teal) center/cover no-repeat;
+  background:var(--ck-latar,none) var(--ck-teal) center/cover no-repeat;
   transition:height .28s ease;
 }
-#carlynk_landing_root .ck-nav__lengkung{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+/* Bidang putih berhenti di tepi kanan lajur isi, bukan di tepi layar. Tombol
+   Daftar/Masuk berhenti di situ juga, jadi keduanya tidak pernah bertabrakan
+   berapa pun lebar layarnya -- tanpa aturan ini lengkungnya terus melar dan
+   menelan tombol di layar 1920 px ke atas. */
+#carlynk_landing_root .ck-nav__lengkung{
+  position:absolute;top:0;bottom:0;left:0;right:auto;
+  width:min(100%,calc(50% + var(--ck-lajur) / 2));height:100%;pointer-events:none;
+}
 #carlynk_landing_root .ck-nav__isi{
   position:relative;height:100%;display:flex;align-items:center;justify-content:space-between;gap:24px;
 }
@@ -125,7 +132,7 @@ body.${KELAS_AKTIF}{background:#f3fafc;overflow-x:clip}
 
 /* --- Bagian masalah --------------------------------------------------- */
 #carlynk_landing_root .ck-masalah{
-  position:relative;background:var(--ck-teal) center/cover no-repeat;
+  position:relative;background:var(--ck-latar,none) var(--ck-teal) center/cover no-repeat;
   padding:clamp(52px,6vw,86px) 0 clamp(44px,5vw,72px);color:#fff;
 }
 #carlynk_landing_root .ck-masalah h2{color:#fff;text-align:center;max-width:18em;margin:0 auto}
@@ -215,7 +222,7 @@ body.${KELAS_AKTIF}{background:#f3fafc;overflow-x:clip}
 
 /* --- Partner ---------------------------------------------------------- */
 #carlynk_landing_root .ck-partner{
-  background:var(--ck-emas-band) center/cover no-repeat;
+  background:var(--ck-latar,none) var(--ck-emas-band) center/cover no-repeat;
   padding:clamp(28px,3.4vw,44px) 0;text-align:center;
 }
 #carlynk_landing_root .ck-partner__label{
@@ -243,7 +250,7 @@ body.${KELAS_AKTIF}{background:#f3fafc;overflow-x:clip}
 
 /* --- Footer ----------------------------------------------------------- */
 #carlynk_landing_root .ck-footer{
-  background:var(--ck-teal) center/cover no-repeat;color:#fff;
+  background:var(--ck-latar,none) var(--ck-teal) center/cover no-repeat;color:#fff;
   padding:clamp(34px,4vw,52px) 0;
 }
 #carlynk_landing_root .ck-footer__kisi{
@@ -315,6 +322,10 @@ body.${KELAS_AKTIF}{background:#f3fafc;overflow-x:clip}
 @media (max-width:1024px){
   #carlynk_landing_root{--ck-nav:88px}
   #carlynk_landing_root .ck-nav--kecil{--ck-nav:70px}
+  /* Lengkungnya berakhir di 67% lebar. Di layar menengah itu mulai menyentuh
+     tombol Daftar, jadi bidang putihnya dipersempit -- jalurnya sendiri tidak
+     digambar ulang supaya bentuknya tetap satu sumber. */
+  #carlynk_landing_root .ck-nav__lengkung{width:88%}
   #carlynk_landing_root .ck-hero__kisi{grid-template-columns:1fr;gap:28px}
   #carlynk_landing_root .ck-hero__gambar{max-width:540px;margin:0 auto}
   #carlynk_landing_root .ck-kenapa__kisi{grid-template-columns:1fr;align-items:start}
@@ -327,15 +338,32 @@ body.${KELAS_AKTIF}{background:#f3fafc;overflow-x:clip}
   #carlynk_landing_root .ck-footer__kisi{grid-template-columns:repeat(2,minmax(0,1fr));gap:28px}
 }
 
+/* Di bawah 355 px lengkungnya sudah tidak mungkin: menyeberang dari 56% ke
+   67% lebar butuh 39 px, dan logo beserta dua tombol sudah menghabiskan
+   seluruh baris. Daripada memaksakannya sampai saling tindih, pitanya dibuat
+   putih polos. Tombol Masuk yang tadinya putih di atas teal diberi garis tepi
+   supaya tetap terbaca. */
+@media (max-width:355px){
+  #carlynk_landing_root .ck-nav{background:#fff}
+  #carlynk_landing_root .ck-nav__lengkung{display:none}
+  #carlynk_landing_root .ck-nav__logo{height:22px}
+  #carlynk_landing_root .ck-tombol--putih{border-color:var(--ck-teal-judul)}
+}
+
 @media (max-width:680px){
   #carlynk_landing_root{--ck-nav:72px}
   #carlynk_landing_root .ck-nav--kecil{--ck-nav:62px}
-  /* Belokan lengkungnya ada di 54% lebar. Di layar sempit itu jatuh tepat di
-     bawah tombol Daftar, jadi separuh tombol duduk di putih dan separuh di
-     teal. Bidang putihnya dipersempit, bukan jalurnya yang digambar ulang. */
-  #carlynk_landing_root .ck-nav__lengkung{width:82%;right:auto}
+  /* Lengkungnya memakan 11% lebar untuk menyeberang dari 56% ke 67%. Di 390 px
+     itu 43 px yang tidak boleh ditempati logo maupun tombol, dan ketiganya
+     tidak muat. Jadi di sini bidang putihnya dipersempit, logonya dikecilkan,
+     dan tombolnya dirapatkan -- ketiganya sekaligus. Menyempitkan yang putih
+     saja membuat ekor logo jatuh di atas teal dan hilang, karena warnanya
+     sama. */
+  #carlynk_landing_root .ck-nav__lengkung{width:76%}
+  #carlynk_landing_root .ck-nav__logo{height:clamp(25px,4.4vw,34px)}
+  #carlynk_landing_root .ck-nav__aksi{gap:8px}
   #carlynk_landing_root .ck-lajur{padding:0 18px}
-  #carlynk_landing_root .ck-nav .ck-tombol{padding:11px 18px;font-size:14px}
+  #carlynk_landing_root .ck-nav .ck-tombol{padding:9px 14px;font-size:13px}
   #carlynk_landing_root .ck-korsel__slide{grid-template-columns:1fr;gap:16px}
   #carlynk_landing_root .ck-masalah__kartu{min-height:0}
   #carlynk_landing_root .ck-masalah__kartu p{max-width:58%;padding:22px 20px}
