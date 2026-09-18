@@ -177,7 +177,7 @@ body.${KELAS_AKTIF}{background:#f3fafc;overflow-x:clip}
 }
 #carlynk_landing_root .ck-masalah__kartu p{
   position:relative;z-index:2;padding:30px 30px 30px;max-width:62%;
-  font-size:clamp(14.5px,1.15vw,17px);color:rgba(255,255,255,.92);
+  font-size:clamp(15.5px,1.6vw,19px);color:rgba(255,255,255,.92);
 }
 #carlynk_landing_root .ck-masalah__kartu p b{color:#fff;font-weight:700}
 #carlynk_landing_root .ck-masalah__foto{
@@ -394,7 +394,11 @@ body.${KELAS_AKTIF}{background:#f3fafc;overflow-x:clip}
   #carlynk_landing_root .ck-lajur{padding:0 18px}
   #carlynk_landing_root .ck-nav .ck-tombol{padding:9px 14px;font-size:13px}
   #carlynk_landing_root .ck-korsel__slide{grid-template-columns:1fr;gap:16px}
-  #carlynk_landing_root .ck-masalah__kartu{min-height:0}
+  /* Kartunya menumpuk jadi satu lajur di sini, jadi lebarnya melar dan
+     teksnya cukup dua-tiga baris. Tanpa tinggi minimum kartunya jadi pendek
+     sekali dan fotonya -- yang tingginya mengikuti kartu -- terjepit di pojok.
+     190 px cukup untuk orangnya tetap terbaca. */
+  #carlynk_landing_root .ck-masalah__kartu{min-height:190px}
   #carlynk_landing_root .ck-masalah__kartu p{max-width:58%;padding:22px 20px}
   #carlynk_landing_root .ck-fitur__kartu{gap:16px;padding:18px}
   #carlynk_landing_root .ck-hero__aksi .ck-tombol{flex:1 1 auto}
