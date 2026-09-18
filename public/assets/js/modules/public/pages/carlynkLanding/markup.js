@@ -50,25 +50,26 @@ function nav({ daftar, masuk }) {
 }
 
 /**
- * Bidang putih navbar. Tepi kanannya bukan busur tunggal, jadi border-radius
- * tidak cukup.
+ * Bidang putih navbar: satu kotak rata, lalu satu baji melengkung di ujungnya.
  *
- * Pertemuan tepi atas dengan tepi kanan dibuat siku, bukan dibulatkan --
- * desainnya membulatkannya, tapi diminta lurus. Yang melengkung hanya
- * turunannya: tepi itu jatuh nyaris tegak dari 56,3% lebar, lalu melebar
- * makin cepat dan berakhir di 67,6%.
+ * Dulu keduanya jadi satu SVG yang dibentangkan selebar navbar dengan
+ * preserveAspectRatio="none". Itu salah. Pita di berkas desain jauh lebih
+ * tinggi dibanding lebarnya ketimbang navbar web, jadi lengkungnya ikut
+ * ditarik mendatar dan melarnya kelihatan -- gerak mendatarnya jadi 1,64 kali
+ * tinggi bidang putih, padahal di desain hanya 1,0 kali.
  *
- * Perbandingan mendatarnya hasil melacak batas putih/teal pada gambar desain
- * baris demi baris, bukan taksiran.
+ * Sekarang kotaknya yang melar mengikuti lebar layar, dan bajinya dikunci
+ * pada perbandingan aslinya lewat aspect-ratio di stylesheet. Bentuk
+ * lengkungnya karena itu selalu sama persis, selebar apa pun layarnya.
  *
- * viewBox-nya memakai proporsi pita desain, dan preserveAspectRatio="none"
- * membuatnya mengisi navbar berapa pun tingginya. Perbandingan mendatarnya --
- * yang paling terlihat -- karena itu selalu tepat.
+ * Koordinatnya hasil melacak batas putih/teal pada gambar acuan baris demi
+ * baris. Sudut atasnya siku, bukan dibulatkan.
  */
 function lengkungNav() {
   return `
-<svg class="ck-nav__lengkung" viewBox="0 0 2000 126" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-  <path d="M0 17 H1125 C1130 92 1272 126 1352 126 H0 Z" fill="#ffffff"/>
+<div class="ck-nav__putih" aria-hidden="true"></div>
+<svg class="ck-nav__lengkung" viewBox="0 0 308 318" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+  <path d="M0 0 C12 110 85 315 308 318 H0 Z" fill="#ffffff"/>
 </svg>`;
 }
 
