@@ -87,7 +87,7 @@ function hero({ daftar, demo }) {
         <a class="ck-tombol ck-tombol--abu" href="${demo}">${teks(h.tombolKedua)}</a>
       </div>
     </div>
-    <img class="ck-hero__gambar" src="${h.gambar}" alt="${teks(h.alt)}" width="1017" height="830" fetchpriority="high">
+    <img class="ck-hero__gambar" src="${h.gambar}" alt="${teks(h.alt)}" width="894" height="745" fetchpriority="high">
   </div>
 </section>`;
 }

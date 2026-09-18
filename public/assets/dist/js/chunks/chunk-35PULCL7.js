@@ -92,7 +92,7 @@ import{a as F}from"./chunk-CNKHECVL.js";import{b as ba,c as aa,d as ka,h as ae,i
         <a class="ck-tombol ck-tombol--abu" href="${e}">${f(t.tombolKedua)}</a>
       </div>
     </div>
-    <img class="ck-hero__gambar" src="${t.gambar}" alt="${f(t.alt)}" width="1017" height="830" fetchpriority="high">
+    <img class="ck-hero__gambar" src="${t.gambar}" alt="${f(t.alt)}" width="894" height="745" fetchpriority="high">
   </div>
 </section>`}function jn(){let a=A.masalah,e=a.slides.map(t=>t.map(Ln).join("")).join("|");return`
 <section class="ck-masalah" style="--ck-latar:url('${a.latar}')">
