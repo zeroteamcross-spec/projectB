@@ -79,7 +79,7 @@ import{a as F}from"./chunk-CNKHECVL.js";import{b as be,c as ee,d as ke,h as ea,i
   </div>
 </header>`}function Cn(){return`
 <svg class="ck-nav__lengkung" viewBox="0 0 2000 126" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-  <path d="M0 17 H1105 Q1125 17 1125 37 C1130 92 1272 126 1352 126 H0 Z" fill="#ffffff"/>
+  <path d="M0 17 H1125 C1130 92 1272 126 1352 126 H0 Z" fill="#ffffff"/>
 </svg>`}function Nn({daftar:e,demo:a}){let t=A.hero;return`
 <section class="ck-hero">
   <div class="ck-lajur ck-hero__kisi">

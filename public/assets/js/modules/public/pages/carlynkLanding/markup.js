@@ -53,11 +53,13 @@ function nav({ daftar, masuk }) {
  * Bidang putih navbar. Tepi kanannya bukan busur tunggal, jadi border-radius
  * tidak cukup.
  *
- * Koordinatnya hasil melacak batas putih/teal pada gambar desain baris demi
- * baris, bukan taksiran: sudut membulat kecil di 55,2%, lalu tepinya nyaris
- * lurus sampai sekitar sepertiga tinggi, baru melebar makin cepat dan
- * berakhir di 67% lebar. Tebakan sebelumnya membelok terlalu dini dan
- * berhenti terlalu kiri.
+ * Pertemuan tepi atas dengan tepi kanan dibuat siku, bukan dibulatkan --
+ * desainnya membulatkannya, tapi diminta lurus. Yang melengkung hanya
+ * turunannya: tepi itu jatuh nyaris tegak dari 56,3% lebar, lalu melebar
+ * makin cepat dan berakhir di 67,6%.
+ *
+ * Perbandingan mendatarnya hasil melacak batas putih/teal pada gambar desain
+ * baris demi baris, bukan taksiran.
  *
  * viewBox-nya memakai proporsi pita desain, dan preserveAspectRatio="none"
  * membuatnya mengisi navbar berapa pun tingginya. Perbandingan mendatarnya --
@@ -66,7 +68,7 @@ function nav({ daftar, masuk }) {
 function lengkungNav() {
   return `
 <svg class="ck-nav__lengkung" viewBox="0 0 2000 126" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-  <path d="M0 17 H1105 Q1125 17 1125 37 C1130 92 1272 126 1352 126 H0 Z" fill="#ffffff"/>
+  <path d="M0 17 H1125 C1130 92 1272 126 1352 126 H0 Z" fill="#ffffff"/>
 </svg>`;
 }
 
