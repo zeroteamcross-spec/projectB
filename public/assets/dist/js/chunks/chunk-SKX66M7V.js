@@ -127,7 +127,7 @@ import{a as F}from"./chunk-CNKHECVL.js";import{b as ba,c as aa,d as ka,h as ae,i
   <div class="ck-lajur ck-kenapa__kisi">
     <div class="ck-kenapa__kiri">
       <h2 data-reveal>${f(a.judul)}</h2>
-      <img class="ck-kenapa__foto" src="${a.gambar}" alt="${f(a.alt)}" loading="lazy" width="823" height="1213">
+      <img class="ck-kenapa__foto" src="${a.gambar}" alt="${f(a.alt)}" loading="lazy" width="1000" height="1568">
     </div>
     <ul class="ck-kenapa__poin">
       ${a.poin.map(e=>`

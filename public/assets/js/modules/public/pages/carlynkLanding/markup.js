@@ -150,7 +150,7 @@ function kenapa() {
   <div class="ck-lajur ck-kenapa__kisi">
     <div class="ck-kenapa__kiri">
       <h2 data-reveal>${teks(k.judul)}</h2>
-      <img class="ck-kenapa__foto" src="${k.gambar}" alt="${teks(k.alt)}" loading="lazy" width="823" height="1213">
+      <img class="ck-kenapa__foto" src="${k.gambar}" alt="${teks(k.alt)}" loading="lazy" width="1000" height="1568">
     </div>
     <ul class="ck-kenapa__poin">
       ${k.poin.map((poin) => `
