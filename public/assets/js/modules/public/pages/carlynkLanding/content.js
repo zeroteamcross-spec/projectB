@@ -180,7 +180,7 @@ export const KONTEN = Object.freeze({
  * Tujuan setiap tautan.
  *
  * Yang halamannya sudah ada di aplikasi menunjuk ke rutenya. Sisanya --
- * demo, harga, syarat, dan seterusnya -- belum punya halaman, jadi sementara
+ * harga, syarat, dan seterusnya -- belum punya halaman, jadi sementara
  * diarahkan ke WhatsApp supaya pengunjung tetap mendarat pada manusia, bukan
  * pada rute yang menjawab 404. Ganti nilainya di sini saat halamannya jadi.
  */
@@ -190,7 +190,7 @@ export function bangunRute(tautanWhatsapp = "") {
   return Object.freeze({
     daftar: "#/daftar-showroom",
     masuk: "#/login/seller",
-    demo: wa,
+    demo: "#/contoh-katalog",
     konsultasi: wa,
     tentang: wa,
     fitur: "#fitur",
