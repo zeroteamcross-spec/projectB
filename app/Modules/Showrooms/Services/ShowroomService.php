@@ -35,7 +35,7 @@ class ShowroomService
         'admin', 'super-admin', 'seller', 'buyer', 'affiliate',
         'login', 'google-login', 'auth', 'api', 'cars', 'transactions',
         'profile', 'notifications', 'public', 'showrooms', 'af', 'a', 's',
-        'daftar-showroom', 'saas-landing', 'contoh-katalog', 'health',
+        'daftar-showroom', 'saas-landing', 'carlynk-landing', 'contoh-katalog', 'health',
         'uploads', 'assets', 'tester', 'app',
     ];
 

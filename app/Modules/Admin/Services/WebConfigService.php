@@ -123,13 +123,14 @@ class WebConfigService
             'app_name' => $theme['brand']['appName'] ?? 'BeliMobil',
             'tagline' => $theme['brand']['tagline'] ?? 'Jual beli mobil terpercaya',
             'whatsapp_number' => $theme['contact']['whatsapp'] ?? '',
-            'landing_page_route_name' => $theme['landingPage']['routeName'] ?? 'public.saas-landing',
+            'landing_page_route_name' => $theme['landingPage']['routeName'] ?? 'public.carlynk-landing',
         ];
     }
 
     private function allowedLandingPageRouteNames(): array
     {
         return [
+            'public.carlynk-landing',
             'public.saas-landing',
             'public.catalog-alias',
             'public.auth-landing',
