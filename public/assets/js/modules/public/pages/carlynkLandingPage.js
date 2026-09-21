@@ -77,6 +77,6 @@ export function CarlynkLandingPage() {
 }
 
 function tautanWhatsapp() {
-  const nomor = String(brandConfig.contact?.whatsapp ?? "").replace(/\D/g, "");
+  const nomor = String(brandConfig.contact?.whatsapp ?? "").replace(/\D/g, "").replace(/^0/, "62");
   return nomor ? `https://wa.me/${nomor}` : "";
 }
