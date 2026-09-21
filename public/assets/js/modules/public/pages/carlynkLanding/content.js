@@ -189,7 +189,7 @@ export function bangunRute(tautanWhatsapp = "") {
 
   return Object.freeze({
     daftar: "#/daftar-showroom",
-    masuk: "#/login/seller",
+    masuk: "#/google-login/buyer",
     demo: "#/contoh-katalog",
     konsultasi: wa,
     tentang: wa,
