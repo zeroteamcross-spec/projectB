@@ -184,12 +184,12 @@ export const KONTEN = Object.freeze({
  * diarahkan ke WhatsApp supaya pengunjung tetap mendarat pada manusia, bukan
  * pada rute yang menjawab 404. Ganti nilainya di sini saat halamannya jadi.
  */
-export function bangunRute(tautanWhatsapp = "") {
+export function bangunRute(tautanWhatsapp = "", tautanMasuk = "") {
   const wa = tautanWhatsapp || "#";
 
   return Object.freeze({
     daftar: "#/daftar-showroom",
-    masuk: "#/google-login/buyer",
+    masuk: tautanMasuk || "#/login/seller",
     demo: "#/contoh-katalog",
     konsultasi: wa,
     tentang: wa,

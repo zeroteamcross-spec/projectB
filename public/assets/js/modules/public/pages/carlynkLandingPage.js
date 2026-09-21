@@ -1,4 +1,5 @@
 import { createPageLifecycle } from "../../../core/lifecycle.js";
+import { currentHost, hostForRole } from "../../../core/roleHosts.js";
 import { brandConfig } from "../../../theme/brandConfig.js";
 import { bangunRute } from "./carlynkLanding/content.js";
 import { landingMarkup } from "./carlynkLanding/markup.js";
@@ -23,7 +24,7 @@ export function CarlynkLandingPage() {
       root = document.createElement("div");
       root.id = "carlynk_landing_root";
       root.className = "relative w-full";
-      root.innerHTML = landingMarkup({ rute: bangunRute(tautanWhatsapp()) });
+      root.innerHTML = landingMarkup({ rute: bangunRute(tautanWhatsapp(), tautanLoginShowroom()) });
 
       pasangGaya();
       sembunyikanHeaderShell();
@@ -74,6 +75,13 @@ export function CarlynkLandingPage() {
     headerShell = null;
     tampilanHeaderShell = null;
   }
+}
+
+// Langsung ke subdomain showroom, tanpa singgah di domain utama lalu dialihkan.
+// Tanpa host khusus (satu host saja) tetap memakai rute SPA biasa.
+function tautanLoginShowroom() {
+  const host = hostForRole("seller");
+  return host && host !== currentHost() ? `${window.location.protocol}//${host}/login/seller` : "";
 }
 
 function tautanWhatsapp() {
