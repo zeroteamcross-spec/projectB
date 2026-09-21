@@ -13,6 +13,7 @@ export function pasangInteraksi(akar) {
     pasangReveal(akar),
     pasangNavMenyusut(akar),
     pasangKorsel(akar),
+    pasangTautanAnkor(akar),
   ];
 
   return () => pembersih.splice(0).forEach((bersihkan) => bersihkan?.());
@@ -89,4 +90,35 @@ function pasangNavMenyusut(akar) {
   window.addEventListener("scroll", gulir, { passive: true });
 
   return () => window.removeEventListener("scroll", gulir);
+}
+
+/**
+ * Tautan ke bagian di halaman yang sama (mis. "#fitur").
+ *
+ * Kalau dibiarkan ke peramban, perubahan hash memicu popstate dan router
+ * merender ulang landing dari awal -- gulirnya hilang dan pengunjung tetap di
+ * atas. Jadi digulirkan di sini dan URL tidak disentuh.
+ */
+function pasangTautanAnkor(akar) {
+  const klik = (e) => {
+    const tautan = e.target.closest?.('a[href^="#"]');
+    const id = tautan?.getAttribute("href").slice(1);
+
+    // "#/rute" adalah navigasi SPA, bukan ankor -- itu urusan router.
+    if (!id || id.startsWith("/")) {
+      return;
+    }
+
+    const tujuan = akar.querySelector(`#${CSS.escape(id)}`);
+    if (!tujuan) {
+      return;
+    }
+
+    e.preventDefault();
+    tujuan.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  akar.addEventListener("click", klik);
+
+  return () => akar.removeEventListener("click", klik);
 }
