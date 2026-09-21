@@ -164,7 +164,7 @@ export function ShowroomRegisterPage() {
       }
     },
     goToLogin(context) {
-      context?.router?.navigate("/auth?role=seller");
+      context?.router?.navigate("/login/seller");
     },
     goHome(context) {
       context?.router?.navigate("/");

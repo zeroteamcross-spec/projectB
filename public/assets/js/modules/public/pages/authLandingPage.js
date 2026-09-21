@@ -1,4 +1,5 @@
 import { createPageLifecycle } from "../../../core/lifecycle.js";
+import { roleHosts } from "../../../core/roleHosts.js";
 import { authStore } from "../../../state/authStore.js";
 import { Button } from "../../../ui/primitives/button.js";
 import { createBackgroundVideoLayer } from "../../../ui/composites/backgroundVideo.js";
@@ -32,6 +33,12 @@ const ROLE_OPTIONS = [
     futureCopy: "Aktivitas dan komisi.",
   },
 ];
+
+const SLUG_LOGIN_BERSUBDOMAIN = Object.freeze({
+  seller: "seller",
+  admin: "admin",
+  affiliate_admin: "affiliate",
+});
 
 const SHOW_AUTH_DEBUG_SECTIONS = false;
 const AUTH_FALLBACK = "bg-[radial-gradient(circle_at_12%_10%,color-mix(in_srgb,var(--pb-brand-primary)_18%,transparent),transparent_32%),radial-gradient(circle_at_88%_18%,color-mix(in_srgb,var(--pb-brand-accent)_16%,transparent),transparent_30%),linear-gradient(135deg,#faf4ed,#f8fafc_44%,#eaf4f9)]";
@@ -85,6 +92,14 @@ function render(root, context, state, getBackgroundVideoLayer = null) {
 
   const currentRole = authStore.role();
   const requestedPath = normalizePath(context.query.from);
+
+  // Peran yang punya subdomain sendiri tidak login di sini: langsung ke
+  // subdomainnya, tanpa menggambar form di domain utama dulu.
+  const slugSubdomain = SLUG_LOGIN_BERSUBDOMAIN[state.selectedRole];
+  if (slugSubdomain && !authStore.isAuthenticated() && roleHosts()[slugSubdomain]) {
+    context.router.navigate(`/login/${slugSubdomain}`);
+    return;
+  }
 
   const frame = document.createElement("main");
   frame.id = "hr_auth_frame";
