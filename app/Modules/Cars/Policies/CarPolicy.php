@@ -6,12 +6,13 @@ namespace App\Modules\Cars\Policies;
 
 use App\Core\Exceptions\ForbiddenException;
 use App\Core\Exceptions\NotFoundException;
+use App\Modules\Auth\Policies\StaffAccessPolicy;
 
 class CarPolicy
 {
     public static function requireSeller(array $user): void
     {
-        if (! in_array(($user['role'] ?? null), ['seller', 'super_admin'], true)) {
+        if (! in_array(($user['role'] ?? null), ['seller', 'super_admin', 'seller_staff'], true)) {
             throw new ForbiddenException('Hanya seller yang dapat mengelola mobil seller.');
         }
     }
@@ -25,7 +26,7 @@ class CarPolicy
 
     public static function requireSellerOrAdmin(array $user): void
     {
-        if (! in_array($user['role'] ?? null, ['seller', 'admin', 'super_admin'], true)) {
+        if (! in_array($user['role'] ?? null, ['seller', 'admin', 'super_admin', 'seller_staff'], true)) {
             throw new ForbiddenException('Hanya seller atau admin yang dapat mengelola mobil.');
         }
     }
@@ -40,7 +41,9 @@ class CarPolicy
             return false;
         }
 
-        return in_array($user['role'] ?? null, ['admin', 'super_admin'], true) || (int) $car['seller_user_id'] === (int) $user['id'];
+        return in_array($user['role'] ?? null, ['admin', 'super_admin'], true)
+            || (int) $car['seller_user_id'] === (int) $user['id']
+            || StaffAccessPolicy::staffCanActOnShowroom($user, (int) ($car['showroom_id'] ?? 0));
     }
 
     public static function ensureCanManage(?array $car, array $user): void
@@ -53,8 +56,14 @@ class CarPolicy
             return;
         }
 
-        if (($user['role'] ?? null) !== 'seller' || (int) $car['seller_user_id'] !== (int) $user['id']) {
-            throw new ForbiddenException('Akses pengelolaan mobil tidak diizinkan.');
+        if (($user['role'] ?? null) === 'seller' && (int) $car['seller_user_id'] === (int) $user['id']) {
+            return;
         }
+
+        if (StaffAccessPolicy::staffCanActOnShowroom($user, (int) ($car['showroom_id'] ?? 0))) {
+            return;
+        }
+
+        throw new ForbiddenException('Akses pengelolaan mobil tidak diizinkan.');
     }
 }

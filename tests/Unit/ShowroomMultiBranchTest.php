@@ -105,7 +105,7 @@ class ShowroomMultiBranchTest extends TestCase
             phone_number TEXT NULL, bank_account_number TEXT NULL, bank_type TEXT NULL,
             bank_account_name TEXT NULL, icon_url TEXT NULL, header_logo_url TEXT NULL, tab_title TEXT NULL,
             selected_plan_name TEXT NULL, selected_plan_price REAL NULL, selected_plan_billing_period TEXT NULL,
-            selected_plan_listing_limit INTEGER NULL, selected_plan_allows_multi_branch INTEGER NULL, selected_plan_selected_at TEXT NULL,
+            selected_plan_listing_limit INTEGER NULL, selected_plan_allows_multi_branch INTEGER NULL, selected_plan_staff_limit INTEGER NULL, selected_plan_selected_at TEXT NULL,
             subscription_payment_status TEXT NULL, subscription_proof_path TEXT NULL, subscription_proof_note TEXT NULL,
             subscription_proof_submitted_at TEXT NULL, subscription_confirmed_at TEXT NULL, subscription_confirmed_by INTEGER NULL,
             subscription_rejected_at TEXT NULL, subscription_rejected_reason TEXT NULL, subscription_next_due_at TEXT NULL,

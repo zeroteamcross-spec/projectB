@@ -103,12 +103,14 @@ class InspectionService
 
     public function sellerOverview(array $user, array $filters = []): array
     {
-        if (! in_array(($user['role'] ?? null), ['seller', 'super_admin'], true)) {
+        if (! in_array(($user['role'] ?? null), ['seller', 'super_admin', 'seller_staff'], true)) {
             throw new ForbiddenException('Akses overview inspeksi seller tidak diizinkan.');
         }
 
         $limit = max(1, min((int) ($filters['limit'] ?? 100), 100));
-        $cars = $this->repository->sellerCars((int) $user['id'], $limit);
+        $cars = ($user['role'] ?? null) === 'seller_staff'
+            ? $this->repository->staffCars((int) ($user['staff_showroom_id'] ?? 0), $limit)
+            : $this->repository->sellerCars((int) $user['id'], $limit);
         $carIds = array_map(static fn (array $car): int => (int) $car['id'], $cars);
         $reports = $this->repository->latestReportsByCars($carIds);
         $reportIds = array_map(static fn (array $report): int => (int) $report['id'], $reports);

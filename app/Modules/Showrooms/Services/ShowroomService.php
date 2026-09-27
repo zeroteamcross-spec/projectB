@@ -71,8 +71,10 @@ class ShowroomService
 
     public function mine(array $user): array
     {
-        $this->ensureSeller($user);
-        $showroom = $this->showrooms->findByUserId((int) $user['id']);
+        $this->ensureSellerOrStaff($user);
+        $showroom = ($user['role'] ?? null) === 'seller_staff'
+            ? $this->showrooms->findById((int) ($user['staff_showroom_id'] ?? 0))
+            : $this->showrooms->findByUserId((int) $user['id']);
 
         if (! $showroom) {
             throw new NotFoundException('Showroom belum tersedia.');
@@ -84,11 +86,19 @@ class ShowroomService
     /**
      * Semua cabang milik seller yang sedang login -- dipakai pemilih cabang
      * di frontend. Berbeda dari mine(), yang cuma balik cabang pertama untuk
-     * kompatibilitas mundur.
+     * kompatibilitas mundur. Staf terikat ke satu cabang tertentu, jadi
+     * baginya ini selalu balik maksimal satu elemen -- pemilih cabang di
+     * frontend otomatis sembunyi sendiri untuknya.
      */
     public function mineList(array $user): array
     {
-        $this->ensureSeller($user);
+        $this->ensureSellerOrStaff($user);
+
+        if (($user['role'] ?? null) === 'seller_staff') {
+            $showroom = $this->showrooms->findById((int) ($user['staff_showroom_id'] ?? 0));
+
+            return $showroom ? [$this->serializeShowroom($showroom)] : [];
+        }
 
         return array_map(
             fn (array $showroom): array => $this->serializeShowroom($showroom),
@@ -169,14 +179,14 @@ class ShowroomService
      */
     public function mineById(array $user, int $showroomId): array
     {
-        $this->ensureSeller($user);
+        $this->ensureSellerOrStaff($user);
         $showroom = $this->showrooms->findById($showroomId);
 
         if (! $showroom) {
             throw new NotFoundException('Showroom tidak ditemukan.');
         }
 
-        ShowroomPolicy::ensureOwnedByUser($showroom, $user);
+        ShowroomPolicy::ensureOwnedOrStaffAssigned($showroom, $user);
 
         return $this->serializeShowroom($showroom);
     }
@@ -252,14 +262,22 @@ class ShowroomService
      */
     public function updateBranch(array $user, int $showroomId, array $data): array
     {
-        $this->ensureSeller($user);
+        $this->ensureSellerOrStaff($user);
         $existing = $this->showrooms->findById($showroomId);
 
         if (! $existing) {
             throw new NotFoundException('Showroom tidak ditemukan.');
         }
 
-        ShowroomPolicy::ensureOwnedByUser($existing, $user);
+        ShowroomPolicy::ensureOwnedOrStaffAssigned($existing, $user);
+
+        // Ganti paket adalah keputusan billing pemilik, bukan staf -- meski
+        // staf lolos pengecekan kepemilikan di atas untuk mengedit
+        // profil/branding cabangnya, payload yang menyertakan
+        // selected_plan_name tetap ditolak di sini.
+        if (($user['role'] ?? null) === 'seller_staff' && array_key_exists('selected_plan_name', $data)) {
+            throw new ForbiddenException('Staf tidak dapat mengubah paket langganan.');
+        }
 
         return $this->applyShowroomUpdate($existing, $data);
     }
@@ -1047,6 +1065,19 @@ class ShowroomService
         }
     }
 
+    /**
+     * Sama seperti ensureSeller(), TAPI juga meloloskan staf showroom --
+     * dipakai HANYA di method yang boleh diakses staf (profil/branding
+     * cabangnya, bukan billing/ganti-paket/tambah-cabang). Method billing
+     * tetap memanggil ensureSeller() di atas, tidak pernah method ini.
+     */
+    private function ensureSellerOrStaff(array $user): void
+    {
+        if (! in_array(($user['role'] ?? null), ['seller', 'super_admin', 'seller_staff'], true)) {
+            throw new ForbiddenException('Hanya seller yang dapat mengelola showroom.');
+        }
+    }
+
     private function serializeShowroom(array $showroom): array
     {
         return [
@@ -1068,6 +1099,7 @@ class ShowroomService
             'selected_plan_billing_period' => $showroom['selected_plan_billing_period'] ?? null,
             'selected_plan_listing_limit' => isset($showroom['selected_plan_listing_limit']) ? (int) $showroom['selected_plan_listing_limit'] : null,
             'selected_plan_allows_multi_branch' => (bool) ($showroom['selected_plan_allows_multi_branch'] ?? false),
+            'selected_plan_staff_limit' => (int) ($showroom['selected_plan_staff_limit'] ?? 0),
             'selected_plan_selected_at' => $showroom['selected_plan_selected_at'] ?? null,
             'subscription_payment_status' => $showroom['subscription_payment_status'] ?? 'unpaid',
             'subscription_proof_path' => $showroom['subscription_proof_path'] ?? null,

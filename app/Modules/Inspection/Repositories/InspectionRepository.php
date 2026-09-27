@@ -26,7 +26,7 @@ class InspectionRepository
     public function carOwner(int $carId): ?array
     {
         $stmt = $this->pdo->prepare(
-            'SELECT id, seller_user_id, listing_status FROM cars WHERE id = :id AND deleted_at IS NULL LIMIT 1'
+            'SELECT id, seller_user_id, showroom_id, listing_status FROM cars WHERE id = :id AND deleted_at IS NULL LIMIT 1'
         );
         $stmt->execute(['id' => $carId]);
         $car = $stmt->fetch();
@@ -45,6 +45,27 @@ class InspectionRepository
              LIMIT :limit'
         );
         $stmt->bindValue('seller_user_id', $sellerUserId, PDO::PARAM_INT);
+        $stmt->bindValue('limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * Padanan sellerCars() untuk staf -- staf tidak punya seller_user_id
+     * sendiri, jadi disaring per cabang yang ditugaskan.
+     */
+    public function staffCars(int $showroomId, int $limit): array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT ' . self::CAR_SELECT_COLUMNS . '
+             FROM cars
+             WHERE showroom_id = :showroom_id
+             AND deleted_at IS NULL
+             ORDER BY id DESC
+             LIMIT :limit'
+        );
+        $stmt->bindValue('showroom_id', $showroomId, PDO::PARAM_INT);
         $stmt->bindValue('limit', $limit, PDO::PARAM_INT);
         $stmt->execute();
 

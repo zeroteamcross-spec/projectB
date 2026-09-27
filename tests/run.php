@@ -39,6 +39,7 @@ $tests = [
     Tests\Unit\JsBundleTest::class,
     Tests\Unit\ManualTransferPaymentTest::class,
     Tests\Unit\ShowroomMultiBranchTest::class,
+    Tests\Unit\StaffAccessTest::class,
 ];
 
 $passed = 0;

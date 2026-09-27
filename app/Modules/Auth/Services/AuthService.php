@@ -409,6 +409,9 @@ class AuthService
             'updated_at' => $user['updated_at'] ?? null,
             'has_google_identity' => (bool) ($user['has_google_identity'] ?? false),
             'home_showroom_slug' => $this->homeShowroomSlug($user),
+            'staff_showroom_id' => isset($user['staff_showroom_id']) && $user['staff_showroom_id'] !== null
+                ? (int) $user['staff_showroom_id']
+                : null,
         ];
     }
 

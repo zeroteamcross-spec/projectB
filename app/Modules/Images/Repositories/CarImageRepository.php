@@ -18,7 +18,7 @@ class CarImageRepository
     public function carOwner(int $carId): ?array
     {
         $stmt = $this->pdo->prepare(
-            'SELECT id, seller_user_id, listing_status FROM cars WHERE id = :id AND deleted_at IS NULL LIMIT 1'
+            'SELECT id, seller_user_id, showroom_id, listing_status FROM cars WHERE id = :id AND deleted_at IS NULL LIMIT 1'
         );
         $stmt->execute(['id' => $carId]);
         $car = $stmt->fetch();

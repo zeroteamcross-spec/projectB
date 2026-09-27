@@ -7,6 +7,7 @@ namespace App\Modules\Cars\Services;
 use App\Core\Exceptions\NotFoundException;
 use App\Core\Exceptions\ForbiddenException;
 use App\Core\Exceptions\ValidationException;
+use App\Modules\Auth\Policies\StaffAccessPolicy;
 use App\Modules\Cars\Mappers\CarMapper;
 use App\Modules\Cars\Policies\CarPolicy;
 use App\Modules\Cars\Repositories\CarRepository;
@@ -48,7 +49,14 @@ class CarService
     {
         CarPolicy::requireSeller($user);
         $pagination = $this->pagination($filters);
-        $filters['seller_user_id'] = (int) $user['id'];
+
+        if (($user['role'] ?? null) === 'seller_staff') {
+            // Staf tidak punya seller_user_id sendiri -- katalognya disaring
+            // per cabang yang ditugaskan, bukan per akun yang login.
+            $filters['showroom_id'] = (int) ($user['staff_showroom_id'] ?? 0);
+        } else {
+            $filters['seller_user_id'] = (int) $user['id'];
+        }
 
         return $this->listWithMeta($filters, $pagination);
     }
@@ -75,19 +83,38 @@ class CarService
     public function create(array $user, array $data): array
     {
         CarPolicy::requireSellerOrAdmin($user);
-        $sellerUserId = (int) ($data['seller_user_id'] ?? $user['id']);
+        $isStaff = ($user['role'] ?? null) === 'seller_staff';
 
-        if (($user['role'] ?? null) !== 'admin' && $sellerUserId !== (int) $user['id']) {
-            throw new ForbiddenException('Seller hanya dapat membuat mobil miliknya sendiri.');
+        if ($isStaff) {
+            // Staf tidak punya showroom sendiri -- mobilnya tercatat atas
+            // nama pemilik cabang yang ditugaskan, showroom_id-nya dipaksa ke
+            // cabang itu, tidak pernah dari body request (staf tidak boleh
+            // memilih showroom sembarangan meski dia cuma punya satu).
+            $showroomId = (int) ($user['staff_showroom_id'] ?? 0);
+            $showroom = $this->showrooms->findById($showroomId);
+
+            if (! $showroom) {
+                throw new ForbiddenException('Showroom staf ini tidak ditemukan.');
+            }
+
+            $sellerUserId = (int) $showroom['user_id'];
+        } else {
+            $sellerUserId = (int) ($data['seller_user_id'] ?? $user['id']);
+
+            if (($user['role'] ?? null) !== 'admin' && $sellerUserId !== (int) $user['id']) {
+                throw new ForbiddenException('Seller hanya dapat membuat mobil miliknya sendiri.');
+            }
         }
 
         $now = date('Y-m-d H:i:s');
         $listingStatus = $data['listing_status'] ?? 'draft';
         $payload = $this->normalizePayload($data);
         $payload['seller_user_id'] = $sellerUserId;
-        $payload['showroom_id'] = array_key_exists('showroom_id', $data)
-            ? $data['showroom_id']
-            : $this->cars->showroomIdForSeller($sellerUserId);
+        $payload['showroom_id'] = $isStaff
+            ? $showroomId
+            : (array_key_exists('showroom_id', $data)
+                ? $data['showroom_id']
+                : $this->cars->showroomIdForSeller($sellerUserId));
 
         $this->ensureShowroomOwnership($user, $sellerUserId, $payload['showroom_id']);
         $this->enforceListingLimit($user, $payload['showroom_id']);
@@ -214,6 +241,10 @@ class CarService
             return;
         }
 
+        if (StaffAccessPolicy::staffCanActOnShowroom($user, (int) $showroomId)) {
+            return;
+        }
+
         if ((int) $showroomId !== (int) $this->cars->showroomIdForSeller($sellerUserId)) {
             throw new ForbiddenException('showroom_id tidak sesuai dengan showroom milik seller ini.');
         }
@@ -229,7 +260,7 @@ class CarService
      */
     private function enforceListingLimit(array $user, $showroomId): void
     {
-        if (($user['role'] ?? null) !== 'seller' || $showroomId === null) {
+        if (! in_array(($user['role'] ?? null), ['seller', 'seller_staff'], true) || $showroomId === null) {
             return;
         }
 
