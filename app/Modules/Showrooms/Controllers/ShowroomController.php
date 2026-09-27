@@ -51,6 +51,56 @@ class ShowroomController extends Controller
         ], 'Showroom berhasil disimpan.');
     }
 
+    /**
+     * Semua cabang milik seller yang sedang login -- dipakai pemilih cabang
+     * di frontend.
+     */
+    public function mineList(Request $request): JsonResponse
+    {
+        $user = $this->user($request);
+
+        return JsonResponse::success([
+            'showrooms' => $this->service->mineList($user),
+        ], 'Daftar showroom berhasil diambil.');
+    }
+
+    /**
+     * Tambah cabang ke-2 dst -- cabang pertama TETAP lewat pendaftaran
+     * (AuthService::register()), lihat ShowroomService::createBranch().
+     */
+    public function createBranch(Request $request): JsonResponse
+    {
+        $user = $this->user($request);
+        $payload = (new UpsertShowroomRequest($request))->validate();
+
+        return JsonResponse::success([
+            'showroom' => $this->service->createBranch($user, $payload),
+        ], 'Cabang berhasil dibuat.', [], 201);
+    }
+
+    /**
+     * Versi seller-facing dari show() -- showroom_id eksplisit, tapi
+     * otorisasinya kepemilikan (ShowroomPolicy), bukan admin.
+     */
+    public function showMine(Request $request): JsonResponse
+    {
+        $user = $this->user($request);
+
+        return JsonResponse::success([
+            'showroom' => $this->service->mineById($user, (int) $request->routeParam('id')),
+        ], 'Showroom berhasil diambil.');
+    }
+
+    public function updateBranch(Request $request): JsonResponse
+    {
+        $user = $this->user($request);
+        $payload = (new UpsertShowroomRequest($request))->validate();
+
+        return JsonResponse::success([
+            'showroom' => $this->service->updateBranch($user, (int) $request->routeParam('id'), $payload),
+        ], 'Showroom berhasil disimpan.');
+    }
+
     public function show(Request $request): JsonResponse
     {
         $user = $this->user($request);
@@ -86,6 +136,16 @@ class ShowroomController extends Controller
 
         return JsonResponse::success([
             'showroom' => $this->service->submitSubscriptionProof($user, $payload),
+        ], 'Bukti transfer berhasil diunggah.');
+    }
+
+    public function submitSubscriptionProofFor(Request $request): JsonResponse
+    {
+        $user = $this->user($request);
+        $payload = (new SubmitManualTransferProofRequest($request))->validate();
+
+        return JsonResponse::success([
+            'showroom' => $this->service->submitSubscriptionProofFor($user, (int) $request->routeParam('id'), $payload),
         ], 'Bukti transfer berhasil diunggah.');
     }
 
@@ -135,6 +195,15 @@ class ShowroomController extends Controller
         ], 'Riwayat pembayaran berhasil diambil.');
     }
 
+    public function subscriptionHistoryForOwned(Request $request): JsonResponse
+    {
+        $user = $this->user($request);
+
+        return JsonResponse::success([
+            'history' => $this->service->subscriptionHistoryForOwnedShowroom($user, (int) $request->routeParam('id')),
+        ], 'Riwayat pembayaran berhasil diambil.');
+    }
+
     public function createSubscriptionMidtransPayment(Request $request): JsonResponse
     {
         $user = $this->user($request);
@@ -142,6 +211,16 @@ class ShowroomController extends Controller
 
         return JsonResponse::success([
             'showroom' => $this->service->createSubscriptionMidtransPayment($user, $bank),
+        ], 'Pembayaran Virtual Account berhasil dibuat.');
+    }
+
+    public function createSubscriptionMidtransPaymentFor(Request $request): JsonResponse
+    {
+        $user = $this->user($request);
+        $bank = (string) ($request->input()['bank'] ?? '');
+
+        return JsonResponse::success([
+            'showroom' => $this->service->createSubscriptionMidtransPaymentFor($user, (int) $request->routeParam('id'), $bank),
         ], 'Pembayaran Virtual Account berhasil dibuat.');
     }
 
@@ -192,6 +271,28 @@ class ShowroomController extends Controller
         $user = $this->user($request);
         $this->service->ensureSellerAccess($user);
         $showroom = $this->service->mine($user);
+        $payload = (new UploadAppIconRequest($request))->validate();
+
+        return JsonResponse::success([
+            'asset' => $this->assets->storeShowroomLogo($payload['icon'], $payload['mime_type'], (int) $showroom['id']),
+        ], 'Logo header showroom berhasil diupload.', [], 201);
+    }
+
+    public function uploadBrandingIconFor(Request $request): JsonResponse
+    {
+        $user = $this->user($request);
+        $showroom = $this->service->mineById($user, (int) $request->routeParam('id'));
+        $payload = (new UploadAppIconRequest($request))->validate();
+
+        return JsonResponse::success([
+            'asset' => $this->assets->storeShowroomIcon($payload['icon'], $payload['mime_type'], (int) $showroom['id']),
+        ], 'Icon showroom berhasil diupload.', [], 201);
+    }
+
+    public function uploadBrandingLogoFor(Request $request): JsonResponse
+    {
+        $user = $this->user($request);
+        $showroom = $this->service->mineById($user, (int) $request->routeParam('id'));
         $payload = (new UploadAppIconRequest($request))->validate();
 
         return JsonResponse::success([

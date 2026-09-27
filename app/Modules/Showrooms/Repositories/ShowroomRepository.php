@@ -42,6 +42,15 @@ class ShowroomRepository
         return $showroom ?: null;
     }
 
+    /**
+     * Sejak fitur multi-cabang, satu user boleh punya lebih dari satu
+     * showroom -- method ini TETAP LIMIT 1 dengan sengaja (kompatibilitas
+     * mundur untuk jalur registrasi dan endpoint singular /showrooms/me lama,
+     * lihat ShowroomService::mine()/upsertMine()), jadi artinya sekarang
+     * "cabang PERTAMA milik user ini" (created_at paling awal), bukan lagi
+     * "satu-satunya showroom milik user ini". Kode baru yang perlu tahu
+     * semua cabang harus pakai findAllByUserId().
+     */
     public function findByUserId(int $userId): ?array
     {
         $stmt = $this->pdo->prepare(
@@ -55,12 +64,38 @@ class ShowroomRepository
              FROM showrooms
              WHERE user_id = :user_id
              AND deleted_at IS NULL
+             ORDER BY created_at ASC
              LIMIT 1'
         );
         $stmt->execute(['user_id' => $userId]);
         $showroom = $stmt->fetch();
 
         return $showroom ?: null;
+    }
+
+    /**
+     * Semua cabang milik satu user, urut dari yang paling lama -- cabang
+     * pertama (index 0) selalu yang menentukan gerbang paket/pembayaran untuk
+     * cabang tambahan (lihat ShowroomService::createBranch()).
+     */
+    public function findAllByUserId(int $userId): array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT id, user_id, slug, name, address, city_name, phone_number, bank_account_number,
+                    bank_type, bank_account_name, icon_url, header_logo_url, tab_title,
+                    selected_plan_name, selected_plan_price, selected_plan_billing_period,
+                    selected_plan_listing_limit, selected_plan_selected_at,
+                    ' . self::SUBSCRIPTION_COLUMNS . ',
+                    is_active, deactivated_reason, deactivated_at, deactivated_by,
+                    created_at, updated_at
+             FROM showrooms
+             WHERE user_id = :user_id
+             AND deleted_at IS NULL
+             ORDER BY created_at ASC'
+        );
+        $stmt->execute(['user_id' => $userId]);
+
+        return $stmt->fetchAll();
     }
 
     /**

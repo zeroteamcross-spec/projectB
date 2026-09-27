@@ -38,6 +38,7 @@ $tests = [
     Tests\Unit\TailwindBuildTest::class,
     Tests\Unit\JsBundleTest::class,
     Tests\Unit\ManualTransferPaymentTest::class,
+    Tests\Unit\ShowroomMultiBranchTest::class,
 ];
 
 $passed = 0;

@@ -13,6 +13,7 @@ use App\Modules\Auth\Policies\AuthPolicy;
 use App\Modules\Auth\Repositories\AuthUserRepository;
 use App\Modules\MasterData\Services\MasterDataService;
 use App\Modules\Notifications\Services\NotificationService;
+use App\Modules\Showrooms\Policies\ShowroomPolicy;
 use App\Modules\Showrooms\Repositories\ShowroomRepository;
 use Throwable;
 
@@ -80,6 +81,72 @@ class ShowroomService
         return $this->serializeShowroom($showroom);
     }
 
+    /**
+     * Semua cabang milik seller yang sedang login -- dipakai pemilih cabang
+     * di frontend. Berbeda dari mine(), yang cuma balik cabang pertama untuk
+     * kompatibilitas mundur.
+     */
+    public function mineList(array $user): array
+    {
+        $this->ensureSeller($user);
+
+        return array_map(
+            fn (array $showroom): array => $this->serializeShowroom($showroom),
+            $this->showrooms->findAllByUserId((int) $user['id'])
+        );
+    }
+
+    /**
+     * Cabang pertama SELALU lewat pendaftaran (AuthService::register()),
+     * bukan lewat sini -- method ini murni jalur "tambah cabang ke-2 dst"
+     * untuk akun yang sudah punya minimal satu showroom. Digerbangi dua
+     * syarat: paket cabang pertama harus mendukung multi-cabang, dan cabang
+     * pertama itu harus sudah lunas -- supaya menambah cabang tidak jadi
+     * cara menghindar dari membayar cabang yang sudah ada.
+     */
+    public function createBranch(array $user, array $data): array
+    {
+        $this->ensureSeller($user);
+        $branches = $this->showrooms->findAllByUserId((int) $user['id']);
+
+        if ($branches === []) {
+            throw new ValidationException([
+                'showroom' => 'Cabang pertama dibuat lewat pendaftaran showroom, bukan lewat sini.',
+            ]);
+        }
+
+        $firstBranch = $branches[0];
+
+        // Kolom selected_plan_allows_multi_branch belum ada sampai fase
+        // berikutnya (bersama checkbox-nya di Master Harga) -- sampai saat
+        // itu key ini memang tidak pernah terisi dari database, jadi gerbang
+        // ini SELALU tertutup dengan sengaja. createBranch() sudah lengkap
+        // kabelnya di sini, tinggal menunggu kolom & checkbox admin-nya ada
+        // supaya bisa benar-benar dibuka untuk paket yang berhak.
+        if (! (bool) ($firstBranch['selected_plan_allows_multi_branch'] ?? false)) {
+            throw new ValidationException([
+                'plan' => 'Paket Anda belum mendukung multi-cabang.',
+            ]);
+        }
+
+        if (($firstBranch['subscription_payment_status'] ?? 'unpaid') !== 'paid' || $this->isSubscriptionDue($firstBranch)) {
+            throw new ValidationException([
+                'subscription_payment_status' => 'Lunasi pembayaran cabang pertama sebelum menambah cabang baru.',
+            ]);
+        }
+
+        $name = trim((string) ($data['name'] ?? ''));
+        if ($name === '') {
+            throw new ValidationException(['name' => 'Nama showroom wajib diisi.']);
+        }
+
+        $data['name'] = $name;
+        $data['slug'] = $this->generateSlug($name);
+        $showroomId = $this->showrooms->create((int) $user['id'], $data);
+
+        return $this->serializeShowroom($this->showrooms->findById($showroomId));
+    }
+
     public function show(int $id, array $user): array
     {
         $showroom = $this->showrooms->findById($id);
@@ -91,6 +158,27 @@ class ShowroomService
         if (($user['role'] ?? null) !== 'admin' && (int) $showroom['user_id'] !== (int) $user['id']) {
             throw new ForbiddenException('Akses showroom tidak diizinkan.');
         }
+
+        return $this->serializeShowroom($showroom);
+    }
+
+    /**
+     * Versi seller-facing dari show() -- sama-sama menerima showroom_id
+     * eksplisit, tapi lewat rute /showrooms/{id}/mine (bukan /showrooms/{id}
+     * yang admin-only lewat rute HTTP-nya). Ownership check-nya sama persis
+     * (ShowroomPolicy::ensureOwnedByUser(), diekstrak dari pengecekan yang
+     * sudah ada di show()).
+     */
+    public function mineById(array $user, int $showroomId): array
+    {
+        $this->ensureSeller($user);
+        $showroom = $this->showrooms->findById($showroomId);
+
+        if (! $showroom) {
+            throw new NotFoundException('Showroom tidak ditemukan.');
+        }
+
+        ShowroomPolicy::ensureOwnedByUser($showroom, $user);
 
         return $this->serializeShowroom($showroom);
     }
@@ -136,89 +224,128 @@ class ShowroomService
         return $this->serializeShowroom($this->showrooms->findById($showroomId));
     }
 
+    /**
+     * Sejak fitur multi-cabang, method ini adalah alias lama untuk
+     * kompatibilitas mundur -- selalu bekerja pada cabang PERTAMA
+     * (findByUserId() sekarang begitu artinya). Kode baru yang perlu
+     * mengedit cabang tertentu pakai updateBranch() dengan showroom_id
+     * eksplisit.
+     */
     public function upsertMine(array $user, array $data): array
     {
         $this->ensureSeller($user);
         $existing = $this->showrooms->findByUserId((int) $user['id']);
 
         if ($existing) {
-            // Harga/periode tagihan TIDAK BOLEH dipercaya dari klien -- kalau
-            // tidak, showroom bisa mengaku pilih paket apa saja dengan harga
-            // berapa saja (termasuk 0 atau negatif) lewat request yang
-            // dimodifikasi manual. Begitu selected_plan_name dikirim, nilai
-            // harga & periode selalu diambil ulang dari Master Harga di sini,
-            // bukan dari $data.
-            $hasPlanSelection = array_key_exists('selected_plan_name', $data);
-            $plan = $hasPlanSelection ? $this->resolveSelectedPlan($data['selected_plan_name']) : null;
-            // Ganti paket (mis. upgrade/downgrade) berarti harga berubah, jadi
-            // pembayaran & bukti transfer yang lama tidak lagi berlaku untuk
-            // paket yang baru -- harus bayar ulang, bukan otomatis "sudah lunas".
-            $planChanged = $hasPlanSelection && ($plan['name'] ?? null) !== $existing['selected_plan_name'];
-
-            $payload = [
-                'slug' => $existing['slug'] ?: $this->generateSlug((string) ($data['name'] ?? $existing['name']), (int) $existing['id']),
-                'name' => $data['name'] ?? $existing['name'],
-                'address' => array_key_exists('address', $data) ? $data['address'] : $existing['address'],
-                'city_name' => array_key_exists('city_name', $data) ? $data['city_name'] : $existing['city_name'],
-                'phone_number' => array_key_exists('phone_number', $data) ? $data['phone_number'] : $existing['phone_number'],
-                'bank_account_number' => array_key_exists('bank_account_number', $data)
-                    ? $data['bank_account_number']
-                    : $existing['bank_account_number'],
-                'bank_type' => array_key_exists('bank_type', $data) ? $data['bank_type'] : $existing['bank_type'],
-                'bank_account_name' => array_key_exists('bank_account_name', $data)
-                    ? $data['bank_account_name']
-                    : $existing['bank_account_name'],
-                'icon_url' => array_key_exists('icon_url', $data) ? $data['icon_url'] : $existing['icon_url'],
-                'header_logo_url' => array_key_exists('header_logo_url', $data)
-                    ? $data['header_logo_url']
-                    : $existing['header_logo_url'],
-                'tab_title' => array_key_exists('tab_title', $data) ? $data['tab_title'] : $existing['tab_title'],
-                // Paket harga dipilih persis sekali, sesaat setelah showroom
-                // mendaftar (lihat routes.js public.showroom-register alur
-                // pilih-paket) -- namanya dan harganya disalin (snapshot) ke
-                // sini, bukan disimpan sebagai referensi ke Master Harga,
-                // supaya kalau Admin nanti mengubah/menghapus paket itu di
-                // Master Harga, riwayat pilihan showroom lama tidak ikut
-                // berubah.
-                'selected_plan_name' => $hasPlanSelection ? $plan['name'] : $existing['selected_plan_name'],
-                'selected_plan_price' => $hasPlanSelection ? $plan['price'] : $existing['selected_plan_price'],
-                'selected_plan_billing_period' => $hasPlanSelection
-                    ? $plan['billing_period']
-                    : $existing['selected_plan_billing_period'],
-                'selected_plan_listing_limit' => $hasPlanSelection
-                    ? $plan['listing_limit']
-                    : ($existing['selected_plan_listing_limit'] ?? null),
-                'selected_plan_selected_at' => $hasPlanSelection ? date('Y-m-d H:i:s') : $existing['selected_plan_selected_at'],
-                'subscription_payment_status' => $planChanged ? 'unpaid' : $existing['subscription_payment_status'],
-                'subscription_proof_path' => $planChanged ? null : $existing['subscription_proof_path'],
-                'subscription_proof_note' => $planChanged ? null : $existing['subscription_proof_note'],
-                'subscription_proof_submitted_at' => $planChanged ? null : $existing['subscription_proof_submitted_at'],
-                'subscription_confirmed_at' => $planChanged ? null : $existing['subscription_confirmed_at'],
-                'subscription_confirmed_by' => $planChanged ? null : $existing['subscription_confirmed_by'],
-                'subscription_rejected_at' => $planChanged ? null : $existing['subscription_rejected_at'],
-                'subscription_rejected_reason' => $planChanged ? null : $existing['subscription_rejected_reason'],
-                'subscription_next_due_at' => $planChanged ? null : $existing['subscription_next_due_at'],
-                // Sesi VA lama menagih harga PAKET LAMA -- kalau tetap
-                // dibiarkan, membayarnya tidak akan pernah cocok dengan paket
-                // yang baru dipilih. Diputus sama seperti bukti transfer
-                // manual di atas.
-                'subscription_payment_method' => $planChanged ? 'manual' : ($existing['subscription_payment_method'] ?? 'manual'),
-                'subscription_midtrans_order_id' => $planChanged ? null : $existing['subscription_midtrans_order_id'],
-                'subscription_midtrans_transaction_id' => $planChanged ? null : $existing['subscription_midtrans_transaction_id'],
-                'subscription_midtrans_payment_data' => $planChanged ? null : $existing['subscription_midtrans_payment_data'],
-                'subscription_midtrans_expires_at' => $planChanged ? null : $existing['subscription_midtrans_expires_at'],
-                'subscription_midtrans_paid_at' => $planChanged ? null : $existing['subscription_midtrans_paid_at'],
-            ];
-
-            $this->showrooms->update((int) $existing['id'], $payload);
-
-            return $this->mine($user);
+            return $this->applyShowroomUpdate($existing, $data);
         }
 
         $data['slug'] = $this->generateSlug((string) $data['name']);
         $showroomId = $this->showrooms->create((int) $user['id'], $data);
 
         return $this->show((int) $showroomId, $user);
+    }
+
+    /**
+     * Edit cabang TERTENTU (bukan selalu cabang pertama seperti upsertMine())
+     * -- dipakai UI baru pemilih cabang. Cabang baru (ke-2 dst) dibuat lewat
+     * createBranch(), bukan lewat sini -- method ini murni untuk mengedit
+     * profil cabang yang sudah ada.
+     */
+    public function updateBranch(array $user, int $showroomId, array $data): array
+    {
+        $this->ensureSeller($user);
+        $existing = $this->showrooms->findById($showroomId);
+
+        if (! $existing) {
+            throw new NotFoundException('Showroom tidak ditemukan.');
+        }
+
+        ShowroomPolicy::ensureOwnedByUser($existing, $user);
+
+        return $this->applyShowroomUpdate($existing, $data);
+    }
+
+    /**
+     * Isi bersama upsertMine() (jalur update) dan updateBranch() -- dulu
+     * cuma ditulis sekali di dalam upsertMine() karena cuma ada satu
+     * showroom per user; diekstrak supaya kedua jalur (cabang pertama lewat
+     * alias lama, cabang tertentu lewat endpoint baru) tidak menyalin ulang
+     * ~40 baris logika snapshot paket yang sama.
+     */
+    private function applyShowroomUpdate(array $existing, array $data): array
+    {
+        // Harga/periode tagihan TIDAK BOLEH dipercaya dari klien -- kalau
+        // tidak, showroom bisa mengaku pilih paket apa saja dengan harga
+        // berapa saja (termasuk 0 atau negatif) lewat request yang
+        // dimodifikasi manual. Begitu selected_plan_name dikirim, nilai
+        // harga & periode selalu diambil ulang dari Master Harga di sini,
+        // bukan dari $data.
+        $hasPlanSelection = array_key_exists('selected_plan_name', $data);
+        $plan = $hasPlanSelection ? $this->resolveSelectedPlan($data['selected_plan_name']) : null;
+        // Ganti paket (mis. upgrade/downgrade) berarti harga berubah, jadi
+        // pembayaran & bukti transfer yang lama tidak lagi berlaku untuk
+        // paket yang baru -- harus bayar ulang, bukan otomatis "sudah lunas".
+        $planChanged = $hasPlanSelection && ($plan['name'] ?? null) !== $existing['selected_plan_name'];
+
+        $payload = [
+            'slug' => $existing['slug'] ?: $this->generateSlug((string) ($data['name'] ?? $existing['name']), (int) $existing['id']),
+            'name' => $data['name'] ?? $existing['name'],
+            'address' => array_key_exists('address', $data) ? $data['address'] : $existing['address'],
+            'city_name' => array_key_exists('city_name', $data) ? $data['city_name'] : $existing['city_name'],
+            'phone_number' => array_key_exists('phone_number', $data) ? $data['phone_number'] : $existing['phone_number'],
+            'bank_account_number' => array_key_exists('bank_account_number', $data)
+                ? $data['bank_account_number']
+                : $existing['bank_account_number'],
+            'bank_type' => array_key_exists('bank_type', $data) ? $data['bank_type'] : $existing['bank_type'],
+            'bank_account_name' => array_key_exists('bank_account_name', $data)
+                ? $data['bank_account_name']
+                : $existing['bank_account_name'],
+            'icon_url' => array_key_exists('icon_url', $data) ? $data['icon_url'] : $existing['icon_url'],
+            'header_logo_url' => array_key_exists('header_logo_url', $data)
+                ? $data['header_logo_url']
+                : $existing['header_logo_url'],
+            'tab_title' => array_key_exists('tab_title', $data) ? $data['tab_title'] : $existing['tab_title'],
+            // Paket harga dipilih persis sekali, sesaat setelah showroom
+            // mendaftar (lihat routes.js public.showroom-register alur
+            // pilih-paket) -- namanya dan harganya disalin (snapshot) ke
+            // sini, bukan disimpan sebagai referensi ke Master Harga,
+            // supaya kalau Admin nanti mengubah/menghapus paket itu di
+            // Master Harga, riwayat pilihan showroom lama tidak ikut
+            // berubah.
+            'selected_plan_name' => $hasPlanSelection ? $plan['name'] : $existing['selected_plan_name'],
+            'selected_plan_price' => $hasPlanSelection ? $plan['price'] : $existing['selected_plan_price'],
+            'selected_plan_billing_period' => $hasPlanSelection
+                ? $plan['billing_period']
+                : $existing['selected_plan_billing_period'],
+            'selected_plan_listing_limit' => $hasPlanSelection
+                ? $plan['listing_limit']
+                : ($existing['selected_plan_listing_limit'] ?? null),
+            'selected_plan_selected_at' => $hasPlanSelection ? date('Y-m-d H:i:s') : $existing['selected_plan_selected_at'],
+            'subscription_payment_status' => $planChanged ? 'unpaid' : $existing['subscription_payment_status'],
+            'subscription_proof_path' => $planChanged ? null : $existing['subscription_proof_path'],
+            'subscription_proof_note' => $planChanged ? null : $existing['subscription_proof_note'],
+            'subscription_proof_submitted_at' => $planChanged ? null : $existing['subscription_proof_submitted_at'],
+            'subscription_confirmed_at' => $planChanged ? null : $existing['subscription_confirmed_at'],
+            'subscription_confirmed_by' => $planChanged ? null : $existing['subscription_confirmed_by'],
+            'subscription_rejected_at' => $planChanged ? null : $existing['subscription_rejected_at'],
+            'subscription_rejected_reason' => $planChanged ? null : $existing['subscription_rejected_reason'],
+            'subscription_next_due_at' => $planChanged ? null : $existing['subscription_next_due_at'],
+            // Sesi VA lama menagih harga PAKET LAMA -- kalau tetap
+            // dibiarkan, membayarnya tidak akan pernah cocok dengan paket
+            // yang baru dipilih. Diputus sama seperti bukti transfer
+            // manual di atas.
+            'subscription_payment_method' => $planChanged ? 'manual' : ($existing['subscription_payment_method'] ?? 'manual'),
+            'subscription_midtrans_order_id' => $planChanged ? null : $existing['subscription_midtrans_order_id'],
+            'subscription_midtrans_transaction_id' => $planChanged ? null : $existing['subscription_midtrans_transaction_id'],
+            'subscription_midtrans_payment_data' => $planChanged ? null : $existing['subscription_midtrans_payment_data'],
+            'subscription_midtrans_expires_at' => $planChanged ? null : $existing['subscription_midtrans_expires_at'],
+            'subscription_midtrans_paid_at' => $planChanged ? null : $existing['subscription_midtrans_paid_at'],
+        ];
+
+        $this->showrooms->update((int) $existing['id'], $payload);
+
+        return $this->serializeShowroom($this->showrooms->findById((int) $existing['id']));
     }
 
     /**
@@ -236,6 +363,30 @@ class ShowroomService
             throw new NotFoundException('Showroom belum tersedia.');
         }
 
+        return $this->applySubscriptionProofSubmission($showroom, $data);
+    }
+
+    /**
+     * Versi seller-facing dengan showroom_id eksplisit -- dipakai UI baru
+     * pemilih cabang untuk mengunggah bukti bagi cabang manapun, bukan
+     * selalu cabang pertama.
+     */
+    public function submitSubscriptionProofFor(array $user, int $showroomId, array $data): array
+    {
+        $this->ensureSeller($user);
+        $showroom = $this->showrooms->findById($showroomId);
+
+        if (! $showroom) {
+            throw new NotFoundException('Showroom tidak ditemukan.');
+        }
+
+        ShowroomPolicy::ensureOwnedByUser($showroom, $user);
+
+        return $this->applySubscriptionProofSubmission($showroom, $data);
+    }
+
+    private function applySubscriptionProofSubmission(array $showroom, array $data): array
+    {
         if (($showroom['selected_plan_name'] ?? null) === null) {
             throw new ValidationException([
                 'selected_plan_name' => 'Pilih paket harga dulu sebelum mengunggah bukti transfer.',
@@ -267,13 +418,13 @@ class ShowroomService
             throw $exception;
         }
 
+        $updated = $this->showrooms->findById($showroomId) ?? $showroom;
+
         if ($this->notificationService !== null) {
-            $this->notificationService->createSubscriptionProofSubmittedNotification(
-                $this->showrooms->findById($showroomId) ?? $showroom
-            );
+            $this->notificationService->createSubscriptionProofSubmittedNotification($updated);
         }
 
-        return $this->mine($user);
+        return $this->serializeShowroom($updated);
     }
 
     /**
@@ -344,6 +495,26 @@ class ShowroomService
         }
 
         return $this->serializeSubscriptionHistory($this->showrooms->findSubscriptionPaymentHistory((int) $showroom['id']));
+    }
+
+    /**
+     * Versi seller-facing dengan showroom_id eksplisit -- namanya sengaja
+     * beda dari subscriptionHistoryForAdmin() (method admin yang sudah ada,
+     * otorisasinya AuthPolicy::requireAdmin bukan kepemilikan) supaya tidak
+     * rancu dua model otorisasi berbeda.
+     */
+    public function subscriptionHistoryForOwnedShowroom(array $user, int $showroomId): array
+    {
+        $this->ensureSeller($user);
+        $showroom = $this->showrooms->findById($showroomId);
+
+        if (! $showroom) {
+            throw new NotFoundException('Showroom tidak ditemukan.');
+        }
+
+        ShowroomPolicy::ensureOwnedByUser($showroom, $user);
+
+        return $this->serializeSubscriptionHistory($this->showrooms->findSubscriptionPaymentHistory($showroomId));
     }
 
     public function subscriptionHistoryForAdmin(array $actor, int $showroomId): array
@@ -494,6 +665,30 @@ class ShowroomService
             throw new NotFoundException('Showroom belum tersedia.');
         }
 
+        return $this->applySubscriptionMidtransPayment($showroom, $user, $bank);
+    }
+
+    /**
+     * Versi seller-facing dengan showroom_id eksplisit -- dipakai UI baru
+     * pemilih cabang untuk membuat VA bagi cabang manapun, bukan selalu
+     * cabang pertama.
+     */
+    public function createSubscriptionMidtransPaymentFor(array $user, int $showroomId, string $bank): array
+    {
+        $this->ensureSeller($user);
+        $showroom = $this->showrooms->findById($showroomId);
+
+        if (! $showroom) {
+            throw new NotFoundException('Showroom tidak ditemukan.');
+        }
+
+        ShowroomPolicy::ensureOwnedByUser($showroom, $user);
+
+        return $this->applySubscriptionMidtransPayment($showroom, $user, $bank);
+    }
+
+    private function applySubscriptionMidtransPayment(array $showroom, array $user, string $bank): array
+    {
         if (($showroom['selected_plan_name'] ?? null) === null) {
             throw new ValidationException([
                 'selected_plan_name' => 'Pilih paket harga dulu sebelum membuat pembayaran.',
@@ -651,10 +846,20 @@ class ShowroomService
 
         // Approval akun cuma relevan untuk pendaftaran PERTAMA KALI (belum
         // is_approved) -- pembayaran perpanjangan (akun sudah aktif) tidak
-        // menyentuh ini sama sekali.
-        $user = $this->users->findById((int) $showroom['user_id']);
-        if ($user && ! (bool) ($user['is_approved'] ?? false)) {
-            $this->users->approveUsers([(int) $showroom['user_id']]);
+        // menyentuh ini sama sekali. Sejak fitur multi-cabang, ini juga harus
+        // dibatasi ke CABANG PERTAMA milik akun itu: cabang ke-2 dst cuma
+        // bisa dibuat oleh akun yang sudah disetujui & cabang pertamanya
+        // lunas (lihat createBranch()), jadi baris ini secara alami tidak
+        // akan pernah kena untuk cabang ke-2 dst -- tetap dijaga eksplisit di
+        // sini supaya tidak diam-diam bergantung pada urutan pemanggilan.
+        $ownerBranches = $this->showrooms->findAllByUserId((int) $showroom['user_id']);
+        $firstBranchId = isset($ownerBranches[0]['id']) ? (int) $ownerBranches[0]['id'] : null;
+
+        if ($firstBranchId === $showroomId) {
+            $user = $this->users->findById((int) $showroom['user_id']);
+            if ($user && ! (bool) ($user['is_approved'] ?? false)) {
+                $this->users->approveUsers([(int) $showroom['user_id']]);
+            }
         }
 
         return [
