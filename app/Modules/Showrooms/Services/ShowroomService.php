@@ -27,6 +27,12 @@ class ShowroomService
     private const MIDTRANS_VA_BANKS = ['bca', 'bni', 'bri', 'mandiri'];
 
     /**
+     * Toleransi hari sejak subscription_next_due_at sebelum showroom
+     * disuspend otomatis -- lihat suspendOverdue().
+     */
+    private const AUTO_SUSPEND_GRACE_DAYS = 14;
+
+    /**
      * Kata yang tidak boleh jadi slug showroom karena URL-nya kini langsung
      * di root ("carlynk.id/{slug}") -- bertabrakan dengan rute sistem yang
      * juga hidup di root (dashboard peran, auth, path API, dst). Daftar ini
@@ -230,6 +236,46 @@ class ShowroomService
         $this->showrooms->updateActivation($showroomId, true, null, null, date('Y-m-d H:i:s'));
 
         return $this->serializeShowroom($this->showrooms->findById($showroomId));
+    }
+
+    /**
+     * Dipanggil dari endpoint cron internal (tidak diautentikasi, tidak ada
+     * $actor admin), sekali sehari -- lihat ShowroomCronController. Showroom
+     * yang jatuh temponya sudah lewat AUTO_SUSPEND_GRACE_DAYS hari dinonaktifkan
+     * persis lewat mekanisme yang sama dengan deactivate() manual admin
+     * (katalog publik ditutup, seller tetap bisa login untuk membayar).
+     *
+     * Sengaja TIDAK ada logika reaktivasi otomatis saat showroom bayar --
+     * sejalan dengan filosofi yang sudah ada di
+     * handleSubscriptionMidtransCallback() (lihat komentarnya): is_active
+     * murni keputusan admin, pembayaran tidak pernah mengubahnya sendiri.
+     * Admin mengaktifkan lagi manual lewat User Management setelah
+     * mengonfirmasi pembayarannya.
+     */
+    public function suspendOverdue(): array
+    {
+        $now = date('Y-m-d H:i:s');
+        $cutoffAt = date('Y-m-d H:i:s', strtotime('-' . self::AUTO_SUSPEND_GRACE_DAYS . ' days'));
+        $suspendedIds = [];
+
+        foreach ($this->showrooms->findOverdueForAutoSuspend($cutoffAt) as $showroom) {
+            $reason = sprintf(
+                'Otomatis: tagihan menunggak lebih dari %d hari sejak jatuh tempo.',
+                self::AUTO_SUSPEND_GRACE_DAYS
+            );
+
+            $this->showrooms->updateActivation((int) $showroom['id'], false, $reason, null, $now);
+            $suspendedIds[] = (int) $showroom['id'];
+
+            if ($this->notificationService !== null) {
+                $this->notificationService->createSubscriptionSuspendedNotification($showroom);
+            }
+        }
+
+        return [
+            'suspended_count' => count($suspendedIds),
+            'showroom_ids' => $suspendedIds,
+        ];
     }
 
     /**

@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Core\Router;
 use App\Modules\Auth\Middleware\AuthenticatedUserMiddleware;
 use App\Modules\Showrooms\Controllers\ShowroomController;
+use App\Modules\Showrooms\Controllers\ShowroomCronController;
 
 return static function (Router $router): void {
     $router->get(
@@ -18,6 +19,14 @@ return static function (Router $router): void {
     $router->post(
         '/api/payments/midtrans/subscription-callbacks',
         [ShowroomController::class, 'providerCallback']
+    );
+
+    // Dipanggil cron server, bukan dari SPA -- pola sama persis dengan
+    // /api/internal/cron/transactions/expire di
+    // app/Modules/Transactions/Routes/api.php.
+    $router->get(
+        '/api/internal/cron/showrooms/suspend-overdue',
+        [ShowroomCronController::class, 'suspendOverdue']
     );
 
     $router->group('/api/showrooms', static function (Router $router): void {

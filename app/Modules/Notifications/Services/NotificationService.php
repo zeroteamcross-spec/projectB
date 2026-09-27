@@ -33,6 +33,7 @@ class NotificationService
         'subscription_proof_submitted',
         'subscription_payment_confirmed',
         'subscription_payment_rejected',
+        'subscription_suspended',
     ];
 
     private const ICON_KEYS = [
@@ -364,6 +365,34 @@ class NotificationService
             'body' => $reason !== ''
                 ? sprintf('Bukti pembayaran paket ditolak: %s. Unggah ulang buktinya.', $reason)
                 : 'Bukti pembayaran paket ditolak Admin. Unggah ulang buktinya.',
+            'data' => $this->showroomSubscriptionNotificationData($showroom),
+            'link_url' => '/seller/billing',
+            'icon_key' => 'payment',
+            'priority' => 'high',
+        ]);
+    }
+
+    /**
+     * Dikirim dari ShowroomService::suspendOverdue() -- showroom yang
+     * menunggak lebih dari masa toleransinya dinonaktifkan otomatis.
+     */
+    public function createSubscriptionSuspendedNotification(array $showroom): ?array
+    {
+        $sellerUserId = (int) ($showroom['user_id'] ?? 0);
+        if ($sellerUserId <= 0) {
+            return null;
+        }
+
+        $planName = $showroom['selected_plan_name'] ?? null;
+
+        return $this->create([
+            'user_id' => $sellerUserId,
+            'role' => 'seller',
+            'type' => 'subscription_suspended',
+            'title' => 'Showroom Disuspend',
+            'body' => $planName
+                ? sprintf('Tagihan paket %s menunggak lebih dari 14 hari. Showroom Anda dinonaktifkan sementara -- segera lunasi tagihan.', $planName)
+                : 'Tagihan paket Anda menunggak lebih dari 14 hari. Showroom Anda dinonaktifkan sementara -- segera lunasi tagihan.',
             'data' => $this->showroomSubscriptionNotificationData($showroom),
             'link_url' => '/seller/billing',
             'icon_key' => 'payment',

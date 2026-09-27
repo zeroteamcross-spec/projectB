@@ -391,6 +391,7 @@ class ShowroomRepository
                     sh.icon_url, sh.header_logo_url, sh.tab_title,
                     sh.selected_plan_name, sh.selected_plan_price, sh.selected_plan_billing_period, sh.selected_plan_selected_at,
                     ' . self::SUBSCRIPTION_COLUMNS . ',
+                    sh.is_active, sh.deactivated_reason, sh.deactivated_by,
                     sh.created_at, sh.updated_at,
                     u.name AS seller_name, u.email AS seller_email
              FROM showrooms AS sh
@@ -406,6 +407,38 @@ class ShowroomRepository
              ORDER BY sh.subscription_next_due_at ASC'
         );
         $stmt->execute();
+
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * Showroom yang layak di-suspend otomatis -- beda dari
+     * findDueSubscriptions() (antrean review admin, tanpa ambang waktu):
+     * di sini jatuh temponya harus sudah lewat $cutoffAt, dan is_active
+     * masih 1 (supaya proses ini idempoten -- showroom yang sudah
+     * disuspend, baik otomatis maupun manual oleh admin, tidak diproses
+     * ulang). $cutoffAt dihitung di ShowroomService::suspendOverdue()
+     * (bukan DATE_SUB/NOW() di SQL) -- pola yang sama dipakai
+     * TransactionService::expirePendingTransactions(), dan portable ke
+     * sqlite yang dipakai tests/run.php.
+     */
+    public function findOverdueForAutoSuspend(string $cutoffAt): array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT sh.id, sh.user_id, sh.name, sh.slug, sh.selected_plan_name,
+                    sh.subscription_payment_status, sh.subscription_next_due_at
+             FROM showrooms AS sh
+             INNER JOIN users AS u ON u.id = sh.user_id
+             WHERE sh.deleted_at IS NULL
+             AND u.deleted_at IS NULL
+             AND u.account_status = \'active\'
+             AND u.is_approved = 1
+             AND sh.is_active = 1
+             AND sh.subscription_next_due_at IS NOT NULL
+             AND sh.subscription_next_due_at <= :cutoff_at
+             ORDER BY sh.subscription_next_due_at ASC'
+        );
+        $stmt->execute(['cutoff_at' => $cutoffAt]);
 
         return $stmt->fetchAll();
     }
