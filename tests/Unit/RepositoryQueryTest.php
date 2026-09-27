@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
+use App\Core\Exceptions\ForbiddenException;
 use App\Modules\Cars\Repositories\CarRepository;
+use App\Modules\Cars\Services\CarService;
 use App\Modules\MasterData\Repositories\MasterDataRepository;
+use App\Modules\Showrooms\Repositories\ShowroomRepository;
 use App\Modules\Transactions\Repositories\TransactionRepository;
 use Tests\TestCase;
 
@@ -15,6 +18,7 @@ class RepositoryQueryTest extends TestCase
     {
         $this->carRepositoryFiltersPublishedCatalogRows();
         $this->carRepositoryCountsActiveListingsForListingLimit();
+        $this->carServiceRejectsShowroomIdNotOwnedBySeller();
         $this->transactionRepositoryFindsTransactionByPaymentLogProviderOrderId();
         $this->masterDataUpdateTargetsSingleRowById();
     }
@@ -74,6 +78,54 @@ class RepositoryQueryTest extends TestCase
         $this->assertSame(3, $repository->countActiveByShowroom(100));
         $this->assertSame(1, $repository->countActiveByShowroom(200));
         $this->assertSame(0, $repository->countActiveByShowroom(999));
+    }
+
+    /**
+     * showroom_id sudah lama diterima dari klien di CarService::create()
+     * tanpa verifikasi kepemilikan (celah yang ditutup sebagai persiapan
+     * fitur multi-cabang) -- seller yang mengirim showroom_id milik seller
+     * lain harus ditolak, bukan diam-diam berhasil menempelkan listingnya ke
+     * showroom orang lain.
+     */
+    private function carServiceRejectsShowroomIdNotOwnedBySeller(): void
+    {
+        $pdo = $this->sqlite();
+        $this->createCarsTable($pdo);
+        $this->createShowroomsTableForCarService($pdo);
+        $pdo->exec("INSERT INTO showrooms (id, user_id, selected_plan_listing_limit) VALUES (100, 7, NULL), (200, 9, NULL)");
+
+        $carService = new CarService(new CarRepository($pdo), new ShowroomRepository($pdo), null);
+        $seller = ['id' => 7, 'role' => 'seller'];
+        $payload = ['brand_name' => 'Toyota', 'model_name' => 'Avanza'];
+
+        $this->expectException(ForbiddenException::class, function () use ($carService, $seller, $payload) {
+            $carService->create($seller, array_merge($payload, ['showroom_id' => 200]));
+        });
+
+        // showroom_id milik sendiri tetap harus berhasil seperti biasa.
+        $created = $carService->create($seller, array_merge($payload, ['showroom_id' => 100]));
+        $this->assertSame(100, (int) $created['showroom_id']);
+    }
+
+    private function createShowroomsTableForCarService(\PDO $pdo): void
+    {
+        $pdo->exec('CREATE TABLE showrooms (
+            id INTEGER PRIMARY KEY,
+            user_id INTEGER,
+            slug TEXT NULL, name TEXT NULL, address TEXT NULL, city_name TEXT NULL,
+            phone_number TEXT NULL, bank_account_number TEXT NULL, bank_type TEXT NULL,
+            bank_account_name TEXT NULL, icon_url TEXT NULL, header_logo_url TEXT NULL, tab_title TEXT NULL,
+            selected_plan_name TEXT NULL, selected_plan_price REAL NULL, selected_plan_billing_period TEXT NULL,
+            selected_plan_listing_limit INTEGER NULL, selected_plan_selected_at TEXT NULL,
+            subscription_payment_status TEXT NULL, subscription_proof_path TEXT NULL, subscription_proof_note TEXT NULL,
+            subscription_proof_submitted_at TEXT NULL, subscription_confirmed_at TEXT NULL, subscription_confirmed_by INTEGER NULL,
+            subscription_rejected_at TEXT NULL, subscription_rejected_reason TEXT NULL, subscription_next_due_at TEXT NULL,
+            subscription_payment_method TEXT NULL, subscription_midtrans_order_id TEXT NULL,
+            subscription_midtrans_transaction_id TEXT NULL, subscription_midtrans_payment_data TEXT NULL,
+            subscription_midtrans_expires_at TEXT NULL, subscription_midtrans_paid_at TEXT NULL,
+            is_active INTEGER NULL, deactivated_reason TEXT NULL, deactivated_at TEXT NULL, deactivated_by INTEGER NULL,
+            created_at TEXT NULL, updated_at TEXT NULL, deleted_at TEXT NULL
+        )');
     }
 
     private function transactionRepositoryFindsTransactionByPaymentLogProviderOrderId(): void

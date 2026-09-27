@@ -89,6 +89,7 @@ class CarService
             ? $data['showroom_id']
             : $this->cars->showroomIdForSeller($sellerUserId);
 
+        $this->ensureShowroomOwnership($user, $sellerUserId, $payload['showroom_id']);
         $this->enforceListingLimit($user, $payload['showroom_id']);
         $payload['listing_status'] = $listingStatus;
         $payload['inspection_summary_status'] = $data['inspection_summary_status'] ?? 'not_checked';
@@ -134,6 +135,7 @@ class CarService
         }
 
         $payload['showroom_id'] = array_key_exists('showroom_id', $data) ? $data['showroom_id'] : $car['showroom_id'];
+        $this->ensureShowroomOwnership($user, $payload['seller_user_id'], $payload['showroom_id']);
         $payload['inspection_summary_status'] = $data['inspection_summary_status'] ?? $car['inspection_summary_status'];
         $payload['updated_at'] = date('Y-m-d H:i:s');
 
@@ -192,6 +194,29 @@ class CarService
         $this->cars->markSoldExternal($id, $trimmedNote, (int) $user['id']);
 
         return $this->detail($id, $user);
+    }
+
+    /**
+     * showroom_id sudah lama diterima dari klien (dipakai admin untuk
+     * memindahkan/menetapkan mobil ke showroom tertentu) tapi sebelumnya tidak
+     * pernah diverifikasi kepemilikannya -- seller mana pun bisa menempelkan
+     * listingnya ke showroom_id milik orang lain sekadar dengan mengirim id
+     * itu di request. Nyaris tidak berbahaya selama satu seller cuma pernah
+     * punya satu showroom (showroomIdForSeller() akan selalu balik ke id yang
+     * sama persis), tapi begitu satu akun bisa punya banyak showroom (fitur
+     * multi-cabang), ini jadi jalan nyata menembus batas antar showroom.
+     * Admin sengaja dikecualikan -- itu mekanisme resmi admin memindahkan
+     * mobil antar showroom.
+     */
+    private function ensureShowroomOwnership(array $user, int $sellerUserId, $showroomId): void
+    {
+        if (($user['role'] ?? null) === 'admin' || ($user['role'] ?? null) === 'super_admin' || $showroomId === null) {
+            return;
+        }
+
+        if ((int) $showroomId !== (int) $this->cars->showroomIdForSeller($sellerUserId)) {
+            throw new ForbiddenException('showroom_id tidak sesuai dengan showroom milik seller ini.');
+        }
     }
 
     /**
