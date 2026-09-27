@@ -7,9 +7,21 @@ import { createIcon } from "../../../theme/iconRegistry.js";
 import { formatDate } from "../../../utils/formatDate.js";
 import { formatCurrency } from "../../../utils/formatCurrency.js";
 import { showroomsResource } from "../../../resources/showroomsResource.js";
+import { activeShowroom } from "../state/activeShowroom.js";
 import { adminMasterService } from "../../admin/services/adminMasterService.js";
 import { SubscriptionMidtransPanel } from "../../../ui/composites/subscriptionMidtransPanel.js";
 import { confirmDialog } from "../../../ui/primitives/confirmDialog.js";
+
+/**
+ * Dibaca persis sama seperti render() menghitung `showroom` -- diekstrak
+ * supaya actions (submitProof, changePlan, dst) tidak perlu menunggu
+ * re-render untuk tahu cabang mana yang sedang ditampilkan.
+ */
+function currentShowroomId() {
+  const working = appStore.get("working.sellerBilling.showroom.data", null);
+  const snapshot = appStore.get("snapshot.seller.showroom.data", null);
+  return (working ?? snapshot)?.id ?? null;
+}
 
 const STATUS_LABEL = {
   unpaid: "Belum bayar",
@@ -83,7 +95,10 @@ export function SellerBillingPage() {
       rerender();
 
       try {
-        const showroom = await showroomsResource.submitSubscriptionProof(state.proofFile, state.note);
+        const showroomId = currentShowroomId();
+        const showroom = showroomId
+          ? await showroomsResource.submitSubscriptionProofFor(showroomId, state.proofFile, state.note)
+          : await showroomsResource.submitSubscriptionProof(state.proofFile, state.note);
         appStore.patchState("working.sellerBilling.showroom", {
           data: showroom,
           hydratedAt: Date.now(),
@@ -122,7 +137,10 @@ export function SellerBillingPage() {
       rerender();
 
       try {
-        const showroom = await showroomsResource.updateMine({ selected_plan_name: plan.name });
+        const showroomId = currentShowroomId();
+        const showroom = showroomId
+          ? await showroomsResource.updateBranch(showroomId, { selected_plan_name: plan.name })
+          : await showroomsResource.updateMine({ selected_plan_name: plan.name });
         appStore.patchState("working.sellerBilling.showroom", {
           data: showroom,
           hydratedAt: Date.now(),
@@ -240,7 +258,7 @@ function render(root, context, state, actions) {
   root.replaceChildren(layout);
 
   if (!appStore.get("working.sellerBilling.showroom.hydratedAt", 0)) {
-    showroomsResource.mine().then((data) => {
+    activeShowroom.resolveMine().then((data) => {
       appStore.patchState("working.sellerBilling.showroom", { data, hydratedAt: Date.now() }, "seller-billing:initial-load");
     }).catch(() => {});
   }
@@ -259,7 +277,8 @@ function render(root, context, state, actions) {
       });
   }
   if (!appStore.get("working.sellerBilling.history.hydratedAt", 0)) {
-    showroomsResource.subscriptionHistory()
+    const showroomId = showroom?.id ?? null;
+    (showroomId ? showroomsResource.subscriptionHistoryForOwned(showroomId) : showroomsResource.subscriptionHistory())
       .catch(() => [])
       .then((data) => {
         appStore.patchState("working.sellerBilling.history", { data, hydratedAt: Date.now() }, "seller-billing:history-loaded");
@@ -302,6 +321,7 @@ function paymentForm(state, actions, destinationMaster) {
     state.midtransPanelWidget?.dispose?.();
     state.midtransPanelWidget = SubscriptionMidtransPanel({
       getShowroom: () => state.midtransShowroom,
+      getShowroomId: () => currentShowroomId(),
       onPaid: (showroom) => actions.handleMidtransPaid(showroom),
     });
     section.append(state.midtransPanelWidget.element);

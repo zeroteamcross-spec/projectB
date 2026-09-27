@@ -10,6 +10,7 @@ import { closeModal, openModal } from "../../../ui/primitives/modal.js";
 import { sellerState } from "../state/sellerState.js";
 import { SellerShowroomForm } from "../components/sellerShowroomForm.js";
 import { SellerShowroomView } from "../components/sellerShowroomView.js";
+import { SellerBranchSwitcher } from "../components/sellerBranchSwitcher.js";
 import { ModalHeaderFormActions } from "../../../ui/composites/modalHeaderFormActions.js";
 
 const FORM_ID = "slrsr_form_section";
@@ -29,6 +30,7 @@ const DEFAULT_RUNTIME = {
 export function SellerShowroomPage() {
   let root = null;
   let unsubscribe = null;
+  let branchSwitcherWidget = null;
 
   return createPageLifecycle({
     mount({ router }) {
@@ -46,45 +48,52 @@ export function SellerShowroomPage() {
     },
     dispose() {
       unsubscribe = null;
+      branchSwitcherWidget?.dispose?.();
+      branchSwitcherWidget = null;
       appStore.destroyRuntimeState(RUNTIME_KEY);
     },
   });
-}
 
-function render(root, router) {
-  if (!root) {
-    return;
+  function render(rootEl, router) {
+    if (!rootEl) {
+      return;
+    }
+
+    const snapshotShowroom = sellerState.snapshot("showroom", null);
+    const showroom = sellerState.working("sellerShowroom", "showroom", snapshotShowroom);
+    const snapshotBankMaster = sellerState.snapshot("masterBank", adminMasterService.normalizeBankMaster(null));
+    const bankMaster = sellerState.working("sellerShowroom", "masterBank", snapshotBankMaster);
+    const bankOptions = adminMasterService.normalizeBankMaster(bankMaster).data.banks;
+    const snapshotLocationMaster = sellerState.snapshot("masterLocation", adminMasterService.normalizeLocationMaster(null));
+    const workingLocationMaster = sellerState.working("sellerShowroom", "masterLocation", snapshotLocationMaster);
+    const locationMaster = adminMasterService.normalizeLocationMaster(workingLocationMaster ?? snapshotLocationMaster);
+    const cityOptions = locationMaster?.data?.cities ?? [];
+    const runtime = runtimeState();
+
+    const body = applyDesignHook(SellerShowroomView({
+      showroom,
+      onEdit: () => setRuntime({ editing: true, error: "" }),
+    }), "seller.showroom.view");
+
+    if (runtime.editing) {
+      openShowroomEditModal({ showroom, bankOptions, cityOptions, runtime, router });
+    } else {
+      closeShowroomEditModal();
+    }
+
+    // Dibuat sekali saja (bukan tiap render) -- widget ini punya state
+    // (fetch mineList()) sendiri, membuatnya ulang tiap kali appStore
+    // berubah akan mengulang fetch dan membuatnya berkedip kosong lagi.
+    branchSwitcherWidget ??= SellerBranchSwitcher();
+
+    const layout = document.createElement("section");
+    layout.id = "slrsr_page_section";
+    layout.className = "grid min-w-0 gap-6";
+    layout.dataset.ds = "seller.showroom.page";
+    layout.append(showroomHero({ router, showroom, editing: false }), branchSwitcherWidget.element, body);
+
+    rootEl.replaceChildren(layout);
   }
-
-  const snapshotShowroom = sellerState.snapshot("showroom", null);
-  const showroom = sellerState.working("sellerShowroom", "showroom", snapshotShowroom);
-  const snapshotBankMaster = sellerState.snapshot("masterBank", adminMasterService.normalizeBankMaster(null));
-  const bankMaster = sellerState.working("sellerShowroom", "masterBank", snapshotBankMaster);
-  const bankOptions = adminMasterService.normalizeBankMaster(bankMaster).data.banks;
-  const snapshotLocationMaster = sellerState.snapshot("masterLocation", adminMasterService.normalizeLocationMaster(null));
-  const workingLocationMaster = sellerState.working("sellerShowroom", "masterLocation", snapshotLocationMaster);
-  const locationMaster = adminMasterService.normalizeLocationMaster(workingLocationMaster ?? snapshotLocationMaster);
-  const cityOptions = locationMaster?.data?.cities ?? [];
-  const runtime = runtimeState();
-
-  const body = applyDesignHook(SellerShowroomView({
-    showroom,
-    onEdit: () => setRuntime({ editing: true, error: "" }),
-  }), "seller.showroom.view");
-
-  if (runtime.editing) {
-    openShowroomEditModal({ showroom, bankOptions, cityOptions, runtime, router });
-  } else {
-    closeShowroomEditModal();
-  }
-
-  const layout = document.createElement("section");
-  layout.id = "slrsr_page_section";
-  layout.className = "grid min-w-0 gap-6";
-  layout.dataset.ds = "seller.showroom.page";
-  layout.append(showroomHero({ router, showroom, editing: false }), body);
-
-  root.replaceChildren(layout);
 }
 
 function openShowroomEditModal({ showroom, bankOptions, cityOptions, runtime, router }) {
@@ -108,8 +117,8 @@ function openShowroomEditModal({ showroom, bankOptions, cityOptions, runtime, ro
     cityOptions,
     uploadingIcon: runtime.uploadingIcon,
     uploadingLogo: runtime.uploadingLogo,
-    onUploadIcon: (file) => uploadBrandingIcon(file),
-    onUploadLogo: (file) => uploadBrandingLogo(file),
+    onUploadIcon: (file) => uploadBrandingIcon(file, showroom?.id ?? null),
+    onUploadLogo: (file) => uploadBrandingLogo(file, showroom?.id ?? null),
     onSubmit: (payload) => saveShowroom(payload, router),
   }), "seller.showroom.form"));
 
@@ -155,10 +164,12 @@ function showroomModalSignature({ showroom, runtime }) {
   ].join("|");
 }
 
-async function uploadBrandingIcon(file) {
+async function uploadBrandingIcon(file, showroomId = null) {
   setRuntime({ uploadingIcon: true, error: "" });
   try {
-    const asset = await showroomsResource.uploadBrandingIcon(file);
+    const asset = showroomId
+      ? await showroomsResource.uploadBrandingIconFor(showroomId, file)
+      : await showroomsResource.uploadBrandingIcon(file);
     const path = asset?.path ?? asset?.url ?? "";
     if (!path) throw new Error("Upload icon tidak mengembalikan path.");
     setRuntime({ uploadingIcon: false, iconUrlDraft: path });
@@ -170,10 +181,12 @@ async function uploadBrandingIcon(file) {
   }
 }
 
-async function uploadBrandingLogo(file) {
+async function uploadBrandingLogo(file, showroomId = null) {
   setRuntime({ uploadingLogo: true, error: "" });
   try {
-    const asset = await showroomsResource.uploadBrandingLogo(file);
+    const asset = showroomId
+      ? await showroomsResource.uploadBrandingLogoFor(showroomId, file)
+      : await showroomsResource.uploadBrandingLogo(file);
     const path = asset?.path ?? asset?.url ?? "";
     if (!path) throw new Error("Upload logo tidak mengembalikan path.");
     setRuntime({ uploadingLogo: false, headerLogoUrlDraft: path });
@@ -186,11 +199,19 @@ async function uploadBrandingLogo(file) {
 }
 
 async function saveShowroom(payload) {
-  const isCreate = !sellerState.working("sellerShowroom", "showroom", sellerState.snapshot("showroom", null));
+  const existing = sellerState.working("sellerShowroom", "showroom", sellerState.snapshot("showroom", null));
+  const isCreate = !existing;
   setRuntime({ saving: true, error: "" });
 
   try {
-    const showroom = await showroomsResource.updateMine(payload);
+    // Cabang yang sudah ada (existing.id) selalu lewat updateBranch() dengan
+    // id eksplisit -- mengedit showroom TIDAK BOLEH diam-diam menyasar
+    // cabang lain kalau seller sempat pindah cabang aktif di tab lain.
+    // Pembuatan showroom PERTAMA (belum ada existing sama sekali) tetap
+    // lewat updateMine() (jalur create lama, tidak berubah).
+    const showroom = existing?.id
+      ? await showroomsResource.updateBranch(existing.id, payload)
+      : await showroomsResource.updateMine(payload);
     appStore.patchState("working.sellerShowroom.showroom", {
       data: showroom,
       hydratedAt: Date.now(),

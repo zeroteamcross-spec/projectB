@@ -4,6 +4,14 @@ export const appStore = new StateEngine({
   app: {
     bootstrapped: false,
     activeRole: "public",
+    // Cabang showroom yang sedang dikelola seller (fitur multi-cabang) --
+    // sama sekali tidak dikirim server. Nilai awalnya selalu null di sini;
+    // modules/seller/state/activeShowroom.js yang membaca/menulis nilai
+    // sesungguhnya (localStorage, supaya bertahan lewat reload penuh) dan
+    // memakai slot ini murni sebagai cache in-memory. null berarti belum
+    // pernah dipilih/seller cuma punya satu cabang (jalur lama, tidak
+    // berubah).
+    activeShowroomId: null,
     currentRoute: null,
     routeHydrateError: null,
     resourceVersions: {},

@@ -25,7 +25,7 @@ const POLL_INTERVAL_MS = 5000;
  * (lihat ShowroomService::confirmSubscriptionPayment()). Polling di sini
  * cuma mendeteksi "sudah dibayar, menunggu Admin", bukan "sudah aktif".
  */
-export function SubscriptionMidtransPanel({ getShowroom, onPaid = null } = {}) {
+export function SubscriptionMidtransPanel({ getShowroom, getShowroomId = null, onPaid = null } = {}) {
   const root = document.createElement("div");
   root.id = "sub_midtrans_panel";
   root.className = "grid gap-3";
@@ -166,7 +166,10 @@ export function SubscriptionMidtransPanel({ getShowroom, onPaid = null } = {}) {
     render();
 
     try {
-      const showroom = await showroomsResource.createSubscriptionMidtransCharge(selectedBank);
+      const showroomId = getShowroomId?.();
+      const showroom = showroomId
+        ? await showroomsResource.createSubscriptionMidtransChargeFor(showroomId, selectedBank)
+        : await showroomsResource.createSubscriptionMidtransCharge(selectedBank);
       onPaid?.(showroom);
     } catch (submitError) {
       error = submitError?.message || "Gagal membuat Virtual Account.";
@@ -182,7 +185,10 @@ export function SubscriptionMidtransPanel({ getShowroom, onPaid = null } = {}) {
     }
     pollTimer = window.setInterval(async () => {
       try {
-        const showroom = await showroomsResource.mine();
+        const showroomId = getShowroomId?.();
+        const showroom = showroomId
+          ? await showroomsResource.mineById(showroomId)
+          : await showroomsResource.mine();
         if (showroom && showroom.subscription_payment_status !== "unpaid") {
           stopPolling();
         }

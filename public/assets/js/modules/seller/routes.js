@@ -1,7 +1,7 @@
 import { carsResource } from "../../resources/carsResource.js";
 import { imagesResource } from "../../resources/imagesResource.js";
 import { inspectionsResource } from "../../resources/inspectionsResource.js";
-import { showroomsResource } from "../../resources/showroomsResource.js";
+import { activeShowroom } from "./state/activeShowroom.js";
 import { transactionsResource } from "../../resources/transactionsResource.js";
 import { affiliatesResource } from "../../resources/affiliatesResource.js";
 import { adminMasterService } from "../admin/services/adminMasterService.js";
@@ -29,7 +29,7 @@ export const sellerRoutes = [
       working: [
         {
           key: "showroom",
-          loader: ({ signal }) => showroomsResource.mine({ signal }).catch(() => null),
+          loader: ({ signal }) => activeShowroom.resolveMine({ signal }).catch(() => null),
         },
         {
           key: "cars",
@@ -53,7 +53,7 @@ export const sellerRoutes = [
       working: [
         {
           key: "showroom",
-          loader: ({ signal }) => showroomsResource.mine({ signal }).catch(() => null),
+          loader: ({ signal }) => activeShowroom.resolveMine({ signal }).catch(() => null),
         },
         {
           key: "masterBank",
@@ -73,7 +73,7 @@ export const sellerRoutes = [
       working: [
         {
           key: "showroom",
-          loader: ({ signal }) => showroomsResource.mine({ signal }).catch(() => null),
+          loader: ({ signal }) => activeShowroom.resolveMine({ signal }).catch(() => null),
         },
         {
           key: "destination",
