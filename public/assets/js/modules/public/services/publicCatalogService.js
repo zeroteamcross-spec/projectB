@@ -12,7 +12,12 @@ export const publicCatalogService = {
     const normalizedAffiliateSlug = normalizeSlug(affiliateSlug);
     const normalizedShowroomSlug = normalizeSlug(showroomSlug);
     let affiliateSellerUserId = null;
-    let showroomSellerUserId = null;
+    // Katalog affiliate/marketing SENGAJA tetap disaring per akun
+    // (seller_user_id), bukan per cabang -- program afiliasi memang
+    // dirancang berlaku lintas semua cabang milik satu akun (lihat
+    // keputusan cakupan v1 di plan fitur Multi-Cabang), jadi kode ini tidak
+    // ikut diubah ke showroom_id.
+    let showroomId = null;
 
     if (normalizedAffiliateSlug) {
       const context = await publicContextService.activateAffiliateBySlug(normalizedAffiliateSlug, options);
@@ -29,7 +34,13 @@ export const publicCatalogService = {
         return { cars: [], meta: {} };
       }
 
-      showroomSellerUserId = context.sellerUserId;
+      // Sebelumnya context.sellerUserId (akun) -- begitu satu akun bisa
+      // punya banyak cabang (fitur Multi-Cabang), dua slug cabang berbeda
+      // milik akun yang sama akan menampilkan katalog yang identik kalau
+      // masih disaring per akun. Katalog showroom langsung (bukan lewat
+      // link marketing) harus per CABANG, jadi disaring pakai id showroom
+      // itu sendiri.
+      showroomId = context.id;
     }
 
     const cleanFilters = Object.fromEntries(
@@ -43,11 +54,13 @@ export const publicCatalogService = {
       listing_status: "published",
     };
 
-    if (affiliateSellerUserId || showroomSellerUserId) {
-      scopedFilters.seller_user_id = affiliateSellerUserId || showroomSellerUserId;
+    if (affiliateSellerUserId) {
+      scopedFilters.seller_user_id = affiliateSellerUserId;
+    } else if (showroomId) {
+      scopedFilters.showroom_id = showroomId;
     }
 
-    const requestFilters = (affiliateSellerUserId || showroomSellerUserId)
+    const requestFilters = (affiliateSellerUserId || showroomId)
       ? scopedFilters
       : publicContextService.applyCatalogFilters(scopedFilters);
     const cacheKey = catalogCacheKey({
@@ -90,6 +103,7 @@ export const publicCatalogService = {
 
   async detail(carId, options = {}) {
     let scopedSellerUserId = null;
+    let scopedShowroomId = null;
 
     if (options.affiliateSlug) {
       const context = await publicContextService.activateAffiliateBySlug(options.affiliateSlug, options);
@@ -97,6 +111,8 @@ export const publicCatalogService = {
         return null;
       }
 
+      // Tetap per akun (lihat catatan yang sama di list()) -- program
+      // afiliasi berlaku lintas semua cabang.
       scopedSellerUserId = context.sellerUserId;
     }
 
@@ -106,7 +122,9 @@ export const publicCatalogService = {
         return null;
       }
 
-      scopedSellerUserId = context.sellerUserId;
+      // Per CABANG (id showroom itu sendiri), bukan per akun -- lihat
+      // catatan yang sama di list().
+      scopedShowroomId = context.id;
     }
 
     let car = null;
@@ -126,6 +144,10 @@ export const publicCatalogService = {
     }
 
     if (scopedSellerUserId && Number(car.seller_user_id) !== Number(scopedSellerUserId)) {
+      return null;
+    }
+
+    if (scopedShowroomId && Number(car.showroom_id) !== Number(scopedShowroomId)) {
       return null;
     }
 

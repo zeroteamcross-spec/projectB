@@ -321,13 +321,18 @@ export const publicContextService = {
     if (!affiliate?.sellerUserId) {
       const showroom = this.activeShowroom();
 
-      if (!showroom?.sellerUserId) {
+      if (!showroom?.id) {
         return { ...filters };
       }
 
+      // Per CABANG (id showroom-nya sendiri), bukan per akun -- dua cabang
+      // berbeda milik akun yang sama tidak boleh menampilkan katalog yang
+      // identik. Beda dengan cabang affiliate di bawah: program afiliasi
+      // sengaja tetap berlaku lintas semua cabang (lihat keputusan cakupan
+      // v1 di plan fitur Multi-Cabang), jadi TIDAK ikut diubah.
       return {
         ...filters,
-        seller_user_id: showroom.sellerUserId,
+        showroom_id: showroom.id,
       };
     }
 
