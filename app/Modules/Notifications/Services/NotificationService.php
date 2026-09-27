@@ -12,7 +12,7 @@ use PDOException;
 
 class NotificationService
 {
-    private const ROLES = ['seller', 'buyer', 'affiliate_admin', 'admin'];
+    private const ROLES = ['seller', 'buyer', 'affiliate_admin', 'admin', 'seller_staff'];
 
     private const TYPES = [
         'transaction_paid',
