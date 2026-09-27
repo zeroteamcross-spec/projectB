@@ -120,6 +120,28 @@ class CarRepository
         return $stmt->fetchAll();
     }
 
+    /**
+     * Dipakai untuk menegakkan batas listing per paket (Master Harga
+     * menjanjikan mis. "Sampai 10 listing mobil" untuk Basic). 'archived'
+     * dikecualikan -- itu mobil yang sengaja dikeluarkan dari listing oleh
+     * seller sendiri, jadi tidak lagi menghabiskan jatah paketnya. Status lain
+     * (draft, published, sold, dp_paid, dst.) tetap dihitung karena semuanya
+     * masih berupa entri mobil yang tersimpan.
+     */
+    public function countActiveByShowroom(int $showroomId): int
+    {
+        $stmt = $this->pdo->prepare(
+            "SELECT COUNT(*) AS total FROM cars
+             WHERE showroom_id = :showroom_id
+             AND deleted_at IS NULL
+             AND listing_status <> 'archived'"
+        );
+        $stmt->execute(['showroom_id' => $showroomId]);
+        $row = $stmt->fetch();
+
+        return (int) ($row['total'] ?? 0);
+    }
+
     public function showroomIdForSeller(int $sellerUserId): ?int
     {
         $stmt = $this->pdo->prepare(

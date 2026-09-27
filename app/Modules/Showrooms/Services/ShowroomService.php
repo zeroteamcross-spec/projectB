@@ -180,6 +180,9 @@ class ShowroomService
                 'selected_plan_billing_period' => $hasPlanSelection
                     ? $plan['billing_period']
                     : $existing['selected_plan_billing_period'],
+                'selected_plan_listing_limit' => $hasPlanSelection
+                    ? $plan['listing_limit']
+                    : ($existing['selected_plan_listing_limit'] ?? null),
                 'selected_plan_selected_at' => $hasPlanSelection ? date('Y-m-d H:i:s') : $existing['selected_plan_selected_at'],
                 'subscription_payment_status' => $planChanged ? 'unpaid' : $existing['subscription_payment_status'],
                 'subscription_proof_path' => $planChanged ? null : $existing['subscription_proof_path'],
@@ -709,7 +712,7 @@ class ShowroomService
         $planName = is_string($planName) ? trim($planName) : '';
 
         if ($planName === '') {
-            return ['name' => null, 'price' => null, 'billing_period' => null];
+            return ['name' => null, 'price' => null, 'billing_period' => null, 'listing_limit' => null];
         }
 
         $plans = [];
@@ -726,10 +729,13 @@ class ShowroomService
             $isActive = ($candidate['status'] ?? 'active') === 'active';
 
             if ($isMatch && $isActive) {
+                $listingLimit = $candidate['listing_limit'] ?? null;
+
                 return [
                     'name' => $candidate['name'],
                     'price' => (float) ($candidate['price'] ?? 0),
                     'billing_period' => $candidate['billing_period'] ?? null,
+                    'listing_limit' => $listingLimit !== null && $listingLimit !== '' ? (int) $listingLimit : null,
                 ];
             }
         }
@@ -799,6 +805,7 @@ class ShowroomService
             'selected_plan_name' => $showroom['selected_plan_name'] ?? null,
             'selected_plan_price' => isset($showroom['selected_plan_price']) ? (float) $showroom['selected_plan_price'] : null,
             'selected_plan_billing_period' => $showroom['selected_plan_billing_period'] ?? null,
+            'selected_plan_listing_limit' => isset($showroom['selected_plan_listing_limit']) ? (int) $showroom['selected_plan_listing_limit'] : null,
             'selected_plan_selected_at' => $showroom['selected_plan_selected_at'] ?? null,
             'subscription_payment_status' => $showroom['subscription_payment_status'] ?? 'unpaid',
             'subscription_proof_path' => $showroom['subscription_proof_path'] ?? null,

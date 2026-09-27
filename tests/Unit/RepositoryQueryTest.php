@@ -14,6 +14,7 @@ class RepositoryQueryTest extends TestCase
     public function run(): void
     {
         $this->carRepositoryFiltersPublishedCatalogRows();
+        $this->carRepositoryCountsActiveListingsForListingLimit();
         $this->transactionRepositoryFindsTransactionByPaymentLogProviderOrderId();
         $this->masterDataUpdateTargetsSingleRowById();
     }
@@ -46,6 +47,33 @@ class RepositoryQueryTest extends TestCase
         $this->assertSame(1, count($rows));
         $this->assertSame('Avanza', $rows[0]['model_name']);
         $this->assertSame(1, $repository->count(['listing_status' => 'published']));
+    }
+
+    /**
+     * Menegakkan batas listing per paket (CarService::enforceListingLimit())
+     * bergantung pada hitungan ini mengecualikan 'archived' -- itu mobil yang
+     * sengaja dikeluarkan seller dari listing, jadi tidak boleh ikut
+     * menghabiskan jatah paketnya -- dan mengecualikan showroom lain sama
+     * sekali walau id-nya berurutan.
+     */
+    private function carRepositoryCountsActiveListingsForListingLimit(): void
+    {
+        $pdo = $this->sqlite();
+        $this->createCarsTable($pdo);
+        $pdo->exec("INSERT INTO cars
+            (id, seller_user_id, showroom_id, listing_status, stock, has_service_book, key_count, created_at)
+            VALUES
+            (1, 7, 100, 'draft', 1, 0, 1, '2026-01-01 00:00:00'),
+            (2, 7, 100, 'published', 1, 0, 1, '2026-01-01 00:00:00'),
+            (3, 7, 100, 'archived', 1, 0, 1, '2026-01-01 00:00:00'),
+            (4, 7, 100, 'sold', 1, 0, 1, '2026-01-01 00:00:00'),
+            (5, 9, 200, 'published', 1, 0, 1, '2026-01-01 00:00:00')");
+
+        $repository = new CarRepository($pdo);
+
+        $this->assertSame(3, $repository->countActiveByShowroom(100));
+        $this->assertSame(1, $repository->countActiveByShowroom(200));
+        $this->assertSame(0, $repository->countActiveByShowroom(999));
     }
 
     private function transactionRepositoryFindsTransactionByPaymentLogProviderOrderId(): void

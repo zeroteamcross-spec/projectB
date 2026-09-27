@@ -11,16 +11,20 @@ use App\Modules\Cars\Mappers\CarMapper;
 use App\Modules\Cars\Policies\CarPolicy;
 use App\Modules\Cars\Repositories\CarRepository;
 use App\Modules\Notifications\Services\NotificationService;
+use App\Modules\Showrooms\Repositories\ShowroomRepository;
 
 class CarService
 {
     private CarRepository $cars;
 
+    private ShowroomRepository $showrooms;
+
     private ?NotificationService $notificationService;
 
-    public function __construct(CarRepository $cars, ?NotificationService $notificationService = null)
+    public function __construct(CarRepository $cars, ShowroomRepository $showrooms, ?NotificationService $notificationService = null)
     {
         $this->cars = $cars;
+        $this->showrooms = $showrooms;
         $this->notificationService = $notificationService;
     }
 
@@ -84,6 +88,8 @@ class CarService
         $payload['showroom_id'] = array_key_exists('showroom_id', $data)
             ? $data['showroom_id']
             : $this->cars->showroomIdForSeller($sellerUserId);
+
+        $this->enforceListingLimit($user, $payload['showroom_id']);
         $payload['listing_status'] = $listingStatus;
         $payload['inspection_summary_status'] = $data['inspection_summary_status'] ?? 'not_checked';
         $payload['published_at'] = $listingStatus === 'published' ? $now : null;
@@ -186,6 +192,36 @@ class CarService
         $this->cars->markSoldExternal($id, $trimmedNote, (int) $user['id']);
 
         return $this->detail($id, $user);
+    }
+
+    /**
+     * Master Harga menjanjikan batas listing per paket (mis. Basic "Sampai 10
+     * listing mobil"), tapi sebelumnya tidak pernah ditegakkan di sini --
+     * showroom paket mana pun bisa membuat listing tanpa batas. Hanya berlaku
+     * untuk seller sendiri; Admin sengaja dikecualikan supaya tetap bisa
+     * membuatkan/memperbaiki listing atas nama showroom mana pun tanpa
+     * terhalang paketnya.
+     */
+    private function enforceListingLimit(array $user, $showroomId): void
+    {
+        if (($user['role'] ?? null) !== 'seller' || $showroomId === null) {
+            return;
+        }
+
+        $showroom = $this->showrooms->findById((int) $showroomId);
+        $limit = $showroom['selected_plan_listing_limit'] ?? null;
+
+        if ($limit === null) {
+            return;
+        }
+
+        $limit = (int) $limit;
+
+        if ($this->cars->countActiveByShowroom((int) $showroomId) >= $limit) {
+            throw new ValidationException([
+                'listing_limit' => "Batas {$limit} listing mobil untuk paket showroom Anda sudah tercapai. Keluarkan listing lama atau upgrade paket untuk menambah lagi.",
+            ]);
+        }
     }
 
     private function listWithMeta(array $filters, array $pagination): array

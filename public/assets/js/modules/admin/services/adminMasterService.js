@@ -120,13 +120,13 @@ const DEFAULT_LOCATION_SEED = [
 const DEFAULT_PRICING_SEED = [
   pricingSeed("plan_basic", "Basic", 500000, "/bulan", [
     "1 showroom aktif", "Sampai 10 listing mobil", "Dukungan email",
-  ], false),
+  ], false, 10),
   pricingSeed("plan_pro", "Pro", 1500000, "/bulan", [
     "1 showroom aktif", "Listing mobil tanpa batas", "Fitur Marketing/Affiliate", "Dukungan prioritas",
-  ], true),
+  ], true, null),
   pricingSeed("plan_enterprise", "Enterprise", 3500000, "/bulan", [
     "Semua fitur Pro", "Multi-cabang", "Manajer akun khusus",
-  ], false),
+  ], false, null),
 ];
 
 export const adminMasterService = {
@@ -588,6 +588,7 @@ function normalizePlans(plans = []) {
       billing_period: String(plan.billing_period ?? "").trim(),
       features: normalizePlanFeatures(plan.features),
       is_recommended: Boolean(plan.is_recommended),
+      listing_limit: normalizeListingLimit(plan.listing_limit),
       status: ["active", "inactive"].includes(plan.status) ? plan.status : "active",
       updated_at: plan.updated_at ?? null,
     };
@@ -597,6 +598,14 @@ function normalizePlans(plans = []) {
     seen.add(normalized.slug);
     return normalized;
   }).filter(Boolean);
+}
+
+function normalizeListingLimit(value) {
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
+  const n = Math.trunc(Number(value));
+  return Number.isFinite(n) && n > 0 ? n : null;
 }
 
 function normalizePlanFeatures(features) {
@@ -692,6 +701,7 @@ function createEmptyPlan() {
     billing_period: "/bulan",
     features: [],
     is_recommended: false,
+    listing_limit: null,
     status: "active",
   };
 }
@@ -775,7 +785,7 @@ function citySeed(id, name, slug, provinceName = "", provinceSlug = "") {
   };
 }
 
-function pricingSeed(id, name, price, billingPeriod, features = [], isRecommended = false) {
+function pricingSeed(id, name, price, billingPeriod, features = [], isRecommended = false, listingLimit = null) {
   return {
     id,
     slug: slugify(name),
@@ -784,6 +794,7 @@ function pricingSeed(id, name, price, billingPeriod, features = [], isRecommende
     billing_period: billingPeriod,
     features,
     is_recommended: isRecommended,
+    listing_limit: listingLimit,
     status: "active",
     updated_at: "2026-09-11T00:00:00.000Z",
   };

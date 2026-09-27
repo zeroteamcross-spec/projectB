@@ -32,11 +32,13 @@ export function AdminMasterPricingForm({
   const name = inputField("admstpr_plan_name_input", "name", "Nama paket", draft.name, "Contoh: Pro");
   const price = inputField("admstpr_plan_price_input", "price", "Harga (Rp)", draft.price || "", "Contoh: 1500000", "number");
   const billingPeriod = inputField("admstpr_plan_billing_period_input", "billing_period", "Periode tagihan", draft.billing_period, "Contoh: /bulan, /tahun, sekali bayar");
+  const listingLimit = inputField("admstpr_plan_listing_limit_input", "listing_limit", "Batas listing mobil (kosongkan = tanpa batas)", draft.listing_limit ?? "", "Contoh: 10", "number");
+  listingLimit.input.min = "1";
   const status = selectField("admstpr_plan_status_input", "status", "Status", draft.status, [
     ["active", "Aktif"],
     ["inactive", "Nonaktif"],
   ]);
-  fields.append(name.wrap, price.wrap, billingPeriod.wrap, status.wrap);
+  fields.append(name.wrap, price.wrap, billingPeriod.wrap, listingLimit.wrap, status.wrap);
 
   const recommendedWrap = document.createElement("label");
   recommendedWrap.className = "flex items-center gap-2 text-xs font-semibold text-gray-700";
@@ -101,6 +103,14 @@ export function AdminMasterPricingForm({
       billing_period: String(formData.get("billing_period") ?? "").trim(),
       features: String(formData.get("features") ?? "").split("\n").map((line) => line.trim()).filter(Boolean),
       is_recommended: formData.get("is_recommended") === "on",
+      listing_limit: (() => {
+        const raw = String(formData.get("listing_limit") ?? "").trim();
+        if (raw === "") {
+          return null;
+        }
+        const n = Math.trunc(Number(raw));
+        return Number.isFinite(n) && n > 0 ? n : null;
+      })(),
       status: String(formData.get("status") ?? "active"),
     });
   });

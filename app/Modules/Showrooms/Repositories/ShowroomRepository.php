@@ -26,7 +26,8 @@ class ShowroomRepository
         $stmt = $this->pdo->prepare(
             'SELECT id, user_id, slug, name, address, city_name, phone_number, bank_account_number,
                     bank_type, bank_account_name, icon_url, header_logo_url, tab_title,
-                    selected_plan_name, selected_plan_price, selected_plan_billing_period, selected_plan_selected_at,
+                    selected_plan_name, selected_plan_price, selected_plan_billing_period,
+                    selected_plan_listing_limit, selected_plan_selected_at,
                     ' . self::SUBSCRIPTION_COLUMNS . ',
                     is_active, deactivated_reason, deactivated_at, deactivated_by,
                     created_at, updated_at
@@ -46,7 +47,8 @@ class ShowroomRepository
         $stmt = $this->pdo->prepare(
             'SELECT id, user_id, slug, name, address, city_name, phone_number, bank_account_number,
                     bank_type, bank_account_name, icon_url, header_logo_url, tab_title,
-                    selected_plan_name, selected_plan_price, selected_plan_billing_period, selected_plan_selected_at,
+                    selected_plan_name, selected_plan_price, selected_plan_billing_period,
+                    selected_plan_listing_limit, selected_plan_selected_at,
                     ' . self::SUBSCRIPTION_COLUMNS . ',
                     is_active, deactivated_reason, deactivated_at, deactivated_by,
                     created_at, updated_at
@@ -152,6 +154,7 @@ class ShowroomRepository
                  selected_plan_name = :selected_plan_name,
                  selected_plan_price = :selected_plan_price,
                  selected_plan_billing_period = :selected_plan_billing_period,
+                 selected_plan_listing_limit = :selected_plan_listing_limit,
                  selected_plan_selected_at = :selected_plan_selected_at,
                  subscription_payment_status = :subscription_payment_status,
                  subscription_proof_path = :subscription_proof_path,
@@ -189,6 +192,7 @@ class ShowroomRepository
             'selected_plan_name' => $data['selected_plan_name'] ?? null,
             'selected_plan_price' => $data['selected_plan_price'] ?? null,
             'selected_plan_billing_period' => $data['selected_plan_billing_period'] ?? null,
+            'selected_plan_listing_limit' => $data['selected_plan_listing_limit'] ?? null,
             'selected_plan_selected_at' => $data['selected_plan_selected_at'] ?? null,
             'subscription_payment_status' => $data['subscription_payment_status'] ?? 'unpaid',
             'subscription_proof_path' => $data['subscription_proof_path'] ?? null,

@@ -52,6 +52,7 @@ export function AdminMasterPricingList({
     columns: [
       { label: "Paket", render: (plan) => planCell(plan) },
       { label: "Harga", render: (plan) => textBlock("text-xs font-black text-gray-900", `${formatCurrency(plan.price)}${plan.billing_period ? ` ${plan.billing_period}` : ""}`) },
+      { label: "Batas Listing", render: (plan) => textBlock("text-xs text-gray-600", listingLimitLabel(plan)) },
       { label: "Fitur", render: (plan) => textBlock("text-xs text-gray-600", plan.features?.length ? plan.features.join(", ") : "-") },
       { label: "Status", render: (plan) => statusBadge(plan.status) },
       { label: "Aksi", render: (plan) => actionGroup({ plan, onEdit, onToggleStatus, onDelete, idScope: "desktop" }) },
@@ -69,6 +70,7 @@ export function AdminMasterPricingList({
       { label: "Status", value: plan.status === "active" ? "Aktif" : "Nonaktif" },
     ],
     mobileDisclosureFields: (plan) => [
+      { label: "Batas Listing", value: listingLimitLabel(plan) },
       { label: "Fitur", value: plan.features?.length ? plan.features.join(", ") : "-" },
       { label: "Slug", value: plan.slug || "-" },
     ],
@@ -127,6 +129,10 @@ function statusBadge(status) {
     label: status === "active" ? "Aktif" : "Nonaktif",
     variant: status === "active" ? "success" : "default",
   });
+}
+
+function listingLimitLabel(plan) {
+  return plan.listing_limit ? `Maks ${plan.listing_limit} listing` : "Tanpa batas";
 }
 
 function textBlock(className, text) {
