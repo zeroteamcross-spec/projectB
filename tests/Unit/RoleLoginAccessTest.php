@@ -18,18 +18,23 @@ class RoleLoginAccessTest extends TestCase
 {
     public function run(): void
     {
-        $this->sellerLoginAlsoAcceptsMarketing();
+        $this->sellerLoginAlsoAcceptsMarketingAndStaff();
         $this->otherLoginPagesStayNarrow();
         $this->landingFollowsTheRealRoleNotThePageTitle();
     }
 
-    private function sellerLoginAlsoAcceptsMarketing(): void
+    /**
+     * Staf showroom (dibuat owner-nya sendiri di #/seller/staff) berbagi
+     * pintu login yang sama dengan seller/marketing -- alasannya sama:
+     * akunnya dibuat dari dalam ekosistem seller ini juga.
+     */
+    private function sellerLoginAlsoAcceptsMarketingAndStaff(): void
     {
         $source = $this->service();
 
         $this->assertTrue(
-            preg_match('/acceptedRoles:\s*\["seller",\s*"affiliate_admin"\]/', $source) === 1,
-            'Halaman /login/seller harus menerima seller dan affiliate_admin.'
+            preg_match('/acceptedRoles:\s*\["seller",\s*"affiliate_admin",\s*"seller_staff"\]/', $source) === 1,
+            'Halaman /login/seller harus menerima seller, affiliate_admin, dan seller_staff.'
         );
     }
 

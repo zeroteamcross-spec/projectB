@@ -23,8 +23,24 @@ const SELLER_LINKS = [
   { href: "/seller/showroom", label: "Showroom Saya", icon: "showroom" },
   { href: "/seller/cars", label: "Katalog", icon: "car" },
   { href: "/seller/inspection", label: "Inspeksi", icon: "clipboard" },
+  { href: "/seller/staff", label: "Kelola Staf", icon: "user" },
   { href: "/seller/affiliates", label: "Marketing", icon: "affiliate" },
   { href: "/seller/affiliate-commissions", label: "Komisi Marketing", icon: "commission" },
+  { href: "/seller/transactions", label: "Transaksi", icon: "transaction" },
+];
+
+/**
+ * Staf showroom -- subset SELLER_LINKS TANPA Kelola Staf, Marketing, Komisi
+ * Marketing, dan Langganan (billing tidak ada di menu seller sama sekali,
+ * jadi tidak perlu dikecualikan lagi di sini). Staf terikat ke satu cabang
+ * tertentu, tidak pernah melihat pemilih cabang atau menu pemilik.
+ */
+const STAFF_LINKS = [
+  { href: "/seller", label: "Dashboard Showroom", icon: "dashboard" },
+  { href: "/profile", label: "Profil Saya", icon: "user" },
+  { href: "/seller/showroom", label: "Showroom Saya", icon: "showroom" },
+  { href: "/seller/cars", label: "Katalog", icon: "car" },
+  { href: "/seller/inspection", label: "Inspeksi", icon: "clipboard" },
   { href: "/seller/transactions", label: "Transaksi", icon: "transaction" },
 ];
 
@@ -298,11 +314,13 @@ function renderLinks(nav, store, options = {}) {
   const path = store?.get("app.currentRoute.path", "/buyer") ?? "/buyer";
   const fallbackLinks = role === "seller"
     ? SELLER_LINKS
-    : role === "admin"
-      ? ADMIN_LINKS
-      : role === "affiliate_admin"
-        ? AFFILIATE_LINKS
-        : BUYER_LINKS;
+    : role === "seller_staff"
+      ? STAFF_LINKS
+      : role === "admin"
+        ? ADMIN_LINKS
+        : role === "affiliate_admin"
+          ? AFFILIATE_LINKS
+          : BUYER_LINKS;
   let links = getSidebarLinksForRole(role, store, fallbackLinks);
 
   const userRealRole = store?.get("auth.user.role", "") || store?.get("auth.role", "");
@@ -316,7 +334,10 @@ function renderLinks(nav, store, options = {}) {
 
 function resolveSidebarRole(store) {
   const routeRole = store?.get("app.currentRoute.route.role", "") ?? "";
-  if (routeRole && routeRole !== "public") {
+  // route.role sekarang bisa berupa array (rute yang dibagi seller & staf) --
+  // begitu itu terjadi, jatuhkan ke role asli user di bawah alih-alih
+  // memakai array itu sendiri sebagai "peran".
+  if (typeof routeRole === "string" && routeRole && routeRole !== "public") {
     return routeRole;
   }
 

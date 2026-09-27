@@ -4,6 +4,7 @@ import { inspectionsResource } from "../../resources/inspectionsResource.js";
 import { activeShowroom } from "./state/activeShowroom.js";
 import { transactionsResource } from "../../resources/transactionsResource.js";
 import { affiliatesResource } from "../../resources/affiliatesResource.js";
+import { staffResource } from "../../resources/staffResource.js";
 import { adminMasterService } from "../admin/services/adminMasterService.js";
 import { SellerDashboardPage } from "./pages/dashboardPage.js";
 import { SellerAffiliateCommissionsPage } from "./pages/affiliateCommissionsPage.js";
@@ -13,6 +14,7 @@ import { SellerCarImagesPage } from "./pages/carImagesPage.js";
 import { SellerCarInspectionPage } from "./pages/carInspectionPage.js";
 import { SellerInspectionPage } from "./pages/inspectionPage.js";
 import { SellerShowroomPage } from "./pages/showroomPage.js";
+import { SellerStaffPage } from "./pages/staffPage.js";
 import { SellerBillingPage } from "./pages/billingPage.js";
 import { SellerTransactionDetailPage } from "./pages/transactionDetailPage.js";
 import { SellerTransactionsPage } from "./pages/transactionsPage.js";
@@ -22,7 +24,7 @@ export const sellerRoutes = [
     name: "seller.dashboard",
     path: "/seller",
     shell: "app",
-    role: "seller",
+    role: ["seller", "seller_staff"],
     page: SellerDashboardPage,
     workingStateKey: "sellerDashboard",
     preload: {
@@ -46,7 +48,7 @@ export const sellerRoutes = [
     name: "seller.showroom",
     path: "/seller/showroom",
     shell: "app",
-    role: "seller",
+    role: ["seller", "seller_staff"],
     page: SellerShowroomPage,
     workingStateKey: "sellerShowroom",
     preload: {
@@ -58,6 +60,29 @@ export const sellerRoutes = [
         {
           key: "masterBank",
           loader: ({ signal }) => adminMasterService.getBankMaster({ signal }).catch(() => adminMasterService.normalizeBankMaster(null)),
+        },
+      ],
+    },
+  },
+  {
+    name: "seller.staff",
+    path: "/seller/staff",
+    shell: "app",
+    role: "seller",
+    page: SellerStaffPage,
+    workingStateKey: "sellerStaff",
+    preload: {
+      working: [
+        {
+          key: "showroom",
+          loader: ({ signal }) => activeShowroom.resolveMine({ signal }).catch(() => null),
+        },
+        {
+          key: "staff",
+          loader: async ({ signal }) => {
+            const showroom = await activeShowroom.resolveMine({ signal }).catch(() => null);
+            return showroom?.id ? staffResource.listMine(showroom.id, { signal }).catch(() => []) : [];
+          },
         },
       ],
     },
@@ -86,7 +111,7 @@ export const sellerRoutes = [
     name: "seller.cars",
     path: "/seller/cars",
     shell: "app",
-    role: "seller",
+    role: ["seller", "seller_staff"],
     page: SellerCarsPage,
     workingStateKey: "sellerCars",
     preload: {
@@ -146,7 +171,7 @@ export const sellerRoutes = [
     name: "seller.transactions",
     path: "/seller/transactions",
     shell: "app",
-    role: "seller",
+    role: ["seller", "seller_staff"],
     page: SellerTransactionsPage,
     workingStateKey: "sellerTransactions",
     preload: {
@@ -162,7 +187,7 @@ export const sellerRoutes = [
     name: "seller.inspection",
     path: "/seller/inspection",
     shell: "app",
-    role: "seller",
+    role: ["seller", "seller_staff"],
     page: SellerInspectionPage,
     workingStateKey: "sellerInspection",
     preload: {
@@ -183,7 +208,7 @@ export const sellerRoutes = [
     name: "seller.transaction-detail",
     path: "/seller/transactions/:id",
     shell: "app",
-    role: "seller",
+    role: ["seller", "seller_staff"],
     page: SellerTransactionDetailPage,
     workingStateKey: "sellerTransactionDetail",
     preload: {
@@ -199,7 +224,7 @@ export const sellerRoutes = [
     name: "seller.car-images",
     path: "/seller/cars/:id/images",
     shell: "app",
-    role: "seller",
+    role: ["seller", "seller_staff"],
     page: SellerCarImagesPage,
     workingStateKey: "sellerCarImages",
     preload: {
@@ -219,7 +244,7 @@ export const sellerRoutes = [
     name: "seller.car-inspection",
     path: "/seller/cars/:id/inspection",
     shell: "app",
-    role: "seller",
+    role: ["seller", "seller_staff"],
     page: SellerCarInspectionPage,
     workingStateKey: "sellerCarInspection",
     preload: {

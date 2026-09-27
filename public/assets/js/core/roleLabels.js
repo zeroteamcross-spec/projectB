@@ -24,6 +24,7 @@ const LABEL_PERAN = Object.freeze({
   super_admin: "Super Admin",
   affiliate: "Marketing",
   affiliate_admin: "Marketing",
+  seller_staff: "Staf Showroom",
 });
 
 export function roleLabel(role) {

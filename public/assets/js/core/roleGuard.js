@@ -12,6 +12,7 @@ const DEFAULT_HOME_BY_ROLE = {
   admin: "/admin",
   super_admin: "/super-admin",
   affiliate_admin: "/affiliate",
+  seller_staff: "/seller",
 };
 
 export function createRoleGuard({ auth } = {}) {
@@ -88,7 +89,7 @@ export function createRoleGuard({ auth } = {}) {
       });
     }
 
-    if (currentRole !== requiredRole && !canViewRole(currentRole, requiredRole)) {
+    if (!matchesRequiredRole(currentRole, requiredRole) && !canViewRole(currentRole, requiredRole)) {
       return redirect({
         route,
         currentRole,
@@ -99,6 +100,16 @@ export function createRoleGuard({ auth } = {}) {
 
     return allow(route);
   };
+}
+
+/**
+ * route.role sekarang bisa berupa array (mis. ["seller","seller_staff"])
+ * untuk rute yang boleh diakses lebih dari satu peran tanpa memberi peran
+ * baru itu izin admin/super_admin -- canViewRole() di bawah tetap terpisah
+ * untuk itu.
+ */
+function matchesRequiredRole(currentRole, requiredRole) {
+  return Array.isArray(requiredRole) ? requiredRole.includes(currentRole) : currentRole === requiredRole;
 }
 
 function canViewRole(currentRole, requiredRole) {
@@ -149,7 +160,8 @@ function redirect({ route, currentRole, requiredRole, fromPath }) {
 }
 
 function mismatchMessage(currentRole, requiredRole) {
-  return `Akun ${roleLabel(currentRole)} tidak dapat membuka area ${roleLabel(requiredRole)}.`;
+  const role = Array.isArray(requiredRole) ? requiredRole[0] : requiredRole;
+  return `Akun ${roleLabel(currentRole)} tidak dapat membuka area ${roleLabel(role)}.`;
 }
 
 function homeForRole(role) {
@@ -157,7 +169,10 @@ function homeForRole(role) {
 }
 
 function authLandingPath(requiredRole, fromPath) {
-  const path = requiredRole === PUBLIC_ROLE ? defaultLoginPath("buyer") : loginPathForRole(requiredRole);
+  // Rute yang boleh diakses lebih dari satu peran (mis. seller & staf) tetap
+  // punya SATU halaman login -- ambil elemen pertama untuk menentukannya.
+  const role = Array.isArray(requiredRole) ? requiredRole[0] : requiredRole;
+  const path = role === PUBLIC_ROLE ? defaultLoginPath("buyer") : loginPathForRole(role);
   const query = new URLSearchParams();
   query.set("from", fromPath);
   return `${path}?${query.toString()}`;

@@ -32,8 +32,10 @@ const ROLE_CONFIG = Object.freeze({
     //
     // Ini hanya soal pintu masuk, bukan hak akses: peran tetap datang dari
     // server, dan roleGuard yang menentukan halaman mana yang boleh dibuka.
-    // Marketing yang masuk di sini tetap marketing.
-    acceptedRoles: ["seller", "affiliate_admin"],
+    // Marketing yang masuk di sini tetap marketing. Staf showroom (dibuat
+    // owner-nya di #/seller/staff) berbagi pintu yang sama dengan alasan
+    // yang sama persis.
+    acceptedRoles: ["seller", "affiliate_admin", "seller_staff"],
     slug: "seller",
     label: "Showroom",
     title: "Login Showroom",
@@ -63,6 +65,11 @@ const ROLE_TO_SLUG = Object.freeze(Object.values(ROLE_CONFIG).reduce((carry, ite
   // default, which mislabels a super admin as "Buyer" anywhere role names
   // are displayed (e.g. the "sesi aktif" guard panel below).
   super_admin: "admin",
+  // seller_staff shares the seller login door (see acceptedRoles above) but
+  // has no ROLE_CONFIG entry of its own -- without this, a staff member
+  // logging in would be sent to config_buyer.home ("/buyer") instead of
+  // "/seller" by homeForAuthenticatedRole()'s role-mismatch branch.
+  seller_staff: "seller",
 }));
 
 export const roleSpecificLoginService = {
