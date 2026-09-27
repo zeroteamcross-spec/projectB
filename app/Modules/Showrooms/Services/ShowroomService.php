@@ -12,6 +12,7 @@ use App\Infrastructure\Storage\StorageServiceInterface;
 use App\Modules\Auth\Policies\AuthPolicy;
 use App\Modules\Auth\Repositories\AuthUserRepository;
 use App\Modules\MasterData\Services\MasterDataService;
+use App\Modules\Notifications\Services\NotificationService;
 use App\Modules\Showrooms\Repositories\ShowroomRepository;
 use Throwable;
 
@@ -49,18 +50,22 @@ class ShowroomService
 
     private AuthUserRepository $users;
 
+    private ?NotificationService $notificationService;
+
     public function __construct(
         ShowroomRepository $showrooms,
         MasterDataService $masterData,
         StorageServiceInterface $storage,
         MidtransHttpClient $midtransHttp,
-        AuthUserRepository $users
+        AuthUserRepository $users,
+        ?NotificationService $notificationService = null
     ) {
         $this->showrooms = $showrooms;
         $this->masterData = $masterData;
         $this->storage = $storage;
         $this->midtransHttp = $midtransHttp;
         $this->users = $users;
+        $this->notificationService = $notificationService;
     }
 
     public function mine(array $user): array
@@ -262,6 +267,12 @@ class ShowroomService
             throw $exception;
         }
 
+        if ($this->notificationService !== null) {
+            $this->notificationService->createSubscriptionProofSubmittedNotification(
+                $this->showrooms->findById($showroomId) ?? $showroom
+            );
+        }
+
         return $this->mine($user);
     }
 
@@ -310,7 +321,12 @@ class ShowroomService
             'updated_at' => $now,
         ]);
 
-        return $this->serializeShowroom($this->showrooms->findById($showroomId));
+        $confirmed = $this->showrooms->findById($showroomId);
+        if ($this->notificationService !== null) {
+            $this->notificationService->createSubscriptionPaymentConfirmedNotification($confirmed);
+        }
+
+        return $this->serializeShowroom($confirmed);
     }
 
     /**
@@ -453,7 +469,12 @@ class ShowroomService
             'updated_at' => $now,
         ]);
 
-        return $this->serializeShowroom($this->showrooms->findById($showroomId));
+        $rejected = $this->showrooms->findById($showroomId);
+        if ($this->notificationService !== null) {
+            $this->notificationService->createSubscriptionPaymentRejectedNotification($rejected);
+        }
+
+        return $this->serializeShowroom($rejected);
     }
 
     /**
@@ -621,6 +642,12 @@ class ShowroomService
             'subscription_next_due_at' => $nextDueAt,
             'updated_at' => $now,
         ]);
+
+        if ($this->notificationService !== null) {
+            $this->notificationService->createSubscriptionPaymentConfirmedNotification(
+                $this->showrooms->findById($showroomId) ?? $showroom
+            );
+        }
 
         // Approval akun cuma relevan untuk pendaftaran PERTAMA KALI (belum
         // is_approved) -- pembayaran perpanjangan (akun sudah aktif) tidak

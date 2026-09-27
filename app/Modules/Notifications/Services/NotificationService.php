@@ -30,6 +30,9 @@ class NotificationService
         'system_message',
         'manual_transfer_submitted',
         'manual_transfer_rejected',
+        'subscription_proof_submitted',
+        'subscription_payment_confirmed',
+        'subscription_payment_rejected',
     ];
 
     private const ICON_KEYS = [
@@ -246,6 +249,98 @@ class NotificationService
                 : sprintf('Bukti transfer untuk %s ditolak showroom. Unggah ulang buktinya.', $carLabel ?: $code),
             'data' => $this->transactionNotificationData($transaction),
             'link_url' => '/buyer/transactions',
+            'icon_key' => 'payment',
+            'priority' => 'high',
+        ]);
+    }
+
+    /**
+     * Admin sebelumnya tidak pernah tahu ada bukti perpanjangan/pembayaran
+     * paket baru masuk kecuali membuka Tagihan Berulang secara manual --
+     * confirmSubscriptionPayment()/rejectSubscriptionPayment() tidak pernah
+     * dipanggil kalau tidak ada yang sadar ada yang perlu ditinjau.
+     */
+    public function createSubscriptionProofSubmittedNotification(array $showroom): array
+    {
+        $showroomId = (int) ($showroom['id'] ?? 0);
+        if ($showroomId <= 0) {
+            return [];
+        }
+
+        $data = $this->showroomSubscriptionNotificationData($showroom);
+        $name = trim((string) ($showroom['name'] ?? '')) ?: ('Showroom #' . $showroomId);
+        $planName = $showroom['selected_plan_name'] ?? null;
+        $created = [];
+
+        foreach ($this->notifications->listActiveAdmins() as $admin) {
+            $created[] = $this->create([
+                'user_id' => (int) $admin['id'],
+                'role' => 'admin',
+                'type' => 'subscription_proof_submitted',
+                'title' => 'Bukti Pembayaran Paket Masuk',
+                'body' => $planName
+                    ? sprintf('%s mengunggah bukti pembayaran paket %s. Segera tinjau.', $name, $planName)
+                    : sprintf('%s mengunggah bukti pembayaran paket. Segera tinjau.', $name),
+                'data' => $data,
+                'link_url' => '/admin/subscriptions-due',
+                'icon_key' => 'payment',
+                'priority' => 'normal',
+            ]);
+        }
+
+        return $created;
+    }
+
+    /**
+     * Dipakai baik dari konfirmasi manual Admin maupun pembayaran Midtrans
+     * otomatis (lihat ShowroomService::confirmSubscriptionPayment()/
+     * handleSubscriptionMidtransCallback()) -- keduanya sama-sama berujung
+     * "pembayaran dikonfirmasi" dari sudut pandang showroom, cuma beda siapa
+     * yang memutuskan.
+     */
+    public function createSubscriptionPaymentConfirmedNotification(array $showroom): ?array
+    {
+        $sellerUserId = (int) ($showroom['user_id'] ?? 0);
+        if ($sellerUserId <= 0) {
+            return null;
+        }
+
+        $planName = $showroom['selected_plan_name'] ?? null;
+
+        return $this->create([
+            'user_id' => $sellerUserId,
+            'role' => 'seller',
+            'type' => 'subscription_payment_confirmed',
+            'title' => 'Pembayaran Paket Dikonfirmasi',
+            'body' => $planName
+                ? sprintf('Pembayaran paket %s sudah dikonfirmasi. Showroom Anda tetap aktif.', $planName)
+                : 'Pembayaran paket Anda sudah dikonfirmasi. Showroom Anda tetap aktif.',
+            'data' => $this->showroomSubscriptionNotificationData($showroom),
+            'link_url' => '/seller/billing',
+            'icon_key' => 'payment',
+            'priority' => 'high',
+        ]);
+    }
+
+    public function createSubscriptionPaymentRejectedNotification(array $showroom): ?array
+    {
+        $sellerUserId = (int) ($showroom['user_id'] ?? 0);
+        if ($sellerUserId <= 0) {
+            return null;
+        }
+
+        $reason = trim((string) ($showroom['subscription_rejected_reason'] ?? ''));
+
+        return $this->create([
+            'user_id' => $sellerUserId,
+            'role' => 'seller',
+            'type' => 'subscription_payment_rejected',
+            'title' => 'Bukti Pembayaran Paket Ditolak',
+            'body' => $reason !== ''
+                ? sprintf('Bukti pembayaran paket ditolak: %s. Unggah ulang buktinya.', $reason)
+                : 'Bukti pembayaran paket ditolak Admin. Unggah ulang buktinya.',
+            'data' => $this->showroomSubscriptionNotificationData($showroom),
+            'link_url' => '/seller/billing',
             'icon_key' => 'payment',
             'priority' => 'high',
         ]);
@@ -494,6 +589,15 @@ class NotificationService
         return [
             'user_id' => $userId,
             'role' => $role,
+        ];
+    }
+
+    private function showroomSubscriptionNotificationData(array $showroom): array
+    {
+        return [
+            'showroom_id' => isset($showroom['id']) ? (int) $showroom['id'] : null,
+            'plan_name' => $showroom['selected_plan_name'] ?? null,
+            'subscription_payment_status' => $showroom['subscription_payment_status'] ?? null,
         ];
     }
 
