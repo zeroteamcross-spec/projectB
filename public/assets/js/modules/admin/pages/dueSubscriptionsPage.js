@@ -255,6 +255,14 @@ function subscriptionCard(showroom, state, actions) {
   if ((showroom.branch_count ?? 1) > 1) {
     nameRow.append(Badge({ label: `${showroom.branch_count} cabang`, variant: "info" }));
   }
+  // Backlog #6: showroom yang menunggak >14 hari disuspend otomatis lewat
+  // cron (lihat ShowroomService::suspendOverdue()) -- is_active dipakai
+  // bersama dengan penonaktifan manual admin, jadi alasannya (yang selalu
+  // diawali "Otomatis: ..." untuk suspend cron) ditampilkan apa adanya
+  // di bawah, bukan ditebak dari label saja.
+  if (showroom.is_active === false) {
+    nameRow.append(Badge({ label: "Nonaktif", variant: "danger" }));
+  }
 
   info.append(
     nameRow,
@@ -262,6 +270,14 @@ function subscriptionCard(showroom, state, actions) {
     textNode("p", "text-xs text-gray-600", `${showroom.selected_plan_name || "-"} · ${formatCurrency(showroom.selected_plan_price || 0)}${showroom.selected_plan_billing_period ? ` ${showroom.selected_plan_billing_period}` : ""}`),
     textNode("p", "text-xs text-gray-500", `Jatuh tempo: ${formatDate(showroom.subscription_next_due_at)}`),
   );
+
+  if (showroom.is_active === false && showroom.deactivated_reason) {
+    info.append(textNode(
+      "p",
+      "text-xs font-semibold text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]",
+      `${showroom.deactivated_reason} Aktifkan lewat User Management setelah tagihan lunas.`
+    ));
+  }
 
   if (showroom.subscription_proof_path) {
     const link = document.createElement("a");
