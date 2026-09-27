@@ -120,13 +120,13 @@ const DEFAULT_LOCATION_SEED = [
 const DEFAULT_PRICING_SEED = [
   pricingSeed("plan_basic", "Basic", 500000, "/bulan", [
     "1 showroom aktif", "Sampai 10 listing mobil", "Dukungan email",
-  ], false, 10),
+  ], false, 10, false),
   pricingSeed("plan_pro", "Pro", 1500000, "/bulan", [
     "1 showroom aktif", "Listing mobil tanpa batas", "Fitur Marketing/Affiliate", "Dukungan prioritas",
-  ], true, null),
+  ], true, null, false),
   pricingSeed("plan_enterprise", "Enterprise", 3500000, "/bulan", [
     "Semua fitur Pro", "Multi-cabang", "Manajer akun khusus",
-  ], false, null),
+  ], false, null, true),
 ];
 
 export const adminMasterService = {
@@ -589,6 +589,7 @@ function normalizePlans(plans = []) {
       features: normalizePlanFeatures(plan.features),
       is_recommended: Boolean(plan.is_recommended),
       listing_limit: normalizeListingLimit(plan.listing_limit),
+      allows_multi_branch: Boolean(plan.allows_multi_branch),
       status: ["active", "inactive"].includes(plan.status) ? plan.status : "active",
       updated_at: plan.updated_at ?? null,
     };
@@ -702,6 +703,7 @@ function createEmptyPlan() {
     features: [],
     is_recommended: false,
     listing_limit: null,
+    allows_multi_branch: false,
     status: "active",
   };
 }
@@ -785,7 +787,7 @@ function citySeed(id, name, slug, provinceName = "", provinceSlug = "") {
   };
 }
 
-function pricingSeed(id, name, price, billingPeriod, features = [], isRecommended = false, listingLimit = null) {
+function pricingSeed(id, name, price, billingPeriod, features = [], isRecommended = false, listingLimit = null, allowsMultiBranch = false) {
   return {
     id,
     slug: slugify(name),
@@ -795,6 +797,7 @@ function pricingSeed(id, name, price, billingPeriod, features = [], isRecommende
     features,
     is_recommended: isRecommended,
     listing_limit: listingLimit,
+    allows_multi_branch: allowsMultiBranch,
     status: "active",
     updated_at: "2026-09-11T00:00:00.000Z",
   };

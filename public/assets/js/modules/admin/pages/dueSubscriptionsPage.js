@@ -249,6 +249,12 @@ function subscriptionCard(showroom, state, actions) {
   if (isOverdue) {
     nameRow.append(Badge({ label: "Jatuh tempo", variant: "danger" }));
   }
+  // Fitur multi-cabang: satu akun (seller_email yang sama) bisa punya
+  // beberapa baris di daftar ini -- badge ini mencegah admin mengira dua
+  // baris beda akun.
+  if ((showroom.branch_count ?? 1) > 1) {
+    nameRow.append(Badge({ label: `${showroom.branch_count} cabang`, variant: "info" }));
+  }
 
   info.append(
     nameRow,

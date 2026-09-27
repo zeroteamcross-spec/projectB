@@ -26,6 +26,27 @@ class ShowroomMultiBranchTest extends TestCase
         $this->findAllByUserIdReturnsAllBranchesOrderedByCreatedAt();
         $this->showroomPolicyRejectsAccessByNonOwner();
         $this->showroomPolicyAllowsAdminRegardlessOfOwnership();
+        $this->findAllByUserIdSelectsAllowsMultiBranchColumn();
+    }
+
+    /**
+     * Fase 5: kolom selected_plan_allows_multi_branch harus benar-benar
+     * ikut terbaca (bukan cuma ada di skema) -- ini gerbang yang dibaca
+     * ShowroomService::createBranch() untuk memutuskan boleh/tidaknya
+     * seller menambah cabang.
+     */
+    private function findAllByUserIdSelectsAllowsMultiBranchColumn(): void
+    {
+        $pdo = $this->sqlite();
+        $this->createShowroomsTable($pdo);
+        $pdo->exec("INSERT INTO showrooms (id, user_id, name, selected_plan_allows_multi_branch, created_at) VALUES
+            (1, 11, 'Cabang Enterprise', 1, '2026-01-01 00:00:00'),
+            (2, 12, 'Cabang Basic', 0, '2026-01-01 00:00:00')");
+
+        $repository = new ShowroomRepository($pdo);
+
+        $this->assertSame(true, (bool) $repository->findAllByUserId(11)[0]['selected_plan_allows_multi_branch']);
+        $this->assertSame(false, (bool) $repository->findAllByUserId(12)[0]['selected_plan_allows_multi_branch']);
     }
 
     private function findAllByUserIdReturnsAllBranchesOrderedByCreatedAt(): void
@@ -84,7 +105,7 @@ class ShowroomMultiBranchTest extends TestCase
             phone_number TEXT NULL, bank_account_number TEXT NULL, bank_type TEXT NULL,
             bank_account_name TEXT NULL, icon_url TEXT NULL, header_logo_url TEXT NULL, tab_title TEXT NULL,
             selected_plan_name TEXT NULL, selected_plan_price REAL NULL, selected_plan_billing_period TEXT NULL,
-            selected_plan_listing_limit INTEGER NULL, selected_plan_selected_at TEXT NULL,
+            selected_plan_listing_limit INTEGER NULL, selected_plan_allows_multi_branch INTEGER NULL, selected_plan_selected_at TEXT NULL,
             subscription_payment_status TEXT NULL, subscription_proof_path TEXT NULL, subscription_proof_note TEXT NULL,
             subscription_proof_submitted_at TEXT NULL, subscription_confirmed_at TEXT NULL, subscription_confirmed_by INTEGER NULL,
             subscription_rejected_at TEXT NULL, subscription_rejected_reason TEXT NULL, subscription_next_due_at TEXT NULL,

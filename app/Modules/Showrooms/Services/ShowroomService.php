@@ -117,12 +117,10 @@ class ShowroomService
 
         $firstBranch = $branches[0];
 
-        // Kolom selected_plan_allows_multi_branch belum ada sampai fase
-        // berikutnya (bersama checkbox-nya di Master Harga) -- sampai saat
-        // itu key ini memang tidak pernah terisi dari database, jadi gerbang
-        // ini SELALU tertutup dengan sengaja. createBranch() sudah lengkap
-        // kabelnya di sini, tinggal menunggu kolom & checkbox admin-nya ada
-        // supaya bisa benar-benar dibuka untuk paket yang berhak.
+        // selected_plan_allows_multi_branch disnapshot dari Master Harga
+        // persis seperti selected_plan_listing_limit -- lihat
+        // resolveSelectedPlan() dan checkbox "Multi-cabang" di form paket
+        // Admin.
         if (! (bool) ($firstBranch['selected_plan_allows_multi_branch'] ?? false)) {
             throw new ValidationException([
                 'plan' => 'Paket Anda belum mendukung multi-cabang.',
@@ -321,6 +319,9 @@ class ShowroomService
             'selected_plan_listing_limit' => $hasPlanSelection
                 ? $plan['listing_limit']
                 : ($existing['selected_plan_listing_limit'] ?? null),
+            'selected_plan_allows_multi_branch' => $hasPlanSelection
+                ? $plan['allows_multi_branch']
+                : ($existing['selected_plan_allows_multi_branch'] ?? false),
             'selected_plan_selected_at' => $hasPlanSelection ? date('Y-m-d H:i:s') : $existing['selected_plan_selected_at'],
             'subscription_payment_status' => $planChanged ? 'unpaid' : $existing['subscription_payment_status'],
             'subscription_proof_path' => $planChanged ? null : $existing['subscription_proof_path'],
@@ -587,10 +588,37 @@ class ShowroomService
     {
         AuthPolicy::requireAdmin($actor);
 
+        $rows = $this->showrooms->findDueSubscriptions();
+        $branchCounts = $this->branchCountsByUserId(array_column($rows, 'user_id'));
+
         return array_map(
-            fn (array $showroom): array => $this->serializeShowroom($showroom),
-            $this->showrooms->findDueSubscriptions()
+            fn (array $showroom): array => array_merge(
+                $this->serializeShowroom($showroom),
+                ['branch_count' => $branchCounts[(int) $showroom['user_id']] ?? 1]
+            ),
+            $rows
         );
+    }
+
+    /**
+     * "Cabang ke-N dari akun X" (fitur multi-cabang) -- admin yang meninjau
+     * tagihan perlu tahu showroom mana yang berbagi satu akun login, supaya
+     * tidak salah kira dua baris berbeda ini dua showroom independen.
+     * Dihitung sekali per user_id UNIK yang muncul di hasil (bukan per
+     * baris) supaya daftar tagihan berukuran wajar tidak memicu query
+     * berulang untuk user yang sama.
+     *
+     * @param array<int, int|string> $userIds
+     * @return array<int, int>
+     */
+    private function branchCountsByUserId(array $userIds): array
+    {
+        $counts = [];
+        foreach (array_unique(array_map('intval', $userIds)) as $userId) {
+            $counts[$userId] = count($this->showrooms->findAllByUserId($userId));
+        }
+
+        return $counts;
     }
 
     /**
@@ -944,7 +972,7 @@ class ShowroomService
         $planName = is_string($planName) ? trim($planName) : '';
 
         if ($planName === '') {
-            return ['name' => null, 'price' => null, 'billing_period' => null, 'listing_limit' => null];
+            return ['name' => null, 'price' => null, 'billing_period' => null, 'listing_limit' => null, 'allows_multi_branch' => false];
         }
 
         $plans = [];
@@ -968,6 +996,7 @@ class ShowroomService
                     'price' => (float) ($candidate['price'] ?? 0),
                     'billing_period' => $candidate['billing_period'] ?? null,
                     'listing_limit' => $listingLimit !== null && $listingLimit !== '' ? (int) $listingLimit : null,
+                    'allows_multi_branch' => (bool) ($candidate['allows_multi_branch'] ?? false),
                 ];
             }
         }
@@ -1038,6 +1067,7 @@ class ShowroomService
             'selected_plan_price' => isset($showroom['selected_plan_price']) ? (float) $showroom['selected_plan_price'] : null,
             'selected_plan_billing_period' => $showroom['selected_plan_billing_period'] ?? null,
             'selected_plan_listing_limit' => isset($showroom['selected_plan_listing_limit']) ? (int) $showroom['selected_plan_listing_limit'] : null,
+            'selected_plan_allows_multi_branch' => (bool) ($showroom['selected_plan_allows_multi_branch'] ?? false),
             'selected_plan_selected_at' => $showroom['selected_plan_selected_at'] ?? null,
             'subscription_payment_status' => $showroom['subscription_payment_status'] ?? 'unpaid',
             'subscription_proof_path' => $showroom['subscription_proof_path'] ?? null,

@@ -64,7 +64,11 @@ export function AdminMasterPricingList({
     emptyDescription: "Tambahkan paket pertama supaya showroom bisa memilihnya saat mendaftar.",
     mobileCardTitle: (plan) => plan.name,
     mobileCardSubtitle: (plan) => `${formatCurrency(plan.price)}${plan.billing_period ? ` ${plan.billing_period}` : ""}`,
-    mobileCardBadges: (plan) => [statusBadge(plan.status), ...(plan.is_recommended ? [Badge({ label: "Rekomendasi", variant: "info" })] : [])],
+    mobileCardBadges: (plan) => [
+      statusBadge(plan.status),
+      ...(plan.is_recommended ? [Badge({ label: "Rekomendasi", variant: "info" })] : []),
+      ...(plan.allows_multi_branch ? [Badge({ label: "Multi-cabang", variant: "success" })] : []),
+    ],
     mobilePrimaryFields: (plan) => [
       { label: "Harga", value: `${formatCurrency(plan.price)}${plan.billing_period ? ` ${plan.billing_period}` : ""}` },
       { label: "Status", value: plan.status === "active" ? "Aktif" : "Nonaktif" },
@@ -94,6 +98,9 @@ function planCell(plan) {
   nameRow.append(textBlock("font-black text-gray-950", plan.name));
   if (plan.is_recommended) {
     nameRow.append(Badge({ label: "Rekomendasi", variant: "info" }));
+  }
+  if (plan.allows_multi_branch) {
+    nameRow.append(Badge({ label: "Multi-cabang", variant: "success" }));
   }
   copy.append(nameRow, textBlock("text-xs text-gray-500", plan.slug || "-"));
   wrap.append(copy);

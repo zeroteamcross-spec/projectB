@@ -50,6 +50,16 @@ export function AdminMasterPricingForm({
   recommended.className = "h-4 w-4 rounded border-[var(--pb-form-border)]";
   recommendedWrap.append(recommended, document.createTextNode("Tandai sebagai \"Rekomendasi\""));
 
+  const multiBranchWrap = document.createElement("label");
+  multiBranchWrap.className = "flex items-center gap-2 text-xs font-semibold text-gray-700";
+  const multiBranch = document.createElement("input");
+  multiBranch.id = "admstpr_plan_allows_multi_branch_input";
+  multiBranch.name = "allows_multi_branch";
+  multiBranch.type = "checkbox";
+  multiBranch.checked = Boolean(draft.allows_multi_branch);
+  multiBranch.className = "h-4 w-4 rounded border-[var(--pb-form-border)]";
+  multiBranchWrap.append(multiBranch, document.createTextNode("Boleh multi-cabang (showroom bisa menambah cabang lain)"));
+
   const featuresWrap = document.createElement("label");
   featuresWrap.className = "grid gap-1 text-xs font-semibold text-gray-700";
   featuresWrap.textContent = "Daftar fitur (satu per baris)";
@@ -90,7 +100,7 @@ export function AdminMasterPricingForm({
   right.append(cancel, submit);
   actions.append(left, right);
 
-  form.append(intro, fields, recommendedWrap, featuresWrap);
+  form.append(intro, fields, recommendedWrap, multiBranchWrap, featuresWrap);
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     const formData = new FormData(form);
@@ -103,6 +113,7 @@ export function AdminMasterPricingForm({
       billing_period: String(formData.get("billing_period") ?? "").trim(),
       features: String(formData.get("features") ?? "").split("\n").map((line) => line.trim()).filter(Boolean),
       is_recommended: formData.get("is_recommended") === "on",
+      allows_multi_branch: formData.get("allows_multi_branch") === "on",
       listing_limit: (() => {
         const raw = String(formData.get("listing_limit") ?? "").trim();
         if (raw === "") {
