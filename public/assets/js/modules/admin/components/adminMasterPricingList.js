@@ -68,6 +68,7 @@ export function AdminMasterPricingList({
       statusBadge(plan.status),
       ...(plan.is_recommended ? [Badge({ label: "Rekomendasi", variant: "info" })] : []),
       ...(plan.allows_multi_branch ? [Badge({ label: "Multi-cabang", variant: "success" })] : []),
+      ...(plan.staff_limit > 0 ? [Badge({ label: `Staf ${plan.staff_limit}`, variant: "success" })] : []),
     ],
     mobilePrimaryFields: (plan) => [
       { label: "Harga", value: `${formatCurrency(plan.price)}${plan.billing_period ? ` ${plan.billing_period}` : ""}` },
@@ -75,6 +76,7 @@ export function AdminMasterPricingList({
     ],
     mobileDisclosureFields: (plan) => [
       { label: "Batas Listing", value: listingLimitLabel(plan) },
+      { label: "Batas Staf", value: plan.staff_limit > 0 ? `${plan.staff_limit} akun` : "Nonaktif" },
       { label: "Fitur", value: plan.features?.length ? plan.features.join(", ") : "-" },
       { label: "Slug", value: plan.slug || "-" },
     ],
@@ -101,6 +103,9 @@ function planCell(plan) {
   }
   if (plan.allows_multi_branch) {
     nameRow.append(Badge({ label: "Multi-cabang", variant: "success" }));
+  }
+  if (plan.staff_limit > 0) {
+    nameRow.append(Badge({ label: `Staf ${plan.staff_limit}`, variant: "success" }));
   }
   copy.append(nameRow, textBlock("text-xs text-gray-500", plan.slug || "-"));
   wrap.append(copy);

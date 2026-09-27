@@ -202,7 +202,32 @@ class NotificationService
             ]));
         }
 
+        foreach ($this->staffForShowroom($transaction['showroom_id'] ?? null) as $staff) {
+            $created[] = $this->createOnce(array_merge($source, [
+                'user_id' => (int) $staff['id'],
+                'role' => 'seller_staff',
+                'title' => 'Transaksi Dibayar',
+                'body' => sprintf('Buyer telah menyelesaikan pembayaran untuk %s. Segera proses transaksi.', $carLabel ?: $code),
+                'data' => $data,
+                'link_url' => '/seller/transactions',
+                'icon_key' => 'transaction',
+                'priority' => 'high',
+            ]));
+        }
+
         return $created;
+    }
+
+    /**
+     * Staf cabang bersangkutan -- dipakai di samping penerima seller/admin
+     * yang sudah ada, tidak pernah menggantikannya. Kosong kalau showroom_id
+     * tidak diketahui atau cabang belum punya staf aktif.
+     */
+    private function staffForShowroom($showroomId): array
+    {
+        $showroomId = (int) ($showroomId ?? 0);
+
+        return $showroomId > 0 ? $this->notifications->listActiveStaffByShowroomId($showroomId) : [];
     }
 
     public function createManualTransferSubmittedNotification(array $transaction): ?array
@@ -412,7 +437,7 @@ class NotificationService
             return null;
         }
 
-        return $this->createOnce([
+        $sellerNotification = $this->createOnce([
             'user_id' => $sellerUserId,
             'role' => 'seller',
             'type' => 'inspection_needed',
@@ -425,6 +450,24 @@ class NotificationService
             'source_type' => 'car_inspection',
             'source_id' => (string) $carId,
         ]);
+
+        foreach ($this->staffForShowroom($car['showroom_id'] ?? null) as $staff) {
+            $this->createOnce([
+                'user_id' => (int) $staff['id'],
+                'role' => 'seller_staff',
+                'type' => 'inspection_needed',
+                'title' => 'Inspeksi Perlu Dilengkapi',
+                'body' => sprintf('Lengkapi inspeksi untuk %s agar listing lebih siap diproses.', $this->carLabel($car) ?: ('mobil #' . $carId)),
+                'data' => $this->carNotificationData($car),
+                'link_url' => '/seller/inspection',
+                'icon_key' => 'inspection',
+                'priority' => 'normal',
+                'source_type' => 'car_inspection',
+                'source_id' => (string) $carId,
+            ]);
+        }
+
+        return $sellerNotification;
     }
 
     public function createTransactionCompletedNotifications(array $transaction): array

@@ -34,11 +34,13 @@ export function AdminMasterPricingForm({
   const billingPeriod = inputField("admstpr_plan_billing_period_input", "billing_period", "Periode tagihan", draft.billing_period, "Contoh: /bulan, /tahun, sekali bayar");
   const listingLimit = inputField("admstpr_plan_listing_limit_input", "listing_limit", "Batas listing mobil (kosongkan = tanpa batas)", draft.listing_limit ?? "", "Contoh: 10", "number");
   listingLimit.input.min = "1";
+  const staffLimit = inputField("admstpr_plan_staff_limit_input", "staff_limit", "Batas akun staf (0 = fitur staf nonaktif)", draft.staff_limit ?? 0, "Contoh: 3", "number");
+  staffLimit.input.min = "0";
   const status = selectField("admstpr_plan_status_input", "status", "Status", draft.status, [
     ["active", "Aktif"],
     ["inactive", "Nonaktif"],
   ]);
-  fields.append(name.wrap, price.wrap, billingPeriod.wrap, listingLimit.wrap, status.wrap);
+  fields.append(name.wrap, price.wrap, billingPeriod.wrap, listingLimit.wrap, staffLimit.wrap, status.wrap);
 
   const recommendedWrap = document.createElement("label");
   recommendedWrap.className = "flex items-center gap-2 text-xs font-semibold text-gray-700";
@@ -121,6 +123,10 @@ export function AdminMasterPricingForm({
         }
         const n = Math.trunc(Number(raw));
         return Number.isFinite(n) && n > 0 ? n : null;
+      })(),
+      staff_limit: (() => {
+        const n = Math.trunc(Number(formData.get("staff_limit")));
+        return Number.isFinite(n) && n > 0 ? n : 0;
       })(),
       status: String(formData.get("status") ?? "active"),
     });

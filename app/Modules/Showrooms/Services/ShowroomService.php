@@ -340,6 +340,9 @@ class ShowroomService
             'selected_plan_allows_multi_branch' => $hasPlanSelection
                 ? $plan['allows_multi_branch']
                 : ($existing['selected_plan_allows_multi_branch'] ?? false),
+            'selected_plan_staff_limit' => $hasPlanSelection
+                ? $plan['staff_limit']
+                : ($existing['selected_plan_staff_limit'] ?? 0),
             'selected_plan_selected_at' => $hasPlanSelection ? date('Y-m-d H:i:s') : $existing['selected_plan_selected_at'],
             'subscription_payment_status' => $planChanged ? 'unpaid' : $existing['subscription_payment_status'],
             'subscription_proof_path' => $planChanged ? null : $existing['subscription_proof_path'],
@@ -990,7 +993,7 @@ class ShowroomService
         $planName = is_string($planName) ? trim($planName) : '';
 
         if ($planName === '') {
-            return ['name' => null, 'price' => null, 'billing_period' => null, 'listing_limit' => null, 'allows_multi_branch' => false];
+            return ['name' => null, 'price' => null, 'billing_period' => null, 'listing_limit' => null, 'allows_multi_branch' => false, 'staff_limit' => 0];
         }
 
         $plans = [];
@@ -1015,6 +1018,7 @@ class ShowroomService
                     'billing_period' => $candidate['billing_period'] ?? null,
                     'listing_limit' => $listingLimit !== null && $listingLimit !== '' ? (int) $listingLimit : null,
                     'allows_multi_branch' => (bool) ($candidate['allows_multi_branch'] ?? false),
+                    'staff_limit' => (int) ($candidate['staff_limit'] ?? 0),
                 ];
             }
         }

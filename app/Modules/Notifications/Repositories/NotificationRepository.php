@@ -93,6 +93,28 @@ class NotificationRepository
         );
         $stmt->execute();
 
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * Staf cabang yang bersangkutan -- dipakai supaya notifikasi
+     * transaksi/inspeksi juga sampai ke staf, bukan cuma pemilik showroom
+     * (lihat NotificationService::createTransactionPaidNotifications() dan
+     * createInspectionNeededNotification()).
+     */
+    public function listActiveStaffByShowroomId(int $showroomId): array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT id, role, name, email
+             FROM users
+             WHERE role = \'seller_staff\'
+             AND staff_showroom_id = :showroom_id
+             AND account_status = \'active\'
+             AND deleted_at IS NULL
+             ORDER BY id ASC'
+        );
+        $stmt->execute(['showroom_id' => $showroomId]);
+
         return $stmt->fetchAll() ?: [];
     }
 

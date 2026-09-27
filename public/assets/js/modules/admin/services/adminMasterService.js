@@ -126,7 +126,7 @@ const DEFAULT_PRICING_SEED = [
   ], true, null, false),
   pricingSeed("plan_enterprise", "Enterprise", 3500000, "/bulan", [
     "Semua fitur Pro", "Multi-cabang", "Manajer akun khusus",
-  ], false, null, true),
+  ], false, null, true, 3),
 ];
 
 export const adminMasterService = {
@@ -590,6 +590,7 @@ function normalizePlans(plans = []) {
       is_recommended: Boolean(plan.is_recommended),
       listing_limit: normalizeListingLimit(plan.listing_limit),
       allows_multi_branch: Boolean(plan.allows_multi_branch),
+      staff_limit: normalizeStaffLimit(plan.staff_limit),
       status: ["active", "inactive"].includes(plan.status) ? plan.status : "active",
       updated_at: plan.updated_at ?? null,
     };
@@ -607,6 +608,16 @@ function normalizeListingLimit(value) {
   }
   const n = Math.trunc(Number(value));
   return Number.isFinite(n) && n > 0 ? n : null;
+}
+
+/**
+ * Beda semantik dengan normalizeListingLimit(): 0/kosong di sini berarti
+ * fitur staf NONAKTIF untuk paket ini, bukan "tanpa batas" -- lihat
+ * ShowroomService::resolveSelectedPlan() dan migrasi 20260930_staff_access.sql.
+ */
+function normalizeStaffLimit(value) {
+  const n = Math.trunc(Number(value));
+  return Number.isFinite(n) && n > 0 ? n : 0;
 }
 
 function normalizePlanFeatures(features) {
@@ -704,6 +715,7 @@ function createEmptyPlan() {
     is_recommended: false,
     listing_limit: null,
     allows_multi_branch: false,
+    staff_limit: 0,
     status: "active",
   };
 }
@@ -787,7 +799,7 @@ function citySeed(id, name, slug, provinceName = "", provinceSlug = "") {
   };
 }
 
-function pricingSeed(id, name, price, billingPeriod, features = [], isRecommended = false, listingLimit = null, allowsMultiBranch = false) {
+function pricingSeed(id, name, price, billingPeriod, features = [], isRecommended = false, listingLimit = null, allowsMultiBranch = false, staffLimit = 0) {
   return {
     id,
     slug: slugify(name),
@@ -798,6 +810,7 @@ function pricingSeed(id, name, price, billingPeriod, features = [], isRecommende
     is_recommended: isRecommended,
     listing_limit: listingLimit,
     allows_multi_branch: allowsMultiBranch,
+    staff_limit: staffLimit,
     status: "active",
     updated_at: "2026-09-11T00:00:00.000Z",
   };
