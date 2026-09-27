@@ -9,6 +9,7 @@ import { formatCurrency } from "../../../utils/formatCurrency.js";
 import { showroomsResource } from "../../../resources/showroomsResource.js";
 import { adminMasterService } from "../../admin/services/adminMasterService.js";
 import { SubscriptionMidtransPanel } from "../../../ui/composites/subscriptionMidtransPanel.js";
+import { confirmDialog } from "../../../ui/primitives/confirmDialog.js";
 
 const STATUS_LABEL = {
   unpaid: "Belum bayar",
@@ -38,6 +39,7 @@ export function SellerBillingPage() {
     paymentMethodTab: "midtrans",
     midtransShowroom: null,
     midtransPanelWidget: null,
+    changingPlanName: null,
   };
 
   const rerender = () => render(root, currentContext, state, actions);
@@ -101,6 +103,42 @@ export function SellerBillingPage() {
         rerender();
       }
     },
+    async changePlan(plan, currentPlanName) {
+      const isFirstPlan = !currentPlanName;
+      const confirmed = isFirstPlan || await confirmDialog({
+        title: `Ganti ke paket ${plan.name}?`,
+        message: "Pembayaran siklus saat ini akan dianggap tidak berlaku untuk paket baru -- status langganan kembali ke \"Belum bayar\" dan Anda perlu membayar ulang sesuai harga paket baru.",
+        confirmLabel: "Ya, ganti paket",
+        cancelLabel: "Batal",
+        tone: "danger",
+        key: "seller-billing-change-plan-confirm",
+      });
+
+      if (!confirmed) {
+        return;
+      }
+
+      state.changingPlanName = plan.name;
+      rerender();
+
+      try {
+        const showroom = await showroomsResource.updateMine({ selected_plan_name: plan.name });
+        appStore.patchState("working.sellerBilling.showroom", {
+          data: showroom,
+          hydratedAt: Date.now(),
+        }, "seller-billing:plan-changed");
+        appStore.patchState("snapshot.seller.showroom", {
+          ...(appStore.get("snapshot.seller.showroom", {}) ?? {}),
+          data: showroom,
+        }, "seller-billing:snapshot-synced");
+        showToast(`Paket berhasil diganti ke ${plan.name}. Silakan lanjutkan pembayaran.`, { type: "success" });
+      } catch (error) {
+        showToast(error.message || "Gagal mengganti paket.", { type: "error" });
+      } finally {
+        state.changingPlanName = null;
+        rerender();
+      }
+    },
   };
 
   return createPageLifecycle({
@@ -144,6 +182,7 @@ function render(root, context, state, actions) {
   const workingShowroom = appStore.get("working.sellerBilling.showroom.data", null);
   const showroom = workingShowroom ?? snapshotShowroom;
   const destinationMaster = appStore.get("working.sellerBilling.destination.data", null);
+  const pricingMaster = appStore.get("working.sellerBilling.pricing.data", null);
 
   const layout = document.createElement("section");
   layout.id = "slrbil_page_section";
@@ -193,6 +232,8 @@ function render(root, context, state, actions) {
     layout.append(paymentForm(state, actions, destinationMaster));
   }
 
+  layout.append(plansSection(showroom, pricingMaster, state, actions));
+
   const history = appStore.get("working.sellerBilling.history.data", null);
   layout.append(historySection(history));
 
@@ -208,6 +249,13 @@ function render(root, context, state, actions) {
       .catch(() => adminMasterService.normalizeSubscriptionDestinationMaster(null))
       .then((master) => {
         appStore.patchState("working.sellerBilling.destination", { data: master, hydratedAt: Date.now() }, "seller-billing:destination-loaded");
+      });
+  }
+  if (!appStore.get("working.sellerBilling.pricing.hydratedAt", 0)) {
+    adminMasterService.getPricingMaster()
+      .catch(() => adminMasterService.normalizePricingMaster(null))
+      .then((master) => {
+        appStore.patchState("working.sellerBilling.pricing", { data: master, hydratedAt: Date.now() }, "seller-billing:pricing-loaded");
       });
   }
   if (!appStore.get("working.sellerBilling.history.hydratedAt", 0)) {
@@ -313,6 +361,88 @@ function paymentForm(state, actions, destinationMaster) {
   section.append(submit);
 
   return section;
+}
+
+/**
+ * Sebelumnya kartu pilih paket cuma tampil sekali di alur registrasi
+ * (showroomRegisterPage.js) -- showroom yang sudah aktif tidak punya cara
+ * upgrade/downgrade sendiri, harus minta Admin ubah manual di database.
+ * Memakai endpoint yang sama (PATCH /showrooms/me dengan selected_plan_name)
+ * -- harga & periode tetap diambil ulang di server dari Master Harga
+ * (ShowroomService::resolveSelectedPlan()), bukan dipercaya dari sini.
+ */
+function plansSection(showroom, pricingMaster, state, actions) {
+  const section = document.createElement("section");
+  section.id = "slrbil_plans_section";
+  section.className = "grid gap-3 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white/85 p-5 shadow-sm";
+
+  section.append(
+    textNode("h2", "text-sm font-black text-gray-950", "Ganti Paket"),
+    textNode("p", "text-xs text-gray-600", "Mengganti paket akan mengembalikan status pembayaran siklus ini ke \"Belum bayar\" -- Anda perlu membayar ulang sesuai harga paket baru."),
+  );
+
+  const plans = (pricingMaster?.data?.plans ?? [])
+    .filter((plan) => (plan?.status ?? "active") === "active")
+    .sort((a, b) => Number(a.price ?? 0) - Number(b.price ?? 0));
+
+  if (!plans.length) {
+    section.append(textNode("p", "text-xs text-gray-500", "Belum ada paket aktif yang bisa dipilih."));
+    return section;
+  }
+
+  const grid = document.createElement("div");
+  grid.id = "slrbil_plan_cards_section";
+  grid.className = "grid gap-3 sm:grid-cols-2 lg:grid-cols-3";
+  grid.append(...plans.map((plan) => planChangeCard(plan, showroom, state, actions)));
+  section.append(grid);
+
+  return section;
+}
+
+function planChangeCard(plan, showroom, state, actions) {
+  const isCurrent = (showroom.selected_plan_name || "") === plan.name;
+  const isBusy = state.changingPlanName === plan.name;
+
+  const card = document.createElement("article");
+  card.id = `slrbil_plan_card_${plan.id}`;
+  card.className = [
+    "grid gap-2 rounded-2xl border p-4 text-xs",
+    isCurrent
+      ? "border-[var(--pb-brand-primary)] bg-[color-mix(in_srgb,var(--pb-brand-primary)_6%,white)]"
+      : "border-[var(--pb-card-border)] bg-gray-50",
+  ].join(" ");
+
+  const nameRow = document.createElement("div");
+  nameRow.className = "flex flex-wrap items-center gap-2";
+  nameRow.append(textNode("p", "font-black text-gray-950", plan.name));
+  if (plan.is_recommended) {
+    nameRow.append(Badge({ label: "Rekomendasi", variant: "info" }));
+  }
+  card.append(nameRow);
+
+  card.append(textNode("p", "text-sm font-black text-gray-900", `${formatCurrency(plan.price)}${plan.billing_period ? ` ${plan.billing_period}` : ""}`));
+  card.append(textNode("p", "text-gray-600", plan.listing_limit ? `Maks ${plan.listing_limit} listing mobil` : "Listing mobil tanpa batas"));
+
+  if (plan.features?.length) {
+    card.append(textNode("p", "text-gray-500", plan.features.join(", ")));
+  }
+
+  if (isCurrent) {
+    const badge = Badge({ label: "Paket Anda saat ini", variant: "success" });
+    badge.id = `slrbil_plan_current_badge_${plan.id}`;
+    card.append(badge);
+  } else {
+    const button = Button({
+      label: isBusy ? "Mengganti..." : "Pilih paket ini",
+      variant: "secondary",
+      disabled: isBusy || Boolean(state.changingPlanName),
+      onClick: () => actions.changePlan(plan, showroom.selected_plan_name),
+    });
+    button.id = `slrbil_plan_select_button_${plan.id}`;
+    card.append(button);
+  }
+
+  return card;
 }
 
 const HISTORY_STATUS_LABEL = {
