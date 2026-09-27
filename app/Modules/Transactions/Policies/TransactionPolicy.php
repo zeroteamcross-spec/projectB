@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Transactions\Policies;
 
 use App\Core\Exceptions\ForbiddenException;
+use App\Modules\Auth\Policies\StaffAccessPolicy;
 
 class TransactionPolicy
 {
@@ -16,13 +17,22 @@ class TransactionPolicy
 
         if (($user['role'] ?? null) === 'seller') {
             $filters['seller_user_id'] = (int) $user['id'];
-            unset($filters['buyer_user_id']);
+            unset($filters['buyer_user_id'], $filters['showroom_id']);
+
+            return $filters;
+        }
+
+        if (($user['role'] ?? null) === 'seller_staff') {
+            // Staf tidak punya seller_user_id sendiri -- disaring per cabang
+            // yang ditugaskan, bukan per akun yang login.
+            $filters['showroom_id'] = (int) ($user['staff_showroom_id'] ?? 0);
+            unset($filters['buyer_user_id'], $filters['seller_user_id']);
 
             return $filters;
         }
 
         $filters['buyer_user_id'] = (int) $user['id'];
-        unset($filters['seller_user_id']);
+        unset($filters['seller_user_id'], $filters['showroom_id']);
 
         return $filters;
     }
@@ -54,6 +64,10 @@ class TransactionPolicy
             return;
         }
 
+        if (StaffAccessPolicy::staffCanActOnShowroom($user, (int) ($transaction['showroom_id'] ?? 0))) {
+            return;
+        }
+
         throw new ForbiddenException('Akses transaksi tidak diizinkan.');
     }
 
@@ -80,12 +94,20 @@ class TransactionPolicy
             return;
         }
 
+        if (StaffAccessPolicy::staffCanActOnShowroom($user, (int) ($transaction['showroom_id'] ?? 0))) {
+            return;
+        }
+
         throw new ForbiddenException('Akses update status transaksi tidak diizinkan.');
     }
 
     public static function ensureCanManageFulfillmentChecklist(array $user, array $transaction): void
     {
         if (($user['role'] ?? null) === 'seller' && (int) $user['id'] === (int) $transaction['seller_user_id']) {
+            return;
+        }
+
+        if (StaffAccessPolicy::staffCanActOnShowroom($user, (int) ($transaction['showroom_id'] ?? 0))) {
             return;
         }
 
@@ -103,6 +125,10 @@ class TransactionPolicy
     public static function ensureCanReturn(array $user, array $transaction): void
     {
         if (($user['role'] ?? null) === 'seller' && (int) $user['id'] === (int) $transaction['seller_user_id']) {
+            return;
+        }
+
+        if (StaffAccessPolicy::staffCanActOnShowroom($user, (int) ($transaction['showroom_id'] ?? 0))) {
             return;
         }
 
@@ -150,6 +176,10 @@ class TransactionPolicy
             return;
         }
 
+        if (StaffAccessPolicy::staffCanActOnShowroom($user, (int) ($transaction['showroom_id'] ?? 0))) {
+            return;
+        }
+
         if (in_array(($user['role'] ?? null), ['admin', 'super_admin'], true)) {
             return;
         }
@@ -168,6 +198,10 @@ class TransactionPolicy
         }
 
         if (($user['role'] ?? null) === 'seller' && (int) $user['id'] === (int) $transaction['seller_user_id']) {
+            return;
+        }
+
+        if (StaffAccessPolicy::staffCanActOnShowroom($user, (int) ($transaction['showroom_id'] ?? 0))) {
             return;
         }
 

@@ -548,6 +548,16 @@ class TransactionRepository
             }
         }
 
+        // transactions tidak punya kolom showroom_id sendiri, dan count()
+        // memakai buildWhere() yang sama TANPA join ke cars (lihat count()
+        // di atas) -- jadi disaring lewat subquery, bukan cars.showroom_id
+        // langsung. Dipakai staf showroom (TransactionPolicy::scopeFilters()),
+        // bukan seller/buyer biasa.
+        if (isset($filters['showroom_id']) && $filters['showroom_id'] !== '') {
+            $conditions[] = 't.car_id IN (SELECT id FROM cars WHERE showroom_id = :showroom_id)';
+            $params['showroom_id'] = $filters['showroom_id'];
+        }
+
         if (isset($filters['transaction_code']) && $filters['transaction_code'] !== '') {
             $conditions[] = 't.transaction_code = :transaction_code';
             $params['transaction_code'] = $filters['transaction_code'];
