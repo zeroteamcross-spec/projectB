@@ -11,8 +11,14 @@ import { SellerInspectionItemsList } from "../components/sellerInspectionItemsLi
 import { SellerInspectionReportPanel } from "../components/sellerInspectionReportPanel.js";
 
 const RUNTIME_KEY = "sellerCarInspection";
+// summaryDraft dulunya lewat appStore (lihat DEFAULT_RUNTIME/setRuntime di bawah), tapi setRuntime()
+// memicu appStore.patchState() yang di-subscribe SEMUA halaman lewat createPageLifecycle -- setiap
+// keystroke di textarea "Catatan ringkas" jadi memicu root.replaceChildren() dan menghancurkan
+// elemen yang sedang fokus (persis pola yang sudah diperbaiki di showroomPage.js/customDomainDraft).
+// Draft-nya sekarang variabel modul biasa di luar store, sama seperti pola itu.
+let summaryDraftValue = null;
+
 const DEFAULT_RUNTIME = {
-  summaryDraft: null,
   creating: false,
   publishing: false,
   savingDraft: false,
@@ -31,6 +37,7 @@ export function SellerCarInspectionPage() {
   return createPageLifecycle({
     mount({ router, params }) {
       ensureRuntime();
+      summaryDraftValue = null;
       root = document.createElement("div");
       render(root, router, params);
       return root;
@@ -103,9 +110,9 @@ function render(root, router, params) {
     SellerInspectionReportPanel({
       car,
       report,
-      summaryDraft: runtime.summaryDraft ?? report?.summary_notes ?? "",
+      summaryDraft: summaryDraftValue ?? report?.summary_notes ?? "",
       progress,
-      dirty: runtime.dirty,
+      dirty: runtime.dirty || (summaryDraftValue !== null && summaryDraftValue !== (report?.summary_notes ?? "")),
       creating: runtime.creating,
       publishing: runtime.publishing,
       savingDraft: runtime.savingDraft,
@@ -113,7 +120,7 @@ function render(root, router, params) {
       onCreate: () => createReport(carId, templates),
       onPublish: () => publishReport(carId, report),
       onSaveDraft: () => saveInspectionDraft(carId, report, templates),
-      onSummaryChange: (value) => setRuntime({ summaryDraft: value, dirty: true }),
+      onSummaryChange: (value) => { summaryDraftValue = value; },
       onSummarySave: () => saveSummary(report),
     })
   );
@@ -260,7 +267,7 @@ async function publishSavedReport(carId, report, { notice, toast } = {}) {
 
   const updated = await inspectionsResource.updateReport(report.id, {
     report_status: "published",
-    summary_notes: runtime.summaryDraft ?? report.summary_notes ?? null,
+    summary_notes: summaryDraftValue ?? report.summary_notes ?? null,
   });
   setReport(updated);
   syncCarInspectionSummary("completed");
@@ -288,7 +295,7 @@ async function persistInspectionDraft(carId, report, templates) {
 
     return inspectionsResource.createReport(carId, {
       report_status: "draft",
-      summary_notes: runtime.summaryDraft ?? null,
+      summary_notes: summaryDraftValue ?? null,
       inspected_at: sqlDateTimeNow(),
       items: selected,
     });
@@ -307,10 +314,10 @@ async function persistInspectionDraft(carId, report, templates) {
       : await inspectionsResource.createItem(updated.id, payload);
   }
 
-  if ((runtime.summaryDraft ?? "") !== (updated.summary_notes ?? "")) {
+  if ((summaryDraftValue ?? "") !== (updated.summary_notes ?? "") && summaryDraftValue !== null) {
     updated = await inspectionsResource.updateReport(updated.id, {
       report_status: updated.report_status ?? "draft",
-      summary_notes: runtime.summaryDraft ?? "",
+      summary_notes: summaryDraftValue ?? "",
     });
   }
 
@@ -326,7 +333,7 @@ async function saveSummary(report) {
 
   try {
     const updated = await inspectionsResource.updateReport(report.id, {
-      summary_notes: runtimeState().summaryDraft ?? "",
+      summary_notes: summaryDraftValue ?? "",
     });
     setReport(updated);
     setRuntime({ savingSummary: false, dirty: hasDirtyItemDrafts(), notice: "Catatan inspection report berhasil disimpan." });
@@ -455,8 +462,11 @@ function syncDraftsFromReport(reportOverride = null, { force = false } = {}) {
     };
   });
 
+  if (summaryDraftValue === null || force) {
+    summaryDraftValue = null;
+  }
+
   setRuntime({
-    summaryDraft: runtime.summaryDraft === null || force ? report?.summary_notes ?? "" : runtime.summaryDraft,
     itemDrafts: drafts,
     dirty: false,
   });
