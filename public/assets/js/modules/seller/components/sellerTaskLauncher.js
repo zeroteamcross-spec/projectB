@@ -1,5 +1,13 @@
 import { Button } from "../../../ui/primitives/button.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
+import { appStore } from "../../../state/store.js";
+
+// Staf showroom dilarang mengelola Marketing/Affiliate (lihat
+// StaffAccessPolicy) -- roleGuard sudah memblokir aksesnya kalau dipaksa
+// lewat URL, tapi kartu ini sendiri sebelumnya tetap tampil ke staf dan
+// tombol "Buka"-nya cuma memantul balik tanpa penjelasan. Disembunyikan di
+// sini supaya task launcher staf konsisten dengan sidebar-nya (STAFF_LINKS).
+const OWNER_ONLY_TASK_KEYS = ["affiliates", "commissions"];
 
 const TASKS = [
   {
@@ -75,7 +83,12 @@ export function SellerTaskLauncher({ router = null } = {}) {
   grid.id = "slr_tasks_grid_section";
   grid.className = "grid gap-3 md:grid-cols-2 xl:grid-cols-5";
 
-  TASKS.forEach((task) => {
+  const role = appStore.get("auth.user.role", "") || appStore.get("auth.role", "");
+  const tasks = role === "seller_staff"
+    ? TASKS.filter((task) => !OWNER_ONLY_TASK_KEYS.includes(task.key))
+    : TASKS;
+
+  tasks.forEach((task) => {
     const card = document.createElement("section");
     card.id = `slr_task_${task.key}_section`;
     card.className = "grid min-w-0 gap-4 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white/86 p-4 shadow-[0_16px_45px_rgba(15,23,42,0.06)] backdrop-blur transition duration-150 hover:-translate-y-0.5 hover:shadow-[0_20px_56px_rgba(15,23,42,0.09)]";
