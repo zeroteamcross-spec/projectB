@@ -1,5 +1,6 @@
 import { deepClone } from "../utils/deepClone.js";
 import { getByPath, setByPath } from "../utils/objectPath.js";
+import { captureFocus } from "../utils/focusPreservation.js";
 
 export class StateEngine {
   constructor(initialState = {}) {
@@ -80,6 +81,12 @@ export class StateEngine {
 
   emit(action) {
     const snapshot = this.getState();
+    // Listener (biasanya page.js) sering full re-render pada patchState
+    // apapun, termasuk yang tidak terkait dengan apa yang sedang diketik
+    // user -- capture fokus di sini supaya restore-nya generik untuk semua
+    // subscriber, bukan cuma yang kebetulan mengetahui soal ini.
+    const restoreFocus = captureFocus();
     this.listeners.forEach((listener) => listener(snapshot, action));
+    restoreFocus();
   }
 }
