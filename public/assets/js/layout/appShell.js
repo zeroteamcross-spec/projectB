@@ -108,7 +108,8 @@ export class AppShell {
 
     const route = this.store?.get("app.currentRoute", null) ?? {};
     const path = route?.path ?? "";
-    const routeRole = route?.route?.role ?? "";
+    const rawRouteRole = route?.route?.role ?? "";
+    const routeRole = Array.isArray(rawRouteRole) ? rawRouteRole[0] : rawRouteRole;
     const appRole = this.store?.get("app.activeRole", "");
     const activeRole = appRole && appRole !== "public"
       ? appRole
@@ -208,7 +209,8 @@ export class AppShell {
 
     const route = this.store?.get("app.currentRoute", null) ?? {};
     const path = route?.path ?? "";
-    const routeRole = route?.route?.role ?? "";
+    const rawRouteRole = route?.route?.role ?? "";
+    const routeRole = Array.isArray(rawRouteRole) ? rawRouteRole[0] : rawRouteRole;
     const appRole = this.store?.get("app.activeRole", "");
     const activeRole = appRole && appRole !== "public"
       ? appRole
