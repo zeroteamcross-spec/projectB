@@ -60,6 +60,7 @@ function serveSpaShell(string $basePath, string $publicPath, string $path): bool
         $theme = loadThemeConfig($basePath);
         $html = str_replace('__ASSET_VER__', assetVersionToken($publicPath), $html);
         $html = str_replace('__ROLE_HOSTS__', roleHostsJson(), $html);
+        $html = str_replace('__CUSTOM_DOMAIN_SERVER_IP__', customDomainServerIp(), $html);
         $html = str_replace('__THEME_CONFIG__', themeConfigJson($theme), $html);
         $metadata = loadPublicWebConfigMetadata($theme);
         $ownBranding = array_filter(
@@ -217,6 +218,23 @@ function loadShowroomShareMetadata(string $basePath, string $path): array
  * Hanya entri yang benar-benar diisi yang diteruskan; sisanya dibuang supaya
  * peta kosong menghasilkan "{}" dan penjaganya diam.
  */
+/**
+ * IP server yang ditampilkan di instruksi "arahkan A record ke sini"
+ * (SellerShowroomPage) -- sumbernya sama persis dengan yang dipakai
+ * ShowroomService::checkCustomDomainDns() untuk verifikasi, supaya
+ * instruksi yang dilihat showroom tidak pernah berbeda dari yang benar-benar
+ * dicek backend.
+ */
+function customDomainServerIp(): string
+{
+    if (! function_exists('config')) {
+        require_once dirname(__DIR__) . '/bootstrap/helpers.php';
+        load_env(base_path('.env'));
+    }
+
+    return (string) config('app.custom_domain.server_ip', '');
+}
+
 function roleHostsJson(): string
 {
     // Shell HTML dilayani sebelum bootstrap/app.php dijalankan, jadi config()

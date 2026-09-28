@@ -471,7 +471,7 @@ class ShowroomService
         ));
         $systemHosts[] = 'carlynk.id';
 
-        if (in_array($domain, $systemHosts, true) || str_ends_with($domain, '.carlynk.id')) {
+        if (in_array($domain, $systemHosts, true) || substr($domain, -strlen('.carlynk.id')) === '.carlynk.id') {
             throw new ValidationException(['custom_domain' => 'Domain ini dipakai sistem, tidak bisa didaftarkan showroom.']);
         }
 

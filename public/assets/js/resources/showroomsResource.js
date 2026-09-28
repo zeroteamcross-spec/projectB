@@ -60,6 +60,26 @@ export const showroomsResource = {
     return response.data?.showroom ?? null;
   },
 
+  async requestCustomDomain(showroomId, domain, options = {}) {
+    const response = await apiClient.post(`/showrooms/${encodeURIComponent(showroomId)}/mine/custom-domain`, { domain }, options);
+    return response.data?.showroom ?? null;
+  },
+
+  async checkCustomDomainDns(showroomId, options = {}) {
+    const response = await apiClient.post(`/showrooms/${encodeURIComponent(showroomId)}/mine/custom-domain/check`, {}, options);
+    return response.data?.showroom ?? null;
+  },
+
+  async removeCustomDomain(showroomId, options = {}) {
+    const response = await apiClient.delete(`/showrooms/${encodeURIComponent(showroomId)}/mine/custom-domain`, options);
+    return response.data?.showroom ?? null;
+  },
+
+  async activateCustomDomain(showroomId, options = {}) {
+    const response = await apiClient.post(`/showrooms/${encodeURIComponent(showroomId)}/custom-domain/activate`, {}, options);
+    return response.data?.showroom ?? null;
+  },
+
   async dueSubscriptions(options = {}) {
     const response = await apiClient.get("/showrooms/subscriptions/due", options);
     return response.data?.showrooms ?? [];

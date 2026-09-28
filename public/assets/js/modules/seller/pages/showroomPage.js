@@ -2,6 +2,9 @@ import { createPageLifecycle } from "../../../core/lifecycle.js";
 import { showroomsResource } from "../../../resources/showroomsResource.js";
 import { appStore } from "../../../state/store.js";
 import { Button } from "../../../ui/primitives/button.js";
+import { Input } from "../../../ui/primitives/input.js";
+import { Badge } from "../../../ui/primitives/badge.js";
+import { Card } from "../../../ui/composites/card.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 import { applyDesignHook } from "../../../theme/designStudioHooks.js";
 import { adminMasterService } from "../../admin/services/adminMasterService.js";
@@ -25,7 +28,29 @@ const DEFAULT_RUNTIME = {
   error: "",
   iconUrlDraft: null,
   headerLogoUrlDraft: null,
+  savingDomain: false,
+  checkingDns: false,
+  domainError: "",
 };
+
+const CUSTOM_DOMAIN_STATUS_LABEL = {
+  pending_dns: "Menunggu DNS",
+  verified: "DNS Terverifikasi, menunggu admin",
+  active: "Aktif",
+};
+
+const CUSTOM_DOMAIN_STATUS_VARIANT = {
+  pending_dns: "warning",
+  verified: "info",
+  active: "success",
+};
+
+// Draft ketikan domain SENGAJA di luar appStore (bukan runtime state) --
+// appStore.subscribe() me-render ulang seluruh halaman (replaceChildren)
+// pada perubahan apa pun, yang akan menghapus fokus & isi field di tengah
+// mengetik kalau nilainya lewat store. Pola sama dipakai affiliateFormDraft
+// di affiliatesModalPage.js.
+let customDomainDraft = "";
 
 export function SellerShowroomPage() {
   let root = null;
@@ -91,6 +116,10 @@ export function SellerShowroomPage() {
     layout.className = "grid min-w-0 gap-6";
     layout.dataset.ds = "seller.showroom.page";
     layout.append(showroomHero({ router, showroom, editing: false }), branchSwitcherWidget.element, body);
+
+    if (showroom?.id) {
+      layout.append(applyDesignHook(customDomainCard(showroom, runtime), "seller.showroom.customDomain"));
+    }
 
     rootEl.replaceChildren(layout);
   }
@@ -234,6 +263,206 @@ async function saveShowroom(payload) {
     });
     showToast(message, { type: "error" });
   }
+}
+
+/**
+ * Backlog #7: showroom mendaftarkan domain sendiri. URL di domain custom
+ * tetap menyertakan slug (mis. www.tokomobiljaya.com/toko-mobil-jaya/...),
+ * jadi kartu ini murni pendaftaran + status -- tidak ada perubahan navigasi
+ * apa pun di SPA. Siklusnya: pending_dns (baru daftar) -> verified (DNS
+ * sudah dicek otomatis, benar mengarah ke server) -> active (ADMIN sudah
+ * menyiapkan nginx/SSL manual dan menekan Aktifkan).
+ */
+function customDomainCard(showroom, runtime) {
+  const card = Card();
+  card.id = "slrsr_custom_domain_card";
+  card.classList.add("grid", "min-w-0", "gap-4");
+
+  const header = document.createElement("div");
+  header.className = "flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between";
+  const heading = document.createElement("div");
+  heading.className = "grid gap-1";
+  heading.append(
+    textNode("p", "text-sm font-black text-gray-950", "Domain Custom"),
+    textNode(
+      "p",
+      "text-xs text-gray-600",
+      "Pakai domain Anda sendiri untuk membuka showroom ini, alih-alih hanya lewat carlynk.id."
+    ),
+  );
+  header.append(heading);
+
+  const status = showroom.custom_domain_status;
+  if (status) {
+    header.append(Badge({ label: CUSTOM_DOMAIN_STATUS_LABEL[status] ?? status, variant: CUSTOM_DOMAIN_STATUS_VARIANT[status] ?? "default" }));
+  }
+  card.append(header);
+
+  if (runtime.domainError) {
+    const errorNode = document.createElement("div");
+    errorNode.className = "rounded-xl bg-[color-mix(in_srgb,var(--pb-danger)_10%,transparent)] px-3 py-2 text-xs font-semibold text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]";
+    errorNode.textContent = runtime.domainError;
+    card.append(errorNode);
+  }
+
+  if (!showroom.custom_domain) {
+    const form = document.createElement("form");
+    form.className = "grid gap-3 sm:flex sm:items-end sm:gap-3";
+    const field = Input({
+      id: "slrsr_custom_domain_input",
+      name: "domain",
+      label: "Domain Anda",
+      value: customDomainDraft,
+      placeholder: "www.tokomobiljaya.com",
+    });
+    field.classList.add("sm:flex-1");
+    form.append(field);
+
+    const submit = Button({
+      id: "slrsr_custom_domain_submit_button",
+      label: runtime.savingDomain ? "Menyimpan..." : "Daftarkan Domain",
+      disabled: runtime.savingDomain,
+      onClick: () => form.requestSubmit(),
+    });
+    submit.type = "submit";
+    form.append(submit);
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const domain = String(new FormData(form).get("domain") ?? "").trim();
+      saveCustomDomain(showroom.id, domain);
+    });
+    // Disimpan ke variabel modul (customDomainDraft), BUKAN setRuntime() --
+    // menulis ke appStore di sini akan memicu render ulang seluruh halaman
+    // pada tiap ketikan dan menghapus fokus/isi field itu sendiri.
+    form.addEventListener("input", () => {
+      customDomainDraft = String(new FormData(form).get("domain") ?? "");
+    });
+
+    card.append(form);
+
+    return card;
+  }
+
+  const info = document.createElement("div");
+  info.className = "grid gap-1";
+  info.append(textNode("p", "text-sm font-semibold text-gray-900", showroom.custom_domain));
+
+  if (status === "pending_dns") {
+    info.append(textNode(
+      "p",
+      "text-xs text-gray-600",
+      `Arahkan A record domain Anda ke ${window.__PROJECTB_CUSTOM_DOMAIN_SERVER_IP__ || "IP server kami"}, lalu klik Cek DNS.`
+    ));
+  } else if (status === "verified") {
+    info.append(textNode("p", "text-xs text-gray-600", "DNS sudah benar. Menunggu admin menyiapkan sertifikat & mengaktifkan domain ini."));
+  } else if (status === "active" && showroom.slug) {
+    info.append(textNode("p", "text-xs text-gray-600", `Aktif di: https://${showroom.custom_domain}/${showroom.slug}`));
+  }
+  card.append(info);
+
+  const actions = document.createElement("div");
+  actions.className = "flex flex-wrap gap-2";
+
+  if (status !== "active") {
+    actions.append(Button({
+      id: "slrsr_custom_domain_check_button",
+      label: runtime.checkingDns ? "Memeriksa..." : "Cek DNS",
+      disabled: runtime.checkingDns,
+      onClick: () => checkCustomDomainDnsAction(showroom.id),
+    }));
+  }
+
+  actions.append(Button({
+    id: "slrsr_custom_domain_remove_button",
+    label: "Cabut Domain",
+    variant: "tidak",
+    onClick: () => removeCustomDomainAction(showroom.id),
+  }));
+
+  card.append(actions);
+
+  return card;
+}
+
+async function saveCustomDomain(showroomId, domain) {
+  if (!domain) {
+    setRuntime({ domainError: "Domain wajib diisi." });
+    return;
+  }
+
+  setRuntime({ savingDomain: true, domainError: "" });
+
+  try {
+    const showroom = await showroomsResource.requestCustomDomain(showroomId, domain);
+    patchShowroomState(showroom);
+    customDomainDraft = "";
+    setRuntime({ savingDomain: false });
+    showToast("Domain berhasil didaftarkan, menunggu verifikasi DNS.", { type: "success" });
+  } catch (error) {
+    const message = customDomainErrorMessage(error, "Domain gagal didaftarkan.");
+    setRuntime({ savingDomain: false, domainError: message });
+    showToast(message, { type: "error" });
+  }
+}
+
+async function checkCustomDomainDnsAction(showroomId) {
+  setRuntime({ checkingDns: true, domainError: "" });
+
+  try {
+    const showroom = await showroomsResource.checkCustomDomainDns(showroomId);
+    patchShowroomState(showroom);
+    setRuntime({ checkingDns: false });
+    showToast("DNS domain custom terverifikasi.", { type: "success" });
+  } catch (error) {
+    const message = customDomainErrorMessage(error, "DNS domain belum mengarah ke server kami.");
+    setRuntime({ checkingDns: false, domainError: message });
+    showToast(message, { type: "error" });
+  }
+}
+
+async function removeCustomDomainAction(showroomId) {
+  try {
+    const showroom = await showroomsResource.removeCustomDomain(showroomId);
+    patchShowroomState(showroom);
+    setRuntime({ domainError: "" });
+    showToast("Domain custom berhasil dicabut.", { type: "success" });
+  } catch (error) {
+    showToast(customDomainErrorMessage(error, "Domain custom gagal dicabut."), { type: "error" });
+  }
+}
+
+/**
+ * ValidationException backend selalu mengirim message generik "Validation
+ * failed" -- pesan yang sebenarnya ada per-field di response.errors (lihat
+ * App\Core\Exceptions\ValidationException). ApiError menyalinnya ke
+ * error.errors -- ambil pesan field pertama dari situ dulu sebelum jatuh ke
+ * error.message/fallback.
+ */
+function customDomainErrorMessage(error, fallback) {
+  const errors = error?.errors;
+  if (errors && typeof errors === "object") {
+    const first = Object.values(errors)[0];
+    if (typeof first === "string" && first) {
+      return first;
+    }
+  }
+
+  return error?.message ?? fallback;
+}
+
+function patchShowroomState(showroom) {
+  appStore.patchState("working.sellerShowroom.showroom", {
+    data: showroom,
+    hydratedAt: Date.now(),
+  }, "seller:showroom-custom-domain");
+  appStore.patchState("snapshot.seller.showroom", {
+    data: showroom,
+    fetchedAt: Date.now(),
+    ttl: 120,
+    version: "seller-showroom-v1",
+    stale: false,
+  }, "seller:showroom-custom-domain-snapshot");
 }
 
 function ensureRuntime() {
