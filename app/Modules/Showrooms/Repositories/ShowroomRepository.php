@@ -522,6 +522,18 @@ class ShowroomRepository
      * (bukan DATE_SUB/NOW() di SQL) -- pola yang sama dipakai
      * TransactionService::expirePendingTransactions(), dan portable ke
      * sqlite yang dipakai tests/run.php.
+     *
+     * Cabang OR kedua menutup celah ganti paket: applyShowroomUpdate()
+     * sengaja meng-null-kan subscription_next_due_at begitu paket
+     * berganti (lihat komentarnya -- tagihan siklus lama tidak berlaku
+     * untuk paket baru), tapi itu juga berarti cabang pertama di atas
+     * (yang mensyaratkan next_due_at IS NOT NULL) tidak akan PERNAH
+     * cocok untuk showroom yang ganti paket lalu tidak pernah membayar
+     * paket barunya -- next_due_at baru terisi lagi setelah admin
+     * mengonfirmasi pembayaran. Tanpa cabang ini showroom itu tetap
+     * is_active dan menikmati fitur paket baru (mis. batas listing yang
+     * lebih longgar) selamanya tanpa pernah membayar. selected_plan_selected_at
+     * dipakai sebagai jangkar waktu penggantinya, dengan grace period yang sama.
      */
     public function findOverdueForAutoSuspend(string $cutoffAt): array
     {
@@ -535,11 +547,18 @@ class ShowroomRepository
              AND u.account_status = \'active\'
              AND u.is_approved = 1
              AND sh.is_active = 1
-             AND sh.subscription_next_due_at IS NOT NULL
-             AND sh.subscription_next_due_at <= :cutoff_at
+             AND (
+                 (sh.subscription_next_due_at IS NOT NULL AND sh.subscription_next_due_at <= :cutoff_at)
+                 OR (
+                     sh.subscription_payment_status = \'unpaid\'
+                     AND sh.subscription_next_due_at IS NULL
+                     AND sh.selected_plan_selected_at IS NOT NULL
+                     AND sh.selected_plan_selected_at <= :cutoff_at_2
+                 )
+             )
              ORDER BY sh.subscription_next_due_at ASC'
         );
-        $stmt->execute(['cutoff_at' => $cutoffAt]);
+        $stmt->execute(['cutoff_at' => $cutoffAt, 'cutoff_at_2' => $cutoffAt]);
 
         return $stmt->fetchAll();
     }

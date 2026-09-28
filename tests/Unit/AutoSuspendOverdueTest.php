@@ -25,6 +25,8 @@ class AutoSuspendOverdueTest extends TestCase
         $this->includesShowroomOverdueYangSudahLewatCutoff();
         $this->excludesShowroomYangBelumLewatCutoff();
         $this->excludesShowroomYangSudahNonaktif();
+        $this->includesShowroomGantiPaketYangTidakKunjungBayar();
+        $this->excludesShowroomGantiPaketYangBaruSaja();
     }
 
     private function includesShowroomOverdueYangSudahLewatCutoff(): void
@@ -75,6 +77,58 @@ class AutoSuspendOverdueTest extends TestCase
         $this->assertSame(0, count($rows));
     }
 
+    /**
+     * applyShowroomUpdate() meng-null-kan subscription_next_due_at begitu
+     * paket berganti (tagihan siklus lama tidak berlaku untuk paket baru).
+     * Kalau showroom itu lalu tidak pernah membayar paket barunya, cabang
+     * pertama query (yang mensyaratkan next_due_at IS NOT NULL) tidak akan
+     * pernah cocok -- showroom bisa tetap aktif menikmati paket baru
+     * selamanya tanpa bayar. selected_plan_selected_at dipakai sebagai
+     * jangkar waktu pengganti untuk kasus ini.
+     */
+    private function includesShowroomGantiPaketYangTidakKunjungBayar(): void
+    {
+        $pdo = $this->sqlite();
+        $this->createSchema($pdo);
+        $this->seedUser($pdo, 1, 'active', 1);
+        $this->seedShowroomGantiPaket($pdo, 1, 1, '-20 days');
+
+        $repository = new ShowroomRepository($pdo);
+        $cutoffAt = date('Y-m-d H:i:s', strtotime('-14 days'));
+        $rows = $repository->findOverdueForAutoSuspend($cutoffAt);
+
+        $this->assertSame(1, count($rows));
+        $this->assertSame(1, (int) $rows[0]['id']);
+    }
+
+    private function excludesShowroomGantiPaketYangBaruSaja(): void
+    {
+        $pdo = $this->sqlite();
+        $this->createSchema($pdo);
+        $this->seedUser($pdo, 1, 'active', 1);
+        // Ganti paket 5 hari lalu -- belum lewat toleransi 14 hari.
+        $this->seedShowroomGantiPaket($pdo, 1, 1, '-5 days');
+
+        $repository = new ShowroomRepository($pdo);
+        $cutoffAt = date('Y-m-d H:i:s', strtotime('-14 days'));
+        $rows = $repository->findOverdueForAutoSuspend($cutoffAt);
+
+        $this->assertSame(0, count($rows));
+    }
+
+    private function seedShowroomGantiPaket(\PDO $pdo, int $id, int $userId, string $selectedOffset): void
+    {
+        $pdo->prepare(
+            'INSERT INTO showrooms (id, user_id, name, subscription_payment_status, subscription_next_due_at, selected_plan_selected_at, is_active, deleted_at)
+             VALUES (:id, :user_id, :name, \'unpaid\', NULL, :selected_at, 1, NULL)'
+        )->execute([
+            'id' => $id,
+            'user_id' => $userId,
+            'name' => 'Showroom Ganti Paket',
+            'selected_at' => date('Y-m-d H:i:s', strtotime($selectedOffset)),
+        ]);
+    }
+
     private function seedUser(\PDO $pdo, int $id, string $accountStatus, int $isApproved): void
     {
         $pdo->prepare('INSERT INTO users (id, account_status, is_approved, deleted_at) VALUES (:id, :status, :approved, NULL)')
@@ -109,6 +163,7 @@ class AutoSuspendOverdueTest extends TestCase
             name TEXT NULL,
             slug TEXT NULL,
             selected_plan_name TEXT NULL,
+            selected_plan_selected_at TEXT NULL,
             subscription_payment_status TEXT NULL,
             subscription_next_due_at TEXT NULL,
             is_active INTEGER NULL,
