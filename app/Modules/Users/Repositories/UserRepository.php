@@ -64,6 +64,7 @@ class UserRepository
         $stmt = $this->pdo->prepare(
             'SELECT id, user_id, name, address, phone_number, bank_account_number,
                     bank_type, bank_account_name,
+                    custom_domain, custom_domain_status, custom_domain_requested_at, custom_domain_verified_at,
                     selected_plan_name, selected_plan_price, selected_plan_billing_period, selected_plan_selected_at,
                     subscription_payment_status, subscription_proof_path, subscription_proof_note,
                     subscription_proof_submitted_at, subscription_confirmed_at, subscription_confirmed_by,

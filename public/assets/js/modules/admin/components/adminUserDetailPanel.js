@@ -6,6 +6,12 @@ import { tw } from "../../../theme/tailwindClasses.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 import { adminUserManagementService } from "../services/adminUserManagementService.js";
 
+const CUSTOM_DOMAIN_STATUS_LABEL = {
+  pending_dns: "Menunggu DNS",
+  verified: "DNS Terverifikasi",
+  active: "Aktif",
+};
+
 export function AdminUserDetailPanel({
   user = null,
   isHydrating = false,
@@ -16,6 +22,8 @@ export function AdminUserDetailPanel({
   onImpersonate = null,
   onDeactivateShowroom = null,
   onActivateShowroom = null,
+  activatingCustomDomainId = null,
+  onActivateCustomDomain = null,
   presentation = "panel",
 } = {}) {
   const panel = document.createElement("section");
@@ -68,6 +76,9 @@ export function AdminUserDetailPanel({
     if (user.showroom.is_active === false && user.showroom.deactivated_reason) {
       facts.append(infoRow("Alasan Nonaktif", user.showroom.deactivated_reason));
     }
+    if (user.showroom.custom_domain) {
+      facts.append(infoRow("Domain Custom", `${user.showroom.custom_domain} (${CUSTOM_DOMAIN_STATUS_LABEL[user.showroom.custom_domain_status] ?? user.showroom.custom_domain_status})`));
+    }
   }
 
   const actions = document.createElement("div");
@@ -118,6 +129,23 @@ export function AdminUserDetailPanel({
     toggle.id = `adusr_modal_${isActive ? "deactivate" : "activate"}_showroom_button_${user.id}`;
     toggle.prepend(createIcon(isActive ? "circleXmark" : "sparkles", { className: "h-4 w-4" }));
     actions.append(toggle);
+  }
+
+  if (user.showroom?.custom_domain_status === "verified") {
+    const isActivatingThis = activatingCustomDomainId === user.showroom.id;
+    const activateDomain = Button({
+      label: isActivatingThis ? "Memproses..." : "Aktifkan Domain",
+      variant: "secondary",
+      disabled: isActivatingThis,
+      onClick: () => onActivateCustomDomain?.(user),
+    });
+    activateDomain.id = `adusr_modal_activate_custom_domain_button_${user.id}`;
+    activateDomain.prepend(createIcon("sparkles", { className: "h-4 w-4" }));
+    actions.append(textBlock(
+      "text-xs leading-6 text-[color-mix(in_srgb,var(--pb-warning)_84%,black)] sm:col-span-2",
+      "Pastikan nginx & SSL untuk domain ini sudah disiapkan manual di server SEBELUM menekan tombol ini."
+    ));
+    actions.append(activateDomain);
   }
 
   panel.append(heading, facts, actions);

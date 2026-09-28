@@ -21,6 +21,7 @@ export function AdminUsersPage() {
     activeUserId: null,
     approvingUserId: null,
     togglingShowroomId: null,
+    activatingCustomDomainId: null,
     confirmDeactivateUserId: null,
     deactivateReasonDraft: "",
     closingDetail: false,
@@ -157,6 +158,24 @@ export function AdminUsersPage() {
         showToast(state.error, { type: "error" });
       } finally {
         state.togglingShowroomId = null;
+        rerender();
+      }
+    },
+    async activateCustomDomain(user) {
+      state.activatingCustomDomainId = user.showroom.id;
+      state.error = "";
+      rerender();
+
+      try {
+        await showroomsResource.activateCustomDomain(user.showroom.id);
+        showToast(`Domain custom ${user.showroom.custom_domain || ""} berhasil diaktifkan.`, { type: "success" });
+        await refreshWorkingState(currentContext, String(user.id));
+        rerender();
+      } catch (error) {
+        state.error = error.message || "Gagal mengaktifkan domain custom.";
+        showToast(state.error, { type: "error" });
+      } finally {
+        state.activatingCustomDomainId = null;
         rerender();
       }
     },
@@ -357,6 +376,8 @@ function render(root, context, state, actions) {
       onImpersonate: (user) => actions.openImpersonation(user),
       onDeactivateShowroom: (user) => actions.deactivateShowroom(user),
       onActivateShowroom: (user) => actions.activateShowroom(user),
+      activatingCustomDomainId: state.activatingCustomDomainId,
+      onActivateCustomDomain: (user) => actions.activateCustomDomain(user),
       presentation: "modal",
     }), "admin.users.detail"), {
       key: `adusr-detail-${filters.userId}`,
