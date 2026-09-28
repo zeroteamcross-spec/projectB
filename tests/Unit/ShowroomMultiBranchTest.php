@@ -101,7 +101,10 @@ class ShowroomMultiBranchTest extends TestCase
         $pdo->exec('CREATE TABLE showrooms (
             id INTEGER PRIMARY KEY,
             user_id INTEGER,
-            slug TEXT NULL, name TEXT NULL, address TEXT NULL, city_name TEXT NULL,
+            slug TEXT NULL,
+            custom_domain TEXT NULL, custom_domain_status TEXT NULL, custom_domain_requested_at TEXT NULL,
+            custom_domain_verified_at TEXT NULL, custom_domain_activated_at TEXT NULL,
+            name TEXT NULL, address TEXT NULL, city_name TEXT NULL,
             phone_number TEXT NULL, bank_account_number TEXT NULL, bank_type TEXT NULL,
             bank_account_name TEXT NULL, icon_url TEXT NULL, header_logo_url TEXT NULL, tab_title TEXT NULL,
             selected_plan_name TEXT NULL, selected_plan_price REAL NULL, selected_plan_billing_period TEXT NULL,

@@ -24,7 +24,9 @@ class ShowroomRepository
     public function findById(int $id): ?array
     {
         $stmt = $this->pdo->prepare(
-            'SELECT id, user_id, slug, name, address, city_name, phone_number, bank_account_number,
+            'SELECT id, user_id, slug, custom_domain, custom_domain_status, custom_domain_requested_at,
+                    custom_domain_verified_at, custom_domain_activated_at,
+                    name, address, city_name, phone_number, bank_account_number,
                     bank_type, bank_account_name, icon_url, header_logo_url, tab_title,
                     selected_plan_name, selected_plan_price, selected_plan_billing_period,
                     selected_plan_listing_limit, selected_plan_allows_multi_branch, selected_plan_staff_limit, selected_plan_selected_at,
@@ -54,7 +56,9 @@ class ShowroomRepository
     public function findByUserId(int $userId): ?array
     {
         $stmt = $this->pdo->prepare(
-            'SELECT id, user_id, slug, name, address, city_name, phone_number, bank_account_number,
+            'SELECT id, user_id, slug, custom_domain, custom_domain_status, custom_domain_requested_at,
+                    custom_domain_verified_at, custom_domain_activated_at,
+                    name, address, city_name, phone_number, bank_account_number,
                     bank_type, bank_account_name, icon_url, header_logo_url, tab_title,
                     selected_plan_name, selected_plan_price, selected_plan_billing_period,
                     selected_plan_listing_limit, selected_plan_allows_multi_branch, selected_plan_staff_limit, selected_plan_selected_at,
@@ -81,7 +85,9 @@ class ShowroomRepository
     public function findAllByUserId(int $userId): array
     {
         $stmt = $this->pdo->prepare(
-            'SELECT id, user_id, slug, name, address, city_name, phone_number, bank_account_number,
+            'SELECT id, user_id, slug, custom_domain, custom_domain_status, custom_domain_requested_at,
+                    custom_domain_verified_at, custom_domain_activated_at,
+                    name, address, city_name, phone_number, bank_account_number,
                     bank_type, bank_account_name, icon_url, header_logo_url, tab_title,
                     selected_plan_name, selected_plan_price, selected_plan_billing_period,
                     selected_plan_listing_limit, selected_plan_allows_multi_branch, selected_plan_staff_limit, selected_plan_selected_at,
@@ -138,6 +144,101 @@ class ShowroomRepository
         $stmt->execute($params);
 
         return (bool) $stmt->fetch();
+    }
+
+    public function customDomainExists(string $domain, ?int $ignoreShowroomId = null): bool
+    {
+        $sql = 'SELECT id FROM showrooms WHERE custom_domain = :domain AND deleted_at IS NULL';
+        $params = ['domain' => $domain];
+
+        if ($ignoreShowroomId !== null) {
+            $sql .= ' AND id <> :id';
+            $params['id'] = $ignoreShowroomId;
+        }
+
+        $sql .= ' LIMIT 1';
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+
+        return (bool) $stmt->fetch();
+    }
+
+    /**
+     * Hanya showroom yang domainnya SUDAH 'active' yang boleh benar-benar
+     * melayani trafik lewat domain itu -- 'pending_dns'/'verified' belum
+     * disiapkan admin di nginx/SSL, lihat ShowroomService::activateCustomDomain().
+     */
+    public function findByCustomDomain(string $domain): ?array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT id, slug FROM showrooms
+             WHERE custom_domain = :domain
+             AND custom_domain_status = \'active\'
+             AND deleted_at IS NULL
+             LIMIT 1'
+        );
+        $stmt->execute(['domain' => $domain]);
+        $showroom = $stmt->fetch();
+
+        return $showroom ?: null;
+    }
+
+    public function updateCustomDomainRequest(int $id, string $domain, string $requestedAt): void
+    {
+        $stmt = $this->pdo->prepare(
+            'UPDATE showrooms
+             SET custom_domain = :domain,
+                 custom_domain_status = \'pending_dns\',
+                 custom_domain_requested_at = :requested_at,
+                 custom_domain_verified_at = NULL,
+                 custom_domain_activated_at = NULL,
+                 updated_at = :updated_at
+             WHERE id = :id
+             AND deleted_at IS NULL'
+        );
+        $stmt->execute(['id' => $id, 'domain' => $domain, 'requested_at' => $requestedAt, 'updated_at' => $requestedAt]);
+    }
+
+    public function updateCustomDomainVerified(int $id, string $verifiedAt): void
+    {
+        $stmt = $this->pdo->prepare(
+            'UPDATE showrooms
+             SET custom_domain_status = \'verified\',
+                 custom_domain_verified_at = :verified_at,
+                 updated_at = :updated_at
+             WHERE id = :id
+             AND deleted_at IS NULL'
+        );
+        $stmt->execute(['id' => $id, 'verified_at' => $verifiedAt, 'updated_at' => $verifiedAt]);
+    }
+
+    public function updateCustomDomainActivated(int $id, string $activatedAt): void
+    {
+        $stmt = $this->pdo->prepare(
+            'UPDATE showrooms
+             SET custom_domain_status = \'active\',
+                 custom_domain_activated_at = :activated_at,
+                 updated_at = :updated_at
+             WHERE id = :id
+             AND deleted_at IS NULL'
+        );
+        $stmt->execute(['id' => $id, 'activated_at' => $activatedAt, 'updated_at' => $activatedAt]);
+    }
+
+    public function clearCustomDomain(int $id, string $clearedAt): void
+    {
+        $stmt = $this->pdo->prepare(
+            'UPDATE showrooms
+             SET custom_domain = NULL,
+                 custom_domain_status = NULL,
+                 custom_domain_requested_at = NULL,
+                 custom_domain_verified_at = NULL,
+                 custom_domain_activated_at = NULL,
+                 updated_at = :cleared_at
+             WHERE id = :id
+             AND deleted_at IS NULL'
+        );
+        $stmt->execute(['id' => $id, 'cleared_at' => $clearedAt]);
     }
 
     public function create(int $userId, array $data): int

@@ -11,6 +11,7 @@ use App\Infrastructure\Payment\Midtrans\MidtransCallbackHandler;
 use App\Modules\MasterData\Requests\UploadAppIconRequest;
 use App\Modules\MasterData\Services\MasterAssetService;
 use App\Modules\Showrooms\Requests\DeactivateShowroomRequest;
+use App\Modules\Showrooms\Requests\RequestCustomDomainRequest;
 use App\Modules\Showrooms\Requests\UpsertShowroomRequest;
 use App\Modules\Showrooms\Services\ShowroomService;
 use App\Modules\Transactions\Requests\ProviderCallbackRequest;
@@ -127,6 +128,43 @@ class ShowroomController extends Controller
         return JsonResponse::success([
             'showroom' => $this->service->activate($user, (int) $request->routeParam('id')),
         ], 'Showroom berhasil diaktifkan kembali.');
+    }
+
+    public function requestCustomDomain(Request $request): JsonResponse
+    {
+        $user = $this->user($request);
+        $payload = (new RequestCustomDomainRequest($request))->validate();
+
+        return JsonResponse::success([
+            'showroom' => $this->service->requestCustomDomain($user, (int) $request->routeParam('id'), $payload['domain']),
+        ], 'Domain custom berhasil didaftarkan, menunggu verifikasi DNS.');
+    }
+
+    public function checkCustomDomainDns(Request $request): JsonResponse
+    {
+        $user = $this->user($request);
+
+        return JsonResponse::success([
+            'showroom' => $this->service->checkCustomDomainDns($user, (int) $request->routeParam('id')),
+        ], 'DNS domain custom terverifikasi.');
+    }
+
+    public function removeCustomDomain(Request $request): JsonResponse
+    {
+        $user = $this->user($request);
+
+        return JsonResponse::success([
+            'showroom' => $this->service->removeCustomDomain($user, (int) $request->routeParam('id')),
+        ], 'Domain custom berhasil dicabut.');
+    }
+
+    public function activateCustomDomain(Request $request): JsonResponse
+    {
+        $user = $this->user($request);
+
+        return JsonResponse::success([
+            'showroom' => $this->service->activateCustomDomain($user, (int) $request->routeParam('id')),
+        ], 'Domain custom berhasil diaktifkan.');
     }
 
     public function submitSubscriptionProof(Request $request): JsonResponse

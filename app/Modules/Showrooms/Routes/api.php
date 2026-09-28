@@ -59,6 +59,15 @@ return static function (Router $router): void {
         $router->post('/{id}/mine/subscription/midtrans/charge', [ShowroomController::class, 'createSubscriptionMidtransPaymentFor']);
         $router->get('/{id}/mine/subscription/history', [ShowroomController::class, 'subscriptionHistoryForOwned']);
 
+        // Domain custom (backlog #7): owner mendaftarkan & cek DNS lewat
+        // ".../mine/...", admin mengaktifkan lewat ".../{id}/custom-domain/activate"
+        // (bukan owner -- lihat ShowroomService::activateCustomDomain(), murni
+        // flag setelah admin menyiapkan nginx/SSL manual).
+        $router->post('/{id}/mine/custom-domain', [ShowroomController::class, 'requestCustomDomain']);
+        $router->post('/{id}/mine/custom-domain/check', [ShowroomController::class, 'checkCustomDomainDns']);
+        $router->delete('/{id}/mine/custom-domain', [ShowroomController::class, 'removeCustomDomain']);
+        $router->post('/{id}/custom-domain/activate', [ShowroomController::class, 'activateCustomDomain']);
+
         $router->post('/{id}/deactivate', [ShowroomController::class, 'deactivate']);
         $router->post('/{id}/activate', [ShowroomController::class, 'activate']);
         $router->post('/{id}/subscription/confirm', [ShowroomController::class, 'confirmSubscriptionPayment']);

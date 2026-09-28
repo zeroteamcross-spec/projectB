@@ -329,6 +329,170 @@ class ShowroomService
     }
 
     /**
+     * Showroom mendaftarkan domain sendiri (backlog #7) -- keputusan
+     * pengaturan tingkat showroom, sama seperti ganti paket, jadi owner-only
+     * (ensureSeller(), staf dilarang menyentuh). Mengganti domain yang
+     * sudah verified/active mengembalikannya ke pending_dns lagi -- domain
+     * baru wajib diverifikasi ulang, tidak mewarisi status domain lama.
+     */
+    public function requestCustomDomain(array $user, int $showroomId, string $domain): array
+    {
+        $this->ensureSeller($user);
+        $existing = $this->showrooms->findById($showroomId);
+
+        if (! $existing) {
+            throw new NotFoundException('Showroom tidak ditemukan.');
+        }
+
+        ShowroomPolicy::ensureOwnedByUser($existing, $user);
+
+        $normalized = $this->normalizeCustomDomain($domain);
+        $this->ensureCustomDomainAvailable($normalized, $showroomId);
+
+        $this->showrooms->updateCustomDomainRequest($showroomId, $normalized, date('Y-m-d H:i:s'));
+
+        return $this->serializeShowroom($this->showrooms->findById($showroomId));
+    }
+
+    /**
+     * Cek DNS read-only (dns_get_record/gethostbyname) -- TIDAK PERNAH
+     * menyentuh nginx/SSL/server, murni pengecekan sebelum admin melakukan
+     * langkah manual itu (lihat plan groovy-napping-thacker.md, Fase 3
+     * Runbook). Dipicu showroom sendiri, boleh diulang kapan pun.
+     */
+    public function checkCustomDomainDns(array $user, int $showroomId): array
+    {
+        $this->ensureSeller($user);
+        $existing = $this->showrooms->findById($showroomId);
+
+        if (! $existing) {
+            throw new NotFoundException('Showroom tidak ditemukan.');
+        }
+
+        ShowroomPolicy::ensureOwnedByUser($existing, $user);
+
+        $domain = trim((string) ($existing['custom_domain'] ?? ''));
+        if ($domain === '') {
+            throw new ValidationException(['custom_domain' => 'Belum ada domain yang didaftarkan.']);
+        }
+
+        $serverIp = trim((string) config('app.custom_domain.server_ip', ''));
+        $resolvedIp = $this->resolveDomainIp($domain);
+
+        if ($serverIp === '' || $resolvedIp === null || $resolvedIp !== $serverIp) {
+            throw new ValidationException([
+                'custom_domain' => 'DNS domain belum mengarah ke server kami. Pastikan A record sudah diarahkan, lalu coba lagi setelah propagasi DNS selesai.',
+            ]);
+        }
+
+        $now = date('Y-m-d H:i:s');
+        $this->showrooms->updateCustomDomainVerified($showroomId, $now);
+        $verified = $this->showrooms->findById($showroomId);
+
+        if ($this->notificationService !== null) {
+            $this->notificationService->createCustomDomainVerifiedNotification($verified);
+        }
+
+        return $this->serializeShowroom($verified);
+    }
+
+    /**
+     * Murni menyalakan FLAG di database -- TIDAK menyentuh nginx/SSL sama
+     * sekali. Admin menjalankan langkah manual di server (Runbook) LEBIH
+     * DULU, baru menekan ini begitu domainnya benar-benar sudah bisa
+     * diakses -- urutan terbalik akan membuat domain "aktif" di database
+     * padahal belum benar-benar melayani trafik.
+     */
+    public function activateCustomDomain(array $actor, int $showroomId): array
+    {
+        AuthPolicy::requireAdmin($actor);
+        $existing = $this->showrooms->findById($showroomId);
+
+        if (! $existing) {
+            throw new NotFoundException('Showroom tidak ditemukan.');
+        }
+
+        if (($existing['custom_domain_status'] ?? null) !== 'verified') {
+            throw new ValidationException([
+                'custom_domain_status' => 'Domain harus lolos verifikasi DNS lebih dulu sebelum diaktifkan.',
+            ]);
+        }
+
+        $this->showrooms->updateCustomDomainActivated($showroomId, date('Y-m-d H:i:s'));
+
+        return $this->serializeShowroom($this->showrooms->findById($showroomId));
+    }
+
+    /**
+     * Mencabut domain custom -- owner (mis. mau ganti domain lain) atau
+     * admin (mis. domain bermasalah) boleh melakukan ini.
+     */
+    public function removeCustomDomain(array $user, int $showroomId): array
+    {
+        $existing = $this->showrooms->findById($showroomId);
+
+        if (! $existing) {
+            throw new NotFoundException('Showroom tidak ditemukan.');
+        }
+
+        if (! in_array($user['role'] ?? null, ['admin', 'super_admin'], true)) {
+            $this->ensureSeller($user);
+            ShowroomPolicy::ensureOwnedByUser($existing, $user);
+        }
+
+        $this->showrooms->clearCustomDomain($showroomId, date('Y-m-d H:i:s'));
+
+        return $this->serializeShowroom($this->showrooms->findById($showroomId));
+    }
+
+    private function normalizeCustomDomain(string $domain): string
+    {
+        $domain = strtolower(trim($domain));
+        $domain = preg_replace('#^https?://#', '', $domain) ?? $domain;
+        $domain = rtrim(explode('/', $domain)[0], '.');
+
+        if ($domain === '' || ! preg_match('/^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/', $domain)) {
+            throw new ValidationException(['custom_domain' => 'Format domain tidak valid.']);
+        }
+
+        return $domain;
+    }
+
+    /**
+     * Domain sendiri (carlynk.id) dan 5 host peran tetap (role_hosts) tidak
+     * boleh diklaim sebagai domain custom showroom -- itu domain sistem,
+     * bukan milik showroom mana pun.
+     */
+    private function ensureCustomDomainAvailable(string $domain, int $showroomId): void
+    {
+        $systemHosts = array_filter(array_map(
+            static fn ($host): string => strtolower(trim((string) $host)),
+            (array) config('app.role_hosts', [])
+        ));
+        $systemHosts[] = 'carlynk.id';
+
+        if (in_array($domain, $systemHosts, true) || str_ends_with($domain, '.carlynk.id')) {
+            throw new ValidationException(['custom_domain' => 'Domain ini dipakai sistem, tidak bisa didaftarkan showroom.']);
+        }
+
+        if ($this->showrooms->customDomainExists($domain, $showroomId)) {
+            throw new ValidationException(['custom_domain' => 'Domain ini sudah didaftarkan showroom lain.']);
+        }
+    }
+
+    private function resolveDomainIp(string $domain): ?string
+    {
+        $records = @dns_get_record($domain, DNS_A);
+        if (is_array($records) && isset($records[0]['ip'])) {
+            return (string) $records[0]['ip'];
+        }
+
+        $resolved = @gethostbyname($domain);
+
+        return ($resolved !== $domain && $resolved !== false) ? $resolved : null;
+    }
+
+    /**
      * Isi bersama upsertMine() (jalur update) dan updateBranch() -- dulu
      * cuma ditulis sekali di dalam upsertMine() karena cuma ada satu
      * showroom per user; diekstrak supaya kedua jalur (cabang pertama lewat
@@ -1134,6 +1298,11 @@ class ShowroomService
             'id' => (int) $showroom['id'],
             'user_id' => (int) $showroom['user_id'],
             'slug' => $showroom['slug'] ?? null,
+            'custom_domain' => $showroom['custom_domain'] ?? null,
+            'custom_domain_status' => $showroom['custom_domain_status'] ?? null,
+            'custom_domain_requested_at' => $showroom['custom_domain_requested_at'] ?? null,
+            'custom_domain_verified_at' => $showroom['custom_domain_verified_at'] ?? null,
+            'custom_domain_activated_at' => $showroom['custom_domain_activated_at'] ?? null,
             'name' => $showroom['name'],
             'address' => $showroom['address'],
             'city_name' => $showroom['city_name'] ?? null,

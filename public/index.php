@@ -15,6 +15,10 @@ if (serveVersionedAsset(__DIR__, $path)) {
     return;
 }
 
+if (redirectCustomDomainRoot(dirname(__DIR__), $path)) {
+    return;
+}
+
 if (serveSpaShell(dirname(__DIR__), __DIR__, $path)) {
     return;
 }
@@ -66,6 +70,54 @@ function serveSpaShell(string $basePath, string $publicPath, string $path): bool
     }
 
     return true;
+}
+
+/**
+ * Backlog #7: showroom yang domain custom-nya sudah 'active' membuka
+ * domainnya sendiri di root ("www.tokomobiljaya.com/") -- arahkan ke
+ * "/{slug}" showroom itu, URL-nya sendiri tetap menyertakan slug (lihat
+ * plan groovy-napping-thacker.md, keputusan cakupan #2). Path selain root
+ * polos (mis. "/toko-mobil-jaya/mobil/123") TIDAK disentuh di sini sama
+ * sekali -- itu sudah otomatis jalan lewat rute "/:slug/..." yang sudah
+ * ada begitu nginx meneruskan domain ini ke docroot yang sama (lihat
+ * Runbook di plan), tidak perlu tahu apa pun soal Host header.
+ */
+function redirectCustomDomainRoot(string $basePath, string $path): bool
+{
+    if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'GET' && ($_SERVER['REQUEST_METHOD'] ?? '') !== 'HEAD') {
+        return false;
+    }
+
+    if ($path !== '/' && $path !== '') {
+        return false;
+    }
+
+    $host = strtolower(trim((string) ($_SERVER['HTTP_HOST'] ?? '')));
+    $host = explode(':', $host)[0];
+
+    if ($host === '') {
+        return false;
+    }
+
+    try {
+        require_once $basePath . DIRECTORY_SEPARATOR . 'bootstrap' . DIRECTORY_SEPARATOR . 'helpers.php';
+        load_env($basePath . DIRECTORY_SEPARATOR . '.env');
+        require_once $basePath . DIRECTORY_SEPARATOR . 'bootstrap' . DIRECTORY_SEPARATOR . 'autoload.php';
+
+        $pdo = \App\Infrastructure\Database\ConnectionFactory::make();
+        $showrooms = new \App\Modules\Showrooms\Repositories\ShowroomRepository($pdo);
+        $showroom = $showrooms->findByCustomDomain($host);
+
+        if (! $showroom || empty($showroom['slug'])) {
+            return false;
+        }
+
+        header('Location: /' . rawurlencode((string) $showroom['slug']));
+
+        return true;
+    } catch (Throwable $exception) {
+        return false;
+    }
 }
 
 /**

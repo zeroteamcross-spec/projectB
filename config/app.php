@@ -25,6 +25,16 @@ return [
         'affiliate' => env('ROLE_HOST_AFFILIATE', ''),
         'buyer' => env('ROLE_HOST_BUYER', ''),
     ],
+    /**
+     * IP publik server -- dibandingkan dengan A record domain custom
+     * showroom saat ShowroomService::checkCustomDomainDns() memverifikasi
+     * DNS-nya sudah diarahkan. Kosong di dev lokal (verifikasi DNS jadi
+     * tidak pernah cocok, sesuai -- domain custom cuma masuk akal di
+     * produksi).
+     */
+    'custom_domain' => [
+        'server_ip' => env('CUSTOM_DOMAIN_SERVER_IP', ''),
+    ],
     'api' => [
         'prefix' => '/api',
         'response_contract' => [

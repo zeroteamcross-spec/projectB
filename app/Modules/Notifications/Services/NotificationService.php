@@ -34,6 +34,7 @@ class NotificationService
         'subscription_payment_confirmed',
         'subscription_payment_rejected',
         'subscription_suspended',
+        'custom_domain_verified',
     ];
 
     private const ICON_KEYS = [
@@ -278,6 +279,42 @@ class NotificationService
             'icon_key' => 'payment',
             'priority' => 'high',
         ]);
+    }
+
+    /**
+     * Showroom sudah lolos cek DNS otomatis (ShowroomService::checkCustomDomainDns())
+     * -- admin perlu menyiapkan nginx+SSL manual (lihat Runbook di plan
+     * groovy-napping-thacker.md) sebelum menekan Aktifkan Domain.
+     */
+    public function createCustomDomainVerifiedNotification(array $showroom): array
+    {
+        $showroomId = (int) ($showroom['id'] ?? 0);
+        if ($showroomId <= 0) {
+            return [];
+        }
+
+        $name = trim((string) ($showroom['name'] ?? '')) ?: ('Showroom #' . $showroomId);
+        $domain = (string) ($showroom['custom_domain'] ?? '');
+        $created = [];
+
+        foreach ($this->notifications->listActiveAdmins() as $admin) {
+            $created[] = $this->create([
+                'user_id' => (int) $admin['id'],
+                'role' => 'admin',
+                'type' => 'custom_domain_verified',
+                'title' => 'Domain Custom Terverifikasi',
+                'body' => sprintf('%s -- domain %s sudah lolos cek DNS, siap disiapkan & diaktifkan.', $name, $domain),
+                'data' => [
+                    'showroom_id' => $showroomId,
+                    'custom_domain' => $domain,
+                ],
+                'link_url' => '/admin/users?user_id=' . (int) ($showroom['user_id'] ?? 0),
+                'icon_key' => 'system',
+                'priority' => 'normal',
+            ]);
+        }
+
+        return $created;
     }
 
     /**
