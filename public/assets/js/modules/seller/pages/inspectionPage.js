@@ -443,7 +443,17 @@ function templateItemSection(template, report) {
     const optionId = `slrinsp_item_status_input_${key}_${value}`;
     const labelNode = document.createElement("label");
     labelNode.className = "flex min-w-0 cursor-pointer items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-bold text-gray-700 has-[:checked]:border-[color-mix(in_srgb,var(--pb-brand-primary)_28%,white)] has-[:checked]:bg-[var(--pb-surface-muted)] has-[:checked]:text-[var(--pb-brand-secondary)]";
-    labelNode.setAttribute("for", optionId);
+    // Sengaja TIDAK memakai for=/id pasangan di sini -- ensureControlId()
+    // (utils/controlIds.js) menjamin id UNIK global dan bisa mengganti id
+    // input ini ke id lain begitu re-render membuat elemen baru sementara id
+    // lama masih "dimiliki" elemen lama yang sudah lepas dari DOM. Kalau
+    // labelNode punya for= yang menunjuk id yang sudah tidak cocok lagi,
+    // spesifikasi HTML memaksa klik label mencari elemen lewat for= itu --
+    // BUKAN lewat kontrol yang bersarang di dalamnya -- jadi klik di mana pun
+    // pada label selain tepat di atas radio-nya tidak melakukan apa-apa.
+    // input tetap bersarang langsung di dalam labelNode di bawah, jadi tanpa
+    // for= browser otomatis memakai hubungan bersarang itu dan klik di mana
+    // pun pada card ini selalu memilih radio-nya, kebal dari id yang berubah.
     const input = document.createElement("input");
     input.id = optionId;
     input.name = `status_${template.id}`;

@@ -401,7 +401,11 @@ function openAffiliateModal({ mode, selectedAffiliate, runtime, actions }) {
       onCreateNew: () => actions.createNew(),
       onOpenLanding: (affiliate) => actions.openLanding(affiliate),
       onCopyLanding: (affiliate) => actions.copyLanding(affiliate),
-      onClose: () => actions.closeModal(),
+      // Modal ini sudah punya tombol close (x) sendiri di pojok header
+      // (closeButtonId di openModal() bawah). SellerAffiliateForm merender
+      // tombol "Tutup" tambahan sendiri kalau onClose truthy -- dobel dengan
+      // tombol x itu di mode create, jadi sengaja tidak dikirim di sini.
+      onClose: isCreate ? null : () => actions.closeModal(),
     }), "seller.affiliates.form"));
   }
 
@@ -453,7 +457,18 @@ function affiliateModalSignature({ mode, selectedAffiliate, runtime }) {
     id,
     detailVersion,
     runtime.saving ? "saving" : "idle",
-    runtime.checkingSlug ? "checking" : "slug-idle",
+    // checkingSlug SENGAJA tidak ikut di sini. checkSlug() (dipicu debounce
+    // 400ms setelah user berhenti mengetik URL marketing) langsung
+    // setRuntime({checkingSlug: true, ...}) begitu timer-nya jalan -- kalau
+    // ini ikut masuk signature, modal langsung dianggap "beda" dan
+    // dibongkar ulang penuh PERSIS di titik itu, padahal checkingSlug
+    // sendiri tidak pernah dirender jadi apa pun yang terlihat (lihat
+    // sellerAffiliateForm.js -- cuma dipakai untuk menyembunyikan pesan
+    // error saat masih diperiksa). Hasilnya form kehilangan fokus setiap
+    // kali user berhenti mengetik sejenak. slugState di bawah ini sudah
+    // cukup menangkap perubahan yang benar-benar perlu tampil (hasil
+    // pengecekan selesai), tanpa rebuild ekstra untuk fase "sedang
+    // memeriksa" yang tidak terlihat itu.
     runtime.error ?? "",
     runtime.slugState?.is_available === true ? "slug-ok" : runtime.slugState?.is_available === false ? "slug-fail" : "slug-none",
     runtime.slugState?.message ?? "",
@@ -518,7 +533,11 @@ function seedAffiliateDraft(mode, affiliate) {
 function affiliatesHero({ counts, action }) {
   const section = document.createElement("section");
   section.id = "slraf_header";
-  section.className = "relative overflow-hidden rounded-[2rem] border border-[var(--pb-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(250,244,237,0.84),rgba(234,244,249,0.72))] p-5 shadow-[0_24px_80px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6 lg:p-7";
+  // "grid gap-5" ditambahkan supaya baris tombol (layout, lewat items-end di
+  // dalamnya) tidak nempel langsung ke baris stats di bawahnya -- sebelum ini
+  // section-nya tidak grid/tidak punya gap sama sekali di antara dua child
+  // block-nya.
+  section.className = "relative grid gap-5 overflow-hidden rounded-[2rem] border border-[var(--pb-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(250,244,237,0.84),rgba(234,244,249,0.72))] p-5 shadow-[0_24px_80px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6 lg:p-7";
   section.dataset.ds = "seller.affiliates.hero";
 
   const layout = document.createElement("section");
