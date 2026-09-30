@@ -51,7 +51,7 @@ export const KONTEN = Object.freeze({
     gambar: `${ASET}hero-showroom-digital.webp`,
     alt: "Katalog mobil showroom tampil di layar ponsel",
     tombolUtama: "Buat Showroom Sekarang",
-    tombolKedua: "Demo Gratis",
+    tombolKedua: "Contoh Katalog",
   },
 
   masalah: {

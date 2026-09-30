@@ -58,6 +58,17 @@ function render(root, context, config, state, getBackgroundVideoLayer) {
     return;
   }
 
+  // Sesi yang sudah login sebagai peran YANG SAMA dengan halaman login ini
+  // tidak ada gunanya melihat panel "Sesi aktif" dulu lalu mengeklik "Buka
+  // dashboard" sendiri -- itu satu langkah tambahan yang tidak menawarkan
+  // pilihan apa pun (dashboardnya memang cuma satu). Langsung diarahkan.
+  // Peran yang BERBEDA tetap ditampilkan panelnya karena itu titik keputusan
+  // sungguhan (user perlu logout dulu sebelum masuk sebagai peran ini).
+  if (authStore.isAuthenticated() && authStore.role() === config.role) {
+    context.router.navigate(config.home);
+    return;
+  }
+
   const frame = document.createElement("main");
   frame.id = `role_login_${config.slug}_frame`;
   frame.className = "relative z-10 mx-auto grid min-h-screen w-full items-center justify-items-center px-4 py-6 sm:px-6 sm:py-10 lg:justify-items-end lg:px-10";
