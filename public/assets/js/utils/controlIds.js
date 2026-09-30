@@ -13,15 +13,26 @@ export function ensureControlId(control, preferredId = "") {
   const currentId = String(control.id ?? "").trim();
   const currentOwner = currentId ? document.getElementById(currentId) : null;
   const issuedOwner = currentId ? issuedIdOwners.get(currentId) : null;
-  if (currentId && (!issuedOwner || issuedOwner === control) && (!currentOwner || currentOwner === control)) {
+  if (currentId && (!issuedOwner || issuedOwner === control || !issuedOwner.isConnected) && (!currentOwner || currentOwner === control)) {
     issuedIdOwners.set(currentId, control);
     return control;
   }
 
+  // Re-render menghancurkan elemen lama lewat replaceChildren() lalu membuat
+  // BARU dengan id preferred yang SAMA (mis. Input({id: "..."}) dipanggil
+  // ulang tiap render() dengan string id tetap). issuedIdOwners tidak pernah
+  // dibersihkan saat elemen lamanya lepas dari DOM -- tanpa cek isConnected
+  // di bawah, elemen baru itu dianggap "id-nya sudah dipakai orang lain" dan
+  // selalu diberi id BARU (angka bertambah tiap render). Itu yang membuat
+  // focusPreservation.js (state/stateEngine.js) tidak pernah berhasil
+  // menemukan elemen barunya lewat getElementById(idLama) -- id-nya sendiri
+  // sudah tidak pernah sama dua kali. Owner yang sudah lepas dari DOM
+  // (!isConnected) bukan penghalang lagi, jadi elemen pengganti yang secara
+  // logis sama bisa memakai id preferred yang sama persis lintas re-render.
   const base = normalizePreferredId(preferredId) || deriveBaseId(control);
   let candidate = base;
   let suffix = 2;
-  while ((issuedIdOwners.has(candidate) && issuedIdOwners.get(candidate) !== control)
+  while ((issuedIdOwners.has(candidate) && issuedIdOwners.get(candidate) !== control && issuedIdOwners.get(candidate)?.isConnected)
     || (document.getElementById(candidate) && document.getElementById(candidate) !== control)) {
     candidate = `${base}-${suffix}`;
     suffix += 1;
