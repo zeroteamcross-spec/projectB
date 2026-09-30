@@ -18,18 +18,28 @@ export function ensureControlId(control, preferredId = "") {
     return control;
   }
 
-  // Re-render menghancurkan elemen lama lewat replaceChildren() lalu membuat
-  // BARU dengan id preferred yang SAMA (mis. Input({id: "..."}) dipanggil
-  // ulang tiap render() dengan string id tetap). issuedIdOwners tidak pernah
-  // dibersihkan saat elemen lamanya lepas dari DOM -- tanpa cek isConnected
-  // di bawah, elemen baru itu dianggap "id-nya sudah dipakai orang lain" dan
-  // selalu diberi id BARU (angka bertambah tiap render). Itu yang membuat
-  // focusPreservation.js (state/stateEngine.js) tidak pernah berhasil
-  // menemukan elemen barunya lewat getElementById(idLama) -- id-nya sendiri
-  // sudah tidak pernah sama dua kali. Owner yang sudah lepas dari DOM
-  // (!isConnected) bukan penghalang lagi, jadi elemen pengganti yang secara
-  // logis sama bisa memakai id preferred yang sama persis lintas re-render.
-  const base = normalizePreferredId(preferredId) || deriveBaseId(control);
+  // Kalau si pemanggil MEMBERI preferredId (mis. Input({id: "slraf_..."})),
+  // itu string tetap yang sengaja dipilih supaya stabil lintas re-render --
+  // dipercaya begitu saja, TANPA pencarian suffix di bawah. Ini penting:
+  // render() lazimnya membangun pohon DOM yang baru dulu (memanggil
+  // Input()/ensureControlId() untuk elemen barunya) SEBELUM menukar lewat
+  // root.replaceChildren(pohonBaru) -- jadi persis di saat elemen baru minta
+  // id ini, elemen LAMA (yang mau dibuang) masih terpasang (`isConnected`
+  // masih true), bukan cuma "belum dibersihkan dari peta". Cek isConnected
+  // di atas jadi tidak berguna untuk kasus ini karena waktunya memang belum
+  // lepas. Duplikat id sesaat (elemen lama+baru sama-sama punya id itu)
+  // tertoleransi browser dan cuma hidup sampai replaceChildren() jalan.
+  // Suffix (pb-input-x-2, -3, dst) tetap dipakai HANYA saat TIDAK ada
+  // preferredId -- id yang diturunkan otomatis dari tag+name/aria-label itu
+  // yang beresiko benar-benar bentrok antar kontrol yang berbeda.
+  const preferred = normalizePreferredId(preferredId);
+  if (preferred) {
+    control.id = preferred;
+    issuedIdOwners.set(preferred, control);
+    return control;
+  }
+
+  const base = deriveBaseId(control);
   let candidate = base;
   let suffix = 2;
   while ((issuedIdOwners.has(candidate) && issuedIdOwners.get(candidate) !== control && issuedIdOwners.get(candidate)?.isConnected)
