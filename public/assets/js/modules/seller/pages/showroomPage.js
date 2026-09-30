@@ -501,8 +501,7 @@ function showroomHero({ router, showroom, editing }) {
   copy.append(
     icon,
     textNode("p", "text-[10px] font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", "Seller showroom profile"),
-    textNode("h1", "max-w-3xl text-2xl font-black leading-tight tracking-normal text-gray-950 sm:text-3xl", showroom?.name || "Showroom Saya"),
-    textNode("p", "max-w-2xl text-xs leading-6 text-gray-600", "Kelola identitas showroom, kontak aktif, dan rekening pencairan seller dalam satu tempat.")
+    textNode("h1", "max-w-3xl text-2xl font-black leading-tight tracking-normal text-gray-950 sm:text-3xl", showroom?.name || "Showroom Saya")
   );
 
   const dashboardButton = Button({

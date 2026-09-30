@@ -18,7 +18,6 @@ import { getBuyerShowroomCatalogUrl } from "../../../utils/buyerShowroomUrl.js";
 import { renderBuyerBrandIcon } from "../../../utils/buyerShowroomIcon.js";
 import { AffiliateAccountLayout, affiliateAccountActions } from "../../affiliate/components/affiliateAccountShell.js";
 import { publicContextService } from "../../public/services/publicContextService.js";
-import { ModalHeaderFormActions } from "../../../ui/composites/modalHeaderFormActions.js";
 
 const PROFILE_MODAL_KEY = "profile-edit-modal";
 const PASSWORD_MODAL_KEY = "profile-password-modal";
@@ -718,6 +717,7 @@ function openEditProfileModal(profile, onSaved) {
       formInput("Email", "profile_email_input", "email", draft.email, (value) => { draft.email = value; }, errors.email, true, "Email tidak dapat diubah."),
       formInput("Nomor HP", "profile_phone_input", "text", draft.phone_number, (value) => { draft.phone_number = value; }, errors.phone_number, saving),
       formTextarea("Alamat", "profile_address_input", draft.address, (value) => { draft.address = value; }, errors.address, saving),
+      modalActions(saving, saving ? "Menyimpan..." : "Simpan", cancelEdit),
     );
 
     openModal(form, {
@@ -729,14 +729,6 @@ function openEditProfileModal(profile, onSaved) {
       panelId: "profile_edit_modal",
       headerId: "profile_edit_modal_header",
       bodyId: "profile_edit_modal_body",
-      // Batal/Simpan replace the corner close button here, instead of living
-      // at the bottom of a form long enough to need scrolling to reach them.
-      headerActions: () => ModalHeaderFormActions({
-        formId: "profile_edit_form",
-        idPrefix: "profile_edit_modal",
-        saving,
-        onCancel: cancelEdit,
-      }),
     });
   };
 
