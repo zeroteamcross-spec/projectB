@@ -32,6 +32,7 @@ return static function (Router $router): void {
         base_path('app/Modules/Staff/Routes/api.php'),
         base_path('app/Modules/Transactions/Routes/api.php'),
         base_path('app/Modules/Notifications/Routes/api.php'),
+        base_path('app/Modules/Tasks/Routes/api.php'),
         base_path('app/Modules/Sliders/Routes/api.php'),
         base_path('app/Modules/Admin/Routes/api.php'),
         base_path('app/Modules/MasterData/Routes/api.php'),

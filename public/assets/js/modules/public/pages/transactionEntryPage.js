@@ -10,7 +10,6 @@ import { formatCurrency } from "../../../utils/formatCurrency.js";
 import { createPageLifecycle } from "../../../core/lifecycle.js";
 import { PublicAffiliateContextBanner } from "../components/publicAffiliateContextBanner.js";
 import { PublicCarTitleBlock } from "../components/publicCarTitleBlock.js";
-import { TransactionAuthGate } from "../components/transactionAuthGate.js";
 import { TransactionEntryForm } from "../components/transactionEntryForm.js";
 import { TransactionResultPanel } from "../components/transactionResultPanel.js";
 import { markGopayAutoOpened, resolvePaymentArtifacts, shouldAutoOpenGopay } from "../../transactions/paymentMethodSupport.js";
@@ -18,7 +17,6 @@ import { publicAffiliateTrackingService } from "../services/publicAffiliateTrack
 import { publicContextService } from "../services/publicContextService.js";
 import { publicTransactionService } from "../services/publicTransactionService.js";
 import { MaintenancePage } from "./maintenancePage.js";
-import { googleLoginService } from "../../auth/services/googleLoginService.js";
 import { transactionEntryState } from "../state/transactionEntryState.js";
 import { tw } from "../../../theme/tailwindClasses.js";
 import { applyDesignHook } from "../../../theme/designStudioHooks.js";
@@ -131,7 +129,8 @@ function render(root, context, getBackgroundVideoLayer) {
   }
 
   const page = document.createElement("main");
-  page.className = "mx-auto grid w-full max-w-[1180px] gap-6 px-3 py-6 sm:px-6 sm:py-8 lg:grid-cols-[minmax(0,1fr)_minmax(360px,400px)] lg:items-start xl:gap-8";
+  const hasRightPanel = Boolean(entry.result) || authStore.isAuthenticated();
+  page.className = `mx-auto grid w-full max-w-[1180px] gap-6 px-3 py-6 sm:px-6 sm:py-8 ${hasRightPanel ? "lg:grid-cols-[minmax(0,1fr)_minmax(360px,400px)]" : "lg:grid-cols-1"} lg:items-start xl:gap-8`;
 
   const left = document.createElement("div");
   left.className = "grid gap-4";
@@ -160,15 +159,6 @@ function render(root, context, getBackgroundVideoLayer) {
       onOpenDashboard: () => context.router.navigate("/buyer/transactions"),
       onOpenStatus: () => context.router.navigate(`/buyer/transactions/${entry.result.id}`),
     }), "buyer.transaction.form"));
-  } else if (!authStore.isAuthenticated()) {
-    right.append(applyDesignHook(TransactionAuthGate({
-      mode: entry.authMode ?? "login",
-      isSubmitting: Boolean(entry.isSubmitting),
-      error: entry.error ?? "",
-      onModeChange: (mode) => transactionEntryState.setMode(mode),
-      onLogin: () => redirectToGoogleLogin(),
-      onRegister: (payload) => registerBuyer(payload),
-    }), "buyer.transaction.form"));
   } else if (!isBuyer) {
     right.append(nonBuyerGate({ user, onLogout: () => logoutAndStay() }));
   } else {
@@ -182,7 +172,10 @@ function render(root, context, getBackgroundVideoLayer) {
     }), "buyer.transaction.form"));
   }
 
-  page.append(left, right);
+  page.append(left);
+  if (right.children.length > 0) {
+    page.append(right);
+  }
   root.replaceChildren(backgroundShell(backgroundVideoLayer, page));
 }
 
@@ -309,23 +302,6 @@ function heroTrustRow() {
     row.append(item);
   });
   return row;
-}
-
-async function redirectToGoogleLogin() {
-  await runAction(async () => {
-    const config = googleLoginService.configForSlug("buyer");
-    const nextPath = window.location.pathname + window.location.search || "/";
-    const authUrl = await googleLoginService.begin(config, nextPath);
-    window.location.assign(authUrl);
-  });
-}
-
-async function registerBuyer(payload) {
-  await runAction(async () => {
-    await publicTransactionService.registerBuyer(payload);
-    transactionEntryState.setError("");
-    showToast("Buyer baru berhasil dibuat.", { type: "success" });
-  });
 }
 
 async function logoutAndStay() {

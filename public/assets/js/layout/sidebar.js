@@ -77,6 +77,7 @@ const ADMIN_LINKS = [
 const SUPER_ADMIN_LINKS = [
   { href: "/super-admin", label: "Superadmin Dashboard", icon: "dashboard" },
   { href: "/super-admin/accounts", label: "Buat Akun", icon: "user" },
+  { href: "/admin/tasks", label: "Daftar Tugas", icon: "clipboard" },
   { href: "/admin/web-config", label: "Konfigurasi WEB", icon: "settings" },
   { href: "/admin/landing-page", label: "Landing Page", icon: "home" },
   { href: "/admin/release-versions", label: "Release Version Manager", icon: "download" },
@@ -328,7 +329,9 @@ function renderLinks(nav, store, options = {}) {
     links = SUPER_ADMIN_LINKS;
   }
 
-  const visibleLinks = userRealRole === "super_admin" ? links : withDesignStudioV2Menu(links, role, store);
+  const visibleLinks = userRealRole === "super_admin"
+    ? links
+    : withAdminTasksMenu(withDesignStudioV2Menu(links, role, store), role);
   nav.replaceChildren(...visibleLinks.map((link) => renderSidebarNode(link, path, options)));
 }
 
@@ -415,6 +418,14 @@ function withDesignStudioV2Menu(links, role, store) {
   }
 
   return [...links, designStudioV2MenuItem()];
+}
+
+function withAdminTasksMenu(links, role) {
+  if (normalizeSidebarRole(role) !== "admin" || links.some((link) => String(link.href ?? "").replace(/^#/, "") === "/admin/tasks")) {
+    return links;
+  }
+
+  return [...links, { href: "/admin/tasks", label: "Daftar Tugas", icon: "clipboard" }];
 }
 
 function buildSidebarTree(items) {

@@ -108,6 +108,7 @@ Daftar tabel inti untuk `projectB`:
 24. `user_oauth_identities`
 25. `car_favorites`
 26. `schema_migrations`
+27. `tasks`
 
 Catatan:
 - beberapa tabel adalah hasil normalisasi dari struktur lama
@@ -915,6 +916,37 @@ Catatan:
 
 ---
 
+## 4.26 `tasks`
+
+Tujuan:
+Menyimpan daftar tugas atau permintaan kerja yang dapat ditandai selesai oleh admin.
+
+Field:
+- `id` bigint unsigned, PK, auto increment
+- `task_key` varchar(120) not null unique
+- `title` varchar(200) not null
+- `description` text null
+- `status` enum(`open`, `sip`) not null default `open`
+- `requested_by_user_id` bigint unsigned, FK -> `users.id`, null
+- `completed_by_user_id` bigint unsigned, FK -> `users.id`, null
+- `completed_at` datetime null
+- `created_at` datetime not null
+- `updated_at` datetime null
+- `deleted_at` datetime null
+
+Index:
+- unique on `task_key`
+- index on (`status`, `created_at`, `id`)
+- index on `requested_by_user_id`
+- index on `completed_by_user_id`
+
+Catatan:
+- status `open` berarti tugas belum ditandai selesai; status `sip` berarti tombol `Beres` sudah diklik.
+- tugas tidak dihapus dari histori; bila perlu disembunyikan gunakan `deleted_at`.
+- endpoint tugas hanya boleh diakses role `admin` dan `super_admin`.
+
+---
+
 ## 5. Mapping dari Struktur Lama ke Canon Baru
 
 ### 5.1 `Users` lama
@@ -1110,25 +1142,29 @@ Catatan:
 - `active`
 - `inactive`
 
-### 6.9 Commission type
+### 6.9 Task status
+- `open`
+- `sip`
+
+### 6.10 Commission type
 - `percent`
 - `flat`
 
-### 6.10 Ledger status
+### 6.11 Ledger status
 - `pending`
 - `accrued`
 - `paid_out`
 - `voided`
 
-### 6.11 Ledger finality event
+### 6.12 Ledger finality event
 - `paid`
 
-### 6.12 Settlement batch status
+### 6.13 Settlement batch status
 - `pending`
 - `settled`
 - `cancelled`
 
-### 6.13 Notification type
+### 6.14 Notification type
 - `transaction_paid`
 - `transaction_processing`
 - `transaction_completed`
@@ -1143,7 +1179,7 @@ Catatan:
 - `security_alert`
 - `system_message`
 
-### 6.14 Notification priority
+### 6.15 Notification priority
 - `low`
 - `normal`
 - `high`
