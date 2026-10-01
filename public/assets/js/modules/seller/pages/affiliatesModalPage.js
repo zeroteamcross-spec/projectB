@@ -552,7 +552,6 @@ function affiliatesHero({ counts, action }) {
     icon,
     textNode("p", "text-[10px] font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", "Seller marketing desk"),
     textNode("h1", "max-w-3xl text-2xl font-black leading-tight tracking-normal text-gray-950 sm:text-3xl", "Marketing"),
-    textNode("p", "max-w-2xl text-xs leading-6 text-gray-600", "Kelola partner marketing, link referral, dan status performa."),
   );
 
   const stats = document.createElement("section");

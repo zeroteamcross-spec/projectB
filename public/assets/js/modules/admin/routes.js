@@ -19,7 +19,6 @@ import { AdminLandingPageConfigPage } from "./pages/landingPageConfigPage.js";
 import { AdminReleaseVersionManagerPage } from "./pages/releaseVersionManagerPage.js";
 import { SuperAdminAccountsPage } from "./pages/superAdminAccountsPage.js";
 import { SuperAdminDashboardPage } from "./pages/superAdminDashboardPage.js";
-import { AdminTasksPage } from "./pages/tasksPage.js";
 import { adminSessionService } from "./services/adminSessionService.js";
 import { transactionsResource } from "../../resources/transactionsResource.js";
 import { carsResource } from "../../resources/carsResource.js";
@@ -81,7 +80,10 @@ export const adminRoutes = [
     path: "/admin/tasks",
     shell: "app",
     role: "admin",
-    page: AdminTasksPage,
+    page: (context) => {
+      context.router.navigate("/tasks");
+      return document.createElement("div");
+    },
     workingStateKey: null,
   },
   {

@@ -120,7 +120,6 @@ function heroSection(overview, filteredCars, isHydrated) {
     icon,
     textNode("p", "text-[10px] font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", "Seller inspection"),
     textNode("h1", "max-w-3xl text-2xl font-black leading-tight tracking-normal text-gray-950 sm:text-3xl", "Inspeksi Kendaraan"),
-    textNode("p", "max-w-2xl text-xs leading-6 text-gray-600", "Pantau readiness inspeksi semua listing, buka checklist dari data yang sudah dipreload, lalu simpan atau publish hasil inspeksi.")
   );
 
   const stats = node("section", "slrinsp_summary_section", "grid gap-2 sm:grid-cols-2 lg:min-w-[560px] lg:grid-cols-4");

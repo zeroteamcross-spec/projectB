@@ -327,7 +327,6 @@ function commissionsHero({ summary, actions }) {
     icon,
     textBlock("p", "text-[10px] font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", "Seller commission desk"),
     textBlock("h1", "max-w-3xl text-2xl font-black leading-tight tracking-normal text-gray-950 sm:text-3xl", "Komisi Marketing"),
-    textBlock("p", "max-w-2xl text-xs leading-6 text-gray-600", "Pantau komisi dari referral affiliate, status pembayaran, dan riwayat performa."),
   );
 
   const stats = document.createElement("section");

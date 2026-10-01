@@ -25,13 +25,13 @@ export function SellerShowroomPanel({ summary = {} } = {}) {
 
   header.append(left);
 
-  const text = textNode(
-    "p",
-    "max-w-3xl text-xs leading-6 text-gray-600",
-    summary.showroomReady
-      ? "Profil showroom sudah cukup untuk memulai pengelolaan listing dan transaksi showroom."
-      : "Lengkapi showroom sebelum UAT showroom agar listing dan transaksi lebih mudah diverifikasi.",
-  );
+  const text = summary.showroomReady
+    ? null
+    : textNode(
+      "p",
+      "max-w-3xl text-xs leading-6 text-gray-600",
+      "Lengkapi showroom sebelum UAT showroom agar listing dan transaksi lebih mudah diverifikasi.",
+    );
 
   const facts = document.createElement("section");
   facts.id = "slr_showroom_facts_section";
@@ -51,7 +51,7 @@ export function SellerShowroomPanel({ summary = {} } = {}) {
     facts.append(item);
   });
 
-  section.append(header, text, facts);
+  section.append(header, ...(text ? [text] : []), facts);
   return section;
 }
 

@@ -562,7 +562,6 @@ function transactionsHero({ transactions, filteredTransactions, onDashboard }) {
     icon,
     textNode("p", "text-[10px] font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", "Seller transaction desk"),
     textNode("h1", "max-w-3xl text-2xl font-black leading-tight tracking-normal text-gray-950 sm:text-3xl", "Transaksi"),
-    textNode("p", "max-w-2xl text-xs leading-6 text-gray-600", "Pantau transaksi mobil, status pembayaran, dan progres penjualan."),
   );
 
   const side = document.createElement("section");
