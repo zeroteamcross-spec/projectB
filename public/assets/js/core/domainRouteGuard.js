@@ -58,6 +58,12 @@ export function enforceDomainRoute({ locationRef = window.location } = {}) {
   }
 
   const path = currentPath(locationRef);
+
+  if (path === "/admin/tasks") {
+    locationRef.replace(`${locationRef.protocol}//${peta.default}/tasks`);
+    return true;
+  }
+
   const defaultPath = defaultPathForHost(peta, currentHost);
 
   if (path === "/" && defaultPath !== null) {
@@ -103,6 +109,11 @@ export function resolveCrossDomainTarget(path, { locationRef = window.location, 
   }
 
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+
+  if (normalizedPath === "/admin/tasks") {
+    return `${locationRef.protocol}//${peta.default}/tasks`;
+  }
+
   const hostRole = roleForHost(peta, host);
 
   if (hostRole) {
