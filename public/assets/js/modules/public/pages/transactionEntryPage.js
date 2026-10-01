@@ -159,7 +159,7 @@ function render(root, context, getBackgroundVideoLayer) {
       onOpenDashboard: () => context.router.navigate("/buyer/transactions"),
       onOpenStatus: () => context.router.navigate(`/buyer/transactions/${entry.result.id}`),
     }), "buyer.transaction.form"));
-  } else if (!isBuyer) {
+  } else if (authStore.isAuthenticated() && !isBuyer) {
     right.append(nonBuyerGate({ user, onLogout: () => logoutAndStay() }));
   } else {
     right.append(applyDesignHook(TransactionEntryForm({
