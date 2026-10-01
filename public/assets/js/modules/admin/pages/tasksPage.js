@@ -9,7 +9,7 @@ const STATUS_LABEL = {
   sip: "Sip",
 };
 
-export function AdminTasksPage() {
+export function TasksPage({ service = adminTasksService } = {}) {
   let root = null;
   let currentContext = null;
   const state = {
@@ -26,7 +26,7 @@ export function AdminTasksPage() {
       render(root, state, actions);
 
       try {
-        state.tasks = await adminTasksService.list();
+        state.tasks = await service.list();
       } catch (error) {
         state.tasks = [];
         state.error = error.message || "Gagal memuat daftar tugas.";
@@ -47,7 +47,7 @@ export function AdminTasksPage() {
       render(root, state, actions);
 
       try {
-        const updated = await adminTasksService.updateStatus(task.id, "sip");
+        const updated = await service.updateStatus(task.id, "sip");
         state.tasks = state.tasks.map((item) => item.id === task.id ? (updated ?? { ...item, status: "sip" }) : item);
         showToast("Tugas ditandai sip.", { type: "success" });
       } catch (error) {
@@ -80,6 +80,10 @@ export function AdminTasksPage() {
       root = null;
     },
   });
+}
+
+export function AdminTasksPage() {
+  return TasksPage();
 }
 
 function render(root, state, actions) {

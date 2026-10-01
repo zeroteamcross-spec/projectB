@@ -16,6 +16,7 @@
  */
 export const publicReservedRoutePrefixes = Object.freeze([
   "admin",
+  "tasks",
   "super-admin",
   "seller",
   "buyer",

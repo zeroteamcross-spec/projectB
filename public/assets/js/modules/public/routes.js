@@ -13,6 +13,8 @@ import { slidersResource } from "../../resources/slidersResource.js";
 import { adminMasterService } from "../admin/services/adminMasterService.js";
 import { affiliatesResource } from "../../resources/affiliatesResource.js";
 import { publicReservedRoutePrefixes } from "../../core/publicReservedRouteWords.js";
+import { TasksPage } from "../admin/pages/tasksPage.js";
+import { publicTasksService } from "./services/publicTasksService.js";
 
 export { publicReservedRoutePrefixes };
 
@@ -342,6 +344,14 @@ export const publicRoutes = [
     path: "/",
     shell: "public",
     page: LandingPageSwitcher,
+    workingStateKey: null,
+  },
+  {
+    name: "public.tasks",
+    path: "/tasks",
+    shell: "public",
+    role: "public",
+    page: () => TasksPage({ service: publicTasksService }),
     workingStateKey: null,
   },
   {

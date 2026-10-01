@@ -40,7 +40,7 @@ class ShowroomService
      * public/assets/js/modules/public/routes.js.
      */
     private const RESERVED_SLUGS = [
-        'admin', 'super-admin', 'seller', 'buyer', 'affiliate',
+        'admin', 'tasks', 'super-admin', 'seller', 'buyer', 'affiliate',
         'login', 'google-login', 'auth', 'api', 'cars', 'transactions',
         'profile', 'notifications', 'public', 'showrooms', 'af', 'a', 's',
         'daftar-showroom', 'saas-landing', 'carlynk-landing', 'contoh-katalog', 'health',

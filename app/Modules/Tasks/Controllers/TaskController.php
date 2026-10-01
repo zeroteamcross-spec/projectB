@@ -33,12 +33,35 @@ class TaskController extends Controller
         ], 'Daftar tugas berhasil diambil.');
     }
 
+    public function publicIndex(Request $request): JsonResponse
+    {
+        $this->schema->ensure();
+
+        return JsonResponse::success([
+            'tasks' => $this->service->listPublic(),
+        ], 'Daftar tugas berhasil diambil.');
+    }
+
     public function update(Request $request): JsonResponse
     {
         $this->schema->ensure();
         $status = trim((string) $request->input('status', ''));
         $task = $this->service->updateStatus(
             $this->user($request),
+            (int) $request->routeParam('task_id'),
+            $status
+        );
+
+        return JsonResponse::success([
+            'task' => $task,
+        ], 'Status tugas berhasil diperbarui.');
+    }
+
+    public function publicUpdate(Request $request): JsonResponse
+    {
+        $this->schema->ensure();
+        $status = trim((string) $request->input('status', ''));
+        $task = $this->service->updateStatusPublic(
             (int) $request->routeParam('task_id'),
             $status
         );

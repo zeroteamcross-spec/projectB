@@ -26,6 +26,13 @@ class TaskService
         return array_map([$this, 'map'], $this->tasks->listAll());
     }
 
+    public function listPublic(): array
+    {
+        $this->tasks->ensureFirstTask();
+
+        return array_map([$this, 'map'], $this->tasks->listAll());
+    }
+
     public function updateStatus(array $user, int $taskId, string $status): array
     {
         AuthPolicy::requireAdmin($user);
@@ -50,6 +57,31 @@ class TaskService
             $status === 'sip' ? $now : null,
             $now
         );
+
+        return $this->map($this->tasks->findById($taskId));
+    }
+
+    public function updateStatusPublic(int $taskId, string $status): array
+    {
+        if ($taskId <= 0) {
+            throw new ValidationException(['task_id' => 'ID tugas tidak valid.']);
+        }
+
+        if ($status !== 'sip') {
+            throw new ValidationException(['status' => 'Status tugas publik hanya dapat diubah menjadi sip.']);
+        }
+
+        $current = $this->tasks->findById($taskId);
+        if (! $current) {
+            throw new NotFoundException('Tugas tidak ditemukan.');
+        }
+
+        if ($current['status'] === 'sip') {
+            return $this->map($current);
+        }
+
+        $now = date('Y-m-d H:i:s');
+        $this->tasks->updateStatus($taskId, 'sip', null, $now, $now);
 
         return $this->map($this->tasks->findById($taskId));
     }

@@ -77,7 +77,7 @@ const ADMIN_LINKS = [
 const SUPER_ADMIN_LINKS = [
   { href: "/super-admin", label: "Superadmin Dashboard", icon: "dashboard" },
   { href: "/super-admin/accounts", label: "Buat Akun", icon: "user" },
-  { href: "/admin/tasks", label: "Daftar Tugas", icon: "clipboard" },
+  { href: "/tasks", label: "Daftar Tugas", icon: "clipboard" },
   { href: "/admin/web-config", label: "Konfigurasi WEB", icon: "settings" },
   { href: "/admin/landing-page", label: "Landing Page", icon: "home" },
   { href: "/admin/release-versions", label: "Release Version Manager", icon: "download" },
@@ -421,11 +421,11 @@ function withDesignStudioV2Menu(links, role, store) {
 }
 
 function withAdminTasksMenu(links, role) {
-  if (normalizeSidebarRole(role) !== "admin" || links.some((link) => String(link.href ?? "").replace(/^#/, "") === "/admin/tasks")) {
+  if (normalizeSidebarRole(role) !== "admin" || links.some((link) => String(link.href ?? "").replace(/^#/, "") === "/tasks")) {
     return links;
   }
 
-  return [...links, { href: "/admin/tasks", label: "Daftar Tugas", icon: "clipboard" }];
+  return [...links, { href: "/tasks", label: "Daftar Tugas", icon: "clipboard" }];
 }
 
 function buildSidebarTree(items) {

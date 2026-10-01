@@ -21,6 +21,7 @@ import { transactionEntryState } from "../state/transactionEntryState.js";
 import { tw } from "../../../theme/tailwindClasses.js";
 import { applyDesignHook } from "../../../theme/designStudioHooks.js";
 import { getListingLockStatus } from "../../../utils/transactionStatus.js";
+import { googleLoginService } from "../../auth/services/googleLoginService.js";
 
 const PUBLIC_TRANSACTION_FALLBACK = "bg-[radial-gradient(circle_at_top_left,color-mix(in_srgb,var(--pb-brand-accent)_18%,transparent),transparent_24%),linear-gradient(180deg,var(--pb-public-canvas-start)_0%,var(--pb-public-canvas-mid)_48%,var(--pb-public-canvas-end)_100%)]";
 
@@ -147,7 +148,8 @@ function render(root, context, getBackgroundVideoLayer) {
     backButton(context, car),
     heroCopy(),
     ...(banner ? [banner] : []),
-    selectedCarPanel(car)
+    selectedCarPanel(car),
+    ...(!authStore.isAuthenticated() ? [guestGoogleLoginButton()] : [])
   );
 
   const right = document.createElement("aside");
@@ -277,6 +279,16 @@ function backButton(context, car) {
   return button;
 }
 
+function guestGoogleLoginButton() {
+  const button = Button({
+    label: "Login dengan Google",
+    variant: "ya",
+    onClick: redirectToGoogleLogin,
+  });
+  button.classList.add("w-fit");
+  return button;
+}
+
 function nonBuyerGate({ user, onLogout }) {
   const section = document.createElement("section");
   section.className = `grid gap-4 ${tw.surface.warningPanel} p-5`;
@@ -311,6 +323,15 @@ async function logoutAndStay() {
     await publicTransactionService.logout();
     transactionEntryState.setError("");
     showToast("Logout berhasil.", { type: "success" });
+  });
+}
+
+async function redirectToGoogleLogin() {
+  await runAction(async () => {
+    const config = googleLoginService.configForSlug("buyer");
+    const nextPath = window.location.pathname + window.location.search || "/";
+    const authUrl = await googleLoginService.begin(config, nextPath);
+    window.location.assign(authUrl);
   });
 }
 
