@@ -159,7 +159,9 @@ function render(root, context, getBackgroundVideoLayer) {
       onOpenDashboard: () => context.router.navigate("/buyer/transactions"),
       onOpenStatus: () => context.router.navigate(`/buyer/transactions/${entry.result.id}`),
     }), "buyer.transaction.form"));
-  } else if (authStore.isAuthenticated() && !isBuyer) {
+  } else if (!authStore.isAuthenticated()) {
+    // Guest tidak menampilkan auth gate maupun form transaksi.
+  } else if (!isBuyer) {
     right.append(nonBuyerGate({ user, onLogout: () => logoutAndStay() }));
   } else {
     right.append(applyDesignHook(TransactionEntryForm({
