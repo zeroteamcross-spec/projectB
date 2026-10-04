@@ -2,7 +2,7 @@
   "production_url": "https://carlynk.id/",
   "vps_host": "195.35.32.230",
   "repository": "https://github.com/zeroteamcross-spec/projectB.git",
-  "production_branch": "codex/feature-checklist",
+  "production_branch": "master",
   "required_server_step": "git pull",
   "ssh_key_candidates": [
     "%USERPROFILE%/.ssh/carlynk_deploy2"
