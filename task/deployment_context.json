@@ -2,14 +2,13 @@
   "production_url": "https://carlynk.id/",
   "vps_host": "195.35.32.230",
   "repository": "https://github.com/zeroteamcross-spec/projectB.git",
-  "production_branch": "master",
+  "production_branch": "feature/full-business-flow-tester",
   "required_server_step": "git pull",
   "ssh_key_candidates": [
-    "%USERPROFILE%/.ssh/carlynk_deploy",
     "%USERPROFILE%/.ssh/carlynk_deploy2"
   ],
-  "ssh_username": null,
-  "server_repository_path": null,
+  "ssh_username": "root",
+  "server_repository_path": "/www/wwwroot/carlynk.id",
   "reload_command": null,
   "notes": [
     "ProjectA is read-only; deployment source is projectB.",
