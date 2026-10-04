@@ -12,7 +12,11 @@ use PDOException;
 
 class NotificationService
 {
-    private const ROLES = ['seller', 'buyer', 'affiliate_admin', 'admin', 'seller_staff'];
+    // Superadmin memakai shell/menu admin yang sama dan selalu memuat
+    // snapshot notifikasi di header. Ia tetap perlu scope notifikasi sendiri
+    // agar endpoint tersebut tidak menghasilkan 422 hanya karena role-nya
+    // lebih tinggi dari admin biasa.
+    private const ROLES = ['seller', 'buyer', 'affiliate_admin', 'admin', 'super_admin', 'seller_staff'];
 
     private const TYPES = [
         'transaction_paid',

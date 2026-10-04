@@ -15,6 +15,7 @@ import { affiliatesResource } from "../../resources/affiliatesResource.js";
 import { publicReservedRoutePrefixes } from "../../core/publicReservedRouteWords.js";
 import { TasksPage } from "../admin/pages/tasksPage.js";
 import { publicTasksService } from "./services/publicTasksService.js";
+import { FeatureChecklistPage } from "./pages/featureChecklistPage.js";
 
 export { publicReservedRoutePrefixes };
 
@@ -352,6 +353,22 @@ export const publicRoutes = [
     shell: "public",
     role: "public",
     page: () => TasksPage({ service: publicTasksService }),
+    workingStateKey: null,
+  },
+  {
+    name: "public.feature-checklist",
+    path: "/fitur",
+    shell: "public",
+    role: "public",
+    page: FeatureChecklistPage,
+    workingStateKey: null,
+  },
+  {
+    name: "public.feature-checklist-alias",
+    path: "/features",
+    shell: "public",
+    role: "public",
+    page: FeatureChecklistPage,
     workingStateKey: null,
   },
   {

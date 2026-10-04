@@ -37,7 +37,7 @@ class NotificationsSchema
 CREATE TABLE IF NOT EXISTS notifications (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   user_id BIGINT UNSIGNED NOT NULL,
-  role ENUM('seller', 'buyer', 'affiliate_admin', 'admin') NOT NULL,
+  role ENUM('seller', 'buyer', 'affiliate_admin', 'admin', 'super_admin', 'seller_staff') NOT NULL,
   type VARCHAR(80) NOT NULL,
   title VARCHAR(160) NOT NULL,
   body VARCHAR(600) NOT NULL,

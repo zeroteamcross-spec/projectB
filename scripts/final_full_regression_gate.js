@@ -289,7 +289,8 @@ async function loggedInContext(role, viewport) {
 
 async function gotoRoute(page, route, waitSelector) {
   try {
-    await page.goto(`${BASE_URL}/app.html?gate=${Date.now()}#${route}`, { waitUntil: "domcontentloaded", timeout: 45000 });
+    const separator = route.includes("?") ? "&" : "?";
+    await page.goto(`${BASE_URL}${route}${separator}gate=${Date.now()}`, { waitUntil: "domcontentloaded", timeout: 45000 });
     await page.locator(waitSelector).waitFor({ timeout: 15000 }).catch(() => null);
     await page.waitForTimeout(900);
     return true;

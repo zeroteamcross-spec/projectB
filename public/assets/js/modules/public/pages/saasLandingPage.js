@@ -24,7 +24,8 @@ export function SaasLandingPage() {
     mount() {
       root = document.createElement("div");
       root.id = "saas_landing_root";
-      root.className = "relative w-full";
+      root.className = "relative w-full overflow-x-clip";
+      root.style.overflowX = "clip";
       // Nyaris putih, bukan putih murni: kartu-kartu di halaman ini putih,
       // dan di atas kanvas putih penuh batasnya hilang.
       root.style.background = "#FDFDFC";

@@ -1265,7 +1265,10 @@ class ShowroomService
     private function addBillingInterval(string $anchor, ?string $billingPeriod): string
     {
         $normalized = strtolower((string) $billingPeriod);
-        $interval = str_contains($normalized, 'tahun') ? 'P1Y' : 'P1M';
+        // VPS yang menjalankan aplikasi ini masih dapat memakai PHP 7.4;
+        // gunakan bentuk kompatibel ini agar konfirmasi paket tidak jatuh ke
+        // HTTP 500 hanya karena str_contains() baru tersedia di PHP 8.
+        $interval = strpos($normalized, 'tahun') !== false ? 'P1Y' : 'P1M';
 
         $date = new \DateTimeImmutable($anchor);
 
