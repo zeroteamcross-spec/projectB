@@ -227,8 +227,24 @@ function metricIconClass(variant) {
   return "bg-[var(--pb-surface-card)] text-[var(--pb-brand-secondary)]";
 }
 
+const STATUS_ALIASES = {
+  good: "good",
+  baik: "good",
+  fair: "fair",
+  kurang_baik: "fair",
+  bad: "bad",
+  tidak_baik: "bad",
+  not_available: "not_available",
+  tidak_tersedia: "not_available",
+};
+
 function normalizeStatus(value) {
-  return String(value ?? "").toLowerCase();
+  const normalized = String(value ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "_");
+
+  return STATUS_ALIASES[normalized] ?? normalized;
 }
 
 function reportLabel(value) {
