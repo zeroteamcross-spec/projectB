@@ -199,7 +199,7 @@ function methodology() {
     "Surface yang diperiksa: carlynk.id, admin.carlynk.id, showroom.carlynk.id, marketing.carlynk.id, dan app.carlynk.id.",
     "Role yang diperiksa: admin, seller, affiliate/marketing, buyer, serta akses publik.",
     "Alur yang diperiksa: login, autologin, profile, role guard, listing published/unpublished, dan halaman publik.",
-    "Pengujian dibatasi agar tidak mengubah data bisnis, tidak mengirim pembayaran nyata, dan tidak menjalankan brute force atau DoS.",
+    "Tidak dilakukan create/edit/delete listing atau akun, pembayaran nyata, brute force, DoS, maupun upload berbahaya; probe cron dibatasi untuk membuktikan exposure endpoint.",
   ].forEach((item) => {
     const row = document.createElement("li");
     row.className = "flex items-start gap-2";
