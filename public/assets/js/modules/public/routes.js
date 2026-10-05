@@ -16,6 +16,7 @@ import { publicReservedRoutePrefixes } from "../../core/publicReservedRouteWords
 import { TasksPage } from "../admin/pages/tasksPage.js";
 import { publicTasksService } from "./services/publicTasksService.js";
 import { FeatureChecklistPage } from "./pages/featureChecklistPage.js";
+import { SecurityReportPage } from "./pages/securityReportPage.js";
 
 export { publicReservedRoutePrefixes };
 
@@ -369,6 +370,22 @@ export const publicRoutes = [
     shell: "public",
     role: "public",
     page: FeatureChecklistPage,
+    workingStateKey: null,
+  },
+  {
+    name: "public.security-report",
+    path: "/security-report",
+    shell: "public",
+    role: "public",
+    page: SecurityReportPage,
+    workingStateKey: null,
+  },
+  {
+    name: "public.security-report-alias",
+    path: "/laporan-keamanan",
+    shell: "public",
+    role: "public",
+    page: SecurityReportPage,
     workingStateKey: null,
   },
   {
