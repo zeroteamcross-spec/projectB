@@ -95,7 +95,7 @@ export function SellerMasterInspectionPage() {
       }
 
       setRuntime({ copying: true, error: "" });
-      render(root, context);
+      render(root, context, actions);
       try {
         const result = await inspectionsResource.copyShowroomTemplates(target.id, sourceShowroomId);
         patchTemplates(result?.templates ?? []);
