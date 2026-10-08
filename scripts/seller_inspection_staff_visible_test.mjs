@@ -91,6 +91,17 @@ function isExpectedFailedRequest(entry) {
     return true;
   }
 
+  if (entry.type === "requestfailed"
+    && entry.failure === "net::ERR_ABORTED"
+    && currentPath === "/"
+    && /\/assets\/.*\.js$/i.test(pathname)) {
+    // Logout mengarahkan ke landing page lalu test segera membuka login
+    // berikutnya. Browser membatalkan bundle landing yang belum selesai
+    // dimuat karena navigasi kedua itu; request tetap dicatat, tetapi bukan
+    // kegagalan aplikasi yang dilihat user pada alur target.
+    return true;
+  }
+
   return false;
 }
 
