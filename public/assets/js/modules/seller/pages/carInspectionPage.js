@@ -17,6 +17,7 @@ const RUNTIME_KEY = "sellerCarInspection";
 // elemen yang sedang fokus (persis pola yang sudah diperbaiki di showroomPage.js/customDomainDraft).
 // Draft-nya sekarang variabel modul biasa di luar store, sama seperti pola itu.
 let summaryDraftValue = null;
+let pendingNotesDrafts = new Map();
 
 const DEFAULT_RUNTIME = {
   creating: false,
@@ -38,6 +39,7 @@ export function SellerCarInspectionPage() {
     mount({ router, params }) {
       ensureRuntime();
       summaryDraftValue = null;
+      pendingNotesDrafts = new Map();
       root = document.createElement("div");
       render(root, router, params);
       return root;
@@ -52,6 +54,7 @@ export function SellerCarInspectionPage() {
     },
     dispose() {
       unsubscribe = null;
+      pendingNotesDrafts = new Map();
       appStore.destroyRuntimeState(RUNTIME_KEY);
     },
   });
@@ -144,7 +147,7 @@ function render(root, router, params) {
       items: inspectionItems,
       busyItemId: runtime.busyItemId,
       onStatusChange: (item, status) => updateItemDraft(item, { result_status: status }),
-      onNotesChange: (item, notes) => updateItemDraft(item, { notes }),
+      onNotesChange: (item, notes) => queueItemNoteDraft(item, notes),
     }));
   } else {
     body.append(masterBlockedState());
@@ -281,7 +284,7 @@ async function publishSavedReport(carId, report, { notice, toast } = {}) {
 
 async function persistInspectionDraft(carId, report, templates) {
   const runtime = runtimeState();
-  const drafts = runtime.itemDrafts ?? {};
+  const drafts = draftsWithPendingNotes(runtime.itemDrafts ?? {});
   const selected = templates
     .map((template) => draftPayloadForTemplate(template, drafts[String(template.id)]))
     .filter(Boolean);
@@ -465,6 +468,10 @@ function syncDraftsFromReport(reportOverride = null, { force = false } = {}) {
     summaryDraftValue = null;
   }
 
+  if (force) {
+    pendingNotesDrafts = new Map();
+  }
+
   setRuntime({
     itemDrafts: drafts,
     dirty: false,
@@ -496,11 +503,37 @@ function updateItemDraft(item, patch = {}) {
   });
 }
 
+function queueItemNoteDraft(item, notes) {
+  const templateId = String(item?.template_id ?? item?.template?.id ?? "");
+  if (!templateId) {
+    return;
+  }
+
+  // Catatan diketik langsung oleh user. Jangan patch appStore pada setiap
+  // karakter karena subscriber halaman akan replaceChildren() dan memutus
+  // input yang sedang aktif. Nilai ini digabungkan ke payload saat user
+  // menekan Simpan Inspeksi.
+  pendingNotesDrafts.set(templateId, String(notes ?? ""));
+}
+
+function draftsWithPendingNotes(drafts = {}) {
+  const next = { ...drafts };
+  pendingNotesDrafts.forEach((notes, templateId) => {
+    next[templateId] = {
+      ...(next[templateId] ?? {}),
+      notes,
+      dirty: true,
+    };
+  });
+  return next;
+}
+
 function buildInspectionItems(templates = [], report = null, drafts = {}) {
   const byTemplate = new Map((report?.items ?? []).map((item) => [Number(item.template_id), item]));
   return templates.map((template) => {
     const existing = byTemplate.get(Number(template.id));
     const draft = drafts[String(template.id)] ?? {};
+    const pendingNote = pendingNotesDrafts.get(String(template.id));
     return {
       ...(existing ?? {}),
       id: existing?.id ?? null,
@@ -508,7 +541,7 @@ function buildInspectionItems(templates = [], report = null, drafts = {}) {
       item_name_snapshot: existing?.item_name_snapshot ?? template.item_name,
       result_status: draft.result_status ?? existing?.result_status ?? "",
       description: existing?.description ?? template.description ?? "",
-      notes: draft.notes ?? existing?.notes ?? "",
+      notes: pendingNote ?? draft.notes ?? existing?.notes ?? "",
       template,
     };
   });
