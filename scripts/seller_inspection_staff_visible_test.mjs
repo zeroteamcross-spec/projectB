@@ -701,6 +701,7 @@ function staffCardByEmail(email) {
 async function ownerStaffCrud() {
   await navigate("/seller/staff", "Kelola Staf owner", "owner");
   await waitForPageHydration(page.locator("#slstf_page"), "halaman Kelola Staf owner");
+  await waitForVisible(page.locator("#slstf_page article").first(), "kartu staf existing visible setelah hydrate", 30000);
   const quotaNode = await waitForRegex(/Terpakai\s+\d+\s+dari\s+\d+\s+akun staf\./, "kuota staf visible");
   const quotaText = await quotaNode.innerText();
   const quotaMatch = quotaText.match(/Terpakai\s+(\d+)\s+dari\s+(\d+)\s+akun staf\./i);
