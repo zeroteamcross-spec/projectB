@@ -690,13 +690,21 @@ function staffCardByEmail(email) {
 async function ownerStaffCrud() {
   await navigate("/seller/staff", "Kelola Staf owner", "owner");
   await waitForPageHydration(page.locator("#slstf_page"), "halaman Kelola Staf owner");
-  await waitForRegex(/Terpakai\s+\d+\s+dari\s+\d+\s+akun staf\./, "kuota staf visible");
+  const quotaNode = await waitForRegex(/Terpakai\s+\d+\s+dari\s+\d+\s+akun staf\./, "kuota staf visible");
+  const quotaText = await quotaNode.innerText();
+  const quotaMatch = quotaText.match(/Terpakai\s+(\d+)\s+dari\s+(\d+)\s+akun staf\./i);
+  if (!quotaMatch) {
+    throw new Error("Kuota staf visible tidak dapat dibaca dari teks halaman.");
+  }
+  const usedStaff = Number(quotaMatch[1]);
+  const staffLimit = Number(quotaMatch[2]);
   const addButton = await visibleCandidate(
     page.getByRole("button", { name: "Tambah Staf", exact: true }),
     "tombol Tambah Staf owner",
     { enabled: false, optional: true },
   );
-  const createAvailable = Boolean(addButton && await addButton.isEnabled().catch(() => false));
+  const quotaReached = usedStaff >= staffLimit;
+  const createAvailable = !quotaReached && Boolean(addButton && await addButton.isEnabled().catch(() => false));
   let createResponse = null;
   let staffName = "Rina Operasional Inspeksi";
   let staffEmail = "";
@@ -749,7 +757,8 @@ async function ownerStaffCrud() {
     report.data.staffCrudMode = {
       createControlVisible: Boolean(addButton),
       createControlEnabled: false,
-      createBlockedByQuota: true,
+      createBlockedByQuota: quotaReached,
+      quota: `${usedStaff}/${staffLimit}`,
       existingVisibleRecordReused: true,
     };
   }
@@ -818,7 +827,8 @@ async function ownerStaffCrud() {
     title: await page.title(),
     createHttpStatus: createResponse?.status() ?? null,
     createAttempted: createAvailable,
-    createBlockedByQuota: !createAvailable,
+    createBlockedByQuota: quotaReached,
+    quota: `${usedStaff}/${staffLimit}`,
     createdOrReusedStaffVisible: createdText.includes(staffEmail),
     updateHttpStatus: updateResponse.status(),
     updatedStaffVisible: updatedText.includes(updatedName),
