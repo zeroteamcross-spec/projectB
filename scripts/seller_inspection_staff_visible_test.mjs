@@ -698,16 +698,47 @@ function staffCardByEmail(email) {
   return page.locator("#slstf_page article").filter({ hasText: email }).first();
 }
 
+async function visibleStaffCardCount() {
+  const cards = page.locator("#slstf_page article");
+  const count = await cards.count();
+  let visibleCount = 0;
+  for (let index = 0; index < count; index += 1) {
+    const card = cards.nth(index);
+    if (await card.isVisible().catch(() => false)) {
+      const text = await card.innerText().catch(() => "");
+      if (/@carlynk-test\.id/i.test(text)) {
+        visibleCount += 1;
+      }
+    }
+  }
+  return visibleCount;
+}
+
+async function waitForStableStaffQuota(timeout = 30000) {
+  const deadline = Date.now() + timeout;
+  while (Date.now() < deadline) {
+    const quotaNode = await visibleCandidate(
+      page.getByText(/Terpakai\s+\d+\s+dari\s+\d+\s+akun staf\./),
+      "kuota staf visible",
+      { enabled: false, optional: true },
+    );
+    if (quotaNode) {
+      const quotaText = await quotaNode.innerText().catch(() => "");
+      const quotaMatch = quotaText.match(/Terpakai\s+(\d+)\s+dari\s+(\d+)\s+akun staf\./i);
+      const visibleCardCount = await visibleStaffCardCount();
+      if (quotaMatch && visibleCardCount > 0 && Number(quotaMatch[1]) === visibleCardCount) {
+        return { quotaNode, quotaText, quotaMatch, visibleCardCount };
+      }
+    }
+    await new Promise((resolve) => setTimeout(resolve, 200));
+  }
+  throw new Error("BLOCKED: kuota staf visible belum stabil terhadap jumlah kartu staf yang tampil.");
+}
+
 async function ownerStaffCrud() {
   await navigate("/seller/staff", "Kelola Staf owner", "owner");
   await waitForPageHydration(page.locator("#slstf_page"), "halaman Kelola Staf owner");
-  await waitForVisible(page.locator("#slstf_page article").first(), "kartu staf existing visible setelah hydrate", 30000);
-  const quotaNode = await waitForRegex(/Terpakai\s+\d+\s+dari\s+\d+\s+akun staf\./, "kuota staf visible");
-  const quotaText = await quotaNode.innerText();
-  const quotaMatch = quotaText.match(/Terpakai\s+(\d+)\s+dari\s+(\d+)\s+akun staf\./i);
-  if (!quotaMatch) {
-    throw new Error("Kuota staf visible tidak dapat dibaca dari teks halaman.");
-  }
+  const { quotaText, quotaMatch, visibleCardCount } = await waitForStableStaffQuota();
   const usedStaff = Number(quotaMatch[1]);
   const staffLimit = Number(quotaMatch[2]);
   const addButton = await visibleCandidate(
@@ -771,6 +802,7 @@ async function ownerStaffCrud() {
       createControlEnabled: false,
       createBlockedByQuota: quotaReached,
       quota: `${usedStaff}/${staffLimit}`,
+      visibleStaffCardCount: visibleCardCount,
       existingVisibleRecordReused: true,
     };
   }
@@ -849,6 +881,7 @@ async function ownerStaffCrud() {
     activateHttpStatus: activateResponse.status(),
     activeStatusVisible: true,
     finalDataVisible: true,
+    visibleStaffCardCount: visibleCardCount,
     mobileViewport: "390x844",
     mobileHorizontalOverflow: mobileOverflow,
     deleteModel: "Soft delete melalui Nonaktifkan/Aktifkan visible; tidak ada hard delete destruktif pada UI staf.",
