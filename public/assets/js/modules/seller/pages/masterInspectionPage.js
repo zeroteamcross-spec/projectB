@@ -180,7 +180,7 @@ function render(root, context, actions) {
   }
 
   layout.append(
-    copySection(showroom, branches, runtime),
+    copySection(showroom, branches, runtime, actions),
     filterSection(templates, runtime.query, actions),
     listSection(page, filtered.length, runtime, actions),
   );
@@ -232,7 +232,7 @@ function statGrid(templates) {
   return grid;
 }
 
-function copySection(target, branches, runtime) {
+function copySection(target, branches, runtime, actions) {
   const section = document.createElement("section");
   section.id = "slrminsp_copy_section";
   section.className = "grid min-w-0 gap-3 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white/88 p-4 shadow-[var(--pb-shadow-card)]";
