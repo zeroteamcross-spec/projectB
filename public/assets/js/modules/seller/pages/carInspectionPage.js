@@ -68,7 +68,8 @@ function render(root, router, params) {
   const reportNode = appStore.get("working.sellerCarInspection.report", null);
   const car = carNode?.data ?? sellerState.working("sellerCarInspection", "car", null);
   const templates = templatesNode?.data ?? sellerState.working("sellerCarInspection", "templates", []);
-  const report = reportNode?.data ?? sellerState.working("sellerCarInspection", "report", null);
+  const rawReport = reportNode?.data ?? sellerState.working("sellerCarInspection", "report", null);
+  const report = currentMasterReport(rawReport, car);
   const hasHydrated = Boolean(carNode?.hydratedAt) && Boolean(templatesNode?.hydratedAt) && Boolean(reportNode?.hydratedAt);
   const runtime = runtimeState();
   const title = car
@@ -106,8 +107,9 @@ function render(root, router, params) {
   body.className = "grid gap-6";
   const inspectionItems = buildInspectionItems(templates, report, runtime.itemDrafts);
   const progress = inspectionProgress(inspectionItems);
-  body.append(
-    SellerInspectionReportPanel({
+
+  if (templates.length) {
+    body.append(SellerInspectionReportPanel({
       car,
       report,
       summaryDraft: summaryDraftValue ?? report?.summary_notes ?? "",
@@ -122,10 +124,8 @@ function render(root, router, params) {
       onSaveDraft: () => saveInspectionDraft(carId, report, templates),
       onSummaryChange: (value) => { summaryDraftValue = value; },
       onSummarySave: () => saveSummary(report),
-    })
-  );
+    }));
 
-  if (templates.length) {
     const toolbar = document.createElement("div");
     toolbar.className = "flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between";
 
@@ -147,10 +147,7 @@ function render(root, router, params) {
       onNotesChange: (item, notes) => updateItemDraft(item, { notes }),
     }));
   } else {
-    body.append(EmptyState({
-      title: "Master inspection belum tersedia",
-      description: "Checklist showroom akan tampil setelah admin mengaktifkan master inspection.",
-    }));
+    body.append(masterBlockedState());
   }
 
   root.replaceChildren(
@@ -190,8 +187,8 @@ function floatingSaveButton({ saving = false, disabled = false, onClick = null }
 
 async function createReport(carId, templates) {
   if (!templates.length) {
-    setRuntime({ error: "Master inspection belum tersedia." });
-    showToast("Master inspection belum tersedia.", { type: "error" });
+    setRuntime({ error: "Master Inspeksi showroom belum dibuat." });
+    showToast("Master Inspeksi showroom belum dibuat.", { type: "error" });
     return;
   }
 
@@ -202,7 +199,8 @@ async function createReport(carId, templates) {
 async function publishReport(carId, report) {
   const templates = sellerState.working("sellerCarInspection", "templates", []) ?? [];
   const runtime = runtimeState();
-  const currentReport = report ?? sellerState.working("sellerCarInspection", "report", null);
+  const car = sellerState.working("sellerCarInspection", "car", null);
+  const currentReport = currentMasterReport(report ?? sellerState.working("sellerCarInspection", "report", null), car);
   const items = buildInspectionItems(templates, currentReport, runtime.itemDrafts);
   const progress = inspectionProgress(items);
 
@@ -451,7 +449,8 @@ function syncDraftsFromReport(reportOverride = null, { force = false } = {}) {
   if (runtime.dirty && !force) {
     return;
   }
-  const report = reportOverride ?? sellerState.working("sellerCarInspection", "report", null);
+  const car = sellerState.working("sellerCarInspection", "car", null);
+  const report = currentMasterReport(reportOverride ?? sellerState.working("sellerCarInspection", "report", null), car);
   const drafts = {};
   (report?.items ?? []).forEach((item) => {
     drafts[String(item.template_id)] = {
@@ -547,6 +546,31 @@ function hasDirtyItemDrafts() {
 
 function sqlDateTimeNow() {
   return new Date().toISOString().slice(0, 19).replace("T", " ");
+}
+
+function currentMasterReport(report, car) {
+  if (!report || !car) {
+    return null;
+  }
+
+  if (report.is_current_master === true) {
+    return report;
+  }
+
+  return null;
+}
+
+function masterBlockedState() {
+  const section = document.createElement("section");
+  section.id = "slrinsp_master_blocked_section";
+  section.className = "grid gap-3 rounded-[1.5rem] border border-dashed border-[color-mix(in_srgb,var(--pb-danger)_26%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] p-5";
+  section.append(
+    EmptyState({
+      title: "Master Inspeksi showroom belum dibuat",
+      description: "Proses pengisian inspeksi diblokir sampai owner showroom membuat master inspeksi untuk cabang mobil ini.",
+    })
+  );
+  return section;
 }
 
 function isAdminCarsPath() {

@@ -6,10 +6,13 @@ namespace App\Modules\Inspection\Services;
 
 use App\Core\Exceptions\NotFoundException;
 use App\Core\Exceptions\ForbiddenException;
+use App\Core\Exceptions\ValidationException;
 use App\Modules\Inspection\Mappers\InspectionMapper;
 use App\Modules\Inspection\Policies\InspectionPolicy;
 use App\Modules\Inspection\Repositories\InspectionRepository;
 use App\Modules\Notifications\Services\NotificationService;
+use App\Modules\Showrooms\Policies\ShowroomPolicy;
+use App\Modules\Showrooms\Repositories\ShowroomRepository;
 use PDO;
 use Throwable;
 
@@ -19,15 +22,23 @@ class InspectionService
 
     private InspectionRepository $repository;
 
+    private ?ShowroomRepository $showrooms;
+
     private ?bool $resultStatusSchemaSynced = null;
 
     private ?NotificationService $notificationService;
 
-    public function __construct(PDO $pdo, InspectionRepository $repository, ?NotificationService $notificationService = null)
+    public function __construct(
+        PDO $pdo,
+        InspectionRepository $repository,
+        ?NotificationService $notificationService = null,
+        ?ShowroomRepository $showrooms = null
+    )
     {
         $this->pdo = $pdo;
         $this->repository = $repository;
         $this->notificationService = $notificationService;
+        $this->showrooms = $showrooms;
     }
 
     public function detailByCar(int $carId, ?array $user): array
@@ -41,7 +52,11 @@ class InspectionService
 
         InspectionPolicy::ensureCanView($user, $car, $report);
 
-        return InspectionMapper::report($report, $this->repository->itemsByReport((int) $report['id']));
+        return InspectionMapper::report(
+            $report,
+            $this->repository->itemsByReport((int) $report['id']),
+            (int) ($car['showroom_id'] ?? 0)
+        );
     }
 
     public function templates(): array
@@ -56,12 +71,181 @@ class InspectionService
         return InspectionMapper::templates($this->repository->listTemplates(false));
     }
 
+    public function templatesForCar(int $carId, array $user): array
+    {
+        $car = $this->requireCar($carId);
+        InspectionPolicy::ensureCanManage($user, $car);
+        $showroomId = (int) ($car['showroom_id'] ?? 0);
+
+        if ($showroomId <= 0) {
+            return [];
+        }
+
+        return InspectionMapper::templates($this->repository->listTemplates(true, $showroomId));
+    }
+
+    public function showroomTemplates(int $showroomId, array $user, bool $includeInactive = true): array
+    {
+        $showroom = $this->requireShowroom($showroomId);
+        $this->ensureShowroomCanRead($showroom, $user);
+
+        return InspectionMapper::templates($this->repository->listTemplates(! $includeInactive, $showroomId));
+    }
+
+    public function createShowroomTemplate(int $showroomId, array $user, array $data): array
+    {
+        $showroom = $this->requireShowroom($showroomId);
+        $this->ensureShowroomOwner($showroom, $user);
+        $categoryName = trim((string) $data['category_name']);
+        $itemName = trim((string) $data['item_name']);
+
+        if ($this->repository->findTemplateByName($categoryName, $itemName, $showroomId)) {
+            throw new ValidationException([
+                'item_name' => 'Item inspeksi dengan section dan nama yang sama sudah ada di cabang ini.',
+            ]);
+        }
+
+        $templateId = $this->repository->createTemplate(
+            $categoryName,
+            $itemName,
+            trim((string) ($data['description'] ?? '')) ?: null,
+            (int) $data['sort_order'],
+            $showroomId
+        );
+
+        if (! $this->toBoolean($data['is_active'])) {
+            $this->repository->updateTemplateCanon(
+                $templateId,
+                $categoryName,
+                $itemName,
+                trim((string) ($data['description'] ?? '')) ?: null,
+                (int) $data['sort_order'],
+                false
+            );
+        }
+
+        return InspectionMapper::template($this->repository->findTemplate($templateId));
+    }
+
+    public function updateShowroomTemplate(int $showroomId, int $templateId, array $user, array $data): array
+    {
+        $showroom = $this->requireShowroom($showroomId);
+        $this->ensureShowroomOwner($showroom, $user);
+        $template = $this->repository->findTemplate($templateId);
+
+        if (! $template || (int) ($template['showroom_id'] ?? 0) !== $showroomId) {
+            throw new NotFoundException('Master item inspeksi cabang tidak ditemukan.');
+        }
+
+        $categoryName = trim((string) $data['category_name']);
+        $itemName = trim((string) $data['item_name']);
+        $duplicate = $this->repository->findTemplateByName($categoryName, $itemName, $showroomId);
+        if ($duplicate && (int) $duplicate['id'] !== $templateId) {
+            throw new ValidationException([
+                'item_name' => 'Item inspeksi dengan section dan nama yang sama sudah ada di cabang ini.',
+            ]);
+        }
+
+        $this->repository->updateTemplateCanon(
+            $templateId,
+            $categoryName,
+            $itemName,
+            trim((string) ($data['description'] ?? '')) ?: null,
+            (int) $data['sort_order'],
+            $this->toBoolean($data['is_active'])
+        );
+
+        return InspectionMapper::template($this->repository->findTemplate($templateId) ?? $template);
+    }
+
+    public function copyShowroomTemplates(int $targetShowroomId, array $user, int $sourceShowroomId): array
+    {
+        if ($sourceShowroomId <= 0 || $sourceShowroomId === $targetShowroomId) {
+            throw new ValidationException([
+                'source_showroom_id' => 'Cabang sumber dan tujuan harus berbeda.',
+            ]);
+        }
+
+        $target = $this->requireShowroom($targetShowroomId);
+        $source = $this->requireShowroom($sourceShowroomId);
+        $this->ensureShowroomOwner($target, $user);
+        $this->ensureShowroomOwner($source, $user);
+        $sourceTemplates = $this->repository->listTemplates(false, $sourceShowroomId);
+        $created = 0;
+
+        try {
+            $this->pdo->beginTransaction();
+
+            foreach ($sourceTemplates as $template) {
+                $existing = $this->repository->findTemplateByName(
+                    (string) $template['category_name'],
+                    (string) $template['item_name'],
+                    $targetShowroomId
+                );
+
+                if ($existing) {
+                    continue;
+                }
+
+                $this->repository->createTemplate(
+                    (string) $template['category_name'],
+                    (string) $template['item_name'],
+                    $template['description'] !== null ? (string) $template['description'] : null,
+                    (int) ($template['sort_order'] ?? 0),
+                    $targetShowroomId
+                );
+                $created++;
+
+                $newTemplate = $this->repository->findTemplateByName(
+                    (string) $template['category_name'],
+                    (string) $template['item_name'],
+                    $targetShowroomId
+                );
+                if ($newTemplate && ! (bool) ($template['is_active'] ?? false)) {
+                    $this->repository->updateTemplateCanon(
+                        (int) $newTemplate['id'],
+                        (string) $template['category_name'],
+                        (string) $template['item_name'],
+                        $template['description'] !== null ? (string) $template['description'] : null,
+                        (int) ($template['sort_order'] ?? 0),
+                        false
+                    );
+                }
+            }
+
+            $this->pdo->commit();
+        } catch (Throwable $exception) {
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+
+            throw $exception;
+        }
+
+        return [
+            'source_showroom_id' => $sourceShowroomId,
+            'target_showroom_id' => $targetShowroomId,
+            'source_count' => count($sourceTemplates),
+            'created_count' => $created,
+            'skipped_count' => count($sourceTemplates) - $created,
+            'templates' => InspectionMapper::templates($this->repository->listTemplates(false, $targetShowroomId)),
+        ];
+    }
+
     public function createTemplate(array $user, array $data): array
     {
         $this->ensureAdmin($user);
+        $categoryName = trim((string) $data['category_name']);
+        $itemName = trim((string) $data['item_name']);
+        if ($this->repository->findTemplateByName($categoryName, $itemName)) {
+            throw new ValidationException([
+                'item_name' => 'Item inspeksi dengan section dan nama yang sama sudah ada di master admin.',
+            ]);
+        }
+
         $templateId = $this->repository->createTemplate(
-            trim((string) $data['category_name']),
-            trim((string) $data['item_name']),
+            $categoryName,
+            $itemName,
             trim((string) ($data['description'] ?? '')) ?: null,
             (int) $data['sort_order']
         );
@@ -69,8 +253,8 @@ class InspectionService
         if (! $this->toBoolean($data['is_active'])) {
             $this->repository->updateTemplateCanon(
                 $templateId,
-                trim((string) $data['category_name']),
-                trim((string) $data['item_name']),
+                $categoryName,
+                $itemName,
                 trim((string) ($data['description'] ?? '')) ?: null,
                 (int) $data['sort_order'],
                 false
@@ -89,10 +273,23 @@ class InspectionService
             throw new NotFoundException('Master item inspeksi tidak ditemukan.');
         }
 
+        if (($template['showroom_id'] ?? null) !== null) {
+            throw new ForbiddenException('Master item inspeksi cabang dikelola dari menu showroom.');
+        }
+
+        $categoryName = trim((string) $data['category_name']);
+        $itemName = trim((string) $data['item_name']);
+        $duplicate = $this->repository->findTemplateByName($categoryName, $itemName);
+        if ($duplicate && (int) $duplicate['id'] !== $templateId) {
+            throw new ValidationException([
+                'item_name' => 'Item inspeksi dengan section dan nama yang sama sudah ada di master admin.',
+            ]);
+        }
+
         $this->repository->updateTemplateCanon(
             $templateId,
-            trim((string) $data['category_name']),
-            trim((string) $data['item_name']),
+            $categoryName,
+            $itemName,
             trim((string) ($data['description'] ?? '')) ?: null,
             (int) $data['sort_order'],
             $this->toBoolean($data['is_active'])
@@ -124,18 +321,41 @@ class InspectionService
         $reportsByCarId = [];
 
         foreach ($reports as $report) {
+            $car = $this->findCarFromList($cars, (int) $report['car_id']);
             $reportsByCarId[(int) $report['car_id']] = InspectionMapper::report(
                 $report,
-                $itemsByReportId[(int) $report['id']] ?? []
+                $itemsByReportId[(int) $report['id']] ?? [],
+                (int) ($car['showroom_id'] ?? 0)
             );
         }
 
-        $masterItems = InspectionMapper::templates($this->repository->listTemplates(true));
+        $templatesByShowroomId = [];
+        $carSummaries = [];
+
+        foreach ($cars as $car) {
+            $showroomId = (int) ($car['showroom_id'] ?? 0);
+            $report = $reportsByCarId[(int) $car['id']] ?? null;
+            $isCurrent = (bool) ($report['is_current_master'] ?? false);
+
+            if ($showroomId > 0 && ! array_key_exists((string) $showroomId, $templatesByShowroomId)) {
+                $templatesByShowroomId[(string) $showroomId] = InspectionMapper::templates(
+                    $this->repository->listTemplates(true, $showroomId)
+                );
+            }
+
+            $carSummaries[] = InspectionMapper::carSummary($car, $report !== null && ! $isCurrent);
+        }
+
+        $masterItems = [];
+        foreach ($templatesByShowroomId as $templates) {
+            $masterItems = array_merge($masterItems, $templates);
+        }
 
         return [
-            'cars' => InspectionMapper::carSummaries($cars),
+            'cars' => $carSummaries,
             'reports_by_car_id' => $reportsByCarId,
-            'templates' => $masterItems,
+            'templates' => [],
+            'templates_by_showroom_id' => $templatesByShowroomId,
             'master_sections' => $this->masterSections($masterItems),
             'summary' => $this->overviewSummary($cars, $reportsByCarId),
         ];
@@ -145,6 +365,12 @@ class InspectionService
     {
         $car = $this->requireCar($carId);
         InspectionPolicy::ensureCanManage($user, $car);
+        $showroomId = (int) ($car['showroom_id'] ?? 0);
+        if ($showroomId <= 0 || $this->repository->listTemplates(true, $showroomId) === []) {
+            throw new ValidationException([
+                'inspection_master' => 'Master Inspeksi showroom belum dibuat.',
+            ]);
+        }
         $this->ensureResultStatusSchema();
         $now = date('Y-m-d H:i:s');
         $reportStatus = $data['report_status'] ?? 'completed';
@@ -155,6 +381,7 @@ class InspectionService
             $reportId = $this->repository->createReport([
                 'car_id' => $carId,
                 'inspector_user_id' => (int) $user['id'],
+                'inspection_master_showroom_id' => $showroomId,
                 'report_status' => $reportStatus,
                 'summary_notes' => $data['summary_notes'] ?? null,
                 'inspected_at' => $data['inspected_at'] ?? $now,
@@ -163,7 +390,7 @@ class InspectionService
             ]);
 
             foreach ($data['items'] as $item) {
-                $template = $this->resolveTemplate($item);
+                $template = $this->resolveTemplate($item, $showroomId);
 
                 $this->repository->createItem([
                     'inspection_report_id' => $reportId,
@@ -191,7 +418,11 @@ class InspectionService
         $report = $this->repository->findReport($reportId);
         $this->notifyInspectionNeeded($car, $summaryStatus ?? null);
 
-        return InspectionMapper::report($report, $this->repository->itemsByReport($reportId));
+        return InspectionMapper::report(
+            $report,
+            $this->repository->itemsByReport($reportId),
+            $showroomId
+        );
     }
 
     public function updateReport(int $reportId, array $user, array $data): array
@@ -199,6 +430,7 @@ class InspectionService
         $report = $this->requireReport($reportId);
         $car = $this->requireCar((int) $report['car_id']);
         InspectionPolicy::ensureCanManage($user, $car);
+        $this->ensureCurrentMasterReport($report, $car);
 
         try {
             $this->pdo->beginTransaction();
@@ -228,8 +460,9 @@ class InspectionService
         $report = $this->requireReport($reportId);
         $car = $this->requireCar((int) $report['car_id']);
         InspectionPolicy::ensureCanManage($user, $car);
+        $this->ensureCurrentMasterReport($report, $car);
         $this->ensureResultStatusSchema();
-        $template = $this->resolveTemplate($data);
+        $template = $this->resolveTemplate($data, (int) $car['showroom_id']);
         $now = date('Y-m-d H:i:s');
 
         try {
@@ -265,6 +498,7 @@ class InspectionService
 
         $car = $this->requireCar((int) $report['car_id']);
         InspectionPolicy::ensureCanManage($user, $car);
+        $this->ensureCurrentMasterReport($report, $car);
         $this->ensureResultStatusSchema();
         $item = $this->repository->findItem($reportId, $itemId);
 
@@ -304,7 +538,7 @@ class InspectionService
             throw $exception;
         }
 
-        return InspectionMapper::report($updatedReport, $items);
+        return InspectionMapper::report($updatedReport, $items, (int) ($car['showroom_id'] ?? 0));
     }
 
     private function requireReport(int $reportId): array
@@ -318,11 +552,14 @@ class InspectionService
         return $report;
     }
 
-    private function resolveTemplate(array $item): array
+    private function resolveTemplate(array $item, int $showroomId): array
     {
         $template = $this->repository->findTemplate((int) ($item['template_id'] ?? 0));
 
-        if (! $template || ! (bool) ($template['is_active'] ?? false)) {
+        if (! $template
+            || (int) ($template['showroom_id'] ?? 0) !== $showroomId
+            || ! (bool) ($template['is_active'] ?? false)
+        ) {
             throw new NotFoundException('Master item inspeksi tidak ditemukan atau sudah nonaktif.');
         }
 
@@ -352,13 +589,59 @@ class InspectionService
         return $car;
     }
 
+    private function requireShowroom(int $showroomId): array
+    {
+        if ($this->showrooms === null) {
+            throw new NotFoundException('Showroom belum tersedia.');
+        }
+
+        $showroom = $this->showrooms->findById($showroomId);
+        if (! $showroom) {
+            throw new NotFoundException('Showroom tidak ditemukan.');
+        }
+
+        return $showroom;
+    }
+
+    private function ensureShowroomCanRead(array $showroom, array $user): void
+    {
+        if (! in_array(($user['role'] ?? null), ['seller', 'seller_staff', 'admin', 'super_admin'], true)) {
+            throw new ForbiddenException('Akses master inspeksi showroom tidak diizinkan.');
+        }
+
+        ShowroomPolicy::ensureOwnedOrStaffAssigned($showroom, $user);
+    }
+
+    private function ensureShowroomOwner(array $showroom, array $user): void
+    {
+        if (($user['role'] ?? null) !== 'seller') {
+            throw new ForbiddenException('Hanya owner showroom yang dapat mengelola master inspeksi.');
+        }
+
+        ShowroomPolicy::ensureOwnedByUser($showroom, $user);
+    }
+
+    private function ensureCurrentMasterReport(array $report, array $car): void
+    {
+        $showroomId = (int) ($car['showroom_id'] ?? 0);
+        $reportShowroomId = (int) ($report['inspection_master_showroom_id'] ?? 0);
+
+        if ($showroomId <= 0 || $reportShowroomId !== $showroomId) {
+            throw new ValidationException([
+                'inspection_master' => 'Inspeksi lama wajib dibuat ulang berdasarkan master inspeksi showroom.',
+            ]);
+        }
+    }
+
     private function refreshReportAndSummary(int $reportId): array
     {
         $report = $this->requireReport($reportId);
         $items = $this->repository->itemsByReport($reportId);
         $this->syncCarInspectionSummary($report, $items);
 
-        return InspectionMapper::report($report, $items);
+        $car = $this->requireCar((int) $report['car_id']);
+
+        return InspectionMapper::report($report, $items, (int) ($car['showroom_id'] ?? 0));
     }
 
     private function syncCarInspectionSummary(array $report, array $items): void
@@ -397,7 +680,10 @@ class InspectionService
         $publishedReports = 0;
 
         foreach ($cars as $car) {
-            $status = $car['inspection_summary_status'] ?? 'not_checked';
+            $report = $reportsByCarId[(int) $car['id']] ?? null;
+            $status = $report && ($report['is_current_master'] ?? false)
+                ? ($car['inspection_summary_status'] ?? 'not_checked')
+                : 'not_checked';
 
             if ($status === 'completed') {
                 $completed++;
@@ -407,8 +693,7 @@ class InspectionService
                 $notChecked++;
             }
 
-            $report = $reportsByCarId[(int) $car['id']] ?? null;
-            if (($report['report_status'] ?? null) === 'published') {
+            if ($report && ($report['is_current_master'] ?? false) && ($report['report_status'] ?? null) === 'published') {
                 $publishedReports++;
             }
         }
@@ -420,6 +705,17 @@ class InspectionService
             'not_checked' => $notChecked,
             'published_reports' => $publishedReports,
         ];
+    }
+
+    private function findCarFromList(array $cars, int $carId): ?array
+    {
+        foreach ($cars as $car) {
+            if ((int) ($car['id'] ?? 0) === $carId) {
+                return $car;
+            }
+        }
+
+        return null;
     }
 
     private function masterSections(array $items): array

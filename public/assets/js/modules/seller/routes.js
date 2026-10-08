@@ -2,6 +2,7 @@ import { carsResource } from "../../resources/carsResource.js";
 import { imagesResource } from "../../resources/imagesResource.js";
 import { inspectionsResource } from "../../resources/inspectionsResource.js";
 import { activeShowroom } from "./state/activeShowroom.js";
+import { showroomsResource } from "../../resources/showroomsResource.js";
 import { transactionsResource } from "../../resources/transactionsResource.js";
 import { affiliatesResource } from "../../resources/affiliatesResource.js";
 import { staffResource } from "../../resources/staffResource.js";
@@ -13,6 +14,7 @@ import { SellerCarsPage } from "./pages/carsPage.js";
 import { SellerCarImagesPage } from "./pages/carImagesPage.js";
 import { SellerCarInspectionPage } from "./pages/carInspectionPage.js";
 import { SellerInspectionPage } from "./pages/inspectionPage.js";
+import { SellerMasterInspectionPage } from "./pages/masterInspectionPage.js";
 import { SellerShowroomPage } from "./pages/showroomPage.js";
 import { SellerStaffPage } from "./pages/staffPage.js";
 import { SellerBillingPage } from "./pages/billingPage.js";
@@ -198,8 +200,38 @@ export const sellerRoutes = [
             cars: [],
             reports_by_car_id: {},
             templates: [],
+            templates_by_showroom_id: {},
             summary: {},
           })),
+        },
+      ],
+    },
+  },
+  {
+    name: "seller.master-inspection",
+    path: "/seller/master-inspection",
+    shell: "app",
+    role: "seller",
+    ownerOnly: true,
+    page: SellerMasterInspectionPage,
+    workingStateKey: "sellerMasterInspection",
+    preload: {
+      working: [
+        {
+          key: "showroom",
+          loader: ({ signal }) => activeShowroom.resolveMine({ signal }).catch(() => null),
+        },
+        {
+          key: "branches",
+          loader: ({ signal }) => showroomsResource.mineList({ signal }).catch(() => []),
+        },
+        {
+          key: "templates",
+          loader: ({ signal }) => activeShowroom.resolveMine({ signal })
+            .then((showroom) => showroom?.id
+              ? inspectionsResource.showroomTemplates(showroom.id, { signal })
+              : [])
+            .catch(() => []),
         },
       ],
     },
@@ -255,7 +287,7 @@ export const sellerRoutes = [
         },
         {
           key: "templates",
-          loader: ({ signal }) => inspectionsResource.templates({ signal }).catch(() => []),
+          loader: ({ params, signal }) => inspectionsResource.templatesForCar(params.id, { signal }).catch(() => []),
         },
         {
           key: "report",

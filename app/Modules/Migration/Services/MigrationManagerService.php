@@ -284,6 +284,10 @@ class MigrationManagerService
             return $this->constraintExists($table, $matches[1]);
         }
 
+        if (preg_match('/^DROP\s+INDEX\s+`?([a-zA-Z0-9_]+)`?/is', $trimmed, $matches)) {
+            return ! $this->indexExists($table, $matches[1]);
+        }
+
         // Bentuk tanpa nama -- ADD PRIMARY KEY, ADD FOREIGN KEY, ADD UNIQUE
         // (kolom) -- tidak punya pengenal untuk dicari, jadi dibiarkan jalan
         // dan biar database yang menolak kalau memang sudah ada.

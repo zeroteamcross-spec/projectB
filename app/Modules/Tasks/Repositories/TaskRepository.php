@@ -26,13 +26,29 @@ class TaskRepository
                 (:task_key, :title, :description, :status, NULL, NULL, NULL, :created_at, NULL, NULL)
              ON DUPLICATE KEY UPDATE task_key = VALUES(task_key)'
         );
-        $stmt->execute([
-            'task_key' => TaskCatalog::FIRST_TASK_KEY,
-            'title' => TaskCatalog::FIRST_TASK_TITLE,
-            'description' => TaskCatalog::FIRST_TASK_DESCRIPTION,
-            'status' => 'open',
-            'created_at' => '2026-10-01 00:00:00',
-        ]);
+        foreach ($this->taskCatalog() as $task) {
+            $stmt->execute($task);
+        }
+    }
+
+    private function taskCatalog(): array
+    {
+        return [
+            [
+                'task_key' => TaskCatalog::FIRST_TASK_KEY,
+                'title' => TaskCatalog::FIRST_TASK_TITLE,
+                'description' => TaskCatalog::FIRST_TASK_DESCRIPTION,
+                'status' => 'open',
+                'created_at' => '2026-10-01 00:00:00',
+            ],
+            [
+                'task_key' => TaskCatalog::SHOWROOM_INSPECTION_MASTER_TASK_KEY,
+                'title' => TaskCatalog::SHOWROOM_INSPECTION_MASTER_TASK_TITLE,
+                'description' => TaskCatalog::SHOWROOM_INSPECTION_MASTER_TASK_DESCRIPTION,
+                'status' => 'open',
+                'created_at' => '2026-10-08 00:00:00',
+            ],
+        ];
     }
 
     public function listAll(): array

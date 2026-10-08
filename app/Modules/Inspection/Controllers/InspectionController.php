@@ -7,6 +7,7 @@ namespace App\Modules\Inspection\Controllers;
 use App\Core\Controller;
 use App\Core\JsonResponse;
 use App\Core\Request;
+use App\Modules\Inspection\Requests\CopyInspectionTemplatesRequest;
 use App\Modules\Inspection\Requests\CreateInspectionItemRequest;
 use App\Modules\Inspection\Requests\CreateInspectionReportRequest;
 use App\Modules\Inspection\Requests\UpdateInspectionItemRequest;
@@ -46,6 +47,67 @@ class InspectionController extends Controller
         return JsonResponse::success([
             'templates' => $this->service->adminTemplates($this->user($request)),
         ], 'Master inspeksi admin berhasil diambil.');
+    }
+
+    public function templatesForCar(Request $request): JsonResponse
+    {
+        return JsonResponse::success([
+            'templates' => $this->service->templatesForCar(
+                (int) $request->routeParam('car_id'),
+                $this->user($request)
+            ),
+        ], 'Master inspeksi showroom untuk mobil berhasil diambil.');
+    }
+
+    public function showroomTemplates(Request $request): JsonResponse
+    {
+        return JsonResponse::success([
+            'templates' => $this->service->showroomTemplates(
+                (int) $request->routeParam('showroom_id'),
+                $this->user($request),
+                true
+            ),
+        ], 'Master inspeksi cabang berhasil diambil.');
+    }
+
+    public function createShowroomTemplate(Request $request): JsonResponse
+    {
+        $payload = (new UpdateInspectionTemplateRequest($request))->validate();
+
+        return JsonResponse::success([
+            'template' => $this->service->createShowroomTemplate(
+                (int) $request->routeParam('showroom_id'),
+                $this->user($request),
+                $payload
+            ),
+        ], 'Master item inspeksi cabang berhasil dibuat.', [], 201);
+    }
+
+    public function updateShowroomTemplate(Request $request): JsonResponse
+    {
+        $payload = (new UpdateInspectionTemplateRequest($request))->validate();
+
+        return JsonResponse::success([
+            'template' => $this->service->updateShowroomTemplate(
+                (int) $request->routeParam('showroom_id'),
+                (int) $request->routeParam('template_id'),
+                $this->user($request),
+                $payload
+            ),
+        ], 'Master item inspeksi cabang berhasil diperbarui.');
+    }
+
+    public function copyShowroomTemplates(Request $request): JsonResponse
+    {
+        $payload = (new CopyInspectionTemplatesRequest($request))->validate();
+
+        return JsonResponse::success([
+            'copy' => $this->service->copyShowroomTemplates(
+                (int) $request->routeParam('showroom_id'),
+                $this->user($request),
+                (int) $payload['source_showroom_id']
+            ),
+        ], 'Master inspeksi berhasil disalin dengan mode gabung.');
     }
 
     public function createTemplate(Request $request): JsonResponse

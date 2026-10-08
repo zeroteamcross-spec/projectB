@@ -10,6 +10,10 @@ return static function (Router $router): void {
     $router->get('/api/inspection-templates', [InspectionController::class, 'templates']);
     $router->get('/api/cars/{car_id}/inspection-report', [InspectionController::class, 'detailByCar']);
 
+    $router->group('/api/cars/{car_id}', static function (Router $router): void {
+        $router->get('/inspection-templates', [InspectionController::class, 'templatesForCar']);
+    }, [AuthenticatedUserMiddleware::class]);
+
     $router->group('/api/cars/{car_id}/inspection-reports', static function (Router $router): void {
         $router->post('', [InspectionController::class, 'createReport']);
     }, [AuthenticatedUserMiddleware::class]);
@@ -26,6 +30,13 @@ return static function (Router $router): void {
         $router->get('', [InspectionController::class, 'adminTemplates']);
         $router->post('', [InspectionController::class, 'createTemplate']);
         $router->patch('/{template_id}', [InspectionController::class, 'updateTemplate']);
+    }, [AuthenticatedUserMiddleware::class]);
+
+    $router->group('/api/showrooms/{showroom_id}/mine/inspection-templates', static function (Router $router): void {
+        $router->get('', [InspectionController::class, 'showroomTemplates']);
+        $router->post('', [InspectionController::class, 'createShowroomTemplate']);
+        $router->post('/copy', [InspectionController::class, 'copyShowroomTemplates']);
+        $router->patch('/{template_id}', [InspectionController::class, 'updateShowroomTemplate']);
     }, [AuthenticatedUserMiddleware::class]);
 
     $router->group('/api/admin/cars/{car_id}', static function (Router $router): void {

@@ -23,6 +23,7 @@ const SELLER_LINKS = [
   { href: "/seller/showroom", label: "Showroom Saya", icon: "showroom" },
   { href: "/seller/cars", label: "Katalog", icon: "car" },
   { href: "/seller/inspection", label: "Inspeksi", icon: "clipboard" },
+  { href: "/seller/master-inspection", label: "Master Inspeksi", icon: "clipboard" },
   { href: "/seller/staff", label: "Kelola Staf", icon: "user" },
   { href: "/seller/affiliates", label: "Marketing", icon: "affiliate" },
   { href: "/seller/affiliate-commissions", label: "Komisi Marketing", icon: "commission" },
@@ -61,7 +62,6 @@ const ADMIN_LINKS = [
         { href: "/admin/master-brand", label: "Master Brand", icon: "car" },
         { href: "/admin/master-sidebar", label: "Master Sidebar", icon: "sitemap" },
         { href: "/admin/master-bank", label: "Master Bank", icon: "bank" },
-        { href: "/admin/master-inspection", label: "Master Inspection", icon: "clipboard" },
         { href: "/admin/master-location", label: "Master Lokasi", icon: "location" },
       ],
     },
@@ -374,7 +374,10 @@ function getSidebarLinksForRole(role, store, fallbackLinks) {
   const items = adminMasterService
     .normalizeSidebarMaster(workingMaster ?? snapshotMaster)
     .data.items
-    .filter((item) => item.role === normalizedRole && item.is_active && item.is_visible);
+    .filter((item) => item.role === normalizedRole
+      && item.is_active
+      && item.is_visible
+      && !(normalizedRole === "admin" && item.key === "admin.master_inspection"));
 
   if (!items.length) {
     return fallbackLinks;
@@ -393,7 +396,13 @@ function getSidebarLinksForRole(role, store, fallbackLinks) {
   //
   // Rutenya sendiri tetap bisa dibuka lewat URL, dan sidebar super admin selalu
   // memuat Konfigurasi WEB, jadi tidak ada yang benar-benar terkunci.
-  return buildSidebarTree(items);
+  const tree = buildSidebarTree(items);
+  if (normalizedRole === "seller" && role === "seller"
+    && !tree.some((item) => String(item.href ?? "") === "/seller/master-inspection")) {
+    tree.push({ href: "/seller/master-inspection", label: "Master Inspeksi", icon: "clipboard", children: [] });
+  }
+
+  return tree;
 }
 
 function normalizeSidebarRole(role) {

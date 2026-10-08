@@ -12,6 +12,33 @@ export const inspectionsResource = {
     return response.data?.templates ?? [];
   },
 
+  async templatesForCar(carId, options = {}) {
+    const response = await apiClient.get(`/cars/${encodeURIComponent(carId)}/inspection-templates`, options);
+    return response.data?.templates ?? [];
+  },
+
+  async showroomTemplates(showroomId, options = {}) {
+    const response = await apiClient.get(`/showrooms/${encodeURIComponent(showroomId)}/mine/inspection-templates`, options);
+    return response.data?.templates ?? [];
+  },
+
+  async createShowroomTemplate(showroomId, payload = {}, options = {}) {
+    const response = await apiClient.post(`/showrooms/${encodeURIComponent(showroomId)}/mine/inspection-templates`, payload, options);
+    return response.data?.template ?? null;
+  },
+
+  async updateShowroomTemplate(showroomId, templateId, payload = {}, options = {}) {
+    const response = await apiClient.patch(`/showrooms/${encodeURIComponent(showroomId)}/mine/inspection-templates/${encodeURIComponent(templateId)}`, payload, options);
+    return response.data?.template ?? null;
+  },
+
+  async copyShowroomTemplates(targetShowroomId, sourceShowroomId, options = {}) {
+    const response = await apiClient.post(`/showrooms/${encodeURIComponent(targetShowroomId)}/mine/inspection-templates/copy`, {
+      source_showroom_id: Number(sourceShowroomId),
+    }, options);
+    return response.data?.copy ?? null;
+  },
+
   async adminTemplates(options = {}) {
     const response = await apiClient.get("/admin/inspection-templates", options);
     return response.data?.templates ?? [];

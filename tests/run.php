@@ -42,6 +42,7 @@ $tests = [
     Tests\Unit\StaffAccessTest::class,
     Tests\Unit\AutoSuspendOverdueTest::class,
     Tests\Unit\CustomDomainTest::class,
+    Tests\Unit\ShowroomInspectionMasterTest::class,
 ];
 
 $passed = 0;

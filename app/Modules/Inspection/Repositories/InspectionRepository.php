@@ -75,7 +75,8 @@ class InspectionRepository
     public function latestReportByCar(int $carId): ?array
     {
         $stmt = $this->pdo->prepare(
-            'SELECT id, car_id, inspector_user_id, report_status, summary_notes,
+            'SELECT id, car_id, inspector_user_id, inspection_master_showroom_id,
+                    report_status, summary_notes,
                     inspected_at, created_at, updated_at
              FROM inspection_reports
              WHERE car_id = :car_id
@@ -99,7 +100,8 @@ class InspectionRepository
 
         $placeholders = implode(', ', array_fill(0, count($carIds), '?'));
         $stmt = $this->pdo->prepare(
-            'SELECT reports.id, reports.car_id, reports.inspector_user_id, reports.report_status,
+            'SELECT reports.id, reports.car_id, reports.inspector_user_id,
+                    reports.inspection_master_showroom_id, reports.report_status,
                     reports.summary_notes, reports.inspected_at, reports.created_at, reports.updated_at
              FROM inspection_reports AS reports
              INNER JOIN (
@@ -119,7 +121,8 @@ class InspectionRepository
     public function findReport(int $reportId): ?array
     {
         $stmt = $this->pdo->prepare(
-            'SELECT id, car_id, inspector_user_id, report_status, summary_notes,
+            'SELECT id, car_id, inspector_user_id, inspection_master_showroom_id,
+                    report_status, summary_notes,
                     inspected_at, created_at, updated_at
              FROM inspection_reports
              WHERE id = :id
@@ -197,7 +200,8 @@ class InspectionRepository
     public function findTemplate(int $templateId): ?array
     {
         $stmt = $this->pdo->prepare(
-            'SELECT id, category_name, item_name, description, sort_order, is_active
+            'SELECT id, showroom_id, category_name, item_name, description, sort_order, is_active,
+                    created_at, updated_at
              FROM inspection_templates
              WHERE id = :id
              LIMIT 1'
@@ -208,49 +212,67 @@ class InspectionRepository
         return $template ?: null;
     }
 
-    public function listTemplates(bool $activeOnly = true): array
+    public function listTemplates(bool $activeOnly = true, ?int $showroomId = null): array
     {
-        $sql = 'SELECT id, category_name, item_name, description, sort_order, is_active, created_at, updated_at
-                FROM inspection_templates';
+        $sql = 'SELECT id, showroom_id, category_name, item_name, description, sort_order, is_active, created_at, updated_at
+                FROM inspection_templates
+                WHERE showroom_id ' . ($showroomId === null ? 'IS NULL' : '= :showroom_id');
 
         if ($activeOnly) {
-            $sql .= ' WHERE is_active = 1';
+            $sql .= ' AND is_active = 1';
         }
 
         $sql .= ' ORDER BY sort_order ASC, id ASC';
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute();
+        if ($showroomId === null) {
+            $stmt->execute();
+        } else {
+            $stmt->execute(['showroom_id' => $showroomId]);
+        }
 
         return $stmt->fetchAll();
     }
 
-    public function findTemplateByName(string $categoryName, string $itemName): ?array
+    public function findTemplateByName(string $categoryName, string $itemName, ?int $showroomId = null): ?array
     {
         $stmt = $this->pdo->prepare(
-            'SELECT id, category_name, item_name, description, sort_order, is_active
+            'SELECT id, showroom_id, category_name, item_name, description, sort_order, is_active,
+                    created_at, updated_at
              FROM inspection_templates
              WHERE category_name = :category_name
              AND item_name = :item_name
+             AND showroom_id ' . ($showroomId === null ? 'IS NULL' : '= :showroom_id') . '
              LIMIT 1'
         );
-        $stmt->execute([
+        $params = [
             'category_name' => $categoryName,
             'item_name' => $itemName,
-        ]);
+        ];
+        if ($showroomId !== null) {
+            $params['showroom_id'] = $showroomId;
+        }
+        $stmt->execute($params);
         $template = $stmt->fetch();
 
         return $template ?: null;
     }
 
-    public function createTemplate(string $categoryName, string $itemName, ?string $description = null, int $sortOrder = 0): int
+    public function createTemplate(
+        string $categoryName,
+        string $itemName,
+        ?string $description = null,
+        int $sortOrder = 0,
+        ?int $showroomId = null
+    ): int
     {
         $stmt = $this->pdo->prepare(
             'INSERT INTO inspection_templates
-                (category_name, item_name, description, sort_order, is_active, created_at, updated_at)
+                (showroom_id, category_name, item_name, description, sort_order, is_active, created_at, updated_at)
              VALUES
-                (:category_name, :item_name, :description, :sort_order, 1, :created_at, NULL)'
+                (:showroom_id, :category_name, :item_name, :description, :sort_order, 1, :created_at, NULL)'
         );
         $stmt->execute([
+            'showroom_id' => $showroomId,
             'category_name' => $categoryName,
             'item_name' => $itemName,
             'description' => $description,
@@ -318,7 +340,8 @@ class InspectionRepository
         $stmt = $this->pdo->prepare(
             'UPDATE inspection_templates
              SET is_active = 0, updated_at = ?
-             WHERE id NOT IN (' . $placeholders . ')'
+             WHERE showroom_id IS NULL
+             AND id NOT IN (' . $placeholders . ')'
         );
         $stmt->execute(array_merge([date('Y-m-d H:i:s')], $templateIds));
 
@@ -329,10 +352,10 @@ class InspectionRepository
     {
         $stmt = $this->pdo->prepare(
             'INSERT INTO inspection_reports
-                (car_id, inspector_user_id, report_status, summary_notes,
+                (car_id, inspector_user_id, inspection_master_showroom_id, report_status, summary_notes,
                  inspected_at, created_at, updated_at)
              VALUES
-                (:car_id, :inspector_user_id, :report_status, :summary_notes,
+                (:car_id, :inspector_user_id, :inspection_master_showroom_id, :report_status, :summary_notes,
                  :inspected_at, :created_at, :updated_at)'
         );
         $stmt->execute($data);

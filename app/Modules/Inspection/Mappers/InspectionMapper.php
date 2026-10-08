@@ -6,7 +6,7 @@ namespace App\Modules\Inspection\Mappers;
 
 class InspectionMapper
 {
-    public static function carSummary(array $car): array
+    public static function carSummary(array $car, bool $inspectionRequiresNew = false): array
     {
         return [
             'id' => (int) $car['id'],
@@ -38,6 +38,7 @@ class InspectionMapper
             'price_discount' => self::nullableInt($car['price_discount']),
             'price_credit' => self::nullableInt($car['price_credit']),
             'inspection_summary_status' => $car['inspection_summary_status'],
+            'inspection_requires_new' => $inspectionRequiresNew,
             'published_at' => $car['published_at'],
             'created_at' => $car['created_at'],
             'updated_at' => $car['updated_at'],
@@ -49,12 +50,21 @@ class InspectionMapper
         return array_map(static fn (array $car): array => self::carSummary($car), $cars);
     }
 
-    public static function report(array $report, array $items = []): array
+    public static function report(array $report, array $items = [], ?int $carShowroomId = null): array
     {
+        $reportShowroomId = isset($report['inspection_master_showroom_id']) && $report['inspection_master_showroom_id'] !== null
+            ? (int) $report['inspection_master_showroom_id']
+            : null;
+        $isCurrentMaster = $carShowroomId !== null
+            && $carShowroomId > 0
+            && $reportShowroomId === $carShowroomId;
+
         return [
             'id' => (int) $report['id'],
             'car_id' => (int) $report['car_id'],
             'inspector_user_id' => (int) $report['inspector_user_id'],
+            'inspection_master_showroom_id' => $reportShowroomId,
+            'is_current_master' => $isCurrentMaster,
             'report_status' => $report['report_status'],
             'summary_notes' => $report['summary_notes'],
             'inspected_at' => $report['inspected_at'],
@@ -96,6 +106,9 @@ class InspectionMapper
     {
         return [
             'id' => (int) $template['id'],
+            'showroom_id' => isset($template['showroom_id']) && $template['showroom_id'] !== null
+                ? (int) $template['showroom_id']
+                : null,
             'category_name' => $template['category_name'],
             'item_name' => $template['item_name'],
             'description' => $template['description'],

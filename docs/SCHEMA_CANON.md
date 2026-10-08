@@ -164,7 +164,7 @@ Menyimpan profil showroom milik seller.
 
 Field:
 - `id` bigint unsigned, PK, auto increment
-- `user_id` bigint unsigned, FK -> `users.id`, unique
+- `user_id` bigint unsigned, FK -> `users.id`
 - `slug` varchar(80) not null unique
 - `name` varchar(225) not null
 - `address` varchar(512) null
@@ -184,7 +184,7 @@ Index:
 - index on `deleted_at`
 
 Catatan:
-- seller memiliki paling banyak satu showroom pada desain awal
+- satu seller dapat memiliki beberapa showroom/cabang; setiap cabang tetap memiliki `slug` yang unik
 - `slug` ditentukan sendiri oleh showroom saat pendaftaran, wajib unik, dan dinormalisasi ke huruf kecil, angka, dan dash
 - halaman publik showroom menggunakan slug ini dan menampilkan hanya listing milik seller/showroom tersebut
 - `city_name` dipilih dari master `locations.cities` dan disimpan sebagai nama kota, bukan id, mengikuti pola `cars.location_name` yang memakai master yang sama
@@ -301,12 +301,15 @@ Index:
 ## 4.6 `inspection_templates`
 
 Tujuan:
-Master item inspeksi paten/canon. Tabel ini adalah source of truth inspection, bukan template fleksibel milik seller.
-Seller/showroom tidak boleh membuat atau mengubah item dari flow seller; seller hanya memilih kondisi dan mengisi catatan hasil inspeksi.
-Admin mengelola definisi canon ini dari halaman `#/admin/master-inspection`, yang berada sebagai child di grup sidebar `Master`.
+Master item inspeksi canon. Tabel ini mempertahankan data global admin lama sekaligus menyimpan master yang dikelola owner untuk setiap cabang showroom.
+
+`showroom_id = NULL` berarti master global/admin lama. Baris dengan `showroom_id` terisi adalah master milik cabang tersebut. Master global tetap dipertahankan untuk kompatibilitas dan halaman admin masa mendatang, tetapi tidak lagi menjadi sumber inspeksi mobil showroom.
+
+Owner showroom boleh membuat dan mengubah master pada cabangnya sendiri. Staff hanya membaca master cabang yang ditugaskan dan tidak boleh mengubahnya.
 
 Field:
 - `id` bigint unsigned, PK, auto increment
+- `showroom_id` bigint unsigned, FK -> `showrooms.id`, null, ON DELETE CASCADE
 - `category_name` varchar(100) not null
 - `item_name` varchar(200) not null
 - `description` text null
@@ -316,8 +319,15 @@ Field:
 - `updated_at` datetime null
 
 Index:
+- unique on (`showroom_id`, `category_name`, `item_name`) untuk scope cabang
 - index on `category_name`
 - index on `is_active`
+- index on `showroom_id`
+
+Catatan:
+- pasangan logis item adalah `trim(category_name)` + `trim(item_name)` pada scope yang sama
+- service tetap memvalidasi duplikat master global karena `NULL` pada unique composite MySQL/MariaDB tidak saling berbenturan
+- operasi salin master dilakukan dengan mode gabung: item yang sudah ada di target dipertahankan, item sumber yang belum ada ditambahkan, dan tidak ada penghapusan
 
 ---
 
@@ -330,6 +340,7 @@ Field:
 - `id` bigint unsigned, PK, auto increment
 - `car_id` bigint unsigned, FK -> `cars.id`
 - `inspector_user_id` bigint unsigned, FK -> `users.id`
+- `inspection_master_showroom_id` bigint unsigned, FK -> `showrooms.id`, null, ON DELETE SET NULL
 - `report_status` enum(`draft`, `completed`, `published`) not null default `draft`
 - `summary_notes` text null
 - `inspected_at` datetime null
@@ -340,7 +351,12 @@ Field:
 Index:
 - index on `car_id`
 - index on `inspector_user_id`
+- index on `inspection_master_showroom_id`
 - index on `report_status`
+
+Catatan:
+- null menandai laporan lama yang dibuat sebelum master inspeksi per cabang diterapkan
+- laporan baru wajib menyimpan showroom master yang digunakan; bila laporan lama dibuka kembali, service menolak update dan flow harus membuat laporan baru berbasis master cabang
 
 ---
 
@@ -365,7 +381,7 @@ Index:
 - index on `template_id`
 
 Catatan:
-- `template_id` merujuk ke master inspection canon pada `inspection_templates`
+- `template_id` merujuk ke master inspection canon pada `inspection_templates`, termasuk master scoped cabang
 - `item_name_snapshot` dan `description` menyimpan snapshot master saat report dibuat/disimpan
 - seller hanya mengisi `result_status` dan `notes`
 - snapshot nama item disimpan untuk menjaga histori bila master inspection berubah

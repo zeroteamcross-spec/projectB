@@ -185,7 +185,7 @@ function heroSection(templates, { onCreate } = {}) {
     icon,
     textNode("p", "text-[10px] font-black uppercase tracking-[0.16em] text-[var(--pb-brand-secondary)]", "Admin Master"),
     textNode("h1", "text-xl font-black leading-tight tracking-normal text-gray-950 sm:text-2xl", "Master Inspection"),
-    textNode("p", "max-w-2xl text-xs leading-6 text-gray-600", "Kelola definisi section dan item inspection canon. Seller tetap hanya memilih kondisi dan menambah catatan dari master ini."),
+    textNode("p", "max-w-2xl text-xs leading-6 text-gray-600", "Kelola master global admin yang dipertahankan untuk kompatibilitas. Flow inspeksi showroom saat ini memakai master yang dikelola owner per cabang."),
   );
 
   const stats = document.createElement("section");

@@ -89,6 +89,15 @@ export function createRoleGuard({ auth } = {}) {
       });
     }
 
+    if (route.ownerOnly && currentRole !== "seller") {
+      return redirect({
+        route,
+        currentRole,
+        requiredRole: "seller",
+        fromPath: location.path,
+      });
+    }
+
     if (!matchesRequiredRole(currentRole, requiredRole) && !canViewRole(currentRole, requiredRole)) {
       return redirect({
         route,

@@ -206,7 +206,7 @@ function toolbarSection(filters) {
 
 function workspaceSection({ overview, cars }) {
   const section = node("section", "slrinsp_workspace_section", "grid min-w-0 gap-4 lg:grid-cols-[minmax(0,0.92fr)_minmax(320px,0.48fr)]");
-  section.append(carQueueSection({ cars, overview }), masterSection(overview.templates));
+  section.append(carQueueSection({ cars, overview }), masterSection(overview));
   return section;
 }
 
@@ -241,6 +241,7 @@ function carQueueSection({ cars, overview }) {
 function carInspectionCard(car, overview) {
   const cardId = slugify(car.id);
   const report = reportForCar(overview, car.id);
+  const legacyReport = rawReportForCar(overview, car.id);
   const section = node("section", `slrinsp_car_card_section_${cardId}`, "grid min-w-0 gap-4 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white p-4 shadow-sm transition duration-150 hover:-translate-y-0.5 hover:shadow-md");
   const header = node("section", `slrinsp_car_card_header_section_${cardId}`, "flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between");
   const copy = node("section", `slrinsp_car_card_copy_section_${cardId}`, "grid min-w-0 gap-1");
@@ -252,6 +253,9 @@ function carInspectionCard(car, overview) {
   badges.append(SellerInspectionStatusBadge({ status: car.inspection_summary_status ?? "not_checked", type: "summary" }));
   if (report?.report_status) {
     badges.append(SellerInspectionStatusBadge({ status: report.report_status, type: "report" }));
+  }
+  if (legacyReport && !report) {
+    badges.append(textNode("span", "rounded-full border border-[color-mix(in_srgb,var(--pb-warning)_26%,white)] bg-[color-mix(in_srgb,var(--pb-warning)_10%,white)] px-3 py-1 text-[10px] font-black text-[color-mix(in_srgb,var(--pb-warning)_84%,black)]", "Wajib inspeksi ulang"));
   }
   header.append(copy, badges);
 
@@ -272,15 +276,16 @@ function carInspectionCard(car, overview) {
   return section;
 }
 
-function masterSection(templates) {
+function masterSection(overview) {
   const section = node("section", "slrinsp_master_section", "grid min-w-0 content-start gap-4 rounded-[2rem] border border-[var(--pb-card-border)] bg-white/72 p-4 shadow-[0_22px_70px_rgba(15,23,42,0.08)] backdrop-blur-xl sm:p-5");
   section.dataset.ds = "seller.inspection.master";
   section.append(
     textNode("p", "text-[10px] font-black uppercase tracking-[0.16em] text-[color-mix(in_srgb,var(--pb-brand-primary)_84%,black)]", "Master inspection"),
     textNode("h2", "text-lg font-black tracking-normal text-gray-950", "Master paten aktif"),
-    textNode("p", "text-xs leading-6 text-gray-500", "Section dan item inspeksi berasal dari canon inspection, bukan dari input seller.")
+    textNode("p", "text-xs leading-6 text-gray-500", "Section dan item inspeksi berasal dari master cabang showroom, bukan dari master admin global.")
   );
 
+  const templates = Object.values(overview.templates_by_showroom_id ?? {}).flat();
   const groups = groupTemplates(templates);
   const list = node("section", "slrinsp_master_group_list_section", "grid min-w-0 gap-3");
   groups.forEach(([category, group], index) => {
@@ -292,19 +297,26 @@ function masterSection(templates) {
     list.append(item);
   });
 
+  if (!groups.length) {
+    list.append(EmptyState({
+      title: "Master Inspeksi showroom belum dibuat",
+      description: "Owner showroom harus membuat master inspeksi cabang sebelum checklist mobil dapat diisi.",
+    }));
+  }
   section.append(list);
   return section;
 }
 
 function openInspectionModal({ car, overview, runtime }) {
   const report = reportForCar(overview, car.id);
-  const templates = overview.templates ?? [];
+  const legacyReport = rawReportForCar(overview, car.id);
+  const templates = templatesForCar(overview, car);
   const content = node("section", "slrinsp_modal_content_section", "grid min-w-0 gap-4");
   content.dataset.ds = "seller.inspection.modal";
   content.append(modalCarSummarySection(car, report));
 
   if (!report) {
-    content.append(emptyReportSection({ car, templates, runtime }));
+    content.append(emptyReportSection({ car, templates, runtime, legacyReport }));
   } else {
     content.append(reportFormSection({ car, report, templates, runtime }));
   }
@@ -341,7 +353,7 @@ function modalCarSummarySection(car, report) {
   return section;
 }
 
-function emptyReportSection({ car, templates, runtime }) {
+function emptyReportSection({ car, templates, runtime, legacyReport }) {
   const section = node("section", "slrinsp_empty_report_section", "grid gap-4 rounded-[1.5rem] border border-dashed border-[color-mix(in_srgb,var(--pb-brand-primary)_26%,white)] bg-[color-mix(in_srgb,var(--pb-brand-primary)_8%,white)] p-4");
   const action = Button({ label: runtime.creating ? "Menyiapkan checklist..." : "Siapkan draft dari master", disabled: runtime.creating || !templates.length, onClick: () => createReportFromTemplates(car, templates) });
   action.id = "slrinsp_create_report_button";
@@ -351,10 +363,18 @@ function emptyReportSection({ car, templates, runtime }) {
   close.prepend(createIcon("arrowLeft", { className: "h-4 w-4" }));
   const actions = node("section", "slrinsp_empty_report_actions_section", "grid gap-2 sm:flex sm:justify-end");
   actions.append(close, action);
+  const title = templates.length
+    ? (legacyReport ? "Inspeksi lama wajib dibuat ulang" : "Checklist belum dibuat")
+    : "Master Inspeksi showroom belum dibuat";
+  const description = templates.length
+    ? (legacyReport
+      ? "Laporan lama tidak dapat dipakai ulang. Buat draft baru berdasarkan master inspeksi cabang ini."
+      : "Draft dibuat dari master inspeksi cabang yang aktif.")
+    : "Proses pengisian diblokir sampai owner membuat master inspeksi showroom.";
   section.append(
     EmptyState({
-      title: templates.length ? "Checklist belum dibuat" : "Master inspeksi belum tersedia",
-      description: templates.length ? "Draft dibuat dari master inspection paten yang sudah dipreload." : "Jalankan seed master inspection canon sebelum showroom mengisi checklist.",
+      title,
+      description,
     }),
     actions
   );
@@ -697,13 +717,16 @@ function normalizeOverview(overview = {}) {
     cars,
     reports_by_car_id: reportsByCarId,
     templates,
+    templates_by_showroom_id: overview.templates_by_showroom_id && typeof overview.templates_by_showroom_id === "object"
+      ? overview.templates_by_showroom_id
+      : {},
     master_sections: masterSections,
     summary: {
       total_cars: cars.length,
       completed: cars.filter((car) => car.inspection_summary_status === "completed").length,
       partial: cars.filter((car) => car.inspection_summary_status === "partial").length,
       not_checked: cars.filter((car) => car.inspection_summary_status === "not_checked").length,
-      published_reports: Object.values(reportsByCarId).filter((report) => report?.report_status === "published").length,
+       published_reports: Object.values(reportsByCarId).filter((report) => report?.is_current_master === true && report?.report_status === "published").length,
       ...(overview.summary ?? {}),
     },
   };
@@ -725,12 +748,31 @@ function emptyOverview() {
     cars: [],
     reports_by_car_id: {},
     templates: [],
+    templates_by_showroom_id: {},
     summary: {},
   });
 }
 
 function reportForCar(overview, carId) {
+  const report = rawReportForCar(overview, carId);
+  return report?.is_current_master === true ? report : null;
+}
+
+function rawReportForCar(overview, carId) {
   return overview.reports_by_car_id?.[carId] ?? overview.reports_by_car_id?.[String(carId)] ?? null;
+}
+
+function templatesForCar(overview, car) {
+  const showroomId = Number(car?.showroom_id ?? 0);
+  if (!showroomId) {
+    return [];
+  }
+
+  return Array.isArray(overview.templates_by_showroom_id?.[showroomId])
+    ? overview.templates_by_showroom_id[showroomId]
+    : Array.isArray(overview.templates_by_showroom_id?.[String(showroomId)])
+      ? overview.templates_by_showroom_id[String(showroomId)]
+      : [];
 }
 
 function filterCars(cars = [], filters = {}) {
@@ -810,7 +852,7 @@ function hasValidItemStatus(value) {
 
 function publishGuardMessage({ formData, report, templates }) {
   if (!templates.length) {
-    return "Master inspeksi belum tersedia. Report belum bisa dipublish.";
+    return "Master Inspeksi showroom belum dibuat. Report belum bisa dipublish.";
   }
 
   const summaryNotes = textValue(formData, "summary_notes");

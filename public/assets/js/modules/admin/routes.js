@@ -192,7 +192,7 @@ export const adminRoutes = [
         },
         {
           key: "templates",
-          loader: ({ signal }) => inspectionsResource.templates({ signal }).catch(() => []),
+          loader: ({ params, signal }) => inspectionsResource.templatesForCar(params.id, { signal }).catch(() => []),
         },
         {
           key: "report",
