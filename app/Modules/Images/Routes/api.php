@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 use App\Core\Router;
 use App\Modules\Auth\Middleware\AuthenticatedUserMiddleware;
+use App\Modules\Auth\Middleware\OptionalAuthenticatedUserMiddleware;
 use App\Modules\Images\Controllers\CarImageController;
 
 return static function (Router $router): void {
-    $router->get('/api/cars/{car_id}/images', [CarImageController::class, 'index']);
+    $router->get(
+        '/api/cars/{car_id}/images',
+        [CarImageController::class, 'index'],
+        [OptionalAuthenticatedUserMiddleware::class]
+    );
 
     $router->group('/api/cars/{car_id}/images', static function (Router $router): void {
         $router->post('', [CarImageController::class, 'upload']);

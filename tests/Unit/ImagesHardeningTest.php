@@ -22,6 +22,7 @@ class ImagesHardeningTest extends TestCase
         $this->sellerCanManageOnlyOwnedCarImages();
         $this->adminCanManageEveryCarImage();
         $this->publicCanViewPublishedCarImagesOnly();
+        $this->sellerCanViewOwnedSoldCarImages();
         $this->uploadRequiresFile();
         $this->uploadRejectsOversizedFile();
         $this->cleanupPurgesOnlyExpiredSoftDeletedFiles();
@@ -79,6 +80,20 @@ class ImagesHardeningTest extends TestCase
                 'listing_status' => 'draft',
             ]);
         });
+    }
+
+    private function sellerCanViewOwnedSoldCarImages(): void
+    {
+        CarImagePolicy::ensureCanViewCarImages([
+            'id' => 7,
+            'role' => 'seller',
+        ], [
+            'id' => 10,
+            'seller_user_id' => 7,
+            'listing_status' => 'sold',
+        ]);
+
+        $this->assertTrue(true);
     }
 
     private function uploadRequiresFile(): void
