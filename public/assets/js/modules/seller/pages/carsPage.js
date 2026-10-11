@@ -121,13 +121,13 @@ function render(root, router) {
   root.replaceChildren(layout);
 
   if (isForm) {
-    openCarFormModal({ runtime, brandOptions, cityOptions });
+    openCarFormModal({ runtime, brandOptions, cityOptions, router });
   } else {
     closeCarFormModal();
   }
 }
 
-function openCarFormModal({ runtime, brandOptions, cityOptions }) {
+function openCarFormModal({ runtime, brandOptions, cityOptions, router }) {
   const isEdit = runtime.mode === "edit" && runtime.selectedCar?.id;
   const content = document.createElement("section");
   content.id = "slrc_car_form_modal_content_section";
@@ -144,7 +144,7 @@ function openCarFormModal({ runtime, brandOptions, cityOptions }) {
     onStepChange: (formStep) => setRuntime({ formStep }),
     onCancel: () => setRuntime({ mode: "list", selectedCar: null, form: null, error: "", formStep: 1 }),
     onChange: (form) => setFormState(form),
-    onSubmit: (payload) => saveCar(payload),
+    onSubmit: (payload) => saveCar(payload, router),
   }));
 
   openModal(content, {
@@ -366,7 +366,7 @@ function carsToolbar({ filters, isForm }) {
   return section;
 }
 
-async function saveCar(payload) {
+async function saveCar(payload, router) {
   const runtime = runtimeState();
   const isEdit = runtime.mode === "edit" && runtime.selectedCar?.id;
   setRuntime({ saving: true, error: "", notice: "" });
@@ -379,6 +379,9 @@ async function saveCar(payload) {
     closeCarFormModal();
     setRuntime({ mode: "list", selectedCar: null, form: null, saving: false, error: "", notice: "Mobil berhasil disimpan.", formStep: 1 });
     showToast(isEdit ? "Mobil berhasil diperbarui." : "Mobil berhasil ditambahkan.", { type: "success" });
+    if (!isEdit && car?.id) {
+      router?.navigate("/seller/cars/" + car.id + "/images?openUpload=1");
+    }
   } catch (error) {
     const message = error?.message ?? "Mobil gagal disimpan.";
     setRuntime({

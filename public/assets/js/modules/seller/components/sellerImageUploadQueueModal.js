@@ -4,6 +4,8 @@ import { createIcon } from "../../../theme/iconRegistry.js";
 export function SellerImageUploadQueueModal({
   queue = [],
   uploading = false,
+  error = "",
+  onFilesChange = null,
   onStart = null,
   onRetryFailed = null,
   onClose = null,
@@ -46,6 +48,7 @@ export function SellerImageUploadQueueModal({
   close.append(createIcon("circleXmark", { className: "h-4 w-4" }));
   titleRow.append(copy, close);
 
+  const uploadPicker = uploadPickerPanel({ uploading, error, onFilesChange });
   const summary = queueSummary(queue);
   const totalProgress = calculateTotalProgress(queue);
   const summaryGrid = document.createElement("section");
@@ -77,7 +80,7 @@ export function SellerImageUploadQueueModal({
     list.append(empty);
   }
 
-  section.append(titleRow, summaryGrid, total, list);
+  section.append(titleRow, uploadPicker, summaryGrid, total, list);
   if (showActions) {
     section.append(SellerImageUploadQueueFooter({
       queue,
@@ -87,6 +90,42 @@ export function SellerImageUploadQueueModal({
       onClose,
     }));
   }
+  return section;
+}
+
+function uploadPickerPanel({ uploading = false, error = "", onFilesChange = null } = {}) {
+  const section = document.createElement("section");
+  section.id = "slri_queue_modal_upload_picker_section";
+  section.className = "grid min-w-0 gap-2 rounded-[var(--pb-radius-xl)] border border-dashed border-[color-mix(in_srgb,var(--pb-brand-primary)_34%,white)] bg-[color-mix(in_srgb,var(--pb-brand-primary)_7%,white)] p-3";
+
+  const label = document.createElement("label");
+  label.className = "grid min-w-0 gap-2 text-xs font-bold text-[var(--pb-text-strong)]";
+  label.append(document.createTextNode("Tambahkan foto mobil"));
+
+  const input = document.createElement("input");
+  input.id = "slri_queue_modal_image_input";
+  input.name = "image";
+  input.type = "file";
+  input.accept = "image/jpeg,image/png,image/webp";
+  input.multiple = true;
+  input.disabled = uploading;
+  input.className = "min-h-11 min-w-0 cursor-pointer rounded-lg border border-[var(--pb-border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--pb-text)] file:mr-3 file:rounded-lg file:border-0 file:bg-[var(--pb-btn-secondary-bg)] file:px-3 file:py-2 file:text-xs file:font-semibold file:text-[var(--pb-btn-secondary-text)]";
+  input.addEventListener("change", () => {
+    onFilesChange?.(input.files ?? []);
+    input.value = "";
+  });
+
+  const helper = document.createElement("span");
+  helper.className = "text-[10px] font-semibold leading-5 text-[var(--pb-text-muted)]";
+  helper.textContent = "Pilih satu atau beberapa foto. JPG, PNG, atau WebP sampai 5 MB per gambar.";
+
+  const errorNode = document.createElement("p");
+  errorNode.className = "text-[10px] font-semibold text-[var(--pb-danger)]";
+  errorNode.textContent = error;
+  errorNode.hidden = !error;
+
+  label.append(input);
+  section.append(label, helper, errorNode);
   return section;
 }
 

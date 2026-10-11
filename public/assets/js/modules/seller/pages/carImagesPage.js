@@ -104,8 +104,9 @@ export function SellerCarImagesPage() {
   }
 
   return createPageLifecycle({
-    mount({ router, params }) {
+    mount({ router, params, query }) {
       ensureRuntime();
+      prepareAutoOpenUpload(query);
       root = document.createElement("div");
       render(root, router, params, {
         getQueue: () => uploadQueue,
@@ -342,6 +343,8 @@ function syncQueueModal({ carId, queueApi, runtime }) {
   openModal(SellerImageUploadQueueModal({
     queue: queueApi.getQueue(),
     uploading: runtime.uploading,
+    error: runtime.error,
+    onFilesChange: queueApi.addFiles,
     onStart: () => uploadQueueItems(carId, queueApi.getQueue(), queueApi.touchQueue),
     onRetryFailed: () => uploadQueueItems(carId, queueApi.getQueue(), queueApi.touchQueue),
     onClose: queueApi.closeQueueModal,
@@ -591,6 +594,20 @@ function ensureRuntime() {
   if (!appStore.get(`runtime.${RUNTIME_KEY}`, null)) {
     appStore.patchState(`runtime.${RUNTIME_KEY}`, DEFAULT_RUNTIME, "seller:images-runtime-init");
   }
+}
+
+function prepareAutoOpenUpload(query = {}) {
+  if (String(query?.openUpload ?? "") !== "1") {
+    return;
+  }
+
+  setRuntime({
+    queueModalOpen: true,
+    queueVersion: Date.now(),
+    queueAutoStartVersion: 0,
+    error: "",
+    notice: "",
+  });
 }
 
 function runtimeState() {

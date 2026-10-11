@@ -397,7 +397,7 @@ function createDocumentTypeToggle(value = "new") {
   const buttons = document.createElement("section");
   buttons.id = "slrc_document_type_actions_section";
   buttons.className = "grid grid-cols-1 gap-2";
-  const oldButton = documentTypeButton("slrc_document_type_old_button", "Mobil Lama", "old", input);
+  const oldButton = documentTypeButton("slrc_document_type_old_button", "Mobil Bekas", "old", input);
   buttons.append(oldButton);
 
   const sync = () => {

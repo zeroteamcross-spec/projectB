@@ -69,7 +69,7 @@ async function handlePublishFlow(documentRef) {
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: '999',
-        fontFamily: 'Inter, system-ui, sans-serif',
+        fontFamily: 'Plus Jakarta Sans, system-ui, sans-serif',
     });
 
     const dialog = documentRef.createElement('div');
@@ -242,7 +242,7 @@ async function handleHistoryFlow(documentRef) {
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: '1000',
-        fontFamily: 'Inter, system-ui, sans-serif',
+        fontFamily: 'Plus Jakarta Sans, system-ui, sans-serif',
     });
 
     const dialog = documentRef.createElement('div');

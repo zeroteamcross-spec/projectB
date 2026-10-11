@@ -38,7 +38,7 @@ export function createEditorPanel({ documentRef = null, resizeManager = null, sh
             boxShadow: '-8px 0 24px rgba(15, 23, 42, 0.12)',
             display: 'flex',
             flexDirection: 'column',
-            fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+    fontFamily: 'Plus Jakarta Sans, system-ui, -apple-system, sans-serif',
             color: '#1f2937',
         });
 

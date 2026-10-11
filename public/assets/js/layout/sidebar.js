@@ -24,7 +24,6 @@ const SELLER_LINKS = [
   { href: "/seller/cars", label: "Katalog", icon: "car" },
   { href: "/seller/inspection", label: "Inspeksi", icon: "clipboard" },
   { href: "/seller/master-inspection", label: "Master Inspeksi", icon: "clipboard" },
-  { href: "/seller/staff", label: "Kelola Staf", icon: "user" },
   { href: "/seller/affiliates", label: "Marketing", icon: "affiliate" },
   { href: "/seller/affiliate-commissions", label: "Komisi Marketing", icon: "commission" },
   { href: "/seller/transactions", label: "Transaksi", icon: "transaction" },
@@ -322,7 +321,7 @@ function renderLinks(nav, store, options = {}) {
         : role === "affiliate_admin"
           ? AFFILIATE_LINKS
           : BUYER_LINKS;
-  let links = getSidebarLinksForRole(role, store, fallbackLinks);
+  let links = hideSellerStaffMenu(getSidebarLinksForRole(role, store, fallbackLinks), role);
 
   const userRealRole = store?.get("auth.user.role", "") || store?.get("auth.role", "");
   if (userRealRole === "super_admin") {
@@ -415,6 +414,26 @@ function normalizeSidebarRole(role) {
   }
 
   return role;
+}
+
+function hideSellerStaffMenu(links, role) {
+  if (normalizeSidebarRole(role) !== "seller") {
+    return links;
+  }
+
+  return (Array.isArray(links) ? links : []).flatMap((link) => {
+    const href = String(link?.href ?? "").replace(/^#/, "");
+    if (href === "/seller/staff") {
+      return [];
+    }
+
+    if (!Array.isArray(link?.children) || !link.children.length) {
+      return [link];
+    }
+
+    const children = hideSellerStaffMenu(link.children, role);
+    return children.length ? [{ ...link, children }] : [];
+  });
 }
 
 function withDesignStudioV2Menu(links, role, store) {
