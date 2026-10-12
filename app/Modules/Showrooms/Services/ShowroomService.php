@@ -59,13 +59,16 @@ class ShowroomService
 
     private ?NotificationService $notificationService;
 
+    private CustomDomainRdapService $customDomainRdap;
+
     public function __construct(
         ShowroomRepository $showrooms,
         MasterDataService $masterData,
         StorageServiceInterface $storage,
         MidtransHttpClient $midtransHttp,
         AuthUserRepository $users,
-        ?NotificationService $notificationService = null
+        ?NotificationService $notificationService = null,
+        ?CustomDomainRdapService $customDomainRdap = null
     ) {
         $this->showrooms = $showrooms;
         $this->masterData = $masterData;
@@ -73,6 +76,7 @@ class ShowroomService
         $this->midtransHttp = $midtransHttp;
         $this->users = $users;
         $this->notificationService = $notificationService;
+        $this->customDomainRdap = $customDomainRdap ?? new CustomDomainRdapService();
     }
 
     public function mine(array $user): array
@@ -355,6 +359,48 @@ class ShowroomService
     }
 
     /**
+     * Cek kandidat domain melalui RDAP dari backend. Endpoint ini tidak
+     * mengubah showroom dan tidak menjadikan browser sebagai proxy ke URL
+     * eksternal. Hasil "available" berarti registry belum mengembalikan object
+     * domain; pembelian final tetap harus dikonfirmasi oleh registrar.
+     */
+    public function checkCustomDomainAvailability(array $user, int $showroomId, string $domain): array
+    {
+        $this->ensureSeller($user);
+        $existing = $this->showrooms->findById($showroomId);
+
+        if (! $existing) {
+            throw new NotFoundException('Showroom tidak ditemukan.');
+        }
+
+        ShowroomPolicy::ensureOwnedByUser($existing, $user);
+
+        $normalized = $this->normalizeCustomDomain($domain);
+
+        if ($this->isSystemCustomDomain($normalized)) {
+            return [
+                'domain' => $normalized,
+                'status' => 'unavailable',
+                'available' => false,
+                'source' => 'carlynk',
+                'message' => 'Domain ini dipakai sistem Carlynk dan tidak dapat digunakan showroom.',
+            ];
+        }
+
+        if ($this->showrooms->customDomainExists($normalized, $showroomId)) {
+            return [
+                'domain' => $normalized,
+                'status' => 'unavailable',
+                'available' => false,
+                'source' => 'carlynk',
+                'message' => 'Domain ini sudah digunakan showroom lain.',
+            ];
+        }
+
+        return $this->customDomainRdap->check($normalized);
+    }
+
+    /**
      * Cek DNS read-only (dns_get_record/gethostbyname) -- TIDAK PERNAH
      * menyentuh nginx/SSL/server, murni pengecekan sebelum admin melakukan
      * langkah manual itu (lihat plan groovy-napping-thacker.md, Fase 3
@@ -465,19 +511,25 @@ class ShowroomService
      */
     private function ensureCustomDomainAvailable(string $domain, int $showroomId): void
     {
-        $systemHosts = array_filter(array_map(
-            static fn ($host): string => strtolower(trim((string) $host)),
-            (array) config('app.role_hosts', [])
-        ));
-        $systemHosts[] = 'carlynk.id';
-
-        if (in_array($domain, $systemHosts, true) || substr($domain, -strlen('.carlynk.id')) === '.carlynk.id') {
+        if ($this->isSystemCustomDomain($domain)) {
             throw new ValidationException(['custom_domain' => 'Domain ini dipakai sistem, tidak bisa didaftarkan showroom.']);
         }
 
         if ($this->showrooms->customDomainExists($domain, $showroomId)) {
             throw new ValidationException(['custom_domain' => 'Domain ini sudah didaftarkan showroom lain.']);
         }
+    }
+
+    private function isSystemCustomDomain(string $domain): bool
+    {
+        $systemHosts = array_filter(array_map(
+            static fn ($host): string => strtolower(trim((string) $host)),
+            (array) config('app.role_hosts', [])
+        ));
+        $systemHosts[] = 'carlynk.id';
+
+        return in_array($domain, $systemHosts, true)
+            || substr($domain, -strlen('.carlynk.id')) === '.carlynk.id';
     }
 
     private function resolveDomainIp(string $domain): ?string

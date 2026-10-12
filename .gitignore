@@ -27,6 +27,11 @@ x
 /callback*.json
 /midtrans*.json
 /status-output*.txt
+/storage/browser-smoke/admin-test-credentials.md
+/storage/browser-smoke/business-flow-visible-state.json
+
+# Internal custom-domain runbook
+/storage/custom-domain/
 
 # Archives and generated bundles
 *.zip

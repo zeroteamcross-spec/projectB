@@ -64,6 +64,7 @@ return static function (Router $router): void {
         // (bukan owner -- lihat ShowroomService::activateCustomDomain(), murni
         // flag setelah admin menyiapkan nginx/SSL manual).
         $router->post('/{id}/mine/custom-domain', [ShowroomController::class, 'requestCustomDomain']);
+        $router->post('/{id}/mine/custom-domain/availability', [ShowroomController::class, 'checkCustomDomainAvailability']);
         $router->post('/{id}/mine/custom-domain/check', [ShowroomController::class, 'checkCustomDomainDns']);
         $router->delete('/{id}/mine/custom-domain', [ShowroomController::class, 'removeCustomDomain']);
         $router->post('/{id}/custom-domain/activate', [ShowroomController::class, 'activateCustomDomain']);

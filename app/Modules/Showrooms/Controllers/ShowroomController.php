@@ -140,6 +140,16 @@ class ShowroomController extends Controller
         ], 'Domain custom berhasil didaftarkan, menunggu verifikasi DNS.');
     }
 
+    public function checkCustomDomainAvailability(Request $request): JsonResponse
+    {
+        $user = $this->user($request);
+        $payload = (new RequestCustomDomainRequest($request))->validate();
+
+        return JsonResponse::success([
+            'availability' => $this->service->checkCustomDomainAvailability($user, (int) $request->routeParam('id'), $payload['domain']),
+        ], 'Ketersediaan domain berhasil diperiksa.');
+    }
+
     public function checkCustomDomainDns(Request $request): JsonResponse
     {
         $user = $this->user($request);

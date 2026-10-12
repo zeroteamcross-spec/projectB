@@ -65,6 +65,11 @@ export const showroomsResource = {
     return response.data?.showroom ?? null;
   },
 
+  async checkCustomDomainAvailability(showroomId, domain, options = {}) {
+    const response = await apiClient.post(`/showrooms/${encodeURIComponent(showroomId)}/mine/custom-domain/availability`, { domain }, options);
+    return response.data?.availability ?? null;
+  },
+
   async checkCustomDomainDns(showroomId, options = {}) {
     const response = await apiClient.post(`/showrooms/${encodeURIComponent(showroomId)}/mine/custom-domain/check`, {}, options);
     return response.data?.showroom ?? null;

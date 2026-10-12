@@ -29,8 +29,10 @@ const DEFAULT_RUNTIME = {
   iconUrlDraft: null,
   headerLogoUrlDraft: null,
   savingDomain: false,
+  checkingAvailability: false,
   checkingDns: false,
   domainError: "",
+  domainAvailability: null,
 };
 
 const CUSTOM_DOMAIN_STATUS_LABEL = {
@@ -43,6 +45,20 @@ const CUSTOM_DOMAIN_STATUS_VARIANT = {
   pending_dns: "warning",
   verified: "info",
   active: "success",
+};
+
+const CUSTOM_DOMAIN_AVAILABILITY_LABEL = {
+  available: "Belum terdaftar",
+  unavailable: "Tidak tersedia",
+  unknown: "Belum dapat dipastikan",
+  unsupported: "Ekstensi belum didukung",
+};
+
+const CUSTOM_DOMAIN_AVAILABILITY_VARIANT = {
+  available: "success",
+  unavailable: "danger",
+  unknown: "warning",
+  unsupported: "info",
 };
 
 // Draft ketikan domain SENGAJA di luar appStore (bukan runtime state) --
@@ -321,11 +337,23 @@ function customDomainCard(showroom, runtime) {
     const submit = Button({
       id: "slrsr_custom_domain_submit_button",
       label: runtime.savingDomain ? "Menyimpan..." : "Daftarkan Domain",
-      disabled: runtime.savingDomain,
+      disabled: runtime.savingDomain || runtime.checkingAvailability,
       onClick: () => form.requestSubmit(),
     });
     submit.type = "submit";
-    form.append(submit);
+
+    const availabilityButton = Button({
+      id: "slrsr_custom_domain_availability_button",
+      label: runtime.checkingAvailability ? "Memeriksa..." : "Cek Ketersediaan",
+      variant: "secondary",
+      disabled: runtime.savingDomain || runtime.checkingAvailability,
+      onClick: () => checkCustomDomainAvailabilityAction(
+        showroom.id,
+        String(new FormData(form).get("domain") ?? "").trim(),
+      ),
+    });
+    availabilityButton.type = "button";
+    form.append(availabilityButton, submit);
 
     form.addEventListener("submit", (event) => {
       event.preventDefault();
@@ -340,6 +368,20 @@ function customDomainCard(showroom, runtime) {
     });
 
     card.append(form);
+
+    const availability = availabilityForDraft(runtime.domainAvailability);
+    if (availability) {
+      const availabilityNode = document.createElement("div");
+      availabilityNode.className = "flex flex-wrap items-center gap-2 rounded-xl border border-[var(--pb-card-border)] bg-white/70 px-3 py-2";
+      availabilityNode.append(
+        Badge({
+          label: CUSTOM_DOMAIN_AVAILABILITY_LABEL[availability.status] ?? "Status domain",
+          variant: CUSTOM_DOMAIN_AVAILABILITY_VARIANT[availability.status] ?? "default",
+        }),
+        textNode("p", "text-xs font-semibold text-gray-700", availability.message),
+      );
+      card.append(availabilityNode);
+    }
 
     return card;
   }
@@ -391,7 +433,7 @@ async function saveCustomDomain(showroomId, domain) {
     return;
   }
 
-  setRuntime({ savingDomain: true, domainError: "" });
+  setRuntime({ savingDomain: true, domainError: "", domainAvailability: null });
 
   try {
     const showroom = await showroomsResource.requestCustomDomain(showroomId, domain);
@@ -403,6 +445,23 @@ async function saveCustomDomain(showroomId, domain) {
     const message = customDomainErrorMessage(error, "Domain gagal didaftarkan.");
     setRuntime({ savingDomain: false, domainError: message });
     showToast(message, { type: "error" });
+  }
+}
+
+async function checkCustomDomainAvailabilityAction(showroomId, domain) {
+  if (!domain) {
+    setRuntime({ domainError: "Domain wajib diisi.", domainAvailability: null });
+    return;
+  }
+
+  setRuntime({ checkingAvailability: true, domainError: "", domainAvailability: null });
+
+  try {
+    const availability = await showroomsResource.checkCustomDomainAvailability(showroomId, domain);
+    setRuntime({ checkingAvailability: false, domainAvailability: availability });
+  } catch (error) {
+    const message = customDomainErrorMessage(error, "Ketersediaan domain gagal diperiksa.");
+    setRuntime({ checkingAvailability: false, domainError: message, domainAvailability: null });
   }
 }
 
@@ -425,11 +484,28 @@ async function removeCustomDomainAction(showroomId) {
   try {
     const showroom = await showroomsResource.removeCustomDomain(showroomId);
     patchShowroomState(showroom);
-    setRuntime({ domainError: "" });
+    setRuntime({ domainError: "", domainAvailability: null });
     showToast("Domain custom berhasil dicabut.", { type: "success" });
   } catch (error) {
     showToast(customDomainErrorMessage(error, "Domain custom gagal dicabut."), { type: "error" });
   }
+}
+
+function availabilityForDraft(availability) {
+  if (!availability?.domain) {
+    return null;
+  }
+
+  return normalizeCustomDomainDraft(customDomainDraft) === String(availability.domain).toLowerCase()
+    ? availability
+    : null;
+}
+
+function normalizeCustomDomainDraft(value) {
+  let domain = String(value ?? "").trim().toLowerCase();
+  domain = domain.replace(/^https?:\/\//, "");
+  domain = domain.split("/")[0] ?? domain;
+  return domain.replace(/\.+$/, "");
 }
 
 /**
