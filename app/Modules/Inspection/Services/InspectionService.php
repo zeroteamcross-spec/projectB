@@ -59,6 +59,27 @@ class InspectionService
         );
     }
 
+    public function publicDetailByCar(int $carId): ?array
+    {
+        $car = $this->requireCar($carId);
+        $report = $this->repository->latestReportByCar($carId);
+
+        // Ringkasan inspeksi pada data mobil bisa tetap tersisa setelah report
+        // dihapus. Untuk katalog publik, kondisi itu berarti "belum ada
+        // laporan", bukan error HTTP yang harus mengotori console browser.
+        if (! $report) {
+            return null;
+        }
+
+        InspectionPolicy::ensureCanView(null, $car, $report);
+
+        return InspectionMapper::report(
+            $report,
+            $this->repository->itemsByReport((int) $report['id']),
+            (int) ($car['showroom_id'] ?? 0)
+        );
+    }
+
     public function templates(): array
     {
         return InspectionMapper::templates($this->repository->listTemplates(true));

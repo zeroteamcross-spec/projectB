@@ -33,6 +33,13 @@ class InspectionController extends Controller
         ], 'Laporan inspeksi berhasil diambil.');
     }
 
+    public function publicDetailByCar(Request $request): JsonResponse
+    {
+        return JsonResponse::success([
+            'report' => $this->service->publicDetailByCar((int) $request->routeParam('car_id')),
+        ], 'Laporan inspeksi berhasil diambil.');
+    }
+
     public function templates(Request $request): JsonResponse
     {
         $templates = $this->service->templates();
