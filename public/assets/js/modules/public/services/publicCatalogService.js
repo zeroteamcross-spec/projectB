@@ -156,9 +156,12 @@ export const publicCatalogService = {
     // detail, tetapi jangan memicu request publik yang memang akan ditolak
     // 403; cover image dari payload katalog tetap dipakai oleh halaman detail.
     const isPublished = String(car.listing_status ?? "").toLowerCase() === "published";
+    const hasInspectionSummary = ["partial", "completed"].includes(
+      String(car.inspection_summary_status ?? "").toLowerCase(),
+    );
     const [imagesResult, inspectionResult] = await Promise.allSettled([
       isPublished ? imagesResource.listByCar(carId, options) : Promise.resolve([]),
-      isPublished ? inspectionsResource.byCar(carId, options) : Promise.resolve(null),
+      isPublished && hasInspectionSummary ? inspectionsResource.byCar(carId, options) : Promise.resolve(null),
     ]);
 
     const images = imagesResult.status === "fulfilled" ? imagesResult.value : [];
