@@ -18,7 +18,7 @@ class ListCarsRequest extends FormRequest
         return [
             'page' => 'nullable|integer|min_value:1',
             'limit' => 'nullable|integer|min_value:1|max_value:100',
-            'listing_status' => 'nullable|string|in:draft,published,reserved,sold,archived',
+            'listing_status' => 'nullable|string|in:draft,published,reserved,sold,view_sold,archived',
             'seller_user_id' => 'nullable|integer',
             'showroom_id' => 'nullable|integer',
             'brand_name' => 'nullable|string|max:100',

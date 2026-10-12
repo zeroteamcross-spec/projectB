@@ -33,7 +33,10 @@ class CarPolicy
 
     public static function canView(array $car, ?array $user): bool
     {
-        if (($car['listing_status'] ?? null) === 'published') {
+        // `view_sold` sengaja tetap dapat dibaca publik agar kartu mobil yang
+        // sudah terjual tetapi masih ditampilkan di katalog bisa membuka
+        // detailnya. Status `sold` biasa tetap tersembunyi dari publik.
+        if (in_array(($car['listing_status'] ?? null), ['published', 'view_sold'], true)) {
             return true;
         }
 
