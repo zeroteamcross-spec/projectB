@@ -21,6 +21,7 @@ class AuthUsersCarsHardeningTest extends TestCase
         $this->userPolicyAllowsSelfOrAdminOnly();
         $this->pendingUsersLimitIsValidated();
         $this->carsListLimitIsValidated();
+        $this->publicCarPolicyAllowsViewSold();
         $this->carPolicySeparatesSellerAndAdminSemantics();
     }
 
@@ -95,5 +96,23 @@ class AuthUsersCarsHardeningTest extends TestCase
                 'role' => 'admin',
             ]);
         });
+    }
+
+    private function publicCarPolicyAllowsViewSold(): void
+    {
+        $viewSold = [
+            'id' => 6,
+            'seller_user_id' => 7,
+            'showroom_id' => 2,
+            'listing_status' => 'view_sold',
+        ];
+
+        $this->assertTrue(CarPolicy::canView($viewSold, null));
+        $this->assertTrue(CarPolicy::canView(array_merge($viewSold, [
+            'listing_status' => 'published',
+        ]), null));
+        $this->assertTrue(! CarPolicy::canView(array_merge($viewSold, [
+            'listing_status' => 'sold',
+        ]), null));
     }
 }
