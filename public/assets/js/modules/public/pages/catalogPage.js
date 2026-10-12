@@ -1008,7 +1008,7 @@ function isLandingRoute(context) {
   const path = String(context?.path ?? "");
   return name === "public.catalog"
     || name === "public.catalog-alias"
-    || path === "/"
+    || (path === "/" && !publicContextService.customDomainShowroomSlug())
     || path === "/public";
 }
 

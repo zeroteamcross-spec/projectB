@@ -15,10 +15,6 @@ if (serveVersionedAsset(__DIR__, $path)) {
     return;
 }
 
-if (redirectCustomDomainRoot(dirname(__DIR__), $path)) {
-    return;
-}
-
 if (serveSpaShell(dirname(__DIR__), __DIR__, $path)) {
     return;
 }
@@ -58,13 +54,18 @@ function serveSpaShell(string $basePath, string $publicPath, string $path): bool
 
     if ($method !== 'HEAD') {
         $theme = loadThemeConfig($basePath);
+        $customDomainShowroomSlug = customDomainShowroomSlug($basePath, $path);
         $html = str_replace('__ASSET_VER__', assetVersionToken($publicPath), $html);
         $html = str_replace('__ROLE_HOSTS__', roleHostsJson(), $html);
         $html = str_replace('__CUSTOM_DOMAIN_SERVER_IP__', customDomainServerIp(), $html);
+        $html = str_replace('__CUSTOM_DOMAIN_SHOWROOM_SLUG__', json_encode($customDomainShowroomSlug, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?: '""', $html);
         $html = str_replace('__THEME_CONFIG__', themeConfigJson($theme), $html);
         $metadata = loadPublicWebConfigMetadata($theme);
+        $metadataPath = $customDomainShowroomSlug !== ''
+            ? '/' . rawurlencode($customDomainShowroomSlug) . ($path === '/' ? '' : $path)
+            : $path;
         $ownBranding = array_filter(
-            loadShowroomShareMetadata($basePath, $path),
+            loadShowroomShareMetadata($basePath, $metadataPath),
             static fn ($value) => $value !== ''
         );
         echo injectPublicMetadata($html, array_merge($metadata, $ownBranding));
@@ -74,30 +75,25 @@ function serveSpaShell(string $basePath, string $publicPath, string $path): bool
 }
 
 /**
- * Backlog #7: showroom yang domain custom-nya sudah 'active' membuka
- * domainnya sendiri di root ("www.tokomobiljaya.com/") -- arahkan ke
- * "/{slug}" showroom itu, URL-nya sendiri tetap menyertakan slug (lihat
- * plan groovy-napping-thacker.md, keputusan cakupan #2). Path selain root
- * polos (mis. "/toko-mobil-jaya/mobil/123") TIDAK disentuh di sini sama
- * sekali -- itu sudah otomatis jalan lewat rute "/:slug/..." yang sudah
- * ada begitu nginx meneruskan domain ini ke docroot yang sama (lihat
- * Runbook di plan), tidak perlu tahu apa pun soal Host header.
+ * Resolves the active showroom behind a custom domain without changing the
+ * browser URL. The SPA uses this value to render the showroom catalog at the
+ * custom-domain root while keeping the legacy /{slug} route available.
  */
-function redirectCustomDomainRoot(string $basePath, string $path): bool
+function customDomainShowroomSlug(string $basePath, string $path): string
 {
     if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'GET' && ($_SERVER['REQUEST_METHOD'] ?? '') !== 'HEAD') {
-        return false;
+        return '';
     }
 
-    if ($path !== '/' && $path !== '') {
-        return false;
+    if (! isCustomDomainShowroomRequestPath($path)) {
+        return '';
     }
 
     $host = strtolower(trim((string) ($_SERVER['HTTP_HOST'] ?? '')));
     $host = explode(':', $host)[0];
 
     if ($host === '') {
-        return false;
+        return '';
     }
 
     try {
@@ -109,16 +105,17 @@ function redirectCustomDomainRoot(string $basePath, string $path): bool
         $showrooms = new \App\Modules\Showrooms\Repositories\ShowroomRepository($pdo);
         $showroom = $showrooms->findByCustomDomain($host);
 
-        if (! $showroom || empty($showroom['slug'])) {
-            return false;
-        }
-
-        header('Location: /' . rawurlencode((string) $showroom['slug']));
-
-        return true;
+        return $showroom && ! empty($showroom['slug']) ? (string) $showroom['slug'] : '';
     } catch (Throwable $exception) {
-        return false;
+        return '';
     }
+}
+
+function isCustomDomainShowroomRequestPath(string $path): bool
+{
+    return $path === '/'
+        || (bool) preg_match('#^/cars/[^/]+$#', $path)
+        || $path === '/transactions/new';
 }
 
 /**

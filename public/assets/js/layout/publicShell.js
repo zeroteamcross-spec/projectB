@@ -168,7 +168,11 @@ export class PublicShell {
     // Bottom footer juga tampil di halaman showroom bahkan sebelum login,
     // supaya pengunjung mobile langsung punya navigasi -- klik menunya nanti
     // yang mengarahkan ke login buyer kalau memang belum masuk.
-    const isShowroomPage = /^\/(?:s|showrooms)\/[^/]+/.test(currentPath) || Boolean(bareShowroomSlugFromPath(currentPath));
+    const isCustomDomainShowroomPage = publicContextService.customDomainShowroomSlug()
+      && publicContextService.isCustomDomainShowroomPath(currentPath);
+    const isShowroomPage = /^\/(?:s|showrooms)\/[^/]+/.test(currentPath)
+      || Boolean(bareShowroomSlugFromPath(currentPath))
+      || Boolean(isCustomDomainShowroomPage);
     const showMobileFooter = isBuyerLoggedIn || isShowroomPage;
 
     if (this.headerNode) {
@@ -254,6 +258,11 @@ const SHOWROOM_SUBPATH_WORDS = new Set(["cars", "transactions", "login"]);
 
 function showroomSlugFromPath(path) {
   const value = String(path ?? "");
+  const customDomainSlug = publicContextService.customDomainShowroomSlug();
+  if (customDomainSlug && publicContextService.isCustomDomainShowroomPath(value)) {
+    return customDomainSlug;
+  }
+
   const legacy = value.match(/^\/(?:showrooms|s)\/([^/]+)/);
   if (legacy) {
     return legacy[1];
@@ -391,6 +400,11 @@ function dashboardHash(role) {
  */
 function loginHashForShowroomRoute() {
   const jalur = window.location.pathname || "/";
+
+  const customDomainSlug = publicContextService.customDomainShowroomSlug();
+  if (customDomainSlug && publicContextService.isCustomDomainShowroomPath(jalur)) {
+    return `/${encodeURIComponent(customDomainSlug)}/login`;
+  }
 
   const legacy = jalur.match(/^\/(?:s|showrooms)\/([^/]+)$/);
   if (legacy) {

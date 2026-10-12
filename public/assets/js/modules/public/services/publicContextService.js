@@ -109,6 +109,38 @@ export const publicContextService = {
   },
 
   /**
+   * Server-resolved showroom context for an active custom-domain root. The
+   * value is deliberately injected into the initial shell instead of being
+   * inferred from the hostname in the browser, so an arbitrary Host header
+   * can never select a showroom without the backend confirming the mapping.
+   */
+  customDomainShowroomSlug() {
+    if (typeof window === "undefined") {
+      return "";
+    }
+
+    return String(window.__PROJECTB_CUSTOM_DOMAIN_SHOWROOM_SLUG__ ?? "")
+      .trim()
+      .toLowerCase();
+  },
+
+  /**
+   * Canonical paths served by the custom-domain showroom context. The root is
+   * the primary page; the two resource paths keep the same context when a
+   * visitor opens a car detail or checkout URL from that root catalog.
+   */
+  isCustomDomainShowroomPath(path = typeof window !== "undefined" ? window.location.pathname : "/") {
+    if (!this.customDomainShowroomSlug()) {
+      return false;
+    }
+
+    const value = String(path ?? "/").split("?", 1)[0].replace(/\/+$/, "") || "/";
+    return value === "/"
+      || /^\/cars\/[^/]+$/.test(value)
+      || value === "/transactions/new";
+  },
+
+  /**
    * true kalau context showroom/affiliate yang sedang aktif menunjuk ke
    * showroom yang dinonaktifkan admin -- dipakai halaman katalog/detail
    * mobil/entry transaksi untuk beralih menampilkan MaintenancePage alih-alih
@@ -237,6 +269,10 @@ export const publicContextService = {
    */
   syncBrandingFromPath(path = "") {
     const value = String(path ?? "");
+    if (this.isCustomDomainShowroomPath(value)) {
+      return;
+    }
+
     const isLegacyBrandedPath = /^\/(?:showrooms|s|af|a)\//.test(value);
     // Showroom di bentuk baru tidak punya prefix -- satu-satunya penanda
     // adalah segmen pertamanya BUKAN kata cadangan (rute sistem lain semua
@@ -303,12 +339,17 @@ export const publicContextService = {
       return "";
     }
 
+    const path = String(context.path ?? "");
+    const customDomainSlug = this.customDomainShowroomSlug();
+    if (customDomainSlug && this.isCustomDomainShowroomPath(path)) {
+      return customDomainSlug;
+    }
+
     const slug = String(context.params?.slug ?? "").trim().toLowerCase();
     if (!slug) {
       return "";
     }
 
-    const path = String(context.path ?? "");
     const isShowroomPath = path.startsWith(`/showrooms/${slug}`) || path.startsWith(`/s/${slug}`)
       || path === `/${slug}` || path.startsWith(`/${slug}/`);
     const isShowroomRoute = name.includes("showroom");
@@ -379,6 +420,10 @@ export const publicContextService = {
   // apa pun. Sempat salah dipakai sebagai fallback di banyak tempat karena
   // dulu, sebelum ada landing page SaaS, "/" memang katalog buyer.
   catalogPath() {
+    if (this.customDomainShowroomSlug() && this.isCustomDomainShowroomPath()) {
+      return "/";
+    }
+
     const affiliate = this.activeAffiliate();
     if (affiliate?.slug) {
       return affiliate.showroom?.slug
@@ -398,6 +443,10 @@ export const publicContextService = {
         : `/af/${encodeURIComponent(affiliate.slug)}/cars/${encodeURIComponent(carId)}`;
     }
 
+    if (this.customDomainShowroomSlug() && this.isCustomDomainShowroomPath()) {
+      return `/cars/${encodeURIComponent(carId)}`;
+    }
+
     const showroom = this.activeShowroom();
     if (showroom?.slug) {
       return `/${encodeURIComponent(showroom.slug)}/cars/${encodeURIComponent(carId)}`;
@@ -413,6 +462,10 @@ export const publicContextService = {
         ? `/${encodeURIComponent(affiliate.showroom.slug)}/${encodeURIComponent(affiliate.slug)}`
         : `/af/${encodeURIComponent(affiliate.slug)}`;
       return `${base}/transactions/new?car_id=${encodeURIComponent(carId)}`;
+    }
+
+    if (this.customDomainShowroomSlug() && this.isCustomDomainShowroomPath()) {
+      return `/transactions/new?car_id=${encodeURIComponent(carId)}`;
     }
 
     const showroom = this.activeShowroom();

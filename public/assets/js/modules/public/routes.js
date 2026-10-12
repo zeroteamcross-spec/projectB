@@ -8,6 +8,7 @@ import { ShowroomRegisterPage } from "./pages/showroomRegisterPage.js";
 import { TransactionEntryPage } from "./pages/transactionEntryPage.js";
 import { GoogleLoginPage } from "../auth/pages/googleLoginPage.js";
 import { publicCatalogService } from "./services/publicCatalogService.js";
+import { publicContextService } from "./services/publicContextService.js";
 import { publicCarDetailPreloadService } from "./services/publicCarDetailPreloadService.js";
 import { slidersResource } from "../../resources/slidersResource.js";
 import { adminMasterService } from "../admin/services/adminMasterService.js";
@@ -345,8 +346,35 @@ export const publicRoutes = [
     name: "public.landing-home",
     path: "/",
     shell: "public",
-    page: LandingPageSwitcher,
-    workingStateKey: null,
+    page: () => publicContextService.customDomainShowroomSlug()
+      ? PublicCatalogPage()
+      : LandingPageSwitcher(),
+    workingStateKey: "publicCatalog",
+    preload: {
+      working: [
+        {
+          key: "catalog",
+          loader: ({ signal }) => {
+            const showroomSlug = publicContextService.customDomainShowroomSlug();
+            return showroomSlug
+              ? publicCatalogService.list({ page: 1, limit: 12, showroomSlug }, { signal })
+              : Promise.resolve(null);
+          },
+        },
+        {
+          key: "masterLocation",
+          loader: ({ signal }) => publicContextService.customDomainShowroomSlug()
+            ? adminMasterService.getLocationMaster({ signal }).catch(() => adminMasterService.normalizeLocationMaster(null))
+            : Promise.resolve(null),
+        },
+        {
+          key: "sliders",
+          loader: ({ signal }) => publicContextService.customDomainShowroomSlug()
+            ? loadPublicLandingSliders(signal)
+            : Promise.resolve([]),
+        },
+      ],
+    },
   },
   {
     name: "public.tasks",
@@ -444,7 +472,10 @@ export const publicRoutes = [
       working: [
         {
           key: "detail",
-          loader: ({ params, signal }) => publicCarDetailPreloadService.detailOrFetch(params.id, { signal }).catch(() => null),
+          loader: ({ params, signal }) => publicCarDetailPreloadService.detailOrFetch(params.id, {
+            signal,
+            showroomSlug: publicContextService.customDomainShowroomSlug(),
+          }).catch(() => null),
         },
       ],
     },
@@ -460,7 +491,10 @@ export const publicRoutes = [
         {
           key: "detail",
           loader: ({ query, signal }) => query.car_id
-            ? publicCarDetailPreloadService.detailOrFetch(query.car_id, { signal }).catch(() => null)
+            ? publicCarDetailPreloadService.detailOrFetch(query.car_id, {
+              signal,
+              showroomSlug: publicContextService.customDomainShowroomSlug(),
+            }).catch(() => null)
             : Promise.resolve(null),
         },
       ],
