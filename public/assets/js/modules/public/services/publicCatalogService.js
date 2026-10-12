@@ -151,9 +151,14 @@ export const publicCatalogService = {
       return null;
     }
 
+    // Policy publik hanya membuka galeri dan laporan inspeksi untuk listing
+    // yang sedang `published`. `view_sold` tetap boleh tampil di katalog dan
+    // detail, tetapi jangan memicu request publik yang memang akan ditolak
+    // 403; cover image dari payload katalog tetap dipakai oleh halaman detail.
+    const isPublished = String(car.listing_status ?? "").toLowerCase() === "published";
     const [imagesResult, inspectionResult] = await Promise.allSettled([
-      imagesResource.listByCar(carId, options),
-      inspectionsResource.byCar(carId, options),
+      isPublished ? imagesResource.listByCar(carId, options) : Promise.resolve([]),
+      isPublished ? inspectionsResource.byCar(carId, options) : Promise.resolve(null),
     ]);
 
     const images = imagesResult.status === "fulfilled" ? imagesResult.value : [];
