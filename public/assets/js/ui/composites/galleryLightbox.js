@@ -257,6 +257,13 @@ export function GalleryLightbox({
     }
   }
 
+  function resetZoom() {
+    zoomLevel = 1;
+    panX = 0;
+    panY = 0;
+    applyZoomTransform();
+  }
+
   function adjustZoom(factor) {
     zoomLevel = clamp(zoomLevel + factor, 1, 4);
     if (zoomLevel === 1) {
