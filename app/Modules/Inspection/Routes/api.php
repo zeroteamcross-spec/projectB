@@ -8,7 +8,7 @@ use App\Modules\Inspection\Controllers\InspectionController;
 
 return static function (Router $router): void {
     $router->get('/api/inspection-templates', [InspectionController::class, 'templates']);
-    $router->get('/api/cars/{car_id}/inspection-report', [InspectionController::class, 'detailByCar']);
+    $router->get('/api/cars/{car_id}/inspection-report', [InspectionController::class, 'publicDetailByCar']);
 
     $router->group('/api/cars/{car_id}', static function (Router $router): void {
         $router->get('/inspection-templates', [InspectionController::class, 'templatesForCar']);
