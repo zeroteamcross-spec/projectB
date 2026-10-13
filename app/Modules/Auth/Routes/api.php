@@ -15,7 +15,9 @@ return static function (Router $router): void {
         $router->get('/autologin', [AuthController::class, 'autologin']);
         $router->get('/google/status', [GoogleAuthController::class, 'status']);
         $router->get('/google/redirect', [GoogleAuthController::class, 'redirect']);
+        $router->get('/google/start', [GoogleAuthController::class, 'start']);
         $router->get('/google/callback', [GoogleAuthController::class, 'callback']);
+        $router->get('/google/consume', [GoogleAuthController::class, 'consume']);
         $router->post('/google/complete-profile', [GoogleAuthController::class, 'completeProfile']);
         $router->post('/otp/confirm', [AuthController::class, 'confirmOtp']);
         $router->get('/pending-users', [AuthController::class, 'pendingUsers'], [AuthenticatedUserMiddleware::class]);

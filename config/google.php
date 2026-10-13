@@ -61,6 +61,15 @@ return [
         'redirect_uri' => env('GOOGLE_REDIRECT_URI', ''),
         'allowed_domains' => $allowedDomains,
         'hosts' => $peranPerHost,
+        'broker' => [
+            // Custom showroom domains cannot all be registered as a separate
+            // Google OAuth redirect URI. They enter through one owned host,
+            // then receive a one-time handoff back to their own domain.
+            'enabled' => env('GOOGLE_AUTH_BROKER_ENABLED', true),
+            'host' => env('GOOGLE_AUTH_BROKER_HOST', 'auth.carlynk.id'),
+            'state_ttl_minutes' => env('GOOGLE_AUTH_BROKER_STATE_TTL_MINUTES', 15),
+            'handoff_ttl_seconds' => env('GOOGLE_AUTH_BROKER_HANDOFF_TTL_SECONDS', 90),
+        ],
         'state_cookie' => [
             'name' => 'google_oauth_state',
             'ttl_minutes' => 15,

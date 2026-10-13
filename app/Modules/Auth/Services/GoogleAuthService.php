@@ -10,6 +10,8 @@ use App\Core\Exceptions\UnauthorizedException;
 use App\Core\Exceptions\ValidationException;
 use App\Modules\Auth\Repositories\AuthTokenRepository;
 use App\Modules\Auth\Repositories\GoogleAuthRepository;
+use App\Modules\Auth\Repositories\GoogleOAuthSessionRepository;
+use App\Modules\Showrooms\Repositories\ShowroomRepository;
 use DateInterval;
 use DateTimeImmutable;
 use PDO;
@@ -26,11 +28,23 @@ class GoogleAuthService
 
     private AuthTokenRepository $tokens;
 
-    public function __construct(PDO $pdo, GoogleAuthRepository $repository, AuthTokenRepository $tokens)
+    private GoogleOAuthSessionRepository $oauthSessions;
+
+    private ShowroomRepository $showrooms;
+
+    public function __construct(
+        PDO $pdo,
+        GoogleAuthRepository $repository,
+        AuthTokenRepository $tokens,
+        GoogleOAuthSessionRepository $oauthSessions,
+        ShowroomRepository $showrooms
+    )
     {
         $this->pdo = $pdo;
         $this->repository = $repository;
         $this->tokens = $tokens;
+        $this->oauthSessions = $oauthSessions;
+        $this->showrooms = $showrooms;
     }
 
     public function status(?string $completionToken = null): array
@@ -69,6 +83,10 @@ class GoogleAuthService
             throw new ForbiddenException('Google Login tidak tersedia untuk domain ini.');
         }
 
+        if (($context['custom_domain'] ?? false) === true) {
+            return $this->brokerRedirect($context, $next);
+        }
+
         return $this->redirect(
             (string) $context['role'],
             $this->redirectUriForHost((string) $context['host']),
@@ -76,6 +94,71 @@ class GoogleAuthService
             $next,
             $showroomSlug
         );
+    }
+
+    /**
+     * Starts the central OAuth flow for an active custom showroom domain.
+     * The browser receives an opaque ticket, while the database keeps only
+     * its SHA-256 hash and the original showroom host.
+     */
+    private function brokerRedirect(array $context, ?string $next): array
+    {
+        if (! $this->brokerEnabled()) {
+            throw new ForbiddenException('Google Login custom domain belum diaktifkan.');
+        }
+
+        $this->ensureEnabled();
+        $state = bin2hex(random_bytes(32));
+        $ttlMinutes = max(1, (int) config('google.auth.broker.state_ttl_minutes', 15));
+        $expiresTimestamp = time() + ($ttlMinutes * 60);
+        $expiresAt = date('Y-m-d H:i:s', $expiresTimestamp);
+        $nextPath = $this->safeNextPath($next);
+
+        $this->oauthSessions->create([
+            'state_hash' => hash('sha256', $state),
+            'source_host' => (string) $context['host'],
+            'role' => (string) $context['role'],
+            'showroom_id' => isset($context['showroom_id']) ? (int) $context['showroom_id'] : null,
+            'next_path' => $nextPath,
+            'redirect_uri' => $this->brokerCallbackUri(),
+            'expires_at' => $expiresAt,
+        ]);
+
+        return [
+            'auth_url' => $this->brokerStartUri() . '?' . http_build_query([
+                'ticket' => $state,
+            ]),
+            'state' => $state,
+            'state_expires_at' => date('c', $expiresTimestamp),
+            'set_state_cookie' => false,
+        ];
+    }
+
+    public function isBrokerHost(string $host): bool
+    {
+        return $this->normalizeHost($host) !== ''
+            && hash_equals($this->brokerHost(), $this->normalizeHost($host));
+    }
+
+    public function brokerStart(string $ticket, string $host): array
+    {
+        $this->ensureBrokerRequest($host);
+        $this->ensureEnabled();
+
+        $session = $this->oauthSessions->findPendingByState($ticket);
+
+        if (! $session) {
+            throw new UnauthorizedException('Sesi Google custom domain tidak valid atau sudah kedaluwarsa.');
+        }
+
+        return [
+            'state' => $ticket,
+            'auth_url' => $this->authorizationUrl(
+                (string) $session['redirect_uri'],
+                $ticket
+            ),
+            'state_expires_at' => date('c', strtotime((string) $session['expires_at'])),
+        ];
     }
 
     public function redirect(string $role, ?string $redirectUri = null, ?string $host = null, ?string $next = null, ?string $showroomSlug = null): array
@@ -114,20 +197,150 @@ class GoogleAuthService
 
         $state = $this->signedToken($statePayload);
 
-        $query = http_build_query([
-            'client_id' => $this->clientId(),
-            'redirect_uri' => $redirectUri ?? $this->redirectUri(),
-            'response_type' => 'code',
-            'scope' => 'openid email profile',
-            'state' => $state,
-            'prompt' => 'select_account',
-        ]);
-
         return [
-            'auth_url' => 'https://accounts.google.com/o/oauth2/v2/auth?' . $query,
+            'auth_url' => $this->authorizationUrl(
+                $redirectUri ?? $this->redirectUri(),
+                $state
+            ),
             'state' => $state,
             'state_expires_at' => date('c', time() + ((int) config('google.auth.state_cookie.ttl_minutes', 15) * 60)),
+            'set_state_cookie' => true,
         ];
+    }
+
+    /**
+     * Completes the OAuth callback on auth.carlynk.id and creates the short
+     * lived one-time handoff that will be consumed by the showroom host.
+     */
+    public function brokerCallback(string $code, string $state, ?string $cookieState, string $host): array
+    {
+        $this->ensureBrokerRequest($host);
+        $this->ensureEnabled();
+
+        if (! is_string($cookieState) || $cookieState === '' || ! hash_equals($cookieState, $state)) {
+            throw new UnauthorizedException('State Google tidak valid.');
+        }
+
+        $session = $this->oauthSessions->findPendingByState($state);
+
+        if (! $session) {
+            throw new UnauthorizedException('Sesi Google custom domain tidak valid atau sudah kedaluwarsa.');
+        }
+
+        $role = $this->normalizeRole((string) $session['role']);
+        $profile = $this->fetchProfile($code, (string) $session['redirect_uri']);
+        $resolved = $this->resolveUser($role, $profile);
+        $user = $resolved['user'];
+
+        if ($role === 'buyer' && ! empty($session['showroom_id'])) {
+            $this->repository->setHomeShowroomId((int) $user['id'], (int) $session['showroom_id']);
+        }
+
+        $completionCookie = null;
+        if ($this->profileCompletionRequired($user)) {
+            $redirectPath = '/google-login/complete?status=completion_required&role=' . $this->slugForRole($role);
+            $completionCookie = $this->completionCookie((int) $user['id'], $role);
+        } elseif (! $this->canAuthenticate($user)) {
+            $redirectPath = '/google-login/complete?status=pending_approval&role=' . $this->slugForRole($role);
+        } else {
+            $redirectPath = $this->safeNextPath($session['next_path'] ?? null) ?? $this->homeForRole($role);
+        }
+
+        $handoff = bin2hex(random_bytes(32));
+        $handoffTtl = max(15, (int) config('google.auth.broker.handoff_ttl_seconds', 90));
+        $handoffExpiresAt = date('Y-m-d H:i:s', time() + $handoffTtl);
+
+        if (! $this->oauthSessions->authorize(
+            (int) $session['id'],
+            hash('sha256', $handoff),
+            (int) $user['id'],
+            $completionCookie,
+            $redirectPath,
+            $handoffExpiresAt
+        )) {
+            throw new UnauthorizedException('Sesi Google sudah diproses. Silakan mulai login lagi.');
+        }
+
+        return [
+            'consume_url' => $this->sourceUrl(
+                (string) $session['source_host'],
+                '/api/auth/google/consume?' . http_build_query(['token' => $handoff])
+            ),
+            'state' => $state,
+        ];
+    }
+
+    public function consumeHandoff(string $handoff, string $host): array
+    {
+        $this->ensureEnabled();
+        $session = $this->oauthSessions->findAuthorizedByHandoff($handoff);
+
+        if (! $session) {
+            throw new UnauthorizedException('Tautan login Google sudah digunakan atau kedaluwarsa.');
+        }
+
+        $actualHost = $this->normalizeHost($host);
+        $sourceHost = $this->normalizeHost((string) $session['source_host']);
+
+        if ($actualHost === '' || $sourceHost === '' || ! hash_equals($sourceHost, $actualHost)) {
+            throw new UnauthorizedException('Tautan login Google bukan untuk domain ini.');
+        }
+
+        $context = $this->contextForHost($actualHost);
+        if (($context['custom_domain'] ?? false) !== true) {
+            throw new UnauthorizedException('Domain showroom custom tidak aktif.');
+        }
+
+        $redirectPath = $this->safeNextPath($session['redirect_path'] ?? null) ?? '/';
+        $rememberToken = null;
+
+        try {
+            $this->pdo->beginTransaction();
+
+            if (! $this->oauthSessions->consume((int) $session['id'], $handoff, date('Y-m-d H:i:s'))) {
+                throw new UnauthorizedException('Tautan login Google sudah digunakan.');
+            }
+
+            $user = $this->repository->findUserById((int) $session['user_id']);
+            if (! $user) {
+                throw new UnauthorizedException('Akun Google tidak lagi tersedia.');
+            }
+
+            if (($session['completion_cookie'] ?? '') === '' && $this->canAuthenticate($user)) {
+                $rememberToken = $this->issueRememberToken((int) $user['id']);
+            }
+
+            $this->pdo->commit();
+        } catch (Throwable $exception) {
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+
+            throw $exception;
+        }
+
+        return [
+            'redirect_url' => $this->sourceUrl($sourceHost, $redirectPath),
+            'completion_cookie' => ($session['completion_cookie'] ?? '') !== ''
+                ? (string) $session['completion_cookie']
+                : null,
+            'remember_token' => $rememberToken,
+        ];
+    }
+
+    public function brokerFailureLocation(string $state, string $message): string
+    {
+        $session = $this->oauthSessions->findByState($state);
+        $path = '/google-login/complete?' . http_build_query([
+            'status' => 'error',
+            'message' => $message,
+        ]);
+
+        if (! $session || trim((string) ($session['source_host'] ?? '')) === '') {
+            return $path;
+        }
+
+        return $this->sourceUrl((string) $session['source_host'], $path);
     }
 
     public function callback(string $code, string $state, ?string $cookieState, string $host = ''): array
@@ -272,6 +485,15 @@ class GoogleAuthService
             (string) config('google.auth.state_cookie.name', 'google_oauth_state'),
             $state,
             time() + ((int) config('google.auth.state_cookie.ttl_minutes', 15) * 60),
+            (bool) config('google.auth.state_cookie.secure', false),
+            (string) config('google.auth.state_cookie.same_site', 'Lax')
+        );
+    }
+
+    public function expiredStateCookieHeader(): string
+    {
+        return AuthCookie::expiredHeader(
+            (string) config('google.auth.state_cookie.name', 'google_oauth_state'),
             (bool) config('google.auth.state_cookie.secure', false),
             (string) config('google.auth.state_cookie.same_site', 'Lax')
         );
@@ -848,6 +1070,20 @@ class GoogleAuthService
         $context = $hosts[$normalizedHost] ?? null;
 
         if (! is_array($context)) {
+            $showroom = $this->showrooms->findByCustomDomain($normalizedHost);
+
+            if ($showroom) {
+                $context = [
+                    'role' => 'buyer',
+                    'google_enabled' => true,
+                    'custom_domain' => true,
+                    'showroom_id' => (int) $showroom['id'],
+                    'showroom_slug' => (string) ($showroom['slug'] ?? ''),
+                ];
+            }
+        }
+
+        if (! is_array($context)) {
             throw new ForbiddenException('Domain login tidak diizinkan.');
         }
 
@@ -871,6 +1107,73 @@ class GoogleAuthService
     private function redirectUriForHost(string $host): string
     {
         return $this->schemeForHost($host) . '://' . $host . '/api/auth/google/callback';
+    }
+
+    private function authorizationUrl(string $redirectUri, string $state): string
+    {
+        $query = http_build_query([
+            'client_id' => $this->clientId(),
+            'redirect_uri' => $redirectUri,
+            'response_type' => 'code',
+            'scope' => 'openid email profile',
+            'state' => $state,
+            'prompt' => 'select_account',
+        ]);
+
+        return 'https://accounts.google.com/o/oauth2/v2/auth?' . $query;
+    }
+
+    private function brokerEnabled(): bool
+    {
+        return (bool) config('google.auth.broker.enabled', true);
+    }
+
+    private function brokerHost(): string
+    {
+        return $this->normalizeHost((string) config('google.auth.broker.host', 'auth.carlynk.id'));
+    }
+
+    private function brokerStartUri(): string
+    {
+        return $this->schemeForHost($this->brokerHost()) . '://' . $this->brokerHost() . '/api/auth/google/start';
+    }
+
+    private function brokerCallbackUri(): string
+    {
+        return $this->schemeForHost($this->brokerHost()) . '://' . $this->brokerHost() . '/api/auth/google/callback';
+    }
+
+    private function ensureBrokerRequest(string $host): void
+    {
+        if (! $this->brokerEnabled() || ! $this->isBrokerHost($host)) {
+            throw new ForbiddenException('Domain broker Google tidak diizinkan.');
+        }
+    }
+
+    private function sourceUrl(string $host, string $path): string
+    {
+        $path = strpos($path, '/') === 0 ? $path : '/' . $path;
+
+        return $this->schemeForHost($this->normalizeHost($host)) . '://' . $this->normalizeHost($host) . $path;
+    }
+
+    private function safeNextPath(?string $path): ?string
+    {
+        if (! is_string($path)) {
+            return null;
+        }
+
+        $path = trim($path);
+
+        if ($path === '' || $path[0] !== '/' || str_starts_with($path, '//')) {
+            return null;
+        }
+
+        if (preg_match('/^[a-z][a-z0-9+.-]*:/i', $path) === 1) {
+            return null;
+        }
+
+        return substr($path, 0, 512);
     }
 
     private function schemeForHost(string $host): string
