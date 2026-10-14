@@ -142,14 +142,18 @@ class GoogleAuthController extends Controller
             if (is_string($result['completion_cookie'] ?? null) && $result['completion_cookie'] !== '') {
                 return $response->withHeader(
                     'Set-Cookie',
-                    $this->service->completionCookieHeader($result['completion_cookie'])
+                    // The response is already on the custom showroom host;
+                    // .carlynk.id would be rejected by the browser here.
+                    $this->service->completionCookieHeader($result['completion_cookie'], '')
                 );
             }
 
             if (is_array($result['remember_token'] ?? null)) {
                 return $response->withHeader(
                     'Set-Cookie',
-                    $this->service->rememberCookieHeader($result['remember_token'])
+                    // An arbitrary custom domain cannot opt into the shared
+                    // Carlynk cookie domain. Empty means host-only.
+                    $this->service->rememberCookieHeader($result['remember_token'], '')
                 );
             }
 
@@ -198,6 +202,9 @@ class GoogleAuthController extends Controller
     {
         $cookie = $request->cookie((string) config('google.auth.completion_cookie.name', 'google_profile_completion'));
         $result = $this->service->completeProfile(is_string($cookie) ? $cookie : null, $request->input());
+        $cookieDomain = $this->service->usesHostOnlyAuthCookie(
+            (string) $request->server('HTTP_HOST', '')
+        ) ? '' : null;
         $response = JsonResponse::success([
             'user' => $result['user'],
             'profile_completion_required' => $result['profile_completion_required'],
@@ -207,10 +214,16 @@ class GoogleAuthController extends Controller
         ], 'Profil Google berhasil dilengkapi.');
 
         if (is_array($result['remember_token'] ?? null)) {
-            return $response->withHeader('Set-Cookie', $this->service->rememberCookieHeader($result['remember_token']));
+            return $response->withHeader(
+                'Set-Cookie',
+                $this->service->rememberCookieHeader($result['remember_token'], $cookieDomain)
+            );
         }
 
-        return $response->withHeader('Set-Cookie', $this->service->expiredCompletionCookieHeader());
+        return $response->withHeader(
+            'Set-Cookie',
+            $this->service->expiredCompletionCookieHeader($cookieDomain)
+        );
     }
 
     private function redirectToFrontend(string $path): Response

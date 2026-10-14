@@ -5,6 +5,11 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use App\Core\Auth\AuthCookie;
+use App\Modules\Auth\Repositories\AuthTokenRepository;
+use App\Modules\Auth\Repositories\GoogleAuthRepository;
+use App\Modules\Auth\Repositories\GoogleOAuthSessionRepository;
+use App\Modules\Auth\Services\GoogleAuthService;
+use App\Modules\Showrooms\Repositories\ShowroomRepository;
 use Tests\TestCase;
 
 /**
@@ -29,6 +34,7 @@ class AuthCookieTest extends TestCase
         $this->tanpaDomainCookieTetapHostOnly();
         $this->domainIkutSaatDikonfigurasi();
         $this->cookieKedaluwarsaMembawaDomainYangSama();
+        $this->googleBrokerCookiesCanBeHostOnly();
     }
 
     private function hanyaSatuPerakitHeaderCookie(): void
@@ -90,6 +96,33 @@ class AuthCookieTest extends TestCase
         $this->assertTrue(
             strpos($header, '; Domain=.contoh.test') !== false,
             'Cookie kedaluwarsa harus membawa Domain yang sama: ' . $header
+        );
+    }
+
+    private function googleBrokerCookiesCanBeHostOnly(): void
+    {
+        $pdo = $this->sqlite();
+        $service = new GoogleAuthService(
+            $pdo,
+            new GoogleAuthRepository($pdo),
+            new AuthTokenRepository($pdo),
+            new GoogleOAuthSessionRepository($pdo),
+            new ShowroomRepository($pdo)
+        );
+
+        $remember = $service->rememberCookieHeader([
+            'value' => 'selector:validator',
+            'expires_at' => '2030-01-01 00:00:00',
+        ], '');
+        $completion = $service->completionCookieHeader('completion-token', '');
+
+        $this->assertTrue(
+            strpos($remember, 'Domain=') === false,
+            'Remember cookie broker harus host-only pada custom domain: ' . $remember
+        );
+        $this->assertTrue(
+            strpos($completion, 'Domain=') === false,
+            'Completion cookie broker harus host-only pada custom domain: ' . $completion
         );
     }
 

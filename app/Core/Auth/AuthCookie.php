@@ -20,8 +20,9 @@ namespace App\Core\Auth;
 final class AuthCookie
 {
     /**
-     * Parameter $domain di ketiga method hanya untuk pengujian. Produksi
-     * membiarkannya null, dan nilainya dibaca dari konfigurasi.
+     * Parameter $domain bersifat opsional. Null memakai konfigurasi global;
+     * string kosong secara eksplisit membuat cookie host-only, yang wajib
+     * dipakai pada domain showroom custom.
      *
      * @param string $name    nama cookie
      * @param string $value   nilai mentah, akan di-encode

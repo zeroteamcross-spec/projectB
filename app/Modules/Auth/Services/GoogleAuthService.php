@@ -140,6 +140,19 @@ class GoogleAuthService
             && hash_equals($this->brokerHost(), $this->normalizeHost($host));
     }
 
+    /**
+     * Custom showroom domains cannot use the shared .carlynk.id cookie
+     * domain. Their browser must receive a host-only cookie instead.
+     */
+    public function usesHostOnlyAuthCookie(string $host): bool
+    {
+        try {
+            return ($this->contextForHost($host)['custom_domain'] ?? false) === true;
+        } catch (Throwable $exception) {
+            return false;
+        }
+    }
+
     public function brokerStart(string $ticket, string $host): array
     {
         $this->ensureBrokerRequest($host);
@@ -499,36 +512,39 @@ class GoogleAuthService
         );
     }
 
-    public function completionCookieHeader(string $token): string
+    public function completionCookieHeader(string $token, ?string $domain = null): string
     {
         return $this->cookieHeader(
             (string) config('google.auth.completion_cookie.name', 'google_profile_completion'),
             $token,
             time() + ((int) config('google.auth.completion_cookie.ttl_minutes', 60) * 60),
             (bool) config('google.auth.completion_cookie.secure', false),
-            (string) config('google.auth.completion_cookie.same_site', 'Lax')
+            (string) config('google.auth.completion_cookie.same_site', 'Lax'),
+            $domain
         );
     }
 
-    public function expiredCompletionCookieHeader(): string
+    public function expiredCompletionCookieHeader(?string $domain = null): string
     {
         return $this->cookieHeader(
             (string) config('google.auth.completion_cookie.name', 'google_profile_completion'),
             '',
             1,
             (bool) config('google.auth.completion_cookie.secure', false),
-            (string) config('google.auth.completion_cookie.same_site', 'Lax')
+            (string) config('google.auth.completion_cookie.same_site', 'Lax'),
+            $domain
         );
     }
 
-    public function rememberCookieHeader(array $token): string
+    public function rememberCookieHeader(array $token, ?string $domain = null): string
     {
         return $this->cookieHeader(
             (string) config('auth.remember_cookie.name', 'remember_me'),
             $token['value'],
             strtotime($token['expires_at']) ?: time(),
             (bool) config('auth.remember_cookie.secure', false),
-            (string) config('auth.remember_cookie.same_site', 'Strict')
+            (string) config('auth.remember_cookie.same_site', 'Strict'),
+            $domain
         );
     }
 
@@ -1213,9 +1229,16 @@ class GoogleAuthService
         return trim((string) config('google.auth.redirect_uri', ''));
     }
 
-    private function cookieHeader(string $name, string $value, int $expiresAt, bool $secure, string $sameSite): string
+    private function cookieHeader(
+        string $name,
+        string $value,
+        int $expiresAt,
+        bool $secure,
+        string $sameSite,
+        ?string $domain = null
+    ): string
     {
-        return AuthCookie::headerFromTimestamp($name, $value, $expiresAt, $secure, $sameSite);
+        return AuthCookie::headerFromTimestamp($name, $value, $expiresAt, $secure, $sameSite, $domain);
     }
 
     private function base64UrlEncode(string $value): string
