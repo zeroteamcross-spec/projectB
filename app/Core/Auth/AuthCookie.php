@@ -98,7 +98,7 @@ final class AuthCookie
             $sameSite
         );
 
-        $domain = trim($domain ?? self::domainTerkonfigurasi());
+        $domain = self::domainUntukHost($domain);
 
         if ($domain !== '') {
             $header .= '; Domain=' . $domain;
@@ -114,5 +114,31 @@ final class AuthCookie
     private static function domainTerkonfigurasi(): string
     {
         return trim((string) config('auth.cookie_domain', ''));
+    }
+
+    private static function domainUntukHost(?string $domain): string
+    {
+        $domain = trim($domain ?? self::domainTerkonfigurasi());
+        $host = strtolower(trim((string) ($_SERVER['HTTP_HOST'] ?? '')));
+
+        if ($domain === '' || $host === '') {
+            return $domain;
+        }
+
+        $host = explode(':', $host, 2)[0];
+        $bareDomain = ltrim(strtolower($domain), '.');
+
+        // A shared Carlynk cookie must never be sent with a Domain attribute
+        // that the current custom showroom host cannot legally accept. An
+        // empty result deliberately produces a host-only cookie.
+        $subdomainSuffix = '.' . $bareDomain;
+        $isSubdomain = strlen($host) > strlen($subdomainSuffix)
+            && substr($host, -strlen($subdomainSuffix)) === $subdomainSuffix;
+
+        if ($host !== $bareDomain && ! $isSubdomain) {
+            return '';
+        }
+
+        return $domain;
     }
 }

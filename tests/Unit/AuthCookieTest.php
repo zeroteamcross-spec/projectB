@@ -34,6 +34,7 @@ class AuthCookieTest extends TestCase
         $this->tanpaDomainCookieTetapHostOnly();
         $this->domainIkutSaatDikonfigurasi();
         $this->cookieKedaluwarsaMembawaDomainYangSama();
+        $this->domainTidakCocokDenganHostMenjadiHostOnly();
         $this->googleBrokerCookiesCanBeHostOnly();
     }
 
@@ -97,6 +98,27 @@ class AuthCookieTest extends TestCase
             strpos($header, '; Domain=.contoh.test') !== false,
             'Cookie kedaluwarsa harus membawa Domain yang sama: ' . $header
         );
+    }
+
+    private function domainTidakCocokDenganHostMenjadiHostOnly(): void
+    {
+        $sebelumnya = $_SERVER['HTTP_HOST'] ?? null;
+        $_SERVER['HTTP_HOST'] = 'carlynk.temanquran.id';
+
+        try {
+            $header = AuthCookie::header('remember_me', 'abc', '2030-01-01 00:00:00', true, 'Lax', '.carlynk.id');
+
+            $this->assertTrue(
+                strpos($header, 'Domain=') === false,
+                'Domain Carlynk tidak boleh dikirim ke custom showroom: ' . $header
+            );
+        } finally {
+            if ($sebelumnya === null) {
+                unset($_SERVER['HTTP_HOST']);
+            } else {
+                $_SERVER['HTTP_HOST'] = $sebelumnya;
+            }
+        }
     }
 
     private function googleBrokerCookiesCanBeHostOnly(): void
