@@ -23,4 +23,10 @@ final class TaskCatalog
     public const NOTIFICATION_PANEL_DENSITY_TASK_TITLE = 'Rapikan ukuran font dan card pada panel Notifikasi.';
 
     public const NOTIFICATION_PANEL_DENSITY_TASK_DESCRIPTION = 'Pada panel Notifikasi, kecilkan font yang terlalu besar, padatkan ukuran card, dan rapikan jarak antar elemen agar daftar lebih nyaman dibaca tanpa mengubah fungsi notifikasi, scroll, atau tombol Lihat semua notifikasi. Gunakan gambar referensi yang disimpan di storage/task-references/.';
+
+    public const ADMIN_MASTER_SIDEBAR_INSPECTION_TASK_KEY = 'request-004-admin-master-sidebar-inspection';
+
+    public const ADMIN_MASTER_SIDEBAR_INSPECTION_TASK_TITLE = 'Periksa dan perbaiki menu Master Inspeksi di Master Sidebar Admin.';
+
+    public const ADMIN_MASTER_SIDEBAR_INSPECTION_TASK_DESCRIPTION = 'Periksa mengapa menu Master Inspeksi tidak muncul pada Master Sidebar di akun Admin, karena menu tersebut seharusnya dapat diatur dari sana. Jika terbukti BUG, perbaiki tanpa merusak menu atau role lain, lalu uji visibilitas dan pengaturan menu Admin. Gambar referensi disimpan di Tugas GitIgnore/master-sidebar-inspeksi-reference-2026-10-18.png. Pekerjaan menunggu instruksi Mulai kerjakan tugas.';
 }

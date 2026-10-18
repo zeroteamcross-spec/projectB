@@ -36,6 +36,9 @@ x
 # Task reference images supplied by the client
 /storage/task-references/
 
+# Task reference images supplied by the client
+/Tugas GitIgnore/
+
 # Archives and generated bundles
 *.zip
 *.tar
