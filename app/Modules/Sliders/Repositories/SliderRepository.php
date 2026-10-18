@@ -141,7 +141,6 @@ class SliderRepository
         $stmt = $this->pdo->prepare(
             'UPDATE sliders
              SET archived_at = :archived_at,
-                 is_active = 0,
                  updated_at = :updated_at,
                  updated_by = :updated_by
              WHERE id = :id

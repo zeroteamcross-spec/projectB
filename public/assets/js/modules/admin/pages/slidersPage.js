@@ -131,7 +131,7 @@ export function AdminSlidersPage() {
       rerender();
       try {
         const archived = await slidersResource.adminDelete(slider.id);
-        patchAdminSliders(archived ?? { ...slider, is_active: false, is_archived: true });
+        patchAdminSliders(archived ?? { ...slider, is_archived: true });
         invalidateSliderSnapshots();
         showToast("Slider berhasil diarsipkan.", { type: "success" });
       } catch (error) {
