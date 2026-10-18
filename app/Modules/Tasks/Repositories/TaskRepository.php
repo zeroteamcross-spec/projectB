@@ -104,6 +104,13 @@ class TaskRepository
                 'status' => 'open',
                 'created_at' => '2026-10-18 00:00:00',
             ],
+            [
+                'task_key' => TaskCatalog::ADMIN_SLIDER_ARCHIVE_BUG_TASK_KEY,
+                'title' => TaskCatalog::ADMIN_SLIDER_ARCHIVE_BUG_TASK_TITLE,
+                'description' => TaskCatalog::ADMIN_SLIDER_ARCHIVE_BUG_TASK_DESCRIPTION,
+                'status' => 'open',
+                'created_at' => '2026-10-18 00:00:00',
+            ],
         ];
     }
 
