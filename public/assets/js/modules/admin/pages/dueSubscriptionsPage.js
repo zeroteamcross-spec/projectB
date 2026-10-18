@@ -396,6 +396,9 @@ function proofButton(path, label, id) {
   link.target = "_blank";
   link.rel = "noopener";
   link.className = "inline-flex min-h-9 w-fit max-w-full items-center justify-center gap-2 rounded-[var(--pb-radius-xl)] border border-[var(--pb-brand-primary)] bg-white px-3 py-2 text-xs font-semibold text-[var(--pb-brand-secondary)] no-underline shadow-sm transition hover:bg-[var(--pb-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  // Link tetap membuka bukti di tab baru, tetapi wajib tampil sebagai kontrol
+  // tombol compact walaupun ada style global yang mengubah display anchor.
+  link.style.display = "inline-flex";
   link.append(createIcon("eye", { className: "h-3.5 w-3.5" }), textNode("span", "break-words", label));
   return link;
 }
