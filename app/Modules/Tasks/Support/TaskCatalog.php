@@ -47,4 +47,10 @@ final class TaskCatalog
     public const ADMIN_MASTER_LOCATION_POPULATE_TASK_TITLE = 'Isi data Master Location berdasarkan kota.json.';
 
     public const ADMIN_MASTER_LOCATION_POPULATE_TASK_DESCRIPTION = 'Pada halaman admin/master-location, isi data berdasarkan Tugas GitIgnore/kota.json. Pekerjaan hanya dicatat dan menunggu instruksi persis Mulai kerjakan tugas; jangan melakukan pengisian, CRUD, atau perubahan implementasi sebelum instruksi tersebut diberikan.';
+
+    public const ADMIN_MASTER_BRAND_MODAL_UI_TASK_KEY = 'request-008-admin-master-brand-modal-ui';
+
+    public const ADMIN_MASTER_BRAND_MODAL_UI_TASK_TITLE = 'Rapikan modal Edit Brand di Master Brand Admin dan buat responsif.';
+
+    public const ADMIN_MASTER_BRAND_MODAL_UI_TASK_DESCRIPTION = 'Pada halaman admin/master-brand, rapikan modal Edit Brand berdasarkan gambar referensi di Tugas GitIgnore/admin-master-brand-modal-reference-2026-10-18.png. Pastikan header, field brand, daftar child models, tombol aksi, scroll, dan footer modal tidak bertumpuk serta responsif pada perangkat mobile dan desktop. Pekerjaan hanya dicatat dan menunggu instruksi persis Mulai kerjakan tugas.';
 }
