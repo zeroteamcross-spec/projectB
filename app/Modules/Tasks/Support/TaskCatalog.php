@@ -53,4 +53,10 @@ final class TaskCatalog
     public const ADMIN_MASTER_BRAND_MODAL_UI_TASK_TITLE = 'Rapikan modal Edit Brand di Master Brand Admin dan buat responsif.';
 
     public const ADMIN_MASTER_BRAND_MODAL_UI_TASK_DESCRIPTION = 'Pada halaman admin/master-brand, rapikan modal Edit Brand berdasarkan gambar referensi di Tugas GitIgnore/admin-master-brand-modal-reference-2026-10-18.png. Pastikan header, field brand, daftar child models, tombol aksi, scroll, dan footer modal tidak bertumpuk serta responsif pada perangkat mobile dan desktop. Pekerjaan hanya dicatat dan menunggu instruksi persis Mulai kerjakan tugas.';
+
+    public const ADMIN_MASTER_BRAND_POPULATE_TASK_KEY = 'request-009-admin-master-brand-populate';
+
+    public const ADMIN_MASTER_BRAND_POPULATE_TASK_TITLE = 'Tambahkan brand ke Master Brand berdasarkan brand.json.';
+
+    public const ADMIN_MASTER_BRAND_POPULATE_TASK_DESCRIPTION = 'Pada halaman admin/master-brand, tambahkan data brand berdasarkan Tugas GitIgnore/brand.json. Pekerjaan hanya dicatat dan menunggu instruksi persis Mulai kerjakan tugas; jangan membaca, mengimpor, membuat, atau mengubah data brand sebelum instruksi tersebut diberikan. Tidak ada gambar referensi baru yang terlampir.';
 }
