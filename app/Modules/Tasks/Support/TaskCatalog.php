@@ -41,4 +41,10 @@ final class TaskCatalog
     public const ADMIN_MASTER_LOCATION_REGENCIES_TASK_TITLE = 'Ambil data kota berdasarkan provinsi untuk Master Lokasi Admin.';
 
     public const ADMIN_MASTER_LOCATION_REGENCIES_TASK_DESCRIPTION = 'Pada halaman admin/master-location, gunakan data provinsi dari Tugas GitIgnore/provinsi.json, panggil endpoint GET https://wilayah.id/api/regencies/[PROVINCE_CODE].json untuk setiap kode provinsi, lalu gabungkan hasil kota/kabupaten ke Tugas GitIgnore/kota.json dengan code, name, province_code, dan province_name. Data hasil tetap berada di folder yang di-ignore.';
+
+    public const ADMIN_MASTER_LOCATION_POPULATE_TASK_KEY = 'request-007-admin-master-location-populate';
+
+    public const ADMIN_MASTER_LOCATION_POPULATE_TASK_TITLE = 'Isi data Master Location berdasarkan kota.json.';
+
+    public const ADMIN_MASTER_LOCATION_POPULATE_TASK_DESCRIPTION = 'Pada halaman admin/master-location, isi data berdasarkan Tugas GitIgnore/kota.json. Pekerjaan hanya dicatat dan menunggu instruksi persis Mulai kerjakan tugas; jangan melakukan pengisian, CRUD, atau perubahan implementasi sebelum instruksi tersebut diberikan.';
 }
