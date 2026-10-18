@@ -29,4 +29,10 @@ final class TaskCatalog
     public const ADMIN_MASTER_SIDEBAR_INSPECTION_TASK_TITLE = 'Periksa dan perbaiki menu Master Inspeksi di Master Sidebar Admin.';
 
     public const ADMIN_MASTER_SIDEBAR_INSPECTION_TASK_DESCRIPTION = 'Periksa mengapa menu Master Inspeksi tidak muncul pada Master Sidebar di akun Admin, karena menu tersebut seharusnya dapat diatur dari sana. Jika terbukti BUG, perbaiki tanpa merusak menu atau role lain, lalu uji visibilitas dan pengaturan menu Admin. Gambar referensi disimpan di Tugas GitIgnore/master-sidebar-inspeksi-reference-2026-10-18.png. Pekerjaan menunggu instruksi Mulai kerjakan tugas.';
+
+    public const BUYER_DESKTOP_USER_NAME_TASK_KEY = 'request-005-buyer-desktop-user-name';
+
+    public const BUYER_DESKTOP_USER_NAME_TASK_TITLE = 'Ubah teks Premium Buyer menjadi nama user yang login di Buyer desktop.';
+
+    public const BUYER_DESKTOP_USER_NAME_TASK_DESCRIPTION = 'Pada halaman Buyer desktop, ganti teks statis Premium Buyer menjadi nama user yang sedang login. Pertahankan tampilan tetap rapi dan fallback yang aman untuk pengguna yang belum login. Pekerjaan menunggu instruksi Mulai kerjakan tugas. Gambar referensi belum dilampirkan.';
 }
