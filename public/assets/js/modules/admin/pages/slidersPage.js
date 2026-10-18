@@ -15,6 +15,7 @@ const DEFAULT_QUERY = Object.freeze({
   keyword: "",
   position: "",
   status: "",
+  archive: "",
   page: 1,
   pageSize: 10,
 });
@@ -28,6 +29,7 @@ export function AdminSlidersPage() {
     modal: null,
     saving: false,
     deletingId: null,
+    restoringId: null,
     togglingId: null,
     reorderingId: null,
     error: "",
@@ -128,14 +130,29 @@ export function AdminSlidersPage() {
       state.deletingId = slider.id;
       rerender();
       try {
-        await slidersResource.adminDelete(slider.id);
-        removeAdminSlider(slider.id);
+        const archived = await slidersResource.adminDelete(slider.id);
+        patchAdminSliders(archived ?? { ...slider, is_active: false, is_archived: true });
         invalidateSliderSnapshots();
         showToast("Slider berhasil diarsipkan.", { type: "success" });
       } catch (error) {
         showToast(error.message || "Gagal mengarsipkan slider.", { type: "error" });
       } finally {
         state.deletingId = null;
+        rerender();
+      }
+    },
+    async restoreSlider(slider) {
+      state.restoringId = slider.id;
+      rerender();
+      try {
+        const restored = await slidersResource.adminRestore(slider.id);
+        patchAdminSliders(restored ?? { ...slider, archived_at: null, is_archived: false });
+        invalidateSliderSnapshots();
+        showToast("Slider berhasil dipulihkan.", { type: "success" });
+      } catch (error) {
+        showToast(error.message || "Gagal memulihkan slider.", { type: "error" });
+      } finally {
+        state.restoringId = null;
         rerender();
       }
     },
@@ -297,18 +314,20 @@ function filterBar({ query, sliders, onSubmit }) {
   const keyword = inputControl("adsl_keyword_input", "keyword", query.keyword, "Cari judul, kode, CTA");
   const position = selectControl("adsl_position_input", "position", query.position, [["", "Semua posisi"], ...sliderPositionOptions().map((item) => [item.value, item.label])]);
   const status = selectControl("adsl_status_input", "status", query.status, [["", "Semua status"], ["active", "Aktif"], ["inactive", "Nonaktif"]]);
+  const archive = selectControl("adsl_archive_input", "archive", query.archive, [["", "Semua arsip"], ["active", "Belum diarsipkan"], ["archived", "Diarsipkan"]]);
   const actions = document.createElement("section");
   actions.className = "grid gap-2 sm:grid-cols-2 lg:grid-cols-1";
   const submit = Button({ label: "Terapkan", variant: "primary" });
   submit.type = "submit";
   submit.prepend(createIcon("search", { className: "block h-4 w-4 leading-none" }));
-  const reset = Button({ label: "Reset", variant: "secondary", onClick: () => onSubmit?.({ keyword: "", position: "", status: "" }) });
+  const reset = Button({ label: "Reset", variant: "secondary", onClick: () => onSubmit?.({ keyword: "", position: "", status: "", archive: "" }) });
   reset.type = "button";
   actions.append(submit, reset);
-  form.append(labelWrap("Keyword", keyword), labelWrap("Posisi", position), labelWrap("Status", status), actions);
+  form.className = "grid gap-3 lg:grid-cols-[minmax(0,1fr)_200px_170px_170px_auto]";
+  form.append(labelWrap("Keyword", keyword), labelWrap("Posisi", position), labelWrap("Status", status), labelWrap("Arsip", archive), actions);
   form.addEventListener("submit", (event) => {
     event.preventDefault();
-    onSubmit?.({ keyword: keyword.value.trim(), position: position.value, status: status.value });
+    onSubmit?.({ keyword: keyword.value.trim(), position: position.value, status: status.value, archive: archive.value });
   });
   const chips = document.createElement("section");
   chips.className = "flex flex-wrap gap-2 border-t border-[var(--pb-card-border)] pt-3";
@@ -394,6 +413,10 @@ function titleCell(slider) {
 }
 
 function statusCell(slider) {
+  if (slider.is_archived || slider.archived_at) {
+    return Badge({ label: "Diarsipkan", variant: "danger" });
+  }
+
   return Badge({ label: slider.is_active ? "Aktif" : "Nonaktif", variant: slider.is_active ? "success" : "default" });
 }
 
@@ -407,13 +430,16 @@ function scheduleCell(slider) {
 function actionCell(slider, allSliders, state, actions) {
   const wrap = document.createElement("section");
   wrap.className = "flex flex-wrap gap-2";
+  const archived = Boolean(slider.is_archived || slider.archived_at);
   const preview = iconButton("Preview", "eye", () => actions.openPreview(slider));
   const edit = iconButton("Edit", "edit", () => actions.openEdit(slider));
-  const toggle = iconButton(state.togglingId === slider.id ? "..." : slider.is_active ? "Nonaktif" : "Aktif", slider.is_active ? "eyeSlash" : "eye", () => actions.toggleSlider(slider), state.togglingId === slider.id);
+  const toggle = iconButton(state.togglingId === slider.id ? "..." : slider.is_active ? "Nonaktif" : "Aktif", slider.is_active ? "eyeSlash" : "eye", () => actions.toggleSlider(slider), archived || state.togglingId === slider.id);
   const up = iconButton("Naik", "arrowLeft", () => actions.moveSlider(slider, "up", allSliders), state.reorderingId === slider.id);
   const down = iconButton("Turun", "arrowRight", () => actions.moveSlider(slider, "down", allSliders), state.reorderingId === slider.id);
-  const remove = iconButton(state.deletingId === slider.id ? "..." : "Arsip", "trash", () => actions.deleteSlider(slider), state.deletingId === slider.id);
-  wrap.append(preview, edit, toggle, up, down, remove);
+  const archiveAction = archived
+    ? iconButton(state.restoringId === slider.id ? "..." : "Pulihkan", "history", () => actions.restoreSlider(slider), state.restoringId === slider.id)
+    : iconButton(state.deletingId === slider.id ? "..." : "Arsip", "trash", () => actions.deleteSlider(slider), state.deletingId === slider.id);
+  wrap.append(preview, edit, toggle, up, down, archiveAction);
   return wrap;
 }
 
@@ -881,12 +907,16 @@ function filterSliders(sliders, query) {
   const keyword = String(query.keyword ?? "").trim().toLowerCase();
   const position = String(query.position ?? "");
   const status = String(query.status ?? "");
+  const archive = String(query.archive ?? "");
   return sliders.filter((slider) => {
+    const isArchived = Boolean(slider.is_archived || slider.archived_at);
     const haystack = [slider.code, slider.title, slider.description, slider.body_text, slider.cta_text].filter(Boolean).join(" ").toLowerCase();
     if (keyword && !haystack.includes(keyword)) return false;
     if (position && slider.position_key !== position) return false;
     if (status === "active" && !slider.is_active) return false;
     if (status === "inactive" && slider.is_active) return false;
+    if (archive === "active" && isArchived) return false;
+    if (archive === "archived" && !isArchived) return false;
     return true;
   });
 }
@@ -911,6 +941,7 @@ function createQuery(query = {}) {
     keyword: query.keyword ?? "",
     position: query.position ?? "",
     status: query.status ?? "",
+    archive: query.archive ?? "",
     page: Math.max(1, Number(query.page || 1)),
     pageSize: Math.max(1, Number(query.page_size || query.pageSize || 10)),
   };
@@ -921,6 +952,7 @@ function syncUrl(query) {
   if (query.keyword) params.set("keyword", query.keyword);
   if (query.position) params.set("position", query.position);
   if (query.status) params.set("status", query.status);
+  if (query.archive) params.set("archive", query.archive);
   if (Number(query.page) > 1) params.set("page", String(query.page));
   if (Number(query.pageSize) !== 10) params.set("page_size", String(query.pageSize));
   const target = params.toString() ? `/admin/sliders?${params.toString()}` : "/admin/sliders";

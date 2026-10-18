@@ -10,7 +10,7 @@ class SliderRepository
 {
     private const SELECT_COLUMNS = 'id, code, title, subtitle, body_text, html_content, image_url, image_alt,
         cta_text, cta_url, position_key, template_key, animation_key, sort_order, is_active,
-        start_at, end_at, created_by, updated_by, created_at, updated_at, deleted_at';
+        start_at, end_at, created_by, updated_by, created_at, updated_at, deleted_at, archived_at';
 
     private PDO $pdo;
 
@@ -55,6 +55,7 @@ class SliderRepository
     {
         $conditions = [
             'deleted_at IS NULL',
+            'archived_at IS NULL',
             'is_active = 1',
             '(start_at IS NULL OR start_at <= :now_start)',
             '(end_at IS NULL OR end_at >= :now_end)',
@@ -135,16 +136,39 @@ class SliderRepository
         $stmt->execute($data);
     }
 
-    public function softDelete(int $id, int $userId): void
+    public function archive(int $id, int $userId): void
     {
         $stmt = $this->pdo->prepare(
-            'UPDATE sliders SET deleted_at = :deleted_at, updated_at = :updated_at, updated_by = :updated_by WHERE id = :id'
+            'UPDATE sliders
+             SET archived_at = :archived_at,
+                 is_active = 0,
+                 updated_at = :updated_at,
+                 updated_by = :updated_by
+             WHERE id = :id
+             AND deleted_at IS NULL'
         );
         $now = date('Y-m-d H:i:s');
         $stmt->execute([
             'id' => $id,
-            'deleted_at' => $now,
+            'archived_at' => $now,
             'updated_at' => $now,
+            'updated_by' => $userId,
+        ]);
+    }
+
+    public function restore(int $id, int $userId): void
+    {
+        $stmt = $this->pdo->prepare(
+            'UPDATE sliders
+             SET archived_at = NULL,
+                 updated_at = :updated_at,
+                 updated_by = :updated_by
+             WHERE id = :id
+             AND deleted_at IS NULL'
+        );
+        $stmt->execute([
+            'id' => $id,
+            'updated_at' => date('Y-m-d H:i:s'),
             'updated_by' => $userId,
         ]);
     }
@@ -164,6 +188,12 @@ class SliderRepository
         if (array_key_exists('is_active', $filters) && $filters['is_active'] !== '') {
             $conditions[] = 'is_active = :is_active';
             $params['is_active'] = (int) (bool) $filters['is_active'];
+        }
+
+        if (($filters['archive_status'] ?? '') === 'archived') {
+            $conditions[] = 'archived_at IS NOT NULL';
+        } elseif (($filters['archive_status'] ?? '') === 'active') {
+            $conditions[] = 'archived_at IS NULL';
         }
 
         if (isset($filters['keyword']) && $filters['keyword'] !== '') {

@@ -35,6 +35,8 @@ class SliderMapper
             'created_at' => $slider['created_at'] ?? null,
             'updated_at' => $slider['updated_at'] ?? null,
             'deleted_at' => $slider['deleted_at'] ?? null,
+            'archived_at' => $slider['archived_at'] ?? null,
+            'is_archived' => ! empty($slider['archived_at']),
         ];
     }
 

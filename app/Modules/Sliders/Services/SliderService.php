@@ -116,12 +116,18 @@ class SliderService
     {
         AuthPolicy::requireAdmin($user);
         $this->requireSlider($id);
-        $this->sliders->softDelete($id, (int) $user['id']);
+        $this->sliders->archive($id, (int) $user['id']);
 
-        return [
-            'id' => $id,
-            'deleted_at' => date('Y-m-d H:i:s'),
-        ];
+        return SliderMapper::toArray($this->requireSlider($id));
+    }
+
+    public function restore(array $user, int $id): array
+    {
+        AuthPolicy::requireAdmin($user);
+        $this->requireSlider($id);
+        $this->sliders->restore($id, (int) $user['id']);
+
+        return SliderMapper::toArray($this->requireSlider($id));
     }
 
     public function toggle(array $user, int $id): array

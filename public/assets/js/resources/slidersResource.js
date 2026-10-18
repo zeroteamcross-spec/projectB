@@ -46,6 +46,11 @@ export const slidersResource = {
     return response.data?.slider ?? null;
   },
 
+  async adminRestore(id, options = {}) {
+    const response = await apiClient.post(`/admin/sliders/${encodeURIComponent(id)}/restore`, {}, options);
+    return response.data?.slider ?? null;
+  },
+
   async adminToggle(id, options = {}) {
     const response = await apiClient.post(`/admin/sliders/${encodeURIComponent(id)}/toggle`, {}, options);
     return response.data?.slider ?? null;

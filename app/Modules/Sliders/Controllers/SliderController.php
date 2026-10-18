@@ -82,6 +82,13 @@ class SliderController extends Controller
         ], 'Status slider berhasil diperbarui.');
     }
 
+    public function restore(Request $request): JsonResponse
+    {
+        return JsonResponse::success([
+            'slider' => $this->service->restore($this->user($request), (int) $request->routeParam('id')),
+        ], 'Slider berhasil dipulihkan.');
+    }
+
     public function reorder(Request $request): JsonResponse
     {
         $items = $request->input('items', []);

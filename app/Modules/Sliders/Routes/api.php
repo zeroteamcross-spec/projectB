@@ -18,6 +18,7 @@ return static function (Router $router): void {
         $router->put('/{id}', [SliderController::class, 'update']);
         $router->patch('/{id}', [SliderController::class, 'update']);
         $router->post('/{id}/toggle', [SliderController::class, 'toggle']);
+        $router->post('/{id}/restore', [SliderController::class, 'restore']);
         $router->delete('/{id}', [SliderController::class, 'delete']);
     }, [AuthenticatedUserMiddleware::class]);
 };

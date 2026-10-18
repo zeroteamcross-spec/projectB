@@ -21,13 +21,15 @@ CREATE TABLE IF NOT EXISTS sliders (
     created_at DATETIME NOT NULL,
     updated_at DATETIME NULL,
     deleted_at DATETIME NULL,
+    archived_at DATETIME NULL,
     PRIMARY KEY (id),
     UNIQUE KEY sliders_code_unique (code),
     KEY sliders_position_active_order_idx (position_key, is_active, sort_order),
     KEY sliders_template_idx (template_key),
     KEY sliders_schedule_idx (start_at, end_at),
     KEY sliders_created_by_idx (created_by),
-    KEY sliders_updated_by_idx (updated_by)
+    KEY sliders_updated_by_idx (updated_by),
+    KEY sliders_archived_idx (archived_at)
 );
 
 SET @slider_sidebar_item = JSON_OBJECT(

@@ -23,6 +23,7 @@ class ListSlidersRequest
             'template_key' => trim((string) $this->request->query('template_key', '')),
             'animation_key' => trim((string) $this->request->query('animation_key', '')),
             'is_active' => $this->normalizeBooleanFilter($this->request->query('is_active', '')),
+            'archive_status' => $this->normalizeArchiveStatus($this->request->query('archive_status', $this->request->query('archive', ''))),
             'page' => max(1, (int) $this->request->query('page', 1)),
             'limit' => max(1, min((int) $this->request->query('limit', 100), 100)),
         ];
@@ -35,5 +36,12 @@ class ListSlidersRequest
         }
 
         return in_array($value, [1, '1', true, 'true', 'yes', 'on'], true) ? 1 : 0;
+    }
+
+    private function normalizeArchiveStatus($value): string
+    {
+        $value = trim(strtolower((string) $value));
+
+        return in_array($value, ['active', 'archived'], true) ? $value : '';
     }
 }
