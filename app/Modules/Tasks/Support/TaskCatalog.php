@@ -59,4 +59,10 @@ final class TaskCatalog
     public const ADMIN_MASTER_BRAND_POPULATE_TASK_TITLE = 'Tambahkan brand ke Master Brand berdasarkan brand.json.';
 
     public const ADMIN_MASTER_BRAND_POPULATE_TASK_DESCRIPTION = 'Pada halaman admin/master-brand, tambahkan data brand berdasarkan Tugas GitIgnore/brand.json. Pekerjaan hanya dicatat dan menunggu instruksi persis Mulai kerjakan tugas; jangan membaca, mengimpor, membuat, atau mengubah data brand sebelum instruksi tersebut diberikan. Tidak ada gambar referensi baru yang terlampir.';
+
+    public const ADMIN_SUBSCRIPTIONS_DUE_CARD_UI_TASK_KEY = 'request-010-admin-subscriptions-due-card-ui';
+
+    public const ADMIN_SUBSCRIPTIONS_DUE_CARD_UI_TASK_TITLE = 'Rapikan card subscriptions due dan ubah text link menjadi tombol.';
+
+    public const ADMIN_SUBSCRIPTIONS_DUE_CARD_UI_TASK_DESCRIPTION = 'Pada halaman admin/subscriptions-due, rapikan card berdasarkan gambar referensi di Tugas GitIgnore/admin-subscriptions-due-card-reference-2026-10-18.png. Pastikan informasi status, jatuh tempo, nominal, pesan, dan aksi tetap jelas, tidak bertumpuk, responsif di mobile dan desktop, serta ubah text link menjadi tombol. Pekerjaan hanya dicatat dan menunggu instruksi persis Mulai kerjakan tugas.';
 }
