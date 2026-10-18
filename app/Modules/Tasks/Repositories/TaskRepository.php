@@ -24,7 +24,9 @@ class TaskRepository
                  completed_at, created_at, updated_at, deleted_at)
              VALUES
                 (:task_key, :title, :description, :status, NULL, NULL, NULL, :created_at, NULL, NULL)
-             ON DUPLICATE KEY UPDATE task_key = VALUES(task_key)'
+             ON DUPLICATE KEY UPDATE
+                title = VALUES(title),
+                description = VALUES(description)'
         );
         foreach ($this->taskCatalog() as $task) {
             $stmt->execute($task);
