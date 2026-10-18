@@ -35,4 +35,10 @@ final class TaskCatalog
     public const BUYER_DESKTOP_USER_NAME_TASK_TITLE = 'Ubah teks Premium Buyer menjadi nama user yang login di Buyer desktop.';
 
     public const BUYER_DESKTOP_USER_NAME_TASK_DESCRIPTION = 'Pada halaman Buyer desktop, ganti teks statis Premium Buyer menjadi nama user yang sedang login. Pertahankan tampilan tetap rapi dan fallback yang aman untuk pengguna yang belum login. Pekerjaan menunggu instruksi Mulai kerjakan tugas. Gambar referensi belum dilampirkan.';
+
+    public const ADMIN_MASTER_LOCATION_REGENCIES_TASK_KEY = 'request-006-admin-master-location-regencies';
+
+    public const ADMIN_MASTER_LOCATION_REGENCIES_TASK_TITLE = 'Ambil data kota berdasarkan provinsi untuk Master Lokasi Admin.';
+
+    public const ADMIN_MASTER_LOCATION_REGENCIES_TASK_DESCRIPTION = 'Pada halaman admin/master-location, gunakan data provinsi dari Tugas GitIgnore/provinsi.json, panggil endpoint GET https://wilayah.id/api/regencies/[PROVINCE_CODE].json untuk setiap kode provinsi, lalu gabungkan hasil kota/kabupaten ke Tugas GitIgnore/kota.json dengan code, name, province_code, dan province_name. Data hasil tetap berada di folder yang di-ignore.';
 }
