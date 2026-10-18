@@ -33,6 +33,9 @@ x
 # Internal custom-domain runbook
 /storage/custom-domain/
 
+# Task reference images supplied by the client
+/storage/task-references/
+
 # Archives and generated bundles
 *.zip
 *.tar

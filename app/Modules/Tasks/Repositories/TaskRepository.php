@@ -48,6 +48,13 @@ class TaskRepository
                 'status' => 'open',
                 'created_at' => '2026-10-08 00:00:00',
             ],
+            [
+                'task_key' => TaskCatalog::NOTIFICATION_PANEL_DENSITY_TASK_KEY,
+                'title' => TaskCatalog::NOTIFICATION_PANEL_DENSITY_TASK_TITLE,
+                'description' => TaskCatalog::NOTIFICATION_PANEL_DENSITY_TASK_DESCRIPTION,
+                'status' => 'open',
+                'created_at' => '2026-10-18 00:00:00',
+            ],
         ];
     }
 
