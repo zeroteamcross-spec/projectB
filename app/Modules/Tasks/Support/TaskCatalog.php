@@ -28,43 +28,43 @@ final class TaskCatalog
 
     public const ADMIN_MASTER_SIDEBAR_INSPECTION_TASK_TITLE = 'Periksa dan perbaiki menu Master Inspeksi di Master Sidebar Admin.';
 
-    public const ADMIN_MASTER_SIDEBAR_INSPECTION_TASK_DESCRIPTION = 'Periksa mengapa menu Master Inspeksi tidak muncul pada Master Sidebar di akun Admin, karena menu tersebut seharusnya dapat diatur dari sana. Jika terbukti BUG, perbaiki tanpa merusak menu atau role lain, lalu uji visibilitas dan pengaturan menu Admin. Gambar referensi disimpan di Tugas GitIgnore/master-sidebar-inspeksi-reference-2026-10-18.png. Pekerjaan menunggu instruksi Mulai kerjakan tugas.';
+    public const ADMIN_MASTER_SIDEBAR_INSPECTION_TASK_DESCRIPTION = 'BUG diperbaiki: Master Inspeksi kini muncul sebagai child Master pada sidebar dan dapat diatur dari Master Sidebar Admin tanpa menghapus fungsi master inspeksi. Perubahan diuji melalui menu Admin setelah deploy. Referensi: Tugas GitIgnore/master-sidebar-inspeksi-reference-2026-10-18.png.';
 
     public const BUYER_DESKTOP_USER_NAME_TASK_KEY = 'request-005-buyer-desktop-user-name';
 
     public const BUYER_DESKTOP_USER_NAME_TASK_TITLE = 'Ubah teks Premium Buyer menjadi nama user yang login di Buyer desktop.';
 
-    public const BUYER_DESKTOP_USER_NAME_TASK_DESCRIPTION = 'Pada halaman Buyer desktop, ganti teks statis Premium Buyer menjadi nama user yang sedang login. Pertahankan tampilan tetap rapi dan fallback yang aman untuk pengguna yang belum login. Pekerjaan menunggu instruksi Mulai kerjakan tugas. Gambar referensi belum dilampirkan.';
+    public const BUYER_DESKTOP_USER_NAME_TASK_DESCRIPTION = 'Buyer desktop kini memakai nama user yang sedang login pada identitas navigasi dan katalog publik yang sudah terautentikasi, dengan fallback User yang aman. Referensi: Tugas GitIgnore/buyer-desktop-reference-2026-10-18.png.';
 
     public const ADMIN_MASTER_LOCATION_REGENCIES_TASK_KEY = 'request-006-admin-master-location-regencies';
 
     public const ADMIN_MASTER_LOCATION_REGENCIES_TASK_TITLE = 'Ambil data kota berdasarkan provinsi untuk Master Lokasi Admin.';
 
-    public const ADMIN_MASTER_LOCATION_REGENCIES_TASK_DESCRIPTION = 'Pada halaman admin/master-location, gunakan data provinsi dari Tugas GitIgnore/provinsi.json, panggil endpoint GET https://wilayah.id/api/regencies/[PROVINCE_CODE].json untuk setiap kode provinsi, lalu gabungkan hasil kota/kabupaten ke Tugas GitIgnore/kota.json dengan code, name, province_code, dan province_name. Data hasil tetap berada di folder yang di-ignore.';
+    public const ADMIN_MASTER_LOCATION_REGENCIES_TASK_DESCRIPTION = 'Data provinsi dan kota/kabupaten dibuat ulang dari endpoint resmi wilayah.id: 38 provinsi dibaca dari provinces.json dan setiap kode dipanggil melalui GET https://wilayah.id/api/regencies/[PROVINCE_CODE].json. Hasil 514 kota/kabupaten disimpan dengan code, name, province_code, dan province_name di Tugas GitIgnore/kota.json.';
 
     public const ADMIN_MASTER_LOCATION_POPULATE_TASK_KEY = 'request-007-admin-master-location-populate';
 
     public const ADMIN_MASTER_LOCATION_POPULATE_TASK_TITLE = 'Isi data Master Location berdasarkan kota.json.';
 
-    public const ADMIN_MASTER_LOCATION_POPULATE_TASK_DESCRIPTION = 'Pada halaman admin/master-location, isi data berdasarkan Tugas GitIgnore/kota.json. Pekerjaan hanya dicatat dan menunggu instruksi persis Mulai kerjakan tugas; jangan melakukan pengisian, CRUD, atau perubahan implementasi sebelum instruksi tersebut diberikan.';
+    public const ADMIN_MASTER_LOCATION_POPULATE_TASK_DESCRIPTION = 'Master Location diisi melalui browser visible pada halaman admin/master-location berdasarkan Tugas GitIgnore/kota.json. Data digabung dengan data yang sudah ada dan setiap penyimpanan divalidasi melalui respons PUT nyata serta tabel UI.';
 
     public const ADMIN_MASTER_BRAND_MODAL_UI_TASK_KEY = 'request-008-admin-master-brand-modal-ui';
 
     public const ADMIN_MASTER_BRAND_MODAL_UI_TASK_TITLE = 'Rapikan modal Edit Brand di Master Brand Admin dan buat responsif.';
 
-    public const ADMIN_MASTER_BRAND_MODAL_UI_TASK_DESCRIPTION = 'Pada halaman admin/master-brand, rapikan modal Edit Brand berdasarkan gambar referensi di Tugas GitIgnore/admin-master-brand-modal-reference-2026-10-18.png. Pastikan header, field brand, daftar child models, tombol aksi, scroll, dan footer modal tidak bertumpuk serta responsif pada perangkat mobile dan desktop. Pekerjaan hanya dicatat dan menunggu instruksi persis Mulai kerjakan tugas.';
+    public const ADMIN_MASTER_BRAND_MODAL_UI_TASK_DESCRIPTION = 'Modal Edit Brand dirapikan: deskripsi memakai lebar penuh, model memakai grid responsif, tombol aksi dapat membungkus, dan child model tidak menempel pada kontrol lain. Perubahan divalidasi pada viewport desktop dan mobile. Referensi: Tugas GitIgnore/admin-master-brand-modal-reference-2026-10-18.png.';
 
     public const ADMIN_MASTER_BRAND_POPULATE_TASK_KEY = 'request-009-admin-master-brand-populate';
 
     public const ADMIN_MASTER_BRAND_POPULATE_TASK_TITLE = 'Tambahkan brand ke Master Brand berdasarkan brand.json.';
 
-    public const ADMIN_MASTER_BRAND_POPULATE_TASK_DESCRIPTION = 'Pada halaman admin/master-brand, tambahkan data brand berdasarkan Tugas GitIgnore/brand.json. Pekerjaan hanya dicatat dan menunggu instruksi persis Mulai kerjakan tugas; jangan membaca, mengimpor, membuat, atau mengubah data brand sebelum instruksi tersebut diberikan. Tidak ada gambar referensi baru yang terlampir.';
+    public const ADMIN_MASTER_BRAND_POPULATE_TASK_DESCRIPTION = 'Master Brand diisi melalui browser visible berdasarkan Tugas GitIgnore/brand.json. Brand yang sudah ada dipertahankan, sedangkan brand sumber yang belum ada ditambahkan bersama model nyata dan divalidasi dari tabel UI serta respons PUT.';
 
     public const ADMIN_SUBSCRIPTIONS_DUE_CARD_UI_TASK_KEY = 'request-010-admin-subscriptions-due-card-ui';
 
     public const ADMIN_SUBSCRIPTIONS_DUE_CARD_UI_TASK_TITLE = 'Rapikan card subscriptions due dan ubah text link menjadi tombol.';
 
-    public const ADMIN_SUBSCRIPTIONS_DUE_CARD_UI_TASK_DESCRIPTION = 'Pada halaman admin/subscriptions-due, rapikan card berdasarkan gambar referensi di Tugas GitIgnore/admin-subscriptions-due-card-reference-2026-10-18.png. Pastikan informasi status, jatuh tempo, nominal, pesan, dan aksi tetap jelas, tidak bertumpuk, responsif di mobile dan desktop, serta ubah text link menjadi tombol. Pekerjaan hanya dicatat dan menunggu instruksi persis Mulai kerjakan tugas.';
+    public const ADMIN_SUBSCRIPTIONS_DUE_CARD_UI_TASK_DESCRIPTION = 'Card admin/subscriptions-due dirapikan dengan grid responsif, teks panjang dapat membungkus, action group tidak bertumpuk, dan link bukti/riwayat tampil sebagai kontrol bergaya tombol. Referensi: Tugas GitIgnore/admin-subscriptions-due-card-reference-2026-10-18.png.';
 
     public const ADMIN_SLIDER_ARCHIVE_BUG_TASK_KEY = 'request-011-admin-slider-archive-bug';
 
