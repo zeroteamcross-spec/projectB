@@ -232,7 +232,7 @@ function hero(showrooms) {
 function subscriptionCard(showroom, state, actions) {
   const card = document.createElement("div");
   card.id = `admdue_card_${showroom.id}`;
-  card.className = "grid gap-3 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white/85 p-4 shadow-sm sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center";
+  card.className = "grid min-w-0 gap-4 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white/85 p-4 shadow-sm sm:grid-cols-[minmax(0,1fr)_minmax(240px,auto)] sm:items-start sm:gap-x-6";
 
   const info = document.createElement("div");
   info.className = "grid gap-1 min-w-0";
@@ -280,12 +280,7 @@ function subscriptionCard(showroom, state, actions) {
   }
 
   if (showroom.subscription_proof_path) {
-    const link = document.createElement("a");
-    link.href = showroom.subscription_proof_path;
-    link.target = "_blank";
-    link.rel = "noopener";
-    link.className = "w-fit text-xs font-semibold text-[var(--pb-brand-secondary)] underline underline-offset-2";
-    link.textContent = "Lihat bukti transfer";
+    const link = proofButton(showroom.subscription_proof_path, "Lihat bukti transfer", `admdue_proof_button_${showroom.id}`);
     info.append(link);
   }
 
@@ -294,7 +289,7 @@ function subscriptionCard(showroom, state, actions) {
   }
 
   const actionsWrap = document.createElement("div");
-  actionsWrap.className = "flex flex-wrap gap-2";
+  actionsWrap.className = "flex min-w-0 flex-wrap items-center gap-2 sm:justify-end";
 
   if (status === "pending_verification") {
     const isBusy = state.processingShowroomId === showroom.id;
@@ -314,15 +309,15 @@ function subscriptionCard(showroom, state, actions) {
     reject.id = `admdue_reject_button_${showroom.id}`;
     actionsWrap.append(confirm, reject);
   } else {
-    actionsWrap.append(textNode("p", "text-xs text-gray-500", "Menunggu showroom mengunggah bukti transfer perpanjangan."));
+    actionsWrap.append(textNode("p", "max-w-sm break-words text-xs text-gray-500 sm:text-right", "Menunggu showroom mengunggah bukti transfer perpanjangan."));
   }
 
   const isHistoryOpen = state.expandedHistoryByShowroomId[showroom.id] !== undefined;
   const historyToggle = document.createElement("button");
   historyToggle.type = "button";
   historyToggle.id = `admdue_history_toggle_${showroom.id}`;
-  historyToggle.className = "w-fit text-xs font-semibold text-[var(--pb-brand-secondary)] underline underline-offset-2";
-  historyToggle.textContent = isHistoryOpen ? "Sembunyikan riwayat" : "Lihat riwayat";
+  historyToggle.className = "inline-flex min-h-9 w-fit items-center justify-center gap-2 rounded-[var(--pb-radius-xl)] border border-[var(--pb-brand-primary)] bg-white px-3 py-2 text-xs font-semibold text-[var(--pb-brand-secondary)] shadow-sm transition hover:bg-[var(--pb-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  historyToggle.append(createIcon("clock", { className: "h-3.5 w-3.5" }), textNode("span", "break-words", isHistoryOpen ? "Sembunyikan riwayat" : "Lihat riwayat"));
   historyToggle.addEventListener("click", () => actions.toggleHistory(showroom));
   actionsWrap.append(historyToggle);
 
@@ -387,16 +382,22 @@ function historyRow(entry) {
   }
 
   if (entry.proof_path) {
-    const link = document.createElement("a");
-    link.href = entry.proof_path;
-    link.target = "_blank";
-    link.rel = "noopener";
-    link.className = "w-fit text-xs font-semibold text-[var(--pb-brand-secondary)] underline underline-offset-2";
-    link.textContent = "Lihat bukti transfer";
+    const link = proofButton(entry.proof_path, "Lihat bukti transfer", `admdue_history_proof_button_${entry.id ?? "item"}`);
     row.append(link);
   }
 
   return row;
+}
+
+function proofButton(path, label, id) {
+  const link = document.createElement("a");
+  link.id = id;
+  link.href = path;
+  link.target = "_blank";
+  link.rel = "noopener";
+  link.className = "inline-flex min-h-9 w-fit max-w-full items-center justify-center gap-2 rounded-[var(--pb-radius-xl)] border border-[var(--pb-brand-primary)] bg-white px-3 py-2 text-xs font-semibold text-[var(--pb-brand-secondary)] no-underline shadow-sm transition hover:bg-[var(--pb-surface-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  link.append(createIcon("eye", { className: "h-3.5 w-3.5" }), textNode("span", "break-words", label));
+  return link;
 }
 
 function textNode(tagName, className, text) {

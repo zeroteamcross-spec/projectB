@@ -373,14 +373,14 @@ function ensureNotificationStyles() {
       top: calc(100% + 1rem);
       right: 0;
       z-index: 1;
-      width: min(calc(100vw - 2rem), 410px);
-      max-height: min(680px, calc(100vh - 6.5rem));
+      width: min(calc(100vw - 2rem), 380px);
+      max-height: min(620px, calc(100vh - 6.5rem));
       display: flex;
       flex-direction: column;
       overflow: visible;
       border: 1.5px solid #1e81b0;
       border-right-width: 6px;
-      border-radius: 28px;
+      border-radius: 22px;
       background: #ffffff;
       box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
       color: #111827;
@@ -434,30 +434,30 @@ function ensureNotificationStyles() {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 1rem;
-      padding: 28px 24px 16px;
-      border-radius: 28px 28px 0 0;
+      gap: 0.75rem;
+      padding: 20px 18px 12px;
+      border-radius: 22px 22px 0 0;
       background: #ffffff;
     }
 
     .pb-notification-popover__title {
       margin: 0;
       color: #111827;
-      font-size: 1.45rem;
+      font-size: 1.2rem;
       font-weight: 800;
       letter-spacing: 0;
       line-height: 1.1;
     }
 
     .pb-notification-popover__mark {
-      min-height: 2.75rem;
+      min-height: 2.25rem;
       border: 0;
       border-radius: var(--pb-radius-lg);
       background: transparent;
       color: var(--pb-danger);
       cursor: pointer;
       font: inherit;
-      font-size: 0.84rem;
+      font-size: 0.72rem;
       font-weight: 800;
       white-space: nowrap;
     }
@@ -486,15 +486,15 @@ function ensureNotificationStyles() {
 
     .pb-notification-item__button {
       display: grid;
-      min-height: 88px;
+      min-height: 72px;
       width: 100%;
-      grid-template-columns: 12px 56px minmax(0, 1fr) auto;
+      grid-template-columns: 10px 44px minmax(0, 1fr) auto;
       align-items: center;
-      gap: 16px;
+      gap: 10px;
       border: 0;
       background: transparent;
       cursor: pointer;
-      padding: 18px 24px;
+      padding: 12px 18px;
       text-align: left;
     }
 
@@ -508,8 +508,8 @@ function ensureNotificationStyles() {
     }
 
     .pb-notification-item__dot {
-      width: 10px;
-      height: 10px;
+      width: 8px;
+      height: 8px;
       border-radius: 999px;
       background: var(--pb-danger);
     }
@@ -520,12 +520,12 @@ function ensureNotificationStyles() {
 
     .pb-notification-icon {
       display: inline-flex;
-      width: 56px;
-      height: 56px;
+      width: 44px;
+      height: 44px;
       flex-shrink: 0;
       align-items: center;
       justify-content: center;
-      border-radius: 16px;
+      border-radius: 12px;
       overflow: hidden;
     }
 
@@ -561,33 +561,33 @@ function ensureNotificationStyles() {
     .pb-notification-item__content {
       display: grid;
       min-width: 0;
-      gap: 4px;
+      gap: 2px;
     }
 
     .pb-notification-item__content h3 {
       margin: 0;
       overflow-wrap: anywhere;
       color: #111827;
-      font-size: 1.02rem;
+      font-size: 0.88rem;
       font-weight: 800;
       letter-spacing: 0;
-      line-height: 1.2;
+      line-height: 1.25;
     }
 
     .pb-notification-item__content p {
       margin: 0;
       overflow-wrap: anywhere;
       color: #6b7280;
-      font-size: 0.86rem;
+      font-size: 0.76rem;
       font-weight: 500;
-      line-height: 1.42;
+      line-height: 1.32;
     }
 
     .pb-notification-item__time {
       align-self: start;
-      padding-top: 3px;
+      padding-top: 2px;
       color: #6b7280;
-      font-size: 0.84rem;
+      font-size: 0.72rem;
       font-weight: 700;
       line-height: 1.25;
       white-space: nowrap;
@@ -632,18 +632,18 @@ function ensureNotificationStyles() {
 
     .pb-notification-popover__footer {
       display: flex;
-      min-height: 58px;
+      min-height: 50px;
       width: 100%;
       align-items: center;
       justify-content: space-between;
-      gap: 1rem;
+      gap: 0.75rem;
       border: 0;
       border-top: 1px solid #e5e7eb;
-      border-radius: 0 0 24px 24px;
+      border-radius: 0 0 20px 20px;
       background: #ffffff;
       color: #111827;
       cursor: pointer;
-      padding: 18px 24px;
+      padding: 12px 18px;
       text-align: left;
     }
 
@@ -655,8 +655,8 @@ function ensureNotificationStyles() {
       display: inline-flex;
       min-width: 0;
       align-items: center;
-      gap: 12px;
-      font-size: 0.95rem;
+      gap: 8px;
+      font-size: 0.82rem;
       font-weight: 800;
       line-height: 1.2;
     }

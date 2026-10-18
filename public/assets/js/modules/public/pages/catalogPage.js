@@ -213,7 +213,7 @@ function render(root, context, flags) {
   if (showDesktopTopNav) {
     frame.append(BuyerDesktopTopNav({
       activePath: context?.path ?? "/",
-      brandLabel: role === "seller" ? "Marketing" : "Premium Buyer",
+      brandLabel: role === "seller" ? "Marketing" : buyerName(authStore.user()),
       brandIcon: role === "seller" ? "showroom" : "car",
       user: authStore.user(),
       onNavigate: (path) => context.router?.navigate(path),

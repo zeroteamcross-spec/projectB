@@ -235,7 +235,7 @@ function buyerTopNavigation({ activePath, actions }) {
   const brandCopy = document.createElement("section");
   brandCopy.className = "grid min-w-0 gap-0.5";
   brandCopy.append(
-    textNode("strong", "truncate text-sm font-black text-[var(--pb-text)]", "Premium Buyer"),
+    textNode("strong", "truncate text-sm font-black text-[var(--pb-text)]", buyerName(user)),
     textNode("span", "truncate text-xs font-bold text-[var(--pb-brand-secondary)]", `Halo, ${buyerName(user)}`),
   );
   brand.append(

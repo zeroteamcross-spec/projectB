@@ -45,6 +45,7 @@ export function AdminMasterBrandForm({
     value: draft.description,
     placeholder: "Catatan singkat brand",
   });
+  description.wrap.classList.add("sm:col-span-2");
   fields.append(name.wrap, status.wrap, description.wrap);
 
   const modelsSection = document.createElement("section");
@@ -101,7 +102,7 @@ export function AdminMasterBrandForm({
 
   const actions = document.createElement("section");
   actions.id = "admst_brand_form_actions_section";
-  actions.className = "flex shrink-0 flex-wrap items-center justify-end gap-2";
+  actions.className = "flex w-full min-w-0 flex-wrap items-center justify-end gap-2";
 
   const cancel = Button({ label: "Batal", variant: "secondary", onClick: () => onCancel?.() });
   cancel.id = "admst_cancel_brand_form_button";
@@ -145,7 +146,7 @@ export function AdminMasterBrandForm({
 function modelRow({ model, index, onRemove }) {
   const row = document.createElement("section");
   row.id = `admst_model_row_${index}_section`;
-  row.className = "grid gap-3 rounded-[1.25rem] border border-[var(--pb-border)] bg-white/82 p-4";
+  row.className = "grid min-w-0 gap-3 rounded-[1.25rem] border border-[var(--pb-border)] bg-white/82 p-4 sm:grid-cols-[minmax(0,1fr)_minmax(150px,0.42fr)]";
 
   const name = inputField({
     id: `admst_model_name_input_${index}`,
@@ -165,7 +166,7 @@ function modelRow({ model, index, onRemove }) {
   const remove = Button({ label: "Hapus", variant: "secondary", onClick: onRemove });
   remove.id = `admst_remove_model_button_${index}`;
   remove.type = "button";
-  remove.classList.add("w-full", "sm:w-auto", "sm:justify-self-start");
+  remove.classList.add("w-full", "sm:col-span-2", "sm:w-auto", "sm:justify-self-start");
 
   row.dataset.modelId = model.id;
   row.append(name.wrap, status.wrap, remove);
