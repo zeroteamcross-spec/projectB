@@ -183,10 +183,19 @@ async function setPaymentMode(mode) {
 async function logoutCurrent(label) {
   await page.goto(`${publicBase}/profile?ui_task=subscription-payment-logout-${Date.now()}`, { waitUntil: "domcontentloaded", timeout: 60000 });
   await waitApp();
-  const logoutButton = page.locator('[id$="_role_specific_logout_button"]').first();
+  let logoutButton;
+  let pendingApprovalLogout = false;
+  try {
+    logoutButton = await visible(page.locator('[id$="_role_specific_logout_button"]').first(), `tombol logout ${label}`);
+  } catch (error) {
+    logoutButton = await visible(page.locator("#pending_approval_logout_button"), `tombol logout pending ${label}`);
+    pendingApprovalLogout = true;
+  }
   await clickVisible(logoutButton, `tombol logout ${label}`);
-  await visible(page.locator("#profile_logout_confirm_modal"), "modal konfirmasi logout");
-  await clickVisible(page.locator("#profile_logout_confirm_button"), `konfirmasi logout ${label}`);
+  if (!pendingApprovalLogout) {
+    await visible(page.locator("#profile_logout_confirm_modal"), "modal konfirmasi logout");
+    await clickVisible(page.locator("#profile_logout_confirm_button"), `konfirmasi logout ${label}`);
+  }
   await page.waitForTimeout(1000);
   await page.goto(`${publicBase}/login/seller?ui_task=subscription-payment-logout-check-${Date.now()}`, { waitUntil: "domcontentloaded", timeout: 60000 });
   await waitApp();
