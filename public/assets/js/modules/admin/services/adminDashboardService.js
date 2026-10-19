@@ -27,7 +27,7 @@ export const adminDashboardService = {
     return getListingStatusMeta(status);
   },
 
-  quickActions({ onUsers, onPending, onTransactions, onSettlements, onActAs } = {}) {
+  quickActions({ onUsers, onPending, onTransactions, onSettlements } = {}) {
     return [
       {
         title: "Users",
@@ -52,12 +52,6 @@ export const adminDashboardService = {
         description: "Pantau batch settlement marketing dan finalisasi manual yang relevan untuk UAT.",
         actionLabel: "Lihat settlement",
         onClick: onSettlements,
-      },
-      {
-        title: "Impersonation",
-        description: "Masuk ke konteks buyer atau showroom dari user management.",
-        actionLabel: "Masuk act-as",
-        onClick: onActAs,
       },
     ];
   },
