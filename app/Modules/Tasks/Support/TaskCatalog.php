@@ -131,4 +131,10 @@ final class TaskCatalog
     public const INSPECTION_MASTER_DESCRIPTION_REQUIRED_TASK_TITLE = 'Wajibkan Keterangan saat membuat Master Inspeksi.';
 
     public const INSPECTION_MASTER_DESCRIPTION_REQUIRED_TASK_DESCRIPTION = 'Field Keterangan pada Master Inspeksi showroom dan admin wajib diisi saat membuat atau mengedit item. Backend menolak nilai kosong atau hanya spasi, frontend menandai field wajib, dan copy antar cabang tidak boleh membuat item tanpa keterangan.';
+
+    public const SELLER_INSPECTION_SUMMARY_REOPEN_TASK_KEY = 'request-022-seller-inspection-summary-reopen';
+
+    public const SELLER_INSPECTION_SUMMARY_REOPEN_TASK_TITLE = 'Selidiki Catatan ringkas kosong saat inspeksi dibuka ulang.';
+
+    public const SELLER_INSPECTION_SUMMARY_REOPEN_TASK_DESCRIPTION = 'Pengguna melaporkan Catatan ringkas kosong saat inspeksi dibuka kembali walau sebelumnya diisi dan disimpan. Uji alur simpan, tutup/buka modal, reload, serta halaman inspeksi per mobil; reproduksi pada mobil dan akun terdampak sebelum menentukan perbaikan. Referensi: Tugas GitIgnore/seller-inspection-summary-empty-reference-2026-10-19.png.';
 }
