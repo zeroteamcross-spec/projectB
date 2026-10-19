@@ -137,4 +137,10 @@ final class TaskCatalog
     public const SELLER_INSPECTION_SUMMARY_REOPEN_TASK_TITLE = 'Selidiki Catatan ringkas kosong saat inspeksi dibuka ulang.';
 
     public const SELLER_INSPECTION_SUMMARY_REOPEN_TASK_DESCRIPTION = 'Pengguna melaporkan Catatan ringkas kosong saat inspeksi dibuka kembali walau sebelumnya diisi dan disimpan. Uji alur simpan, tutup/buka modal, reload, serta halaman inspeksi per mobil; reproduksi pada mobil dan akun terdampak sebelum menentukan perbaikan. Referensi: Tugas GitIgnore/seller-inspection-summary-empty-reference-2026-10-19.png.';
+
+    public const SELLER_AFFILIATE_DETAIL_CLOSE_TASK_KEY = 'request-023-seller-affiliate-detail-close-button';
+
+    public const SELLER_AFFILIATE_DETAIL_CLOSE_TASK_TITLE = 'Tambahkan tombol tutup pada modal Detail Marketing.';
+
+    public const SELLER_AFFILIATE_DETAIL_CLOSE_TASK_DESCRIPTION = 'Pada halaman seller/affiliates?affiliate_id={id}&mode=detail, tambahkan tombol Tutup yang terlihat dan berfungsi pada modal Detail Marketing agar pengguna dapat menutupnya dengan jelas. Pertahankan fungsi Edit, Copy Link, dan Buka Landing. Referensi: Tugas GitIgnore/seller-affiliate-detail-close-button-reference-2026-10-19.png.';
 }
