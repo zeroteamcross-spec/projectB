@@ -118,5 +118,5 @@ final class TaskCatalog
 
     public const ADMIN_SUBSCRIPTIONS_DUE_AUTO_APPROVE_TASK_TITLE = 'Otomatis approve showroom saat pembayaran paket disetujui.';
 
-    public const ADMIN_SUBSCRIPTIONS_DUE_AUTO_APPROVE_TASK_DESCRIPTION = 'Pada halaman admin/subscriptions-due, ketika Admin menyetujui pembayaran paket showroom, akun showroom harus otomatis menjadi approved/aktif dan tidak lagi memerlukan persetujuan kedua di admin/approvals. Perubahan harus tetap atomik, aman, dan tidak mengubah alur pembayaran transaksi mobil.';
+    public const ADMIN_SUBSCRIPTIONS_DUE_AUTO_APPROVE_TASK_DESCRIPTION = 'Pembayaran manual yang disetujui dari admin/subscriptions-due harus otomatis mengaktifkan owner showroom tanpa approval kedua di admin/approvals. Pembayaran Virtual Account Midtrans yang menerima callback sukses juga harus langsung dikonfirmasi dan mengaktifkan owner untuk pendaftaran pertama. Pembayaran perpanjangan dan transaksi mobil tidak boleh berubah.';
 }

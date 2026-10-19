@@ -241,7 +241,13 @@ function render(root, context, state, actions) {
     card.append(textNode("p", "text-xs text-[color-mix(in_srgb,var(--pb-danger)_84%,black)]", `Bukti sebelumnya ditolak: ${showroom.subscription_rejected_reason}`));
   }
   if (status === "pending_verification") {
-    card.append(textNode("p", "text-xs text-gray-600", "Bukti transfer Anda sedang ditinjau Admin."));
+    card.append(textNode(
+      "p",
+      "text-xs text-gray-600",
+      showroom.subscription_payment_method === "midtrans"
+        ? "Pembayaran Virtual Account sedang dikonfirmasi otomatis."
+        : "Bukti transfer Anda sedang ditinjau Admin.",
+    ));
   }
 
   layout.append(card);

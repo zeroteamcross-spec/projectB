@@ -636,7 +636,7 @@ function paymentPanel(state, actions, context) {
 
   const body = document.createElement("p");
   body.className = "text-xs leading-6 text-gray-600";
-  body.textContent = "Bayar instan lewat Virtual Account, atau transfer manual dan unggah buktinya. Admin akan memeriksa sebelum akun showroom Anda disetujui.";
+  body.textContent = "Bayar lewat Virtual Account untuk konfirmasi otomatis, atau transfer manual dan unggah bukti untuk ditinjau Admin.";
 
   const recap = document.createElement("div");
   recap.className = "grid gap-2 rounded-2xl border border-[var(--pb-card-border)] bg-gray-50 p-3 text-xs";
@@ -787,9 +787,13 @@ function successPanel(state, actions, context) {
 
   const body = document.createElement("p");
   body.className = "text-xs leading-6 text-gray-600";
-  body.textContent = state.plans.length
-    ? "Akun Anda menunggu persetujuan admin, termasuk verifikasi pembayaran paket yang baru saja Anda lakukan. Anda sudah bisa masuk dan menyiapkan showroom, tetapi sebagian fitur baru terbuka penuh setelah disetujui."
-    : "Akun Anda menunggu persetujuan admin. Anda sudah bisa masuk dan menyiapkan showroom, tetapi sebagian fitur baru terbuka penuh setelah disetujui.";
+  const automaticPaymentConfirmed = state.paymentMethodTab === "midtrans"
+    && state.midtransShowroom?.subscription_payment_status === "paid";
+  body.textContent = automaticPaymentConfirmed
+    ? "Pembayaran Virtual Account berhasil dikonfirmasi otomatis. Akun showroom Anda sudah aktif dan dapat digunakan."
+    : state.plans.length
+      ? "Bukti transfer manual sudah dikirim dan menunggu verifikasi Admin. Anda sudah bisa masuk dan menyiapkan showroom, tetapi sebagian fitur baru terbuka penuh setelah disetujui."
+      : "Akun Anda menunggu persetujuan admin. Anda sudah bisa masuk dan menyiapkan showroom, tetapi sebagian fitur baru terbuka penuh setelah disetujui.";
 
   const detail = document.createElement("div");
   detail.className = "grid gap-2 rounded-2xl border border-[var(--pb-card-border)] bg-gray-50 p-3 text-xs";

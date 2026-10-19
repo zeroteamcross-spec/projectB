@@ -17,13 +17,12 @@ const POLL_INTERVAL_MS = 5000;
  *
  * Mengelola state-nya sendiri (bank dipilih, sesi VA yang sedang berjalan,
  * polling status) dan memanggil onPaid() begitu subscription_payment_status
- * berubah jadi "pending_verification" -- pemanggil cukup me-refresh
- * tampilannya sendiri dari situ, tidak perlu tahu detail Midtrans.
+ * berubah dari "unpaid" -- pemanggil cukup me-refresh tampilannya sendiri
+ * dari situ, tidak perlu tahu detail Midtrans.
  *
- * Pembayaran instan ini TIDAK langsung meloloskan showroom -- begitu VA
- * dibayar, Admin tetap harus konfirmasi manual seperti alur transfer manual
- * (lihat ShowroomService::confirmSubscriptionPayment()). Polling di sini
- * cuma mendeteksi "sudah dibayar, menunggu Admin", bukan "sudah aktif".
+ * Pembayaran Virtual Account yang menerima callback settlement/capture yang
+ * valid langsung dikonfirmasi oleh backend, termasuk approval owner untuk
+ * pendaftaran pertama. Transfer manual tetap memakai alur verifikasi Admin.
  */
 export function SubscriptionMidtransPanel({ getShowroom, getShowroomId = null, onPaid = null } = {}) {
   const root = document.createElement("div");

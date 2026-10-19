@@ -399,11 +399,10 @@ class ShowroomRepository
     }
 
     /**
-     * Midtrans mengonfirmasi VA sudah dibayar -- disamakan dengan alur
-     * unggah bukti transfer manual (status jadi pending_verification) supaya
-     * masuk ke antrean tinjau Admin yang sama, cuma sumbernya beda. Admin
-     * tetap harus konfirmasi manual (lihat ShowroomService::confirmSubscriptionPayment()),
-     * pembayaran otomatis TIDAK langsung meloloskan showroom.
+     * Menyimpan hasil callback Midtrans sebelum service menyelesaikan
+     * konfirmasi otomatis. Transfer manual tetap masuk pending_verification,
+     * sedangkan callback sukses langsung dilanjutkan oleh
+     * ShowroomService::handleSubscriptionMidtransCallback().
      */
     public function updateSubscriptionMidtransPaid(int $id, array $data): void
     {
