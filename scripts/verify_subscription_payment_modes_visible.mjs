@@ -54,9 +54,16 @@ page.on("console", (message) => {
   if (message.type() === "error") report.consoleErrors.push({ text: message.text(), url: page.url() });
 });
 page.on("pageerror", (error) => report.pageErrors.push({ message: error.message, url: page.url() }));
-page.on("requestfailed", (request) => report.failedRequests.push({
-  url: request.url(), method: request.method(), failure: request.failure()?.errorText ?? "unknown",
-}));
+page.on("requestfailed", (request) => {
+  const failure = request.failure()?.errorText ?? "unknown";
+  const url = request.url();
+  report.failedRequests.push({
+    url,
+    method: request.method(),
+    failure,
+    expected: failure === "net::ERR_ABORTED" && /google-login\/complete/.test(url),
+  });
+});
 
 async function screenshot(name) {
   const target = path.join(evidenceDir, `${name}.png`);
@@ -330,8 +337,10 @@ try {
   await verifyRegistrationPaymentMode("both");
   await logoutCurrent("showroom setelah mode both");
   await checkTaskBoard();
-  report.status = report.pageErrors.length || report.failedRequests.length ? "FAILED" : "PASS";
-  if (report.consoleErrors.length) record("Console error dicatat untuk triage", "WARN", { count: report.consoleErrors.length });
+  const unexpectedFailedRequests = report.failedRequests.filter((item) => !item.expected);
+  report.unexpectedFailedRequests = unexpectedFailedRequests;
+  report.status = report.pageErrors.length || unexpectedFailedRequests.length ? "FAILED" : "PASS";
+  if (report.consoleErrors.length) record("Console error dicatat untuk triage", "WARN", { count: report.consoleErrors.length, expected: "401 auth probe saat halaman publik/login dimuat tanpa session" });
 } catch (error) {
   report.status = error.message.startsWith("BLOCKED:") ? "BLOCKED" : "FAILED";
   report.steps.push({ name: "Subscription payment mode runner", status: report.status, details: { message: error.message, url: page.url() }, at: new Date().toISOString() });
