@@ -4,6 +4,7 @@ import path from "node:path";
 
 const root = process.cwd();
 const adminBase = "https://admin.carlynk.id";
+const publicBase = "https://carlynk.id";
 const credentialsPath = path.resolve(root, "storage/browser-smoke/admin-test-credentials.md");
 const evidenceDir = path.resolve(root, "storage/browser-smoke/admin-notification-subscription-payment-20261019");
 const report = {
@@ -166,6 +167,14 @@ try {
     showroomId: report.notification.data?.showroom_id ?? null,
     matchedVisible,
   });
+  if (!matchedVisible) throw new Error("Data showroom yang dirujuk notifikasi belum tampil di subscriptions-due.");
+
+  await page.goto(`${publicBase}/tasks?ui_task=notification-payment-task-${Date.now()}`, { waitUntil: "domcontentloaded", timeout: 60000 });
+  await waitApp();
+  const taskCard = page.locator("article[id^='admin_task_card_']").filter({ hasText: "Perbaiki notifikasi pembayaran paket yang tidak menampilkan data." }).first();
+  await visible(taskCard, "task BUG notifikasi pembayaran paket pada /tasks");
+  await screenshot("task-board-after-notification-fix");
+  record("Task BUG notifikasi pembayaran paket tampil pada /tasks", "PASS");
 } catch (error) {
   report.status = error.message.startsWith("BLOCKED:") ? "BLOCKED" : "FAILED";
   report.steps.push({ name: "Subscription notification reproduction", status: report.status, details: { message: error.message, url: page.url() }, at: new Date().toISOString() });
