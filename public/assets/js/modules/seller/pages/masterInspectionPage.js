@@ -68,10 +68,17 @@ export function SellerMasterInspectionPage() {
         return;
       }
 
+      const payload = readEditorForm(form);
+      if (!payload.description) {
+        setRuntime({ saving: false, error: "Keterangan item inspeksi wajib diisi." });
+        showToast("Keterangan item inspeksi wajib diisi.", { type: "error" });
+        render(root, context, actions);
+        return;
+      }
+
       setRuntime({ saving: true, error: "" });
       render(root, context, actions);
       try {
-        const payload = readEditorForm(form);
         const result = template?.id
           ? await inspectionsResource.updateShowroomTemplate(showroom.id, template.id, payload)
           : await inspectionsResource.createShowroomTemplate(showroom.id, payload);
@@ -377,6 +384,10 @@ function openEditor(template, actions) {
   description.name = "description";
   description.rows = 4;
   description.value = template?.description ?? "";
+  description.required = true;
+  description.minLength = 1;
+  description.setAttribute("aria-required", "true");
+  description.placeholder = "Jelaskan keterangan item yang diperiksa";
   description.className = inputClass();
   const order = inputControl("slrminsp_editor_sort_order_input", String(template?.sort_order ?? 0), "Urutan");
   order.type = "number";
@@ -390,7 +401,7 @@ function openEditor(template, actions) {
   const activeWrap = document.createElement("label");
   activeWrap.className = "flex items-center gap-2 rounded-xl border border-[var(--pb-card-border)] bg-gray-50 px-3 py-3 text-xs font-bold text-gray-700";
   activeWrap.append(active, document.createTextNode("Item aktif untuk flow inspeksi cabang"));
-  form.append(labelWrap("Section", section), labelWrap("Nama item", item), labelWrap("Keterangan", description), labelWrap("Urutan", order), activeWrap);
+  form.append(labelWrap("Section", section), labelWrap("Nama item", item), labelWrap("Keterangan *", description), labelWrap("Urutan", order), activeWrap);
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     actions.save(template, form);

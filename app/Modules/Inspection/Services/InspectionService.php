@@ -119,6 +119,7 @@ class InspectionService
         $this->ensureShowroomOwner($showroom, $user);
         $categoryName = trim((string) $data['category_name']);
         $itemName = trim((string) $data['item_name']);
+        $description = $this->requiredTemplateDescription($data);
 
         if ($this->repository->findTemplateByName($categoryName, $itemName, $showroomId)) {
             throw new ValidationException([
@@ -129,7 +130,7 @@ class InspectionService
         $templateId = $this->repository->createTemplate(
             $categoryName,
             $itemName,
-            trim((string) ($data['description'] ?? '')) ?: null,
+            $description,
             (int) $data['sort_order'],
             $showroomId
         );
@@ -139,7 +140,7 @@ class InspectionService
                 $templateId,
                 $categoryName,
                 $itemName,
-                trim((string) ($data['description'] ?? '')) ?: null,
+                $description,
                 (int) $data['sort_order'],
                 false
             );
@@ -160,6 +161,7 @@ class InspectionService
 
         $categoryName = trim((string) $data['category_name']);
         $itemName = trim((string) $data['item_name']);
+        $description = $this->requiredTemplateDescription($data);
         $duplicate = $this->repository->findTemplateByName($categoryName, $itemName, $showroomId);
         if ($duplicate && (int) $duplicate['id'] !== $templateId) {
             throw new ValidationException([
@@ -171,7 +173,7 @@ class InspectionService
             $templateId,
             $categoryName,
             $itemName,
-            trim((string) ($data['description'] ?? '')) ?: null,
+            $description,
             (int) $data['sort_order'],
             $this->toBoolean($data['is_active'])
         );
@@ -208,10 +210,12 @@ class InspectionService
                     continue;
                 }
 
+                $description = $this->requiredTemplateDescription($template, sprintf('Keterangan item "%s" wajib diisi pada master sumber sebelum disalin.', (string) ($template['item_name'] ?? '')));
+
                 $this->repository->createTemplate(
                     (string) $template['category_name'],
                     (string) $template['item_name'],
-                    $template['description'] !== null ? (string) $template['description'] : null,
+                    $description,
                     (int) ($template['sort_order'] ?? 0),
                     $targetShowroomId
                 );
@@ -227,7 +231,7 @@ class InspectionService
                         (int) $newTemplate['id'],
                         (string) $template['category_name'],
                         (string) $template['item_name'],
-                        $template['description'] !== null ? (string) $template['description'] : null,
+                        $description,
                         (int) ($template['sort_order'] ?? 0),
                         false
                     );
@@ -258,6 +262,7 @@ class InspectionService
         $this->ensureAdmin($user);
         $categoryName = trim((string) $data['category_name']);
         $itemName = trim((string) $data['item_name']);
+        $description = $this->requiredTemplateDescription($data);
         if ($this->repository->findTemplateByName($categoryName, $itemName)) {
             throw new ValidationException([
                 'item_name' => 'Item inspeksi dengan section dan nama yang sama sudah ada di master admin.',
@@ -267,7 +272,7 @@ class InspectionService
         $templateId = $this->repository->createTemplate(
             $categoryName,
             $itemName,
-            trim((string) ($data['description'] ?? '')) ?: null,
+            $description,
             (int) $data['sort_order']
         );
 
@@ -276,7 +281,7 @@ class InspectionService
                 $templateId,
                 $categoryName,
                 $itemName,
-                trim((string) ($data['description'] ?? '')) ?: null,
+                $description,
                 (int) $data['sort_order'],
                 false
             );
@@ -300,6 +305,7 @@ class InspectionService
 
         $categoryName = trim((string) $data['category_name']);
         $itemName = trim((string) $data['item_name']);
+        $description = $this->requiredTemplateDescription($data);
         $duplicate = $this->repository->findTemplateByName($categoryName, $itemName);
         if ($duplicate && (int) $duplicate['id'] !== $templateId) {
             throw new ValidationException([
@@ -311,7 +317,7 @@ class InspectionService
             $templateId,
             $categoryName,
             $itemName,
-            trim((string) ($data['description'] ?? '')) ?: null,
+            $description,
             (int) $data['sort_order'],
             $this->toBoolean($data['is_active'])
         );
@@ -592,6 +598,19 @@ class InspectionService
         if (($user['role'] ?? null) !== 'admin') {
             throw new ForbiddenException('Akses master inspeksi tidak diizinkan.');
         }
+    }
+
+    private function requiredTemplateDescription(array $data, string $message = 'Keterangan item inspeksi wajib diisi.'): string
+    {
+        $description = trim((string) ($data['description'] ?? ''));
+
+        if ($description === '') {
+            throw new ValidationException([
+                'description' => $message,
+            ]);
+        }
+
+        return $description;
     }
 
     private function toBoolean($value): bool

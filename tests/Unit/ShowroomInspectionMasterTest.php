@@ -10,6 +10,7 @@ use App\Core\Request;
 use App\Modules\Inspection\Mappers\InspectionMapper;
 use App\Modules\Inspection\Repositories\InspectionRepository;
 use App\Modules\Inspection\Requests\CopyInspectionTemplatesRequest;
+use App\Modules\Inspection\Requests\UpdateInspectionTemplateRequest;
 use App\Modules\Inspection\Services\InspectionService;
 use App\Modules\Showrooms\Repositories\ShowroomRepository;
 use Tests\TestCase;
@@ -23,6 +24,7 @@ class ShowroomInspectionMasterTest extends TestCase
         $this->emptyBranchBlocksNewInspectionReports();
         $this->legacyReportCannotBeUpdatedAgainstTheNewBranchMaster();
         $this->copyRequestRequiresSourceBranch();
+        $this->templateDescriptionIsRequired();
         $this->mapperMarksOnlyTheCurrentBranchMasterAsCurrent();
     }
 
@@ -173,6 +175,27 @@ class ShowroomInspectionMasterTest extends TestCase
         $this->expectException(ValidationException::class, static function () use ($request): void {
             (new CopyInspectionTemplatesRequest($request))->validate();
         }, 'source_showroom_id');
+    }
+
+    private function templateDescriptionIsRequired(): void
+    {
+        $request = new Request(
+            'POST',
+            '/api/showrooms/2/mine/inspection-templates',
+            '/api/showrooms/2/mine/inspection-templates',
+            [],
+            [
+                'category_name' => 'exterior',
+                'item_name' => 'Warna Cat',
+                'description' => '   ',
+                'sort_order' => 10,
+                'is_active' => true,
+            ]
+        );
+
+        $this->expectException(ValidationException::class, static function () use ($request): void {
+            (new UpdateInspectionTemplateRequest($request))->validate();
+        }, 'description');
     }
 
     private function mapperMarksOnlyTheCurrentBranchMasterAsCurrent(): void

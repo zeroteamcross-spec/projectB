@@ -67,11 +67,18 @@ export function AdminMasterInspectionPage() {
       openDetailModal(template, actions);
     },
     async saveTemplate(template, form) {
+      const payload = readTemplateForm(form);
+      if (!payload.description) {
+        state.error = "Keterangan item inspeksi wajib diisi.";
+        showToast(state.error, { type: "error" });
+        rerender();
+        return;
+      }
+
       state.saving = true;
       state.error = "";
       rerender();
       try {
-        const payload = readTemplateForm(form);
         const updated = template?.id
           ? await inspectionsResource.updateTemplate(template.id, payload)
           : await inspectionsResource.createTemplate(payload);
@@ -348,6 +355,10 @@ function editorSection({ template, saving, onSave }) {
   description.id = "admstinsp_editor_description_input";
   description.value = template?.description ?? "";
   description.rows = 4;
+  description.required = true;
+  description.minLength = 1;
+  description.setAttribute("aria-required", "true");
+  description.placeholder = "Jelaskan keterangan item yang diperiksa";
   description.className = "min-h-[112px] min-w-0 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-xs text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
   const sortOrder = inputField("admstinsp_editor_sort_order_input", String(template?.sort_order ?? 0), "Urutan");
   sortOrder.type = "number";
@@ -382,7 +393,7 @@ function editorSection({ template, saving, onSave }) {
   form.append(
     labelWrap("Section", sectionInput),
     labelWrap("Nama item", itemName),
-    labelWrap("Keterangan", description),
+    labelWrap("Keterangan *", description),
     labelWrap("Urutan", sortOrder),
     activeWrap,
   );

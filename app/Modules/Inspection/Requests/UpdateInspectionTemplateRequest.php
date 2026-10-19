@@ -13,7 +13,7 @@ class UpdateInspectionTemplateRequest extends FormRequest
         return [
             'category_name' => 'required|string|max:100',
             'item_name' => 'required|string|max:200',
-            'description' => 'nullable|string',
+            'description' => 'required|string',
             'sort_order' => 'required|integer|min_value:0',
             'is_active' => 'required|boolean',
         ];
@@ -27,6 +27,10 @@ class UpdateInspectionTemplateRequest extends FormRequest
 
         if (trim((string) ($data['item_name'] ?? '')) === '') {
             $errors['item_name'] = 'Nama item inspeksi wajib diisi.';
+        }
+
+        if (trim((string) ($data['description'] ?? '')) === '') {
+            $errors['description'] = 'Keterangan item inspeksi wajib diisi.';
         }
     }
 }

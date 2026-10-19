@@ -125,4 +125,10 @@ final class TaskCatalog
     public const SELLER_INSPECTION_SUMMARY_DRAFT_TASK_TITLE = 'Pertahankan Catatan ringkas saat validasi publish inspeksi gagal.';
 
     public const SELLER_INSPECTION_SUMMARY_DRAFT_TASK_DESCRIPTION = 'Pada halaman seller/inspection, ketika Catatan ringkas sudah diisi valid tetapi publish kemudian gagal karena Keterangan item "Warna Cat" belum tersedia, nilai Catatan ringkas dan draft form tidak boleh hilang saat pesan validasi tampil. Referensi: Tugas GitIgnore/seller-inspection-summary-reset-reference-2026-10-19.png.';
+
+    public const INSPECTION_MASTER_DESCRIPTION_REQUIRED_TASK_KEY = 'request-021-inspection-master-description-required';
+
+    public const INSPECTION_MASTER_DESCRIPTION_REQUIRED_TASK_TITLE = 'Wajibkan Keterangan saat membuat Master Inspeksi.';
+
+    public const INSPECTION_MASTER_DESCRIPTION_REQUIRED_TASK_DESCRIPTION = 'Field Keterangan pada Master Inspeksi showroom dan admin wajib diisi saat membuat atau mengedit item. Backend menolak nilai kosong atau hanya spasi, frontend menandai field wajib, dan copy antar cabang tidak boleh membuat item tanpa keterangan.';
 }
