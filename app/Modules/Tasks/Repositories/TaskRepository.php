@@ -204,6 +204,13 @@ class TaskRepository
                 'status' => 'open',
                 'created_at' => '2026-10-19 00:00:00',
             ],
+            [
+                'task_key' => TaskCatalog::SELLER_AFFILIATE_PAGES_BUYER_DESIGN_TASK_KEY,
+                'title' => TaskCatalog::SELLER_AFFILIATE_PAGES_BUYER_DESIGN_TASK_TITLE,
+                'description' => TaskCatalog::SELLER_AFFILIATE_PAGES_BUYER_DESIGN_TASK_DESCRIPTION,
+                'status' => 'open',
+                'created_at' => '2026-10-19 00:00:00',
+            ],
         ];
     }
 

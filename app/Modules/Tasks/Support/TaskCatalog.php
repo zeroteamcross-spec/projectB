@@ -149,4 +149,10 @@ final class TaskCatalog
     public const SHOWROOM_REGISTRATION_CARLYNK_BRANDING_TASK_TITLE = 'Ubah favicon dan teks web daftar-showroom menjadi Carlynk.';
 
     public const SHOWROOM_REGISTRATION_CARLYNK_BRANDING_TASK_DESCRIPTION = 'Pada halaman daftar-showroom, sesuaikan favicon dan teks branding web menjadi Carlynk. Pesan ini tidak menyertakan gambar referensi; tambahkan referensi saat tersedia.';
+
+    public const SELLER_AFFILIATE_PAGES_BUYER_DESIGN_TASK_KEY = 'request-025-seller-affiliate-pages-buyer-design';
+
+    public const SELLER_AFFILIATE_PAGES_BUYER_DESIGN_TASK_TITLE = 'Percantik seluruh halaman Marketing agar seragam dengan desain akun Buyer.';
+
+    public const SELLER_AFFILIATE_PAGES_BUYER_DESIGN_TASK_DESCRIPTION = 'Perbarui tampilan seluruh halaman Marketing/Affiliate agar rapi dan konsisten dengan desain akun Buyer, termasuk halaman daftar, detail, tambah/edit, serta halaman marketing terkait. Pertahankan alur dan fungsi bisnis. Pesan ini tidak menyertakan gambar referensi; tambahkan referensi saat tersedia.';
 }
