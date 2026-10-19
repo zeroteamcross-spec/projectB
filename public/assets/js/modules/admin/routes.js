@@ -10,7 +10,7 @@ import { AdminSettlementsPage } from "./pages/settlementsPage.js";
 import { AdminAffiliateCommissionsPage } from "./pages/affiliateCommissionsPage.js";
 import { AdminTransactionsPage } from "./pages/transactionsPage.js";
 import { AdminSlidersPage } from "./pages/slidersPage.js";
-import { AdminMasterBankPage, AdminMasterBrandPage, AdminMasterLocationPage, AdminMasterSidebarPage, AdminMasterPricingPage } from "./pages/masterPage.js";
+import { AdminMasterBankPage, AdminMasterBrandPage, AdminMasterLocationPage, AdminMasterSidebarPage, AdminMasterPricingPage, AdminMasterPaymentPage } from "./pages/masterPage.js";
 import { AdminMasterInspectionPage } from "./pages/masterInspectionPage.js";
 import { AdminDueSubscriptionsPage } from "./pages/dueSubscriptionsPage.js";
 import { showroomsResource } from "../../resources/showroomsResource.js";
@@ -381,6 +381,22 @@ export const adminRoutes = [
           key: "pricing",
           loader: ({ signal }) => adminMasterService.getPricingMaster({ signal }).catch(() => adminMasterService.normalizePricingMaster(null)),
         },
+        {
+          key: "subscriptionDestination",
+          loader: ({ signal }) => adminMasterService.getSubscriptionDestinationMaster({ signal }).catch(() => adminMasterService.normalizeSubscriptionDestinationMaster(null)),
+        },
+      ],
+    },
+  },
+  {
+    name: "admin.master-payment",
+    path: "/admin/master-payment",
+    shell: "app",
+    role: "admin",
+    page: AdminMasterPaymentPage,
+    workingStateKey: "adminMaster",
+    preload: {
+      working: [
         {
           key: "subscriptionDestination",
           loader: ({ signal }) => adminMasterService.getSubscriptionDestinationMaster({ signal }).catch(() => adminMasterService.normalizeSubscriptionDestinationMaster(null)),

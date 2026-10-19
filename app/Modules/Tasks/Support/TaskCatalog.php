@@ -83,4 +83,10 @@ final class TaskCatalog
     public const ADMIN_MASTER_BRAND_MODELS_TASK_TITLE = 'Perbaiki penyimpanan banyak model pada Master Brand.';
 
     public const ADMIN_MASTER_BRAND_MODELS_TASK_DESCRIPTION = 'Pada halaman admin/master-brand, perbaiki BUG ketika beberapa model ditambahkan berturut-turut tetapi yang tersimpan hanya model terakhir. Nilai model/status yang sudah diisi harus dipertahankan saat baris baru ditambahkan atau dihapus, lalu seluruh model dari Tugas GitIgnore/brand.json harus dapat disimpan sebagai array brand.';
+
+    public const ADMIN_SUBSCRIPTION_PAYMENT_METHODS_TASK_KEY = 'request-014-admin-subscription-payment-methods';
+
+    public const ADMIN_SUBSCRIPTION_PAYMENT_METHODS_TASK_TITLE = 'Atur metode pembayaran pendaftaran showroom dari Master Admin.';
+
+    public const ADMIN_SUBSCRIPTION_PAYMENT_METHODS_TASK_DESCRIPTION = 'Pada halaman daftar-showroom, Admin dapat menentukan apakah pembayaran paket showroom memakai transfer manual, Virtual Account otomatis, atau keduanya. Pengaturan berada pada submenu Master yang dinamis melalui Master Sidebar, tersimpan sebagai master data, tampil sesuai pilihan di UI, dan divalidasi ulang di backend tanpa mengubah metode pembayaran transaksi mobil.';
 }

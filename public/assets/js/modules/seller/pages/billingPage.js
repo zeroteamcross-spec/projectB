@@ -312,12 +312,18 @@ function paymentForm(state, actions, destinationMaster) {
   section.id = "slrbil_payment_section";
   section.className = "grid gap-3 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white/85 p-5 shadow-sm";
 
+  const paymentMode = adminMasterService.normalizeSubscriptionPaymentMode(destinationMaster?.data?.payment_mode);
+  const activePaymentTab = paymentMode === "manual" ? "manual" : paymentMode === "midtrans" ? "midtrans" : state.paymentMethodTab;
+  if (state.paymentMethodTab !== activePaymentTab) {
+    state.paymentMethodTab = activePaymentTab;
+  }
+
   section.append(
     textNode("h2", "text-sm font-black text-gray-950", "Bayar paket showroom"),
-    billingPaymentMethodTabs(state, actions),
+    billingPaymentMethodTabs(state, actions, paymentMode),
   );
 
-  if (state.paymentMethodTab === "midtrans") {
+  if (activePaymentTab === "midtrans") {
     state.midtransPanelWidget?.dispose?.();
     state.midtransPanelWidget = SubscriptionMidtransPanel({
       getShowroom: () => state.midtransShowroom,
@@ -543,15 +549,23 @@ function historyRow(entry) {
   return row;
 }
 
-function billingPaymentMethodTabs(state, actions) {
+function billingPaymentMethodTabs(state, actions, paymentMode = "both") {
   const wrap = document.createElement("div");
   wrap.id = "slrbil_payment_method_tabs";
-  wrap.className = "grid grid-cols-2 gap-2";
-
-  [
+  const options = [
     { value: "midtrans", label: "Virtual Account (Instan)" },
     { value: "manual", label: "Transfer Manual" },
-  ].forEach(({ value, label }) => {
+  ].filter(({ value }) => paymentMode === "both" || paymentMode === value);
+
+  if (options.length === 1) {
+    wrap.className = "rounded-xl border border-[var(--pb-card-border)] bg-gray-50 px-3 py-2 text-xs font-bold text-gray-700";
+    wrap.textContent = `Metode pembayaran: ${options[0].label}`;
+    return wrap;
+  }
+
+  wrap.className = "grid grid-cols-2 gap-2";
+
+  options.forEach(({ value, label }) => {
     const tab = document.createElement("button");
     tab.type = "button";
     tab.dataset.paymentMethodTab = value;

@@ -12,6 +12,7 @@ const DEFAULT_SUBSCRIPTION_DESTINATION_SEED = {
   bank_name: "BCA",
   account_number: "1234567890",
   account_holder: "PT Siata Mobilindo",
+  payment_mode: "both",
 };
 
 const DEFAULT_BRAND_SEED = [
@@ -68,6 +69,7 @@ const DEFAULT_SIDEBAR_SEED = [
   sidebarSeed("admin.master_inspection", "admin", "Master Inspection", "/admin/master-inspection", "clipboard", 40, "admin.master"),
   sidebarSeed("admin.master_location", "admin", "Master Lokasi", "/admin/master-location", "location", 50, "admin.master"),
   sidebarSeed("admin.master_pricing", "admin", "Master Harga", "/admin/master-pricing", "tag", 60, "admin.master"),
+  sidebarSeed("admin.master_payment", "admin", "Master Pembayaran", "/admin/master-payment", "creditCard", 70, "admin.master"),
   sidebarSeed("admin.subscriptions_due", "admin", "Tagihan Berulang", "/admin/subscriptions-due", "creditCard", 25),
   sidebarSeed("admin.design_studio", "admin", "Design Studio", "/admin/design-studio", "sparkles", 80),
   sidebarSeed("seller.dashboard", "seller", "Dashboard Showroom", "/seller", "dashboard", 10),
@@ -234,6 +236,7 @@ export const adminMasterService = {
       bank_name: String(destination.bank_name ?? "").trim(),
       account_number: String(destination.account_number ?? "").trim(),
       account_holder: String(destination.account_holder ?? "").trim(),
+      payment_mode: normalizeSubscriptionPaymentMode(destination.payment_mode),
     }, {
       displayName: "Rekening Tujuan Pembayaran",
       bumpVersion: true,
@@ -253,6 +256,7 @@ export const adminMasterService = {
   normalizeBanks,
   normalizeCities,
   normalizePlans,
+  normalizeSubscriptionPaymentMode,
   validateSidebarItems,
   assertValidSidebarItems,
   getSidebarChildren,
@@ -499,12 +503,18 @@ function normalizeSubscriptionDestinationMaster(master = null) {
       bank_name: String(source.bank_name ?? "").trim(),
       account_number: String(source.account_number ?? "").trim(),
       account_holder: String(source.account_holder ?? "").trim(),
+      payment_mode: normalizeSubscriptionPaymentMode(source.payment_mode),
     },
     version: master?.version ?? null,
     created_at: master?.created_at ?? null,
     updated_at: master?.updated_at ?? null,
     seeded: !hasPersisted,
   };
+}
+
+function normalizeSubscriptionPaymentMode(value) {
+  const mode = String(value ?? "both").trim().toLowerCase();
+  return ["manual", "midtrans", "both"].includes(mode) ? mode : "both";
 }
 
 function normalizeBrands(brands = []) {
@@ -1004,6 +1014,11 @@ function ensureAdminMasterSidebarChildren(items = []) {
     normalized[normalized.length - 1].updated_at = now;
   }
 
+  if (!byKey.has("admin.master_payment")) {
+    normalized.push(sidebarSeed("admin.master_payment", "admin", "Master Pembayaran", "/admin/master-payment", "creditCard", 70, "admin.master"));
+    normalized[normalized.length - 1].updated_at = now;
+  }
+
   return normalized.map((item) => {
     if (item.key === "admin.sliders") {
       return {
@@ -1090,6 +1105,17 @@ function ensureAdminMasterSidebarChildren(items = []) {
         label: item.label || "Master Harga",
         route: "/admin/master-pricing",
         icon: item.icon || "tag",
+        parent_key: "admin.master",
+        role: "admin",
+        is_parent: false,
+      };
+    }
+    if (item.key === "admin.master_payment") {
+      return {
+        ...item,
+        label: item.label || "Master Pembayaran",
+        route: "/admin/master-payment",
+        icon: item.icon || "creditCard",
         parent_key: "admin.master",
         role: "admin",
         is_parent: false,

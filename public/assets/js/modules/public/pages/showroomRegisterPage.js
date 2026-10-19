@@ -200,6 +200,8 @@ export function ShowroomRegisterPage() {
         .sort((a, b) => Number(a.price ?? 0) - Number(b.price ?? 0));
 
       state.subscriptionDestination = destinationMaster?.data ?? null;
+      const paymentMode = adminMasterService.normalizeSubscriptionPaymentMode(state.subscriptionDestination?.payment_mode);
+      state.paymentMethodTab = paymentMode === "manual" ? "manual" : "midtrans";
 
       const activeBanks = (bankMaster?.data?.banks ?? bankMaster?.banks ?? [])
         .filter((bank) => (bank?.status ?? "active") === "active");
@@ -645,9 +647,19 @@ function paymentPanel(state, actions, context) {
     );
   }
 
-  section.append(badge, title, body, recap, paymentMethodTabs(state, actions, context));
+  const paymentMode = adminMasterService.normalizeSubscriptionPaymentMode(state.subscriptionDestination?.payment_mode);
+  const activePaymentTab = paymentMode === "manual" ? "manual" : paymentMode === "midtrans" ? "midtrans" : state.paymentMethodTab;
+  if (state.paymentMethodTab !== activePaymentTab) {
+    state.paymentMethodTab = activePaymentTab;
+  }
 
-  if (state.paymentMethodTab === "midtrans") {
+  section.append(badge, title, body, recap);
+  const methodTabs = paymentMethodTabs(state, actions, context, paymentMode);
+  if (methodTabs) {
+    section.append(methodTabs);
+  }
+
+  if (activePaymentTab === "midtrans") {
     state.midtransPanelWidget?.dispose?.();
     state.midtransPanelWidget = SubscriptionMidtransPanel({
       getShowroom: () => state.midtransShowroom,
@@ -724,15 +736,23 @@ function paymentPanel(state, actions, context) {
   return section;
 }
 
-function paymentMethodTabs(state, actions, context) {
+function paymentMethodTabs(state, actions, context, paymentMode = "both") {
   const wrap = document.createElement("div");
   wrap.id = "shr_register_payment_method_tabs";
-  wrap.className = "grid grid-cols-2 gap-2";
-
-  [
+  const options = [
     { value: "midtrans", label: "Virtual Account (Instan)" },
     { value: "manual", label: "Transfer Manual" },
-  ].forEach(({ value, label }) => {
+  ].filter(({ value }) => paymentMode === "both" || paymentMode === value);
+
+  if (options.length === 1) {
+    wrap.className = "rounded-xl border border-[var(--pb-card-border)] bg-gray-50 px-3 py-2 text-xs font-bold text-gray-700";
+    wrap.textContent = `Metode pembayaran: ${options[0].label}`;
+    return wrap;
+  }
+
+  wrap.className = "grid grid-cols-2 gap-2";
+
+  options.forEach(({ value, label }) => {
     const tab = document.createElement("button");
     tab.type = "button";
     tab.dataset.paymentMethodTab = value;

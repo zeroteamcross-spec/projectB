@@ -27,6 +27,13 @@ class ShowroomService
     private const MIDTRANS_VA_BANKS = ['bca', 'bni', 'bri', 'mandiri'];
 
     /**
+     * Mode pembayaran paket showroom disimpan sebagai bagian dari master
+     * payments.subscription_destination agar pengaturan rekening lama tetap
+     * kompatibel. Nilai lama/tidak dikenal sengaja jatuh ke both.
+     */
+    private const SUBSCRIPTION_PAYMENT_MODES = ['manual', 'midtrans', 'both'];
+
+    /**
      * Toleransi hari sejak subscription_next_due_at sebelum showroom
      * disuspend otomatis -- lihat suspendOverdue().
      */
@@ -671,6 +678,8 @@ class ShowroomService
 
     private function applySubscriptionProofSubmission(array $showroom, array $data): array
     {
+        $this->ensureSubscriptionPaymentMethodAllowed('manual');
+
         if (($showroom['selected_plan_name'] ?? null) === null) {
             throw new ValidationException([
                 'selected_plan_name' => 'Pilih paket harga dulu sebelum mengunggah bukti transfer.',
@@ -1000,6 +1009,8 @@ class ShowroomService
 
     private function applySubscriptionMidtransPayment(array $showroom, array $user, string $bank): array
     {
+        $this->ensureSubscriptionPaymentMethodAllowed('midtrans');
+
         if (($showroom['selected_plan_name'] ?? null) === null) {
             throw new ValidationException([
                 'selected_plan_name' => 'Pilih paket harga dulu sebelum membuat pembayaran.',
@@ -1071,6 +1082,33 @@ class ShowroomService
         ]);
 
         return $this->serializeShowroom($this->showrooms->findById($showroomId));
+    }
+
+    private function ensureSubscriptionPaymentMethodAllowed(string $method): void
+    {
+        $mode = 'both';
+
+        try {
+            $master = $this->masterData->get('payments.subscription_destination');
+            $candidate = strtolower(trim((string) ($master['data']['payment_mode'] ?? 'both')));
+            if (in_array($candidate, self::SUBSCRIPTION_PAYMENT_MODES, true)) {
+                $mode = $candidate;
+            }
+        } catch (Throwable $exception) {
+            // Master belum pernah disimpan: pertahankan perilaku lama, yaitu
+            // kedua metode pembayaran tetap tersedia.
+        }
+
+        $allowed = $mode === 'both' || $mode === $method;
+        if ($allowed) {
+            return;
+        }
+
+        throw new ValidationException([
+            'payment_method' => $mode === 'manual'
+                ? 'Pembayaran Virtual Account sedang tidak tersedia. Gunakan transfer manual.'
+                : 'Transfer manual sedang tidak tersedia. Gunakan Virtual Account.',
+        ]);
     }
 
     /**

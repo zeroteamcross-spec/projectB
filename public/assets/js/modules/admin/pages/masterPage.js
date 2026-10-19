@@ -20,7 +20,7 @@ import { AdminMasterPricingForm } from "../components/adminMasterPricingForm.js"
 import { adminMasterService } from "../services/adminMasterService.js";
 import { masterDataResource } from "../../../resources/masterDataResource.js";
 
-const MASTER_PAGES = ["brand", "sidebar", "bank", "location", "pricing"];
+const MASTER_PAGES = ["brand", "sidebar", "bank", "location", "pricing", "payment"];
 
 export function AdminMasterBrandPage() {
   return createAdminMasterPage("brand");
@@ -40,6 +40,10 @@ export function AdminMasterLocationPage() {
 
 export function AdminMasterPricingPage() {
   return createAdminMasterPage("pricing");
+}
+
+export function AdminMasterPaymentPage() {
+  return createAdminMasterPage("payment");
 }
 
 export function AdminMasterPage() {
@@ -495,6 +499,7 @@ function render(root, context, state, actions, activePage = "brand") {
   const isSidebar = activePage === "sidebar";
   const isBank = activePage === "bank";
   const isLocation = activePage === "location";
+  const isPayment = activePage === "payment";
 
   const snapshotBankMaster = appStore.get("snapshot.admin.masterBank.data", null);
   const workingBankMaster = appStore.get("working.adminMaster.bank.data", null);
@@ -524,11 +529,11 @@ function render(root, context, state, actions, activePage = "brand") {
   const destination = destinationMaster.data;
 
   const layout = document.createElement("section");
-  layout.id = isPricing ? "admstpr_page_section" : isLocation ? "admstloc_page_section" : isBank ? "admstbk_page_section" : isSidebar ? "admst_sidebar_page_section" : "admst_brand_page_section";
+  layout.id = isPayment ? "admstpm_page_section" : isPricing ? "admstpr_page_section" : isLocation ? "admstloc_page_section" : isBank ? "admstbk_page_section" : isSidebar ? "admst_sidebar_page_section" : "admst_brand_page_section";
   layout.className = "grid min-w-0 gap-6";
-  layout.dataset.ds = isPricing ? "admin.master.pricing.page" : isLocation ? "admin.master.location.page" : isBank ? "admin.master.bank.page" : isSidebar ? "admin.master.sidebar.page" : "admin.master.brand.page";
+  layout.dataset.ds = isPayment ? "admin.master.payment.page" : isPricing ? "admin.master.pricing.page" : isLocation ? "admin.master.location.page" : isBank ? "admin.master.bank.page" : isSidebar ? "admin.master.sidebar.page" : "admin.master.brand.page";
 
-  const createButton = Button({
+  const createButton = isPayment ? null : Button({
     label: isPricing ? "Tambah Paket" : isLocation ? "Tambah Kota" : isBank ? "Tambah Bank" : isSidebar ? "Tambah Menu" : "Tambah Brand",
     variant: "primary",
     onClick: () => isPricing
@@ -542,11 +547,13 @@ function render(root, context, state, actions, activePage = "brand") {
       : actions.openCreateBrand(brands),
     designHook: "shared.button.primary",
   });
-  createButton.id = isPricing ? "admstpr_create_plan_button" : isLocation ? "admstloc_create_city_button" : isBank ? "admstbk_create_bank_button" : isSidebar ? "admst_create_sidebar_button" : "admst_create_brand_button";
-  createButton.prepend(createIcon("sparkles", { className: "h-4 w-4" }));
+  if (createButton) {
+    createButton.id = isPricing ? "admstpr_create_plan_button" : isLocation ? "admstloc_create_city_button" : isBank ? "admstbk_create_bank_button" : isSidebar ? "admst_create_sidebar_button" : "admst_create_brand_button";
+    createButton.prepend(createIcon("sparkles", { className: "h-4 w-4" }));
+  }
 
   layout.append(
-    masterHero({ action: createButton, pageType: activePage, brands, sidebarItems, banks, cities, plans, master: isPricing ? pricingMaster : isLocation ? locationMaster : isBank ? bankMaster : isSidebar ? sidebarMaster : brandMaster }),
+    masterHero({ action: createButton, pageType: activePage, brands, sidebarItems, banks, cities, plans, master: isPayment ? destinationMaster : isPricing ? pricingMaster : isLocation ? locationMaster : isBank ? bankMaster : isSidebar ? sidebarMaster : brandMaster }),
   );
 
   if (state.error) {
@@ -557,7 +564,13 @@ function render(root, context, state, actions, activePage = "brand") {
     layout.append(error);
   }
 
-  if (isPricing) {
+  if (isPayment) {
+    layout.append(...renderPaymentPage({
+      destination,
+      saving: state.saving,
+      onSave: actions.saveSubscriptionDestination,
+    }));
+  } else if (isPricing) {
     layout.append(...renderPricingPage({
       state,
       actions,
@@ -596,6 +609,10 @@ function render(root, context, state, actions, activePage = "brand") {
   }
 
   root.replaceChildren(layout);
+}
+
+function renderPaymentPage({ destination, saving, onSave }) {
+  return [subscriptionPaymentModeCard({ destination, saving, onSave })];
 }
 
 function renderPricingPage({ state, actions, plans, destination, loading }) {
@@ -720,8 +737,9 @@ function masterHero({ action, pageType, brands = [], sidebarItems = [], banks = 
   const isBank = pageType === "bank";
   const isLocation = pageType === "location";
   const isPricing = pageType === "pricing";
+  const isPayment = pageType === "payment";
   const section = document.createElement("section");
-  section.id = isPricing ? "admstpr_hero_section" : isLocation ? "admstloc_hero_section" : isBank ? "admstbk_hero_section" : "admst_hero_section";
+  section.id = isPayment ? "admstpm_hero_section" : isPricing ? "admstpr_hero_section" : isLocation ? "admstloc_hero_section" : isBank ? "admstbk_hero_section" : "admst_hero_section";
   section.className = "relative overflow-hidden rounded-[2rem] border border-[var(--pb-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.95),rgba(250,244,237,0.86),rgba(234,244,249,0.72))] p-5 shadow-[0_24px_80px_rgba(15,23,42,0.10)] backdrop-blur-xl transition-shadow duration-150 sm:p-6 lg:p-7";
   section.dataset.ds = "admin.master.hero";
 
@@ -731,19 +749,21 @@ function masterHero({ action, pageType, brands = [], sidebarItems = [], banks = 
   copy.className = "grid min-w-0 gap-3";
   const icon = document.createElement("div");
   icon.className = "grid h-12 w-12 place-items-center rounded-2xl bg-[linear-gradient(135deg,#1e81b0,#1e81b0)] text-white shadow-[0_16px_40px_rgba(30,129,176,0.22)]";
-  icon.append(createIcon(isPricing ? "tag" : isLocation ? "location" : isBank ? "bank" : isSidebar ? "sort" : "car", { className: "h-5 w-5" }));
+  icon.append(createIcon(isPayment ? "creditCard" : isPricing ? "tag" : isLocation ? "location" : isBank ? "bank" : isSidebar ? "sort" : "car", { className: "h-5 w-5" }));
   copy.append(
     icon,
     textNode("p", "text-[10px] font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", ""),
-    textNode("h1", "text-2xl font-black leading-tight tracking-normal text-gray-950 sm:text-3xl", isPricing ? "Master Harga" : isLocation ? "Master Lokasi" : isBank ? "Master Bank" : isSidebar ? "Master Sidebar" : "Master Brand"),
-    textNode("p", "max-w-2xl text-xs leading-6 text-gray-600", isPricing ? "Paket harga yang tampil sebagai kartu pilihan saat showroom mendaftar." : ""),
+    textNode("h1", "text-2xl font-black leading-tight tracking-normal text-gray-950 sm:text-3xl", isPayment ? "Master Pembayaran" : isPricing ? "Master Harga" : isLocation ? "Master Lokasi" : isBank ? "Master Bank" : isSidebar ? "Master Sidebar" : "Master Brand"),
+    textNode("p", "max-w-2xl text-xs leading-6 text-gray-600", isPayment ? "Atur metode pembayaran yang tersedia saat showroom memilih dan membayar paket pendaftaran." : isPricing ? "Paket harga yang tampil sebagai kartu pilihan saat showroom mendaftar." : ""),
   );
 
   const stats = document.createElement("section");
-  stats.id = isPricing ? "admstpr_hero_stats_section" : isLocation ? "admstloc_hero_stats_section" : isBank ? "admstbk_hero_stats_section" : "admst_hero_stats_section";
+  stats.id = isPayment ? "admstpm_hero_stats_section" : isPricing ? "admstpr_hero_stats_section" : isLocation ? "admstloc_hero_stats_section" : isBank ? "admstbk_hero_stats_section" : "admst_hero_stats_section";
   stats.className = "grid gap-2 sm:grid-cols-3 lg:min-w-[380px]";
   const provinceCount = new Set(cities.map((city) => city.province_slug || city.province_name).filter(Boolean)).size;
-  const statItems = isPricing
+  const statItems = isPayment
+    ? [["Mode", adminMasterService.normalizeSubscriptionPaymentMode(master?.data?.payment_mode ?? master?.payment_mode) === "both" ? "2 opsi" : "1 opsi"], ["Manual", adminMasterService.normalizeSubscriptionPaymentMode(master?.data?.payment_mode ?? master?.payment_mode) !== "midtrans" ? "Aktif" : "Off"], ["Otomatis", adminMasterService.normalizeSubscriptionPaymentMode(master?.data?.payment_mode ?? master?.payment_mode) !== "manual" ? "Aktif" : "Off"]]
+    : isPricing
     ? [
       ["Paket", plans.length],
       ["Aktif", plans.filter((plan) => plan.status === "active").length],
@@ -774,7 +794,7 @@ function masterHero({ action, pageType, brands = [], sidebarItems = [], banks = 
     ];
   statItems.forEach(([label, value]) => {
     const card = document.createElement("section");
-    card.id = `${isPricing ? "admstpr" : isLocation ? "admstloc" : isBank ? "admstbk" : "admst"}_hero_stat_${String(label).toLowerCase()}_section`;
+    card.id = `${isPayment ? "admstpm" : isPricing ? "admstpr" : isLocation ? "admstloc" : isBank ? "admstbk" : "admst"}_hero_stat_${String(label).toLowerCase()}_section`;
     card.className = "rounded-[1.25rem] border border-[var(--pb-card-border)] bg-white/78 p-3 shadow-sm";
     card.append(
       textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label),
@@ -784,9 +804,13 @@ function masterHero({ action, pageType, brands = [], sidebarItems = [], banks = 
   });
 
   const side = document.createElement("section");
-  side.id = isLocation ? "admstloc_hero_actions_section" : isBank ? "admstbk_hero_actions_section" : "admst_hero_actions_section";
+  side.id = isPayment ? "admstpm_hero_actions_section" : isLocation ? "admstloc_hero_actions_section" : isBank ? "admstbk_hero_actions_section" : "admst_hero_actions_section";
   side.className = "grid gap-3";
-  side.append(stats, action, textNode("p", "text-[10px] font-semibold text-gray-500", `master_key: ${master.master_key ?? "-"}`));
+  side.append(stats);
+  if (action) {
+    side.append(action);
+  }
+  side.append(textNode("p", "text-[10px] font-semibold text-gray-500", `master_key: ${master.master_key ?? "-"}`));
   grid.append(copy, side);
   section.append(grid);
   return section;
@@ -829,10 +853,68 @@ function subscriptionDestinationCard({ destination, saving, onSave }) {
       bank_name: bankName.value.trim(),
       account_number: accountNumber.value.trim(),
       account_holder: accountHolder.value.trim(),
+      payment_mode: destination.payment_mode,
     });
   });
 
   section.append(form);
+  return section;
+}
+
+function subscriptionPaymentModeCard({ destination, saving, onSave }) {
+  const section = baseFilterSection("admstpm_payment_mode_section", "admin.master.payment.mode");
+  const mode = adminMasterService.normalizeSubscriptionPaymentMode(destination?.payment_mode);
+
+  section.append(
+    textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-[var(--pb-brand-secondary)]", "Metode pembayaran paket showroom"),
+    textNode("p", "text-xs leading-6 text-gray-600", "Pengaturan ini berlaku untuk pembayaran paket saat daftar-showroom dan perpanjangan langganan. Pembayaran transaksi mobil tidak terpengaruh."),
+  );
+
+  const form = document.createElement("form");
+  form.id = "admstpm_payment_mode_form_section";
+  form.className = "grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end";
+
+  const label = document.createElement("label");
+  label.className = "grid min-w-0 gap-1 text-xs font-semibold text-gray-700";
+  label.textContent = "Metode yang tersedia";
+  const select = document.createElement("select");
+  select.id = "admstpm_payment_mode_input";
+  select.className = "min-h-10 w-full min-w-0 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-xs text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  [
+    ["manual", "Transfer Manual saja"],
+    ["midtrans", "Virtual Account otomatis saja"],
+    ["both", "Keduanya"],
+  ].forEach(([value, labelText]) => {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = labelText;
+    option.selected = value === mode;
+    select.append(option);
+  });
+  label.append(select);
+
+  const submit = Button({ label: saving ? "Menyimpan..." : "Simpan metode", variant: "primary", disabled: saving });
+  submit.id = "admstpm_payment_mode_save_button";
+  submit.type = "submit";
+  form.append(label, submit);
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    onSave?.({
+      ...destination,
+      payment_mode: select.value,
+    });
+  });
+
+  const hint = document.createElement("p");
+  hint.id = "admstpm_payment_mode_hint";
+  hint.className = "text-[11px] leading-5 text-gray-500";
+  hint.textContent = mode === "manual"
+    ? "Showroom hanya melihat instruksi transfer manual dan upload bukti."
+    : mode === "midtrans"
+    ? "Showroom hanya melihat Virtual Account dan tidak dapat memilih transfer manual."
+    : "Showroom dapat memilih Virtual Account atau transfer manual.";
+
+  section.append(form, hint);
   return section;
 }
 
