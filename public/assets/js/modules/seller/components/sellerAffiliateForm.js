@@ -33,7 +33,7 @@ export function SellerAffiliateForm({
   }
 
   const header = document.createElement("div");
-  header.className = "grid gap-3";
+  header.className = "grid gap-3 rounded-[1.5rem] border border-[color-mix(in_srgb,var(--pb-brand-secondary)_20%,white)] bg-[linear-gradient(115deg,color-mix(in_srgb,var(--pb-brand-secondary)_12%,white),color-mix(in_srgb,var(--pb-brand-accent)_16%,white))] p-4 sm:p-5";
 
   const headerTop = document.createElement("div");
   headerTop.className = "flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between";
@@ -41,8 +41,8 @@ export function SellerAffiliateForm({
   const headerCopy = document.createElement("div");
   headerCopy.className = "grid gap-2";
   headerCopy.append(
-    textBlock("text-xs font-semibold text-gray-500", mode === "edit" ? "Edit marketing" : "Marketing baru"),
-    textBlock("text-lg font-bold text-gray-950", mode === "edit" ? (draft.user?.name || draft.name || "Marketing") : "Buat marketing showroom"),
+    textBlock("w-fit rounded-full border border-[color-mix(in_srgb,var(--pb-brand-secondary)_20%,white)] bg-white/80 px-3 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-[var(--pb-brand-secondary)]", mode === "edit" ? "Edit marketing" : "Marketing baru"),
+    textBlock("text-lg font-black text-[var(--pb-text)]", mode === "edit" ? (draft.user?.name || draft.name || "Marketing") : "Buat marketing showroom"),
     textBlock(`text-xs ${tw.text.muted}`, mode === "edit"
       ? "Perbarui username/email login, slug, nomor WhatsApp, status, atau isi password baru untuk reset akses login marketing."
       : "Tambahkan marketing dengan username/email login, password, slug unik global, dan nomor WhatsApp yang dipakai di landing."),

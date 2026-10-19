@@ -34,10 +34,10 @@ export function SellerCommissionOverrideForm({
 
   const draft = rule ?? sellerAffiliateCommissionService.emptyOverride();
   const header = document.createElement("div");
-  header.className = "grid gap-2";
+  header.className = "grid gap-2 rounded-[1.5rem] border border-[color-mix(in_srgb,var(--pb-brand-secondary)_20%,white)] bg-[linear-gradient(115deg,color-mix(in_srgb,var(--pb-brand-secondary)_12%,white),color-mix(in_srgb,var(--pb-brand-accent)_16%,white))] p-4 sm:p-5";
   header.append(
-    textBlock("text-xs font-semibold text-gray-500", mode === "edit" ? "Detail aturan khusus" : "Aturan komisi per mobil"),
-    textBlock("text-lg font-bold text-gray-950", mode === "edit"
+    textBlock("w-fit rounded-full border border-[color-mix(in_srgb,var(--pb-brand-secondary)_20%,white)] bg-white/80 px-3 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-[var(--pb-brand-secondary)]", mode === "edit" ? "Detail aturan khusus" : "Aturan komisi per mobil"),
+    textBlock("text-lg font-black text-[var(--pb-text)]", mode === "edit"
       ? sellerAffiliateCommissionService.carLabel(rule?.car)
       : "Buat aturan untuk mobil tertentu"),
     textBlock(`text-xs ${tw.text.muted}`, "Gunakan aturan khusus jika mobil tertentu butuh komisi berbeda dari aturan umum showroom."),

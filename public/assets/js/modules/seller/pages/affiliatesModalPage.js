@@ -527,31 +527,36 @@ function seedAffiliateDraft(mode, affiliate) {
 function affiliatesHero({ action }) {
   const section = document.createElement("section");
   section.id = "slraf_header";
-  section.className = "grid min-w-0 gap-4 rounded-[1.75rem] border border-[color-mix(in_srgb,var(--pb-brand-primary)_12%,var(--pb-border))] bg-[color-mix(in_srgb,var(--pb-surface-card)_94%,white)] p-5 shadow-[var(--pb-shadow-card)] md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:rounded-[2rem] md:p-6";
+  section.className = "relative isolate grid min-w-0 gap-4 overflow-hidden rounded-[1.75rem] border border-[color-mix(in_srgb,var(--pb-brand-secondary)_24%,var(--pb-border))] bg-[linear-gradient(118deg,color-mix(in_srgb,var(--pb-brand-secondary)_19%,white),color-mix(in_srgb,var(--pb-brand-primary)_12%,white)_56%,color-mix(in_srgb,var(--pb-brand-accent)_27%,white))] p-5 shadow-[var(--pb-shadow-card)] md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:rounded-[2rem] md:p-6";
   section.dataset.ds = "seller.affiliates.hero";
 
+  const glow = document.createElement("span");
+  glow.className = "pointer-events-none absolute -right-8 -top-16 h-56 w-56 rounded-full bg-[color-mix(in_srgb,var(--pb-brand-accent)_55%,white)] opacity-80 blur-3xl";
+  glow.setAttribute("aria-hidden", "true");
+
   const layout = document.createElement("section");
-  layout.className = "grid min-w-0 gap-3";
+  layout.className = "relative z-10 grid min-w-0 gap-3";
 
   const copy = document.createElement("section");
   copy.className = "grid min-w-0 gap-1.5";
   const icon = document.createElement("span");
-  icon.className = "mb-1 grid h-11 w-11 place-items-center rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_10%,white)] text-[var(--pb-brand-secondary)]";
+  icon.className = "mb-1 grid h-12 w-12 place-items-center rounded-2xl bg-[linear-gradient(135deg,var(--pb-brand-secondary),var(--pb-brand-primary),var(--pb-brand-accent))] text-white shadow-[var(--pb-shadow-card)]";
   icon.append(createIcon("affiliate", { className: "h-5 w-5" }));
+  const eyebrow = textNode("p", "w-fit rounded-full border border-[color-mix(in_srgb,var(--pb-brand-secondary)_20%,white)] bg-white/75 px-3 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-[var(--pb-brand-secondary)] shadow-sm", "Showroom marketing");
   copy.append(
     icon,
-    textNode("p", "text-[10px] font-black uppercase tracking-[0.12em] text-[var(--pb-brand-secondary)]", "Showroom marketing"),
+    eyebrow,
     textNode("h1", "max-w-3xl break-words text-2xl font-black leading-tight tracking-normal text-[var(--pb-text)] md:text-3xl", "Marketing"),
     textNode("p", "max-w-2xl text-xs font-semibold leading-6 text-[var(--pb-text-muted)]", "Kelola partner, link referral, dan performa marketing showroom Anda."),
   );
 
   const actions = document.createElement("section");
-  actions.className = "w-full md:w-auto md:min-w-[190px]";
+  actions.className = "relative z-10 w-full md:w-auto md:min-w-[190px]";
   action.classList.add("min-h-11", "w-full", "md:w-auto");
   actions.append(action);
 
   layout.append(copy);
-  section.append(layout, actions);
+  section.append(glow, layout, actions);
   return section;
 }
 
@@ -569,16 +574,53 @@ function summaryCards({ affiliates, counts }) {
 
   const totals = summarizeMetrics(affiliates);
   [
-    ["Total marketing", counts.total],
-    ["Marketing aktif", counts.active],
-    ["Total klik / prospek", `${totals.clicks.toLocaleString("id-ID")} / ${totals.leads.toLocaleString("id-ID")}`],
-    ["Komisi / settlement", totals.commission],
-  ].forEach(([label, value]) => {
+    {
+      label: "Total marketing",
+      value: counts.total,
+      icon: "affiliate",
+      surface: "border-l-[var(--pb-brand-secondary)] border-[color-mix(in_srgb,var(--pb-brand-secondary)_32%,white)] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--pb-brand-secondary)_19%,white),color-mix(in_srgb,var(--pb-brand-secondary)_5%,white))]",
+      marker: "bg-[var(--pb-brand-secondary)]",
+      valueColor: "text-[var(--pb-brand-secondary)]",
+    },
+    {
+      label: "Marketing aktif",
+      value: counts.active,
+      icon: "circleCheck",
+      surface: "border-l-[var(--pb-success)] border-[color-mix(in_srgb,var(--pb-success)_32%,white)] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--pb-success)_19%,white),color-mix(in_srgb,var(--pb-success)_5%,white))]",
+      marker: "bg-[var(--pb-success)]",
+      valueColor: "text-[var(--pb-success)]",
+    },
+    {
+      label: "Total klik / prospek",
+      value: `${totals.clicks.toLocaleString("id-ID")} / ${totals.leads.toLocaleString("id-ID")}`,
+      icon: "chart",
+      surface: "border-l-[var(--pb-info)] border-[color-mix(in_srgb,var(--pb-info)_32%,white)] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--pb-info)_19%,white),color-mix(in_srgb,var(--pb-info)_5%,white))]",
+      marker: "bg-[var(--pb-info)]",
+      valueColor: "text-[var(--pb-info)]",
+    },
+    {
+      label: "Komisi / settlement",
+      value: totals.commission,
+      icon: "commission",
+      surface: "border-l-[var(--pb-brand-accent)] border-[color-mix(in_srgb,var(--pb-brand-accent)_38%,white)] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--pb-brand-accent)_24%,white),color-mix(in_srgb,var(--pb-brand-accent)_7%,white))]",
+      marker: "bg-[var(--pb-brand-accent)]",
+      valueColor: "text-[color-mix(in_srgb,var(--pb-brand-accent)_72%,black)]",
+    },
+  ].forEach(({ label, value, icon, surface, marker, valueColor }) => {
     const card = document.createElement("section");
-    card.className = "grid min-w-0 gap-1.5 rounded-[1.5rem] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] p-3.5 shadow-[var(--pb-shadow-card)] sm:p-4";
+    card.className = `grid min-w-0 gap-2 rounded-[1.5rem] border-l-4 p-3.5 shadow-[var(--pb-shadow-card)] transition hover:-translate-y-0.5 hover:shadow-[var(--pb-shadow-elevated)] sm:p-4 ${surface}`;
+    const labelRow = document.createElement("div");
+    labelRow.className = "flex min-w-0 items-center gap-2.5";
+    const markerWrap = document.createElement("span");
+    markerWrap.className = `grid h-9 w-9 shrink-0 place-items-center rounded-xl text-white shadow-sm ${marker}`;
+    markerWrap.append(createIcon(icon, { className: "h-4 w-4" }));
+    labelRow.append(
+      markerWrap,
+      textNode("p", "text-[9px] font-black uppercase tracking-[0.09em] text-[var(--pb-text-strong)] sm:text-[10px] sm:tracking-[0.12em]", label),
+    );
     card.append(
-      textNode("p", "text-[9px] font-black uppercase tracking-[0.09em] text-[var(--pb-text-muted)] sm:text-[10px] sm:tracking-[0.12em]", label),
-      textNode("p", "break-words text-base font-black text-[var(--pb-text)] sm:text-lg", String(value)),
+      labelRow,
+      textNode("p", `break-words pl-[2.875rem] text-base font-black sm:text-lg ${valueColor}`, String(value)),
     );
     section.append(card);
   });
@@ -638,7 +680,7 @@ function affiliateDetailPanel({ affiliate, actions = {} }) {
   }
 
   const header = document.createElement("section");
-  header.className = "grid min-w-0 gap-3 rounded-[1.5rem] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] p-4 shadow-[var(--pb-shadow-soft)] sm:p-5";
+  header.className = "grid min-w-0 gap-3 rounded-[1.5rem] border border-[color-mix(in_srgb,var(--pb-brand-secondary)_20%,white)] bg-[linear-gradient(115deg,color-mix(in_srgb,var(--pb-brand-secondary)_12%,white),color-mix(in_srgb,var(--pb-brand-accent)_16%,white))] p-4 shadow-[var(--pb-shadow-soft)] sm:p-5";
   header.append(
     textNode("p", "break-words text-xl font-black text-[var(--pb-text)]", affiliate.user?.name || affiliate.name || `Marketing #${affiliate.id}`),
     textNode("p", "break-words text-xs font-semibold leading-5 text-[var(--pb-text-muted)]", [affiliate.user?.email || affiliate.email, affiliate.phone_number || affiliate.user?.phone_number].filter(Boolean).join(" | ") || "Kontak belum lengkap"),

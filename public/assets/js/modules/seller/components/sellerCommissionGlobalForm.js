@@ -18,10 +18,10 @@ export function SellerCommissionGlobalForm({
   card.classList.add("grid", "gap-4", "rounded-[1.75rem]", "bg-[var(--pb-surface-card)]", "p-5", "shadow-[var(--pb-shadow-card)]", "md:p-6");
 
   const header = document.createElement("div");
-  header.className = "grid gap-2";
+  header.className = "grid gap-2 rounded-[1.5rem] border border-[color-mix(in_srgb,var(--pb-brand-secondary)_20%,white)] bg-[linear-gradient(115deg,color-mix(in_srgb,var(--pb-brand-secondary)_12%,white),color-mix(in_srgb,var(--pb-brand-accent)_16%,white))] p-4 sm:p-5";
   header.append(
-    textBlock("text-xs font-semibold text-gray-500", "Aturan komisi umum"),
-    textBlock("text-lg font-bold text-gray-950", "Atur komisi dasar seluruh mobil showroom"),
+    textBlock("w-fit rounded-full border border-[color-mix(in_srgb,var(--pb-brand-secondary)_20%,white)] bg-white/80 px-3 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-[var(--pb-brand-secondary)]", "Aturan komisi umum"),
+    textBlock("text-lg font-black text-[var(--pb-text)]", "Atur komisi dasar seluruh mobil showroom"),
     textBlock(`text-xs ${tw.text.muted}`, sellerAffiliateCommissionService.priorityCopy()),
   );
 

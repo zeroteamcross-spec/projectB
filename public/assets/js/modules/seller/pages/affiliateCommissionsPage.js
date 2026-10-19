@@ -288,18 +288,59 @@ function summaryCards(summary, globalRule) {
   section.className = "grid grid-cols-2 gap-3 xl:grid-cols-4";
 
   [
-    ["Aturan umum", summary.hasGlobalRule ? sellerAffiliateCommissionService.formatValue(globalRule) : "Belum diatur", "Fallback komisi bila tidak ada aturan khusus aktif."],
-    ["Status umum", summary.hasGlobalRule ? (summary.activeGlobalRule ? "Aktif" : "Nonaktif") : "Belum ada", "Status aturan dasar showroom."],
-    ["Khusus aktif", String(summary.activeOverrides), "Aturan per mobil yang sedang aktif."],
-    ["Total khusus", String(summary.totalOverrides), "Jumlah aturan khusus dari data lokal."],
-  ].forEach(([label, value, note]) => {
+    {
+      label: "Aturan umum",
+      value: summary.hasGlobalRule ? sellerAffiliateCommissionService.formatValue(globalRule) : "Belum diatur",
+      note: "Fallback komisi bila tidak ada aturan khusus aktif.",
+      icon: "commission",
+      surface: "border-l-[var(--pb-brand-secondary)] border-[color-mix(in_srgb,var(--pb-brand-secondary)_32%,white)] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--pb-brand-secondary)_19%,white),color-mix(in_srgb,var(--pb-brand-secondary)_5%,white))]",
+      marker: "bg-[var(--pb-brand-secondary)]",
+      valueColor: "text-[var(--pb-brand-secondary)]",
+    },
+    {
+      label: "Status umum",
+      value: summary.hasGlobalRule ? (summary.activeGlobalRule ? "Aktif" : "Nonaktif") : "Belum ada",
+      note: "Status aturan dasar showroom.",
+      icon: "circleCheck",
+      surface: "border-l-[var(--pb-success)] border-[color-mix(in_srgb,var(--pb-success)_32%,white)] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--pb-success)_19%,white),color-mix(in_srgb,var(--pb-success)_5%,white))]",
+      marker: "bg-[var(--pb-success)]",
+      valueColor: "text-[var(--pb-success)]",
+    },
+    {
+      label: "Khusus aktif",
+      value: String(summary.activeOverrides),
+      note: "Aturan per mobil yang sedang aktif.",
+      icon: "car",
+      surface: "border-l-[var(--pb-info)] border-[color-mix(in_srgb,var(--pb-info)_32%,white)] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--pb-info)_19%,white),color-mix(in_srgb,var(--pb-info)_5%,white))]",
+      marker: "bg-[var(--pb-info)]",
+      valueColor: "text-[var(--pb-info)]",
+    },
+    {
+      label: "Total khusus",
+      value: String(summary.totalOverrides),
+      note: "Jumlah aturan khusus dari data lokal.",
+      icon: "tags",
+      surface: "border-l-[var(--pb-brand-accent)] border-[color-mix(in_srgb,var(--pb-brand-accent)_38%,white)] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--pb-brand-accent)_24%,white),color-mix(in_srgb,var(--pb-brand-accent)_7%,white))]",
+      marker: "bg-[var(--pb-brand-accent)]",
+      valueColor: "text-[color-mix(in_srgb,var(--pb-brand-accent)_72%,black)]",
+    },
+  ].forEach(({ label, value, note, icon, surface, marker, valueColor }) => {
     const card = document.createElement("section");
     card.id = `slrafc_summary_${slugify(label)}_section`;
-    card.className = "grid min-w-0 gap-1.5 rounded-[1.5rem] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] p-3.5 shadow-[var(--pb-shadow-card)] sm:gap-2 sm:p-4";
+    card.className = `grid min-w-0 gap-2 rounded-[1.5rem] border-l-4 p-3.5 shadow-[var(--pb-shadow-card)] transition hover:-translate-y-0.5 hover:shadow-[var(--pb-shadow-elevated)] sm:gap-2 sm:p-4 ${surface}`;
+    const labelRow = document.createElement("div");
+    labelRow.className = "flex min-w-0 items-center gap-2.5";
+    const markerWrap = document.createElement("span");
+    markerWrap.className = `grid h-9 w-9 shrink-0 place-items-center rounded-xl text-white shadow-sm ${marker}`;
+    markerWrap.append(createIcon(icon, { className: "h-4 w-4" }));
+    labelRow.append(
+      markerWrap,
+      textBlock("text-[9px] font-black uppercase tracking-[0.09em] text-[var(--pb-text-strong)] sm:text-[10px] sm:tracking-[0.12em]", label),
+    );
     card.append(
-      textBlock("text-[9px] font-black uppercase tracking-[0.09em] text-[var(--pb-text-muted)] sm:text-[10px] sm:tracking-[0.12em]", label),
-      textBlock("break-words text-base font-black text-[var(--pb-text)] sm:text-lg", value),
-      textBlock("text-[11px] leading-5 text-[var(--pb-text-muted)] sm:text-xs sm:leading-6", note),
+      labelRow,
+      textBlock(`break-words pl-[2.875rem] text-base font-black sm:text-lg ${valueColor}`, value),
+      textBlock("pl-[2.875rem] text-[11px] leading-5 text-[var(--pb-text-muted)] sm:text-xs sm:leading-6", note),
     );
     section.append(card);
   });
@@ -310,28 +351,32 @@ function summaryCards(summary, globalRule) {
 function commissionsHero({ actions }) {
   const section = document.createElement("section");
   section.id = "slrafc_header";
-  section.className = "grid min-w-0 gap-4 rounded-[1.75rem] border border-[color-mix(in_srgb,var(--pb-brand-primary)_12%,var(--pb-border))] bg-[color-mix(in_srgb,var(--pb-surface-card)_94%,white)] p-5 shadow-[var(--pb-shadow-card)] md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:rounded-[2rem] md:p-6";
+  section.className = "relative isolate grid min-w-0 gap-4 overflow-hidden rounded-[1.75rem] border border-[color-mix(in_srgb,var(--pb-brand-secondary)_24%,var(--pb-border))] bg-[linear-gradient(118deg,color-mix(in_srgb,var(--pb-brand-secondary)_19%,white),color-mix(in_srgb,var(--pb-brand-primary)_12%,white)_56%,color-mix(in_srgb,var(--pb-brand-accent)_27%,white))] p-5 shadow-[var(--pb-shadow-card)] md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:rounded-[2rem] md:p-6";
   section.dataset.ds = "seller.commissions.hero";
 
+  const glow = document.createElement("span");
+  glow.className = "pointer-events-none absolute -right-8 -top-16 h-56 w-56 rounded-full bg-[color-mix(in_srgb,var(--pb-brand-accent)_55%,white)] opacity-80 blur-3xl";
+  glow.setAttribute("aria-hidden", "true");
+
   const layout = document.createElement("section");
-  layout.className = "grid min-w-0 gap-3";
+  layout.className = "relative z-10 grid min-w-0 gap-3";
   const copy = document.createElement("section");
   copy.className = "grid min-w-0 gap-1.5";
   const icon = document.createElement("span");
-  icon.className = "mb-1 grid h-11 w-11 place-items-center rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_10%,white)] text-[var(--pb-brand-secondary)]";
+  icon.className = "mb-1 grid h-12 w-12 place-items-center rounded-2xl bg-[linear-gradient(135deg,var(--pb-brand-secondary),var(--pb-brand-primary),var(--pb-brand-accent))] text-white shadow-[var(--pb-shadow-card)]";
   icon.append(createIcon("commission", { className: "h-5 w-5" }));
   copy.append(
     icon,
-    textBlock("p", "text-[10px] font-black uppercase tracking-[0.12em] text-[var(--pb-brand-secondary)]", "Showroom marketing"),
+    textBlock("p", "w-fit rounded-full border border-[color-mix(in_srgb,var(--pb-brand-secondary)_20%,white)] bg-white/75 px-3 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-[var(--pb-brand-secondary)] shadow-sm", "Showroom marketing"),
     textBlock("h1", "max-w-3xl break-words text-2xl font-black leading-tight tracking-normal text-[var(--pb-text)] md:text-3xl", "Komisi Marketing"),
     textBlock("p", "max-w-2xl text-xs font-semibold leading-6 text-[var(--pb-text-muted)]", "Atur komisi dasar dan aturan khusus untuk transaksi dari referral marketing."),
   );
 
   const actionWrap = document.createElement("section");
-  actionWrap.className = "w-full md:w-auto md:min-w-[320px]";
+  actionWrap.className = "relative z-10 w-full md:w-auto md:min-w-[320px]";
   actionWrap.append(heroActions(actions));
   layout.append(copy);
-  section.append(layout, actionWrap);
+  section.append(glow, layout, actionWrap);
   return section;
 }
 
@@ -430,7 +475,7 @@ function filterBar({ query, overrides, onChange }) {
 
 function priorityPanel() {
   const card = Card([], { variant: "raised" });
-  card.classList.add("grid", "gap-3", "rounded-[1.5rem]", "bg-[var(--pb-surface-card)]", "shadow-[var(--pb-shadow-card)]");
+  card.classList.add("grid", "gap-3", "rounded-[1.5rem]", "border-l-4", "border-l-[var(--pb-brand-accent)]", "bg-[linear-gradient(110deg,color-mix(in_srgb,var(--pb-brand-secondary)_12%,white),color-mix(in_srgb,var(--pb-brand-accent)_17%,white))]", "shadow-[var(--pb-shadow-card)]");
 
   const top = document.createElement("div");
   top.className = "flex flex-wrap items-center gap-2";
