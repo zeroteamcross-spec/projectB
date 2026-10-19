@@ -170,13 +170,19 @@ export class PublicShell {
     // yang mengarahkan ke login buyer kalau memang belum masuk.
     const isCustomDomainShowroomPage = publicContextService.customDomainShowroomSlug()
       && publicContextService.isCustomDomainShowroomPath(currentPath);
+    // Landing page di root membawa navbar sendiri dan menyembunyikan header
+    // shell saat mount. Sembunyikan shell sejak render pertama agar tidak
+    // terlihat berkedip sebelum landing selesai dimuat. Root custom domain
+    // showroom tetap memakai header shell katalog seperti biasa.
+    const isMainDomainLandingRoot = currentPath === "/"
+      && !publicContextService.customDomainShowroomSlug();
     const isShowroomPage = /^\/(?:s|showrooms)\/[^/]+/.test(currentPath)
       || Boolean(bareShowroomSlugFromPath(currentPath))
       || Boolean(isCustomDomainShowroomPage);
     const showMobileFooter = isBuyerLoggedIn || isShowroomPage;
 
     if (this.headerNode) {
-      this.headerNode.classList.toggle("hidden", isAuthenticated);
+      this.headerNode.classList.toggle("hidden", isAuthenticated || isMainDomainLandingRoot);
       this.headerNode.classList.toggle("sm:block", false);
     }
 

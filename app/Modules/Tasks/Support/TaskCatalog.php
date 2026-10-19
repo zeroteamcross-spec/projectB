@@ -155,4 +155,10 @@ final class TaskCatalog
     public const SELLER_AFFILIATE_PAGES_BUYER_DESIGN_TASK_TITLE = 'Percantik seluruh halaman Marketing agar seragam dengan desain akun Buyer.';
 
     public const SELLER_AFFILIATE_PAGES_BUYER_DESIGN_TASK_DESCRIPTION = 'Perbarui tampilan seluruh halaman Marketing/Affiliate agar rapi dan konsisten dengan desain akun Buyer, termasuk halaman daftar, detail, tambah/edit, serta halaman marketing terkait. Pertahankan alur dan fungsi bisnis. Pesan ini tidak menyertakan gambar referensi; tambahkan referensi saat tersedia.';
+
+    public const MAIN_LANDING_HEADER_FLASH_TASK_KEY = 'request-026-main-landing-header-flash';
+
+    public const MAIN_LANDING_HEADER_FLASH_TASK_TITLE = 'Hilangkan header yang berkedip sebelum landing page Carlynk tampil.';
+
+    public const MAIN_LANDING_HEADER_FLASH_TASK_DESCRIPTION = 'Pada root domain utama (/), header publik global sempat muncul sebelum landing page mandiri selesai dimuat. Sembunyikan header shell sejak render awal agar tidak berkedip atau bertumpuk dengan navbar landing page. Header katalog pada root custom domain showroom harus tetap berfungsi. Referensi: Tugas GitIgnore/carlynk-root-header-flash-2026-10-19.png.';
 }
