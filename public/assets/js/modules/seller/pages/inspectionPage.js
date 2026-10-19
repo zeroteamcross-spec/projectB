@@ -40,6 +40,10 @@ const DEFAULT_RUNTIME = {
     status: "",
   },
 };
+// The modal is rebuilt when a validation message updates the page runtime.
+// Keep the visible form draft outside the server-backed overview so values
+// typed by the seller survive that rebuild.
+const reportFormDrafts = new Map();
 
 export function SellerInspectionPage() {
   let root = null;
@@ -48,6 +52,7 @@ export function SellerInspectionPage() {
   return createPageLifecycle({
     mount() {
       ensureRuntime();
+      reportFormDrafts.clear();
       root = document.createElement("div");
       render(root);
       return root;
@@ -65,6 +70,7 @@ export function SellerInspectionPage() {
     },
     dispose() {
       closeInspectionModal();
+      reportFormDrafts.clear();
       unsubscribe = null;
       appStore.destroyRuntimeState(RUNTIME_KEY);
     },
@@ -318,7 +324,13 @@ function openInspectionModal({ car, overview, runtime }) {
   if (!report) {
     content.append(emptyReportSection({ car, templates, runtime, legacyReport }));
   } else {
-    content.append(reportFormSection({ car, report, templates, runtime }));
+    content.append(reportFormSection({
+      car,
+      report,
+      templates,
+      runtime,
+      draft: reportFormDrafts.get(Number(car.id)) ?? null,
+    }));
   }
 
   openModal(content, {
@@ -332,7 +344,10 @@ function openInspectionModal({ car, overview, runtime }) {
     bodyId: "slrinsp_modal_body_section",
     closeButtonId: "slrinsp_modal_close_button",
     panelClassName: "md:min-w-[920px]",
-    onClose: () => setRuntime({ selectedCarId: null, error: "", notice: "" }),
+    onClose: () => {
+      reportFormDrafts.delete(Number(car.id));
+      setRuntime({ selectedCarId: null, error: "", notice: "" });
+    },
   });
 }
 
@@ -381,10 +396,13 @@ function emptyReportSection({ car, templates, runtime, legacyReport }) {
   return section;
 }
 
-function reportFormSection({ car, report, templates, runtime }) {
+function reportFormSection({ car, report, templates, runtime, draft = null }) {
   const form = document.createElement("form");
   form.id = "slrinsp_report_form_section";
   form.className = "grid min-w-0 gap-4";
+  const rememberDraft = () => rememberReportFormDraft(car.id, new FormData(form));
+  form.addEventListener("input", rememberDraft);
+  form.addEventListener("change", rememberDraft);
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     saveReportForm(car, report, templates, false);
@@ -399,14 +417,14 @@ function reportFormSection({ car, report, templates, runtime }) {
   summary.id = "slrinsp_summary_notes_input";
   summary.name = "summary_notes";
   summary.rows = 3;
-  summary.value = report.summary_notes ?? "";
+  summary.value = draftField(draft, "summary_notes", report.summary_notes ?? "");
   summary.placeholder = "Contoh: Unit siap jual, minor baret di bumper belakang.";
   summary.className = `${inputClass()} min-h-[92px] resize-y`;
   summarySection.append(summaryLabel, summary);
 
   const itemsSection = node("section", "slrinsp_report_items_section", "grid min-w-0 gap-3");
   groupTemplates(templates).forEach(([category, group]) => {
-    itemsSection.append(templateGroupSection(category, group, report));
+    itemsSection.append(templateGroupSection(category, group, report, draft));
   });
   itemsSection.append(nonCanonItemsNoticeSection(report, templates));
 
@@ -426,7 +444,7 @@ function reportFormSection({ car, report, templates, runtime }) {
   return form;
 }
 
-function templateGroupSection(category, templates, report) {
+function templateGroupSection(category, templates, report, draft = null) {
   const section = node("section", `slrinsp_item_group_section_${slugify(category)}`, "grid gap-3 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white p-4");
   section.append(
     textNode("h3", "text-xs font-black uppercase tracking-[0.12em] text-gray-600", categoryLabel(category)),
@@ -434,13 +452,13 @@ function templateGroupSection(category, templates, report) {
   );
 
   templates.forEach((template) => {
-    section.append(templateItemSection(template, report));
+    section.append(templateItemSection(template, report, draft));
   });
 
   return section;
 }
 
-function templateItemSection(template, report) {
+function templateItemSection(template, report, draft = null) {
   const item = (report.items ?? []).find((entry) => Number(entry.template_id) === Number(template.id));
   const key = slugify(template.id);
   const section = node("section", `slrinsp_item_section_${key}`, "grid min-w-0 gap-3 rounded-[1.25rem] border border-[var(--pb-card-border)] bg-gray-50/80 p-3");
@@ -455,7 +473,7 @@ function templateItemSection(template, report) {
   description.type = "hidden";
   description.id = `slrinsp_item_description_input_${key}`;
   description.name = `description_${template.id}`;
-  description.value = item?.description ?? template.description ?? "";
+  description.value = draftField(draft, `description_${template.id}`, item?.description ?? template.description ?? "");
 
   const statusWrap = node("section", `slrinsp_item_status_section_${key}`, "grid gap-2 sm:grid-cols-3");
   ITEM_STATUS_OPTIONS.forEach(([value, label]) => {
@@ -478,7 +496,7 @@ function templateItemSection(template, report) {
     input.name = `status_${template.id}`;
     input.type = "radio";
     input.value = value;
-    input.checked = normalizeItemStatus(item?.result_status) === value;
+    input.checked = normalizeItemStatus(draftField(draft, `status_${template.id}`, item?.result_status)) === value;
     input.className = "h-4 w-4 accent-[var(--pb-brand-primary)]";
     labelNode.append(input, document.createTextNode(label));
     statusWrap.append(labelNode);
@@ -492,7 +510,7 @@ function templateItemSection(template, report) {
   notes.id = `slrinsp_item_notes_input_${key}`;
   notes.name = `notes_${template.id}`;
   notes.rows = 2;
-  notes.value = item?.notes ?? "";
+  notes.value = draftField(draft, `notes_${template.id}`, item?.notes ?? "");
   notes.placeholder = "Catatan khusus bila ada";
   notes.className = `${inputClass()} min-h-[76px] resize-y`;
   section.append(header, textNode("p", "text-xs leading-6 text-gray-500", template.description ?? "Keterangan item master belum diisi."), description, statusWrap, notesLabel, notes);
@@ -566,7 +584,11 @@ async function saveReportForm(car, report, templates, publish) {
   }
 
   const form = document.getElementById("slrinsp_report_form_section");
+  if (!form) {
+    return;
+  }
   const formData = new FormData(form);
+  rememberReportFormDraft(car.id, formData);
 
   if (publish) {
     const guardMessage = publishGuardMessage({ formData, report, templates });
@@ -602,6 +624,7 @@ async function saveReportForm(car, report, templates, publish) {
         : await inspectionsResource.createItem(updated.id, payload);
     }
 
+    reportFormDrafts.delete(Number(car.id));
     applyReportToOverview(car.id, updated);
     setRuntime({
       saving: false,
@@ -835,6 +858,22 @@ function inputClass() {
 
 function textValue(formData, key) {
   return String(formData.get(key) ?? "").trim();
+}
+
+function draftField(draft, key, fallback = "") {
+  return draft && Object.prototype.hasOwnProperty.call(draft, key)
+    ? String(draft[key] ?? "")
+    : fallback;
+}
+
+function rememberReportFormDraft(carId, formData) {
+  const draft = {};
+  for (const [key, value] of formData.entries()) {
+    if (typeof value === "string") {
+      draft[key] = value;
+    }
+  }
+  reportFormDrafts.set(Number(carId), draft);
 }
 
 function nullableText(formData, key) {

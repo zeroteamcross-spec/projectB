@@ -119,4 +119,10 @@ final class TaskCatalog
     public const ADMIN_SUBSCRIPTIONS_DUE_AUTO_APPROVE_TASK_TITLE = 'Otomatis approve showroom saat pembayaran paket disetujui.';
 
     public const ADMIN_SUBSCRIPTIONS_DUE_AUTO_APPROVE_TASK_DESCRIPTION = 'Pembayaran manual yang disetujui dari admin/subscriptions-due harus otomatis mengaktifkan owner showroom tanpa approval kedua di admin/approvals. Pembayaran Virtual Account Midtrans yang menerima callback sukses juga harus langsung dikonfirmasi dan mengaktifkan owner untuk pendaftaran pertama. Pembayaran perpanjangan dan transaksi mobil tidak boleh berubah.';
+
+    public const SELLER_INSPECTION_SUMMARY_DRAFT_TASK_KEY = 'request-020-seller-inspection-summary-draft';
+
+    public const SELLER_INSPECTION_SUMMARY_DRAFT_TASK_TITLE = 'Pertahankan Catatan ringkas saat validasi publish inspeksi gagal.';
+
+    public const SELLER_INSPECTION_SUMMARY_DRAFT_TASK_DESCRIPTION = 'Pada halaman seller/inspection, ketika Catatan ringkas sudah diisi valid tetapi publish kemudian gagal karena Keterangan item "Warna Cat" belum tersedia, nilai Catatan ringkas dan draft form tidak boleh hilang saat pesan validasi tampil. Referensi: Tugas GitIgnore/seller-inspection-summary-reset-reference-2026-10-19.png.';
 }
