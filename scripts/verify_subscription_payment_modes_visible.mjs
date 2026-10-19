@@ -144,16 +144,16 @@ async function openDynamicPaymentMenu() {
     await clickVisible(parent, "parent Master dari sidebar dinamis");
   }
   const paymentLink = page.locator('a[href="/admin/master-payment"]');
-  await visible(paymentLink, "menu Master Pembayaran dari sidebar dinamis");
-  if ((await paymentLink.getAttribute("title")) !== "Master Pembayaran") throw new Error("Label menu Master Pembayaran tidak sesuai.");
-  await clickVisible(paymentLink, "menu Master Pembayaran visible");
+  const visiblePaymentLink = await visible(paymentLink, "menu Master Pembayaran dari sidebar dinamis");
+  if ((await visiblePaymentLink.getAttribute("title")) !== "Master Pembayaran") throw new Error("Label menu Master Pembayaran tidak sesuai.");
+  await clickVisible(visiblePaymentLink, "menu Master Pembayaran visible");
   await page.waitForURL((url) => url.pathname === "/admin/master-payment", { timeout: 30000 });
   await waitApp();
   await visible(page.locator("#admstpm_hero_section"), "hero Master Pembayaran");
   await visible(page.locator("#admstpm_payment_mode_section"), "card metode pembayaran");
   await noHorizontalOverflow("Master Pembayaran desktop");
   await screenshot("admin-master-payment-desktop");
-  record("Master Pembayaran terbuka melalui submenu Master dinamis", "PASS", { url: page.url(), title: await paymentLink.getAttribute("title") });
+  record("Master Pembayaran terbuka melalui submenu Master dinamis", "PASS", { url: page.url(), title: await visiblePaymentLink.getAttribute("title") });
 }
 
 async function setPaymentMode(mode) {
