@@ -107,4 +107,10 @@ final class TaskCatalog
     public const ADMIN_SUBSCRIPTION_NOTIFICATION_PAYMENT_TASK_TITLE = 'Perbaiki notifikasi pembayaran paket yang tidak menampilkan data.';
 
     public const ADMIN_SUBSCRIPTION_NOTIFICATION_PAYMENT_TASK_DESCRIPTION = 'Pada notifikasi pembayaran paket pendaftaran baru, saat Admin membuka notifikasi, halaman admin/subscriptions-due harus menampilkan pembayaran paket yang dirujuk oleh notifikasi. Perbaiki pemetaan identifier atau filter data tanpa menghilangkan data pembayaran yang valid. Referensi: Tugas GitIgnore/admin-notification-subscription-payment-missing-reference-2026-10-19.png.';
+
+    public const SHOWROOM_REGISTER_DUPLICATE_EMAIL_TASK_KEY = 'request-018-showroom-register-duplicate-email';
+
+    public const SHOWROOM_REGISTER_DUPLICATE_EMAIL_TASK_TITLE = 'Tolak email showroom yang sudah digunakan.';
+
+    public const SHOWROOM_REGISTER_DUPLICATE_EMAIL_TASK_DESCRIPTION = 'Pada halaman daftar-showroom, jika email login sudah dipakai user lain, pendaftaran showroom harus ditolak dan menampilkan teks merah "Email sudah digunakan" tepat di bawah field Email. Validasi wajib tetap dilakukan di backend. Referensi: Tugas GitIgnore/daftar-showroom-email-used-reference-2026-10-19.png.';
 }

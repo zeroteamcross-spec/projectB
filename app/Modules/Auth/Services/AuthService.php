@@ -43,7 +43,7 @@ class AuthService
     {
         if ($this->users->emailExists($data['email'])) {
             throw new ValidationException([
-                'email' => 'Email sudah terdaftar.',
+                'email' => 'Email sudah digunakan',
             ]);
         }
 
