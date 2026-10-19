@@ -86,6 +86,7 @@ export function AdminMasterBrandForm({
 
     draft.models.forEach((model, index) => {
       modelRows.append(modelRow({ model, index, onRemove: () => {
+        syncDraftModels();
         draft.models.splice(index, 1);
         renderModels();
       } }));
@@ -93,9 +94,26 @@ export function AdminMasterBrandForm({
   };
 
   addModel.addEventListener("click", () => {
+    // Simpan nilai yang baru saja diketik sebelum render ulang. Tanpa sync ini,
+    // menambah model kedua membangun ulang semua row dari draft lama dan
+    // membuang nama/status model sebelumnya.
+    syncDraftModels();
     draft.models.push(adminMasterService.createEmptyModel());
     renderModels();
   });
+
+  function syncDraftModels() {
+    const valuesById = new Map(Array.from(modelRows.querySelectorAll("[data-model-id]")).map((row) => {
+      const name = row.querySelector('[id^="admst_model_name_input_"]')?.value ?? "";
+      const status = row.querySelector('[id^="admst_model_status_input_"]')?.value ?? "active";
+      return [String(row.dataset.modelId ?? ""), { name: name.trim(), slug: slugify(name), status }];
+    }));
+
+    draft.models = draft.models.map((model) => ({
+      ...model,
+      ...(valuesById.get(String(model.id)) ?? {}),
+    }));
+  }
 
   modelsSection.append(modelsHeader, modelRows);
   renderModels();
