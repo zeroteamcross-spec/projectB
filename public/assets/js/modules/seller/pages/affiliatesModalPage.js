@@ -307,7 +307,7 @@ function render(root, context, actions) {
 
   const layout = document.createElement("section");
   layout.id = "slraf_page";
-  layout.className = "mx-auto grid min-w-0 w-full max-w-[1180px] gap-4 pb-6 text-[var(--pb-text)] md:gap-6";
+  layout.className = "mx-auto grid min-w-0 w-full max-w-[1180px] gap-4 pb-28 text-[var(--pb-text)] md:gap-6 md:pb-8";
   layout.dataset.ds = "seller.affiliates.page";
 
   layout.append(

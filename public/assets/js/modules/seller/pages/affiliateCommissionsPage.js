@@ -206,7 +206,7 @@ function render(root, context, actions) {
 
   const frame = document.createElement("section");
   frame.id = "slrafc_page";
-  frame.className = "mx-auto grid min-w-0 w-full max-w-[1180px] gap-4 pb-6 text-[var(--pb-text)] md:gap-6";
+  frame.className = "mx-auto grid min-w-0 w-full max-w-[1180px] gap-4 pb-28 text-[var(--pb-text)] md:gap-6 md:pb-8";
   frame.dataset.ds = "seller.commissions.page";
   frame.append(
     commissionsHero({ actions }),
