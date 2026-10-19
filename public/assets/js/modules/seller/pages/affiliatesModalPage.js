@@ -307,11 +307,11 @@ function render(root, context, actions) {
 
   const layout = document.createElement("section");
   layout.id = "slraf_page";
-  layout.className = "grid min-w-0 gap-5";
+  layout.className = "mx-auto grid min-w-0 w-full max-w-[1180px] gap-4 pb-6 text-[var(--pb-text)] md:gap-6";
   layout.dataset.ds = "seller.affiliates.page";
 
   layout.append(
-    affiliatesHero({ counts, action: createButton(actions.createNew) }),
+    affiliatesHero({ action: createButton(actions.createNew) }),
     applyDesignHook(summaryCards({ affiliates, counts }), "seller.affiliates.summary"),
     filterBar({ query, counts, onChange: actions.applyFilters }),
   );
@@ -378,7 +378,14 @@ function openAffiliateModal({ mode, selectedAffiliate, runtime, actions }) {
   content.className = "grid min-w-0 gap-4";
 
   if (mode === "detail") {
-    content.append(affiliateDetailPanel({ affiliate: selectedAffiliate }));
+    content.append(affiliateDetailPanel({
+      affiliate: selectedAffiliate,
+      actions: {
+        onEdit: () => selectedAffiliate ? actions.editAffiliate(selectedAffiliate) : null,
+        onCopyLanding: () => selectedAffiliate ? actions.copyLanding(selectedAffiliate) : null,
+        onOpenLanding: () => selectedAffiliate ? actions.openLanding(selectedAffiliate) : null,
+      },
+    }));
   } else {
     const formDraft = ensureAffiliateFormDraft({
       mode,
@@ -401,11 +408,8 @@ function openAffiliateModal({ mode, selectedAffiliate, runtime, actions }) {
       onCreateNew: () => actions.createNew(),
       onOpenLanding: (affiliate) => actions.openLanding(affiliate),
       onCopyLanding: (affiliate) => actions.copyLanding(affiliate),
-      // Modal ini sudah punya tombol close (x) sendiri di pojok header
-      // (closeButtonId di openModal() bawah). SellerAffiliateForm merender
-      // tombol "Tutup" tambahan sendiri kalau onClose truthy -- dobel dengan
-      // tombol x itu di mode create, jadi sengaja tidak dikirim di sini.
-      onClose: isCreate ? null : () => actions.closeModal(),
+      // Modal menggunakan tombol X bawaan pada header untuk semua mode.
+      onClose: null,
     }), "seller.affiliates.form"));
   }
 
@@ -423,16 +427,6 @@ function openAffiliateModal({ mode, selectedAffiliate, runtime, actions }) {
     headerId: "slraf_modal_header_section",
     bodyId: "slraf_modal_body_section",
     closeButtonId: "slraf_modal_close_button",
-    // Detail mode replaces the corner close button with Edit/Copy Link/Buka
-    // Landing, since those are the only actions this read-only view offers.
-    headerActions: mode === "detail"
-      ? () => affiliateDetailHeaderActions({
-        disabled: !selectedAffiliate,
-        onEdit: () => selectedAffiliate ? actions.editAffiliate(selectedAffiliate) : null,
-        onCopyLanding: () => selectedAffiliate ? actions.copyLanding(selectedAffiliate) : null,
-        onOpenLanding: () => selectedAffiliate ? actions.openLanding(selectedAffiliate) : null,
-      })
-      : undefined,
     onClose: () => actions.closeModal(),
     preserveContentOnSameSignature: true,
     contentSignature: affiliateModalSignature({ mode, selectedAffiliate, runtime }),
@@ -530,48 +524,34 @@ function seedAffiliateDraft(mode, affiliate) {
   };
 }
 
-function affiliatesHero({ counts, action }) {
+function affiliatesHero({ action }) {
   const section = document.createElement("section");
   section.id = "slraf_header";
-  // "grid gap-5" ditambahkan supaya baris tombol (layout, lewat items-end di
-  // dalamnya) tidak nempel langsung ke baris stats di bawahnya -- sebelum ini
-  // section-nya tidak grid/tidak punya gap sama sekali di antara dua child
-  // block-nya.
-  section.className = "relative grid gap-5 overflow-hidden rounded-[2rem] border border-[var(--pb-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(250,244,237,0.84),rgba(234,244,249,0.72))] p-5 shadow-[0_24px_80px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6 lg:p-7";
+  section.className = "grid min-w-0 gap-4 rounded-[1.75rem] border border-[color-mix(in_srgb,var(--pb-brand-primary)_12%,var(--pb-border))] bg-[color-mix(in_srgb,var(--pb-surface-card)_94%,white)] p-5 shadow-[var(--pb-shadow-card)] md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:rounded-[2rem] md:p-6";
   section.dataset.ds = "seller.affiliates.hero";
 
   const layout = document.createElement("section");
-  layout.className = "grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end";
+  layout.className = "grid min-w-0 gap-3";
 
   const copy = document.createElement("section");
-  copy.className = "grid min-w-0 gap-3";
+  copy.className = "grid min-w-0 gap-1.5";
   const icon = document.createElement("span");
-  icon.className = "grid h-12 w-12 place-items-center rounded-2xl bg-[linear-gradient(135deg,#1e81b0,#1e81b0)] text-white shadow-[0_16px_40px_rgba(30,129,176,0.22)]";
+  icon.className = "mb-1 grid h-11 w-11 place-items-center rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_10%,white)] text-[var(--pb-brand-secondary)]";
   icon.append(createIcon("affiliate", { className: "h-5 w-5" }));
   copy.append(
     icon,
-    textNode("p", "text-[10px] font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", "Seller marketing desk"),
-    textNode("h1", "max-w-3xl text-2xl font-black leading-tight tracking-normal text-gray-950 sm:text-3xl", "Marketing"),
+    textNode("p", "text-[10px] font-black uppercase tracking-[0.12em] text-[var(--pb-brand-secondary)]", "Showroom marketing"),
+    textNode("h1", "max-w-3xl break-words text-2xl font-black leading-tight tracking-normal text-[var(--pb-text)] md:text-3xl", "Marketing"),
+    textNode("p", "max-w-2xl text-xs font-semibold leading-6 text-[var(--pb-text-muted)]", "Kelola partner, link referral, dan performa marketing showroom Anda."),
   );
 
-  const stats = document.createElement("section");
-  stats.className = "grid gap-2 sm:grid-cols-3 lg:min-w-[420px]";
-  [
-    ["Total", counts.total],
-    ["Aktif", counts.active],
-    ["Nonaktif", counts.inactive],
-  ].forEach(([label, value], index) => {
-    const stat = document.createElement("section");
-    stat.className = "rounded-[1.25rem] border border-[var(--pb-card-border)] bg-white/78 p-3 shadow-sm";
-    stat.append(
-      textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label),
-      textNode("p", "text-xl font-black text-gray-950", String(value)),
-    );
-    stats.append(stat);
-  });
+  const actions = document.createElement("section");
+  actions.className = "w-full md:w-auto md:min-w-[190px]";
+  action.classList.add("min-h-11", "w-full", "md:w-auto");
+  actions.append(action);
 
-  layout.append(copy, action);
-  section.append(layout, stats);
+  layout.append(copy);
+  section.append(layout, actions);
   return section;
 }
 
@@ -585,7 +565,7 @@ function createButton(onClick) {
 function summaryCards({ affiliates, counts }) {
   const section = document.createElement("section");
   section.id = "slraf_summary_section";
-  section.className = "grid gap-3 sm:grid-cols-2 xl:grid-cols-4";
+  section.className = "grid grid-cols-2 gap-3 xl:grid-cols-4";
 
   const totals = summarizeMetrics(affiliates);
   [
@@ -593,15 +573,12 @@ function summaryCards({ affiliates, counts }) {
     ["Marketing aktif", counts.active],
     ["Total klik / prospek", `${totals.clicks.toLocaleString("id-ID")} / ${totals.leads.toLocaleString("id-ID")}`],
     ["Komisi / settlement", totals.commission],
-  ].forEach(([label, value], index) => {
+  ].forEach(([label, value]) => {
     const card = document.createElement("section");
-    card.className = [
-      "rounded-[1.5rem] border p-4 shadow-[0_18px_55px_rgba(15,23,42,0.07)] backdrop-blur-xl",
-      summaryCardClass(index),
-    ].join(" ");
+    card.className = "grid min-w-0 gap-1.5 rounded-[1.5rem] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] p-3.5 shadow-[var(--pb-shadow-card)] sm:p-4";
     card.append(
-      textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label),
-      textNode("p", "mt-2 text-xl font-black text-gray-950", String(value)),
+      textNode("p", "text-[9px] font-black uppercase tracking-[0.09em] text-[var(--pb-text-muted)] sm:text-[10px] sm:tracking-[0.12em]", label),
+      textNode("p", "break-words text-base font-black text-[var(--pb-text)] sm:text-lg", String(value)),
     );
     section.append(card);
   });
@@ -612,11 +589,11 @@ function summaryCards({ affiliates, counts }) {
 function filterBar({ query, counts, onChange }) {
   const section = document.createElement("section");
   section.id = "slraf_filter_section";
-  section.className = "grid gap-3 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white/80 p-4 shadow-[0_18px_55px_rgba(15,23,42,0.07)] backdrop-blur-xl md:grid-cols-[minmax(0,1fr)_190px] md:items-end";
+  section.className = "grid min-w-0 gap-3 rounded-[1.5rem] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] p-4 shadow-[var(--pb-shadow-card)] sm:grid-cols-[minmax(0,1fr)_190px] sm:items-end md:p-5";
   section.dataset.ds = "seller.affiliates.filters";
 
   const searchWrap = document.createElement("label");
-  searchWrap.className = "grid min-w-0 gap-1.5 text-xs font-bold text-gray-700";
+  searchWrap.className = "grid min-w-0 gap-1.5 text-xs font-bold text-[var(--pb-text-strong)]";
   searchWrap.textContent = "Cari marketing";
   const search = document.createElement("input");
   search.id = "slraf_search_input";
@@ -627,7 +604,7 @@ function filterBar({ query, counts, onChange }) {
   searchWrap.append(search);
 
   const statusWrap = document.createElement("label");
-  statusWrap.className = "grid min-w-0 gap-1.5 text-xs font-bold text-gray-700";
+  statusWrap.className = "grid min-w-0 gap-1.5 text-xs font-bold text-[var(--pb-text-strong)]";
   statusWrap.textContent = "Status";
   const status = document.createElement("select");
   status.id = "slraf_status_filter";
@@ -650,16 +627,7 @@ function filterBar({ query, counts, onChange }) {
   return section;
 }
 
-function summaryCardClass(index) {
-  return [
-    "border-[var(--pb-border)] bg-[linear-gradient(135deg,rgba(250,244,237,0.96),rgba(255,255,255,0.88))]",
-    "border-[color-mix(in_srgb,var(--pb-success)_14%,white)] bg-[linear-gradient(135deg,rgba(236,246,239,0.96),rgba(255,255,255,0.88))]",
-    "border-[color-mix(in_srgb,var(--pb-brand-primary)_14%,white)] bg-[linear-gradient(135deg,rgba(234,244,249,0.96),rgba(255,255,255,0.88))]",
-    "border-[color-mix(in_srgb,var(--pb-brand-primary)_14%,white)] bg-[linear-gradient(135deg,rgba(234,244,249,0.96),rgba(255,255,255,0.88))]",
-  ][index % 4];
-}
-
-function affiliateDetailPanel({ affiliate }) {
+function affiliateDetailPanel({ affiliate, actions = {} }) {
   const section = document.createElement("section");
   section.id = "slraf_detail_panel_section";
   section.className = "grid min-w-0 gap-4";
@@ -670,12 +638,19 @@ function affiliateDetailPanel({ affiliate }) {
   }
 
   const header = document.createElement("section");
-  header.className = "grid gap-3 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-[var(--pb-surface-inset)] p-4";
+  header.className = "grid min-w-0 gap-3 rounded-[1.5rem] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] p-4 shadow-[var(--pb-shadow-soft)] sm:p-5";
   header.append(
-    textNode("p", "text-xl font-black text-gray-950", affiliate.user?.name || affiliate.name || `Marketing #${affiliate.id}`),
-    textNode("p", "break-words text-xs font-semibold text-gray-600", [affiliate.user?.email || affiliate.email, affiliate.phone_number || affiliate.user?.phone_number].filter(Boolean).join(" | ") || "Kontak belum lengkap"),
+    textNode("p", "break-words text-xl font-black text-[var(--pb-text)]", affiliate.user?.name || affiliate.name || `Marketing #${affiliate.id}`),
+    textNode("p", "break-words text-xs font-semibold leading-5 text-[var(--pb-text-muted)]", [affiliate.user?.email || affiliate.email, affiliate.phone_number || affiliate.user?.phone_number].filter(Boolean).join(" | ") || "Kontak belum lengkap"),
     SellerAffiliateStatusBadge(affiliate.status),
   );
+
+  const actionBar = affiliateDetailActions({
+    disabled: !affiliate,
+    onEdit: actions.onEdit,
+    onCopyLanding: actions.onCopyLanding,
+    onOpenLanding: actions.onOpenLanding,
+  });
 
   const facts = document.createElement("section");
   facts.className = "grid gap-3 sm:grid-cols-2";
@@ -688,23 +663,22 @@ function affiliateDetailPanel({ affiliate }) {
     ["Diupdate", affiliate.updated_at || "-"],
   ].forEach(([label, value]) => {
     const card = document.createElement("section");
-    card.className = "grid gap-1 rounded-[1.25rem] border border-[var(--pb-border)] bg-white/82 p-3";
+    card.className = "grid min-w-0 gap-1 rounded-[1.25rem] border border-[var(--pb-border)] bg-[var(--pb-surface-muted)] p-3";
     card.append(
-      textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label),
-      textNode("p", "break-words text-xs font-semibold text-gray-900", value),
+      textNode("p", "text-[10px] font-black uppercase tracking-[0.12em] text-[var(--pb-text-muted)]", label),
+      textNode("p", "break-words text-xs font-semibold text-[var(--pb-text)]", value),
     );
     facts.append(card);
   });
 
-  // Edit/Copy Link/Buka Landing now live in the modal header (see
-  // openAffiliateModal), not here.
-  section.append(header, facts);
+  section.append(header, actionBar, facts);
   return section;
 }
 
-function affiliateDetailHeaderActions({ disabled, onEdit, onCopyLanding, onOpenLanding }) {
+function affiliateDetailActions({ disabled, onEdit, onCopyLanding, onOpenLanding }) {
   const wrap = document.createElement("div");
-  wrap.className = "flex shrink-0 flex-wrap items-center justify-end gap-2";
+  wrap.id = "slraf_detail_actions_section";
+  wrap.className = "flex min-w-0 flex-wrap items-center gap-2";
 
   const edit = Button({ label: "Edit", variant: "primary", disabled, onClick: onEdit });
   edit.id = "slraf_detail_edit_button";

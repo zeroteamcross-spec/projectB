@@ -15,7 +15,7 @@ export function SellerCommissionGlobalForm({
 } = {}) {
   const draft = rule ?? sellerAffiliateCommissionService.emptyGlobalRule();
   const card = Card();
-  card.classList.add("grid", "gap-4");
+  card.classList.add("grid", "gap-4", "rounded-[1.75rem]", "bg-[var(--pb-surface-card)]", "p-5", "shadow-[var(--pb-shadow-card)]", "md:p-6");
 
   const header = document.createElement("div");
   header.className = "grid gap-2";

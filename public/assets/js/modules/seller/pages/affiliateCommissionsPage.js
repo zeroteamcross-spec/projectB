@@ -206,17 +206,17 @@ function render(root, context, actions) {
 
   const frame = document.createElement("section");
   frame.id = "slrafc_page";
-  frame.className = "grid min-w-0 gap-5";
+  frame.className = "mx-auto grid min-w-0 w-full max-w-[1180px] gap-4 pb-6 text-[var(--pb-text)] md:gap-6";
   frame.dataset.ds = "seller.commissions.page";
   frame.append(
-    commissionsHero({ summary, actions }),
+    commissionsHero({ actions }),
     applyDesignHook(summaryCards(summary, globalRule), "seller.commissions.summary"),
     filterBar({ query, overrides, onChange: actions.applyFilters }),
   );
 
   const layout = document.createElement("div");
   layout.id = "slrafc_content_section";
-  layout.className = "grid gap-6";
+  layout.className = "grid min-w-0 gap-4 md:gap-5";
 
   const left = document.createElement("div");
   left.className = "grid gap-4";
@@ -285,24 +285,21 @@ function render(root, context, actions) {
 function summaryCards(summary, globalRule) {
   const section = document.createElement("section");
   section.id = "slrafc_summary_section";
-  section.className = "grid gap-3 sm:grid-cols-2 xl:grid-cols-4";
+  section.className = "grid grid-cols-2 gap-3 xl:grid-cols-4";
 
   [
     ["Aturan umum", summary.hasGlobalRule ? sellerAffiliateCommissionService.formatValue(globalRule) : "Belum diatur", "Fallback komisi bila tidak ada aturan khusus aktif."],
     ["Status umum", summary.hasGlobalRule ? (summary.activeGlobalRule ? "Aktif" : "Nonaktif") : "Belum ada", "Status aturan dasar showroom."],
     ["Khusus aktif", String(summary.activeOverrides), "Aturan per mobil yang sedang aktif."],
     ["Total khusus", String(summary.totalOverrides), "Jumlah aturan khusus dari data lokal."],
-  ].forEach(([label, value, note], index) => {
+  ].forEach(([label, value, note]) => {
     const card = document.createElement("section");
     card.id = `slrafc_summary_${slugify(label)}_section`;
-    card.className = [
-      "grid gap-2 rounded-[1.5rem] border p-4 shadow-[0_18px_55px_rgba(15,23,42,0.07)] backdrop-blur-xl",
-      summaryCardClass(index),
-    ].join(" ");
+    card.className = "grid min-w-0 gap-1.5 rounded-[1.5rem] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] p-3.5 shadow-[var(--pb-shadow-card)] sm:gap-2 sm:p-4";
     card.append(
-      textBlock("text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label),
-      textBlock("text-xl font-black text-gray-950", value),
-      textBlock("text-xs leading-6 text-gray-600", note),
+      textBlock("text-[9px] font-black uppercase tracking-[0.09em] text-[var(--pb-text-muted)] sm:text-[10px] sm:tracking-[0.12em]", label),
+      textBlock("break-words text-base font-black text-[var(--pb-text)] sm:text-lg", value),
+      textBlock("text-[11px] leading-5 text-[var(--pb-text-muted)] sm:text-xs sm:leading-6", note),
     );
     section.append(card);
   });
@@ -310,50 +307,38 @@ function summaryCards(summary, globalRule) {
   return section;
 }
 
-function commissionsHero({ summary, actions }) {
+function commissionsHero({ actions }) {
   const section = document.createElement("section");
   section.id = "slrafc_header";
-  section.className = "relative overflow-hidden rounded-[2rem] border border-[var(--pb-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(250,244,237,0.84),rgba(234,244,249,0.72))] p-5 shadow-[0_24px_80px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6 lg:p-7";
+  section.className = "grid min-w-0 gap-4 rounded-[1.75rem] border border-[color-mix(in_srgb,var(--pb-brand-primary)_12%,var(--pb-border))] bg-[color-mix(in_srgb,var(--pb-surface-card)_94%,white)] p-5 shadow-[var(--pb-shadow-card)] md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:rounded-[2rem] md:p-6";
   section.dataset.ds = "seller.commissions.hero";
 
   const layout = document.createElement("section");
-  layout.className = "grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end";
+  layout.className = "grid min-w-0 gap-3";
   const copy = document.createElement("section");
-  copy.className = "grid min-w-0 gap-3";
+  copy.className = "grid min-w-0 gap-1.5";
   const icon = document.createElement("span");
-  icon.className = "grid h-12 w-12 place-items-center rounded-2xl bg-[linear-gradient(135deg,#1e81b0,#1e81b0)] text-white shadow-[0_16px_40px_rgba(30,129,176,0.22)]";
+  icon.className = "mb-1 grid h-11 w-11 place-items-center rounded-full bg-[color-mix(in_srgb,var(--pb-brand-primary)_10%,white)] text-[var(--pb-brand-secondary)]";
   icon.append(createIcon("commission", { className: "h-5 w-5" }));
   copy.append(
     icon,
-    textBlock("p", "text-[10px] font-black uppercase tracking-[0.18em] text-[var(--pb-brand-secondary)]", "Seller commission desk"),
-    textBlock("h1", "max-w-3xl text-2xl font-black leading-tight tracking-normal text-gray-950 sm:text-3xl", "Komisi Marketing"),
+    textBlock("p", "text-[10px] font-black uppercase tracking-[0.12em] text-[var(--pb-brand-secondary)]", "Showroom marketing"),
+    textBlock("h1", "max-w-3xl break-words text-2xl font-black leading-tight tracking-normal text-[var(--pb-text)] md:text-3xl", "Komisi Marketing"),
+    textBlock("p", "max-w-2xl text-xs font-semibold leading-6 text-[var(--pb-text-muted)]", "Atur komisi dasar dan aturan khusus untuk transaksi dari referral marketing."),
   );
 
-  const stats = document.createElement("section");
-  stats.className = "grid gap-2 sm:grid-cols-3 lg:min-w-[420px]";
-  [
-    ["Umum", summary.activeGlobalRule ? "Aktif" : "Nonaktif"],
-    ["Khusus", summary.totalOverrides],
-    ["Aktif", summary.activeOverrides],
-  ].forEach(([label, value]) => {
-    const stat = document.createElement("section");
-    stat.className = "rounded-[1.25rem] border border-[var(--pb-card-border)] bg-white/78 p-3 shadow-sm";
-    stat.append(
-      textBlock("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label),
-      textBlock("p", "text-xl font-black text-gray-950", String(value)),
-    );
-    stats.append(stat);
-  });
-
-  layout.append(copy, heroActions(actions));
-  section.append(layout, stats);
+  const actionWrap = document.createElement("section");
+  actionWrap.className = "w-full md:w-auto md:min-w-[320px]";
+  actionWrap.append(heroActions(actions));
+  layout.append(copy);
+  section.append(layout, actionWrap);
   return section;
 }
 
 function heroActions(actions) {
   const wrap = document.createElement("section");
   wrap.id = "slrafc_header_actions_section";
-  wrap.className = "grid gap-2 sm:grid-cols-2 lg:min-w-[360px] mb-[5px]";
+  wrap.className = "grid gap-2 sm:grid-cols-2";
 
   const global = Button({ label: "Atur komisi umum", onClick: () => actions.openGlobalRule(), designHook: "shared.button.primary" });
   global.id = "slrafc_global_rule_button";
@@ -372,7 +357,7 @@ function heroActions(actions) {
 function filterBar({ query, overrides, onChange }) {
   const section = document.createElement("section");
   section.id = "slrafc_filter_section";
-  section.className = "grid gap-3 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white/80 p-4 shadow-[0_18px_55px_rgba(15,23,42,0.07)] backdrop-blur-xl lg:grid-cols-[minmax(0,1fr)_180px_180px_180px] lg:items-end";
+  section.className = "grid min-w-0 gap-3 rounded-[1.5rem] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] p-4 shadow-[var(--pb-shadow-card)] sm:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_160px_160px_160px] xl:items-end md:p-5";
   section.dataset.ds = "seller.commissions.filters";
 
   const searchWrap = fieldWrap("Cari komisi");
@@ -445,7 +430,7 @@ function filterBar({ query, overrides, onChange }) {
 
 function priorityPanel() {
   const card = Card([], { variant: "raised" });
-  card.classList.add("grid", "gap-3");
+  card.classList.add("grid", "gap-3", "rounded-[1.5rem]", "bg-[var(--pb-surface-card)]", "shadow-[var(--pb-shadow-card)]");
 
   const top = document.createElement("div");
   top.className = "flex flex-wrap items-center gap-2";
@@ -650,6 +635,7 @@ function openOverrideFormModal({ mode, selectedOverride, availableCars, carsSnap
         ? ensureSelectedCar(availableCars, selectedOverride.car)
         : availableCars,
       mode,
+      presentation: "modal",
       saving: runtime.overrideSaving,
       error: runtime.overrideError,
       onSubmit: (payload) => actions.saveOverride(payload),
@@ -692,7 +678,7 @@ function commissionDetailPanel({ rule, onEdit }) {
   section.className = "grid min-w-0 gap-4";
 
   const header = document.createElement("section");
-  header.className = "grid gap-3 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-[var(--pb-surface-inset)] p-4";
+  header.className = "grid gap-3 rounded-[1.5rem] border border-[var(--pb-border)] bg-[var(--pb-surface-card)] p-4 shadow-[var(--pb-shadow-soft)] sm:p-5";
   header.append(
     textBlock("p", "text-xl font-black text-gray-950", sellerAffiliateCommissionService.carLabel(rule.car)),
     textBlock("p", "text-xs font-semibold text-gray-600", "Aturan komisi ini berlaku untuk transaksi referral pada mobil terkait."),
@@ -714,10 +700,10 @@ function commissionDetailPanel({ rule, onEdit }) {
     ["Catatan settlement", "Settlement mengikuti ledger canon setelah transaksi paid."],
   ].forEach(([label, value]) => {
     const item = document.createElement("section");
-    item.className = "grid gap-1 rounded-[1.25rem] border border-[var(--pb-border)] bg-white/82 p-3";
+    item.className = "grid gap-1 rounded-[1.25rem] border border-[var(--pb-border)] bg-[var(--pb-surface-muted)] p-3";
     item.append(
-      textBlock("p", "text-[10px] font-black uppercase tracking-[0.14em] text-gray-500", label),
-      textBlock("p", "break-words text-xs font-semibold text-gray-900", value),
+      textBlock("p", "text-[10px] font-black uppercase tracking-[0.12em] text-[var(--pb-text-muted)]", label),
+      textBlock("p", "break-words text-xs font-semibold text-[var(--pb-text)]", value),
     );
     facts.append(item);
   });
@@ -757,18 +743,9 @@ function filterOverrides(overrides, query) {
   });
 }
 
-function summaryCardClass(index) {
-  return [
-    "border-[var(--pb-border)] bg-[linear-gradient(135deg,rgba(250,244,237,0.96),rgba(255,255,255,0.88))]",
-    "border-[color-mix(in_srgb,var(--pb-success)_14%,white)] bg-[linear-gradient(135deg,rgba(236,246,239,0.96),rgba(255,255,255,0.88))]",
-    "border-[color-mix(in_srgb,var(--pb-brand-primary)_14%,white)] bg-[linear-gradient(135deg,rgba(234,244,249,0.96),rgba(255,255,255,0.88))]",
-    "border-[color-mix(in_srgb,var(--pb-brand-primary)_14%,white)] bg-[linear-gradient(135deg,rgba(234,244,249,0.96),rgba(255,255,255,0.88))]",
-  ][index % 4];
-}
-
 function fieldWrap(label) {
   const wrap = document.createElement("label");
-  wrap.className = "grid min-w-0 gap-1.5 text-xs font-bold text-gray-700";
+  wrap.className = "grid min-w-0 gap-1.5 text-xs font-bold text-[var(--pb-text-strong)]";
   wrap.textContent = label;
   return wrap;
 }

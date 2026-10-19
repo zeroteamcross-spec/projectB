@@ -27,7 +27,7 @@ export function SellerAffiliateForm({
 } = {}) {
   const draft = draftOverride ?? affiliate ?? sellerAffiliateService.emptyDraft();
   const card = Card();
-  card.classList.add("grid", "min-w-0", "gap-4");
+  card.classList.add("grid", "min-w-0", "gap-4", "rounded-[1.75rem]", "bg-[var(--pb-surface-card)]", "p-5", "shadow-[var(--pb-shadow-card)]", "md:p-6");
   if (presentation === "sidebar") {
     card.classList.add("xl:sticky", "xl:top-6");
   }
@@ -109,7 +109,9 @@ export function SellerAffiliateForm({
     referralCodeField.append(slugError);
   }
 
-  form.append(
+  const identityGrid = document.createElement("section");
+  identityGrid.className = "grid min-w-0 gap-4 sm:grid-cols-2";
+  identityGrid.append(
     Input({
       id: "slraf_affiliate_name_input",
       name: "name",
@@ -125,6 +127,11 @@ export function SellerAffiliateForm({
       value: draft.user?.email ?? draft.email ?? "",
       placeholder: "marketing@example.com",
     }),
+  );
+
+  const marketingGrid = document.createElement("section");
+  marketingGrid.className = "grid min-w-0 gap-4 sm:grid-cols-2";
+  marketingGrid.append(
     referralCodeField,
     Input({
       id: "slraf_affiliate_phone_number_input",
@@ -134,6 +141,7 @@ export function SellerAffiliateForm({
       placeholder: "Contoh: 081234567890",
     }),
   );
+  form.append(identityGrid, marketingGrid);
 
   const passwordGrid = document.createElement("section");
   passwordGrid.className = "grid gap-4 sm:grid-cols-2";
@@ -192,13 +200,14 @@ export function SellerAffiliateForm({
   form.addEventListener("change", () => onDraftChange?.(collectFormDraft(form)));
 
   const actions = document.createElement("div");
-  actions.className = "flex flex-col gap-2 sm:flex-row sm:flex-wrap";
+  actions.className = "grid gap-2 sm:flex sm:flex-wrap";
   const submitButton = Button({
     label: saving ? "Menyimpan..." : mode === "edit" ? "Simpan perubahan" : "Buat marketing",
     disabled: saving,
     onClick: () => form.requestSubmit(),
   });
   submitButton.id = "slraf_affiliate_submit_button";
+  submitButton.classList.add("w-full", "sm:w-auto");
   actions.append(submitButton);
 
   if (mode === "edit") {
@@ -209,6 +218,7 @@ export function SellerAffiliateForm({
       onClick: () => onCreateNew?.(),
     });
     newButton.id = "slraf_affiliate_new_button";
+    newButton.classList.add("w-full", "sm:w-auto");
     actions.append(newButton);
   }
 

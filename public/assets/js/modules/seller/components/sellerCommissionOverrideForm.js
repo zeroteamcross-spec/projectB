@@ -12,13 +12,17 @@ export function SellerCommissionOverrideForm({
   rule = null,
   cars = [],
   mode = "create",
+  presentation = "sidebar",
   saving = false,
   error = "",
   onSubmit = null,
   onCreateNew = null,
 } = {}) {
   const card = Card();
-  card.classList.add("grid", "min-w-0", "gap-4", "xl:sticky", "xl:top-6");
+  card.classList.add("grid", "min-w-0", "gap-4", "rounded-[1.75rem]", "bg-[var(--pb-surface-card)]", "p-5", "shadow-[var(--pb-shadow-card)]", "md:p-6");
+  if (presentation === "sidebar") {
+    card.classList.add("xl:sticky", "xl:top-6");
+  }
 
   if (mode === "edit" && !rule) {
     card.append(EmptyState({
