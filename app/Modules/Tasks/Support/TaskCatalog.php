@@ -113,4 +113,10 @@ final class TaskCatalog
     public const SHOWROOM_REGISTER_DUPLICATE_EMAIL_TASK_TITLE = 'Tolak email showroom yang sudah digunakan.';
 
     public const SHOWROOM_REGISTER_DUPLICATE_EMAIL_TASK_DESCRIPTION = 'Pada halaman daftar-showroom, jika email login sudah dipakai user lain, pendaftaran showroom harus ditolak dan menampilkan teks merah "Email sudah digunakan" tepat di bawah field Email. Validasi wajib tetap dilakukan di backend. Referensi: Tugas GitIgnore/daftar-showroom-email-used-reference-2026-10-19.png.';
+
+    public const ADMIN_SUBSCRIPTIONS_DUE_AUTO_APPROVE_TASK_KEY = 'request-019-admin-subscriptions-due-auto-approve';
+
+    public const ADMIN_SUBSCRIPTIONS_DUE_AUTO_APPROVE_TASK_TITLE = 'Otomatis approve showroom saat pembayaran paket disetujui.';
+
+    public const ADMIN_SUBSCRIPTIONS_DUE_AUTO_APPROVE_TASK_DESCRIPTION = 'Pada halaman admin/subscriptions-due, ketika Admin menyetujui pembayaran paket showroom, akun showroom harus otomatis menjadi approved/aktif dan tidak lagi memerlukan persetujuan kedua di admin/approvals. Perubahan harus tetap atomik, aman, dan tidak mengubah alur pembayaran transaksi mobil.';
 }

@@ -721,9 +721,9 @@ class ShowroomService
     }
 
     /**
-     * Admin mengonfirmasi bukti transfer paket sudah dicek. Dipisah dari
-     * approval akun showroom (lihat AuthService::approveUsers()) -- keduanya
-     * dua keputusan berbeda yang kebetulan sering diambil bersamaan.
+     * Admin mengonfirmasi pembayaran paket yang sudah diverifikasi. Untuk
+     * pendaftaran pertama, konfirmasi ini sekaligus menyelesaikan approval
+     * owner showroom; pembayaran perpanjangan tidak mengubah approval akun.
      */
     public function confirmSubscriptionPayment(array $actor, int $showroomId): array
     {
@@ -764,6 +764,19 @@ class ShowroomService
             'subscription_next_due_at' => $nextDueAt,
             'updated_at' => $now,
         ]);
+
+        // Approval akun hanya relevan untuk pendaftaran pertama. Cabang
+        // berikutnya memakai akun owner yang sama, sehingga pembayaran
+        // cabang tersebut tidak boleh mengubah status approval lagi.
+        $ownerBranches = $this->showrooms->findAllByUserId((int) $showroom['user_id']);
+        $firstBranchId = isset($ownerBranches[0]['id']) ? (int) $ownerBranches[0]['id'] : null;
+
+        if ($firstBranchId === $showroomId) {
+            $user = $this->users->findById((int) $showroom['user_id']);
+            if ($user && ! (bool) ($user['is_approved'] ?? false)) {
+                $this->users->approveUsers([(int) $showroom['user_id']]);
+            }
+        }
 
         $confirmed = $this->showrooms->findById($showroomId);
         if ($this->notificationService !== null) {
