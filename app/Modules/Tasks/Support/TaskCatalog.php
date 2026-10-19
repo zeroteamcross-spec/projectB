@@ -77,4 +77,10 @@ final class TaskCatalog
     public const ADMIN_DASHBOARD_IMPERSONATION_CARD_TASK_TITLE = 'Sembunyikan card Impersonation pada Dashboard Admin.';
 
     public const ADMIN_DASHBOARD_IMPERSONATION_CARD_TASK_DESCRIPTION = 'Pada halaman /admin, sembunyikan card quick action Impersonation agar dashboard lebih ringkas. Fungsi impersonation tetap tersedia melalui User Management, dan layout dashboard harus tetap responsif serta rapi pada desktop dan mobile. Referensi: Tugas GitIgnore/admin-dashboard-impersonation-reference-2026-10-19.png.';
+
+    public const ADMIN_MASTER_BRAND_MODELS_TASK_KEY = 'request-013-admin-master-brand-models';
+
+    public const ADMIN_MASTER_BRAND_MODELS_TASK_TITLE = 'Perbaiki penyimpanan banyak model pada Master Brand.';
+
+    public const ADMIN_MASTER_BRAND_MODELS_TASK_DESCRIPTION = 'Pada halaman admin/master-brand, perbaiki BUG ketika beberapa model ditambahkan berturut-turut tetapi yang tersimpan hanya model terakhir. Nilai model/status yang sudah diisi harus dipertahankan saat baris baru ditambahkan atau dihapus, lalu seluruh model dari Tugas GitIgnore/brand.json harus dapat disimpan sebagai array brand.';
 }
