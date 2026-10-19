@@ -348,6 +348,7 @@ function editorSection({ template, saving, onSave }) {
 
   const form = document.createElement("form");
   form.id = "admstinsp_editor_form_section";
+  form.noValidate = true;
   form.className = "grid gap-3";
   const sectionInput = selectField("admstinsp_editor_section_input", template?.category_name ?? "road_test", SECTION_OPTIONS);
   const itemName = inputField("admstinsp_editor_item_name_input", template?.item_name ?? "", "Nama item inspeksi");

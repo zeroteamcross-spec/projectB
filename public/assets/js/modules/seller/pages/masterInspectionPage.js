@@ -376,6 +376,7 @@ function openEditor(template, actions) {
   const formId = "slrminsp_editor_form";
   const form = document.createElement("form");
   form.id = formId;
+  form.noValidate = true;
   form.className = "grid min-w-0 gap-3";
   const section = selectControl("slrminsp_editor_section_input", SECTION_OPTIONS, template?.category_name ?? "road_test");
   const item = inputControl("slrminsp_editor_item_name_input", template?.item_name ?? "", "Nama item inspeksi");
