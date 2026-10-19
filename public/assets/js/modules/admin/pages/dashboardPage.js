@@ -104,7 +104,6 @@ function render(root, context, notFound, animation = {}) {
         onPending: () => context.router?.navigate("/admin/approvals"),
         onTransactions: () => context.router?.navigate("/admin/transactions"),
         onSettlements: () => context.router?.navigate("/admin/settlements"),
-        onActAs: () => context.router?.navigate("/admin/users"),
       }),
     }), "admin.dashboard.quick_actions"),
     adminChartPanel({ summary, transactions, pendingUsers, cars }),

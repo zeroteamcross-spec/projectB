@@ -71,4 +71,10 @@ final class TaskCatalog
     public const ADMIN_SLIDER_ARCHIVE_BUG_TASK_TITLE = 'Perbaiki BUG slider menghilang setelah diarsipkan.';
 
     public const ADMIN_SLIDER_ARCHIVE_BUG_TASK_DESCRIPTION = 'Pada halaman admin/sliders, perbaiki BUG ketika slider diarsipkan lalu menghilang seolah-olah terhapus. Pastikan aksi arsip hanya mengubah status menjadi arsip, data tetap tersimpan, dapat dibedakan dari hapus permanen, dan alur daftar/restore tetap aman. Implementasi selesai dan sudah diuji di production; tekan Beres setelah Anda memverifikasi hasil. Tidak ada gambar referensi baru yang terlampir.';
+
+    public const ADMIN_DASHBOARD_IMPERSONATION_CARD_TASK_KEY = 'request-012-admin-dashboard-impersonation-card';
+
+    public const ADMIN_DASHBOARD_IMPERSONATION_CARD_TASK_TITLE = 'Sembunyikan card Impersonation pada Dashboard Admin.';
+
+    public const ADMIN_DASHBOARD_IMPERSONATION_CARD_TASK_DESCRIPTION = 'Pada halaman /admin, sembunyikan card quick action Impersonation agar dashboard lebih ringkas. Fungsi impersonation tetap tersedia melalui User Management, dan layout dashboard harus tetap responsif serta rapi pada desktop dan mobile. Referensi: Tugas GitIgnore/admin-dashboard-impersonation-reference-2026-10-19.png.';
 }
