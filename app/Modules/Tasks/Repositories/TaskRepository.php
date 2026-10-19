@@ -134,6 +134,20 @@ class TaskRepository
                 'status' => 'open',
                 'created_at' => '2026-10-19 00:00:00',
             ],
+            [
+                'task_key' => TaskCatalog::ADMIN_MASTER_PAYMENT_LABELS_TASK_KEY,
+                'title' => TaskCatalog::ADMIN_MASTER_PAYMENT_LABELS_TASK_TITLE,
+                'description' => TaskCatalog::ADMIN_MASTER_PAYMENT_LABELS_TASK_DESCRIPTION,
+                'status' => 'open',
+                'created_at' => '2026-10-19 00:00:00',
+            ],
+            [
+                'task_key' => TaskCatalog::SHOWROOM_PAYMENT_BANK_ICONS_TASK_KEY,
+                'title' => TaskCatalog::SHOWROOM_PAYMENT_BANK_ICONS_TASK_TITLE,
+                'description' => TaskCatalog::SHOWROOM_PAYMENT_BANK_ICONS_TASK_DESCRIPTION,
+                'status' => 'open',
+                'created_at' => '2026-10-19 00:00:00',
+            ],
         ];
     }
 

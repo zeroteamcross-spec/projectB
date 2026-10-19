@@ -89,4 +89,16 @@ final class TaskCatalog
     public const ADMIN_SUBSCRIPTION_PAYMENT_METHODS_TASK_TITLE = 'Atur metode pembayaran pendaftaran showroom dari Master Admin.';
 
     public const ADMIN_SUBSCRIPTION_PAYMENT_METHODS_TASK_DESCRIPTION = 'Pada halaman daftar-showroom, Admin dapat menentukan apakah pembayaran paket showroom memakai transfer manual, Virtual Account otomatis, atau keduanya. Pengaturan berada pada submenu Master yang dinamis melalui Master Sidebar, tersimpan sebagai master data, tampil sesuai pilihan di UI, dan divalidasi ulang di backend tanpa mengubah metode pembayaran transaksi mobil.';
+
+    public const ADMIN_MASTER_PAYMENT_LABELS_TASK_KEY = 'request-015-admin-master-payment-labels';
+
+    public const ADMIN_MASTER_PAYMENT_LABELS_TASK_TITLE = 'Hapus kata saja dari opsi Master Pembayaran.';
+
+    public const ADMIN_MASTER_PAYMENT_LABELS_TASK_DESCRIPTION = 'Pada halaman admin/master-payment, ubah label Transfer Manual saja menjadi Transfer Manual dan Virtual Account otomatis saja menjadi Virtual Account otomatis tanpa mengubah nilai mode, alur pembayaran, atau fungsi penyimpanan. Referensi: Tugas GitIgnore/admin-master-payment-remove-saja-reference-2026-10-19.png.';
+
+    public const SHOWROOM_PAYMENT_BANK_ICONS_TASK_KEY = 'request-016-showroom-payment-bank-icons';
+
+    public const SHOWROOM_PAYMENT_BANK_ICONS_TASK_TITLE = 'Tampilkan icon bank pada pilihan Virtual Account showroom.';
+
+    public const SHOWROOM_PAYMENT_BANK_ICONS_TASK_DESCRIPTION = 'Pada halaman daftar-showroom, tampilkan icon bank yang sudah tersedia di master pada pilihan BCA, BNI, BRI, dan Mandiri di panel Virtual Account. Referensi: Tugas GitIgnore/daftar-showroom-bank-icons-reference-2026-10-19.png.';
 }

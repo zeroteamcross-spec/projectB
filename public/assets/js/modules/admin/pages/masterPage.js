@@ -881,8 +881,8 @@ function subscriptionPaymentModeCard({ destination, saving, onSave }) {
   select.id = "admstpm_payment_mode_input";
   select.className = "min-h-10 w-full min-w-0 rounded-[var(--pb-radius-xl)] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-3 py-2 text-xs text-[var(--pb-text)] outline-none transition focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
   [
-    ["manual", "Transfer Manual saja"],
-    ["midtrans", "Virtual Account otomatis saja"],
+    ["manual", "Transfer Manual"],
+    ["midtrans", "Virtual Account otomatis"],
     ["both", "Keduanya"],
   ].forEach(([value, labelText]) => {
     const option = document.createElement("option");
