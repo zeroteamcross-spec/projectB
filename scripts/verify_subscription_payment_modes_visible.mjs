@@ -294,6 +294,21 @@ async function checkTaskBoard() {
   record("Task metode pembayaran tampil pada /tasks", "PASS");
 }
 
+async function checkMobileMasterPayment() {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await loginAdmin();
+  await page.goto(`${adminBase}/admin/master-payment?ui_task=subscription-payment-mobile-${Date.now()}`, { waitUntil: "domcontentloaded", timeout: 60000 });
+  await waitApp();
+  await visible(page.locator("#admstpm_hero_section"), "hero Master Pembayaran mobile");
+  await visible(page.locator("#admstpm_payment_mode_section"), "card metode pembayaran mobile");
+  await visible(page.locator("#admstpm_payment_mode_input"), "select metode pembayaran mobile", { enabled: true });
+  await visible(page.locator("#admstpm_payment_mode_save_button"), "tombol simpan metode mobile", { enabled: true });
+  const sizes = await noHorizontalOverflow("Master Pembayaran mobile");
+  await screenshot("admin-master-payment-mobile");
+  record("Master Pembayaran mobile visible, kontrol tidak menempel, dan tanpa horizontal overflow", "PASS", sizes);
+  await logoutCurrent("admin setelah uji mobile");
+}
+
 async function restoreBothIfPossible() {
   try {
     await page.goto(`${adminBase}/login/admin?ui_task=subscription-payment-restore-${Date.now()}`, { waitUntil: "domcontentloaded", timeout: 30000 });
@@ -337,6 +352,7 @@ try {
   await verifyRegistrationPaymentMode("both");
   await logoutCurrent("showroom setelah mode both");
   await checkTaskBoard();
+  await checkMobileMasterPayment();
   const unexpectedFailedRequests = report.failedRequests.filter((item) => !item.expected);
   report.unexpectedFailedRequests = unexpectedFailedRequests;
   report.status = report.pageErrors.length || unexpectedFailedRequests.length ? "FAILED" : "PASS";
