@@ -143,4 +143,10 @@ final class TaskCatalog
     public const SELLER_AFFILIATE_DETAIL_CLOSE_TASK_TITLE = 'Tambahkan tombol tutup pada modal Detail Marketing.';
 
     public const SELLER_AFFILIATE_DETAIL_CLOSE_TASK_DESCRIPTION = 'Pada halaman seller/affiliates?affiliate_id={id}&mode=detail, tambahkan tombol Tutup yang terlihat dan berfungsi pada modal Detail Marketing agar pengguna dapat menutupnya dengan jelas. Pertahankan fungsi Edit, Copy Link, dan Buka Landing. Referensi: Tugas GitIgnore/seller-affiliate-detail-close-button-reference-2026-10-19.png.';
+
+    public const SHOWROOM_REGISTRATION_CARLYNK_BRANDING_TASK_KEY = 'request-024-showroom-registration-carlynk-branding';
+
+    public const SHOWROOM_REGISTRATION_CARLYNK_BRANDING_TASK_TITLE = 'Ubah favicon dan teks web daftar-showroom menjadi Carlynk.';
+
+    public const SHOWROOM_REGISTRATION_CARLYNK_BRANDING_TASK_DESCRIPTION = 'Pada halaman daftar-showroom, sesuaikan favicon dan teks branding web menjadi Carlynk. Pesan ini tidak menyertakan gambar referensi; tambahkan referensi saat tersedia.';
 }

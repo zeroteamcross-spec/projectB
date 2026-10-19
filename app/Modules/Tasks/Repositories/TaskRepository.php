@@ -197,6 +197,13 @@ class TaskRepository
                 'status' => 'open',
                 'created_at' => '2026-10-19 00:00:00',
             ],
+            [
+                'task_key' => TaskCatalog::SHOWROOM_REGISTRATION_CARLYNK_BRANDING_TASK_KEY,
+                'title' => TaskCatalog::SHOWROOM_REGISTRATION_CARLYNK_BRANDING_TASK_TITLE,
+                'description' => TaskCatalog::SHOWROOM_REGISTRATION_CARLYNK_BRANDING_TASK_DESCRIPTION,
+                'status' => 'open',
+                'created_at' => '2026-10-19 00:00:00',
+            ],
         ];
     }
 
