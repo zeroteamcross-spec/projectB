@@ -101,4 +101,10 @@ final class TaskCatalog
     public const SHOWROOM_PAYMENT_BANK_ICONS_TASK_TITLE = 'Tampilkan icon bank pada pilihan Virtual Account showroom.';
 
     public const SHOWROOM_PAYMENT_BANK_ICONS_TASK_DESCRIPTION = 'Pada halaman daftar-showroom, tampilkan icon bank yang sudah tersedia di master pada pilihan BCA, BNI, BRI, dan Mandiri di panel Virtual Account. Referensi: Tugas GitIgnore/daftar-showroom-bank-icons-reference-2026-10-19.png.';
+
+    public const ADMIN_SUBSCRIPTION_NOTIFICATION_PAYMENT_TASK_KEY = 'request-017-admin-subscription-notification-payment';
+
+    public const ADMIN_SUBSCRIPTION_NOTIFICATION_PAYMENT_TASK_TITLE = 'Perbaiki notifikasi pembayaran paket yang tidak menampilkan data.';
+
+    public const ADMIN_SUBSCRIPTION_NOTIFICATION_PAYMENT_TASK_DESCRIPTION = 'Pada notifikasi pembayaran paket pendaftaran baru, saat Admin membuka notifikasi, halaman admin/subscriptions-due harus menampilkan pembayaran paket yang dirujuk oleh notifikasi. Perbaiki pemetaan identifier atau filter data tanpa menghilangkan data pembayaran yang valid. Referensi: Tugas GitIgnore/admin-notification-subscription-payment-missing-reference-2026-10-19.png.';
 }

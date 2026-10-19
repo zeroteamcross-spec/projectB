@@ -480,9 +480,10 @@ class ShowroomRepository
     /**
      * Showroom yang sudah disetujui Admin, siklus tagihannya sudah jatuh
      * tempo (subscription_next_due_at terlewati) atau sedang menunggu
-     * verifikasi bukti transfer perpanjangan. Sengaja dibatasi ke showroom
-     * yang SUDAH disetujui -- pembayaran pertama (sebelum approval) sudah
-     * tertangani lewat Approval Queue, bukan halaman ini.
+     * verifikasi pembayaran paket. Tagihan jatuh tempo tetap dibatasi ke
+     * showroom yang SUDAH disetujui, tetapi pembayaran pending_verification
+     * juga harus masuk meskipun approval akun belum selesai: notifikasi bukti
+     * pembayaran paket pertama memang membuka halaman ini.
      */
     public function findDueSubscriptions(): array
     {
@@ -499,10 +500,13 @@ class ShowroomRepository
              INNER JOIN users AS u ON u.id = sh.user_id
              WHERE sh.deleted_at IS NULL
              AND u.deleted_at IS NULL
-             AND u.account_status = \'active\'
-             AND u.is_approved = 1
              AND (
-                 (sh.subscription_next_due_at IS NOT NULL AND sh.subscription_next_due_at <= NOW())
+                 (
+                     u.account_status = \'active\'
+                     AND u.is_approved = 1
+                     AND sh.subscription_next_due_at IS NOT NULL
+                     AND sh.subscription_next_due_at <= NOW()
+                 )
                  OR sh.subscription_payment_status = \'pending_verification\'
              )
              ORDER BY sh.subscription_next_due_at ASC'
