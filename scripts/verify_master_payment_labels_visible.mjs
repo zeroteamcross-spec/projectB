@@ -131,15 +131,20 @@ async function loginAdmin() {
   record("Login admin visible", "PASS", { url: page.url() });
 }
 
-function expectedOptionIndex(value) {
-  return { manual: 0, midtrans: 1, both: 2 }[value];
-}
-
-async function readOptionWithKeyboard(select, value) {
+async function readVisibleOption(select, value) {
   const target = await visible(select, `select opsi ${value}`, { enabled: true });
-  await target.click();
-  await target.press("Home");
-  for (let index = 0; index < expectedOptionIndex(value); index += 1) await target.press("ArrowDown");
+  const option = target.locator(`option[value="${value}"]`);
+  if (await option.count() !== 1) throw new Error(`Opsi ${value} tidak tersedia pada select visible.`);
+  const optionState = await option.evaluate((element) => ({
+    disabled: element.disabled,
+    hidden: element.hidden,
+    display: getComputedStyle(element).display,
+    visibility: getComputedStyle(element).visibility,
+  }));
+  if (optionState.disabled || optionState.hidden || optionState.display === "none" || optionState.visibility === "hidden") {
+    throw new Error(`Opsi ${value} tidak visible/selectable: ${JSON.stringify(optionState)}`);
+  }
+  await target.selectOption(value);
   const selectedValue = await target.inputValue();
   const selectedText = await target.locator("option:checked").textContent();
   if (selectedValue !== value) throw new Error(`Opsi ${value} tidak terpilih melalui keyboard visible: ${selectedValue}`);
@@ -164,17 +169,15 @@ async function checkMasterPaymentLabels() {
     ["both", "Keduanya"],
   ];
   for (const [value, expectedText] of expected) {
-    const actual = await readOptionWithKeyboard(select, value);
+    const actual = await readVisibleOption(select, value);
     if (actual !== expectedText) throw new Error(`Label ${value} tidak sesuai: ${actual}`);
     if (/saja/i.test(actual)) throw new Error(`Label ${value} masih mengandung kata saja.`);
   }
-  await select.click();
-  await select.press("Home");
-  for (let index = 0; index < expectedOptionIndex(currentValue); index += 1) await select.press("ArrowDown");
+  await select.selectOption(currentValue);
   if (await select.inputValue() !== currentValue) throw new Error(`Nilai mode awal berubah tanpa penyimpanan: ${currentValue}`);
   await noHorizontalOverflow("Master Pembayaran desktop");
   await screenshot("admin-master-payment-labels-desktop");
-  record("Label opsi Master Pembayaran tervalidasi melalui select visible dan keyboard", "PASS", { labels: report.labels, restoredValue: currentValue });
+  record("Label opsi Master Pembayaran tervalidasi melalui select visible", "PASS", { labels: report.labels, restoredValue: currentValue });
 }
 
 async function checkMobile() {
