@@ -184,7 +184,9 @@ async function openBrandEditor(name) {
   const edit = row.locator("button[id^='admst_edit_brand_button_desktop_']");
   await clickVisible(edit, `Edit brand ${name} visible`);
   await visible(page.locator("#admst_brand_modal_section"), `modal Edit Brand ${name}`);
-  await visible(page.locator("#admst_brand_form_section"), `form Edit Brand ${name}`);
+  // Form membentang melewati area footer modal yang fixed. Validasi input
+  // yang benar-benar dipakai user, bukan bounding box form induk yang besar.
+  await visible(page.locator("#admst_brand_name_input"), `input Nama Brand ${name}`);
   await page.waitForTimeout(300);
   return row;
 }
