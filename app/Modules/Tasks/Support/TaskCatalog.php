@@ -227,4 +227,10 @@ final class TaskCatalog
     public const CATALOG_LOCATION_FILTER_SHOW_ALL_CITIES_TASK_TITLE = 'Tambahkan pencarian lokasi dan tombol Tampilkan Semua Kota pada katalog mobil.';
 
     public const CATALOG_LOCATION_FILTER_SHOW_ALL_CITIES_TASK_DESCRIPTION = 'Pada filter lokasi di katalog mobil, tambahkan pencarian kota, tampilkan hanya sebagian kota pada kondisi awal, sembunyikan sisanya, dan sediakan tombol "Tampilkan Semua Kota" untuk membuka daftar lengkap. Jumlah atau aturan pemilihan kota yang tampil awal perlu dipastikan sebelum implementasi. Sesuai screenshot Tugas GitIgnore/catalog-location-filter-show-all-cities-2026-10-20.png. Implementasi menunggu instruksi pengguna.';
+
+    public const SELLER_AFFILIATES_PROSPECT_EXPLANATION_TASK_KEY = 'request-038-seller-affiliates-prospect-explanation';
+
+    public const SELLER_AFFILIATES_PROSPECT_EXPLANATION_TASK_TITLE = 'Jelaskan asal, dasar perhitungan, dan cara mendapatkan Prospek di seller/affiliates.';
+
+    public const SELLER_AFFILIATES_PROSPECT_EXPLANATION_TASK_DESCRIPTION = 'Pada halaman seller/affiliates, jelaskan dari sumber data mana angka Prospek berasal, aturan atau kriteria apa yang dihitung, serta bagaimana prospek diperoleh. Jawaban harus ditelusuri dari implementasi dan alur data aplikasi, bukan asumsi. Jangan mengubah perilaku fitur. Penelusuran menunggu instruksi pengguna. Pesan tidak menyertakan gambar referensi.';
 }
