@@ -245,4 +245,10 @@ final class TaskCatalog
     public const LANDING_LEGAL_PAGES_SOCIAL_LINKS_TASK_TITLE = 'Buat halaman Syarat & Ketentuan dan Kebijakan Privasi pada Landingpage.';
 
     public const LANDING_LEGAL_PAGES_SOCIAL_LINKS_TASK_DESCRIPTION = 'Pada Landingpage, buat halaman Syarat & Ketentuan dan Kebijakan Privasi, lalu arahkan text link masing-masing ke halaman yang sesuai. Buat tautan Facebook dan Instagram tidak dapat diklik karena akun/tautannya belum tersedia. Implementasi menunggu instruksi pengguna. Pesan tidak menyertakan gambar referensi.';
+
+    public const LANDING_ACTIVE_PACKAGE_PRICING_TASK_KEY = 'request-041-landing-active-package-pricing';
+
+    public const LANDING_ACTIVE_PACKAGE_PRICING_TASK_TITLE = 'Tampilkan harga paket aktif di Landingpage dan pertahankan paket yang dipilih.';
+
+    public const LANDING_ACTIVE_PACKAGE_PRICING_TASK_DESCRIPTION = 'Pada Landingpage, hubungkan text link Harga ke daftar harga paket yang sedang aktif. Buat desain daftar harga yang responsif, kontras dan jelas, selaras dengan tema Landingpage. Tombol pada setiap paket harus menuju pendaftaran sambil mempertahankan pilihan paket agar otomatis terpilih pada formulir. Implementasi menunggu instruksi pengguna. Pesan tidak menyertakan gambar referensi.';
 }
