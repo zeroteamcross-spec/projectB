@@ -167,4 +167,10 @@ final class TaskCatalog
     public const MAIN_DOMAIN_TAB_TITLE_TASK_TITLE = 'Ubah judul tab halaman utama menjadi carlynk.id.';
 
     public const MAIN_DOMAIN_TAB_TITLE_TASK_DESCRIPTION = 'Pada landing page root domain carlynk.id, tampilkan judul tab browser "carlynk.id" menggantikan "Siata Mobilindo". Perubahan dibatasi ke landing page domain utama; branding judul tab showroom dan custom domain tetap mengikuti konfigurasi showroom. Referensi: Tugas GitIgnore/carlynk-tab-title-reference-2026-10-20.png.';
+
+    public const SHOWROOM_REGISTRATION_NO_AUTOFILL_CHECK_TASK_KEY = 'request-028-showroom-registration-no-autofill-check';
+
+    public const SHOWROOM_REGISTRATION_NO_AUTOFILL_CHECK_TASK_TITLE = 'Hilangkan autofill pada pendaftaran showroom dan tambahkan tombol cek slug.';
+
+    public const SHOWROOM_REGISTRATION_NO_AUTOFILL_CHECK_TASK_DESCRIPTION = 'Pada halaman daftar-showroom, nonaktifkan pengisian otomatis browser di seluruh form pendaftaran agar field Alamat URL Showroom tidak terisi sendiri. Tambahkan tombol hijau bertuliskan "cek" di samping field tersebut. Implementasi fitur menunggu instruksi pengguna. Referensi: Tugas GitIgnore/daftar-showroom-no-autofill-check-2026-10-20.png.';
 }
