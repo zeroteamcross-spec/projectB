@@ -233,4 +233,10 @@ final class TaskCatalog
     public const SELLER_AFFILIATES_PROSPECT_EXPLANATION_TASK_TITLE = 'Jelaskan asal, dasar perhitungan, dan cara mendapatkan Prospek di seller/affiliates.';
 
     public const SELLER_AFFILIATES_PROSPECT_EXPLANATION_TASK_DESCRIPTION = 'Pada halaman seller/affiliates, jelaskan dari sumber data mana angka Prospek berasal, aturan atau kriteria apa yang dihitung, serta bagaimana prospek diperoleh. Jawaban harus ditelusuri dari implementasi dan alur data aplikasi, bukan asumsi. Jangan mengubah perilaku fitur. Penelusuran menunggu instruksi pengguna. Pesan tidak menyertakan gambar referensi.';
+
+    public const SELLER_MASTER_INSPECTION_SECTION_GROUPING_ORDER_TASK_KEY = 'request-039-seller-master-inspection-section-grouping-order';
+
+    public const SELLER_MASTER_INSPECTION_SECTION_GROUPING_ORDER_TASK_TITLE = 'Kelompokkan dan urutkan item Master Inspeksi berdasarkan section.';
+
+    public const SELLER_MASTER_INSPECTION_SECTION_GROUPING_ORDER_TASK_DESCRIPTION = 'Pada halaman seller/master-inspection, ikat urutan item inspeksi ke section masing-masing dan tampilkan item secara berkelompok berdasarkan section agar lebih mudah dikelola. Implementasi menunggu instruksi pengguna. Pesan tidak menyertakan gambar referensi.';
 }
