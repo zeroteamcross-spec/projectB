@@ -215,4 +215,10 @@ final class TaskCatalog
     public const SELLER_CAR_LISTING_SINGLE_CATALOG_PREVIEW_TASK_TITLE = 'Tambahkan tombol live proview pada setiap listing mobil seller.';
 
     public const SELLER_CAR_LISTING_SINGLE_CATALOG_PREVIEW_TASK_DESCRIPTION = 'Pada halaman seller/cars, tambahkan tombol "live proview" pada setiap listing mobil. Saat ditekan, tampilkan halaman mobil penuh dengan tampilan seperti katalog publik, tetapi hanya untuk mobil pada listing yang dipilih. Ejaan tombol "live proview" dicatat sesuai permintaan dan perlu dikonfirmasi sebelum implementasi. Implementasi menunggu instruksi pengguna. Pesan tidak menyertakan gambar referensi.';
+
+    public const SELLER_INSPECTION_MASTER_ITEM_HEADING_TASK_KEY = 'request-036-seller-inspection-master-item-heading';
+
+    public const SELLER_INSPECTION_MASTER_ITEM_HEADING_TASK_TITLE = 'Ubah label Master Paten Aktif menjadi Master Item Inspeksi Aktif.';
+
+    public const SELLER_INSPECTION_MASTER_ITEM_HEADING_TASK_DESCRIPTION = 'Pada halaman seller/inspection, ubah teks "Master Paten Aktif" menjadi "Master Item Inspeksi Aktif" sesuai screenshot Tugas GitIgnore/seller-inspection-master-item-label-2026-10-20.png. Perubahan hanya pada label; fungsi dan data master inspeksi tetap sama. Implementasi menunggu instruksi pengguna.';
 }
