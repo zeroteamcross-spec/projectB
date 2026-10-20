@@ -197,4 +197,10 @@ final class TaskCatalog
     public const SELLER_CARS_YEAR_ONLY_TASK_TITLE = 'Tampilkan tahun saja pada halaman seller/cars.';
 
     public const SELLER_CARS_YEAR_ONLY_TASK_DESCRIPTION = 'Pada halaman seller/cars, permintaan menyebut mengubah tampilan menjadi tahun saja tanpa bulan dan tanggal. Field atau komponen tanggal yang dimaksud perlu dikonfirmasi sebelum implementasi agar perubahan tepat. Implementasi menunggu instruksi pengguna. Pesan tidak menyertakan gambar referensi.';
+
+    public const SELLER_INSPECTION_SELECTED_OPTION_CONTRAST_TASK_KEY = 'request-033-seller-inspection-selected-option-contrast';
+
+    public const SELLER_INSPECTION_SELECTED_OPTION_CONTRAST_TASK_TITLE = 'Perjelas tampilan pilihan inspeksi yang sedang dipilih.';
+
+    public const SELLER_INSPECTION_SELECTED_OPTION_CONTRAST_TASK_DESCRIPTION = 'Pada halaman seller/cars/{id}/inspection, tebalkan dan tingkatkan keterbacaan teks pilihan inspeksi yang aktif. Beri latar berwarna pada pilihan aktif dengan warna yang mengikuti warna status yang sudah digunakan, serta teks putih. Pertahankan pemetaan warna/status yang ada. Implementasi menunggu instruksi pengguna. Pesan tidak menyertakan gambar referensi.';
 }
