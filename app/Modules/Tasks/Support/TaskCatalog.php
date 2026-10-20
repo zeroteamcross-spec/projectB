@@ -251,4 +251,10 @@ final class TaskCatalog
     public const LANDING_ACTIVE_PACKAGE_PRICING_TASK_TITLE = 'Tampilkan harga paket aktif di Landingpage dan pertahankan paket yang dipilih.';
 
     public const LANDING_ACTIVE_PACKAGE_PRICING_TASK_DESCRIPTION = 'Pada Landingpage, hubungkan text link Harga ke daftar harga paket yang sedang aktif. Buat desain daftar harga yang responsif, kontras dan jelas, selaras dengan tema Landingpage. Tombol pada setiap paket harus menuju pendaftaran sambil mempertahankan pilihan paket agar otomatis terpilih pada formulir. Implementasi menunggu instruksi pengguna. Pesan tidak menyertakan gambar referensi.';
+
+    public const LANDING_SIGNUP_HEADER_FLASH_TASK_KEY = 'request-042-landing-signup-header-flash';
+
+    public const LANDING_SIGNUP_HEADER_FLASH_TASK_TITLE = 'Cari penyebab dan perbaiki glitch header saat klik Daftar di Landingpage.';
+
+    public const LANDING_SIGNUP_HEADER_FLASH_TASK_DESCRIPTION = 'Pada Landingpage, saat tombol Daftar diklik, header global SIATA MOBILINDO sempat muncul sebelum halaman tujuan tampil. Telusuri penyebab glitch tersebut dan perbaiki tanpa merusak tujuan/alur pendaftaran. Screenshot referensi: Tugas GitIgnore/landing-daftar-header-flash-2026-10-20.png. Diagnosis dan implementasi menunggu instruksi pengguna.';
 }

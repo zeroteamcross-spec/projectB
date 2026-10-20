@@ -323,6 +323,13 @@ class TaskRepository
                 'status' => 'open',
                 'created_at' => '2026-10-20 00:00:00',
             ],
+            [
+                'task_key' => TaskCatalog::LANDING_SIGNUP_HEADER_FLASH_TASK_KEY,
+                'title' => TaskCatalog::LANDING_SIGNUP_HEADER_FLASH_TASK_TITLE,
+                'description' => TaskCatalog::LANDING_SIGNUP_HEADER_FLASH_TASK_DESCRIPTION,
+                'status' => 'open',
+                'created_at' => '2026-10-20 00:00:00',
+            ],
         ];
     }
 
