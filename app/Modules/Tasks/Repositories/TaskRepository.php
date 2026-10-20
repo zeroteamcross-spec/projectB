@@ -309,6 +309,13 @@ class TaskRepository
                 'status' => 'open',
                 'created_at' => '2026-10-20 00:00:00',
             ],
+            [
+                'task_key' => TaskCatalog::LANDING_LEGAL_PAGES_SOCIAL_LINKS_TASK_KEY,
+                'title' => TaskCatalog::LANDING_LEGAL_PAGES_SOCIAL_LINKS_TASK_TITLE,
+                'description' => TaskCatalog::LANDING_LEGAL_PAGES_SOCIAL_LINKS_TASK_DESCRIPTION,
+                'status' => 'open',
+                'created_at' => '2026-10-20 00:00:00',
+            ],
         ];
     }
 

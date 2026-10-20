@@ -239,4 +239,10 @@ final class TaskCatalog
     public const SELLER_MASTER_INSPECTION_SECTION_GROUPING_ORDER_TASK_TITLE = 'Kelompokkan dan urutkan item Master Inspeksi berdasarkan section.';
 
     public const SELLER_MASTER_INSPECTION_SECTION_GROUPING_ORDER_TASK_DESCRIPTION = 'Pada halaman seller/master-inspection, ikat urutan item inspeksi ke section masing-masing dan tampilkan item secara berkelompok berdasarkan section agar lebih mudah dikelola. Implementasi menunggu instruksi pengguna. Pesan tidak menyertakan gambar referensi.';
+
+    public const LANDING_LEGAL_PAGES_SOCIAL_LINKS_TASK_KEY = 'request-040-landing-legal-pages-social-links';
+
+    public const LANDING_LEGAL_PAGES_SOCIAL_LINKS_TASK_TITLE = 'Buat halaman Syarat & Ketentuan dan Kebijakan Privasi pada Landingpage.';
+
+    public const LANDING_LEGAL_PAGES_SOCIAL_LINKS_TASK_DESCRIPTION = 'Pada Landingpage, buat halaman Syarat & Ketentuan dan Kebijakan Privasi, lalu arahkan text link masing-masing ke halaman yang sesuai. Buat tautan Facebook dan Instagram tidak dapat diklik karena akun/tautannya belum tersedia. Implementasi menunggu instruksi pengguna. Pesan tidak menyertakan gambar referensi.';
 }
