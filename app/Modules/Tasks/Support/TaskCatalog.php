@@ -287,4 +287,10 @@ final class TaskCatalog
     public const BUYER_NOTIFICATION_BLOCKED_PAGES_TASK_TITLE = 'Periksa dua halaman yang terblokir saat Buyer memilih Notif.';
 
     public const BUYER_NOTIFICATION_BLOCKED_PAGES_TASK_DESCRIPTION = 'Pada halaman notifications akun Buyer, ketika memilih halaman "Notif", pengguna melaporkan dua halaman ikut terblokir, padahal seharusnya hanya halaman Notif yang terblokir. Reproduksi perilaku, identifikasi halaman kedua yang terdampak, lalu perbaiki cakupan blokir agar hanya berlaku pada halaman yang dimaksud tanpa mengganggu navigasi Buyer lainnya. Gambar referensi tidak terlampir. Implementasi menunggu instruksi pengguna.';
+
+    public const BUYER_CATALOG_REDIRECT_TO_MAIN_LANDING_TASK_KEY = 'request-048-buyer-catalog-redirects-to-main-landing';
+
+    public const BUYER_CATALOG_REDIRECT_TO_MAIN_LANDING_TASK_TITLE = 'Perbaiki redirect Katalog Buyer yang melewati atau berhenti di landingpage utama.';
+
+    public const BUYER_CATALOG_REDIRECT_TO_MAIN_LANDING_TASK_DESCRIPTION = 'Pada akun Buyer, saat memilih halaman "Katalog", navigasi lebih dulu dilempar ke landingpage utama https://carlynk.id/ sebelum menuju halaman showroom. Lebih parah, dari halaman "Notif" lalu memilih "Katalog", pengguna justru berakhir di https://carlynk.id/. Reproduksi kedua skenario, telusuri penyebab navigasi, dan pastikan Katalog membuka showroom yang benar secara langsung, termasuk saat berpindah dari Notif, tanpa transit atau berakhir di landingpage utama. Gambar referensi tidak terlampir. Implementasi menunggu instruksi pengguna.';
 }
