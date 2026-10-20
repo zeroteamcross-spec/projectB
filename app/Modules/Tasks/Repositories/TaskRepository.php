@@ -337,6 +337,13 @@ class TaskRepository
                 'status' => 'open',
                 'created_at' => '2026-10-20 00:00:00',
             ],
+            [
+                'task_key' => TaskCatalog::GOOGLE_SELLER_PENDING_APPROVAL_SWITCH_ACCOUNT_ERROR_TASK_KEY,
+                'title' => TaskCatalog::GOOGLE_SELLER_PENDING_APPROVAL_SWITCH_ACCOUNT_ERROR_TASK_TITLE,
+                'description' => TaskCatalog::GOOGLE_SELLER_PENDING_APPROVAL_SWITCH_ACCOUNT_ERROR_TASK_DESCRIPTION,
+                'status' => 'open',
+                'created_at' => '2026-10-20 00:00:00',
+            ],
         ];
     }
 

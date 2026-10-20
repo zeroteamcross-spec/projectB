@@ -263,4 +263,10 @@ final class TaskCatalog
     public const SHOWROOM_REGISTRATION_COPY_PAYMENT_FIELDS_TASK_TITLE = 'Tambahkan tombol salin untuk Jumlah Transfer dan Nomor Rekening saat daftar showroom.';
 
     public const SHOWROOM_REGISTRATION_COPY_PAYMENT_FIELDS_TASK_DESCRIPTION = 'Pada halaman daftar-showroom, tambahkan tombol copy untuk nilai Jumlah Transfer dan Nomor Rekening pada informasi pembayaran paket, sesuai screenshot Tugas GitIgnore/daftar-showroom-copy-payment-fields-2026-10-20.png. Masing-masing tombol menyalin nilai field yang sesuai. Implementasi menunggu instruksi pengguna.';
+
+    public const GOOGLE_SELLER_PENDING_APPROVAL_SWITCH_ACCOUNT_ERROR_TASK_KEY = 'request-044-google-pending-approval-switch-account-error';
+
+    public const GOOGLE_SELLER_PENDING_APPROVAL_SWITCH_ACCOUNT_ERROR_TASK_TITLE = 'Perbaiki error saat keluar atau mengganti akun dari persetujuan Google seller.';
+
+    public const GOOGLE_SELLER_PENDING_APPROVAL_SWITCH_ACCOUNT_ERROR_TASK_DESCRIPTION = 'Pada halaman google-login/complete?status=pending_approval&role=seller, klik tombol "Keluar / Gunakan Akun Lain" menampilkan error "Cannot read properties of null (reading \'user\')". Perbaiki alur keluar/ganti akun agar menangani sesi atau user null dengan aman, membersihkan sesi yang benar, dan mengarahkan pengguna ke login tanpa error. Referensi: Tugas GitIgnore/google-pending-approval-switch-account-error-2026-10-20.png. Implementasi menunggu instruksi pengguna.';
 }
