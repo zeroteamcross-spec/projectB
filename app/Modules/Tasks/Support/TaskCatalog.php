@@ -185,4 +185,16 @@ final class TaskCatalog
     public const SELLER_CAR_IMAGE_UPLOAD_SAVE_BUTTON_TASK_TITLE = 'Ubah tombol Tutup menjadi Simpan pada uploader foto mobil.';
 
     public const SELLER_CAR_IMAGE_UPLOAD_SAVE_BUTTON_TASK_DESCRIPTION = 'Pada halaman seller/cars/{id}/image, ubah tombol Tutup menjadi Simpan dengan latar hijau dan teks putih, sesuai screenshot referensi Tugas GitIgnore/seller-car-image-upload-save-button-2026-10-20.png. Implementasi menunggu instruksi pengguna.';
+
+    public const SELLER_INSPECTION_SAVE_BUTTON_ALIGNMENT_TASK_KEY = 'request-031-seller-inspection-save-button-alignment';
+
+    public const SELLER_INSPECTION_SAVE_BUTTON_ALIGNMENT_TASK_TITLE = 'Pindahkan tombol Simpan Inspeksi ke kanan bawah.';
+
+    public const SELLER_INSPECTION_SAVE_BUTTON_ALIGNMENT_TASK_DESCRIPTION = 'Pada halaman seller/cars/{id}/inspection, pindahkan tombol Simpan Inspeksi dari kiri bawah ke kanan bawah tanpa mengubah alur penyimpanan. Implementasi menunggu instruksi pengguna. Pesan tidak menyertakan gambar referensi.';
+
+    public const SELLER_CARS_YEAR_ONLY_TASK_KEY = 'request-032-seller-cars-year-only';
+
+    public const SELLER_CARS_YEAR_ONLY_TASK_TITLE = 'Tampilkan tahun saja pada halaman seller/cars.';
+
+    public const SELLER_CARS_YEAR_ONLY_TASK_DESCRIPTION = 'Pada halaman seller/cars, permintaan menyebut mengubah tampilan menjadi tahun saja tanpa bulan dan tanggal. Field atau komponen tanggal yang dimaksud perlu dikonfirmasi sebelum implementasi agar perubahan tepat. Implementasi menunggu instruksi pengguna. Pesan tidak menyertakan gambar referensi.';
 }

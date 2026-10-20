@@ -246,6 +246,20 @@ class TaskRepository
                 'status' => 'open',
                 'created_at' => '2026-10-20 00:00:00',
             ],
+            [
+                'task_key' => TaskCatalog::SELLER_INSPECTION_SAVE_BUTTON_ALIGNMENT_TASK_KEY,
+                'title' => TaskCatalog::SELLER_INSPECTION_SAVE_BUTTON_ALIGNMENT_TASK_TITLE,
+                'description' => TaskCatalog::SELLER_INSPECTION_SAVE_BUTTON_ALIGNMENT_TASK_DESCRIPTION,
+                'status' => 'open',
+                'created_at' => '2026-10-20 00:00:00',
+            ],
+            [
+                'task_key' => TaskCatalog::SELLER_CARS_YEAR_ONLY_TASK_KEY,
+                'title' => TaskCatalog::SELLER_CARS_YEAR_ONLY_TASK_TITLE,
+                'description' => TaskCatalog::SELLER_CARS_YEAR_ONLY_TASK_DESCRIPTION,
+                'status' => 'open',
+                'created_at' => '2026-10-20 00:00:00',
+            ],
         ];
     }
 
