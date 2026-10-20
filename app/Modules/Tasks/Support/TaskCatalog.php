@@ -293,4 +293,10 @@ final class TaskCatalog
     public const BUYER_CATALOG_REDIRECT_TO_MAIN_LANDING_TASK_TITLE = 'Perbaiki redirect Katalog Buyer yang melewati atau berhenti di landingpage utama.';
 
     public const BUYER_CATALOG_REDIRECT_TO_MAIN_LANDING_TASK_DESCRIPTION = 'Pada akun Buyer, saat memilih halaman "Katalog", navigasi lebih dulu dilempar ke landingpage utama https://carlynk.id/ sebelum menuju halaman showroom. Lebih parah, dari halaman "Notif" lalu memilih "Katalog", pengguna justru berakhir di https://carlynk.id/. Reproduksi kedua skenario, telusuri penyebab navigasi, dan pastikan Katalog membuka showroom yang benar secara langsung, termasuk saat berpindah dari Notif, tanpa transit atau berakhir di landingpage utama. Gambar referensi tidak terlampir. Implementasi menunggu instruksi pengguna.';
+
+    public const SHOWROOM_MANUAL_OFFLINE_TRANSACTION_CONTINUATION_TASK_KEY = 'request-049-showroom-manual-offline-transaction-continuation';
+
+    public const SHOWROOM_MANUAL_OFFLINE_TRANSACTION_CONTINUATION_TASK_TITLE = 'Izinkan showroom melanjutkan transaksi secara manual untuk pembayaran offline.';
+
+    public const SHOWROOM_MANUAL_OFFLINE_TRANSACTION_CONTINUATION_TASK_DESCRIPTION = 'Tambahkan fitur pada akun showroom untuk memproses transaksi secara manual ketika pembayaran terjadi offline: showroom dapat mencatat/menangani booking dan melanjutkan proses transaksi yang sudah berstatus booked, sehingga transaksi dapat terus berjalan tanpa pembayaran online. Telusuri alur status dan validasi yang ada saat implementasi agar pencatatan manual konsisten dan tidak mengubah alur pembayaran online. Gambar referensi tidak terlampir. Implementasi menunggu instruksi pengguna.';
 }
