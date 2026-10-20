@@ -281,4 +281,10 @@ final class TaskCatalog
     public const BUYER_TRANSACTION_MANUAL_PAYMENT_INSTRUCTIONS_TASK_TITLE = 'Sesuaikan instruksi transaksi Buyer dengan metode pembayaran yang dipilih.';
 
     public const BUYER_TRANSACTION_MANUAL_PAYMENT_INSTRUCTIONS_TASK_DESCRIPTION = 'Pada halaman buyer/transactions/{id}, Buyer memilih pembayaran manual, tetapi halaman justru menampilkan instruksi pembayaran otomatis (VA/QRIS/GoPay, batas waktu, dan refresh otomatis) seperti pada screenshot Tugas GitIgnore/buyer-transaction-manual-payment-instructions-2026-10-20.png. Selidiki penyebab dan pastikan instruksi serta status yang tampil sesuai metode pembayaran transaksi; jangan mengubah alur otomatis untuk transaksi yang memang memakai metode otomatis. Implementasi menunggu instruksi pengguna.';
+
+    public const BUYER_NOTIFICATION_BLOCKED_PAGES_TASK_KEY = 'request-047-buyer-notification-blocked-pages';
+
+    public const BUYER_NOTIFICATION_BLOCKED_PAGES_TASK_TITLE = 'Periksa dua halaman yang terblokir saat Buyer memilih Notif.';
+
+    public const BUYER_NOTIFICATION_BLOCKED_PAGES_TASK_DESCRIPTION = 'Pada halaman notifications akun Buyer, ketika memilih halaman "Notif", pengguna melaporkan dua halaman ikut terblokir, padahal seharusnya hanya halaman Notif yang terblokir. Reproduksi perilaku, identifikasi halaman kedua yang terdampak, lalu perbaiki cakupan blokir agar hanya berlaku pada halaman yang dimaksud tanpa mengganggu navigasi Buyer lainnya. Gambar referensi tidak terlampir. Implementasi menunggu instruksi pengguna.';
 }
