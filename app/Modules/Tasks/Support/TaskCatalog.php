@@ -212,9 +212,9 @@ final class TaskCatalog
 
     public const SELLER_CAR_LISTING_SINGLE_CATALOG_PREVIEW_TASK_KEY = 'request-035-seller-car-listing-single-catalog-preview';
 
-    public const SELLER_CAR_LISTING_SINGLE_CATALOG_PREVIEW_TASK_TITLE = 'Tambahkan tombol live proview pada setiap listing mobil seller.';
+    public const SELLER_CAR_LISTING_SINGLE_CATALOG_PREVIEW_TASK_TITLE = 'Tambahkan tombol Live Preview pada setiap listing mobil seller.';
 
-    public const SELLER_CAR_LISTING_SINGLE_CATALOG_PREVIEW_TASK_DESCRIPTION = 'Pada halaman seller/cars, tambahkan tombol "live proview" pada setiap listing mobil. Saat ditekan, tampilkan halaman mobil penuh dengan tampilan seperti katalog publik, tetapi hanya untuk mobil pada listing yang dipilih. Ejaan tombol "live proview" dicatat sesuai permintaan dan perlu dikonfirmasi sebelum implementasi. Implementasi menunggu instruksi pengguna. Pesan tidak menyertakan gambar referensi.';
+    public const SELLER_CAR_LISTING_SINGLE_CATALOG_PREVIEW_TASK_DESCRIPTION = 'Pada halaman seller/cars, tambahkan tombol "Live Preview" pada setiap listing mobil. Saat ditekan, tampilkan halaman mobil penuh dengan tampilan seperti katalog publik, tetapi hanya untuk mobil pada listing yang dipilih. Ejaan sudah dikoreksi menjadi "Live Preview" sesuai konfirmasi pengguna. Implementasi menunggu instruksi pengguna. Pesan tidak menyertakan gambar referensi.';
 
     public const SELLER_INSPECTION_MASTER_ITEM_HEADING_TASK_KEY = 'request-036-seller-inspection-master-item-heading';
 
