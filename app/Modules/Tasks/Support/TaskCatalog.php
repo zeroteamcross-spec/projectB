@@ -173,4 +173,10 @@ final class TaskCatalog
     public const SHOWROOM_REGISTRATION_NO_AUTOFILL_CHECK_TASK_TITLE = 'Hilangkan autofill pada pendaftaran showroom dan tambahkan tombol cek slug.';
 
     public const SHOWROOM_REGISTRATION_NO_AUTOFILL_CHECK_TASK_DESCRIPTION = 'Pada halaman daftar-showroom, nonaktifkan pengisian otomatis browser di seluruh form pendaftaran agar field Alamat URL Showroom tidak terisi sendiri. Tambahkan tombol hijau bertuliskan "cek" di samping field tersebut. Implementasi fitur menunggu instruksi pengguna. Referensi: Tugas GitIgnore/daftar-showroom-no-autofill-check-2026-10-20.png.';
+
+    public const SELLER_CAR_IMAGES_REMOVE_COVER_EDIT_TASK_KEY = 'request-029-seller-car-images-remove-cover-edit';
+
+    public const SELLER_CAR_IMAGES_REMOVE_COVER_EDIT_TASK_TITLE = 'Hilangkan tombol Cover dan Edit pada halaman foto mobil showroom.';
+
+    public const SELLER_CAR_IMAGES_REMOVE_COVER_EDIT_TASK_DESCRIPTION = 'Pada halaman seller/cars/{id}/images, hilangkan tombol Cover dan Edit dari tampilan. Implementasi menunggu instruksi pengguna. Pesan ini tidak menyertakan gambar referensi.';
 }
