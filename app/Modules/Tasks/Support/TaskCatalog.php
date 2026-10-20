@@ -221,4 +221,10 @@ final class TaskCatalog
     public const SELLER_INSPECTION_MASTER_ITEM_HEADING_TASK_TITLE = 'Ubah label Master Paten Aktif menjadi Master Item Inspeksi Aktif.';
 
     public const SELLER_INSPECTION_MASTER_ITEM_HEADING_TASK_DESCRIPTION = 'Pada halaman seller/inspection, ubah teks "Master Paten Aktif" menjadi "Master Item Inspeksi Aktif" sesuai screenshot Tugas GitIgnore/seller-inspection-master-item-label-2026-10-20.png. Perubahan hanya pada label; fungsi dan data master inspeksi tetap sama. Implementasi menunggu instruksi pengguna.';
+
+    public const CATALOG_LOCATION_FILTER_SHOW_ALL_CITIES_TASK_KEY = 'request-037-catalog-location-filter-show-all-cities';
+
+    public const CATALOG_LOCATION_FILTER_SHOW_ALL_CITIES_TASK_TITLE = 'Tambahkan pencarian lokasi dan tombol Tampilkan Semua Kota pada katalog mobil.';
+
+    public const CATALOG_LOCATION_FILTER_SHOW_ALL_CITIES_TASK_DESCRIPTION = 'Pada filter lokasi di katalog mobil, tambahkan pencarian kota, tampilkan hanya sebagian kota pada kondisi awal, sembunyikan sisanya, dan sediakan tombol "Tampilkan Semua Kota" untuk membuka daftar lengkap. Jumlah atau aturan pemilihan kota yang tampil awal perlu dipastikan sebelum implementasi. Sesuai screenshot Tugas GitIgnore/catalog-location-filter-show-all-cities-2026-10-20.png. Implementasi menunggu instruksi pengguna.';
 }

@@ -288,6 +288,13 @@ class TaskRepository
                 'status' => 'open',
                 'created_at' => '2026-10-20 00:00:00',
             ],
+            [
+                'task_key' => TaskCatalog::CATALOG_LOCATION_FILTER_SHOW_ALL_CITIES_TASK_KEY,
+                'title' => TaskCatalog::CATALOG_LOCATION_FILTER_SHOW_ALL_CITIES_TASK_TITLE,
+                'description' => TaskCatalog::CATALOG_LOCATION_FILTER_SHOW_ALL_CITIES_TASK_DESCRIPTION,
+                'status' => 'open',
+                'created_at' => '2026-10-20 00:00:00',
+            ],
         ];
     }
 
