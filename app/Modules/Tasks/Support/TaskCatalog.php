@@ -209,4 +209,10 @@ final class TaskCatalog
     public const SELLER_SHOWROOM_HIDE_VIEW_MODE_TASK_TITLE = 'Hapus tombol Mode lihat showroom pada halaman seller/showroom.';
 
     public const SELLER_SHOWROOM_HIDE_VIEW_MODE_TASK_DESCRIPTION = 'Pada halaman seller/showroom, hapus kontrol "Mode lihat showroom" (ikon mata) yang ditunjukkan pada screenshot Tugas GitIgnore/seller-showroom-hide-mode-control-2026-10-20.png. Implementasi menunggu instruksi pengguna.';
+
+    public const SELLER_CAR_LISTING_SINGLE_CATALOG_PREVIEW_TASK_KEY = 'request-035-seller-car-listing-single-catalog-preview';
+
+    public const SELLER_CAR_LISTING_SINGLE_CATALOG_PREVIEW_TASK_TITLE = 'Tambahkan tombol live proview pada setiap listing mobil seller.';
+
+    public const SELLER_CAR_LISTING_SINGLE_CATALOG_PREVIEW_TASK_DESCRIPTION = 'Pada halaman seller/cars, tambahkan tombol "live proview" pada setiap listing mobil. Saat ditekan, tampilkan halaman mobil penuh dengan tampilan seperti katalog publik, tetapi hanya untuk mobil pada listing yang dipilih. Ejaan tombol "live proview" dicatat sesuai permintaan dan perlu dikonfirmasi sebelum implementasi. Implementasi menunggu instruksi pengguna. Pesan tidak menyertakan gambar referensi.';
 }

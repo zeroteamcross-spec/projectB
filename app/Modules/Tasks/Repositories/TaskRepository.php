@@ -274,6 +274,13 @@ class TaskRepository
                 'status' => 'open',
                 'created_at' => '2026-10-20 00:00:00',
             ],
+            [
+                'task_key' => TaskCatalog::SELLER_CAR_LISTING_SINGLE_CATALOG_PREVIEW_TASK_KEY,
+                'title' => TaskCatalog::SELLER_CAR_LISTING_SINGLE_CATALOG_PREVIEW_TASK_TITLE,
+                'description' => TaskCatalog::SELLER_CAR_LISTING_SINGLE_CATALOG_PREVIEW_TASK_DESCRIPTION,
+                'status' => 'open',
+                'created_at' => '2026-10-20 00:00:00',
+            ],
         ];
     }
 
