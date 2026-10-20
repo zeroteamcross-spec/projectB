@@ -203,4 +203,10 @@ final class TaskCatalog
     public const SELLER_INSPECTION_SELECTED_OPTION_CONTRAST_TASK_TITLE = 'Perjelas tampilan pilihan inspeksi yang sedang dipilih.';
 
     public const SELLER_INSPECTION_SELECTED_OPTION_CONTRAST_TASK_DESCRIPTION = 'Pada halaman seller/cars/{id}/inspection, tebalkan dan tingkatkan keterbacaan teks pilihan inspeksi yang aktif. Beri latar berwarna pada pilihan aktif dengan warna yang mengikuti warna status yang sudah digunakan, serta teks putih. Pertahankan pemetaan warna/status yang ada. Implementasi menunggu instruksi pengguna. Pesan tidak menyertakan gambar referensi.';
+
+    public const SELLER_SHOWROOM_HIDE_VIEW_MODE_TASK_KEY = 'request-034-seller-showroom-hide-view-mode';
+
+    public const SELLER_SHOWROOM_HIDE_VIEW_MODE_TASK_TITLE = 'Hapus tombol Mode lihat showroom pada halaman seller/showroom.';
+
+    public const SELLER_SHOWROOM_HIDE_VIEW_MODE_TASK_DESCRIPTION = 'Pada halaman seller/showroom, hapus kontrol "Mode lihat showroom" (ikon mata) yang ditunjukkan pada screenshot Tugas GitIgnore/seller-showroom-hide-mode-control-2026-10-20.png. Implementasi menunggu instruksi pengguna.';
 }
