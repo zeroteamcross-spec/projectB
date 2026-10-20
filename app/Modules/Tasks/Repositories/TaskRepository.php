@@ -351,6 +351,13 @@ class TaskRepository
                 'status' => 'open',
                 'created_at' => '2026-10-20 00:00:00',
             ],
+            [
+                'task_key' => TaskCatalog::BUYER_TRANSACTION_MANUAL_PAYMENT_INSTRUCTIONS_TASK_KEY,
+                'title' => TaskCatalog::BUYER_TRANSACTION_MANUAL_PAYMENT_INSTRUCTIONS_TASK_TITLE,
+                'description' => TaskCatalog::BUYER_TRANSACTION_MANUAL_PAYMENT_INSTRUCTIONS_TASK_DESCRIPTION,
+                'status' => 'open',
+                'created_at' => '2026-10-20 00:00:00',
+            ],
         ];
     }
 

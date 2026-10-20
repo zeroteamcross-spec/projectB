@@ -275,4 +275,10 @@ final class TaskCatalog
     public const BUYER_TRANSACTION_TRANSFER_PROOF_UPLOAD_TASK_TITLE = 'Perbaiki upload bukti transfer pada detail transaksi Buyer.';
 
     public const BUYER_TRANSACTION_TRANSFER_PROOF_UPLOAD_TASK_DESCRIPTION = 'Pada halaman buyer/transactions/{id}, Buyer tidak dapat mengunggah bukti transfer melalui form file (JPG, PNG, atau PDF, maksimal 5 MB) sesuai screenshot Tugas GitIgnore/buyer-transaction-transfer-proof-upload-2026-10-20.png. Telusuri penyebab dan perbaiki agar file valid dapat diunggah serta ditautkan ke transaksi yang sesuai, dengan validasi akses transaksi, tipe, dan ukuran file yang aman. Implementasi menunggu instruksi pengguna.';
+
+    public const BUYER_TRANSACTION_MANUAL_PAYMENT_INSTRUCTIONS_TASK_KEY = 'request-046-buyer-transaction-manual-payment-instructions';
+
+    public const BUYER_TRANSACTION_MANUAL_PAYMENT_INSTRUCTIONS_TASK_TITLE = 'Sesuaikan instruksi transaksi Buyer dengan metode pembayaran yang dipilih.';
+
+    public const BUYER_TRANSACTION_MANUAL_PAYMENT_INSTRUCTIONS_TASK_DESCRIPTION = 'Pada halaman buyer/transactions/{id}, Buyer memilih pembayaran manual, tetapi halaman justru menampilkan instruksi pembayaran otomatis (VA/QRIS/GoPay, batas waktu, dan refresh otomatis) seperti pada screenshot Tugas GitIgnore/buyer-transaction-manual-payment-instructions-2026-10-20.png. Selidiki penyebab dan pastikan instruksi serta status yang tampil sesuai metode pembayaran transaksi; jangan mengubah alur otomatis untuk transaksi yang memang memakai metode otomatis. Implementasi menunggu instruksi pengguna.';
 }
