@@ -257,4 +257,10 @@ final class TaskCatalog
     public const LANDING_SIGNUP_HEADER_FLASH_TASK_TITLE = 'Cari penyebab dan perbaiki glitch header saat klik Daftar di Landingpage.';
 
     public const LANDING_SIGNUP_HEADER_FLASH_TASK_DESCRIPTION = 'Pada Landingpage, saat tombol Daftar diklik, header global SIATA MOBILINDO sempat muncul sebelum halaman tujuan tampil. Telusuri penyebab glitch tersebut dan perbaiki tanpa merusak tujuan/alur pendaftaran. Screenshot referensi: Tugas GitIgnore/landing-daftar-header-flash-2026-10-20.png. Diagnosis dan implementasi menunggu instruksi pengguna.';
+
+    public const SHOWROOM_REGISTRATION_COPY_PAYMENT_FIELDS_TASK_KEY = 'request-043-showroom-registration-copy-payment-fields';
+
+    public const SHOWROOM_REGISTRATION_COPY_PAYMENT_FIELDS_TASK_TITLE = 'Tambahkan tombol salin untuk Jumlah Transfer dan Nomor Rekening saat daftar showroom.';
+
+    public const SHOWROOM_REGISTRATION_COPY_PAYMENT_FIELDS_TASK_DESCRIPTION = 'Pada halaman daftar-showroom, tambahkan tombol copy untuk nilai Jumlah Transfer dan Nomor Rekening pada informasi pembayaran paket, sesuai screenshot Tugas GitIgnore/daftar-showroom-copy-payment-fields-2026-10-20.png. Masing-masing tombol menyalin nilai field yang sesuai. Implementasi menunggu instruksi pengguna.';
 }
