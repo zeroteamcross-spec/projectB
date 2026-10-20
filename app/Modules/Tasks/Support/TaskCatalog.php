@@ -269,4 +269,10 @@ final class TaskCatalog
     public const GOOGLE_SELLER_PENDING_APPROVAL_SWITCH_ACCOUNT_ERROR_TASK_TITLE = 'Perbaiki error saat keluar atau mengganti akun dari persetujuan Google seller.';
 
     public const GOOGLE_SELLER_PENDING_APPROVAL_SWITCH_ACCOUNT_ERROR_TASK_DESCRIPTION = 'Pada halaman google-login/complete?status=pending_approval&role=seller, klik tombol "Keluar / Gunakan Akun Lain" menampilkan error "Cannot read properties of null (reading \'user\')". Perbaiki alur keluar/ganti akun agar menangani sesi atau user null dengan aman, membersihkan sesi yang benar, dan mengarahkan pengguna ke login tanpa error. Referensi: Tugas GitIgnore/google-pending-approval-switch-account-error-2026-10-20.png. Implementasi menunggu instruksi pengguna.';
+
+    public const BUYER_TRANSACTION_TRANSFER_PROOF_UPLOAD_TASK_KEY = 'request-045-buyer-transaction-transfer-proof-upload';
+
+    public const BUYER_TRANSACTION_TRANSFER_PROOF_UPLOAD_TASK_TITLE = 'Perbaiki upload bukti transfer pada detail transaksi Buyer.';
+
+    public const BUYER_TRANSACTION_TRANSFER_PROOF_UPLOAD_TASK_DESCRIPTION = 'Pada halaman buyer/transactions/{id}, Buyer tidak dapat mengunggah bukti transfer melalui form file (JPG, PNG, atau PDF, maksimal 5 MB) sesuai screenshot Tugas GitIgnore/buyer-transaction-transfer-proof-upload-2026-10-20.png. Telusuri penyebab dan perbaiki agar file valid dapat diunggah serta ditautkan ke transaksi yang sesuai, dengan validasi akses transaksi, tipe, dan ukuran file yang aman. Implementasi menunggu instruksi pengguna.';
 }
