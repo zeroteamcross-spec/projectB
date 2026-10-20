@@ -179,4 +179,10 @@ final class TaskCatalog
     public const SELLER_CAR_IMAGES_REMOVE_COVER_EDIT_TASK_TITLE = 'Hilangkan tombol Cover dan Edit pada halaman foto mobil showroom.';
 
     public const SELLER_CAR_IMAGES_REMOVE_COVER_EDIT_TASK_DESCRIPTION = 'Pada halaman seller/cars/{id}/images, hilangkan tombol Cover dan Edit dari tampilan. Implementasi menunggu instruksi pengguna. Pesan ini tidak menyertakan gambar referensi.';
+
+    public const SELLER_CAR_IMAGE_UPLOAD_SAVE_BUTTON_TASK_KEY = 'request-030-seller-car-image-upload-save-button';
+
+    public const SELLER_CAR_IMAGE_UPLOAD_SAVE_BUTTON_TASK_TITLE = 'Ubah tombol Tutup menjadi Simpan pada uploader foto mobil.';
+
+    public const SELLER_CAR_IMAGE_UPLOAD_SAVE_BUTTON_TASK_DESCRIPTION = 'Pada halaman seller/cars/{id}/image, ubah tombol Tutup menjadi Simpan dengan latar hijau dan teks putih, sesuai screenshot referensi Tugas GitIgnore/seller-car-image-upload-save-button-2026-10-20.png. Implementasi menunggu instruksi pengguna.';
 }
