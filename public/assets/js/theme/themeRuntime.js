@@ -34,7 +34,9 @@ export function applyThemeToDocument(input = {}) {
   if (typeof globalThis.__PROJECTB_APPLY_THEME__ === "function") {
     const next = globalThis.__PROJECTB_APPLY_THEME__(input);
     if (next?.brand?.appName) {
-      document.title = next.brand.appName;
+      document.title = typeof globalThis.__PROJECTB_RESOLVE_TAB_TITLE__ === "function"
+        ? globalThis.__PROJECTB_RESOLVE_TAB_TITLE__(next.brand.appName)
+        : next.brand.appName;
     }
     return deepClone(next);
   }

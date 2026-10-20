@@ -356,7 +356,9 @@
       theme.brand && (theme.brand.iconUrl || theme.brand.logoMarkAsset)
     );
 
-    doc.title = appName;
+    doc.title = typeof global.__PROJECTB_RESOLVE_TAB_TITLE__ === "function"
+      ? global.__PROJECTB_RESOLVE_TAB_TITLE__(appName)
+      : appName;
     upsertMeta("name", "application-name", appName);
     upsertMeta("name", "apple-mobile-web-app-title", appName);
     upsertMeta("name", "description", tagline);

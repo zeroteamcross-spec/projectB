@@ -46,7 +46,9 @@ function revertShowroomBranding() {
     return;
   }
 
-  document.title = brandingOriginal.title;
+  document.title = typeof globalThis.__PROJECTB_RESOLVE_TAB_TITLE__ === "function"
+    ? globalThis.__PROJECTB_RESOLVE_TAB_TITLE__(brandingOriginal.title)
+    : brandingOriginal.title;
   ICON_RELS.forEach((rel) => {
     const originalHref = brandingOriginal.icons[rel];
     if (originalHref === null) {

@@ -12,6 +12,18 @@
     <meta name="twitter:title" content="JualBeliMobil">
     <meta name="twitter:description" content="Jual beli mobil terpercaya">
     <title>JualBeliMobil</title>
+    <script>
+      window.__PROJECTB_RESOLVE_TAB_TITLE__ = function resolveProjectBTabTitle(fallback) {
+        var hostname = String(window.location.hostname || "").toLowerCase();
+        var pathname = String(window.location.pathname || "/").replace(/\/+$/, "") || "/";
+        var legacyHashRoute = /^#\/.+/.test(String(window.location.hash || ""));
+        var isMainLanding = (hostname === "carlynk.id" || hostname === "www.carlynk.id")
+          && pathname === "/"
+          && !legacyHashRoute;
+
+        return isMainLanding ? "carlynk.id" : fallback;
+      };
+    </script>
     <script>window.__PROJECTB_ROLE_HOSTS__ = __ROLE_HOSTS__;</script>
     <script>window.__PROJECTB_CUSTOM_DOMAIN_SERVER_IP__ = "__CUSTOM_DOMAIN_SERVER_IP__";</script>
     <script>window.__PROJECTB_CUSTOM_DOMAIN_SHOWROOM_SLUG__ = __CUSTOM_DOMAIN_SHOWROOM_SLUG__;</script>

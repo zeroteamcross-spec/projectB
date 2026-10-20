@@ -68,7 +68,10 @@ function serveSpaShell(string $basePath, string $publicPath, string $path): bool
             loadShowroomShareMetadata($basePath, $metadataPath),
             static fn ($value) => $value !== ''
         );
-        echo injectPublicMetadata($html, array_merge($metadata, $ownBranding));
+        $tabTitleOverride = $path === '/' && $customDomainShowroomSlug === '' && isMainCarlynkHost()
+            ? 'carlynk.id'
+            : null;
+        echo injectPublicMetadata($html, array_merge($metadata, $ownBranding), $tabTitleOverride);
     }
 
     return true;
@@ -536,14 +539,15 @@ function loadPublicWebConfigMetadata(array $theme): array
     ];
 }
 
-function injectPublicMetadata(string $html, array $metadata): string
+function injectPublicMetadata(string $html, array $metadata, ?string $tabTitleOverride = null): string
 {
     $appName = (string) ($metadata['app_name'] ?? 'BeliMobil');
+    $tabTitle = trim((string) $tabTitleOverride) !== '' ? trim((string) $tabTitleOverride) : $appName;
     $tagline = (string) ($metadata['tagline'] ?? 'Jual beli mobil terpercaya');
     $iconUrl = (string) ($metadata['icon_url'] ?? '');
     $absoluteIconUrl = $iconUrl !== '' ? absolutePublicMetadataUrl($iconUrl) : '';
 
-    $html = preg_replace('/<title>.*?<\/title>/is', '<title>' . htmlMetadataEscape($appName) . '</title>', $html, 1) ?? $html;
+    $html = preg_replace('/<title>.*?<\/title>/is', '<title>' . htmlMetadataEscape($tabTitle) . '</title>', $html, 1) ?? $html;
     foreach ([
         ['name', 'application-name', $appName],
         ['name', 'apple-mobile-web-app-title', $appName],
@@ -566,6 +570,14 @@ function injectPublicMetadata(string $html, array $metadata): string
     }
 
     return $html;
+}
+
+function isMainCarlynkHost(): bool
+{
+    $host = strtolower(trim((string) ($_SERVER['HTTP_HOST'] ?? '')));
+    $host = preg_replace('/:\\d+$/', '', $host) ?? $host;
+
+    return in_array($host, ['carlynk.id', 'www.carlynk.id'], true);
 }
 
 function upsertPublicHtmlMeta(string $html, string $attribute, string $key, string $content): string

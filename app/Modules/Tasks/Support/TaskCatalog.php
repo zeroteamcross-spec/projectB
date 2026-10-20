@@ -161,4 +161,10 @@ final class TaskCatalog
     public const MAIN_LANDING_HEADER_FLASH_TASK_TITLE = 'Hilangkan header yang berkedip sebelum landing page Carlynk tampil.';
 
     public const MAIN_LANDING_HEADER_FLASH_TASK_DESCRIPTION = 'Pada root domain utama (/), header publik global sempat muncul sebelum landing page mandiri selesai dimuat. Sembunyikan header shell sejak render awal agar tidak berkedip atau bertumpuk dengan navbar landing page. Header katalog pada root custom domain showroom harus tetap berfungsi. Referensi: Tugas GitIgnore/carlynk-root-header-flash-2026-10-19.png.';
+
+    public const MAIN_DOMAIN_TAB_TITLE_TASK_KEY = 'request-027-main-domain-tab-title';
+
+    public const MAIN_DOMAIN_TAB_TITLE_TASK_TITLE = 'Ubah judul tab halaman utama menjadi carlynk.id.';
+
+    public const MAIN_DOMAIN_TAB_TITLE_TASK_DESCRIPTION = 'Pada landing page root domain carlynk.id, tampilkan judul tab browser "carlynk.id" menggantikan "Siata Mobilindo". Perubahan dibatasi ke landing page domain utama; branding judul tab showroom dan custom domain tetap mengikuti konfigurasi showroom. Referensi: Tugas GitIgnore/carlynk-tab-title-reference-2026-10-20.png.';
 }

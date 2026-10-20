@@ -4,7 +4,9 @@ import { bindInternalLinkInterceptor } from "./core/router.js";
 import { upgradeLegacyHashUrl } from "./core/legacyHashUrl.js";
 import { brandConfig } from "./theme/brandConfig.js";
 
-document.title = brandConfig.appName;
+document.title = typeof globalThis.__PROJECTB_RESOLVE_TAB_TITLE__ === "function"
+  ? globalThis.__PROJECTB_RESOLVE_TAB_TITLE__(brandConfig.appName)
+  : brandConfig.appName;
 upgradeLegacyHashUrl();
 const domainRouteGuard = bindDomainRouteGuard();
 

@@ -218,6 +218,13 @@ class TaskRepository
                 'status' => 'open',
                 'created_at' => '2026-10-19 00:00:00',
             ],
+            [
+                'task_key' => TaskCatalog::MAIN_DOMAIN_TAB_TITLE_TASK_KEY,
+                'title' => TaskCatalog::MAIN_DOMAIN_TAB_TITLE_TASK_TITLE,
+                'description' => TaskCatalog::MAIN_DOMAIN_TAB_TITLE_TASK_DESCRIPTION,
+                'status' => 'open',
+                'created_at' => '2026-10-20 00:00:00',
+            ],
         ];
     }
 
