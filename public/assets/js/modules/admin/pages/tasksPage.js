@@ -6,7 +6,7 @@ import { adminTasksService } from "../services/adminTasksService.js";
 
 const STATUS_LABEL = {
   open: "Belum selesai",
-  sip: "Sip",
+  sip: "Sudah Dikerjakan",
 };
 
 export function TasksPage({ service = adminTasksService } = {}) {
@@ -152,7 +152,7 @@ function summary(state) {
   const done = state.tasks.filter((task) => task.status === "sip").length;
   const grid = document.createElement("div");
   grid.className = "grid gap-3 sm:grid-cols-2";
-  grid.append(summaryCard("Belum selesai", open), summaryCard("Sip", done));
+  grid.append(summaryCard("Belum selesai", open), summaryCard("Sudah Dikerjakan", done));
   return grid;
 }
 
@@ -206,7 +206,7 @@ function taskCard(task, state, actions) {
 
   const button = Button({
     id: `admin_task_beres_${task.id}`,
-    label: task.status === "sip" ? "Sip" : (state.savingId === task.id ? "Menyimpan..." : "Beres"),
+    label: task.status === "sip" ? "Sudah Dikerjakan" : (state.savingId === task.id ? "Menyimpan..." : "Beres"),
     variant: task.status === "sip" ? "secondary" : "ya",
     disabled: task.status === "sip" || state.savingId !== null,
     onClick: () => actions.complete(task),
