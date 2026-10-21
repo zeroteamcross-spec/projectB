@@ -299,4 +299,10 @@ final class TaskCatalog
     public const SHOWROOM_MANUAL_OFFLINE_TRANSACTION_CONTINUATION_TASK_TITLE = 'Izinkan showroom melanjutkan transaksi secara manual untuk pembayaran offline.';
 
     public const SHOWROOM_MANUAL_OFFLINE_TRANSACTION_CONTINUATION_TASK_DESCRIPTION = 'Tambahkan fitur pada akun showroom untuk memproses transaksi secara manual ketika pembayaran terjadi offline: showroom dapat mencatat/menangani booking dan melanjutkan proses transaksi yang sudah berstatus booked, sehingga transaksi dapat terus berjalan tanpa pembayaran online. Telusuri alur status dan validasi yang ada saat implementasi agar pencatatan manual konsisten dan tidak mengubah alur pembayaran online. Gambar referensi tidak terlampir. Implementasi menunggu instruksi pengguna.';
+
+    public const ADMIN_WEB_CONFIGURATION_MENU_TASK_KEY = 'request-050-admin-web-configuration-menu';
+
+    public const ADMIN_WEB_CONFIGURATION_MENU_TASK_TITLE = 'Tambahkan menu Konfigurasi WEB pada akun Admin.';
+
+    public const ADMIN_WEB_CONFIGURATION_MENU_TASK_DESCRIPTION = 'Tambahkan menu bernama "Konfigurasi WEB" pada level akun Admin. Rincian pengaturan yang harus tersedia belum ditentukan; sebelum mengimplementasikan isi/fungsi menu, konfirmasi ruang lingkup kepada pengguna. Permintaan dicatat sebagai backlog saja dan menunggu instruksi "mulai kerjakan semua tugas". Tidak ada gambar referensi yang terlampir.';
 }
