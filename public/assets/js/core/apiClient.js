@@ -8,6 +8,21 @@ export class ApiError extends Error {
   }
 }
 
+export class ApiFetchError extends Error {
+  constructor(cause) {
+    const message = typeof cause?.message === "string"
+      ? cause.message
+      : String(cause ?? "Network request failed");
+    super(message);
+    this.name = cause?.name === "AbortError" ? "AbortError" : "ApiFetchError";
+    this.cause = cause;
+  }
+}
+
+export function isApiFetchFailure(error) {
+  return error instanceof ApiFetchError;
+}
+
 export class ApiClient {
   constructor({ baseUrl = "/api", defaultHeaders = {}, credentials = "same-origin" } = {}) {
     this.baseUrl = baseUrl.replace(/\/$/, "");
@@ -36,13 +51,20 @@ export class ApiClient {
   }
 
   async request(path, { method = "GET", body = null, headers = {}, signal = null } = {}) {
-    const response = await fetch(this.url(path), {
+    const url = this.url(path);
+    const requestOptions = {
       method,
       credentials: this.credentials,
       headers: this.headers(headers, body),
       body: this.body(body),
       signal,
-    });
+    };
+    let response;
+    try {
+      response = await fetch(url, requestOptions);
+    } catch (error) {
+      throw new ApiFetchError(error);
+    }
 
     const payload = await this.parseJson(response);
 

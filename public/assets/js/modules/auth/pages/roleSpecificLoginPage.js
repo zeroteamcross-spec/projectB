@@ -5,6 +5,7 @@ import { createBackgroundVideoLayer } from "../../../ui/composites/backgroundVid
 import { showToast } from "../../../ui/primitives/toast.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 import { roleSpecificLoginService } from "../services/roleSpecificLoginService.js";
+import { buyerLoginCredentials } from "../services/buyerLoginCredentials.js";
 import { hostForRole, currentHost } from "../../../core/roleHosts.js";
 
 const AUTH_FALLBACK = "bg-[radial-gradient(circle_at_12%_10%,color-mix(in_srgb,var(--pb-brand-primary)_18%,transparent),transparent_32%),radial-gradient(circle_at_88%_18%,color-mix(in_srgb,var(--pb-brand-accent)_16%,transparent),transparent_30%),linear-gradient(135deg,#faf4ed,#f8fafc_44%,#eaf4f9)]";
@@ -147,8 +148,15 @@ function loginPanel({ config, isSubmitting, error, onSubmit }) {
 function loginForm({ config, isSubmitting, error, onSubmit }) {
   const form = document.createElement("form");
   form.className = "grid gap-3";
+  const isBuyer = config.role === "buyer";
   form.append(
-    field({ id: `role_login_${config.slug}_email_input`, name: "email", label: "Email", type: "email", placeholder: config.emailPlaceholder }),
+    field({
+      id: `role_login_${config.slug}_email_input`,
+      name: isBuyer ? "identifier" : "email",
+      label: isBuyer ? "Username atau email" : "Email",
+      type: isBuyer ? "text" : "email",
+      placeholder: config.emailPlaceholder,
+    }),
     field({ id: `role_login_${config.slug}_password_input`, name: "password", label: "Password", type: "password", placeholder: "Password akun" }),
   );
 
@@ -173,10 +181,9 @@ function loginForm({ config, isSubmitting, error, onSubmit }) {
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     const data = Object.fromEntries(new FormData(form));
-    onSubmit?.({
-      email: data.email,
-      password: data.password,
-    });
+    onSubmit?.(isBuyer
+      ? buyerLoginCredentials(data.identifier, data.password)
+      : { email: data.email, password: data.password });
   });
 
   return form;

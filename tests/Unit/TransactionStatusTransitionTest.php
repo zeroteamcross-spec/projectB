@@ -20,9 +20,10 @@ class TransactionStatusTransitionTest extends TestCase
 {
     public function run(): void
     {
-        $this->paidStatusClearsRemainingAmountAndSetsPaidAt();
+        $this->genericStatusCannotSetPaymentPaid();
         $this->providerSettlementSyncsFullPayment();
         $this->providerSettlementSyncsDpPayment();
+        $this->providerCaptureRequiresAcceptedFraudStatusWhenPresent();
         $this->providerPendingSyncKeepsTransactionPending();
         $this->providerSyncFailureKeepsTransactionPending();
         $this->fullPaymentTransactionCannotBecomeDpPaid();
@@ -40,20 +41,29 @@ class TransactionStatusTransitionTest extends TestCase
         $this->genericStatusUpdateCannotCancelTransaction();
     }
 
-    private function paidStatusClearsRemainingAmountAndSetsPaidAt(): void
+    private function genericStatusCannotSetPaymentPaid(): void
     {
-        [$pdo, $service] = $this->serviceWithSeedData('dp', 'pending_payment', 50000000, 100000000);
+        foreach (['dp_paid', 'paid'] as $targetStatus) {
+            foreach ([['id' => 9, 'role' => 'admin'], ['id' => 2, 'role' => 'seller']] as $user) {
+                [$pdo, $service] = $this->serviceWithSeedData('dp', 'pending_payment', 50000000, 100000000);
 
-        $result = $service->updateStatus(['id' => 9, 'role' => 'admin'], 1, [
-            'transaction_status' => 'paid',
-        ]);
+                try {
+                    $service->updateStatus($user, 1, ['transaction_status' => $targetStatus]);
+                    throw new \RuntimeException('A generic status update must not confirm payment.');
+                } catch (ValidationException $exception) {
+                    $message = (string) ($exception->errors()['transaction_status'] ?? '');
+                    $this->assertTrue(strpos($message, 'endpoint konfirmasi pembayaran') !== false);
+                }
 
-        $row = $pdo->query('SELECT transaction_status, remaining_amount, paid_at FROM transactions WHERE id = 1')->fetch();
-
-        $this->assertSame('paid', $row['transaction_status']);
-        $this->assertSame(0, (int) $row['remaining_amount']);
-        $this->assertNotNull($row['paid_at']);
-        $this->assertSame('paid', $result['transaction_status']);
+                $row = $pdo->query('SELECT transaction_status, remaining_amount, paid_at FROM transactions WHERE id = 1')->fetch();
+                $car = $pdo->query('SELECT listing_status FROM cars WHERE id = 10')->fetch();
+                $this->assertSame('pending_payment', $row['transaction_status']);
+                $this->assertSame(100000000, (int) $row['remaining_amount']);
+                $this->assertSame(null, $row['paid_at']);
+                $this->assertSame('published', $car['listing_status']);
+                $this->assertSame(null, FakeTransactionAffiliateService::$lastAccruedTransaction);
+            }
+        }
     }
 
     private function providerSettlementSyncsFullPayment(): void
@@ -94,7 +104,7 @@ class TransactionStatusTransitionTest extends TestCase
             50000000,
             100000000,
             new StatusTransactionPaymentProvider([
-                'transaction_status' => 'capture',
+                'transaction_status' => 'settlement',
                 'gross_amount' => '50000000.00',
                 'payment_type' => 'bank_transfer',
                 'transaction_id' => 'MID-002',
@@ -112,6 +122,42 @@ class TransactionStatusTransitionTest extends TestCase
         $this->assertSame('sold', $car['listing_status']);
         $this->assertSame('dp_paid', $result['transaction_status']);
         $this->assertSame('dp_paid', FakeTransactionAffiliateService::$lastAccruedTransaction['transaction_status'] ?? null);
+    }
+
+    private function providerCaptureRequiresAcceptedFraudStatusWhenPresent(): void
+    {
+        foreach ([['accept', 'paid'], [null, 'pending_payment'], ['challenge', 'pending_payment'], ['deny', 'pending_payment']] as [$fraudStatus, $expectedStatus]) {
+            $providerPayload = [
+                'transaction_status' => 'capture',
+                'gross_amount' => '150000000.00',
+                'payment_type' => 'bank_transfer',
+                'transaction_id' => 'MID-CAPTURE-' . ($fraudStatus ?? 'absent'),
+            ];
+            if ($fraudStatus !== null) {
+                $providerPayload['fraud_status'] = $fraudStatus;
+            }
+
+            [$pdo, $service] = $this->serviceWithSeedData(
+                'full',
+                'pending_payment',
+                null,
+                0,
+                new StatusTransactionPaymentProvider($providerPayload),
+                'ORDER-CAPTURE-FRAUD'
+            );
+
+            $service->syncPaymentStatus(['id' => 1, 'role' => 'buyer'], 1);
+            $transaction = $pdo->query('SELECT transaction_status, paid_at FROM transactions WHERE id = 1')->fetch();
+            $car = $pdo->query('SELECT listing_status FROM cars WHERE id = 10')->fetch();
+
+            $this->assertSame($expectedStatus, $transaction['transaction_status']);
+            $this->assertSame($expectedStatus === 'paid', $transaction['paid_at'] !== null);
+            $this->assertSame($expectedStatus === 'paid' ? 'sold' : 'published', $car['listing_status']);
+            $this->assertSame(
+                $expectedStatus === 'paid' ? 'paid' : null,
+                FakeTransactionAffiliateService::$lastAccruedTransaction['transaction_status'] ?? null
+            );
+        }
     }
 
     private function providerPendingSyncKeepsTransactionPending(): void
@@ -477,6 +523,30 @@ class TransactionStatusTransitionTest extends TestCase
             logged_at TEXT,
             created_at TEXT
         )');
+        $pdo->exec('CREATE TABLE transaction_payment_operations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            transaction_id INTEGER NOT NULL,
+            parent_operation_id INTEGER NULL,
+            operation_key TEXT NOT NULL,
+            operation_type TEXT NOT NULL,
+            provider_order_id TEXT NULL,
+            payment_method TEXT NULL,
+            gross_amount INTEGER NULL,
+            idempotency_key TEXT NULL,
+            operation_status TEXT NOT NULL,
+            provider_status TEXT NULL,
+            fence INTEGER NOT NULL DEFAULT 0,
+            lease_token TEXT NULL,
+            lease_expires_at TEXT NULL,
+            first_attempt_at TEXT NULL,
+            request_payload_json TEXT NULL,
+            response_payload_json TEXT NULL,
+            error_payload_json TEXT NULL,
+            late_success_at TEXT NULL,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NULL,
+            completed_at TEXT NULL
+        )');
         $pdo->exec('CREATE TABLE showrooms (
             id INTEGER PRIMARY KEY,
             name TEXT NULL,
@@ -549,17 +619,22 @@ class FakeTransactionStorageService implements StorageServiceInterface
 
 class FakeTransactionPaymentProvider implements PaymentProviderInterface
 {
-    public function createInitialPayment(array $transaction, array $customer, string $paymentMethod): array
+    public function createInitialPayment(array $transaction, array $customer, string $paymentMethod, ?string $providerOrderId = null, ?string $idempotencyKey = null): array
     {
         return [];
     }
 
-    public function createCompletionPayment(array $transaction, array $customer, string $paymentMethod): array
+    public function createCompletionPayment(array $transaction, array $customer, string $paymentMethod, ?string $providerOrderId = null, ?string $idempotencyKey = null): array
     {
         return [];
     }
 
     public function checkStatus(string $providerOrderId): array
+    {
+        return [];
+    }
+
+    public function cancelPending(string $providerOrderId, ?string $idempotencyKey = null): array
     {
         return [];
     }
@@ -574,12 +649,12 @@ class StatusTransactionPaymentProvider implements PaymentProviderInterface
         $this->status = $status;
     }
 
-    public function createInitialPayment(array $transaction, array $customer, string $paymentMethod): array
+    public function createInitialPayment(array $transaction, array $customer, string $paymentMethod, ?string $providerOrderId = null, ?string $idempotencyKey = null): array
     {
         return [];
     }
 
-    public function createCompletionPayment(array $transaction, array $customer, string $paymentMethod): array
+    public function createCompletionPayment(array $transaction, array $customer, string $paymentMethod, ?string $providerOrderId = null, ?string $idempotencyKey = null): array
     {
         return [];
     }
@@ -588,21 +663,31 @@ class StatusTransactionPaymentProvider implements PaymentProviderInterface
     {
         return array_merge(['order_id' => $providerOrderId], $this->status);
     }
+
+    public function cancelPending(string $providerOrderId, ?string $idempotencyKey = null): array
+    {
+        return array_merge(['order_id' => $providerOrderId], $this->status);
+    }
 }
 
 class FailingTransactionPaymentProvider implements PaymentProviderInterface
 {
-    public function createInitialPayment(array $transaction, array $customer, string $paymentMethod): array
+    public function createInitialPayment(array $transaction, array $customer, string $paymentMethod, ?string $providerOrderId = null, ?string $idempotencyKey = null): array
     {
         throw $this->failure($paymentMethod);
     }
 
-    public function createCompletionPayment(array $transaction, array $customer, string $paymentMethod): array
+    public function createCompletionPayment(array $transaction, array $customer, string $paymentMethod, ?string $providerOrderId = null, ?string $idempotencyKey = null): array
     {
         throw $this->failure($paymentMethod);
     }
 
     public function checkStatus(string $providerOrderId): array
+    {
+        throw $this->failure('');
+    }
+
+    public function cancelPending(string $providerOrderId, ?string $idempotencyKey = null): array
     {
         throw $this->failure('');
     }

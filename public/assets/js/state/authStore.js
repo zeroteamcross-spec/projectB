@@ -3,7 +3,8 @@ import { persistBuyerShowroomUrl } from "../utils/buyerShowroomUrl.js";
 import { persistBuyerShowroomIcon } from "../utils/buyerShowroomIcon.js";
 
 export const authStore = {
-  setContext({ user = null, actor = null, impersonation = null } = {}) {
+  setContext(context = {}) {
+    const { user = null, actor = null, impersonation = null } = context ?? {};
     appStore.patchState("auth", {
       user,
       actor,

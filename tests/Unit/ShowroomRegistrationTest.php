@@ -11,6 +11,8 @@ use App\Modules\Auth\Repositories\AuthUserRepository;
 use App\Modules\Auth\Requests\RegisterRequest;
 use App\Modules\Auth\Services\AuthService;
 use App\Modules\Showrooms\Repositories\ShowroomRepository;
+use App\Modules\Showrooms\Services\ShowroomMetadataTargetResolver;
+use App\Modules\Showrooms\Services\SystemRouteSlugRegistry;
 use PDO;
 use Tests\TestCase;
 
@@ -23,6 +25,11 @@ class ShowroomRegistrationTest extends TestCase
         $this->buyerRegistrationIgnoresShowroomRules();
         $this->showroomFieldLengthsAreValidated();
         $this->registrationStoresNormalizedSlugAndBankDetails();
+        $this->routePrefixesComeFromActualRouteDefinitions();
+        $this->publicDocumentRootEntriesAreReservedDynamically();
+        $this->metadataTargetRejectsAmbiguousAndReservedPaths();
+        $this->trustedCustomDomainMetadataAllowsLegacyReservedSlug();
+        $this->reservedRouteSlugIsRejectedBeforeCreatingAnAccount();
         $this->takenSlugIsRejectedWithAnAvailableSuggestion();
         $this->tooShortSlugIsRejected();
         $this->registerPageSendsTheShowroomAddress();
@@ -186,6 +193,126 @@ class ShowroomRegistrationTest extends TestCase
         }
 
         $this->assertTrue(false, 'Registration with a taken slug must fail.');
+    }
+
+    private function routePrefixesComeFromActualRouteDefinitions(): void
+    {
+        $prefixes = SystemRouteSlugRegistry::reservedPrefixes();
+        foreach (['login', 'google-login', 'fitur', 'security-report', 'admin', 'api'] as $routePrefix) {
+            $this->assertTrue(
+                in_array($routePrefix, $prefixes, true),
+                "Registered route prefix '{$routePrefix}' must be reserved for showroom slugs."
+            );
+        }
+        $this->assertTrue(! in_array('slug', $prefixes, true), 'Dynamic showroom route parameters must not be reserved.');
+    }
+
+    private function publicDocumentRootEntriesAreReservedDynamically(): void
+    {
+        $rootEntries = SystemRouteSlugRegistry::publicDocumentRootPrefixes();
+        $reserved = SystemRouteSlugRegistry::reservedPrefixes();
+
+        foreach ($rootEntries as $entry) {
+            $this->assertTrue(
+                in_array($entry, $reserved, true),
+                "Actual public document-root entry '{$entry}' must be reserved."
+            );
+        }
+
+        foreach (['assets', 'uploads', 'tester'] as $knownCurrentEntry) {
+            $entryPath = dirname(__DIR__, 2) . '/public/' . $knownCurrentEntry;
+            if (is_file($entryPath) || is_dir($entryPath)) {
+                $this->assertTrue(
+                    in_array($knownCurrentEntry, $reserved, true),
+                    "Existing public path '{$knownCurrentEntry}' must not be available as a showroom slug."
+                );
+            }
+        }
+    }
+
+    private function trustedCustomDomainMetadataAllowsLegacyReservedSlug(): void
+    {
+        $reserved = SystemRouteSlugRegistry::reservedPrefixes();
+        $legacyRouteSlug = ShowroomMetadataTargetResolver::resolve('/admin', $reserved, 'admin');
+        $legacyStaticPathSlug = ShowroomMetadataTargetResolver::resolve('/assets', $reserved, 'assets');
+        $activeCustomDomainRoot = ShowroomMetadataTargetResolver::resolve('/', $reserved, 'admin');
+        $mainDomainRoute = ShowroomMetadataTargetResolver::resolve('/admin', $reserved);
+
+        $this->assertSame('admin', $legacyRouteSlug['slug'], 'An active custom domain must retain branding for a legacy route-colliding showroom slug.');
+        $this->assertSame('assets', $legacyStaticPathSlug['slug'], 'An active custom domain must retain branding for a legacy static-path showroom slug.');
+        $this->assertSame('admin', $activeCustomDomainRoot['slug'], 'An active custom domain must retain its trusted showroom branding at the normalized root path.');
+        $this->assertSame(null, $mainDomainRoute['slug'], 'The main-domain route must remain reserved for its system page.');
+
+        $indexSource = (string) file_get_contents(dirname(__DIR__, 2) . '/public/index.php');
+        $this->assertTrue(
+            preg_match(
+                '/loadShowroomShareMetadata\(\s*\$basePath,\s*\$metadataPath,\s*is_array\(\$reservedRoutePrefixes\)\s*\?\s*\$reservedRoutePrefixes\s*:\s*\[\],\s*\$customDomainShowroomSlug\s*!==\s*\x27\x27\s*\?\s*\$customDomainShowroomSlug\s*:\s*null\s*\)/s',
+                $indexSource
+            ) === 1,
+            'The SSR metadata loader must receive the slug resolved from the active custom domain as trusted context.'
+        );
+    }
+
+    private function metadataTargetRejectsAmbiguousAndReservedPaths(): void
+    {
+        $reserved = SystemRouteSlugRegistry::reservedPrefixes();
+        $expectedEmptyTarget = ['slug' => null, 'referral_code' => null];
+
+        foreach (['/%61dmin', '/%61ssets', '/../admin', '/%2e%2e/admin', '/%2fadmin', '/%5cadmin', '/%252fadmin', '/%6'] as $path) {
+            $this->assertSame(
+                $expectedEmptyTarget,
+                ShowroomMetadataTargetResolver::resolve($path, $reserved),
+                "Invalid or reserved metadata path '{$path}' must not reach a showroom lookup."
+            );
+        }
+
+        $this->assertSame(
+            ['slug' => 'bekasi-motor', 'referral_code' => null],
+            ShowroomMetadataTargetResolver::resolve('/bekasi-motor', $reserved),
+            'A valid, non-reserved showroom slug should continue to resolve.'
+        );
+        $this->assertSame(
+            $expectedEmptyTarget,
+            ShowroomMetadataTargetResolver::resolve('/%2fadmin', $reserved, 'trusted-legacy-showroom'),
+            'Malformed or ambiguous request paths must not bypass validation through trusted custom-domain context.'
+        );
+    }
+
+    private function reservedRouteSlugIsRejectedBeforeCreatingAnAccount(): void
+    {
+        [$pdo, $service] = $this->makeService();
+
+        $this->expectException(ValidationException::class, function () use ($service): void {
+            $service->register([
+                'role' => 'seller',
+                'name' => 'Pemilik',
+                'email' => 'route@example.test',
+                'password' => 'RahasiaKu123',
+                'showroom' => [
+                    'name' => 'Login Motor',
+                    'slug' => 'login',
+                    'city_name' => 'Surabaya',
+                ],
+            ]);
+        }, 'showroom.slug');
+
+        $this->assertSame(0, (int) $pdo->query('SELECT COUNT(*) FROM users')->fetchColumn());
+
+        [$pdo, $service] = $this->makeService();
+        $this->expectException(ValidationException::class, function () use ($service): void {
+            $service->register([
+                'role' => 'seller',
+                'name' => 'Pemilik',
+                'email' => 'static-path@example.test',
+                'password' => 'RahasiaKu123',
+                'showroom' => [
+                    'name' => 'Assets Motor',
+                    'slug' => 'assets',
+                    'city_name' => 'Surabaya',
+                ],
+            ]);
+        }, 'showroom.slug');
+        $this->assertSame(0, (int) $pdo->query('SELECT COUNT(*) FROM users')->fetchColumn());
     }
 
     private function tooShortSlugIsRejected(): void

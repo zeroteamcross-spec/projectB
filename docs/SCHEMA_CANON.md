@@ -92,23 +92,24 @@ Daftar tabel inti untuk `projectB`:
 8. `inspection_report_items`
 9. `transactions`
 10. `transaction_payment_logs`
-11. `affiliates`
-12. `affiliate_click_logs`
-13. `affiliate_commission_ledgers`
-14. `master_data`
-15. `api_versions`
-16. `admin_impersonation_sessions`
-17. `affiliate_commission_rules`
-18. `affiliate_settlement_batches`
-19. `affiliate_settlement_items`
-20. `transaction_fulfillment_checklist_items`
-21. `notifications`
-22. `sliders`
-23. `affiliate_settlement_histories`
-24. `user_oauth_identities`
-25. `car_favorites`
-26. `schema_migrations`
-27. `tasks`
+11. `transaction_payment_operations`
+12. `affiliates`
+13. `affiliate_click_logs`
+14. `affiliate_commission_ledgers`
+15. `master_data`
+16. `api_versions`
+17. `admin_impersonation_sessions`
+18. `affiliate_commission_rules`
+19. `affiliate_settlement_batches`
+20. `affiliate_settlement_items`
+21. `transaction_fulfillment_checklist_items`
+22. `notifications`
+23. `sliders`
+24. `affiliate_settlement_histories`
+25. `user_oauth_identities`
+26. `car_favorites`
+27. `schema_migrations`
+28. `tasks`
 
 Catatan:
 - beberapa tabel adalah hasil normalisasi dari struktur lama
@@ -126,10 +127,11 @@ Menyimpan data akun utama untuk semua role.
 
 Field:
 - `id` bigint unsigned, PK, auto increment
-- `role` enum(`seller`, `buyer`, `affiliate_admin`, `admin`) not null
+- `role` enum(`seller`, `buyer`, `affiliate_admin`, `admin`, `super_admin`, `seller_staff`) not null
 - `name` varchar(200) not null
 - `phone_number` varchar(25) null
-- `email` varchar(100) not null unique
+- `email` varchar(100) null unique
+- `buyer_username` varchar(50) null unique
 - `password_hash` varchar(255) not null
 - `address` varchar(512) null
 - `account_status` enum(`pending`, `active`, `suspended`) not null default `pending`
@@ -143,11 +145,16 @@ Field:
 - `deleted_at` datetime null
 
 Index:
+- unique on `email`
+- unique on `buyer_username`
 - index on `home_showroom_id`
 
 Catatan:
 - data showroom dipisahkan dari tabel ini
 - `otp_code` dan `security_key` masih dipertahankan untuk kompatibilitas perilaku, tetapi secara domain bisa dipisah lagi nanti
+- `email` tetap wajib pada registrasi yang ada dan pada semua role selain Buyer. `NULL` hanya untuk Buyer yang dibuat offline tanpa alamat email; nilai email lama tidak diubah.
+- `buyer_username` hanya untuk role `buyer`, boleh `NULL` pada akun lama. Jika diisi, nilainya unik tanpa membedakan huruf besar/kecil, dinormalisasi ke huruf kecil, dan terdiri dari 3-50 karakter `a-z`, `0-9`, titik, garis bawah, atau dash. Buyer harus mempunyai email atau `buyer_username`.
+- Login email tetap berlaku untuk semua role. Login memakai `buyer_username` hanya mencari role `buyer`; payload login memilih tepat satu dari `email` atau `buyer_username`. Pembuatan Buyer offline oleh seller akan memakai service transaksi terpisah.
 - `home_showroom_id` hanya bermakna untuk role `buyer`. Menyatakan showroom
   mana yang sedang jadi "rumah" buyer ini — diisi saat login lewat
   `#/s/<slug>/login`, dan ditimpa lagi setiap kali buyer login lewat link
@@ -403,6 +410,14 @@ Field:
 - `affiliate_referral_code_snapshot` varchar(50) null
 - `car_price` bigint not null
 - `payment_type` enum(`dp`, `full`) not null
+- `payment_method` varchar(30) null
+- `manual_transfer_proof_path` varchar(255) null
+- `manual_transfer_note` varchar(255) null
+- `manual_transfer_submitted_at` datetime null
+- `manual_transfer_confirmed_at` datetime null
+- `manual_transfer_confirmed_by` bigint unsigned null
+- `manual_transfer_rejected_at` datetime null
+- `manual_transfer_rejected_reason` varchar(500) null
 - `dp_amount` bigint null
 - `remaining_amount` bigint null
 - `transaction_status` enum(`pending_payment`, `dp_paid`, `paid`, `completed`, `expired`, `cancelled`, `returned`) not null default `pending_payment`
@@ -431,6 +446,7 @@ Catatan penting:
 - PK dan kode transaksi dipisahkan secara tegas
 - `dp_amount` disalin dari `cars.dp_amount` saat transaksi dibuat, bukan dari input buyer. Salinan ini menjaga nominal historis tetap utuh bila showroom mengubah Booking Fee mobil di kemudian hari
 - `dp_paid` adalah status terminal transaksi untuk alur baru: Booking Fee sudah lunas, transaksi dianggap selesai, dan tidak ada pelunasan atau langkah fulfillment lanjutan di aplikasi
+- `payment_method = 'offline_payment'` menandai pembayaran yang dicatat langsung oleh owner showroom setelah menerima pembayaran offline. Nilai ini tidak memulai sesi Midtrans dan `expires_at` harus `NULL`; transaksi langsung berakhir di `dp_paid` setelah nominal yang dicatat sama persis dengan `dp_amount`
 - `remaining_amount` bersifat informatif. Sisa harga diselesaikan di luar sistem, bukan melalui transaksi lanjutan di aplikasi
 - `paid` dan `completed` dipertahankan untuk data lama atau alur historis; keduanya bukan target status untuk transaksi DP baru
 - `returned_at` dan `return_reason` diisi saat showroom meretur transaksi. Retur hanya boleh dari status `dp_paid`
@@ -460,6 +476,52 @@ Field:
 Index:
 - index on `transaction_id`
 - index on `provider_order_id`
+
+Catatan:
+- log pembayaran manual showroom memakai `provider_name = 'offline'`, `payment_method = 'offline_payment'`, `transaction_status = 'dp_paid'`, dan `gross_amount` sebesar Booking Fee yang diterima
+- `payload_request_json` menyimpan waktu pembayaran, catatan opsional, dan `recorded_by_user_id` owner sebagai jejak audit; tidak menyimpan password Buyer atau kredensial login
+- sebelum transaksi online pending dialihkan ke offline, setiap order Midtrans yang tercatat wajib diverifikasi; order `pending` dibatalkan lalu statusnya diperiksa ulang. Status sukses, status tidak dikenal, identitas order yang tidak cocok, atau kegagalan provider menolak pengalihan
+- callback provider tetap dicatat untuk audit, tetapi tidak boleh mengubah status transaksi yang sudah memiliki `payment_method = 'offline_payment'`
+
+## 4.10.1 `transaction_payment_operations`
+
+Tujuan:
+Menyimpan operasi payment-provider sebelum request jaringan dimulai, termasuk sesi Midtrans, pemeriksaan status, pembatalan, dan pengalihan ke pembayaran offline. Baris ini menjadi jurnal/fence yang tahan terhadap retry dan crash di tengah request.
+
+Field:
+- `id` bigint unsigned, PK, auto increment
+- `transaction_id` bigint unsigned, FK -> `transactions.id`
+- `parent_operation_id` bigint unsigned, FK -> `transaction_payment_operations.id`, null
+- `operation_key` varchar(100) not null, unik bersama `transaction_id`
+- `operation_type` varchar(40) not null (`initial_session`, `completion_session`, `status_check`, `cancel`, `offline_conversion`, `legacy_session`)
+- `provider_order_id` varchar(100) null; dibuat dan disimpan sebelum request create-session
+- `payment_method` varchar(50) null
+- `gross_amount` bigint null
+- `idempotency_key` varchar(46) null; dipakai ulang untuk retry request POST dalam masa berlaku provider
+- `operation_status` varchar(24) not null (`prepared`, `in_flight`, `completed`, `failed`, `unknown`, `blocked`, `converted`)
+- `provider_status` varchar(50) null
+- `fence` bigint unsigned not null default 0
+- `lease_token` char(36) null
+- `lease_expires_at` datetime null
+- `first_attempt_at` datetime null
+- `request_payload_json`, `response_payload_json`, `error_payload_json` longtext null
+- `late_success_at` datetime null; menandai settlement/capture setelah konversi offline
+- `created_at` datetime not null
+- `updated_at`, `completed_at` datetime null
+
+Index:
+- unique (`transaction_id`, `operation_key`)
+- index (`provider_order_id`)
+- index (`transaction_id`, `operation_type`, `operation_status`)
+- index (`parent_operation_id`)
+
+Catatan:
+- setiap create-session, GET status, dan POST cancel wajib memiliki baris operasi committed sebelum request provider dimulai; transaksi database tidak boleh terbuka selama request jaringan
+- create-session menyimpan order ID dan idempotency key stabil. Retry menggunakan keduanya; hasil ambigu setelah jendela idempotensi provider berakhir tidak boleh mengirim POST ulang dan harus fail closed
+- sesi, callback, dan konversi offline diserialisasi melalui lock singkat pada baris transaksi serta lease/fence operasi; response dari lease/fence lama tidak boleh mengubah transaksi
+- konversi offline memblokir sesi aktif, memeriksa semua order lama maupun baru, dan baru berhasil bila seluruhnya terminal unpaid, nominal sama persis dengan Booking Fee, tidak ada bukti transfer, dan belum ada pembayaran sukses
+- migrasi mengimpor order dari log/kolom transaksi lama. Status lama yang tidak dapat dipastikan tetap `unknown` dan wajib direkonsiliasi sebelum konversi offline
+- callback sukses setelah konversi offline tetap dicatat; operasi terkait diberi `late_success_at` dan payload log diberi penanda audit, tanpa mengubah status `offline_payment`/`dp_paid`
 
 ---
 
@@ -769,7 +831,7 @@ Menyimpan inbox notifikasi per user untuk preload snapshot, popover global, dan 
 Field:
 - `id` bigint unsigned, PK, auto increment
 - `user_id` bigint unsigned, FK -> `users.id`
-- `role` enum(`seller`, `buyer`, `affiliate_admin`, `admin`) not null
+- `role` enum(`seller`, `buyer`, `affiliate_admin`, `admin`, `super_admin`, `seller_staff`) not null
 - `type` varchar(80) not null
 - `title` varchar(160) not null
 - `body` varchar(600) not null
@@ -1106,6 +1168,8 @@ Mapping:
 - `buyer`
 - `affiliate_admin`
 - `admin`
+- `super_admin`
+- `seller_staff`
 
 ### 6.2 Account status
 - `pending`

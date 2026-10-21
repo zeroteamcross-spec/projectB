@@ -146,7 +146,8 @@ class InspectionRepository
              FROM inspection_report_items AS items
              LEFT JOIN inspection_templates AS templates ON templates.id = items.template_id
              WHERE items.inspection_report_id = :inspection_report_id
-             ORDER BY templates.sort_order ASC, items.id ASC'
+             ORDER BY ' . $this->sectionOrderSql('templates.category_name') . ',
+                      templates.category_name ASC, templates.sort_order ASC, items.id ASC'
         );
         $stmt->execute(['inspection_report_id' => $reportId]);
 
@@ -171,7 +172,9 @@ class InspectionRepository
              FROM inspection_report_items AS items
              LEFT JOIN inspection_templates AS templates ON templates.id = items.template_id
              WHERE items.inspection_report_id IN (' . $placeholders . ')
-             ORDER BY items.inspection_report_id ASC, templates.sort_order ASC, items.id ASC'
+             ORDER BY items.inspection_report_id ASC,
+                      ' . $this->sectionOrderSql('templates.category_name') . ',
+                      templates.category_name ASC, templates.sort_order ASC, items.id ASC'
         );
         $stmt->execute($reportIds);
 
@@ -222,7 +225,7 @@ class InspectionRepository
             $sql .= ' AND is_active = 1';
         }
 
-        $sql .= ' ORDER BY sort_order ASC, id ASC';
+        $sql .= ' ORDER BY ' . $this->sectionOrderSql('category_name') . ', category_name ASC, sort_order ASC, id ASC';
         $stmt = $this->pdo->prepare($sql);
         if ($showroomId === null) {
             $stmt->execute();
@@ -416,5 +419,16 @@ class InspectionRepository
             'status' => $summaryStatus,
             'updated_at' => date('Y-m-d H:i:s'),
         ]);
+    }
+
+    private function sectionOrderSql(string $categoryColumn): string
+    {
+        return "CASE {$categoryColumn}
+                    WHEN 'road_test' THEN 0
+                    WHEN 'exterior' THEN 1
+                    WHEN 'interior' THEN 2
+                    WHEN 'underbody_engine' THEN 3
+                    WHEN 'documents' THEN 4
+                    ELSE 5 END";
     }
 }

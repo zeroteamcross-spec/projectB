@@ -22,13 +22,19 @@ class MidtransPaymentAdapter implements PaymentProviderInterface
         $this->http = $http ?? new MidtransHttpClient($this->config);
     }
 
-    public function createInitialPayment(array $transaction, array $customer, string $paymentMethod): array
+    public function createInitialPayment(
+        array $transaction,
+        array $customer,
+        string $paymentMethod,
+        ?string $providerOrderId = null,
+        ?string $idempotencyKey = null
+    ): array
     {
         $amount = ($transaction['payment_type'] ?? null) === 'dp'
             ? (int) $transaction['dp_amount']
             : (int) $transaction['car_price'];
 
-        $orderId = $this->orderId('ORDER', $transaction);
+        $orderId = $providerOrderId ?: $this->orderId('ORDER', $transaction);
         $payload = $this->basePayload($transaction, $customer, $orderId, $amount, 'initial_payment');
         $payload['item_details'] = [[
             'id' => 'CAR-' . (int) $transaction['car_id'],
@@ -44,11 +50,17 @@ class MidtransPaymentAdapter implements PaymentProviderInterface
             $paymentMethod,
             $amount,
             $payload,
-            $this->charge($payload, $paymentMethod, $amount)
+            $this->charge($payload, $paymentMethod, $amount, $idempotencyKey)
         );
     }
 
-    public function createCompletionPayment(array $transaction, array $customer, string $paymentMethod): array
+    public function createCompletionPayment(
+        array $transaction,
+        array $customer,
+        string $paymentMethod,
+        ?string $providerOrderId = null,
+        ?string $idempotencyKey = null
+    ): array
     {
         $amount = (int) ($transaction['remaining_amount'] ?? 0);
 
@@ -58,7 +70,7 @@ class MidtransPaymentAdapter implements PaymentProviderInterface
             ]);
         }
 
-        $orderId = $this->orderId('PELUNASAN', $transaction);
+        $orderId = $providerOrderId ?: $this->orderId('PELUNASAN', $transaction);
         $payload = $this->basePayload($transaction, $customer, $orderId, $amount, 'completion_payment');
         $payload['item_details'] = [[
             'id' => 'PELUNASAN-' . (int) $transaction['id'],
@@ -74,7 +86,7 @@ class MidtransPaymentAdapter implements PaymentProviderInterface
             $paymentMethod,
             $amount,
             $payload,
-            $this->charge($payload, $paymentMethod, $amount)
+            $this->charge($payload, $paymentMethod, $amount, $idempotencyKey)
         );
     }
 
@@ -83,10 +95,15 @@ class MidtransPaymentAdapter implements PaymentProviderInterface
         return $this->http->get('/v2/' . rawurlencode($providerOrderId) . '/status');
     }
 
-    private function charge(array $payload, string $paymentMethod, int $amount): array
+    public function cancelPending(string $providerOrderId, ?string $idempotencyKey = null): array
+    {
+        return $this->http->post('/v2/' . rawurlencode($providerOrderId) . '/cancel', [], $idempotencyKey);
+    }
+
+    private function charge(array $payload, string $paymentMethod, int $amount, ?string $idempotencyKey): array
     {
         try {
-            return $this->http->post('/v2/charge', $payload);
+            return $this->http->post('/v2/charge', $payload, $idempotencyKey);
         } catch (Throwable $exception) {
             $responsePayload = [
                 'error' => $exception->getMessage(),
@@ -177,11 +194,15 @@ class MidtransPaymentAdapter implements PaymentProviderInterface
     {
         return [
             'provider_name' => 'midtrans',
-            'provider_order_id' => $requestPayload['transaction_details']['order_id'],
+            'provider_order_id' => $responsePayload['order_id'] ?? null,
             'provider_transaction_id' => $responsePayload['transaction_id'] ?? null,
             'payment_method' => $paymentMethod,
             'transaction_status' => $responsePayload['transaction_status'] ?? 'pending',
-            'gross_amount' => $amount,
+            // Keep the provider's amount as returned. The service compares
+            // this raw value with the durable local intent using exact
+            // decimal-string parsing; substituting $amount would hide a
+            // mismatched or omitted Core API response field.
+            'gross_amount' => $responsePayload['gross_amount'] ?? null,
             'midtrans_token' => $responsePayload['token'] ?? null,
             'midtrans_redirect_url' => $responsePayload['redirect_url'] ?? $this->redirectUrl($responsePayload),
             'expires_at' => date('Y-m-d H:i:s', strtotime('+5 minutes')),

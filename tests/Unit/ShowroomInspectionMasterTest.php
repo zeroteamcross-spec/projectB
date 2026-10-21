@@ -26,6 +26,7 @@ class ShowroomInspectionMasterTest extends TestCase
         $this->copyRequestRequiresSourceBranch();
         $this->templateDescriptionIsRequired();
         $this->mapperMarksOnlyTheCurrentBranchMasterAsCurrent();
+        $this->templateItemsOrderWithinSections();
     }
 
     private function copyMergesWithoutOverwritingTargetItems(): void
@@ -217,6 +218,26 @@ class ShowroomInspectionMasterTest extends TestCase
         $this->assertSame(false, InspectionMapper::report(array_merge($report, [
             'inspection_master_showroom_id' => null,
         ]), [], 2)['is_current_master']);
+    }
+
+    private function templateItemsOrderWithinSections(): void
+    {
+        $pdo = $this->sqlite();
+        $this->createTemplatesTable($pdo);
+        $pdo->exec("INSERT INTO inspection_templates
+            (id, showroom_id, category_name, item_name, sort_order, is_active)
+            VALUES
+            (1, 2, 'exterior', 'Lampu', 10, 1),
+            (2, 2, 'road_test', 'Rem', 20, 1),
+            (3, 2, 'road_test', 'Akselerasi', 10, 1),
+            (4, 2, 'exterior', 'Cat', 5, 1)");
+
+        $repository = new InspectionRepository($pdo);
+        $this->assertSame(
+            [3, 2, 4, 1],
+            array_map('intval', array_column($repository->listTemplates(true, 2), 'id'))
+        );
+
     }
 
     private function createTemplatesTable(\PDO $pdo): void

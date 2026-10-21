@@ -4,10 +4,10 @@ import { tw } from "../../../ui/theme/tailwindClasses.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 
 const STATUS_OPTIONS = [
-  { value: "good", label: "Baik", icon: "circleCheck", active: "border-[color-mix(in_srgb,var(--pb-success)_42%,white)] bg-[color-mix(in_srgb,var(--pb-success)_8%,white)] text-[color-mix(in_srgb,var(--pb-success)_84%,black)] shadow-sm" },
-  { value: "fair", label: "Kurang baik", icon: "triangleWarning", active: "border-[color-mix(in_srgb,var(--pb-warning)_42%,white)] bg-[color-mix(in_srgb,var(--pb-warning)_8%,white)] text-[color-mix(in_srgb,var(--pb-warning)_84%,black)] shadow-sm" },
-  { value: "bad", label: "Tidak baik", icon: "circleXmark", active: "border-[color-mix(in_srgb,var(--pb-danger)_42%,white)] bg-[color-mix(in_srgb,var(--pb-danger)_8%,white)] text-[color-mix(in_srgb,var(--pb-danger)_84%,black)] shadow-sm" },
-  { value: "not_available", label: "Tidak tersedia", icon: "eyeSlash", active: "border-slate-300 bg-slate-100 text-slate-700 shadow-sm" },
+  { value: "good", label: "Baik", icon: "circleCheck", background: "var(--pb-success)" },
+  { value: "fair", label: "Kurang baik", icon: "triangleWarning", background: "var(--pb-warning)" },
+  { value: "bad", label: "Tidak baik", icon: "circleXmark", background: "var(--pb-danger)" },
+  { value: "not_available", label: "Tidak tersedia", icon: "eyeSlash", background: "#334155" },
 ];
 
 export function SellerInspectionItemsList({
@@ -117,9 +117,13 @@ function statusButtons(item, { busyItemId, onStatusChange }) {
     button.disabled = isBusy;
     button.className = [
       "inline-flex min-h-7 items-center justify-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-black transition",
-      active ? option.active : "border-gray-200 bg-gray-50 text-gray-600 hover:border-gray-300 hover:bg-white hover:text-gray-800",
+      active ? "border-transparent text-white shadow-sm" : "border-gray-200 bg-gray-50 text-gray-600 hover:border-gray-300 hover:bg-white hover:text-gray-800",
       button.disabled ? "cursor-not-allowed opacity-60" : "",
     ].join(" ");
+    button.setAttribute("aria-pressed", String(active));
+    if (active) {
+      button.style.backgroundColor = option.background;
+    }
     button.append(createIcon(option.icon, { className: "h-3.5 w-3.5" }), document.createTextNode(option.label));
     button.addEventListener("click", () => onStatusChange?.(item, option.value));
     group.append(button);

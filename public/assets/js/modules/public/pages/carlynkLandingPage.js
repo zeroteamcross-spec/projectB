@@ -1,8 +1,10 @@
 import { createPageLifecycle } from "../../../core/lifecycle.js";
 import { currentHost, hostForRole } from "../../../core/roleHosts.js";
 import { brandConfig } from "../../../theme/brandConfig.js";
+import { adminMasterService } from "../../admin/services/adminMasterService.js";
+import { activeSubscriptionPlans } from "../services/subscriptionPricing.js";
 import { bangunRute } from "./carlynkLanding/content.js";
-import { landingMarkup } from "./carlynkLanding/markup.js";
+import { landingMarkup, landingPricingCardsMarkup } from "./carlynkLanding/markup.js";
 import { pasangInteraksi } from "./carlynkLanding/interactions.js";
 import { pasangGaya, lepasGaya } from "./carlynkLanding/styles.js";
 
@@ -24,10 +26,12 @@ export function CarlynkLandingPage() {
       root = document.createElement("div");
       root.id = "carlynk_landing_root";
       root.className = "relative w-full";
-      root.innerHTML = landingMarkup({ rute: bangunRute(tautanWhatsapp(), tautanLoginShowroom()) });
+      const rute = bangunRute(tautanWhatsapp(), tautanLoginShowroom());
+      root.innerHTML = landingMarkup({ rute, pricingLoading: true });
 
       pasangGaya();
       sembunyikanHeaderShell();
+      void muatHargaPaket(root, rute);
 
       return root;
     },
@@ -71,9 +75,53 @@ export function CarlynkLandingPage() {
     if (!headerShell) {
       return;
     }
-    headerShell.style.display = tampilanHeaderShell ?? "";
+    const header = headerShell;
+    const previousDisplay = tampilanHeaderShell ?? "";
+    const oldRoot = root;
+    const outlet = oldRoot?.parentNode;
+    const restore = () => {
+      // Jangan tampilkan header shell selagi landing lama masih terlihat.
+      // Router melepas page lama sebelum bootstrap halaman tujuan selesai.
+      if (outlet?.querySelector("#carlynk_landing_root")) {
+        return;
+      }
+      header.style.display = previousDisplay;
+    };
+    if (oldRoot?.isConnected && outlet) {
+      const observer = new MutationObserver(() => {
+        if (oldRoot.isConnected) {
+          return;
+        }
+        observer.disconnect();
+        restore();
+      });
+      observer.observe(outlet, { childList: true });
+    } else {
+      restore();
+    }
     headerShell = null;
     tampilanHeaderShell = null;
+  }
+
+  async function muatHargaPaket(target, rute) {
+    try {
+      const master = await adminMasterService.getPricingMaster();
+      perbaruiGridHarga(target, rute, activeSubscriptionPlans(master?.data?.plans));
+    } catch {
+      perbaruiGridHarga(target, rute, [], { error: true });
+    }
+  }
+
+  function perbaruiGridHarga(target, rute, plans, options = {}) {
+    if (root !== target) {
+      return;
+    }
+    const grid = target.querySelector("#ck_harga_grid");
+    if (!grid) {
+      return;
+    }
+    grid.innerHTML = landingPricingCardsMarkup(plans, rute, options);
+    grid.setAttribute("aria-busy", "false");
   }
 }
 

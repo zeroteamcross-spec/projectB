@@ -5,6 +5,7 @@ import { formatCurrency } from "../../../utils/formatCurrency.js";
 import { formatDate } from "../../../utils/formatDate.js";
 import { sellerTransactionService } from "../services/sellerTransactionService.js";
 import { SellerTransactionStatusBadge } from "./sellerTransactionStatusBadge.js";
+import { SellerOfflinePaymentForm } from "./sellerOfflinePaymentForm.js";
 
 export function SellerTransactionDetailPanel({
   transaction = null,
@@ -21,6 +22,14 @@ export function SellerTransactionDetailPanel({
   isConfirmingManualTransfer = false,
   onConfirmManualTransfer = null,
   onRejectManualTransfer = null,
+  offlinePaymentOpen = false,
+  offlinePaymentDraft = {},
+  offlinePaymentSaving = false,
+  offlinePaymentError = "",
+  onOpenOfflinePayment = null,
+  onCloseOfflinePayment = null,
+  onOfflinePaymentChange = null,
+  onSubmitOfflinePayment = null,
 } = {}) {
   if (!transaction) {
     return EmptyState({
@@ -36,6 +45,17 @@ export function SellerTransactionDetailPanel({
   layout.append(
     statusCard(transaction, statusMeta, { isCancelling, onCancel, isReturning, onReturn }),
     manualTransferConfirmationCard(transaction, { isConfirmingManualTransfer, onConfirmManualTransfer, onRejectManualTransfer }),
+    SellerOfflinePaymentForm({
+      transaction,
+      open: offlinePaymentOpen,
+      draft: offlinePaymentDraft,
+      saving: offlinePaymentSaving,
+      error: offlinePaymentError,
+      onOpen: onOpenOfflinePayment,
+      onClose: onCloseOfflinePayment,
+      onChange: onOfflinePaymentChange,
+      onSubmit: onSubmitOfflinePayment,
+    }),
     fulfillmentChecklistCard({
       transaction,
       checklistDraft,

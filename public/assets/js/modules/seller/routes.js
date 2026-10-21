@@ -11,6 +11,7 @@ import { SellerDashboardPage } from "./pages/dashboardPage.js";
 import { SellerAffiliateCommissionsPage } from "./pages/affiliateCommissionsPage.js";
 import { SellerAffiliatesModalPage } from "./pages/affiliatesModalPage.js";
 import { SellerCarsPage } from "./pages/carsPage.js";
+import { PublicCarDetailPage } from "../public/pages/carDetailPage.js";
 import { SellerCarImagesPage } from "./pages/carImagesPage.js";
 import { SellerCarInspectionPage } from "./pages/carInspectionPage.js";
 import { SellerInspectionPage } from "./pages/inspectionPage.js";
@@ -20,6 +21,7 @@ import { SellerStaffPage } from "./pages/staffPage.js";
 import { SellerBillingPage } from "./pages/billingPage.js";
 import { SellerTransactionDetailPage } from "./pages/transactionDetailPage.js";
 import { SellerTransactionsPage } from "./pages/transactionsPage.js";
+import { loadSellerCarPreview } from "./services/sellerCarPreviewService.js";
 
 export const sellerRoutes = [
   {
@@ -125,6 +127,25 @@ export const sellerRoutes = [
         {
           key: "masterBrand",
           loader: ({ signal }) => adminMasterService.getBrandMaster({ signal }).catch(() => adminMasterService.normalizeMaster(null)),
+        },
+      ],
+    },
+  },
+  {
+    name: "seller.car-preview",
+    path: "/seller/cars/:id/preview",
+    shell: "public",
+    role: ["seller", "seller_staff"],
+    page: () => PublicCarDetailPage({ preview: true }),
+    workingStateKey: "sellerCarPreview",
+    preload: {
+      working: [
+        {
+          key: "detail",
+          loader: ({ params, query, signal }) => loadSellerCarPreview(params.id, {
+            signal,
+            archived: query?.status === "archived",
+          }),
         },
       ],
     },

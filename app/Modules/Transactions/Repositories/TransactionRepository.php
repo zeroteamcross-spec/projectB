@@ -86,6 +86,15 @@ class TransactionRepository
         return $transaction ?: null;
     }
 
+    public function lockById(int $id): ?array
+    {
+        $suffix = $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'mysql' ? ' FOR UPDATE' : '';
+        $stmt = $this->pdo->prepare('SELECT id FROM transactions WHERE id = :id AND deleted_at IS NULL' . $suffix);
+        $stmt->execute(['id' => $id]);
+
+        return $stmt->fetch() ? $this->findById($id) : null;
+    }
+
     public function findByCode(string $transactionCode): ?array
     {
         $stmt = $this->pdo->prepare(
@@ -97,10 +106,30 @@ class TransactionRepository
         return $transaction ?: null;
     }
 
-    public function findByProviderOrderId(string $providerOrderId): ?array
+    /**
+     * Resolve an order ID only from persisted Midtrans associations.
+     *
+     * The result is deliberately tri-state so callers cannot confuse an
+     * unknown order with a unique match, or silently choose one transaction
+     * when legacy data contains duplicate order IDs. Set $forUpdate while
+     * inside a transaction when the caller is about to apply provider state;
+     * on MySQL this locks every matching transaction row for revalidation.
+     *
+     * @return array{status: 'not_found'|'unique'|'ambiguous', transaction_id: ?int, transaction_ids: array<int, int>}
+     */
+    public function resolveMidtransOrderId(string $providerOrderId, bool $forUpdate = false): array
     {
+        $providerOrderId = trim($providerOrderId);
+        if ($providerOrderId === '') {
+            return ['status' => 'not_found', 'transaction_id' => null, 'transaction_ids' => []];
+        }
+
+        $suffix = $forUpdate && $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'mysql'
+            ? ' FOR UPDATE'
+            : '';
         $stmt = $this->pdo->prepare(
-            $this->baseSelect() . '
+            'SELECT t.id
+             FROM transactions AS t
              WHERE t.deleted_at IS NULL
              AND (
                 t.midtrans_order_id = :provider_order_id_transaction
@@ -108,19 +137,49 @@ class TransactionRepository
                     SELECT 1
                     FROM transaction_payment_logs AS logs
                     WHERE logs.transaction_id = t.id
+                    AND logs.provider_name = \'midtrans\'
                     AND logs.provider_order_id = :provider_order_id_log
-                    LIMIT 1
+                )
+                OR EXISTS (
+                    SELECT 1
+                    FROM transaction_payment_operations AS operations
+                    WHERE operations.transaction_id = t.id
+                    AND operations.provider_order_id = :provider_order_id_operation
+                    AND operations.operation_type IN (\'initial_session\', \'completion_session\', \'legacy_session\')
                 )
              )
-             LIMIT 1'
+             ORDER BY t.id ASC' . $suffix
         );
         $stmt->execute([
             'provider_order_id_transaction' => $providerOrderId,
             'provider_order_id_log' => $providerOrderId,
+            'provider_order_id_operation' => $providerOrderId,
         ]);
-        $transaction = $stmt->fetch();
+        $transactionIds = array_map('intval', $stmt->fetchAll(PDO::FETCH_COLUMN));
 
-        return $transaction ?: null;
+        if ($transactionIds === []) {
+            return ['status' => 'not_found', 'transaction_id' => null, 'transaction_ids' => []];
+        }
+
+        if (count($transactionIds) !== 1) {
+            return ['status' => 'ambiguous', 'transaction_id' => null, 'transaction_ids' => $transactionIds];
+        }
+
+        return [
+            'status' => 'unique',
+            'transaction_id' => $transactionIds[0],
+            'transaction_ids' => $transactionIds,
+        ];
+    }
+
+    public function findByProviderOrderId(string $providerOrderId): ?array
+    {
+        $resolution = $this->resolveMidtransOrderId($providerOrderId);
+        if ($resolution['status'] !== 'unique' || $resolution['transaction_id'] === null) {
+            return null;
+        }
+
+        return $this->findById($resolution['transaction_id']);
     }
 
     public function list(array $filters, int $limit, int $offset): array
@@ -188,20 +247,22 @@ class TransactionRepository
         ]);
     }
 
-    public function listStalePending(string $threshold): array
+    public function listStalePending(string $now): array
     {
         $stmt = $this->pdo->prepare(
-            'SELECT id, car_id, transaction_code, payment_type, car_price, dp_amount, remaining_amount,
+            "SELECT id, car_id, transaction_code, payment_type, car_price, dp_amount, remaining_amount,
                     transaction_status, midtrans_order_id, paid_at
              FROM transactions
              WHERE transaction_status = :transaction_status
-             AND created_at <= :threshold
+             AND expires_at IS NOT NULL
+             AND (payment_method IS NULL OR payment_method <> 'offline_payment')
+             AND expires_at <= :now
              AND deleted_at IS NULL
-             ORDER BY expires_at ASC, id ASC'
+             ORDER BY expires_at ASC, id ASC"
         );
         $stmt->execute([
             'transaction_status' => 'pending_payment',
-            'threshold' => $threshold,
+            'now' => $now,
         ]);
 
         return $stmt->fetchAll();
@@ -218,6 +279,7 @@ class TransactionRepository
             'next_status' => 'expired',
             'current_status' => 'pending_payment',
             'updated_at' => $now,
+            'now' => $now,
         ];
 
         foreach (array_values($ids) as $index => $id) {
@@ -227,12 +289,15 @@ class TransactionRepository
         }
 
         $stmt = $this->pdo->prepare(
-            'UPDATE transactions
+            "UPDATE transactions
              SET transaction_status = :next_status,
                  updated_at = :updated_at
              WHERE transaction_status = :current_status
+             AND expires_at IS NOT NULL
+             AND expires_at <= :now
+             AND (payment_method IS NULL OR payment_method <> 'offline_payment')
              AND deleted_at IS NULL
-             AND id IN (' . implode(', ', $placeholders) . ')'
+             AND id IN (" . implode(', ', $placeholders) . ')'
         );
         $stmt->execute($params);
 
@@ -394,6 +459,23 @@ class TransactionRepository
         );
         $data['id'] = $id;
         $stmt->execute($data);
+    }
+
+    public function convertToOfflinePayment(int $id): bool
+    {
+        $stmt = $this->pdo->prepare(
+            "UPDATE transactions
+             SET payment_method = 'offline_payment',
+                 midtrans_token = NULL,
+                 midtrans_redirect_url = NULL,
+                 expires_at = NULL,
+                 updated_at = :updated_at
+             WHERE id = :id AND deleted_at IS NULL
+             AND transaction_status = 'pending_payment' AND paid_at IS NULL"
+        );
+        $stmt->execute(['id' => $id, 'updated_at' => date('Y-m-d H:i:s')]);
+
+        return $stmt->rowCount() === 1;
     }
 
     public function updateManualTransferSubmission(int $id, array $data): void

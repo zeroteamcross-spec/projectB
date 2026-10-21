@@ -9,6 +9,8 @@ import { adminMasterService } from "../../admin/services/adminMasterService.js";
 import { showroomsResource } from "../../../resources/showroomsResource.js";
 import { formatCurrency } from "../../../utils/formatCurrency.js";
 import { SubscriptionMidtransPanel } from "../../../ui/composites/subscriptionMidtransPanel.js";
+import { copyTextToClipboard } from "../../../utils/copyTextToClipboard.js";
+import { activeSubscriptionPlans, selectedSubscriptionPlan } from "../services/subscriptionPricing.js";
 
 const SHOWROOM_REGISTER_FALLBACK = "bg-[radial-gradient(circle_at_12%_10%,color-mix(in_srgb,var(--pb-brand-primary)_18%,transparent),transparent_32%),radial-gradient(circle_at_88%_18%,color-mix(in_srgb,var(--pb-brand-accent)_16%,transparent),transparent_30%),linear-gradient(135deg,#faf4ed,#f8fafc_44%,#eaf4f9)]";
 
@@ -183,7 +185,7 @@ export function ShowroomRegisterPage() {
   };
 
   return createPageLifecycle({
-    async bootstrap() {
+    async bootstrap(context) {
       const [bankMaster, locationMaster, pricingMaster, destinationMaster] = await Promise.all([
         // Fallback ke normalize<X>Master(null), bukan null mentah -- itu yang
         // mengembalikan seed default (mis. daftar bank/kota bawaan) saat
@@ -195,9 +197,9 @@ export function ShowroomRegisterPage() {
         adminMasterService.getSubscriptionDestinationMaster().catch(() => adminMasterService.normalizeSubscriptionDestinationMaster(null)),
       ]);
 
-      state.plans = (pricingMaster?.data?.plans ?? [])
-        .filter((plan) => (plan?.status ?? "active") === "active")
-        .sort((a, b) => Number(a.price ?? 0) - Number(b.price ?? 0));
+      state.plans = activeSubscriptionPlans(pricingMaster?.data?.plans);
+      const matchingPlan = selectedSubscriptionPlan(state.plans, context?.query?.paket);
+      state.selectedPlanId = matchingPlan?.id ?? null;
 
       state.subscriptionDestination = destinationMaster?.data ?? null;
       const paymentMode = adminMasterService.normalizeSubscriptionPaymentMode(state.subscriptionDestination?.payment_mode);
@@ -305,6 +307,7 @@ function registerPanel(state, actions, context) {
   form.id = "shr_register_form";
   form.className = "grid gap-4";
   form.noValidate = true;
+  form.autocomplete = "off";
 
   const nameInput = field({
     id: "shr_register_name_input",
@@ -333,6 +336,18 @@ function registerPanel(state, actions, context) {
     error: state.fieldErrors["showroom.slug"],
     hint: "Huruf kecil, angka, dan dash. Inilah alamat halaman publik Anda.",
   });
+  const slugRow = document.createElement("div");
+  slugRow.className = "grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2";
+  const checkSlug = Button({ label: "Cek", variant: "ya" });
+  checkSlug.id = "shr_register_showroom_slug_check_button";
+  checkSlug.type = "button";
+  checkSlug.classList.add("mt-5", "min-h-10", "px-4", "text-white");
+  const slugStatus = document.createElement("p");
+  slugStatus.id = "shr_register_showroom_slug_status";
+  slugStatus.className = "col-span-2 text-[11px] font-semibold";
+  slugStatus.setAttribute("role", "status");
+  slugStatus.setAttribute("aria-live", "polite");
+  slugRow.append(slugInput, checkSlug, slugStatus);
 
   const slugPreview = document.createElement("p");
   slugPreview.id = "shr_register_slug_preview";
@@ -345,22 +360,43 @@ function registerPanel(state, actions, context) {
   };
   paintSlugPreview(state.draft.showroom_slug ?? "");
 
-  // Typing the showroom name fills the slug until the owner edits it directly.
-  let slugTouched = Boolean(state.draft.showroom_slug);
   const slugField = slugInput.querySelector("input");
-  const nameField = showroomNameInput.querySelector("input");
-
-  nameField?.addEventListener("input", () => {
-    if (slugTouched || !slugField) {
+  slugField?.addEventListener("input", () => {
+    paintSlugPreview(slugField.value);
+    slugStatus.textContent = "";
+  });
+  checkSlug.addEventListener("click", async () => {
+    const slug = normalizeSlug(slugField?.value);
+    if (slug.length < SLUG_MIN_LENGTH || slug.length > SLUG_MAX_LENGTH) {
+      slugStatus.className = "col-span-2 text-[11px] font-semibold text-[var(--pb-danger)]";
+      slugStatus.textContent = `Alamat halaman harus ${SLUG_MIN_LENGTH}–${SLUG_MAX_LENGTH} karakter.`;
       return;
     }
-    slugField.value = normalizeSlug(nameField.value);
-    paintSlugPreview(slugField.value);
-  });
-
-  slugField?.addEventListener("input", () => {
-    slugTouched = slugField.value.trim() !== "";
-    paintSlugPreview(slugField.value);
+    checkSlug.disabled = true;
+    slugStatus.className = "col-span-2 text-[11px] font-semibold text-[var(--pb-text-muted)]";
+    slugStatus.textContent = "Memeriksa alamat halaman...";
+    try {
+      const result = await showroomsResource.validateSlug(slug);
+      if (normalizeSlug(slugField?.value) !== slug) {
+        return;
+      }
+      const available = typeof result?.is_available === "boolean"
+        ? result.is_available
+        : !result?.is_valid && !result?.is_reserved;
+      slugStatus.className = available
+        ? "col-span-2 text-[11px] font-semibold text-[var(--pb-success)]"
+        : "col-span-2 text-[11px] font-semibold text-[var(--pb-danger)]";
+      slugStatus.textContent = available
+        ? "Alamat halaman tersedia."
+        : result?.is_reserved
+          ? "Alamat halaman dipakai oleh sistem. Pilih alamat lain."
+          : "Alamat halaman sudah digunakan.";
+    } catch (error) {
+      slugStatus.className = "col-span-2 text-[11px] font-semibold text-[var(--pb-danger)]";
+      slugStatus.textContent = error?.message || "Alamat halaman belum dapat diperiksa. Coba lagi.";
+    } finally {
+      checkSlug.disabled = false;
+    }
   });
 
   form.append(
@@ -387,7 +423,7 @@ function registerPanel(state, actions, context) {
     ]),
     fieldGroup("", [
       showroomNameInput,
-      slugInput,
+      slugRow,
       slugPreview,
       selectField({
         id: "shr_register_city_input",
@@ -643,7 +679,7 @@ function paymentPanel(state, actions, context) {
   if (plan) {
     recap.append(
       detailRow("Paket", plan.name),
-      detailRow("Jumlah transfer", `${formatCurrency(plan.price)}${plan.billing_period ? ` ${plan.billing_period}` : ""}`),
+      detailRow("Jumlah transfer", `${formatCurrency(plan.price)}${plan.billing_period ? ` ${plan.billing_period}` : ""}`, { copyValue: String(plan.price ?? ""), copyLabel: "Salin jumlah transfer" }),
     );
   }
 
@@ -672,7 +708,7 @@ function paymentPanel(state, actions, context) {
   if (state.subscriptionDestination?.account_number) {
     recap.append(
       detailRow("Bank tujuan", state.subscriptionDestination.bank_name || "-"),
-      detailRow("Nomor rekening", state.subscriptionDestination.account_number),
+      detailRow("Nomor rekening", state.subscriptionDestination.account_number, { copyValue: state.subscriptionDestination.account_number, copyLabel: "Salin nomor rekening" }),
       detailRow("Atas nama", state.subscriptionDestination.account_holder || "-"),
     );
   }
@@ -811,7 +847,7 @@ function successPanel(state, actions, context) {
   return section;
 }
 
-function detailRow(label, value) {
+function detailRow(label, value, { copyValue = null, copyLabel = "Salin" } = {}) {
   const row = document.createElement("div");
   row.className = "grid gap-0.5";
 
@@ -823,7 +859,32 @@ function detailRow(label, value) {
   content.className = "break-all font-semibold text-gray-900";
   content.textContent = value;
 
-  row.append(caption, content);
+  if (copyValue === null) {
+    row.append(caption, content);
+    return row;
+  }
+
+  const valueRow = document.createElement("div");
+  valueRow.className = "flex flex-wrap items-center justify-between gap-2";
+  const copy = Button({ label: "Salin", variant: "ya" });
+  copy.type = "button";
+  copy.setAttribute("aria-label", copyLabel);
+  copy.classList.add("min-h-8", "px-3", "text-[11px]", "text-white");
+  const feedback = document.createElement("span");
+  feedback.className = "text-[10px] font-semibold text-[var(--pb-success)]";
+  feedback.setAttribute("role", "status");
+  copy.addEventListener("click", async () => {
+    const copied = await copyTextToClipboard(copyValue);
+    if (copied) {
+      feedback.className = "text-[10px] font-semibold text-[var(--pb-success)]";
+      feedback.textContent = "Berhasil disalin";
+    } else {
+      feedback.className = "text-[10px] font-semibold text-[var(--pb-danger)]";
+      feedback.textContent = "Gagal menyalin";
+    }
+  });
+  valueRow.append(content, copy, feedback);
+  row.append(caption, valueRow);
   return row;
 }
 
@@ -848,6 +909,7 @@ function field({ id, name, label, type = "text", placeholder = "", required = tr
   input.id = id;
   input.name = name;
   input.type = type;
+  input.autocomplete = type === "password" ? "new-password" : "off";
   input.required = required;
   input.placeholder = placeholder;
   input.value = value ?? "";
@@ -1070,6 +1132,7 @@ function textareaField({ id, name, label, placeholder = "", required = true, val
   const input = document.createElement("textarea");
   input.id = id;
   input.name = name;
+  input.autocomplete = "off";
   input.required = required;
   input.placeholder = placeholder;
   input.rows = 3;

@@ -39,21 +39,6 @@ class ShowroomService
      */
     private const AUTO_SUSPEND_GRACE_DAYS = 14;
 
-    /**
-     * Kata yang tidak boleh jadi slug showroom karena URL-nya kini langsung
-     * di root ("carlynk.id/{slug}") -- bertabrakan dengan rute sistem yang
-     * juga hidup di root (dashboard peran, auth, path API, dst). Daftar ini
-     * harus sejalan dengan RESERVED_ROOT_SLUGS di
-     * public/assets/js/modules/public/routes.js.
-     */
-    private const RESERVED_SLUGS = [
-        'admin', 'tasks', 'super-admin', 'seller', 'buyer', 'affiliate',
-        'login', 'google-login', 'auth', 'api', 'cars', 'transactions',
-        'profile', 'notifications', 'public', 'showrooms', 'af', 'a', 's',
-        'daftar-showroom', 'saas-landing', 'carlynk-landing', 'contoh-katalog', 'health',
-        'uploads', 'assets', 'tester', 'app',
-    ];
-
     private ShowroomRepository $showrooms;
 
     private MasterDataService $masterData;
@@ -1264,10 +1249,13 @@ class ShowroomService
         $normalized = $this->normalizeSlug($slug);
         $this->assertSlugFormat($normalized);
         $showroom = $this->showrooms->findPublicContextBySlug($normalized);
+        $isReserved = SystemRouteSlugRegistry::isReserved($normalized);
 
         return [
             'slug' => $normalized,
             'is_valid' => $showroom !== null,
+            'is_reserved' => $isReserved,
+            'is_available' => $showroom === null && ! $isReserved,
             'seller_user_id' => $showroom ? (int) $showroom['user_id'] : null,
             'contact_whatsapp' => $showroom ? ($showroom['phone_number'] ?: $showroom['seller_phone_number']) : null,
             'seller' => $showroom ? [
@@ -1465,10 +1453,9 @@ class ShowroomService
         }
 
         for ($attempt = 0; $attempt < 20; $attempt++) {
-            // Kata cadangan diperlakukan sama seperti tabrakan slug lain --
-            // langsung dapat suffix acak di percobaan pertama juga, bukan
-            // cuma saat sudah dipakai showroom lain.
-            $suffix = ($attempt === 0 && ! in_array($base, self::RESERVED_SLUGS, true))
+            // Prefix yang sedang dipakai route sistem mendapat suffix sejak
+            // percobaan pertama, sama seperti tabrakan slug biasa.
+            $suffix = ($attempt === 0 && ! SystemRouteSlugRegistry::isReserved($base))
                 ? ''
                 : '-' . strtolower(bin2hex(random_bytes(2)));
             $slug = substr($base, 0, 60 - strlen($suffix)) . $suffix;

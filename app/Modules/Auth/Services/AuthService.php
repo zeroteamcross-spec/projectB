@@ -11,6 +11,7 @@ use App\Modules\Auth\Repositories\AuthTokenRepository;
 use App\Modules\Auth\Repositories\AuthUserRepository;
 use App\Modules\Auth\Policies\AuthPolicy;
 use App\Modules\Showrooms\Repositories\ShowroomRepository;
+use App\Modules\Showrooms\Services\SystemRouteSlugRegistry;
 use DateInterval;
 use DateTimeImmutable;
 use PDO;
@@ -110,12 +111,45 @@ class AuthService
         return $result;
     }
 
+    /**
+     * Internal booking integration only. The caller authorizes the owner and
+     * owns the database transaction; this method sends no email or credentials.
+     */
+    public function createBuyerForOfflineBooking(
+        string $name,
+        ?string $phoneNumber,
+        string $buyerUsername,
+        string $password,
+        ?string $email = null
+    ): int {
+        if (strlen($password) < 8 || strlen($password) > 72) {
+            throw new ValidationException([
+                'password' => 'Password Buyer harus 8-72 karakter.',
+            ]);
+        }
+        if (trim($buyerUsername) === '') {
+            throw new ValidationException([
+                'buyer_username' => 'Username Buyer wajib diisi.',
+            ]);
+        }
+
+        return $this->users->createBuyerWithCredentials(
+            $name,
+            $phoneNumber,
+            $buyerUsername,
+            password_hash($password, PASSWORD_DEFAULT),
+            $email
+        );
+    }
+
     public function login(array $data): array
     {
-        $user = $this->users->findByEmail($data['email']);
+        $user = ! empty($data['buyer_username'])
+            ? $this->users->findBuyerByUsername($data['buyer_username'])
+            : $this->users->findByEmail($data['email'] ?? '');
 
         if (! $user || ! password_verify($data['password'], $user['password_hash'])) {
-            throw new UnauthorizedException('Email atau password salah.');
+            throw new UnauthorizedException('Email, username, atau password salah.');
         }
 
         $this->ensureCanAuthenticate($user);
@@ -335,6 +369,12 @@ class AuthService
             ]);
         }
 
+        if (SystemRouteSlugRegistry::isReserved($slug)) {
+            throw new ValidationException([
+                'showroom.slug' => "Alamat '{$slug}' dipakai oleh halaman sistem. Pilih alamat lain.",
+            ]);
+        }
+
         if ($this->users->showroomSlugExists($slug)) {
             throw $this->showroomSlugTakenException($slug);
         }
@@ -402,6 +442,7 @@ class AuthService
             'name' => $user['name'] ?? null,
             'phone_number' => $user['phone_number'] ?? null,
             'email' => $user['email'] ?? null,
+            'buyer_username' => ($user['role'] ?? null) === 'buyer' ? ($user['buyer_username'] ?? null) : null,
             'address' => $user['address'] ?? null,
             'account_status' => $user['account_status'] ?? null,
             'is_approved' => (bool) ($user['is_approved'] ?? false),

@@ -9,6 +9,11 @@ import { closeModal, openModal } from "../../../ui/primitives/modal.js";
 import { ModalHeaderFormActions } from "../../../ui/composites/modalHeaderFormActions.js";
 import { showToast } from "../../../ui/primitives/toast.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
+import {
+  groupInspectionTemplates,
+  nextInspectionItemOrder,
+  sortInspectionTemplates,
+} from "../inspectionTemplateOrdering.js";
 
 const RUNTIME_KEY = "sellerMasterInspection";
 const EDITOR_MODAL_KEY = "seller-master-inspection-editor";
@@ -277,7 +282,7 @@ function filterSection(templates, filters, actions) {
   form.id = "slrminsp_filter_form_section";
   form.className = "grid gap-3 lg:grid-cols-[minmax(0,1fr)_220px_180px_auto]";
   const keyword = inputControl("slrminsp_keyword_input", filters.keyword ?? "", "Cari section atau item");
-  const sectionSelect = selectControl("slrminsp_section_input", [["", "Semua section"], ...SECTION_OPTIONS], filters.section ?? "");
+  const sectionSelect = selectControl("slrminsp_section_input", [["", "Semua section"], ...sectionOptions(templates)], filters.section ?? "");
   const status = selectControl("slrminsp_status_input", [["", "Semua status"], ["active", "Aktif"], ["inactive", "Nonaktif"]], filters.status ?? "");
   const buttons = document.createElement("div");
   buttons.className = "grid gap-2 sm:grid-cols-2 lg:grid-cols-1";
@@ -306,58 +311,71 @@ function listSection(page, total, runtime, actions) {
   const section = document.createElement("section");
   section.id = "slrminsp_list_section";
   section.className = "grid min-w-0 gap-3";
-  section.append(DataTable({
-    shellId: "slrminsp_item_table_section",
-    title: "Daftar master inspeksi cabang",
-    subtitle: `${total} item sesuai filter.`,
-    icon: createIcon("clipboard", { className: "h-4 w-4" }),
-    columns: columns(actions),
-    rows: page.items,
-    loading: false,
-    emptyTitle: "Master inspeksi showroom belum dibuat",
-    emptyDescription: "Buat item pertama atau salin master dari cabang lain.",
-    mobileMode: "stack",
-    tableMinWidth: "min-w-[880px]",
-    getRowKey: (template) => template.id,
-    mobileCardId: (template) => `slrminsp_item_${template.id}_section`,
-    mobileCardTitle: (template) => template.item_name,
-    mobileCardSubtitle: (template) => sectionLabel(template.category_name),
-    mobileCardBadges: (template) => [statusBadge(template.is_active)],
-    mobileCardFields: (template) => [
-      { label: "Urutan", value: String(template.sort_order ?? 0) },
-      { label: "Keterangan", value: template.description || "Tanpa keterangan." },
-    ],
-    mobileCardActions: (template) => rowActions(template, actions),
-    pagination: DataTablePagination({
-      page: page.page,
-      totalPages: Math.max(1, Math.ceil(total / page.pageSize)),
-      totalItems: total,
-      perPage: page.pageSize,
-      itemLabel: "item",
-      onChange: actions.changePage,
-      onPerPageChange: actions.changePageSize,
-      onJump: actions.changePage,
-      buttonIds: {
-        previous: "slrminsp_prev_page_button",
-        next: "slrminsp_next_page_button",
-        jump: "slrminsp_jump_page_button",
-        page: (pageNumber) => `slrminsp_page_${pageNumber}_button`,
-      },
-      inputIds: {
-        perPage: "slrminsp_per_page_input",
-        jump: "slrminsp_jump_page_input",
-      },
-    }),
-  }));
+  const groups = groupInspectionTemplates(page.items);
+  if (!groups.length) {
+    section.append(DataTable({
+      shellId: "slrminsp_item_table_section",
+      title: "Daftar master inspeksi cabang",
+      subtitle: `${total} item sesuai filter.`,
+      emptyTitle: "Master inspeksi showroom belum dibuat",
+      emptyDescription: "Buat item pertama atau salin master dari cabang lain.",
+    }));
+  }
+
+  groups.forEach(([category, items], index) => {
+    section.append(DataTable({
+      shellId: `slrminsp_section_${index}_table_section`,
+      title: sectionLabel(category),
+      subtitle: `${items.length} item pada halaman ini, urut di dalam section.`,
+      icon: createIcon("clipboard", { className: "h-4 w-4" }),
+      columns: columns(actions),
+      rows: items,
+      mobileMode: "stack",
+      tableMinWidth: "min-w-[880px]",
+      getRowKey: (template) => template.id,
+      mobileCardId: (template) => `slrminsp_item_${template.id}_section`,
+      mobileCardTitle: (template) => template.item_name,
+      mobileCardSubtitle: (template) => sectionLabel(template.category_name),
+      mobileCardBadges: (template) => [statusBadge(template.is_active)],
+      mobileCardFields: (template) => [
+        { label: "Urutan di section", value: String(template.sort_order ?? 0) },
+        { label: "Keterangan", value: template.description || "Tanpa keterangan." },
+      ],
+      mobileCardActions: (template) => rowActions(template, actions),
+    }));
+  });
+
+  const pagination = DataTablePagination({
+    page: page.page,
+    totalPages: Math.max(1, Math.ceil(total / page.pageSize)),
+    totalItems: total,
+    perPage: page.pageSize,
+    itemLabel: "item",
+    onChange: actions.changePage,
+    onPerPageChange: actions.changePageSize,
+    onJump: actions.changePage,
+    buttonIds: {
+      previous: "slrminsp_prev_page_button",
+      next: "slrminsp_next_page_button",
+      jump: "slrminsp_jump_page_button",
+      page: (pageNumber) => `slrminsp_page_${pageNumber}_button`,
+    },
+    inputIds: {
+      perPage: "slrminsp_per_page_input",
+      jump: "slrminsp_jump_page_input",
+    },
+  });
+  if (pagination) {
+    section.append(pagination);
+  }
   return section;
 }
 
 function columns(actions) {
   return [
-    { key: "category_name", label: "Section", render: (template) => sectionLabel(template.category_name) },
     { key: "item_name", label: "Item", render: (template) => template.item_name },
     { key: "description", label: "Keterangan", render: (template) => template.description || "-" },
-    { key: "sort_order", label: "Urutan", render: (template) => String(template.sort_order ?? 0) },
+    { key: "sort_order", label: "Urutan di section", render: (template) => String(template.sort_order ?? 0) },
     { key: "is_active", label: "Status", render: (template) => statusBadge(template.is_active) },
     { key: "actions", label: "Aksi", render: (template) => rowActions(template, actions) },
   ];
@@ -378,7 +396,7 @@ function openEditor(template, actions) {
   form.id = formId;
   form.noValidate = true;
   form.className = "grid min-w-0 gap-3";
-  const section = selectControl("slrminsp_editor_section_input", SECTION_OPTIONS, template?.category_name ?? "road_test");
+  const section = selectControl("slrminsp_editor_section_input", sectionOptions(currentTemplates()), template?.category_name ?? "road_test");
   const item = inputControl("slrminsp_editor_item_name_input", template?.item_name ?? "", "Nama item inspeksi");
   const description = document.createElement("textarea");
   description.id = "slrminsp_editor_description_input";
@@ -390,9 +408,15 @@ function openEditor(template, actions) {
   description.setAttribute("aria-required", "true");
   description.placeholder = "Jelaskan keterangan item yang diperiksa";
   description.className = inputClass();
-  const order = inputControl("slrminsp_editor_sort_order_input", String(template?.sort_order ?? 0), "Urutan");
+  const order = inputControl("slrminsp_editor_sort_order_input", String(template?.sort_order ?? nextInspectionItemOrder(currentTemplates(), section.value)), "Urutan dalam section");
   order.type = "number";
   order.min = "0";
+  order.step = "1";
+  section.addEventListener("change", () => {
+    order.value = section.value === template?.category_name
+      ? String(template.sort_order)
+      : String(nextInspectionItemOrder(currentTemplates(), section.value));
+  });
   const active = document.createElement("input");
   active.id = "slrminsp_editor_active_input";
   active.name = "is_active";
@@ -402,7 +426,7 @@ function openEditor(template, actions) {
   const activeWrap = document.createElement("label");
   activeWrap.className = "flex items-center gap-2 rounded-xl border border-[var(--pb-card-border)] bg-gray-50 px-3 py-3 text-xs font-bold text-gray-700";
   activeWrap.append(active, document.createTextNode("Item aktif untuk flow inspeksi cabang"));
-  form.append(labelWrap("Section", section), labelWrap("Nama item", item), labelWrap("Keterangan *", description), labelWrap("Urutan", order), activeWrap);
+  form.append(labelWrap("Section", section), labelWrap("Nama item", item), labelWrap("Keterangan *", description), labelWrap("Urutan dalam section", order), activeWrap);
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     actions.save(template, form);
@@ -434,9 +458,9 @@ function openDetail(template) {
     detailRow("Section", sectionLabel(template.category_name)),
     detailRow("Nama item", template.item_name),
     detailRow("Keterangan", template.description || "Tanpa keterangan."),
-    detailRow("Urutan", String(template.sort_order ?? 0)),
+    detailRow("Urutan dalam section", String(template.sort_order ?? 0)),
     detailRow("Status", template.is_active ? "Aktif" : "Nonaktif"),
-    textNode("p", "rounded-xl border border-[var(--pb-card-border)] bg-gray-50 px-3 py-3 text-xs leading-6 text-gray-600", "Laporan inspeksi yang sudah tersimpan tetap menggunakan snapshot itemnya; perubahan ini berlaku untuk draft inspeksi baru."),
+    textNode("p", "rounded-xl border border-amber-200 bg-amber-50 px-3 py-3 text-xs leading-6 text-amber-900", "Catatan kompatibilitas: laporan lama menyimpan nama item, tetapi section dan urutannya masih mengikuti master saat ini. Perubahan master dapat mengubah pengelompokan atau urutan laporan lama."),
   );
   openModal(body, {
     key: DETAIL_MODAL_KEY,
@@ -471,7 +495,7 @@ function patchTemplates(templates) {
 }
 
 function normalizeTemplates(templates) {
-  return templates.map((template) => ({
+  const normalized = templates.map((template) => ({
     id: Number(template.id),
     showroom_id: template.showroom_id == null ? null : Number(template.showroom_id),
     category_name: String(template.category_name ?? "general"),
@@ -479,8 +503,17 @@ function normalizeTemplates(templates) {
     description: String(template.description ?? "").trim(),
     sort_order: Number(template.sort_order ?? 0),
     is_active: template.is_active !== false,
-  })).filter((template) => template.id > 0 && template.item_name)
-    .sort((left, right) => left.sort_order - right.sort_order || left.id - right.id);
+  })).filter((template) => template.id > 0 && template.item_name);
+  return sortInspectionTemplates(normalized, SECTION_OPTIONS.map(([key]) => key));
+}
+
+function sectionOptions(templates) {
+  const known = new Set(SECTION_OPTIONS.map(([key]) => key));
+  const custom = [...new Set(templates.map((template) => template.category_name))]
+    .filter((key) => !known.has(key))
+    .sort()
+    .map((key) => [key, sectionLabel(key)]);
+  return [...SECTION_OPTIONS, ...custom];
 }
 
 function filterTemplates(templates, query) {

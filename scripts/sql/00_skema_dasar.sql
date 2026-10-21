@@ -527,6 +527,14 @@ CREATE TABLE IF NOT EXISTS `transactions` (
   `affiliate_referral_code_snapshot` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `car_price` bigint NOT NULL,
   `payment_type` enum('dp','full') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `payment_method` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `manual_transfer_proof_path` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `manual_transfer_note` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `manual_transfer_submitted_at` datetime DEFAULT NULL,
+  `manual_transfer_confirmed_at` datetime DEFAULT NULL,
+  `manual_transfer_confirmed_by` bigint unsigned DEFAULT NULL,
+  `manual_transfer_rejected_at` datetime DEFAULT NULL,
+  `manual_transfer_rejected_reason` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `dp_amount` bigint DEFAULT NULL,
   `remaining_amount` bigint DEFAULT NULL,
   `transaction_status` enum('pending_payment','dp_paid','paid','completed','expired','cancelled','returned') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending_payment',
@@ -553,6 +561,38 @@ CREATE TABLE IF NOT EXISTS `transactions` (
   CONSTRAINT `fk_transactions_buyer_user_id` FOREIGN KEY (`buyer_user_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT `fk_transactions_car_id` FOREIGN KEY (`car_id`) REFERENCES `cars` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT `fk_transactions_seller_user_id` FOREIGN KEY (`seller_user_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `transaction_payment_operations` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `transaction_id` bigint unsigned NOT NULL,
+  `parent_operation_id` bigint unsigned DEFAULT NULL,
+  `operation_key` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `operation_type` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `provider_order_id` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `payment_method` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `gross_amount` bigint DEFAULT NULL,
+  `idempotency_key` varchar(46) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `operation_status` varchar(24) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `provider_status` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fence` bigint unsigned NOT NULL DEFAULT 0,
+  `lease_token` char(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `lease_expires_at` datetime DEFAULT NULL,
+  `first_attempt_at` datetime DEFAULT NULL,
+  `request_payload_json` longtext COLLATE utf8mb4_unicode_ci,
+  `response_payload_json` longtext COLLATE utf8mb4_unicode_ci,
+  `error_payload_json` longtext COLLATE utf8mb4_unicode_ci,
+  `late_success_at` datetime DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT NULL,
+  `completed_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_transaction_payment_operations_key` (`transaction_id`,`operation_key`),
+  KEY `idx_transaction_payment_operations_order` (`provider_order_id`),
+  KEY `idx_transaction_payment_operations_state` (`transaction_id`,`operation_type`,`operation_status`),
+  KEY `idx_transaction_payment_operations_parent` (`parent_operation_id`),
+  CONSTRAINT `fk_transaction_payment_operations_transaction` FOREIGN KEY (`transaction_id`) REFERENCES `transactions` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT `fk_transaction_payment_operations_parent` FOREIGN KEY (`parent_operation_id`) REFERENCES `transaction_payment_operations` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `user_auth_tokens` (

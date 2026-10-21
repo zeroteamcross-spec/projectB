@@ -271,6 +271,27 @@ body.${KELAS_AKTIF}{background:#f3fafc;overflow-x:clip}
   letter-spacing:-.02em;text-transform:uppercase;
 }
 
+/* --- Harga paket aktif ------------------------------------------------ */
+#carlynk_landing_root .ck-harga{padding:clamp(56px,7vw,96px) 0;background:linear-gradient(145deg,#003f46,#00636b 60%,#004950);color:#fff;scroll-margin-top:88px}
+#carlynk_landing_root .ck-harga__kepala{text-align:center;max-width:650px;margin:0 auto 30px}
+#carlynk_landing_root .ck-harga__kepala p{font-size:12px;font-weight:800;letter-spacing:.17em;color:#e7d1a9}
+#carlynk_landing_root .ck-harga__kepala h2{margin:10px 0;color:#fff}
+#carlynk_landing_root .ck-harga__kepala span{font-size:14px;line-height:1.7;color:#d7f0f1}
+#carlynk_landing_root .ck-harga__kisi{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:18px;align-items:stretch}
+#carlynk_landing_root .ck-harga__kartu{position:relative;display:flex;flex-direction:column;gap:7px;min-width:0;padding:26px;border:1px solid #93babb;border-radius:24px;background:#f8fcfb;color:#123f43;box-shadow:0 18px 36px rgba(0,27,31,.16)}
+#carlynk_landing_root .ck-harga__kartu--utama{border:3px solid #dbbb81;padding:24px;box-shadow:0 20px 42px rgba(0,25,28,.28)}
+#carlynk_landing_root .ck-harga__rekomendasi{align-self:flex-start;padding:5px 10px;border-radius:99px;background:#c1a372;color:#092d32;font-size:11px;font-weight:800}
+#carlynk_landing_root .ck-harga__kartu h3{margin-top:4px;font-size:20px;color:#003f46}
+#carlynk_landing_root .ck-harga__nominal{font-size:clamp(24px,2.4vw,32px);font-weight:800;color:#006069;overflow-wrap:anywhere}
+#carlynk_landing_root .ck-harga__periode{font-size:12px;font-weight:700;color:#5b6d6d}
+#carlynk_landing_root .ck-harga__kartu ul{display:grid;gap:10px;margin:14px 0 24px;padding:0;list-style:none;font-size:13px;line-height:1.5}
+#carlynk_landing_root .ck-harga__kartu li{display:flex;gap:9px;align-items:flex-start}
+#carlynk_landing_root .ck-harga__kartu li::before{content:"✓";font-weight:800;color:#087466}
+#carlynk_landing_root .ck-harga__kosong{margin:15px 0 25px;font-size:13px;color:#5b6d6d}
+#carlynk_landing_root .ck-harga__pilih{display:flex;align-items:center;justify-content:center;min-height:46px;margin-top:auto;padding:9px 16px;border-radius:12px;background:#00545d;color:#fff!important;font-size:13px;font-weight:800;text-align:center;transition:background .2s ease,transform .2s ease}
+#carlynk_landing_root .ck-harga__pilih:hover{background:#00747a;transform:translateY(-2px)}
+#carlynk_landing_root .ck-harga__belum{grid-column:1/-1;text-align:center;padding:26px;border:1px solid #93babb;border-radius:20px;background:#f8fcfb;color:#123f43}
+
 /* --- Penutup ---------------------------------------------------------- */
 #carlynk_landing_root .ck-penutup{
   background:linear-gradient(180deg,var(--ck-langit-1),var(--ck-langit-2));
@@ -294,11 +315,12 @@ body.${KELAS_AKTIF}{background:#f3fafc;overflow-x:clip}
 #carlynk_landing_root .ck-footer__kolom a{opacity:.92;transition:opacity .2s ease}
 #carlynk_landing_root .ck-footer__kolom a:hover{opacity:1;text-decoration:underline}
 #carlynk_landing_root .ck-footer__sosial{display:flex;gap:12px}
-#carlynk_landing_root .ck-footer__sosial a{
+#carlynk_landing_root .ck-footer__sosial a,#carlynk_landing_root .ck-footer__sosial button{
   width:34px;height:34px;border-radius:50%;background:#fff;color:var(--ck-teal);
-  display:grid;place-items:center;transition:transform .2s ease;
+  display:grid;place-items:center;transition:transform .2s ease;border:0;padding:0;
 }
 #carlynk_landing_root .ck-footer__sosial a:hover{transform:translateY(-2px)}
+#carlynk_landing_root .ck-footer__sosial button:disabled{opacity:.55;cursor:not-allowed}
 #carlynk_landing_root .ck-footer__sosial svg{width:19px;height:19px;fill:currentColor}
 #carlynk_landing_root .ck-footer__hak{margin-top:16px;font-size:14.5px;opacity:.88}
 

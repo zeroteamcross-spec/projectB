@@ -3,6 +3,11 @@ import { Input } from "../../../ui/primitives/input.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 import { appStore } from "../../../state/store.js";
 import { closeModal, openModal } from "../../../ui/primitives/modal.js";
+import {
+  PUBLIC_LOCATION_FILTER_INITIAL_CITY_COUNT,
+  publicLocationFilterView,
+  togglePublicLocationSelection,
+} from "./publicLocationFilterState.js";
 
 const FILTER_MODAL_KEY = "pub-local-filter-modal";
 
@@ -52,20 +57,7 @@ export function PublicFilterBottomSheet({
       active: String(filters.transmission ?? "") === item.value,
       onClick: (button, siblings) => syncSingleOptionButtons(button, siblings),
     })), "transmission"),
-    filterGroup("Lokasi", withEmptyOption(options.locations ?? [], "Semua lokasi").map((item) => ({
-      label: item.label,
-      value: item.value,
-      icon: "location",
-      active: item.value === "" ? draft.locations.length === 0 : draft.locations.includes(item.value),
-      onClick: (button, siblings) => {
-        if (item.value === "") {
-          draft.locations = [];
-        } else {
-          draft.locations = toggleValue(draft.locations, item.value);
-        }
-        syncMultiOptionButtons(siblings, draft.locations);
-      },
-    }))),
+    locationFilterGroup(options.locations ?? [], draft),
     numericFields(filters),
   );
 
@@ -147,6 +139,69 @@ function numericFields(filters) {
       placeholder: "Contoh 300000000",
     }),
   );
+  return section;
+}
+
+function locationFilterGroup(locations, draft) {
+  const section = document.createElement("section");
+  section.id = "pub_filter_location_section";
+  section.className = "grid min-w-0 gap-3";
+  const heading = textNode("h3", "text-xs font-black text-[var(--pb-text)]", "Lokasi");
+  const search = document.createElement("input");
+  search.id = "pub_filter_location_search_input";
+  search.type = "search";
+  search.placeholder = "Cari kota";
+  search.setAttribute("aria-label", "Cari kota");
+  search.autocomplete = "off";
+  search.className = "min-h-10 w-full rounded-xl border border-[var(--pb-border)] bg-white px-3 py-2 text-xs text-[var(--pb-text-strong)] outline-none focus:border-[var(--pb-brand-primary)]";
+  const grid = document.createElement("div");
+  grid.id = "pub_filter_location_options";
+  grid.className = "grid grid-cols-2 gap-2 sm:grid-cols-3";
+  const toggle = Button({ label: "Tampilkan Semua Kota", variant: "netral" });
+  toggle.id = "pub_filter_location_show_all_button";
+  toggle.classList.add("w-fit", "min-h-9", "px-3", "text-xs");
+  let expanded = false;
+  const allLocations = [...new Set(locations.map(String).map((city) => city.trim()).filter(Boolean))];
+
+  function renderOptions() {
+    const { matches, cities } = publicLocationFilterView(allLocations, {
+      query: search.value,
+      expanded,
+      selected: draft.locations,
+    });
+    const choices = withEmptyOption(cities, "Semua lokasi");
+    grid.replaceChildren();
+    choices.forEach(({ value, label }) => {
+      const active = value === "" ? draft.locations.length === 0 : draft.locations.includes(value);
+      const button = document.createElement("button");
+      button.type = "button";
+      button.dataset.active = String(active);
+      button.dataset.value = value;
+      button.setAttribute("aria-pressed", String(active));
+      button.className = optionButtonClassName(active);
+      button.append(iconBox({ icon: "location" }), textNode("span", "min-w-0 truncate text-left", label));
+      button.addEventListener("click", () => {
+        draft.locations = value === "" ? [] : togglePublicLocationSelection(draft.locations, value, cities);
+        renderOptions();
+      });
+      grid.append(button);
+    });
+    if (!matches.length) {
+      grid.append(textNode("p", "col-span-full text-xs text-[var(--pb-text-muted)]", "Kota tidak ditemukan."));
+    }
+    toggle.hidden = matches.length <= PUBLIC_LOCATION_FILTER_INITIAL_CITY_COUNT;
+    toggle.textContent = expanded ? "Tampilkan Lebih Sedikit" : "Tampilkan Semua Kota";
+    toggle.setAttribute("aria-expanded", String(expanded));
+    toggle.setAttribute("aria-controls", grid.id);
+  }
+
+  search.addEventListener("input", renderOptions);
+  toggle.addEventListener("click", () => {
+    expanded = !expanded;
+    renderOptions();
+  });
+  section.append(heading, search, grid, toggle);
+  renderOptions();
   return section;
 }
 

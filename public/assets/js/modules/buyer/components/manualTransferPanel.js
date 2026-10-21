@@ -7,6 +7,7 @@ export function ManualTransferPanel({
   isSubmitting = false,
   error = "",
   onSubmit = null,
+  existingForm = null,
 } = {}) {
   const manualTransfer = transaction?.manual_transfer ?? {};
   const bank = manualTransfer.bank ?? {};
@@ -23,7 +24,7 @@ export function ManualTransferPanel({
   title.className = "text-base font-bold tracking-normal text-gray-950";
   title.textContent = "Transfer Booking Fee ke Rekening Showroom";
   header.append(eyebrow, title);
-  section.append(header, bankDetailBlock(bank, transaction));
+  section.append(header, bankDetailBlock(bank, transaction, Boolean(manualTransfer.proof_path)));
 
   if (manualTransfer.rejected_reason) {
     section.append(rejectionNotice(manualTransfer.rejected_reason));
@@ -32,13 +33,17 @@ export function ManualTransferPanel({
   if (manualTransfer.proof_path && !manualTransfer.rejected_reason) {
     section.append(waitingConfirmationNotice(manualTransfer));
   } else {
-    section.append(uploadForm({ isSubmitting, error, onSubmit }));
+    const form = existingForm?.dataset.transactionId === String(transaction?.id)
+      ? existingForm
+      : uploadForm({ transactionId: transaction?.id, onSubmit });
+    updateUploadForm(form, { isSubmitting, error });
+    section.append(form);
   }
 
   return section;
 }
 
-function bankDetailBlock(bank, transaction) {
+function bankDetailBlock(bank, transaction, hasProof) {
   const box = document.createElement("div");
   box.id = "byrpay_manual_transfer_bank_block";
   box.className = "grid gap-2 rounded-2xl border border-[color-mix(in_srgb,var(--pb-brand-primary)_24%,white)] bg-[color-mix(in_srgb,var(--pb-brand-primary)_8%,white)] px-4 py-3 text-xs";
@@ -72,7 +77,9 @@ function bankDetailBlock(bank, transaction) {
 
   const hint = document.createElement("p");
   hint.className = "text-[10px] leading-5 text-gray-600";
-  hint.textContent = "Transfer sesuai nominal persis, lalu unggah bukti transfernya di bawah ini.";
+  hint.textContent = hasProof
+    ? "Bukti transfer sudah dikirim. Tunggu showroom memeriksa rekening tujuan."
+    : "Transfer sesuai nominal persis, lalu unggah bukti transfernya di bawah ini.";
   box.append(hint);
 
   return box;
@@ -109,14 +116,15 @@ function waitingConfirmationNotice(manualTransfer) {
   return box;
 }
 
-function uploadForm({ isSubmitting, error, onSubmit }) {
+function uploadForm({ transactionId, onSubmit }) {
   const form = document.createElement("form");
   form.id = "byrpay_manual_transfer_upload_form";
+  form.dataset.transactionId = String(transactionId ?? "");
   form.className = "grid gap-3";
 
   const fileLabel = document.createElement("label");
   fileLabel.className = "grid gap-1 text-xs font-bold text-gray-800";
-  fileLabel.textContent = "Bukti transfer (jpg, png, atau pdf, maks 5 MB)";
+  fileLabel.textContent = "Bukti transfer (jpg, png, webp, atau pdf, maks 5 MB)";
 
   const fileInput = document.createElement("input");
   fileInput.id = "byrpay_manual_transfer_proof_input";
@@ -140,18 +148,9 @@ function uploadForm({ isSubmitting, error, onSubmit }) {
 
   form.append(fileLabel, noteLabel);
 
-  if (error) {
-    const message = document.createElement("p");
-    message.id = "byrpay_manual_transfer_upload_error";
-    message.className = tw.alert.error;
-    message.textContent = error;
-    form.append(message);
-  }
-
   const submit = Button({
-    label: isSubmitting ? "Mengunggah..." : "Unggah Bukti Transfer",
+    label: "Unggah Bukti Transfer",
     variant: "primary",
-    disabled: isSubmitting,
   });
   submit.id = "byrpay_manual_transfer_submit_button";
   submit.type = "submit";
@@ -168,4 +167,22 @@ function uploadForm({ isSubmitting, error, onSubmit }) {
   });
 
   return form;
+}
+
+function updateUploadForm(form, { isSubmitting, error }) {
+  const submit = form.querySelector("#byrpay_manual_transfer_submit_button");
+  submit.disabled = isSubmitting;
+  submit.textContent = isSubmitting ? "Mengunggah..." : "Unggah Bukti Transfer";
+  let message = form.querySelector("#byrpay_manual_transfer_upload_error");
+  if (!error) {
+    message?.remove();
+    return;
+  }
+  if (!message) {
+    message = document.createElement("p");
+    message.id = "byrpay_manual_transfer_upload_error";
+    message.className = tw.alert.error;
+    form.insertBefore(message, submit);
+  }
+  message.textContent = error;
 }

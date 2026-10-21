@@ -9,9 +9,7 @@ export function SellerImageUploadQueueModal({
   onStart = null,
   onRetryFailed = null,
   onClose = null,
-  onEdit = null,
   onRemove = null,
-  onToggleCover = null,
   showActions = true,
 } = {}) {
   const section = document.createElement("section");
@@ -71,7 +69,7 @@ export function SellerImageUploadQueueModal({
   list.className = "grid max-h-[48vh] min-w-0 gap-3 overflow-y-auto pr-1";
   if (queue.length) {
     queue.forEach((item) => {
-      list.append(queueItem(item, { uploading, onEdit, onRemove, onToggleCover }));
+      list.append(queueItem(item, { uploading, onRemove }));
     });
   } else {
     const empty = document.createElement("section");
@@ -136,11 +134,19 @@ export function SellerImageUploadQueueFooter({
   onRetryFailed = null,
   onClose = null,
 } = {}) {
-  const summary = queueSummary(queue);
+  const blocker = queueSaveBlocker(queue, uploading);
   const actions = document.createElement("section");
   actions.id = "slri_queue_actions_section";
-  actions.className = "flex w-full flex-col-reverse gap-2 sm:flex-row sm:flex-wrap sm:justify-end";
-  const hasQueued = queue.some((item) => canUpload(item));
+  actions.className = "grid w-full gap-2";
+  const guidance = document.createElement("p");
+  guidance.className = "text-xs font-semibold text-[var(--pb-text-muted)]";
+  guidance.setAttribute("aria-live", "polite");
+  guidance.textContent = blocker || (queue.length
+    ? "Semua foto dalam antrean berhasil diupload. Simpan untuk menutup."
+    : "Belum ada foto di antrean. Pilih foto, atau Simpan untuk menutup.");
+  const buttons = document.createElement("div");
+  buttons.className = "flex flex-col-reverse gap-2 sm:flex-row sm:flex-wrap sm:justify-end";
+  const hasQueued = queue.some((item) => ["queued", "ready"].includes(item.status));
   const hasFailed = queue.some((item) => item.status === "failed");
   const retry = Button({
     label: "Upload Ulang yang gagal",
@@ -158,9 +164,9 @@ export function SellerImageUploadQueueFooter({
   start.id = "slri_queue_start_upload_button";
   start.prepend(createIcon(uploading ? "clock" : "upload", { className: "h-4 w-4" }));
   const done = Button({
-    label: summary.inProgress ? "Tunggu proses selesai" : "Tutup",
-    variant: "secondary",
-    disabled: summary.inProgress,
+    label: "Simpan",
+    variant: "ya",
+    disabled: Boolean(blocker),
     onClick: (event) => {
       event?.preventDefault?.();
       event?.stopPropagation?.();
@@ -169,11 +175,33 @@ export function SellerImageUploadQueueFooter({
   });
   done.id = "slri_queue_done_button";
   done.prepend(createIcon("circleCheck", { className: "h-4 w-4" }));
-  actions.append(retry, start, done);
+  buttons.append(retry, start, done);
+  actions.append(guidance, buttons);
   return actions;
 }
 
-function queueItem(item, { uploading, onEdit, onRemove, onToggleCover }) {
+export function queueSaveBlocker(queue = [], uploading = false) {
+  if (uploading || queue.some((item) => item.status === "uploading")) {
+    return "Tunggu upload selesai sebelum menyimpan.";
+  }
+
+  const steps = [];
+  if (queue.some((item) => item.status === "invalid")) {
+    steps.push("Hapus file tidak valid, lalu pilih ulang foto yang sesuai.");
+  }
+  if (queue.some((item) => item.status === "failed")) {
+    steps.push("Klik Upload Ulang yang gagal, atau Hapus foto yang tidak ingin diupload.");
+  }
+  if (queue.some((item) => ["queued", "ready"].includes(item.status))) {
+    steps.push("Klik Mulai Upload untuk foto yang masih menunggu.");
+  }
+  if (queue.some((item) => !["invalid", "failed", "queued", "ready", "success"].includes(item.status))) {
+    steps.push("Selesaikan atau hapus foto yang belum berhasil diupload.");
+  }
+  return steps.join(" ");
+}
+
+function queueItem(item, { uploading, onRemove }) {
   const card = document.createElement("section");
   card.id = `slri_queue_modal_item_${safeId(item.id)}_section`;
   card.className = "grid min-w-0 gap-3 rounded-[var(--pb-radius-xl)] border border-[var(--pb-border)] bg-white p-3 shadow-sm sm:grid-cols-[96px_minmax(0,1fr)]";
@@ -207,23 +235,6 @@ function queueItem(item, { uploading, onEdit, onRemove, onToggleCover }) {
 
   const actions = document.createElement("section");
   actions.className = "flex flex-wrap items-center gap-2";
-  const cover = document.createElement("label");
-  cover.className = "inline-flex min-h-10 items-center gap-2 rounded-lg border border-[var(--pb-border)] bg-[var(--pb-surface-muted)] px-3 text-[10px] font-bold text-[var(--pb-text-strong)]";
-  const coverInput = document.createElement("input");
-  coverInput.type = "checkbox";
-  coverInput.checked = Boolean(item.isCover);
-  coverInput.disabled = uploading || ["uploading", "success", "invalid"].includes(item.status);
-  coverInput.addEventListener("change", () => onToggleCover?.(item, coverInput.checked));
-  cover.append(coverInput, document.createTextNode("Cover"));
-
-  const edit = Button({
-    label: "Edit",
-    variant: "secondary",
-    disabled: uploading || ["uploading", "success", "invalid"].includes(item.status),
-    onClick: () => onEdit?.(item),
-  });
-  edit.id = `slri_queue_edit_${safeId(item.id)}_button`;
-  edit.prepend(createIcon("edit", { className: "h-4 w-4" }));
   const remove = Button({
     label: "Hapus",
     variant: "danger",
@@ -232,7 +243,7 @@ function queueItem(item, { uploading, onEdit, onRemove, onToggleCover }) {
   });
   remove.id = `slri_queue_remove_${safeId(item.id)}_button`;
   remove.prepend(createIcon("trash", { className: "h-4 w-4" }));
-  actions.append(cover, edit, remove);
+  actions.append(remove);
   body.append(actions);
 
   card.append(preview, body);
@@ -263,10 +274,6 @@ function calculateTotalProgress(queue) {
   }
   const total = queue.reduce((sum, item) => sum + Number(item.progress ?? 0), 0);
   return Math.round(total / queue.length);
-}
-
-function canUpload(item) {
-  return ["queued", "ready", "failed"].includes(item.status);
 }
 
 function summaryMetric(label, value) {

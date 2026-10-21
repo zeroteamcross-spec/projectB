@@ -12,6 +12,9 @@ export function SellerCarsList({
   onArchive = null,
   onImages = null,
   onInspection = null,
+  onPreview = null,
+  canCreateOfflineBooking = null,
+  onOfflineBooking = null,
   onMarkSoldExternal = null,
   pagination = null,
 } = {}) {
@@ -25,7 +28,7 @@ export function SellerCarsList({
     title: "Daftar mobil",
     subtitle: `${cars.length} listing cocok dengan filter aktif`,
     icon: tableIcon(),
-    columns: carColumns({ onEdit, onArchive, onImages, onInspection, onMarkSoldExternal }),
+    columns: carColumns({ onEdit, onArchive, onImages, onInspection, onPreview, canCreateOfflineBooking, onOfflineBooking, onMarkSoldExternal }),
     rows: cars,
     emptyTitle: "Mobil belum tersedia",
     emptyDescription: "Buat listing mobil pertama agar buyer bisa melihat katalog dari showroom.",
@@ -45,7 +48,7 @@ export function SellerCarsList({
       { label: "Lokasi", value: car.location_name || "-" },
       ...(car.external_sale_note ? [{ label: "Keterangan terjual (luar sistem)", value: car.external_sale_note }] : []),
     ],
-    mobileCardActions: (car) => actionButtons(car, { onEdit, onArchive, onImages, onInspection, onMarkSoldExternal }),
+    mobileCardActions: (car) => actionButtons(car, { onEdit, onArchive, onImages, onInspection, onPreview, canCreateOfflineBooking, onOfflineBooking, onMarkSoldExternal }),
     pagination,
   }));
 
@@ -63,7 +66,7 @@ export function SellerCarsList({
   return shell;
 }
 
-function carColumns({ onEdit, onArchive, onImages, onInspection, onMarkSoldExternal }) {
+function carColumns({ onEdit, onArchive, onImages, onInspection, onPreview, canCreateOfflineBooking, onOfflineBooking, onMarkSoldExternal }) {
   return [
     {
       label: "Mobil",
@@ -117,12 +120,12 @@ function carColumns({ onEdit, onArchive, onImages, onInspection, onMarkSoldExter
       label: "Aksi",
       key: "actions",
       cellClassName: "px-4 py-4 align-top",
-      render: (car) => actionButtons(car, { onEdit, onArchive, onImages, onInspection, onMarkSoldExternal }),
+      render: (car) => actionButtons(car, { onEdit, onArchive, onImages, onInspection, onPreview, canCreateOfflineBooking, onOfflineBooking, onMarkSoldExternal }),
     },
   ];
 }
 
-function actionButtons(car, { onEdit, onArchive, onImages, onInspection, onMarkSoldExternal }) {
+function actionButtons(car, { onEdit, onArchive, onImages, onInspection, onPreview, canCreateOfflineBooking, onOfflineBooking, onMarkSoldExternal }) {
   const carId = car?.id ?? "unknown";
   const actions = document.createElement("section");
   actions.id = `slrc_car_actions_${carId}_section`;
@@ -140,7 +143,26 @@ function actionButtons(car, { onEdit, onArchive, onImages, onInspection, onMarkS
   inspection.id = `slrc_car_inspection_button_${carId}`;
   inspection.prepend(createIcon("eye", { className: "h-4 w-4" }));
 
-  actions.append(edit, images, inspection);
+  const preview = Button({ label: "Live Preview", variant: "secondary", onClick: () => onPreview?.(car) });
+  preview.id = `slrc_car_live_preview_button_${carId}`;
+  preview.prepend(createIcon("eye", { className: "h-4 w-4" }));
+
+  actions.append(edit, images, inspection, preview);
+
+  if (canCreateOfflineBooking?.(car)) {
+    const feeValid = Number.isSafeInteger(Number(car.dp_amount)) && Number(car.dp_amount) > 0;
+    const booking = Button({
+      label: "Booking Offline",
+      variant: "primary",
+      disabled: !feeValid,
+      onClick: () => onOfflineBooking?.(car),
+    });
+    booking.id = `slrc_offline_booking_button_${carId}`;
+    if (!feeValid) {
+      booking.title = "Isi Booking Fee yang valid pada listing mobil terlebih dahulu.";
+    }
+    actions.append(booking);
+  }
 
   if (car.listing_status !== "archived") {
     const archive = Button({ label: "Keluarkan dari Listing", variant: "danger", onClick: () => onArchive?.(car) });

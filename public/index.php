@@ -55,20 +55,50 @@ function serveSpaShell(string $basePath, string $publicPath, string $path): bool
     if ($method !== 'HEAD') {
         $theme = loadThemeConfig($basePath);
         $customDomainShowroomSlug = customDomainShowroomSlug($basePath, $path);
-        $html = str_replace('__ASSET_VER__', assetVersionToken($publicPath), $html);
+        $reservedRoutePrefixes = null;
+        try {
+            require_once $basePath . DIRECTORY_SEPARATOR . 'bootstrap' . DIRECTORY_SEPARATOR . 'helpers.php';
+            require_once $basePath . DIRECTORY_SEPARATOR . 'bootstrap' . DIRECTORY_SEPARATOR . 'autoload.php';
+            $reservedRoutePrefixes = \App\Modules\Showrooms\Services\SystemRouteSlugRegistry::reservedPrefixes();
+        } catch (Throwable $exception) {
+            error_log('Unable to derive reserved showroom route prefixes: ' . $exception->getMessage());
+        }
+        $assetVersion = assetVersionToken($publicPath);
+        $html = str_replace('__ASSET_VER__', $assetVersion, $html);
         $html = str_replace('__ROLE_HOSTS__', roleHostsJson(), $html);
         $html = str_replace('__CUSTOM_DOMAIN_SERVER_IP__', customDomainServerIp(), $html);
         $html = str_replace('__CUSTOM_DOMAIN_SHOWROOM_SLUG__', json_encode($customDomainShowroomSlug, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?: '""', $html);
+        $html = \App\Modules\Showrooms\Services\PublicRouteSlugBootstrap::injectIntoHtml(
+            $html,
+            $reservedRoutePrefixes
+        );
         $html = str_replace('__THEME_CONFIG__', themeConfigJson($theme), $html);
         $metadata = loadPublicWebConfigMetadata($theme);
+        $normalizedPath = '/' . trim($path, '/');
+        $normalizedPath = $normalizedPath === '/' ? '/' : $normalizedPath;
+        $isMainRegistrationPage = $normalizedPath === '/daftar-showroom'
+            && $customDomainShowroomSlug === ''
+            && isMainCarlynkHost();
+        if ($isMainRegistrationPage) {
+            $metadata['app_name'] = 'carlynk.id';
+            $metadata['tagline'] = 'Pendaftaran showroom Carlynk';
+            $metadata['icon_url'] = '/assets/v-' . $assetVersion . '/images/landing/favicon-carlynk.png';
+        }
         $metadataPath = $customDomainShowroomSlug !== ''
             ? '/' . rawurlencode($customDomainShowroomSlug) . ($path === '/' ? '' : $path)
             : $path;
         $ownBranding = array_filter(
-            loadShowroomShareMetadata($basePath, $metadataPath),
+            loadShowroomShareMetadata(
+                $basePath,
+                $metadataPath,
+                is_array($reservedRoutePrefixes) ? $reservedRoutePrefixes : [],
+                $customDomainShowroomSlug !== '' ? $customDomainShowroomSlug : null
+            ),
             static fn ($value) => $value !== ''
         );
-        $tabTitleOverride = $path === '/' && $customDomainShowroomSlug === '' && isMainCarlynkHost()
+        $tabTitleOverride = ($normalizedPath === '/' || $isMainRegistrationPage)
+            && $customDomainShowroomSlug === ''
+            && isMainCarlynkHost()
             ? 'carlynk.id'
             : null;
         echo injectPublicMetadata($html, array_merge($metadata, $ownBranding), $tabTitleOverride);
@@ -131,39 +161,28 @@ function isCustomDomainShowroomRequestPath(string $path): bool
  * caranya sendiri -- fungsi ini cuma mengisi apa yang dilihat SEBELUM JS itu
  * sempat jalan.
  *
- * Daftar kata yang dilewati harus sejalan dengan
- * ShowroomService::RESERVED_SLUGS -- itu yang mencegah showroom memilih slug
- * yang bentrok dengan rute sistem ini sejak awal.
+ * Prefix berasal dari route SPA/API dan entri document-root publik aktual,
+ * sama dengan validasi slug showroom. Slug dari custom-domain aktif diteruskan
+ * sebagai konteks tepercaya supaya slug legacy tetap mendapat branding SSR.
  */
-function loadShowroomShareMetadata(string $basePath, string $path): array
+function loadShowroomShareMetadata(
+    string $basePath,
+    string $path,
+    array $registeredRoutePrefixes = [],
+    ?string $trustedCustomDomainSlug = null
+): array
 {
-    static $reservedSlugs = [
-        'admin', 'super-admin', 'seller', 'buyer', 'affiliate',
-        'login', 'google-login', 'auth', 'api', 'cars', 'transactions',
-        'profile', 'notifications', 'public', 'showrooms', 'af', 'a', 's',
-        'daftar-showroom', 'saas-landing', 'carlynk-landing', 'contoh-katalog', 'health',
-        'uploads', 'assets', 'tester', 'app',
-    ];
-    static $showroomOnlySubPaths = ['cars', 'transactions', 'login'];
-
-    $segments = array_values(array_filter(explode('/', $path), static fn ($segment) => $segment !== ''));
-    if ($segments === []) {
+    if ($registeredRoutePrefixes === [] && trim((string) $trustedCustomDomainSlug) === '') {
         return [];
     }
 
-    $slug = null;
-    $referralCode = null;
-
-    if (in_array($segments[0], ['showrooms', 's'], true) && isset($segments[1])) {
-        $slug = rawurldecode($segments[1]);
-    } elseif (in_array($segments[0], ['af', 'a'], true) && isset($segments[1])) {
-        $referralCode = rawurldecode($segments[1]);
-    } elseif (! in_array($segments[0], $reservedSlugs, true)) {
-        $slug = rawurldecode($segments[0]);
-        if (isset($segments[1]) && ! in_array($segments[1], $showroomOnlySubPaths, true)) {
-            $referralCode = rawurldecode($segments[1]);
-        }
-    }
+    $metadataTarget = \App\Modules\Showrooms\Services\ShowroomMetadataTargetResolver::resolve(
+        $path,
+        $registeredRoutePrefixes,
+        $trustedCustomDomainSlug
+    );
+    $slug = $metadataTarget['slug'];
+    $referralCode = $metadataTarget['referral_code'];
 
     if ($slug === null && $referralCode === null) {
         return [];

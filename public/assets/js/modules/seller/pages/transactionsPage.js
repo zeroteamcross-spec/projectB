@@ -12,6 +12,7 @@ import { sellerTransactionService } from "../services/sellerTransactionService.j
 import { SellerTransactionSummaryCards } from "../components/sellerTransactionSummaryCards.js";
 import { SellerTransactionsList } from "../components/sellerTransactionsList.js";
 import { SellerTransactionDetailPanel } from "../components/sellerTransactionDetailPanel.js";
+import { localPaidAtValue } from "../components/sellerOfflinePaymentFields.js";
 
 const DEFAULT_QUERY = {
   keyword: "",
@@ -45,6 +46,10 @@ export function SellerTransactionsPage() {
     isCancelling: false,
     isReturning: false,
     isConfirmingManualTransfer: false,
+    offlinePaymentOpen: false,
+    offlinePaymentDraft: {},
+    offlinePaymentError: "",
+    isRecordingOfflinePayment: false,
   };
 
   const rerender = () => render(root, currentContext, state, actions);
@@ -154,6 +159,9 @@ export function SellerTransactionsPage() {
       rerender();
     },
     openDetail(transaction) {
+      if (String(state.query.transactionId ?? "") !== String(transaction?.id ?? "")) {
+        resetOfflinePaymentForm(state);
+      }
       state.query = {
         ...state.query,
         transactionId: transaction?.id ?? "",
@@ -163,6 +171,7 @@ export function SellerTransactionsPage() {
       rerender();
     },
     closeDetail() {
+      resetOfflinePaymentForm(state);
       state.query = {
         ...state.query,
         transactionId: "",
@@ -308,6 +317,63 @@ export function SellerTransactionsPage() {
         rerender();
       }
     },
+    openOfflinePayment(transaction) {
+      if (!sellerTransactionService.canRecordOfflinePayment(transaction)) {
+        return;
+      }
+      state.offlinePaymentOpen = true;
+      state.offlinePaymentDraft = {
+        payment_amount: transaction.dp_amount,
+        paid_at: localPaidAtValue(),
+        note: "",
+      };
+      state.offlinePaymentError = "";
+      rerender();
+    },
+    closeOfflinePayment() {
+      if (state.isRecordingOfflinePayment) {
+        return;
+      }
+      resetOfflinePaymentForm(state);
+      rerender();
+    },
+    patchOfflinePayment(patch = {}) {
+      state.offlinePaymentDraft = {
+        ...state.offlinePaymentDraft,
+        ...patch,
+      };
+    },
+    async recordOfflinePayment(transaction, payload) {
+      if (state.isRecordingOfflinePayment || !sellerTransactionService.canRecordOfflinePayment(transaction)) {
+        return;
+      }
+
+      state.isRecordingOfflinePayment = true;
+      state.offlinePaymentError = "";
+      rerender();
+
+      try {
+        const updated = await sellerTransactionService.recordOfflinePayment(transaction.id, payload);
+        if (!updated?.id) {
+          throw new Error("Respons pembayaran offline tidak memuat transaksi.");
+        }
+
+        const fresh = await sellerTransactionService.detail(transaction.id).catch(() => updated);
+        const current = fresh ?? updated;
+        syncBusinessTransaction(current, {
+          primaryRole: "seller",
+          source: "seller-transactions:offline-payment",
+        });
+        resetOfflinePaymentForm(state);
+        showToast("Pembayaran offline berhasil dicatat.", { type: "success" });
+      } catch (error) {
+        state.offlinePaymentError = error?.message || "Gagal mencatat pembayaran offline.";
+        showToast(state.offlinePaymentError, { type: "error" });
+      } finally {
+        state.isRecordingOfflinePayment = false;
+        rerender();
+      }
+    },
   };
 
   return createPageLifecycle({
@@ -323,7 +389,11 @@ export function SellerTransactionsPage() {
     },
     hydrate(context) {
       currentContext = context;
-      state.query = createTransactionsQuery(context?.query);
+      const nextQuery = createTransactionsQuery(context?.query);
+      if (String(nextQuery.transactionId ?? "") !== String(state.query.transactionId ?? "")) {
+        resetOfflinePaymentForm(state);
+      }
+      state.query = nextQuery;
       rerender();
       startPolling();
     },
@@ -519,6 +589,14 @@ function openTransactionModal({ transaction, actions }) {
     isConfirmingManualTransfer: Boolean(flags.isConfirmingManualTransfer),
     onConfirmManualTransfer: () => actions.confirmManualTransfer?.(transaction),
     onRejectManualTransfer: () => actions.rejectManualTransfer?.(transaction),
+    offlinePaymentOpen: Boolean(flags.offlinePaymentOpen),
+    offlinePaymentDraft: flags.offlinePaymentDraft ?? {},
+    offlinePaymentSaving: Boolean(flags.isRecordingOfflinePayment),
+    offlinePaymentError: flags.offlinePaymentError ?? "",
+    onOpenOfflinePayment: () => actions.openOfflinePayment?.(transaction),
+    onCloseOfflinePayment: () => actions.closeOfflinePayment?.(),
+    onOfflinePaymentChange: (patch) => actions.patchOfflinePayment?.(patch),
+    onSubmitOfflinePayment: (payload) => actions.recordOfflinePayment?.(transaction, payload),
   }), "seller.transactions.detail"));
 
   openModal(content, {
@@ -541,6 +619,12 @@ function closeTransactionModal() {
   if (modal?.key === "slrtx-detail-modal") {
     closeModal({ notify: false });
   }
+}
+
+function resetOfflinePaymentForm(state) {
+  state.offlinePaymentOpen = false;
+  state.offlinePaymentDraft = {};
+  state.offlinePaymentError = "";
 }
 
 function transactionsHero({ transactions, filteredTransactions, onDashboard }) {

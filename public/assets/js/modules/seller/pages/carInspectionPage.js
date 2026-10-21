@@ -171,10 +171,8 @@ function render(root, router, params) {
 function floatingSaveButton({ saving = false, disabled = false, onClick = null } = {}) {
   const wrap = document.createElement("section");
   wrap.id = "slrinsp_floating_save_section";
-  // left-4, bukan right-4 -- tombol toggle sidebar mobile global (AppShell)
-  // duduk fixed di bottom-right dengan z-index lebih tinggi, jadi kalau tombol
-  // ini juga di kanan, ia akan tertutup toggle itu di layar sempit.
-  wrap.className = "fixed bottom-5 left-4 z-40 sm:bottom-6 sm:left-6";
+  // Tombol sidebar mobile berada di kanan bawah; beri ruang di atasnya.
+  wrap.className = "fixed bottom-24 right-4 z-40 md:bottom-6 md:right-6";
 
   const button = Button({
     label: saving ? "Menyimpan..." : "Simpan Inspeksi",

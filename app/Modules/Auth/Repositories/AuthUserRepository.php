@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Modules\Auth\Repositories;
 
+use App\Core\Exceptions\ValidationException;
 use PDO;
+use PDOException;
 
 class AuthUserRepository
 {
@@ -30,6 +32,23 @@ class AuthUserRepository
         $user = $stmt->fetch();
 
         return $user ?: null;
+    }
+
+    public function findBuyerByUsername(string $username): ?array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT * FROM users
+             WHERE buyer_username = :buyer_username
+             AND role = :role
+             AND deleted_at IS NULL
+             LIMIT 1'
+        );
+        $stmt->execute([
+            'buyer_username' => $username,
+            'role' => 'buyer',
+        ]);
+
+        return $stmt->fetch() ?: null;
     }
 
     public function findById(int $id): ?array
@@ -87,6 +106,116 @@ class AuthUserRepository
         ]);
 
         return (int) $this->pdo->lastInsertId();
+    }
+
+    /**
+     * Create an active Buyer without starting a transaction; the booking caller
+     * must own the transaction so account and booking can commit together.
+     */
+    public function createBuyerWithCredentials(
+        string $name,
+        ?string $phoneNumber,
+        ?string $buyerUsername,
+        string $passwordHash,
+        ?string $email = null
+    ): int {
+        $name = trim($name);
+        $phoneNumber = $phoneNumber !== null ? trim($phoneNumber) : null;
+        $phoneNumber = $phoneNumber !== '' ? $phoneNumber : null;
+        $buyerUsername = $buyerUsername !== null ? strtolower(trim($buyerUsername)) : null;
+        $buyerUsername = $buyerUsername !== '' ? $buyerUsername : null;
+        $email = $email !== null ? strtolower(trim($email)) : null;
+        $email = $email !== '' ? $email : null;
+
+        $errors = [];
+        if ($name === '' || strlen($name) > 200) {
+            $errors['name'] = 'Nama Buyer wajib diisi dan maksimal 200 karakter.';
+        }
+        if ($phoneNumber !== null && strlen($phoneNumber) > 25) {
+            $errors['phone_number'] = 'Nomor kontak Buyer maksimal 25 karakter.';
+        }
+        if ($email !== null && (strlen($email) > 100 || ! filter_var($email, FILTER_VALIDATE_EMAIL))) {
+            $errors['email'] = 'Email Buyer tidak valid atau terlalu panjang.';
+        }
+        if ($buyerUsername !== null && ! preg_match('/^[a-z0-9][a-z0-9._-]{2,49}$/', $buyerUsername)) {
+            $errors['buyer_username'] = 'Username Buyer harus 3-50 karakter: huruf kecil, angka, titik, garis bawah, atau dash.';
+        }
+        if ($email === null && $buyerUsername === null) {
+            $errors['buyer_username'] = 'Username atau email Buyer wajib diisi.';
+        }
+        if ($phoneNumber === null && $email === null) {
+            $errors['phone_number'] = 'Nomor kontak atau email Buyer wajib diisi.';
+        }
+        if (strlen($passwordHash) > 255 || (password_get_info($passwordHash)['algoName'] ?? 'unknown') === 'unknown') {
+            $errors['password_hash'] = 'Password Buyer harus berupa hash yang valid.';
+        }
+        if ($errors !== []) {
+            throw new ValidationException($errors);
+        }
+
+        $this->ensureBuyerIdentifiersAvailable($email, $buyerUsername);
+
+        $now = date('Y-m-d H:i:s');
+        $stmt = $this->pdo->prepare(
+            'INSERT INTO users
+                (role, name, phone_number, email, buyer_username, password_hash,
+                 account_status, is_approved, created_at)
+             VALUES
+                (:role, :name, :phone_number, :email, :buyer_username, :password_hash,
+                 :account_status, :is_approved, :created_at)'
+        );
+
+        try {
+            $stmt->execute([
+                'role' => 'buyer',
+                'name' => $name,
+                'phone_number' => $phoneNumber,
+                'email' => $email,
+                'buyer_username' => $buyerUsername,
+                'password_hash' => $passwordHash,
+                'account_status' => 'active',
+                'is_approved' => 1,
+                'created_at' => $now,
+            ]);
+        } catch (PDOException $exception) {
+            if (($exception->errorInfo[0] ?? $exception->getCode()) === '23000') {
+                // A concurrent insert can win after our preflight check. The
+                // losing transaction may still have an older read snapshot.
+                $message = $exception->getMessage();
+                if ($email !== null && (stripos($message, 'uq_users_email') !== false
+                    || stripos($message, 'users.email') !== false)) {
+                    throw new ValidationException(['email' => 'Email sudah digunakan.']);
+                }
+                if ($buyerUsername !== null && (stripos($message, 'uq_users_buyer_username') !== false
+                    || stripos($message, 'users.buyer_username') !== false)) {
+                    throw new ValidationException(['buyer_username' => 'Username Buyer sudah digunakan.']);
+                }
+                $this->ensureBuyerIdentifiersAvailable($email, $buyerUsername);
+            }
+
+            throw $exception;
+        }
+
+        return (int) $this->pdo->lastInsertId();
+    }
+
+    private function ensureBuyerIdentifiersAvailable(?string $email, ?string $buyerUsername): void
+    {
+        if ($email !== null) {
+            $stmt = $this->pdo->prepare('SELECT id FROM users WHERE email = :email LIMIT 1');
+            $stmt->execute(['email' => $email]);
+            if ($stmt->fetchColumn() !== false) {
+                throw new ValidationException(['email' => 'Email sudah digunakan.']);
+            }
+        }
+
+        if ($buyerUsername !== null) {
+            $stmt = $this->pdo->prepare('SELECT id FROM users WHERE buyer_username = :buyer_username LIMIT 1');
+            $stmt->execute(['buyer_username' => $buyerUsername]);
+            if ($stmt->fetchColumn() !== false) {
+                throw new ValidationException(['buyer_username' => 'Username Buyer sudah digunakan.']);
+            }
+        }
     }
 
     public function createShowroom(int $userId, array $data): int

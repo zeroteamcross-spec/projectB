@@ -18,6 +18,7 @@ import { applyDesignHook } from "../../../theme/designStudioHooks.js";
 import { BUYER_MOBILE_FOOTER_ITEMS, BuyerMobileFooterNav } from "../components/buyerMobileFooterNav.js";
 import { BuyerDesktopTopNav } from "../components/buyerDesktopTopNav.js";
 import { isPaymentPaid } from "../../../utils/transactionStatus.js";
+import { formatCurrency } from "../../../utils/formatCurrency.js";
 
 // Booking Fee menutup kewajiban bayar, jadi tidak ada pelunasan lanjutan.
 // Setel true untuk menghidupkan kembali jalur pelunasan lama.
@@ -136,16 +137,18 @@ function render(root, context, flags) {
 
   const main = document.createElement("div");
   main.className = "grid gap-4";
+  const isManualTransfer = transaction.payment_method === "manual_transfer";
   if (isPaymentPaid(transaction)) {
     main.append(paymentSuccessPanel(transaction));
     main.append(PaymentStatusSummary({ transaction }), carSummary(transaction));
   } else {
-    if (isPendingPayment(transaction) && transaction.payment_method === "manual_transfer") {
+    if (isPendingPayment(transaction) && isManualTransfer) {
       main.append(applyDesignHook(ManualTransferPanel({
         transaction,
         isSubmitting: flags.isSubmittingManualTransfer,
         error: appStore.get("runtime.buyerPaymentStatus.manualTransferError", ""),
         onSubmit: (file, note) => submitManualTransferProof(context, flags, file, note),
+        existingForm: root.querySelector("#byrpay_manual_transfer_upload_form"),
       }), "buyer.payment.manual-transfer"));
     } else if (isPendingPayment(transaction)) {
       main.append(applyDesignHook(PaymentInstructionPanel({
@@ -155,7 +158,9 @@ function render(root, context, flags) {
         onOpenGopay: () => openGopayDeeplink(transaction),
       }), "buyer.payment.instructions"));
     }
-    main.append(PaymentStatusSummary({ transaction }));
+    main.append(isManualTransfer && isPendingPayment(transaction)
+      ? manualPaymentStatusSummary(transaction)
+      : PaymentStatusSummary({ transaction }));
     if (isPendingPayment(transaction)) {
       main.append(pendingPaymentGuidePanel({
         transaction,
@@ -283,6 +288,48 @@ function carSummary(transaction) {
   seller.className = "text-xs text-gray-500";
   seller.textContent = transaction?.seller?.name ? `Seller: ${transaction.seller.name}` : "Showroom terdaftar";
   section.append(title, name, seller);
+  return section;
+}
+
+function manualPaymentStatusSummary(transaction) {
+  const hasProof = Boolean(transaction?.manual_transfer?.proof_path);
+  const section = document.createElement("section");
+  section.id = "buyer_payment_detail_summary";
+  section.className = `grid gap-4 ${tw.surface.raisedCard} p-5`;
+  applyDesignHook(section, "buyer.payment.summary");
+
+  const title = textNode("h1", "break-words text-xl font-bold text-gray-950", transaction.transaction_code ?? `Transaksi #${transaction.id}`);
+  const status = textNode("p", "text-xs font-bold text-gray-800", hasProof
+    ? "Menunggu konfirmasi transfer oleh showroom"
+    : transaction?.manual_transfer?.rejected_reason
+      ? "Bukti transfer ditolak. Unggah ulang bukti yang benar."
+      : "Menunggu transfer dan bukti pembayaran");
+  const detail = textNode("p", "text-xs leading-6 text-gray-600", hasProof
+    ? "Showroom akan memeriksa rekening sebelum pembayaran dinyatakan lunas."
+    : "Transfer Booking Fee ke rekening showroom, lalu unggah bukti pada form di atas.");
+  section.append(title, status, detail);
+
+  const facts = document.createElement("div");
+  facts.className = `grid gap-2 ${tw.surface.insetGrid} sm:grid-cols-2`;
+  const values = [
+    ["Metode", "Transfer Manual"],
+    ["Harga mobil", formatCurrency(transaction.car_price)],
+    ["Booking Fee", formatCurrency(transaction.dp_amount)],
+    ["Sisa pembayaran", transaction.remaining_amount ? formatCurrency(transaction.remaining_amount) : "-"],
+  ];
+  if (!hasProof && transaction.expires_at) {
+    values.push(["Batas waktu transaksi", transaction.expires_at]);
+  }
+  values.forEach(([label, value]) => {
+    const row = document.createElement("div");
+    row.className = "grid gap-1 rounded-2xl bg-white/90 px-3 py-3 text-xs shadow-sm";
+    row.append(
+      textNode("span", "text-gray-500", label),
+      textNode("span", "break-words font-semibold text-gray-900", value),
+    );
+    facts.append(row);
+  });
+  section.append(facts);
   return section;
 }
 
@@ -425,6 +472,8 @@ function handoverInstructionPanel() {
 }
 
 function pendingPaymentGuidePanel({ transaction, isRefreshing = false, onRefresh = null } = {}) {
+  const isManualTransfer = transaction?.payment_method === "manual_transfer";
+  const hasProof = Boolean(transaction?.manual_transfer?.proof_path);
   const section = document.createElement("section");
   section.className = `grid gap-4 ${tw.surface.accentPanel} p-5`;
   applyDesignHook(section, "buyer.payment.pendingGuide");
@@ -433,22 +482,35 @@ function pendingPaymentGuidePanel({ transaction, isRefreshing = false, onRefresh
   copy.className = "grid gap-2";
   const eyebrow = document.createElement("p");
   eyebrow.className = tw.text.eyebrow;
-  eyebrow.textContent = "Menunggu pembayaran";
+  eyebrow.textContent = isManualTransfer && hasProof ? "Menunggu konfirmasi showroom" : "Menunggu pembayaran";
   const title = document.createElement("h2");
   title.className = "text-lg font-bold tracking-normal text-gray-950";
-  title.textContent = "Lanjutkan dari instruksi pembayaran di bawah";
+  title.textContent = isManualTransfer
+    ? hasProof ? "Bukti transfer sedang diperiksa" : "Transfer ke rekening showroom"
+    : "Lanjutkan dari instruksi pembayaran di bawah";
   const body = document.createElement("p");
   body.className = "text-xs leading-6 text-gray-700";
-  body.textContent = "Status transaksi belum berubah karena pembayaran belum terkonfirmasi. Setelah membayar, halaman ini akan mengecek otomatis dan menampilkan notifikasi saat status berubah.";
+  body.textContent = isManualTransfer
+    ? hasProof
+      ? "Bukti transfer sudah terkirim. Showroom akan memeriksa mutasi rekening dan mengonfirmasi pembayaran."
+      : "Gunakan rekening showroom dan nominal Booking Fee yang tertera, lalu unggah bukti transfer pada form di atas."
+    : "Status transaksi belum berubah karena pembayaran belum terkonfirmasi. Setelah membayar, halaman ini akan mengecek otomatis dan menampilkan notifikasi saat status berubah.";
   copy.append(eyebrow, title, body);
 
   const steps = document.createElement("div");
   steps.className = "grid gap-2 sm:grid-cols-3";
-  [
-    ["1", "Ikuti instruksi", "Gunakan VA, QRIS, atau GoPay yang aktif."],
-    ["2", "Selesaikan pembayaran", paymentDueCopy(transaction)],
-    ["3", "Tunggu konfirmasi", "Halaman akan refresh otomatis; gunakan refresh manual hanya jika perlu."],
-  ].forEach(([number, label, description]) => {
+  const guideSteps = isManualTransfer
+    ? [
+        ["1", "Transfer Booking Fee", "Transfer sesuai nominal ke rekening showroom yang tertera di atas."],
+        ["2", "Unggah bukti transfer", hasProof ? "Bukti transfer sudah diterima dan menunggu pemeriksaan." : paymentDueCopy(transaction)],
+        ["3", "Konfirmasi showroom", "Showroom memeriksa transfer sebelum status pembayaran berubah."],
+      ]
+    : [
+        ["1", "Ikuti instruksi", "Gunakan VA, QRIS, atau GoPay yang aktif."],
+        ["2", "Selesaikan pembayaran", paymentDueCopy(transaction)],
+        ["3", "Tunggu konfirmasi", "Halaman akan refresh otomatis; gunakan refresh manual hanya jika perlu."],
+      ];
+  guideSteps.forEach(([number, label, description]) => {
     const item = document.createElement("section");
     item.className = "grid gap-2 rounded-2xl border border-[var(--pb-card-border)] bg-white/90 p-4 shadow-sm";
     const mark = document.createElement("span");
@@ -528,7 +590,9 @@ async function refreshStatus(context, flags, {
   setActionState(flags);
 
   try {
-    const transaction = await buyerTransactionService.syncPaymentStatus(context.params.id);
+    const transaction = current?.payment_method === "manual_transfer"
+      ? await buyerTransactionService.detail(context.params.id)
+      : await buyerTransactionService.syncPaymentStatus(context.params.id);
 
     if (!transaction) {
       return null;
@@ -577,6 +641,10 @@ function syncInitialPaymentStatus(context, flags) {
 
   const transaction = appStore.get("working.buyerPaymentStatus.transaction", null)?.data ?? null;
   if (!isPendingPayment(transaction)) {
+    return;
+  }
+
+  if (transaction.payment_method === "manual_transfer" && !transaction.manual_transfer?.proof_path) {
     return;
   }
 
@@ -653,7 +721,8 @@ function bindVisibilityResume(context, flags, poller) {
 }
 
 function shouldAutoPollTransaction(transaction) {
-  return Boolean(transaction?.id) && isPendingPayment(transaction);
+  return Boolean(transaction?.id) && isPendingPayment(transaction)
+    && (transaction.payment_method !== "manual_transfer" || Boolean(transaction.manual_transfer?.proof_path));
 }
 
 function openCompletionFlow() {
@@ -781,7 +850,9 @@ async function finishTransaction(context, flags) {
 
 async function submitManualTransferProof(context, flags, file, note) {
   const transaction = appStore.get("working.buyerPaymentStatus.transaction", null)?.data ?? null;
-  if (!transaction?.id || flags.isSubmittingManualTransfer) {
+  if (!transaction?.id || String(transaction.id) !== String(context.params.id)
+    || transaction.payment_method !== "manual_transfer" || !isPendingPayment(transaction)
+    || !file || flags.isSubmittingManualTransfer) {
     return;
   }
 
@@ -791,16 +862,17 @@ async function submitManualTransferProof(context, flags, file, note) {
 
   try {
     const updated = await buyerTransactionService.submitManualTransferProof(context.params.id, file, note);
-    if (updated) {
-      appStore.patchState("working.buyerPaymentStatus.transaction", {
-        data: updated,
-        hydratedAt: Date.now(),
-      }, "buyer-payment-status:manual-transfer-submitted");
-      syncBusinessTransaction(updated, {
-        primaryRole: "buyer",
-        source: "buyer-payment-status:manual-transfer-submitted",
-      });
+    if (!updated?.manual_transfer?.proof_path) {
+      throw new Error("Bukti transfer belum terkonfirmasi tersimpan. Muat ulang status transaksi.");
     }
+    appStore.patchState("working.buyerPaymentStatus.transaction", {
+      data: updated,
+      hydratedAt: Date.now(),
+    }, "buyer-payment-status:manual-transfer-submitted");
+    syncBusinessTransaction(updated, {
+      primaryRole: "buyer",
+      source: "buyer-payment-status:manual-transfer-submitted",
+    });
     showToast("Bukti transfer berhasil diunggah. Menunggu konfirmasi showroom.", { type: "success" });
   } catch (error) {
     appStore.patchState("runtime.buyerPaymentStatus.manualTransferError", error.message || "Gagal mengunggah bukti transfer.", "buyer-payment-status:manual-transfer-error");
@@ -901,6 +973,11 @@ function canBuyerCancel(transaction) {
 }
 
 function paymentDueCopy(transaction) {
+  if (transaction?.payment_method === "manual_transfer") {
+    return transaction.expires_at
+      ? `Unggah bukti transfer sebelum batas waktu transaksi: ${transaction.expires_at}.`
+      : "Unggah bukti transfer agar showroom dapat memeriksa pembayaran.";
+  }
   return transaction?.expires_at
     ? `Selesaikan sebelum batas waktu: ${transaction.expires_at}.`
     : "Selesaikan pembayaran sebelum sesi provider berakhir.";
@@ -915,6 +992,14 @@ function statusFeedback(transaction) {
   }
 
   if (isPendingPayment(transaction)) {
+    if (transaction.payment_method === "manual_transfer") {
+      return {
+        message: transaction.manual_transfer?.proof_path
+          ? "Bukti transfer sudah diterima dan menunggu konfirmasi showroom."
+          : "Pembayaran manual masih menunggu bukti transfer. Gunakan rekening showroom di halaman ini.",
+        type: "info",
+      };
+    }
     return {
       message: "Pembayaran masih menunggu konfirmasi. Ikuti instruksi pembayaran aktif di halaman ini.",
       type: "info",

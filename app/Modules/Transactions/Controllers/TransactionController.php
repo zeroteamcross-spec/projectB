@@ -11,6 +11,8 @@ use App\Core\Response;
 use App\Modules\Transactions\Requests\CancelTransactionRequest;
 use App\Modules\Transactions\Requests\CompleteTransactionRequest;
 use App\Modules\Transactions\Requests\CreateTransactionRequest;
+use App\Modules\Transactions\Requests\CreateOfflineBookingRequest;
+use App\Modules\Transactions\Requests\RecordOfflinePaymentRequest;
 use App\Modules\Transactions\Requests\ProviderCallbackRequest;
 use App\Modules\Transactions\Requests\RejectManualTransferRequest;
 use App\Modules\Transactions\Requests\ReturnTransactionRequest;
@@ -42,6 +44,28 @@ class TransactionController extends Controller
         return JsonResponse::success([
             'transaction' => $this->service->create($user, $payload),
         ], 'Transaksi berhasil dibuat.', [], 201);
+    }
+
+    public function createOfflineBooking(Request $request): JsonResponse
+    {
+        $payload = (new CreateOfflineBookingRequest($request))->validate();
+
+        return JsonResponse::success([
+            'transaction' => $this->service->createOfflineBooking($this->user($request), $payload),
+        ], 'Booking offline berhasil dibuat.', [], 201);
+    }
+
+    public function recordOfflinePayment(Request $request): JsonResponse
+    {
+        $payload = (new RecordOfflinePaymentRequest($request))->validate();
+
+        return JsonResponse::success([
+            'transaction' => $this->service->recordOfflinePayment(
+                $this->user($request),
+                (int) $request->routeParam('transaction_id'),
+                $payload
+            ),
+        ], 'Pembayaran offline berhasil dicatat.');
     }
 
     public function list(Request $request): JsonResponse

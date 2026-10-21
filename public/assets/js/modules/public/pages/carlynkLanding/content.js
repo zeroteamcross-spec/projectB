@@ -188,16 +188,16 @@ export function bangunRute(tautanWhatsapp = "", tautanMasuk = "") {
   const wa = tautanWhatsapp || "#";
 
   return Object.freeze({
-    daftar: "#/daftar-showroom",
-    masuk: tautanMasuk || "#/login/seller",
-    demo: "#/contoh-katalog",
+    daftar: "/daftar-showroom",
+    masuk: tautanMasuk || "/login/seller",
+    demo: "/contoh-katalog",
     konsultasi: wa,
     tentang: wa,
     fitur: "#fitur",
-    harga: wa,
+    harga: "#harga",
     syarat: wa,
     privasi: wa,
-    facebook: wa,
-    instagram: wa,
+    facebook: null,
+    instagram: null,
   });
 }

@@ -11,7 +11,7 @@ export const BUYER_MOBILE_FOOTER_ITEMS = [
   { id: "profile", label: "Profil", icon: "user", path: "/profile" },
 ];
 
-export function BuyerMobileFooterNav({ items = BUYER_MOBILE_FOOTER_ITEMS, activePath = "/buyer", onNavigate = null } = {}) {
+export function BuyerMobileFooterNav({ items = BUYER_MOBILE_FOOTER_ITEMS, activePath = "/buyer", onNavigate = null, resolveCatalogTarget = getBuyerShowroomCatalogUrl } = {}) {
   ensureFooterStyles();
 
   const nav = document.createElement("nav");
@@ -35,14 +35,14 @@ export function BuyerMobileFooterNav({ items = BUYER_MOBILE_FOOTER_ITEMS, active
 
   items.forEach((item) => {
     if (item.featured) {
-      centerDock.append(footerLink({ item, activePath, onNavigate }));
+      centerDock.append(footerLink({ item, activePath, onNavigate, resolveCatalogTarget }));
       const spacer = document.createElement("span");
       spacer.className = "account-mobile-footer__spacer";
       spacer.setAttribute("aria-hidden", "true");
       list.append(spacer);
       return;
     }
-    list.append(footerLink({ item, activePath, onNavigate }));
+    list.append(footerLink({ item, activePath, onNavigate, resolveCatalogTarget }));
   });
 
   shell.append(bar, list, centerDock);
@@ -50,11 +50,12 @@ export function BuyerMobileFooterNav({ items = BUYER_MOBILE_FOOTER_ITEMS, active
   return nav;
 }
 
-function footerLink({ item, activePath, onNavigate }) {
+function footerLink({ item, activePath, onNavigate, resolveCatalogTarget }) {
   const active = isActiveNav(item, activePath);
   const link = item.disabled ? document.createElement("button") : document.createElement("a");
   link.id = `byr_nav_mobile_${item.id}`;
-  const target = item.id === "catalog" ? getBuyerShowroomCatalogUrl() : item.path;
+  const getTarget = () => item.id === "catalog" ? resolveCatalogTarget() : item.path;
+  const target = getTarget();
   link.className = item.featured
     ? "account-mobile-footer__action"
     : active
@@ -74,8 +75,9 @@ function footerLink({ item, activePath, onNavigate }) {
     }
     link.addEventListener("click", (event) => {
       event.preventDefault();
-      if (target) {
-        onNavigate?.(target);
+      const destination = getTarget();
+      if (destination) {
+        onNavigate?.(destination);
       }
     });
   }

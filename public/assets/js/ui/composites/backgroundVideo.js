@@ -189,7 +189,7 @@ function ensureBackgroundVideoStyles() {
       opacity: 0;
     }
 
-    ${BACKGROUND_VIDEO_ENABLED ? `
+${BACKGROUND_VIDEO_ENABLED ? `
     /* Hanya berlaku saat video menyala: teks dipaksa putih supaya terbaca di
        atas rekaman yang gelap. Dengan latar putih aturan ini justru membuat
        teks hilang, jadi tidak ikut ditulis saat videonya dimatikan. */

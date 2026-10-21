@@ -6,10 +6,12 @@ import { persistLastViewedShowroom, persistLastViewedAffiliate } from "../../../
 import { publicReservedRoutePrefixes } from "../../../core/publicReservedRouteWords.js";
 
 const ICON_RELS = ["icon", "shortcut icon", "apple-touch-icon"];
+const MAIN_CARLYNK_REGISTER_ICON = String(globalThis.__PROJECTB_CARLYNK_REGISTER_ICON__ ?? "");
 const RESERVED_ROOT_WORD_PATTERN = new RegExp(`^(?:${publicReservedRoutePrefixes.join("|")})$`);
 
 let brandingOriginal = null;
 let brandingShowroomId = null;
+let mainRegistrationBrandingOriginal = null;
 
 function applyShowroomBranding(showroom) {
   const iconUrl = String(showroom?.showroom?.icon_url ?? "").trim();
@@ -271,6 +273,23 @@ export const publicContextService = {
    */
   syncBrandingFromPath(path = "") {
     const value = String(path ?? "");
+    const normalizedPath = value.split(/[?#]/, 1)[0].replace(/\/+$/, "") || "/";
+    const isMainHost = ["carlynk.id", "www.carlynk.id"].includes(
+      String(window.location.hostname ?? "").toLowerCase()
+    );
+
+    if (isMainHost && normalizedPath === "/daftar-showroom") {
+      if (brandingShowroomId !== null) {
+        revertShowroomBranding();
+      }
+      if (publicContextState.activeShowroom() || publicContextState.activeAffiliate()) {
+        publicContextState.setDefault();
+      }
+      applyMainRegistrationBranding();
+      return;
+    }
+
+    revertMainRegistrationBranding();
     if (this.isCustomDomainShowroomPath(value)) {
       return;
     }
@@ -478,3 +497,38 @@ export const publicContextService = {
     return `/transactions/new?car_id=${encodeURIComponent(carId)}`;
   },
 };
+
+function applyMainRegistrationBranding() {
+  if (mainRegistrationBrandingOriginal === null) {
+    mainRegistrationBrandingOriginal = {
+      title: document.title,
+      icons: Object.fromEntries(ICON_RELS.map((rel) => [
+        rel,
+        document.head.querySelector(`link[rel="${rel}"]`)?.getAttribute("href") ?? null,
+      ])),
+    };
+  }
+  document.title = "carlynk.id";
+  if (MAIN_CARLYNK_REGISTER_ICON) {
+    ICON_RELS.forEach((rel) => upsertShowroomIconLink(rel, MAIN_CARLYNK_REGISTER_ICON));
+  }
+}
+
+function revertMainRegistrationBranding() {
+  if (mainRegistrationBrandingOriginal === null) {
+    return;
+  }
+
+  document.title = typeof globalThis.__PROJECTB_RESOLVE_TAB_TITLE__ === "function"
+    ? globalThis.__PROJECTB_RESOLVE_TAB_TITLE__(mainRegistrationBrandingOriginal.title)
+    : mainRegistrationBrandingOriginal.title;
+  ICON_RELS.forEach((rel) => {
+    const originalHref = mainRegistrationBrandingOriginal.icons[rel];
+    if (originalHref === null) {
+      document.head.querySelectorAll(`link[rel="${rel.replace(/"/g, '\\"')}"]`).forEach((node) => node.remove());
+    } else {
+      upsertShowroomIconLink(rel, originalHref);
+    }
+  });
+  mainRegistrationBrandingOriginal = null;
+}

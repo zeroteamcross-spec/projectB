@@ -44,6 +44,7 @@ $tests = [
     Tests\Unit\CustomDomainTest::class,
     Tests\Unit\CustomDomainRdapTest::class,
     Tests\Unit\ShowroomInspectionMasterTest::class,
+    Tests\Unit\OfflineBookingPaymentTest::class,
 ];
 
 $passed = 0;

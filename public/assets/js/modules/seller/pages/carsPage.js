@@ -1,7 +1,7 @@
 import { createPageLifecycle } from "../../../core/lifecycle.js";
 import { carsResource } from "../../../resources/carsResource.js";
 import { appStore } from "../../../state/store.js";
-import { syncBusinessListing } from "../../../state/sync/businessStatusSync.js";
+import { syncBusinessListing, syncBusinessTransaction } from "../../../state/sync/businessStatusSync.js";
 import { Button } from "../../../ui/primitives/button.js";
 import { confirmDialog } from "../../../ui/primitives/confirmDialog.js";
 import { closeModal, openModal } from "../../../ui/primitives/modal.js";
@@ -11,9 +11,13 @@ import { adminMasterService } from "../../admin/services/adminMasterService.js";
 import { sellerState } from "../state/sellerState.js";
 import { SellerCarForm } from "../components/sellerCarForm.js";
 import { SellerCarsList } from "../components/sellerCarsList.js";
+import { SellerOfflineBookingForm } from "../components/sellerOfflineBookingForm.js";
+import { sellerTransactionService } from "../services/sellerTransactionService.js";
 
 const RUNTIME_KEY = "sellerCars";
 const CAR_FORM_MODAL_KEY = "seller-cars-form-modal";
+const OFFLINE_BOOKING_MODAL_KEY = "seller-offline-booking-modal";
+export const OFFLINE_BOOKING_REFRESH_WARNING = "Booking berhasil dicatat, tetapi daftar mobil gagal diperbarui. Mobil telah ditandai terjual agar tidak bisa dibooking ulang. Muat ulang halaman untuk memeriksa status terbaru.";
 const DEFAULT_RUNTIME = {
   mode: "list",
   selectedCar: null,
@@ -57,6 +61,7 @@ export function SellerCarsPage() {
     },
     dispose() {
       closeCarFormModal();
+      closeOfflineBookingModal();
       unsubscribe = null;
       appStore.destroyRuntimeState(RUNTIME_KEY);
     },
@@ -86,7 +91,11 @@ function render(root, router) {
 
   const notice = document.createElement("p");
   notice.id = "slrc_notice_section";
-  notice.className = "rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-success)_26%,white)] bg-[color-mix(in_srgb,var(--pb-success)_8%,white)] px-4 py-3 text-xs font-semibold text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
+  const isOfflineBookingRefreshWarning = runtime.notice === OFFLINE_BOOKING_REFRESH_WARNING;
+  notice.className = isOfflineBookingRefreshWarning
+    ? "rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-warning)_34%,white)] bg-[color-mix(in_srgb,var(--pb-warning)_12%,white)] px-4 py-3 text-xs font-semibold text-[color-mix(in_srgb,var(--pb-warning)_84%,black)]"
+    : "rounded-[1rem] border border-[color-mix(in_srgb,var(--pb-success)_26%,white)] bg-[color-mix(in_srgb,var(--pb-success)_8%,white)] px-4 py-3 text-xs font-semibold text-[color-mix(in_srgb,var(--pb-success)_84%,black)]";
+  notice.setAttribute("role", isOfflineBookingRefreshWarning ? "alert" : "status");
   notice.textContent = runtime.notice;
   notice.hidden = !runtime.notice;
 
@@ -103,6 +112,11 @@ function render(root, router) {
     onArchive: (car) => archiveCar(car),
     onImages: (car) => router?.navigate(`/seller/cars/${car.id}/images`),
     onInspection: (car) => router?.navigate(`/seller/cars/${car.id}/inspection`),
+    onPreview: (car) => router?.navigate(
+      `/seller/cars/${encodeURIComponent(car.id)}/preview${car.listing_status === "archived" ? "?status=archived" : ""}`
+    ),
+    canCreateOfflineBooking: (car) => sellerTransactionService.canCreateOfflineBooking(car),
+    onOfflineBooking: (car) => openOfflineBookingModal(car),
     pagination: createCarsPagination(pagination),
   });
 
@@ -244,6 +258,91 @@ function setFooterButtonVisibility(button, visible) {
 function closeCarFormModal() {
   const modal = appStore.get("ui.modal", null);
   if (modal?.key === CAR_FORM_MODAL_KEY) {
+    closeModal({ notify: false });
+  }
+}
+
+export function markOfflineBookedCarSoldLocally(car) {
+  if (!car?.id) {
+    return null;
+  }
+
+  return syncBusinessListing({ ...car, listing_status: "sold" }, {
+    primaryRole: "",
+    source: "seller-cars:offline-booking-sold",
+  });
+}
+
+export function preserveOfflineBookedCarStatus(fresh, car) {
+  if (!Array.isArray(fresh?.cars) || !car?.id) {
+    return fresh;
+  }
+
+  return {
+    ...fresh,
+    cars: fresh.cars.map((item) => String(item?.id) === String(car.id)
+      ? { ...item, listing_status: "sold" }
+      : item),
+  };
+}
+
+export function showOfflineBookingRefreshWarning() {
+  setRuntime({ notice: OFFLINE_BOOKING_REFRESH_WARNING });
+}
+
+function openOfflineBookingModal(car) {
+  if (!sellerTransactionService.canCreateOfflineBooking(car)) {
+    return;
+  }
+  if (!Number.isSafeInteger(Number(car.dp_amount)) || Number(car.dp_amount) <= 0) {
+    showToast("Isi Booking Fee yang valid pada listing mobil terlebih dahulu.", { type: "error" });
+    return;
+  }
+
+  const content = SellerOfflineBookingForm({
+    car,
+    onCancel: closeOfflineBookingModal,
+    onSubmit: async (payload) => {
+      if (!sellerTransactionService.canCreateOfflineBooking(car)) {
+        throw new Error("Hanya pemilik showroom yang dapat mencatat booking untuk mobil published.");
+      }
+      const transaction = await sellerTransactionService.createOfflineBooking(payload);
+      if (!transaction?.id) {
+        throw new Error("Respons booking offline tidak memuat transaksi.");
+      }
+      syncBusinessTransaction(transaction, {
+        primaryRole: "seller",
+        source: "seller-cars:offline-booking",
+      });
+      markOfflineBookedCarSoldLocally(car);
+      closeOfflineBookingModal();
+      showToast("Booking dan pembayaran offline berhasil dicatat.", { type: "success" });
+      void carsResource.sellerList({ limit: 24 }).then((fresh) => {
+        if (appStore.get("app.currentRoute.name", "") === "seller.cars") {
+          appStore.patchState("working.sellerCars.cars", {
+            data: preserveOfflineBookedCarStatus(fresh, car),
+            hydratedAt: Date.now(),
+          }, "seller-cars:offline-booking-refresh");
+        }
+      }).catch(() => {
+        if (appStore.get("app.currentRoute.name", "") === "seller.cars") {
+          showOfflineBookingRefreshWarning();
+        }
+      });
+    },
+  });
+  openModal(content, {
+    key: OFFLINE_BOOKING_MODAL_KEY,
+    title: "Booking Offline",
+    description: "Catat buyer baru dan Booking Fee yang sudah diterima showroom.",
+    size: "lg",
+    footer: null,
+    panelId: "slrc_offline_booking_modal",
+  });
+}
+
+function closeOfflineBookingModal() {
+  if (appStore.get("ui.modal.key", "") === OFFLINE_BOOKING_MODAL_KEY) {
     closeModal({ notify: false });
   }
 }

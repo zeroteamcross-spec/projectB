@@ -76,6 +76,15 @@ class Router
         return $this;
     }
 
+    /** @return array<int, string> The normalized paths registered on this router. */
+    public function registeredPaths(): array
+    {
+        return array_values(array_unique(array_map(
+            static fn (array $route): string => (string) $route['path'],
+            $this->routes
+        )));
+    }
+
     public function group(string $prefix, callable $routes, array $middleware = []): self
     {
         $this->groups[] = [

@@ -8,6 +8,7 @@ import { Skeleton } from "../../../ui/primitives/skeleton.js";
 import { showToast } from "../../../ui/primitives/toast.js";
 import { sellerState } from "../state/sellerState.js";
 import { SellerTransactionDetailPanel } from "../components/sellerTransactionDetailPanel.js";
+import { localPaidAtValue } from "../components/sellerOfflinePaymentFields.js";
 import { sellerTransactionService } from "../services/sellerTransactionService.js";
 
 export function SellerTransactionDetailPage() {
@@ -17,6 +18,10 @@ export function SellerTransactionDetailPage() {
     isCancelling: false,
     isReturning: false,
     isConfirmingManualTransfer: false,
+    offlinePaymentOpen: false,
+    offlinePaymentDraft: {},
+    offlinePaymentError: "",
+    isRecordingOfflinePayment: false,
   };
 
   return createPageLifecycle({
@@ -80,8 +85,61 @@ function render(root, context, flags) {
       isConfirmingManualTransfer: flags.isConfirmingManualTransfer,
       onConfirmManualTransfer: () => confirmManualTransfer(root, context, flags, transaction),
       onRejectManualTransfer: () => rejectManualTransfer(root, context, flags, transaction),
+      offlinePaymentOpen: flags.offlinePaymentOpen,
+      offlinePaymentDraft: flags.offlinePaymentDraft,
+      offlinePaymentSaving: flags.isRecordingOfflinePayment,
+      offlinePaymentError: flags.offlinePaymentError,
+      onOpenOfflinePayment: () => {
+        flags.offlinePaymentOpen = true;
+        flags.offlinePaymentDraft = { payment_amount: transaction.dp_amount, paid_at: localPaidAtValue(), note: "" };
+        flags.offlinePaymentError = "";
+        render(root, context, flags);
+      },
+      onCloseOfflinePayment: () => {
+        if (!flags.isRecordingOfflinePayment) {
+          flags.offlinePaymentOpen = false;
+          flags.offlinePaymentError = "";
+          render(root, context, flags);
+        }
+      },
+      onOfflinePaymentChange: (patch) => Object.assign(flags.offlinePaymentDraft, patch),
+      onSubmitOfflinePayment: (payload) => recordOfflinePayment(root, context, flags, transaction, payload),
     })
   );
+}
+
+async function recordOfflinePayment(root, context, flags, transaction, payload) {
+  if (flags.isRecordingOfflinePayment || !sellerTransactionService.canRecordOfflinePayment(transaction)) {
+    return;
+  }
+  flags.isRecordingOfflinePayment = true;
+  flags.offlinePaymentError = "";
+  render(root, context, flags);
+  try {
+    const updated = await sellerTransactionService.recordOfflinePayment(transaction.id, payload);
+    if (!updated?.id) {
+      throw new Error("Respons pembayaran offline tidak memuat transaksi.");
+    }
+    const fresh = await sellerTransactionService.detail(transaction.id).catch(() => updated);
+    const current = fresh ?? updated;
+    appStore.patchState("working.sellerTransactionDetail.transaction", {
+      data: current,
+      hydratedAt: Date.now(),
+    }, "seller-transaction-detail:offline-payment");
+    syncBusinessTransaction(current, {
+      primaryRole: "seller",
+      source: "seller-transaction-detail:offline-payment",
+    });
+    flags.offlinePaymentOpen = false;
+    flags.offlinePaymentDraft = {};
+    showToast("Pembayaran offline berhasil dicatat.", { type: "success" });
+  } catch (error) {
+    flags.offlinePaymentError = error?.message || "Gagal mencatat pembayaran offline.";
+    showToast(flags.offlinePaymentError, { type: "error" });
+  } finally {
+    flags.isRecordingOfflinePayment = false;
+    render(root, context, flags);
+  }
 }
 
 function header(context, transaction) {

@@ -88,6 +88,7 @@ export function SellerCarForm({
   form.id = "slrc_car_form_section";
   form.className = "grid min-w-0 gap-5";
   form.dataset.ds = "seller.cars.form";
+  const normalizeForm = () => normalizeCarPayload(new FormData(form), car?.registration_date);
 
   const header = formHeader(car);
   const stepper = createStepper(currentStep);
@@ -117,8 +118,12 @@ export function SellerCarForm({
 
   const step2 = createStepPanel(2, currentStep);
   const technical = fieldGroup("slrc_car_step_2_technical_fields_section", "Spesifikasi Teknis", "settings");
+  const registrationYearField = Input({ id: "slrc_registration_date_input", name: "registration_date", label: "Tahun Registrasi", value: registrationYear(values.registration_date), placeholder: "YYYY" });
+  const registrationYearInput = registrationYearField.querySelector("input");
+  registrationYearInput.inputMode = "numeric";
+  registrationYearInput.maxLength = 4;
   technical.body.append(
-    Input({ id: "slrc_registration_date_input", name: "registration_date", label: "Tahun Registrasi", type: "date", value: values.registration_date ?? "" }),
+    registrationYearField,
     NumericInput({ id: "slrc_engine_capacity_cc_input", name: "engine_capacity_cc", label: "Kapasitas mesin (cc)", value: values.engine_capacity_cc ?? "", placeholder: "1500" }),
     NumericInput({ id: "slrc_mileage_km_input", name: "mileage_km", label: "Jarak tempuh (km)", value: values.mileage_km ?? "", placeholder: "15000" }),
     Select({ id: "slrc_seat_count_input", name: "seat_count", label: "Jumlah kursi", value: seatCountValue(values.seat_count), options: SEAT_OPTIONS }),
@@ -162,8 +167,8 @@ export function SellerCarForm({
     currentStep,
     saving,
     onCancel,
-    onPrevious: () => moveStep(form, currentStep - 1, onStepChange, onChange, validationNode),
-    onNext: () => moveStep(form, currentStep + 1, onStepChange, onChange, validationNode),
+    onPrevious: () => moveStep(form, currentStep - 1, onStepChange, onChange, validationNode, normalizeForm),
+    onNext: () => moveStep(form, currentStep + 1, onStepChange, onChange, validationNode, normalizeForm),
   }) : null;
 
   form.append(header, stepper, errorNode, validationNode, step1, step2, step3);
@@ -175,10 +180,10 @@ export function SellerCarForm({
     const selectedBrand = findBrandByValue(brands, brandField.select.value);
     syncModelSelect(modelField.select, selectedBrand, "");
   });
-  form.addEventListener("input", () => onChange?.(normalizeCarPayload(new FormData(form))));
-  form.addEventListener("change", () => onChange?.(normalizeCarPayload(new FormData(form))));
-  form.addEventListener("seller-car-form:previous", () => moveStep(form, currentStep - 1, onStepChange, onChange, validationNode));
-  form.addEventListener("seller-car-form:next", () => moveStep(form, currentStep + 1, onStepChange, onChange, validationNode));
+  form.addEventListener("input", () => onChange?.(normalizeForm()));
+  form.addEventListener("change", () => onChange?.(normalizeForm()));
+  form.addEventListener("seller-car-form:previous", () => moveStep(form, currentStep - 1, onStepChange, onChange, validationNode, normalizeForm));
+  form.addEventListener("seller-car-form:next", () => moveStep(form, currentStep + 1, onStepChange, onChange, validationNode, normalizeForm));
   form.addEventListener("seller-car-form:cancel", () => onCancel?.());
   form.addEventListener("seller-car-form:submit", () => form.requestSubmit());
   form.addEventListener("submit", (event) => {
@@ -189,7 +194,7 @@ export function SellerCarForm({
       onStepChange?.(invalidStep.step);
       return;
     }
-    onSubmit?.(normalizeCarPayload(new FormData(form)));
+    onSubmit?.(normalizeForm());
   });
 
   return form;
@@ -323,7 +328,7 @@ function createNavigation({ currentStep, saving, onCancel, onPrevious, onNext })
   return section;
 }
 
-function moveStep(form, nextStep, onStepChange, onChange, validationNode) {
+function moveStep(form, nextStep, onStepChange, onChange, validationNode, normalizeForm) {
   const currentStep = Number(form.querySelector("[data-car-step-panel]:not([hidden])")?.dataset?.carStepPanel ?? 1);
   if (nextStep > currentStep) {
     const result = validateStep(form, currentStep);
@@ -333,7 +338,7 @@ function moveStep(form, nextStep, onStepChange, onChange, validationNode) {
     }
   }
   validationNode.hidden = true;
-  onChange?.(normalizeCarPayload(new FormData(form)));
+  onChange?.(normalizeForm());
   onStepChange?.(clampStep(nextStep));
 }
 
@@ -350,6 +355,10 @@ function firstInvalidStep(form) {
 function validateStep(form, step) {
   const data = new FormData(form);
   const missing = (REQUIRED_FIELDS[step] ?? []).find((name) => !String(data.get(name) ?? "").trim());
+  if (!missing && step === 2 && !/^\d{4}$/.test(String(data.get("registration_date") ?? "").trim())) {
+    form.elements.namedItem("registration_date")?.focus?.();
+    return { valid: false, message: "Isi Tahun Registrasi dengan 4 digit." };
+  }
   if (!missing) {
     return { valid: true, message: "" };
   }
@@ -521,7 +530,7 @@ function fieldGroup(id, title, iconName) {
   return { section, body };
 }
 
-function normalizeCarPayload(formData) {
+function normalizeCarPayload(formData, originalRegistrationDate = null) {
   return {
     brand_name: textValue(formData, "brand_name"),
     model_name: textValue(formData, "model_name"),
@@ -531,7 +540,7 @@ function normalizeCarPayload(formData) {
     secondary_color: nullableText(formData, "secondary_color"),
     color_variation: nullableText(formData, "color_variation"),
     document_type: textValue(formData, "document_type") || "new",
-    registration_date: nullableText(formData, "registration_date"),
+    registration_date: registrationDateForYear(formData.get("registration_date"), originalRegistrationDate),
     engine_number: nullableText(formData, "engine_number"),
     chassis_number: nullableText(formData, "chassis_number"),
     engine_capacity_cc: numberValue(formData, "engine_capacity_cc"),
@@ -552,6 +561,21 @@ function normalizeCarPayload(formData) {
     youtube_url: nullableText(formData, "youtube_url"),
     description: nullableText(formData, "description"),
   };
+}
+
+function registrationYear(value) {
+  return String(value ?? "").slice(0, 4);
+}
+
+function registrationDateForYear(value, originalDate) {
+  const year = String(value ?? "").trim();
+  if (!/^\d{4}$/.test(year)) {
+    return null;
+  }
+  const original = String(originalDate ?? "");
+  return /^\d{4}-\d{2}-\d{2}$/.test(original) && original.slice(0, 4) === year
+    ? original
+    : `${year}-01-01`;
 }
 
 function seatCountValue(value) {

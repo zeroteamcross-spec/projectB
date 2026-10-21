@@ -12,6 +12,7 @@ import { NotificationBell } from "../components/notificationBell.js";
 import { BUYER_MOBILE_FOOTER_ITEMS, BuyerMobileFooterNav } from "../../buyer/components/buyerMobileFooterNav.js";
 import { AffiliateAccountLayout, affiliateAccountActions } from "../../affiliate/components/affiliateAccountShell.js";
 import { renderBuyerBrandIcon } from "../../../utils/buyerShowroomIcon.js";
+import { getBuyerShowroomCatalogUrl } from "../../../utils/buyerShowroomUrl.js";
 
 const PAGE_SIZE = 20;
 
@@ -19,6 +20,7 @@ export function NotificationsPage() {
   let root = null;
   let contextRef = null;
   let unsubscribe = null;
+  let unsubscribeAuth = null;
 
   const state = {
     filter: "all",
@@ -106,13 +108,50 @@ export function NotificationsPage() {
     bindEvents(context) {
       contextRef = context;
       unsubscribe = notificationService.subscribe(() => render(root, contextRef, state, actions));
-      return () => unsubscribe?.();
+      unsubscribeAuth = subscribeNotificationsBuyerCatalogHrefSync(root);
+      return () => {
+        unsubscribe?.();
+        unsubscribeAuth?.();
+      };
     },
     dispose() {
       unsubscribe?.();
+      unsubscribeAuth?.();
       unsubscribe = null;
+      unsubscribeAuth = null;
       root = null;
     },
+  });
+}
+
+export function notificationsBuyerCatalogTarget() {
+  return getBuyerShowroomCatalogUrl();
+}
+
+export function syncNotificationsBuyerCatalogHrefs(root, target = notificationsBuyerCatalogTarget()) {
+  const destination = String(target ?? "").trim();
+  ["byr_notifications_nav_desktop_catalog", "byr_nav_mobile_catalog"].forEach((id) => {
+    const link = root?.querySelector?.(`#${id}`);
+    if (!link) {
+      return;
+    }
+
+    if (destination) {
+      link.setAttribute("href", destination);
+      link.removeAttribute("aria-disabled");
+      return;
+    }
+
+    link.removeAttribute("href");
+    link.setAttribute("aria-disabled", "true");
+  });
+}
+
+export function subscribeNotificationsBuyerCatalogHrefSync(root) {
+  return appStore.subscribe((_, action) => {
+    if (action === "state:init" || action === "auth:set-context") {
+      syncNotificationsBuyerCatalogHrefs(root);
+    }
   });
 }
 
@@ -261,6 +300,7 @@ function updateBuyerNotifications(root, context, state, actions, viewState) {
       BuyerMobileFooterNav({
         activePath,
         items: BUYER_MOBILE_FOOTER_ITEMS,
+        resolveCatalogTarget: notificationsBuyerCatalogTarget,
         onNavigate: (path) => actions.navigate(path),
       }),
     );
@@ -533,15 +573,24 @@ function buyerDesktopNavLink(item, activePath, actions) {
   const active = isActiveBuyerNav(item, activePath);
   const link = item.disabled ? document.createElement("button") : document.createElement("a");
   link.id = `byr_notifications_nav_desktop_${item.id}`;
+  const getTarget = () => item.id === "catalog" ? notificationsBuyerCatalogTarget() : item.path;
+  const target = getTarget();
   if (item.disabled) {
     link.type = "button";
     link.disabled = true;
     link.setAttribute("aria-disabled", "true");
   } else {
-    link.href = item.path;
+    if (target) {
+      link.href = target;
+    } else {
+      link.setAttribute("aria-disabled", "true");
+    }
     link.addEventListener("click", (event) => {
       event.preventDefault();
-      actions.navigate(item.path);
+      const destination = getTarget();
+      if (destination) {
+        actions.navigate(destination);
+      }
     });
   }
   link.className = active
@@ -584,10 +633,17 @@ function buyerProfileAvatarButton(user, actions, compact = false) {
 }
 
 function isActiveBuyerNav(item, activePath) {
+  const path = String(activePath ?? "");
   if (item.path === "/buyer") {
-    return activePath === "/buyer";
+    return path === "/buyer";
   }
-  return String(activePath ?? "").startsWith(item.path);
+  if (item.path === "/buyer/portfolio") {
+    return path === "/buyer/portfolio" || path === "/buyer/transactions" || path.startsWith("/buyer/transactions/");
+  }
+  if (item.path === "/") {
+    return path === "/" || path === "/buyer/cars";
+  }
+  return path === item.path || path.startsWith(`${item.path}/`);
 }
 
 function iconBox(icon, className) {

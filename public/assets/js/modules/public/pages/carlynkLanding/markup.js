@@ -14,8 +14,10 @@
  */
 
 import { KONTEN } from "./content.js";
+import { formatCurrency } from "../../../../utils/formatCurrency.js";
+import { registrationPackageUrl } from "../../services/subscriptionPricing.js";
 
-export function landingMarkup({ rute }) {
+export function landingMarkup({ rute, plans = [], pricingLoading = false, pricingError = false }) {
   return [
     nav(rute),
     hero(rute),
@@ -24,6 +26,7 @@ export function landingMarkup({ rute }) {
     kenapa(),
     testimoni(),
     partner(),
+    pricing(plans, rute, { loading: pricingLoading, error: pricingError }),
     penutup(rute),
     footer(rute),
   ].join("");
@@ -38,7 +41,7 @@ function nav({ daftar, masuk }) {
 <header class="ck-nav" data-nav style="--ck-latar:url('${KONTEN.masalah.latar}')">
   ${lengkungNav()}
   <div class="ck-lajur ck-nav__isi">
-    <a href="#/" aria-label="Carlynk">
+    <a href="/" aria-label="Carlynk">
       <img class="ck-nav__logo" src="${logoTeal}" alt="Carlynk" width="1930" height="365">
     </a>
     <div class="ck-nav__aksi">
@@ -224,6 +227,47 @@ function penutup({ daftar, konsultasi }) {
 </section>`;
 }
 
+export function landingPricingCardsMarkup(plans, rute, { loading = false, error = false } = {}) {
+  if (loading) {
+    return '<p class="ck-harga__belum" role="status">Memuat harga paket terbaru...</p>';
+  }
+  if (error) {
+    return '<p class="ck-harga__belum" role="status">Harga paket belum dapat dimuat. Silakan muat ulang halaman.</p>';
+  }
+
+  return plans.length
+    ? plans.map((plan) => {
+        const recommended = Boolean(plan.is_recommended);
+        const signupUrl = registrationPackageUrl(rute.daftar, plan);
+        return `<article class="ck-harga__kartu${recommended ? " ck-harga__kartu--utama" : ""}">
+          ${recommended ? '<span class="ck-harga__rekomendasi">Paling diminati</span>' : ""}
+          <h3>${teks(plan.name)}</h3>
+          <p class="ck-harga__nominal">${teks(formatCurrency(plan.price))}</p>
+          <p class="ck-harga__periode">${teks(plan.billing_period || "per bulan")}</p>
+          ${Array.isArray(plan.features) && plan.features.length
+            ? `<ul>${plan.features.map((feature) => `<li>${teks(feature)}</li>`).join("")}</ul>`
+            : '<p class="ck-harga__kosong">Fitur paket dapat dilihat saat pendaftaran.</p>'}
+          <a class="ck-harga__pilih" href="${signupUrl}">Pilih Paket ${teks(plan.name)}</a>
+        </article>`;
+      }).join("")
+    : '<p class="ck-harga__belum">Paket aktif sedang disiapkan. Hubungi tim Carlynk untuk informasi harga terbaru.</p>';
+}
+
+function pricing(plans, rute, { loading = false, error = false } = {}) {
+  const cards = landingPricingCardsMarkup(plans, rute, { loading, error });
+
+  return `<section class="ck-harga" id="harga" aria-labelledby="ck_harga_title">
+    <div class="ck-lajur">
+      <div class="ck-harga__kepala">
+        <p>PILIH PAKET SHOWROOM</p>
+        <h2 id="ck_harga_title">Harga yang jelas untuk showroom Anda</h2>
+        <span>Semua paket aktif diambil dari daftar harga Carlynk saat ini.</span>
+      </div>
+      <div class="ck-harga__kisi" id="ck_harga_grid" aria-live="polite" aria-busy="${loading}">${cards}</div>
+    </div>
+  </section>`;
+}
+
 function footer(rute) {
   const f = KONTEN.footer;
 
@@ -239,8 +283,9 @@ function footer(rute) {
     </nav>`).join("")}
     <div>
       <div class="ck-footer__sosial">
-        ${f.sosial.map((s) => `
-        <a href="${rute[s.kunci] ?? "#"}" aria-label="${teks(s.label)}" rel="noopener">${ikonSosial(s.ikon)}</a>`).join("")}
+        ${f.sosial.map((s) => rute[s.kunci]
+          ? `<a href="${rute[s.kunci]}" aria-label="${teks(s.label)}" rel="noopener">${ikonSosial(s.ikon)}</a>`
+          : `<button type="button" disabled aria-label="${teks(s.label)} — segera hadir" title="Segera hadir">${ikonSosial(s.ikon)}</button>`).join("")}
       </div>
       <div class="ck-footer__hak">${teks(f.hakCipta)}</div>
     </div>

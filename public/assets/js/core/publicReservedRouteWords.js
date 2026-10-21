@@ -1,10 +1,7 @@
 /**
- * Kata yang tidak boleh jadi slug showroom di root ("carlynk.id/{slug}") --
- * bertabrakan dengan rute sistem yang juga hidup di root (dashboard peran,
- * auth, path API, dst). HARUS sejalan dengan RESERVED_SLUGS di
- * app/Modules/Showrooms/Services/ShowroomService.php -- itu yang mencegah
- * showroom baru dapat slug ini sejak awal; daftar di sini jaring pengaman
- * kedua di sisi rute/klien.
+ * Prefix ini dikirim shell oleh server dari definisi route SPA dan PHP yang
+ * benar-benar terdaftar. Daftar fallback hanya dipakai di lingkungan yang
+ * menyajikan aset tanpa bridge PHP (mis. unit test/editor).
  *
  * Berkas ini sengaja tidak mengimpor apa pun. beberapa pemakainya (mis.
  * utils/lastViewedPublicContext.js, utils/buyerShowroomUrl.js,
@@ -14,7 +11,7 @@
  * yang pada akhirnya mengimpor balik routes.js untuk daftar ini), yang
  * membuat modul tersebut membaca nilai belum terinisialisasi saat load.
  */
-export const publicReservedRoutePrefixes = Object.freeze([
+const FALLBACK_RESERVED_ROUTE_PREFIXES = [
   "admin",
   "tasks",
   "fitur",
@@ -47,4 +44,15 @@ export const publicReservedRoutePrefixes = Object.freeze([
   "assets",
   "tester",
   "app",
-]);
+];
+
+const injectedPrefixes = globalThis.__PROJECTB_RESERVED_ROUTE_PREFIXES__;
+const routePrefixes = Array.isArray(injectedPrefixes)
+  ? injectedPrefixes
+  : FALLBACK_RESERVED_ROUTE_PREFIXES;
+
+export const publicReservedRoutePrefixes = Object.freeze(
+  [...new Set(routePrefixes
+    .map((prefix) => String(prefix ?? "").trim().toLowerCase())
+    .filter((prefix) => /^[a-z0-9-]+$/.test(prefix)))]
+);

@@ -19,11 +19,11 @@ import { publicCatalogState } from "../state/publicCatalogState.js";
 import { MaintenancePage } from "./maintenancePage.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 import { applyDesignHook } from "../../../theme/designStudioHooks.js";
-import { getListingLockStatus } from "../../../utils/transactionStatus.js";
+import { getListingLockStatus, getListingStatusMeta } from "../../../utils/transactionStatus.js";
 
 const PUBLIC_DETAIL_FALLBACK = "bg-[radial-gradient(circle_at_top_left,color-mix(in_srgb,var(--pb-brand-accent)_18%,transparent),transparent_24%),linear-gradient(180deg,var(--pb-public-canvas-start)_0%,var(--pb-public-canvas-mid)_48%,var(--pb-public-canvas-end)_100%)]";
 
-export function PublicCarDetailPage() {
+export function PublicCarDetailPage({ preview = false } = {}) {
   let root = null;
   let unsubscribe = null;
   let backgroundVideoLayer = null;
@@ -38,6 +38,9 @@ export function PublicCarDetailPage() {
 
   return createPageLifecycle({
     async bootstrap(context) {
+      if (preview) {
+        return;
+      }
       publicContextService.syncRouteContext(context);
       const affiliateSlug = publicContextService.routeAffiliateSlug(context);
       const showroomSlug = publicContextService.routeShowroomSlug(context);
@@ -53,15 +56,17 @@ export function PublicCarDetailPage() {
     mount(context) {
       root = document.createElement("div");
       root.className = "min-h-screen pb-24 sm:pb-0";
-      render(root, context, getBackgroundVideoLayer);
-      publicAffiliateTrackingService.trackCurrentPage();
+      render(root, context, getBackgroundVideoLayer, preview);
+      if (!preview) {
+        publicAffiliateTrackingService.trackCurrentPage();
+      }
       return root;
     },
     hydrate(context) {
-      render(root, context, getBackgroundVideoLayer);
+      render(root, context, getBackgroundVideoLayer, preview);
     },
     bindEvents(context) {
-      unsubscribe = appStore.subscribe(() => render(root, context, getBackgroundVideoLayer));
+      unsubscribe = appStore.subscribe(() => render(root, context, getBackgroundVideoLayer, preview));
       return () => unsubscribe?.();
     },
     unmount() {},
@@ -73,21 +78,24 @@ export function PublicCarDetailPage() {
   });
 }
 
-function render(root, context, getBackgroundVideoLayer) {
+function render(root, context, getBackgroundVideoLayer, preview) {
   if (!root) {
     return;
   }
 
   const routeCarId = String(context.params?.id ?? "");
-  const detailNode = appStore.get("working.publicCarDetail.detail", null);
-  const rawDetail = detailNode?.data ?? null;
+  const detailNode = appStore.get(preview ? "working.sellerCarPreview.detail" : "working.publicCarDetail.detail", null);
+  const previewResult = preview ? detailNode?.data ?? null : null;
+  const rawDetail = preview
+    ? (previewResult?.status === "ready" ? previewResult.detail : null)
+    : detailNode?.data ?? null;
   const detail = String(rawDetail?.car?.id ?? "") === routeCarId ? rawDetail : null;
   const hasHydrated = Boolean(detailNode?.hydratedAt);
-  const affiliate = publicContextService.activeAffiliate();
-  const showroom = publicContextService.activeShowroom();
+  const affiliate = preview ? null : publicContextService.activeAffiliate();
+  const showroom = preview ? null : publicContextService.activeShowroom();
   const activeContext = affiliate || showroom;
 
-  if (publicContextService.routeAffiliateSlug(context) || publicContextService.routeShowroomSlug(context)) {
+  if (!preview && (publicContextService.routeAffiliateSlug(context) || publicContextService.routeShowroomSlug(context))) {
     const maintenance = publicContextService.inactiveShowroomContext();
     if (maintenance.isInactive) {
       root.replaceChildren(MaintenancePage({ showroomName: maintenance.showroomName }));
@@ -95,7 +103,7 @@ function render(root, context, getBackgroundVideoLayer) {
     }
   }
 
-  const summary = publicCatalogState.selectedCarSummary(context.params.id, {
+  const summary = preview ? null : publicCatalogState.selectedCarSummary(context.params.id, {
     affiliateSlug: publicContextService.routeAffiliateSlug(context),
     showroomSlug: publicContextService.routeShowroomSlug(context),
     filters: publicCatalogState.filters(),
@@ -104,15 +112,25 @@ function render(root, context, getBackgroundVideoLayer) {
   const car = detail?.car ?? summary;
   const images = detail?.images ?? car?.images ?? [];
   const inspection = detail?.inspection ?? null;
-  const backgroundVideoLayer = isPublicCarDetailRoute(context) ? getBackgroundVideoLayer?.() : null;
+  const backgroundVideoLayer = preview || isPublicCarDetailRoute(context) ? getBackgroundVideoLayer?.() : null;
+
+  if (preview && previewResult?.status === "error") {
+    root.replaceChildren(backgroundShell(backgroundVideoLayer, previewLoadFailure(context, previewResult)));
+    return;
+  }
+
+  if (preview && previewResult?.status === "not_found") {
+    root.replaceChildren(backgroundShell(backgroundVideoLayer, notFound(context, true)));
+    return;
+  }
 
   if (!car && !hasHydrated) {
-    root.replaceChildren(backgroundShell(backgroundVideoLayer, loadingDetail(context)));
+    root.replaceChildren(backgroundShell(backgroundVideoLayer, loadingDetail(context, preview)));
     return;
   }
 
   if (!car) {
-    root.replaceChildren(backgroundShell(backgroundVideoLayer, notFound(context)));
+    root.replaceChildren(backgroundShell(backgroundVideoLayer, notFound(context, preview)));
     return;
   }
 
@@ -132,7 +150,8 @@ function render(root, context, getBackgroundVideoLayer) {
     })
     : null;
   mainColumn.append(
-    backButton(context),
+    backButton(context, preview),
+    ...(preview ? [previewNotice(car)] : []),
     ...(banner ? [banner] : []),
     applyDesignHook(PublicCarGallery({ car, images }), "public.car_detail.gallery"),
     applyDesignHook(PublicCarTitleBlock({ car }), "public.car_detail.title"),
@@ -143,18 +162,18 @@ function render(root, context, getBackgroundVideoLayer) {
 
   const aside = document.createElement("aside");
   aside.className = "grid gap-4 lg:sticky lg:top-6 xl:top-8";
-  aside.append(
-    applyDesignHook(PublicPriceBlock({ car }), "public.car_detail.price_panel"),
-    desktopCta({ car, context }),
-    applyDesignHook(PublicSellerSummary({ car }), "public.car_detail.seller_summary")
-  );
+  aside.append(applyDesignHook(PublicPriceBlock({ car }), "public.car_detail.price_panel"));
+  if (!preview) {
+    aside.append(desktopCta({ car, context }));
+  }
+  aside.append(applyDesignHook(PublicSellerSummary({ car }), "public.car_detail.seller_summary"));
 
   frame.append(mainColumn, aside);
 
   root.replaceChildren(backgroundShell(
     backgroundVideoLayer,
     frame,
-    PublicStickyCta({
+    preview ? null : PublicStickyCta({
       car,
       onStartTransaction: (selectedCar) => startTransactionEntry(context, selectedCar),
       onConsult: (selectedCar) => publicContactService.openWhatsAppConsultation(selectedCar),
@@ -176,13 +195,13 @@ function backgroundShell(backgroundVideoLayer, ...children) {
   return shell;
 }
 
-function loadingDetail(context) {
+function loadingDetail(context, preview) {
   const wrap = document.createElement("main");
   wrap.className = "mx-auto grid w-full max-w-[1200px] gap-6 px-4 py-5 sm:px-6 sm:py-8 lg:grid-cols-[minmax(0,1fr)_360px] 2xl:max-w-[1240px]";
 
   const left = document.createElement("div");
   left.className = "grid gap-4";
-  left.append(backButton(context), Skeleton({ lines: 8 }), Skeleton({ lines: 6 }));
+  left.append(backButton(context, preview), Skeleton({ lines: 8 }), Skeleton({ lines: 6 }));
 
   const right = document.createElement("div");
   right.className = "grid gap-4";
@@ -192,31 +211,83 @@ function loadingDetail(context) {
   return wrap;
 }
 
-function notFound(context) {
+function notFound(context, preview) {
   const wrap = document.createElement("main");
   wrap.className = "mx-auto grid min-h-[70vh] w-full max-w-3xl place-items-center px-4 py-10";
   const content = document.createElement("div");
   content.className = "grid gap-4";
   content.append(EmptyState({
-    title: "Mobil tidak ditemukan",
-    description: "Kembali ke katalog untuk melihat mobil publik yang masih tersedia.",
+    title: preview ? "Pratinjau mobil tidak tersedia" : "Mobil tidak ditemukan",
+    description: preview
+      ? "Mobil ini tidak ditemukan atau akun Anda tidak memiliki akses ke listing tersebut."
+      : "Kembali ke katalog untuk melihat mobil publik yang masih tersedia.",
   }));
-  const button = Button({ label: "Kembali ke katalog", variant: "secondary", onClick: () => context.router.navigate(publicContextService.catalogPath()) });
+  const button = backButton(context, preview);
   button.classList.add("justify-self-center");
   content.append(button);
   wrap.append(content);
   return wrap;
 }
 
-function backButton(context) {
+function previewLoadFailure(context, result) {
+  const wrap = document.createElement("main");
+  wrap.className = "mx-auto grid min-h-[70vh] w-full max-w-3xl place-items-center px-4 py-10";
+
+  const content = document.createElement("section");
+  content.className = "grid justify-items-center gap-4 rounded-[24px] border border-[var(--pb-border)] bg-white/95 p-6 text-center shadow-card sm:p-8";
+  content.append(EmptyState({
+    title: "Live preview gagal dimuat",
+    description: result.message || "Terjadi kendala koneksi atau server. Silakan coba lagi.",
+  }));
+
+  const actions = document.createElement("div");
+  actions.className = "flex flex-wrap justify-center gap-3";
+  const retry = Button({
+    id: "slrc_preview_retry_button",
+    label: "Coba lagi",
+    onClick: () => retrySellerCarPreview(context),
+  });
+  retry.prepend(createIcon("history", { className: "h-4 w-4" }));
+  actions.append(retry, backButton(context, true));
+  content.append(actions);
+  wrap.append(content);
+  return wrap;
+}
+
+function retrySellerCarPreview(context) {
+  const query = new URLSearchParams();
+  if (context.query?.status === "archived") {
+    query.set("status", "archived");
+  }
+  query.set("retry", String(Date.now()));
+  context.router.navigate(`/seller/cars/${encodeURIComponent(context.params?.id ?? "")}/preview?${query.toString()}`);
+}
+
+function backButton(context, preview = false) {
   const button = Button({
-    label: "Kembali ke katalog",
+    label: preview ? "Kembali ke daftar mobil" : "Kembali ke katalog",
     variant: "secondary",
-    onClick: () => context.router.navigate(publicContextService.catalogPath()),
+    onClick: () => context.router.navigate(preview ? "/seller/cars" : publicContextService.catalogPath()),
   });
   button.classList.add("w-fit");
   button.prepend(createIcon("search", { className: "h-4 w-4" }));
   return button;
+}
+
+function previewNotice(car) {
+  const notice = document.createElement("section");
+  notice.className = "grid gap-1 rounded-[24px] border border-[var(--pb-border)] bg-white/95 px-5 py-4 shadow-card";
+
+  const title = document.createElement("h2");
+  title.className = "text-sm font-bold text-gray-950";
+  title.textContent = "Live Preview";
+
+  const description = document.createElement("p");
+  description.className = "text-xs leading-6 text-gray-600";
+  description.textContent = `Pratinjau khusus akun showroom · Status listing: ${getListingStatusMeta(car?.listing_status).label}. Aksi pembelian dan konsultasi tidak tersedia di halaman ini.`;
+
+  notice.append(title, description);
+  return notice;
 }
 
 function desktopCta({ car, context }) {

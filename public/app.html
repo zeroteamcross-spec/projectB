@@ -17,13 +17,15 @@
         var hostname = String(window.location.hostname || "").toLowerCase();
         var pathname = String(window.location.pathname || "/").replace(/\/+$/, "") || "/";
         var legacyHashRoute = /^#\/.+/.test(String(window.location.hash || ""));
-        var isMainLanding = (hostname === "carlynk.id" || hostname === "www.carlynk.id")
-          && pathname === "/"
+        var isMainCarlynkPage = (hostname === "carlynk.id" || hostname === "www.carlynk.id")
+          && (pathname === "/" || pathname === "/daftar-showroom")
           && !legacyHashRoute;
 
-        return isMainLanding ? "carlynk.id" : fallback;
+        return isMainCarlynkPage ? "carlynk.id" : fallback;
       };
     </script>
+    <script>window.__PROJECTB_RESERVED_ROUTE_PREFIXES__ = __PROJECTB_RESERVED_ROUTE_PREFIXES_JSON__;</script>
+    <script>window.__PROJECTB_CARLYNK_REGISTER_ICON__ = "/assets/v-__ASSET_VER__/images/landing/favicon-carlynk.png";</script>
     <script>window.__PROJECTB_ROLE_HOSTS__ = __ROLE_HOSTS__;</script>
     <script>window.__PROJECTB_CUSTOM_DOMAIN_SERVER_IP__ = "__CUSTOM_DOMAIN_SERVER_IP__";</script>
     <script>window.__PROJECTB_CUSTOM_DOMAIN_SHOWROOM_SLUG__ = __CUSTOM_DOMAIN_SHOWROOM_SLUG__;</script>

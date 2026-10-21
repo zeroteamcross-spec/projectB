@@ -67,4 +67,44 @@ class PaymentLogRepository
 
         return $stmt->fetchAll();
     }
+
+    public function midtransOrderIds(int $transactionId): array
+    {
+        $stmt = $this->pdo->prepare(
+            "SELECT DISTINCT provider_order_id FROM transaction_payment_logs
+             WHERE transaction_id = :transaction_id AND provider_name = 'midtrans'
+             AND provider_order_id IS NOT NULL AND provider_order_id <> ''"
+        );
+        $stmt->execute(['transaction_id' => $transactionId]);
+
+        return array_map('strval', $stmt->fetchAll(PDO::FETCH_COLUMN));
+    }
+
+    public function hasSuccessfulPayment(int $transactionId): bool
+    {
+        $stmt = $this->pdo->prepare(
+            "SELECT 1 FROM transaction_payment_operations
+             WHERE transaction_id = :transaction_id
+             AND operation_type IN ('initial_session', 'completion_session', 'legacy_session')
+             AND LOWER(COALESCE(provider_status, '')) IN ('settlement', 'capture', 'paid')
+             LIMIT 1"
+        );
+        $stmt->execute(['transaction_id' => $transactionId]);
+        if ($stmt->fetchColumn() !== false) {
+            return true;
+        }
+
+        // Raw Midtrans observations are audit evidence, not verified payment
+        // state. Keep application-recorded offline payments as trusted markers.
+        $offlineStmt = $this->pdo->prepare(
+            "SELECT 1 FROM transaction_payment_logs
+             WHERE transaction_id = :transaction_id
+             AND provider_name = 'offline'
+             AND LOWER(transaction_status) IN ('settlement', 'capture', 'paid', 'dp_paid')
+             LIMIT 1"
+        );
+        $offlineStmt->execute(['transaction_id' => $transactionId]);
+
+        return $offlineStmt->fetchColumn() !== false;
+    }
 }

@@ -131,7 +131,7 @@ export function SellerShowroomPage() {
     layout.id = "slrsr_page_section";
     layout.className = "grid min-w-0 gap-6";
     layout.dataset.ds = "seller.showroom.page";
-    layout.append(showroomHero({ router, showroom, editing: false }), branchSwitcherWidget.element, body);
+    layout.append(showroomHero({ router, showroom }), branchSwitcherWidget.element, body);
 
     if (showroom?.id) {
       layout.append(applyDesignHook(customDomainCard(showroom, runtime), "seller.showroom.customDomain"));
@@ -558,7 +558,7 @@ function setRuntime(patch = {}) {
   }, "seller:showroom-runtime");
 }
 
-function showroomHero({ router, showroom, editing }) {
+function showroomHero({ router, showroom }) {
   const section = document.createElement("section");
   section.id = "slrsr_hero_section";
   section.className = "relative overflow-hidden rounded-[2rem] border border-[var(--pb-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(250,244,237,0.84),rgba(234,244,249,0.72))] p-5 shadow-[0_24px_80px_rgba(15,23,42,0.10)] backdrop-blur-xl transition-shadow duration-150 sm:p-6 lg:p-7";
@@ -592,11 +592,7 @@ function showroomHero({ router, showroom, editing }) {
   const side = document.createElement("section");
   side.id = "slrsr_hero_actions_section";
   side.className = "grid gap-3";
-  const status = document.createElement("section");
-  status.id = "slrsr_mode_status_section";
-  status.className = "rounded-[1.25rem] border border-[var(--pb-card-border)] bg-white/78 px-4 py-3 text-xs font-bold text-gray-700 shadow-sm";
-  status.append(createIcon(editing ? "edit" : "eye", { className: "mr-2 h-4 w-4 text-[var(--pb-brand-secondary)]" }), document.createTextNode(editing ? "Mode edit showroom" : "Mode lihat showroom"));
-  side.append(status, dashboardButton);
+  side.append(dashboardButton);
 
   layout.append(copy, side);
   section.append(layout);

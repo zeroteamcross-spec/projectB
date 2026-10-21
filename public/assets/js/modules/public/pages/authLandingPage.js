@@ -6,6 +6,7 @@ import { createBackgroundVideoLayer } from "../../../ui/composites/backgroundVid
 import { createIcon } from "../../../theme/iconRegistry.js";
 import { showToast } from "../../../ui/primitives/toast.js";
 import { publicAuthLandingService } from "../services/publicAuthLandingService.js";
+import { buyerLoginCredentials } from "../../auth/services/buyerLoginCredentials.js";
 
 const ROLE_OPTIONS = [
   {
@@ -325,7 +326,9 @@ function authPanel({
   body.className = "text-xs leading-6 text-gray-600";
   body.textContent = requestedPath
     ? "Masuk, lalu kembali ke halaman tujuan."
-    : "Gunakan email dan password sesuai akun Anda.";
+    : selectedRole === "buyer" && activeMode === "login"
+      ? "Gunakan username atau email beserta password akun Buyer Anda."
+      : "Gunakan email dan password sesuai akun Anda.";
 
   header.append(title, body);
   section.append(header);
@@ -391,8 +394,15 @@ function authModeButton(value, label, activeMode, onModeChange) {
 function loginForm({ selectedRole, isSubmitting, error, onSubmit }) {
   const form = document.createElement("form");
   form.className = "grid gap-3";
+  const isBuyer = selectedRole === "buyer";
   form.append(
-    field({ id: `hr_auth_login_${selectedRole}_email_input`, name: "email", label: "Email", type: "email", placeholder: emailPlaceholder(selectedRole) }),
+    field({
+      id: `hr_auth_login_${selectedRole}_email_input`,
+      name: isBuyer ? "identifier" : "email",
+      label: isBuyer ? "Username atau email" : "Email",
+      type: isBuyer ? "text" : "email",
+      placeholder: emailPlaceholder(selectedRole),
+    }),
     field({ id: `hr_auth_login_${selectedRole}_password_input`, name: "password", label: "Password", type: "password", placeholder: "Password akun" }),
   );
 
@@ -416,10 +426,9 @@ function loginForm({ selectedRole, isSubmitting, error, onSubmit }) {
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     const data = Object.fromEntries(new FormData(form));
-    onSubmit?.({
-      email: data.email,
-      password: data.password,
-    });
+    onSubmit?.(isBuyer
+      ? buyerLoginCredentials(data.identifier, data.password)
+      : { email: data.email, password: data.password });
   });
 
   return form;
@@ -636,7 +645,7 @@ function emailPlaceholder(role) {
     return "affiliate@projectb.local";
   }
 
-  return "buyer@projectb.local";
+  return "Username atau buyer@projectb.local";
 }
 
 function registerEmailPlaceholder(role) {

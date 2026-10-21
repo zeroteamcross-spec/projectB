@@ -287,7 +287,7 @@ function masterSection(overview) {
   section.dataset.ds = "seller.inspection.master";
   section.append(
     textNode("p", "text-[10px] font-black uppercase tracking-[0.16em] text-[color-mix(in_srgb,var(--pb-brand-primary)_84%,black)]", "Master inspection"),
-    textNode("h2", "text-lg font-black tracking-normal text-gray-950", "Master paten aktif"),
+    textNode("h2", "text-lg font-black tracking-normal text-gray-950", "Master Item Inspeksi Aktif"),
     textNode("p", "text-xs leading-6 text-gray-500", "Section dan item inspeksi berasal dari master cabang showroom, bukan dari master admin global.")
   );
 

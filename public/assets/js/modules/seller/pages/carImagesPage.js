@@ -14,7 +14,7 @@ import { createIcon } from "../../../theme/iconRegistry.js";
 import { sellerState } from "../state/sellerState.js";
 import { SellerImageGalleryPreviewModal } from "../components/sellerImageGalleryPreviewModal.js";
 import { SellerImageUploadPanel } from "../components/sellerImageUploadPanel.js";
-import { SellerImageUploadQueueFooter, SellerImageUploadQueueModal } from "../components/sellerImageUploadQueueModal.js";
+import { SellerImageUploadQueueFooter, SellerImageUploadQueueModal, queueSaveBlocker } from "../components/sellerImageUploadQueueModal.js";
 import { SellerImagesList } from "../components/sellerImagesList.js";
 
 const RUNTIME_KEY = "sellerCarImages";
@@ -80,6 +80,9 @@ export function SellerCarImagesPage() {
   }
 
   function removeQueueItem(queueId) {
+    if (runtimeState().uploading) {
+      return;
+    }
     const item = uploadQueue.find((entry) => entry.id === queueId);
     revokeQueueItem(item);
     uploadQueue = uploadQueue.filter((entry) => entry.id !== queueId);
@@ -87,7 +90,10 @@ export function SellerCarImagesPage() {
   }
 
   function closeQueueModal() {
-    if (runtimeState().uploading) {
+    const blocker = queueSaveBlocker(uploadQueue, runtimeState().uploading);
+    if (blocker) {
+      setRuntime({ error: blocker, notice: "" });
+      showToast(blocker, { type: "error" });
       return;
     }
     uploadQueue.forEach(revokeQueueItem);
@@ -226,7 +232,6 @@ function render(root, router, params, queueApi) {
           images,
           busyImageId: runtime.busyImageId,
           onPreview: (image) => openGalleryPreview(image),
-          onSetCover: (image) => setCover(carId, image),
           onDelete: (image) => deleteImage(carId, image),
           onMoveUp: (image) => reorderImage(carId, image, -1),
           onMoveDown: (image) => reorderImage(carId, image, 1),
@@ -346,21 +351,9 @@ function syncQueueModal({ carId, queueApi, runtime }) {
     error: runtime.error,
     onFilesChange: queueApi.addFiles,
     onStart: () => uploadQueueItems(carId, queueApi.getQueue(), queueApi.touchQueue),
-    onRetryFailed: () => uploadQueueItems(carId, queueApi.getQueue(), queueApi.touchQueue),
+    onRetryFailed: () => uploadQueueItems(carId, queueApi.getQueue(), queueApi.touchQueue, ["failed"]),
     onClose: queueApi.closeQueueModal,
-    onEdit: (item) => openImageEditor(item, queueApi),
     onRemove: queueApi.removeQueueItem,
-    onToggleCover: (item, isCover) => {
-      if (isCover) {
-        queueApi.getQueue().forEach((entry) => {
-          entry.isCover = entry.id === item.id;
-        });
-        queueApi.touchQueue();
-        return;
-      }
-      item.isCover = isCover;
-      queueApi.touchQueue();
-    },
     showActions: false,
   }), {
     key: QUEUE_MODAL_KEY,
@@ -370,7 +363,7 @@ function syncQueueModal({ carId, queueApi, runtime }) {
       queue: queueApi.getQueue(),
       uploading: runtime.uploading,
       onStart: () => uploadQueueItems(carId, queueApi.getQueue(), queueApi.touchQueue),
-      onRetryFailed: () => uploadQueueItems(carId, queueApi.getQueue(), queueApi.touchQueue),
+      onRetryFailed: () => uploadQueueItems(carId, queueApi.getQueue(), queueApi.touchQueue, ["failed"]),
       onClose: queueApi.closeQueueModal,
     }),
     panelId: "slri_queue_modal_panel_section",
@@ -429,8 +422,11 @@ function moveGalleryPreview(direction) {
   setRuntime({ previewIndex: nextIndex });
 }
 
-async function uploadQueueItems(carId, queue, touchQueue) {
-  const pending = queue.filter((item) => ["queued", "ready", "failed"].includes(item.status));
+async function uploadQueueItems(carId, queue, touchQueue, statuses = ["queued", "ready"]) {
+  if (runtimeState().uploading) {
+    return;
+  }
+  const pending = queue.filter((item) => statuses.includes(item.status));
   if (!pending.length) {
     setRuntime({ error: "Pilih gambar terlebih dahulu.", notice: "" });
     showToast("Pilih gambar terlebih dahulu.", { type: "error" });

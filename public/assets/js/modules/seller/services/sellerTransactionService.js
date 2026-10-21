@@ -1,4 +1,6 @@
 import { transactionsResource } from "../../../resources/transactionsResource.js";
+import { apiClient } from "../../../core/apiClient.js";
+import { authStore } from "../../../state/authStore.js";
 import { getTransactionStatusMeta, isPaymentPaid } from "../../../utils/transactionStatus.js";
 
 export const sellerTransactionService = {
@@ -8,6 +10,30 @@ export const sellerTransactionService = {
 
   detail(transactionId, options = {}) {
     return transactionsResource.detail(transactionId, options);
+  },
+
+  async createOfflineBooking(payload, options = {}) {
+    const response = await apiClient.post("/transactions/offline-bookings", payload, options);
+    return response.data?.transaction ?? null;
+  },
+
+  async recordOfflinePayment(transactionId, payload, options = {}) {
+    const response = await apiClient.post(`/transactions/${encodeURIComponent(transactionId)}/offline-payment`, payload, options);
+    return response.data?.transaction ?? null;
+  },
+
+  canCreateOfflineBooking(car) {
+    return isCurrentSellerOwner(car?.seller_user_id)
+      && car?.listing_status === "published";
+  },
+
+  canRecordOfflinePayment(transaction) {
+    const hasManualProof = transaction?.payment_method === "manual_transfer"
+      && Boolean(transaction?.manual_transfer?.proof_path);
+    return isCurrentSellerOwner(transaction?.seller_user_id)
+      && transaction?.payment_type === "dp"
+      && transaction?.transaction_status === "pending_payment"
+      && !hasManualProof;
   },
 
   updateStatus(transactionId, payload = {}, options = {}) {
@@ -102,6 +128,16 @@ export const sellerTransactionService = {
     };
   },
 };
+
+function isCurrentSellerOwner(sellerUserId) {
+  const user = authStore.user();
+  return authStore.isAuthenticated()
+    && authStore.role() === "seller"
+    && user?.role === "seller"
+    && Number.isSafeInteger(Number(sellerUserId))
+    && Number(sellerUserId) > 0
+    && Number(user?.id) === Number(sellerUserId);
+}
 
 function isPaidStatus(status) {
   return ["dp_paid", "paid", "completed"].includes(String(status ?? ""));

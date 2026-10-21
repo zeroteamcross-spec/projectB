@@ -28,17 +28,27 @@ class MidtransCallbackHandler
             throw new ValidationException(['transaction_status' => 'The transaction_status field is required.']);
         }
 
-        return [
+        $normalized = [
             'provider_name' => 'midtrans',
             'order_id' => (string) $payload['order_id'],
             'transaction_id' => isset($payload['transaction_id']) ? (string) $payload['transaction_id'] : null,
             'payment_type' => isset($payload['payment_type']) ? (string) $payload['payment_type'] : null,
             'transaction_status' => (string) $payload['transaction_status'],
-            'gross_amount' => isset($payload['gross_amount']) ? (float) $payload['gross_amount'] : null,
-            'fraud_status' => isset($payload['fraud_status']) ? (string) $payload['fraud_status'] : null,
+            // Keep the provider's exact amount representation. Midtrans signs
+            // the original gross_amount bytes and downstream validation must
+            // not receive a lossy float conversion.
+            'gross_amount' => $payload['gross_amount'] ?? null,
             'status_code' => isset($payload['status_code']) ? (string) $payload['status_code'] : null,
             'payload_callback' => $payload,
         ];
+
+        // Absence and an explicit non-accept fraud status have different
+        // meanings for capture. Keep this key absent if Midtrans omitted it.
+        if (array_key_exists('fraud_status', $payload)) {
+            $normalized['fraud_status'] = (string) $payload['fraud_status'];
+        }
+
+        return $normalized;
     }
 
     private function verifySignature(array $payload): void

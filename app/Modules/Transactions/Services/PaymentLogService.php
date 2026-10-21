@@ -42,13 +42,30 @@ class PaymentLogService
         return $this->logs->latestByTransaction($transactionId, $limit);
     }
 
-    public function providerStatusToCanon(array $transaction, ?string $providerStatus, ?int $grossAmount): ?string
+    public function midtransOrderIds(int $transactionId): array
+    {
+        return $this->logs->midtransOrderIds($transactionId);
+    }
+
+    public function hasSuccessfulPayment(int $transactionId): bool
+    {
+        return $this->logs->hasSuccessfulPayment($transactionId);
+    }
+
+    public function providerStatusToCanon(
+        array $transaction,
+        ?string $providerStatus,
+        ?int $grossAmount,
+        ?int $expectedGrossAmount,
+        ?string $fraudStatus = null,
+        bool $fraudStatusPresent = false
+    ): ?string
     {
         if (! is_string($providerStatus) || $providerStatus === '') {
             return null;
         }
 
-        $providerStatus = strtolower($providerStatus);
+        $providerStatus = strtolower(trim($providerStatus));
 
         // Booking Fee closes the transaction in the application. Keep the
         // canonical dp_paid status stable when a late provider callback for
@@ -74,6 +91,17 @@ class PaymentLogService
         }
 
         if (in_array($providerStatus, ['settlement', 'capture', 'paid'], true)) {
+            if ($providerStatus === 'capture'
+                && (! $fraudStatusPresent || strtolower(trim((string) $fraudStatus)) !== 'accept')) {
+                return null;
+            }
+
+            if ($grossAmount === null
+                || $expectedGrossAmount === null
+                || $grossAmount !== $expectedGrossAmount) {
+                return null;
+            }
+
             return $this->settledStatus($transaction, $grossAmount);
         }
 

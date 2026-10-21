@@ -9,6 +9,22 @@ use App\Modules\Auth\Policies\StaffAccessPolicy;
 
 class TransactionPolicy
 {
+    public static function ensureCanCreateOfflineBooking(array $user, array $car): void
+    {
+        if (($user['role'] ?? null) !== 'seller'
+            || (int) ($user['id'] ?? 0) !== (int) ($car['seller_user_id'] ?? 0)) {
+            throw new ForbiddenException('Hanya owner showroom pemilik mobil yang dapat membuat booking offline.');
+        }
+    }
+
+    public static function ensureCanRecordOfflinePayment(array $user, array $transaction): void
+    {
+        if (($user['role'] ?? null) !== 'seller'
+            || (int) ($user['id'] ?? 0) !== (int) ($transaction['seller_user_id'] ?? 0)) {
+            throw new ForbiddenException('Hanya owner showroom pemilik transaksi yang dapat mencatat pembayaran offline.');
+        }
+    }
+
     public static function scopeFilters(array $user, array $filters): array
     {
         if (in_array(($user['role'] ?? null), ['admin', 'super_admin'], true)) {

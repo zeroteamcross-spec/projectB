@@ -62,7 +62,6 @@ export function SellerImageUploadPanel({
   checklist.className = "grid gap-2 text-xs text-[var(--pb-text-strong)]";
   checklist.append(
     guidanceItem("camera", "Gunakan foto eksterior/interior yang terang."),
-    guidanceItem("star", "Tandai salah satu foto sebagai cover bila perlu."),
     guidanceItem("image", "Thumbnail dan status upload tampil per file.")
   );
 

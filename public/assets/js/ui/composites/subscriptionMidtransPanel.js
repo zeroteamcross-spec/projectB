@@ -1,5 +1,6 @@
 import { Button } from "../primitives/button.js";
 import { showroomsResource } from "../../resources/showroomsResource.js";
+import { adminMasterService } from "../../modules/admin/services/adminMasterService.js";
 
 const BANKS = [
   { value: "bca", label: "BCA" },
@@ -9,6 +10,14 @@ const BANKS = [
 ];
 
 const POLL_INTERVAL_MS = 5000;
+const BANK_NAME_ALIASES = Object.freeze({
+  bca: ["bca", "bankcentralasia"],
+  bni: ["bni", "banknegaraindonesia"],
+  bri: ["bri", "bankrakyatindonesia"],
+  mandiri: ["mandiri", "bankmandiri"],
+});
+let bankIconsCache = null;
+let bankIconsPromise = null;
 
 /**
  * Panel "bayar via Virtual Account (Midtrans)" -- dipakai di dua tempat
@@ -33,12 +42,16 @@ export function SubscriptionMidtransPanel({ getShowroom, getShowroomId = null, o
   let isCharging = false;
   let error = "";
   let selectedBank = BANKS[0].value;
+  let bankIcons = new Map();
+  let disposed = false;
 
   render();
+  void loadBankIcons();
 
   return {
     element: root,
     dispose() {
+      disposed = true;
       stopPolling();
     },
   };
@@ -85,7 +98,19 @@ export function SubscriptionMidtransPanel({ getShowroom, getShowroomId = null, o
           ? "border-[var(--pb-brand-primary)] bg-[color-mix(in_srgb,var(--pb-brand-primary)_8%,white)] text-[var(--pb-brand-secondary)]"
           : "border-[var(--pb-card-border)] bg-white text-gray-700 hover:border-[color-mix(in_srgb,var(--pb-brand-primary)_35%,var(--pb-card-border))]",
       ].join(" ");
-      option.textContent = bank.label;
+      const iconUrl = bankIcons.get(bank.value);
+      if (iconUrl) {
+        const image = document.createElement("img");
+        image.src = iconUrl;
+        image.alt = "";
+        image.setAttribute("aria-hidden", "true");
+        image.className = "h-5 w-5 shrink-0 object-contain";
+        image.addEventListener("error", () => image.remove(), { once: true });
+        option.append(image);
+      }
+      const label = document.createElement("span");
+      label.textContent = bank.label;
+      option.append(label);
       option.addEventListener("click", () => {
         selectedBank = bank.value;
         render();
@@ -206,6 +231,19 @@ export function SubscriptionMidtransPanel({ getShowroom, getShowroomId = null, o
     }
   }
 
+  async function loadBankIcons() {
+    try {
+      bankIcons = await getSubscriptionBankIcons();
+      if (disposed) {
+        return;
+      }
+      render();
+    } catch {
+      // Bank labels and payment flow stay usable if the optional master icon
+      // request fails.
+    }
+  }
+
   function row(label, value) {
     const node = document.createElement("div");
     node.className = "flex items-center justify-between gap-3 text-xs";
@@ -285,4 +323,52 @@ export function SubscriptionMidtransPanel({ getShowroom, getShowroomId = null, o
     }
     return new Intl.DateTimeFormat("id-ID", { dateStyle: "medium", timeStyle: "short" }).format(new Date(time));
   }
+}
+
+function getSubscriptionBankIcons() {
+  if (bankIconsCache) {
+    return Promise.resolve(bankIconsCache);
+  }
+  if (!bankIconsPromise) {
+    bankIconsPromise = adminMasterService.getBankMaster()
+      .then(subscriptionBankIconsFromMaster)
+      .then((icons) => {
+        bankIconsCache = icons;
+        return icons;
+      })
+      .finally(() => {
+        bankIconsPromise = null;
+      });
+  }
+  return bankIconsPromise;
+}
+
+export function subscriptionBankIconsFromMaster(master) {
+  const records = master?.data?.banks ?? master?.banks ?? [];
+  const result = new Map();
+
+  for (const bank of Array.isArray(records) ? records : []) {
+    if ((bank?.status ?? "active") !== "active") {
+      continue;
+    }
+    const iconPath = String(bank?.icon_path ?? "").trim();
+    if (!iconPath) {
+      continue;
+    }
+
+    const identifiers = [bank?.slug, bank?.bank_name]
+      .map(normalizeBankIdentifier)
+      .filter(Boolean);
+    for (const [bankKey, aliases] of Object.entries(BANK_NAME_ALIASES)) {
+      if (!result.has(bankKey) && identifiers.some((identifier) => aliases.includes(identifier))) {
+        result.set(bankKey, iconPath);
+      }
+    }
+  }
+
+  return result;
+}
+
+function normalizeBankIdentifier(value) {
+  return String(value ?? "").trim().toLocaleLowerCase("id-ID").replace(/[^a-z0-9]/g, "");
 }

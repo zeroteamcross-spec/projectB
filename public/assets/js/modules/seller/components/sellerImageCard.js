@@ -10,7 +10,6 @@ export function SellerImageCard({
   total = 1,
   busy = false,
   onPreview = null,
-  onSetCover = null,
   onDelete = null,
   onMoveUp = null,
   onMoveDown = null,
@@ -73,10 +72,6 @@ export function SellerImageCard({
   preview.id = `slri_image_preview_${imageKey}_button`;
   preview.prepend(createIcon("eye", { className: "h-4 w-4" }));
 
-  const cover = Button({ label: image.is_cover ? "Cover aktif" : "Jadikan cover", variant: "secondary", disabled: busy || image.is_cover, onClick: () => onSetCover?.(image) });
-  cover.id = `slri_image_cover_${imageKey}_button`;
-  cover.prepend(createIcon("star", { className: "h-4 w-4" }));
-
   const remove = Button({ label: "Hapus", variant: "danger", disabled: busy, onClick: () => onDelete?.(image) });
   remove.id = `slri_image_delete_${imageKey}_button`;
   remove.prepend(createIcon("trash", { className: "h-4 w-4" }));
@@ -89,7 +84,7 @@ export function SellerImageCard({
   moveDown.id = `slri_image_move_down_${imageKey}_button`;
   moveDown.prepend(createIcon("arrowRight", { className: "h-4 w-4 rotate-90" }));
 
-  actions.append(preview, cover, moveUp, moveDown, remove);
+  actions.append(preview, moveUp, moveDown, remove);
   meta.append(copy, actions);
 
   wrap.append(media, meta);

@@ -296,6 +296,11 @@ class RepositoryQueryTest extends TestCase
             logged_at TEXT,
             created_at TEXT
         )');
+        $pdo->exec('CREATE TABLE transaction_payment_operations (
+            transaction_id INTEGER NOT NULL,
+            operation_type TEXT NOT NULL,
+            provider_order_id TEXT NULL
+        )');
         $pdo->exec('CREATE TABLE affiliates (
             id INTEGER PRIMARY KEY,
             user_id INTEGER,

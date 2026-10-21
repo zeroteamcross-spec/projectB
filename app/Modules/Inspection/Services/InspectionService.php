@@ -761,6 +761,7 @@ class InspectionService
     private function masterSections(array $items): array
     {
         $sections = [];
+        $sectionOrder = array_flip(['road_test', 'exterior', 'interior', 'underbody_engine', 'documents']);
 
         foreach ($items as $item) {
             $key = $item['category_name'] ?? 'general';
@@ -769,7 +770,7 @@ class InspectionService
                 $sections[$key] = [
                     'section_key' => $key,
                     'label' => $this->sectionLabel($key),
-                    'sort_order' => (int) floor(((int) ($item['sort_order'] ?? 0)) / 100) * 100,
+                    'sort_order' => ($sectionOrder[$key] ?? count($sectionOrder)) * 100,
                     'items' => [],
                 ];
             }
@@ -777,7 +778,10 @@ class InspectionService
             $sections[$key]['items'][] = $item;
         }
 
-        usort($sections, static fn (array $left, array $right): int => $left['sort_order'] <=> $right['sort_order']);
+        usort($sections, static fn (array $left, array $right): int =>
+            ($left['sort_order'] <=> $right['sort_order'])
+            ?: strcmp((string) $left['section_key'], (string) $right['section_key'])
+        );
 
         return array_values($sections);
     }

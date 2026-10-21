@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use Tests\TestCase;
+use App\Modules\Showrooms\Services\PublicRouteSlugBootstrap;
 
 /**
  * Menjaga syarat yang membuat versi-di-jalur benar.
@@ -34,6 +35,7 @@ class FrontendAssetVersioningTest extends TestCase
         $this->modulJsTidakMemakaiImportAbsolut();
         $this->jsTidakMenyebutJalurAsetAbsolut();
         $this->halamanMasukMemakaiPlaceholderVersi();
+        $this->reservedRouteBootstrapRendersAValidUniqueJavascriptAssignment();
         $this->halamanTidakBolehIkutTersimpan();
     }
 
@@ -117,6 +119,32 @@ class FrontendAssetVersioningTest extends TestCase
             preg_match('~Cache-Control:\s*no-store~i', $isi) === 1,
             'index.php harus mengirim HTML dengan Cache-Control no-store.'
         );
+    }
+
+    private function reservedRouteBootstrapRendersAValidUniqueJavascriptAssignment(): void
+    {
+        foreach (['public/index.html', 'public/app.html'] as $page) {
+            $template = (string) file_get_contents($this->projectPath($page));
+            $this->assertTrue(
+                strpos($template, 'window.__PROJECTB_RESERVED_ROUTE_PREFIXES__ = __PROJECTB_RESERVED_ROUTE_PREFIXES_JSON__;') !== false,
+                $page . ' must keep the JavaScript property separate from its unique JSON placeholder.'
+            );
+
+            $rendered = PublicRouteSlugBootstrap::injectIntoHtml($template, ['admin', 'assets', '</script>']);
+            $expectedScript = 'window.__PROJECTB_RESERVED_ROUTE_PREFIXES__ = ["admin","assets","\\u003C/script\\u003E"];';
+            $this->assertTrue(
+                strpos($rendered, $expectedScript) !== false,
+                $page . ' must render the exact valid JavaScript assignment without replacing its property name.'
+            );
+            $this->assertTrue(
+                strpos($rendered, PublicRouteSlugBootstrap::HTML_PLACEHOLDER) === false,
+                $page . ' must not leave the route JSON placeholder in served HTML.'
+            );
+            $this->assertTrue(
+                strpos($rendered, 'window.["admin"') === false,
+                $page . ' must not turn the global property into invalid JavaScript syntax.'
+            );
+        }
     }
 
     /** @return list<string> */

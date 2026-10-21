@@ -15,7 +15,7 @@ class MidtransHttpClient
         $this->config = $config;
     }
 
-    public function post(string $path, array $payload): array
+    public function post(string $path, array $payload, ?string $idempotencyKey = null): array
     {
         $this->config->ensureUsable();
         $url = $this->config->coreApiBaseUrl() . '/' . ltrim($path, '/');
@@ -25,6 +25,9 @@ class MidtransHttpClient
             'Content-Type: application/json',
             'Authorization: Basic ' . base64_encode($this->config->serverKey() . ':'),
         ];
+        if ($idempotencyKey !== null && trim($idempotencyKey) !== '' && strlen($idempotencyKey) <= 46) {
+            $headers[] = 'Idempotency-Key: ' . $idempotencyKey;
+        }
 
         if (function_exists('curl_init')) {
             return $this->postWithCurl($url, $body, $headers);

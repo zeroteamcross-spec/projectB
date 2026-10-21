@@ -152,6 +152,10 @@ class TransactionMapper
 
     public static function paymentInstruction(array $logs, array $transaction = []): ?array
     {
+        if (($transaction['payment_method'] ?? null) === 'offline_payment') {
+            return null;
+        }
+
         foreach (self::paymentLogs($logs) as $log) {
             $paymentData = is_array($log['payment_data'] ?? null) ? $log['payment_data'] : [];
             $payloadResponse = is_array($log['payload_response'] ?? null) ? $log['payload_response'] : [];

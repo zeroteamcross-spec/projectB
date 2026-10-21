@@ -21,7 +21,9 @@ return static function (Router $router): void {
     $router->group('/api/transactions', static function (Router $router): void {
         $router->get('', [TransactionController::class, 'list']);
         $router->post('', [TransactionController::class, 'create']);
+        $router->post('/offline-bookings', [TransactionController::class, 'createOfflineBooking']);
         $router->get('/{transaction_id}', [TransactionController::class, 'detail']);
+        $router->post('/{transaction_id}/offline-payment', [TransactionController::class, 'recordOfflinePayment']);
         $router->get('/{transaction_id}/status', [TransactionController::class, 'status']);
         $router->post('/{transaction_id}/payment-status/sync', [TransactionController::class, 'syncPaymentStatus']);
         $router->get('/{transaction_id}/payment-qr', [TransactionController::class, 'downloadPaymentQr']);

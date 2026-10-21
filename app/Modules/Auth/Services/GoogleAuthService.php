@@ -10,6 +10,7 @@ use App\Core\Exceptions\UnauthorizedException;
 use App\Core\Exceptions\ValidationException;
 use App\Modules\Auth\Repositories\AuthTokenRepository;
 use App\Modules\Auth\Repositories\GoogleAuthRepository;
+use App\Modules\Showrooms\Services\SystemRouteSlugRegistry;
 use App\Modules\Auth\Repositories\GoogleOAuthSessionRepository;
 use App\Modules\Showrooms\Repositories\ShowroomRepository;
 use DateInterval;
@@ -925,7 +926,9 @@ class GoogleAuthService
         }
 
         for ($attempt = 0; $attempt < 20; $attempt++) {
-            $suffix = $attempt === 0 ? '' : '-' . strtolower(bin2hex(random_bytes(2)));
+            $suffix = ($attempt === 0 && ! SystemRouteSlugRegistry::isReserved($base))
+                ? ''
+                : '-' . strtolower(bin2hex(random_bytes(2)));
             $slug = substr($base, 0, 60 - strlen($suffix)) . $suffix;
 
             if (! $this->repository->showroomSlugExists($slug, $ignoreShowroomId)) {

@@ -11,7 +11,7 @@ const ROLE_CONFIG = Object.freeze({
     subtitle: "Masuk sebagai Buyer",
     home: "/buyer",
     icon: "transaction",
-    emailPlaceholder: "buyer@projectb.local",
+    emailPlaceholder: "Username atau buyer@projectb.local",
   },
   admin: {
     role: "admin",

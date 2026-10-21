@@ -283,6 +283,30 @@ class ManualTransferPaymentTest extends TestCase
             logged_at TEXT,
             created_at TEXT
         )');
+        $pdo->exec('CREATE TABLE transaction_payment_operations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            transaction_id INTEGER NOT NULL,
+            parent_operation_id INTEGER NULL,
+            operation_key TEXT NOT NULL,
+            operation_type TEXT NOT NULL,
+            provider_order_id TEXT NULL,
+            payment_method TEXT NULL,
+            gross_amount INTEGER NULL,
+            idempotency_key TEXT NULL,
+            operation_status TEXT NOT NULL,
+            provider_status TEXT NULL,
+            fence INTEGER NOT NULL DEFAULT 0,
+            lease_token TEXT NULL,
+            lease_expires_at TEXT NULL,
+            first_attempt_at TEXT NULL,
+            request_payload_json TEXT NULL,
+            response_payload_json TEXT NULL,
+            error_payload_json TEXT NULL,
+            late_success_at TEXT NULL,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NULL,
+            completed_at TEXT NULL
+        )');
         $pdo->exec('CREATE TABLE affiliates (
             id INTEGER PRIMARY KEY,
             user_id INTEGER,
@@ -330,17 +354,22 @@ class FakeManualTransferAffiliateService extends AffiliateService
 
 class FakeManualTransferPaymentProvider implements PaymentProviderInterface
 {
-    public function createInitialPayment(array $transaction, array $customer, string $paymentMethod): array
+    public function createInitialPayment(array $transaction, array $customer, string $paymentMethod, ?string $providerOrderId = null, ?string $idempotencyKey = null): array
     {
         throw new \RuntimeException('Manual transfer transactions must never call the payment provider.');
     }
 
-    public function createCompletionPayment(array $transaction, array $customer, string $paymentMethod): array
+    public function createCompletionPayment(array $transaction, array $customer, string $paymentMethod, ?string $providerOrderId = null, ?string $idempotencyKey = null): array
     {
         return [];
     }
 
     public function checkStatus(string $providerOrderId): array
+    {
+        return [];
+    }
+
+    public function cancelPending(string $providerOrderId, ?string $idempotencyKey = null): array
     {
         return [];
     }
