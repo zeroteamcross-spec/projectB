@@ -168,7 +168,6 @@ function formSection(config, state, actions) {
       app_name: appName.value.trim(),
       tagline: tagline.value.trim(),
       whatsapp_number: whatsapp.value.trim(),
-      landing_page_route_name: config.landing_page_route_name ?? "",
     };
   }
 
