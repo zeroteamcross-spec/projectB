@@ -206,7 +206,7 @@ function taskCard(task, state, actions) {
 
   const button = Button({
     id: `admin_task_beres_${task.id}`,
-    label: task.status === "sip" ? "Sudah Dikerjakan" : (state.savingId === task.id ? "Menyimpan..." : "Beres"),
+    label: task.status === "sip" ? "Sip" : (state.savingId === task.id ? "Menyimpan..." : "Beres"),
     variant: task.status === "sip" ? "secondary" : "ya",
     disabled: task.status === "sip" || state.savingId !== null,
     onClick: () => actions.complete(task),
