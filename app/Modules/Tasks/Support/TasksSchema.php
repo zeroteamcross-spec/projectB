@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS tasks (
   title VARCHAR(200) NOT NULL,
   description TEXT NULL,
   status ENUM('open', 'sip') NOT NULL DEFAULT 'open',
+  work_status ENUM('pending', 'done') NOT NULL DEFAULT 'pending',
   requested_by_user_id BIGINT UNSIGNED NULL,
   completed_by_user_id BIGINT UNSIGNED NULL,
   completed_at DATETIME NULL,

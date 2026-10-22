@@ -10,4 +10,9 @@ export const adminTasksService = {
     const response = await apiClient.patch(`/admin/tasks/${encodeURIComponent(taskId)}`, { status }, options);
     return response.data?.task ?? null;
   },
+
+  async updateWorkStatus(taskId, workStatus, options = {}) {
+    const response = await apiClient.patch(`/admin/tasks/${encodeURIComponent(taskId)}/work-status`, { work_status: workStatus }, options);
+    return response.data?.task ?? null;
+  },
 };

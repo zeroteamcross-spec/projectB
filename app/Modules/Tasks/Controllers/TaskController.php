@@ -57,6 +57,21 @@ class TaskController extends Controller
         ], 'Status tugas berhasil diperbarui.');
     }
 
+    public function updateWorkStatus(Request $request): JsonResponse
+    {
+        $this->schema->ensure();
+        $workStatus = trim((string) $request->input('work_status', ''));
+        $task = $this->service->updateWorkStatus(
+            $this->user($request),
+            (int) $request->routeParam('task_id'),
+            $workStatus
+        );
+
+        return JsonResponse::success([
+            'task' => $task,
+        ], 'Status pekerjaan berhasil diperbarui.');
+    }
+
     public function publicUpdate(Request $request): JsonResponse
     {
         $this->schema->ensure();

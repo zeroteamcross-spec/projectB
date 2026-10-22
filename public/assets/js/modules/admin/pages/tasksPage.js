@@ -4,9 +4,9 @@ import { EmptyState } from "../../../ui/primitives/emptyState.js";
 import { showToast } from "../../../ui/primitives/toast.js";
 import { adminTasksService } from "../services/adminTasksService.js";
 
-const STATUS_LABEL = {
-  open: "Belum selesai",
-  sip: "Sudah Dikerjakan",
+const WORK_STATUS_LABEL = {
+  pending: "Belum selesai",
+  done: "Sudah Dikerjakan",
 };
 
 export function TasksPage({ service = adminTasksService } = {}) {
@@ -133,7 +133,7 @@ function hero(state, actions) {
 
   const description = document.createElement("p");
   description.className = "max-w-3xl text-xs leading-6 text-[var(--pb-text-muted)]";
-  description.textContent = "Daftar tugas dan permintaan dari Anda. Klik Beres setelah pekerjaan selesai untuk mengubah status menjadi sip.";
+  description.textContent = "Badge menunjukkan progres pekerjaan. Tombol Beres hanya untuk konfirmasi Anda setelah memeriksa hasilnya.";
 
   const refresh = Button({
     label: state.loading ? "Memuat..." : "Refresh",
@@ -148,8 +148,8 @@ function hero(state, actions) {
 }
 
 function summary(state) {
-  const open = state.tasks.filter((task) => task.status === "open").length;
-  const done = state.tasks.filter((task) => task.status === "sip").length;
+  const open = state.tasks.filter((task) => (task.work_status || "pending") === "pending").length;
+  const done = state.tasks.filter((task) => task.work_status === "done").length;
   const grid = document.createElement("div");
   grid.className = "grid gap-3 sm:grid-cols-2";
   grid.append(summaryCard("Belum selesai", open), summaryCard("Sudah Dikerjakan", done));
@@ -188,8 +188,9 @@ function taskCard(task, state, actions) {
   copy.append(title, key);
 
   const status = document.createElement("span");
-  status.className = `inline-flex w-fit shrink-0 items-center rounded-full px-3 py-1 text-[10px] font-bold ${task.status === "sip" ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`;
-  status.textContent = STATUS_LABEL[task.status] || task.status;
+  const workStatus = task.work_status || "pending";
+  status.className = `inline-flex w-fit shrink-0 items-center rounded-full px-3 py-1 text-[10px] font-bold ${workStatus === "done" ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`;
+  status.textContent = WORK_STATUS_LABEL[workStatus] || WORK_STATUS_LABEL.pending;
   header.append(copy, status);
 
   const description = document.createElement("p");

@@ -392,7 +392,7 @@ class TaskRepository
     public function listAll(): array
     {
         $stmt = $this->pdo->query(
-            'SELECT t.id, t.task_key, t.title, t.description, t.status,
+            'SELECT t.id, t.task_key, t.title, t.description, t.status, t.work_status,
                     t.requested_by_user_id, requested.name AS requested_by_name,
                     t.completed_by_user_id, completed.name AS completed_by_name,
                     t.completed_at, t.created_at, t.updated_at
@@ -410,7 +410,7 @@ class TaskRepository
     public function findById(int $id): ?array
     {
         $stmt = $this->pdo->prepare(
-            'SELECT t.id, t.task_key, t.title, t.description, t.status,
+            'SELECT t.id, t.task_key, t.title, t.description, t.status, t.work_status,
                     t.requested_by_user_id, requested.name AS requested_by_name,
                     t.completed_by_user_id, completed.name AS completed_by_name,
                     t.completed_at, t.created_at, t.updated_at
@@ -444,5 +444,21 @@ class TaskRepository
         $stmt->bindValue(':updated_at', $updatedAt);
         $stmt->bindValue(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
+    }
+
+    public function updateWorkStatus(int $id, string $workStatus, string $updatedAt): void
+    {
+        $stmt = $this->pdo->prepare(
+            'UPDATE tasks
+             SET work_status = :work_status,
+                 updated_at = :updated_at
+             WHERE id = :id
+             AND deleted_at IS NULL'
+        );
+        $stmt->execute([
+            'work_status' => $workStatus,
+            'updated_at' => $updatedAt,
+            'id' => $id,
+        ]);
     }
 }

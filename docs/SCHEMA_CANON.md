@@ -821,6 +821,29 @@ Catatan:
 - status `completed` dipertahankan untuk kompatibilitas data lama; status itu bukan langkah lanjutan untuk transaksi baru berstatus `dp_paid`.
 - settlement tetap mengikuti runbook. Status transaksi `dp_paid` menandai transaksi selesai, sedangkan `accrued`, `pending`, dan `paid_out` tetap mengatur siklus payout komisi.
 
+## 4.21 `tasks` (operasional task board)
+
+Tujuan:
+Menyimpan permintaan pengguna, progres pengerjaan internal, dan konfirmasi akhir pengguna secara terpisah.
+
+Field tambahan/yang relevan:
+- `id` bigint unsigned, PK, auto increment
+- `task_key` varchar(120) not null unique
+- `title` varchar(200) not null
+- `description` text null
+- `work_status` enum(`pending`, `done`) not null default `pending`; progres implementasi yang ditampilkan sebagai badge
+- `status` enum(`open`, `sip`) not null default `open`; konfirmasi pengguna bahwa ia telah memeriksa hasil
+- `completed_by_user_id` bigint unsigned, FK -> `users.id`, null; aktor konfirmasi pengguna
+- `completed_at` datetime null; waktu konfirmasi pengguna
+- `created_at` datetime not null
+- `updated_at` datetime null
+- `deleted_at` datetime null
+
+Catatan:
+- `work_status` tidak boleh mengubah `status`, `completed_by_user_id`, atau `completed_at`
+- hanya aksi eksplisit pengguna pada tombol `Beres` yang mengubah `status` menjadi `sip`
+- label UI `Sudah Dikerjakan` berasal dari `work_status = 'done'`, bukan dari konfirmasi pengguna
+
 ---
 
 ## 4.21 `notifications`
@@ -1225,6 +1248,14 @@ Catatan:
 ### 6.9 Task status
 - `open`
 - `sip`
+
+Keterangan: status ini merekam konfirmasi akhir pengguna pada task board. Jangan gunakan untuk menandai progres implementasi.
+
+### 6.9.1 Task work status
+- `pending`
+- `done`
+
+Keterangan: `done` menampilkan badge `Sudah Dikerjakan`; status ini tidak mengonfirmasi tugas atas nama pengguna.
 
 ### 6.10 Commission type
 - `percent`

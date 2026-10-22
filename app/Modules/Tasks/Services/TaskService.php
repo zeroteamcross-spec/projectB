@@ -86,6 +86,27 @@ class TaskService
         return $this->map($this->tasks->findById($taskId));
     }
 
+    public function updateWorkStatus(array $user, int $taskId, string $workStatus): array
+    {
+        AuthPolicy::requireAdmin($user);
+
+        if ($taskId <= 0) {
+            throw new ValidationException(['task_id' => 'ID tugas tidak valid.']);
+        }
+
+        if (! in_array($workStatus, ['pending', 'done'], true)) {
+            throw new ValidationException(['work_status' => 'Status pekerjaan harus pending atau done.']);
+        }
+
+        if (! $this->tasks->findById($taskId)) {
+            throw new NotFoundException('Tugas tidak ditemukan.');
+        }
+
+        $this->tasks->updateWorkStatus($taskId, $workStatus, date('Y-m-d H:i:s'));
+
+        return $this->map($this->tasks->findById($taskId));
+    }
+
     private function map(?array $task): array
     {
         return [
@@ -94,6 +115,7 @@ class TaskService
             'title' => (string) ($task['title'] ?? ''),
             'description' => $task['description'] !== null ? (string) $task['description'] : null,
             'status' => (string) ($task['status'] ?? 'open'),
+            'work_status' => (string) ($task['work_status'] ?? 'pending'),
             'requested_by_user_id' => $task['requested_by_user_id'] !== null ? (int) $task['requested_by_user_id'] : null,
             'requested_by_name' => $task['requested_by_name'] !== null ? (string) $task['requested_by_name'] : null,
             'completed_by_user_id' => $task['completed_by_user_id'] !== null ? (int) $task['completed_by_user_id'] : null,

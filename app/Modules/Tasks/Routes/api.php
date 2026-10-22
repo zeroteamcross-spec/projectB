@@ -14,6 +14,7 @@ return static function (Router $router): void {
 
     $router->group('/api/admin/tasks', static function (Router $router): void {
         $router->get('', [TaskController::class, 'index']);
+        $router->patch('/{task_id}/work-status', [TaskController::class, 'updateWorkStatus']);
         $router->patch('/{task_id}', [TaskController::class, 'update']);
     }, [AuthenticatedUserMiddleware::class]);
 };
