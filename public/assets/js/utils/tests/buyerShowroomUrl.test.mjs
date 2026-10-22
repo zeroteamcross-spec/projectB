@@ -5,6 +5,7 @@ import {
   BUYER_SHOWROOM_URL_STORAGE_KEY,
   getBuyerShowroomCatalogUrl,
 } from "../buyerShowroomUrl.js";
+import { persistLastViewedShowroom } from "../lastViewedPublicContext.js";
 import { notificationsBuyerCatalogTarget } from "../../modules/notifications/pages/notificationsPage.js";
 
 function withBrowserStorage(run, { customDomainSlug = "" } = {}) {
@@ -52,12 +53,32 @@ function withAuthUser(user, run) {
   }
 }
 
-test("buyer showroom destination never falls back to a stored slug when current account has none", () => {
+test("buyer without an account showroom never trusts the legacy stored buyer slug", () => {
   withBrowserStorage((storage) => {
     withAuthUser({ id: 11, role: "buyer", home_showroom_slug: null }, () => {
       storage.setItem(BUYER_SHOWROOM_URL_STORAGE_KEY, "/showroom-lama");
-      assert.equal(getBuyerShowroomCatalogUrl(), "");
-      assert.equal(notificationsBuyerCatalogTarget(), "");
+      assert.equal(getBuyerShowroomCatalogUrl(), "/public");
+      assert.equal(notificationsBuyerCatalogTarget(), "/public");
+    });
+  });
+});
+
+test("buyer without an account showroom returns to the last showroom they actually viewed", () => {
+  withBrowserStorage((storage) => {
+    withAuthUser({ id: 15, role: "buyer", home_showroom_slug: null }, () => {
+      persistLastViewedShowroom("showroom-yang-dikunjungi");
+      // Navigasi ke Notifikasi menghapus publicContext aktif, bukan catatan
+      // aman tentang showroom terakhir yang telah dibuka oleh pengguna.
+      assert.equal(storage.getItem("projectB:public:last-viewed-context"), JSON.stringify({ path: "/showroom-yang-dikunjungi" }));
+      assert.equal(notificationsBuyerCatalogTarget(), "/showroom-yang-dikunjungi");
+    });
+  });
+});
+
+test("buyer without a home showroom stays on the verified custom-domain root", () => {
+  withBrowserStorage(() => {
+    withAuthUser({ id: 16, role: "buyer", home_showroom_slug: null }, () => {
+      assert.equal(notificationsBuyerCatalogTarget(), "/");
     });
   }, { customDomainSlug: "showroom-domain" });
 });

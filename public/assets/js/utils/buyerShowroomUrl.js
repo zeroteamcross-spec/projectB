@@ -1,5 +1,6 @@
 import { publicReservedRoutePrefixes } from "../core/publicReservedRouteWords.js";
 import { appStore } from "../state/store.js";
+import { getLastViewedPublicContextPath, publicContextPathFromRedirect } from "./lastViewedPublicContext.js";
 
 export const BUYER_SHOWROOM_URL_STORAGE_KEY = "projectB:buyer:showroom-url";
 
@@ -39,15 +40,25 @@ export function getBuyerShowroomCatalogUrl() {
     return "";
   }
 
-  const path = buyerShowroomCatalogUrlFromSlug(user.home_showroom_slug);
-  if (!isValidShowroomUrl(path)) {
-    return "";
-  }
-
   const customDomainSlug = typeof window === "undefined"
     ? ""
     : String(window.__PROJECTB_CUSTOM_DOMAIN_SHOWROOM_SLUG__ ?? "").trim();
-  return customDomainSlug && path === buyerShowroomCatalogUrlFromSlug(customDomainSlug)
-    ? "/"
-    : path;
+  const homeShowroomPath = buyerShowroomCatalogUrlFromSlug(user.home_showroom_slug);
+
+  if (isValidShowroomUrl(homeShowroomPath)) {
+    return customDomainSlug && homeShowroomPath === buyerShowroomCatalogUrlFromSlug(customDomainSlug)
+      ? "/"
+      : homeShowroomPath;
+  }
+
+  // Buyer yang masuk dengan akun password atau belum pernah login lewat
+  // tautan showroom tidak mempunyai home_showroom_slug. Pertahankan konteks
+  // showroom yang memang terakhir dibuka dan divalidasi oleh publicContext,
+  // agar menu Katalog dari Notifikasi tidak jatuh ke landing root.
+  if (customDomainSlug) {
+    return "/";
+  }
+
+  const lastViewedPath = publicContextPathFromRedirect(getLastViewedPublicContextPath());
+  return lastViewedPath || "/public";
 }
