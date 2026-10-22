@@ -5,8 +5,33 @@ import { activeSubscriptionPlans, selectedSubscriptionPlan, registrationPackageU
 import { landingPricingCardsMarkup } from "../public/assets/js/modules/public/pages/carlynkLanding/markup.js";
 import { subscriptionBankIconsFromMaster } from "../public/assets/js/ui/composites/subscriptionMidtransPanel.js";
 import { copyTextToClipboard } from "../public/assets/js/utils/copyTextToClipboard.js";
+import { bangunRute } from "../public/assets/js/modules/public/pages/carlynkLanding/content.js";
 
 const read = (path) => readFile(new URL(path, import.meta.url), "utf8");
+
+test("landing legal links open dedicated public routes while WhatsApp remains separate", () => {
+  const routes = bangunRute("https://wa.me/628111111111111", "/login/seller");
+
+  assert.equal(routes.syarat, "/syarat-ketentuan");
+  assert.equal(routes.privasi, "/kebijakan-privasi");
+  assert.equal(routes.konsultasi, "https://wa.me/628111111111111");
+  assert.equal(routes.facebook, null);
+  assert.equal(routes.instagram, null);
+});
+
+test("legal documents have public routes, draft notices, and reserved showroom slugs", async () => {
+  const routes = await read("../public/assets/js/modules/public/routes.js");
+  const reserved = await read("../public/assets/js/core/publicReservedRouteWords.js");
+  const legal = await read("../public/assets/js/modules/public/pages/legalDocumentPage.js");
+
+  assert.match(routes, /path: "\/syarat-ketentuan"[\s\S]*page: \(\) => LegalDocumentPage\("terms"\)/);
+  assert.match(routes, /path: "\/kebijakan-privasi"[\s\S]*page: \(\) => LegalDocumentPage\("privacy"\)/);
+  assert.match(reserved, /"syarat-ketentuan"/);
+  assert.match(reserved, /"kebijakan-privasi"/);
+  assert.match(legal, /Draf untuk ditinjau — belum berlaku/);
+  assert.doesNotMatch(legal, /wa\.me/i);
+  assert.match(legal, /Tanggal berlaku belum ditetapkan/);
+});
 
 test("landing prices use the current active master plans and omit inactive plans", () => {
   const plans = activeSubscriptionPlans([

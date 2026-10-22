@@ -198,7 +198,7 @@ class ShowroomRegistrationTest extends TestCase
     private function routePrefixesComeFromActualRouteDefinitions(): void
     {
         $prefixes = SystemRouteSlugRegistry::reservedPrefixes();
-        foreach (['login', 'google-login', 'fitur', 'security-report', 'admin', 'api'] as $routePrefix) {
+        foreach (['login', 'google-login', 'fitur', 'security-report', 'syarat-ketentuan', 'kebijakan-privasi', 'admin', 'api'] as $routePrefix) {
             $this->assertTrue(
                 in_array($routePrefix, $prefixes, true),
                 "Registered route prefix '{$routePrefix}' must be reserved for showroom slugs."

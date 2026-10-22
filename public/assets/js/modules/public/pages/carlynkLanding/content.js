@@ -177,12 +177,10 @@ export const KONTEN = Object.freeze({
 });
 
 /**
- * Tujuan setiap tautan.
+ * Tujuan setiap tautan landing.
  *
- * Yang halamannya sudah ada di aplikasi menunjuk ke rutenya. Sisanya --
- * harga, syarat, dan seterusnya -- belum punya halaman, jadi sementara
- * diarahkan ke WhatsApp supaya pengunjung tetap mendarat pada manusia, bukan
- * pada rute yang menjawab 404. Ganti nilainya di sini saat halamannya jadi.
+ * Halaman legal mempunyai rute khusus. Kanal konsultasi WhatsApp tetap
+ * terpisah dan tidak dipakai sebagai tujuan tautan legal.
  */
 export function bangunRute(tautanWhatsapp = "", tautanMasuk = "") {
   const wa = tautanWhatsapp || "#";
@@ -195,8 +193,8 @@ export function bangunRute(tautanWhatsapp = "", tautanMasuk = "") {
     tentang: wa,
     fitur: "#fitur",
     harga: "#harga",
-    syarat: wa,
-    privasi: wa,
+    syarat: "/syarat-ketentuan",
+    privasi: "/kebijakan-privasi",
     facebook: null,
     instagram: null,
   });

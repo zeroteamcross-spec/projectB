@@ -18,6 +18,7 @@ import { TasksPage } from "../admin/pages/tasksPage.js";
 import { publicTasksService } from "./services/publicTasksService.js";
 import { FeatureChecklistPage } from "./pages/featureChecklistPage.js";
 import { SecurityReportPage } from "./pages/securityReportPage.js";
+import { LegalDocumentPage } from "./pages/legalDocumentPage.js";
 
 export { publicReservedRoutePrefixes };
 
@@ -414,6 +415,22 @@ export const publicRoutes = [
     shell: "public",
     role: "public",
     page: SecurityReportPage,
+    workingStateKey: null,
+  },
+  {
+    name: "public.terms-and-conditions",
+    path: "/syarat-ketentuan",
+    shell: "public",
+    role: "public",
+    page: () => LegalDocumentPage("terms"),
+    workingStateKey: null,
+  },
+  {
+    name: "public.privacy-policy",
+    path: "/kebijakan-privasi",
+    shell: "public",
+    role: "public",
+    page: () => LegalDocumentPage("privacy"),
     workingStateKey: null,
   },
   {

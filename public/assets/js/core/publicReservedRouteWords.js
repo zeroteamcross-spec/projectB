@@ -16,6 +16,8 @@ const FALLBACK_RESERVED_ROUTE_PREFIXES = [
   "tasks",
   "fitur",
   "features",
+  "syarat-ketentuan",
+  "kebijakan-privasi",
   "security-report",
   "laporan-keamanan",
   "super-admin",
