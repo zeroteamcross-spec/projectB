@@ -313,6 +313,7 @@ function render(root, context, actions) {
   layout.append(
     affiliatesHero({ action: createButton(actions.createNew) }),
     applyDesignHook(summaryCards({ affiliates, counts }), "seller.affiliates.summary"),
+    prospectExplanation(),
     filterBar({ query, counts, onChange: actions.applyFilters }),
   );
 
@@ -625,6 +626,32 @@ function summaryCards({ affiliates, counts }) {
     section.append(card);
   });
 
+  return section;
+}
+
+function prospectExplanation() {
+  const section = document.createElement("section");
+  section.id = "slraf_prospect_explanation_section";
+  section.className = "grid min-w-0 gap-4 rounded-[1.5rem] border border-[color-mix(in_srgb,var(--pb-brand-primary)_22%,white)] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--pb-brand-primary)_7%,white),color-mix(in_srgb,var(--pb-brand-accent)_14%,white))] p-4 shadow-[var(--pb-shadow-card)] sm:p-5 lg:grid-cols-[minmax(0,1fr)_minmax(240px,0.72fr)] lg:items-start";
+  section.setAttribute("aria-labelledby", "slraf_prospect_explanation_title");
+
+  const explanation = document.createElement("div");
+  explanation.className = "grid min-w-0 gap-2";
+  explanation.append(
+    textNode("p", "w-fit rounded-full border border-[color-mix(in_srgb,var(--pb-brand-primary)_20%,white)] bg-white/75 px-3 py-1 text-[9px] font-black uppercase tracking-[0.14em] text-[var(--pb-brand-secondary)]", "Informasi prospek"),
+    textNode("h2", "break-words text-sm font-black text-[var(--pb-text-strong)] sm:text-base", "Bagaimana Prospek dihitung?"),
+    textNode("p", "break-words text-xs leading-6 text-[var(--pb-text-muted)]", "Saat ini Carlynk belum menghitung atau mencatat Prospek sebagai metrik tersendiri. Angka Prospek hanya membaca data prospek opsional dari server; jika datanya tidak tersedia, halaman menampilkan 0. Data yang saat ini dihitung adalah klik referral, transaksi, dan komisi. Klik tidak otomatis dianggap sebagai Prospek."),
+  );
+  explanation.querySelector("h2")?.setAttribute("id", "slraf_prospect_explanation_title");
+
+  const howTo = document.createElement("div");
+  howTo.className = "grid min-w-0 content-start gap-1 rounded-[1.15rem] border border-white/80 bg-white/75 p-3.5 sm:p-4";
+  howTo.append(
+    textNode("h3", "break-words text-xs font-black text-[var(--pb-text-strong)]", "Cara menjangkau calon pembeli"),
+    textNode("p", "break-words text-xs leading-6 text-[var(--pb-text-muted)]", "Bagikan tautan referral melalui tombol Copy Link atau Buka. Kunjungan pada tautan tercatat sebagai klik, bukan Prospek. Agar Prospek dapat dihitung, definisi dan alur pencatatannya perlu ditetapkan terlebih dahulu."),
+  );
+
+  section.append(explanation, howTo);
   return section;
 }
 
