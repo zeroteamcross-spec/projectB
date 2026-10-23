@@ -911,9 +911,13 @@ function resolveLocationMaster() {
 function masterLocationOptions(master) {
   return (master?.data?.cities ?? [])
     .filter((city) => city.status === "active")
-    .map((city) => city.name)
+    .map((city) => locationDisplayName(city.name))
     .filter(Boolean)
     .sort((a, b) => a.localeCompare(b));
+}
+
+function locationDisplayName(value) {
+  return String(value ?? "").trim().replace(/^kabupaten\s+/i, "");
 }
 
 function canLoadMoreCatalog(meta, shownCount, page, limit) {
@@ -950,7 +954,7 @@ function applyLocalFilters(cars, filters = {}) {
   const keyword = String(filters.keyword ?? "").trim().toLowerCase();
   const brands = selectedBrands(filters).map((brand) => brand.toLowerCase());
   const transmission = String(filters.transmission ?? "").trim().toLowerCase();
-  const locations = selectedLocations(filters).map((location) => location.toLowerCase());
+  const locations = selectedLocations(filters).map(locationFilterKey);
   const minPrice = Number(filters.min_price_cash ?? 0);
   const maxPrice = Number(filters.max_price_cash ?? 0);
 
@@ -967,7 +971,7 @@ function applyLocalFilters(cars, filters = {}) {
     if (keyword && !searchable.includes(keyword)) return false;
     if (brands.length > 0 && !brands.includes(String(car.brand_name ?? "").toLowerCase())) return false;
     if (transmission && String(car.transmission ?? "").toLowerCase() !== transmission) return false;
-    if (locations.length > 0 && !locations.includes(String(car.location_name ?? "").toLowerCase())) return false;
+    if (locations.length > 0 && !locations.includes(locationFilterKey(car.location_name))) return false;
     if (minPrice > 0 && price < minPrice) return false;
     if (maxPrice > 0 && price > maxPrice) return false;
     return true;
@@ -988,6 +992,10 @@ function selectedLocations(filters) {
   }
   const legacyLocation = String(filters?.location_name ?? "");
   return legacyLocation ? [legacyLocation] : [];
+}
+
+function locationFilterKey(value) {
+  return locationDisplayName(value).toLowerCase();
 }
 
 function marketableCars(cars = []) {

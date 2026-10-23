@@ -335,4 +335,10 @@ final class TaskCatalog
     public const SELLER_AFFILIATES_HIDE_ZERO_PROSPECT_TASK_TITLE = 'Sembunyikan metrik 0 prospek di halaman Marketing.';
 
     public const SELLER_AFFILIATES_HIDE_ZERO_PROSPECT_TASK_DESCRIPTION = 'Pada halaman seller/affiliates, hilangkan potongan teks "0 prospek" dari ringkasan performa marketing ketika jumlahnya nol; pertahankan klik dan transaksi, dan tampilkan jumlah prospek saat nilainya lebih dari nol. Referensi: Tugas GitIgnore/seller-affiliates-remove-zero-prospek-2026-10-23.png.';
+
+    public const PUBLIC_CATALOG_LOCATION_FILTER_KABUPATEN_TASK_KEY = 'request-056-public-catalog-location-filter-kabupaten';
+
+    public const PUBLIC_CATALOG_LOCATION_FILTER_KABUPATEN_TASK_TITLE = 'Hilangkan awalan Kabupaten dari pilihan lokasi katalog showroom.';
+
+    public const PUBLIC_CATALOG_LOCATION_FILTER_KABUPATEN_TASK_DESCRIPTION = 'Pada katalog publik showroom, filter lokasi masih menampilkan awalan "Kabupaten" karena mengambil city.name mentah dari payload Master Lokasi. Tampilkan label kota tanpa awalan tersebut dan normalisasikan pilihan serta lokasi listing lama saat pencocokan agar filter tetap bekerja. Referensi: Tugas GitIgnore/catalog-showroom-filter-kabupaten-reference-2026-10-23.png.';
 }

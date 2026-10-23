@@ -426,6 +426,14 @@ class TaskRepository
                 'work_status' => 'done',
                 'created_at' => '2026-10-23 00:00:00',
             ],
+            [
+                'task_key' => TaskCatalog::PUBLIC_CATALOG_LOCATION_FILTER_KABUPATEN_TASK_KEY,
+                'title' => TaskCatalog::PUBLIC_CATALOG_LOCATION_FILTER_KABUPATEN_TASK_TITLE,
+                'description' => TaskCatalog::PUBLIC_CATALOG_LOCATION_FILTER_KABUPATEN_TASK_DESCRIPTION,
+                'status' => 'open',
+                'work_status' => 'done',
+                'created_at' => '2026-10-23 00:00:00',
+            ],
         ];
     }
 

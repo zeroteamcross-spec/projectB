@@ -32,7 +32,7 @@ export function PublicFilterBottomSheet({
   content.className = "grid min-w-0 gap-5";
   const draft = {
     brands: selectedBrands(filters),
-    locations: selectedLocations(filters),
+    locations: selectedLocations(filters).map(locationDisplayName).filter(Boolean),
   };
 
   content.append(
@@ -296,6 +296,10 @@ function selectedLocations(filters) {
   }
   const legacyLocation = String(filters?.location_name ?? "");
   return legacyLocation ? [legacyLocation] : [];
+}
+
+function locationDisplayName(value) {
+  return String(value ?? "").trim().replace(/^kabupaten\s+/i, "");
 }
 
 function toggleValue(values, value) {
