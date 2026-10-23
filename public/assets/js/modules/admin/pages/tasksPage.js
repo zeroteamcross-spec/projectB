@@ -150,9 +150,15 @@ function hero(state, actions) {
 function summary(state) {
   const open = state.tasks.filter((task) => (task.work_status || "pending") === "pending").length;
   const done = state.tasks.filter((task) => task.work_status === "done").length;
+  const sip = state.tasks.filter((task) => task.status === "sip").length;
+
   const grid = document.createElement("div");
-  grid.className = "grid gap-3 sm:grid-cols-2";
-  grid.append(summaryCard("Belum selesai", open), summaryCard("Sudah Dikerjakan", done));
+  grid.className = "grid gap-3 sm:grid-cols-3";
+  grid.append(
+    summaryCard("Belum selesai", open),
+    summaryCard("Sudah Dikerjakan", done),
+    summaryCard("Sip", sip)
+  );
   return grid;
 }
 
