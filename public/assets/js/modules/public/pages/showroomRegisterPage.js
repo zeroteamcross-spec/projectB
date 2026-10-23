@@ -17,6 +17,30 @@ const SHOWROOM_REGISTER_FALLBACK = "bg-[radial-gradient(circle_at_12%_10%,color-
 const SLUG_MIN_LENGTH = 3;
 const SLUG_MAX_LENGTH = 80;
 
+export function showroomCityOptions(cities = []) {
+  return (Array.isArray(cities) ? cities : [])
+    .filter((city) => (city?.status ?? "active") === "active")
+    .map((city) => {
+      const value = String(city?.name ?? city?.city_name ?? "").trim();
+      const provinceName = String(city?.province_name ?? "").trim();
+
+      return value
+        ? { value, label: provinceName ? `${value}, ${provinceName}` : value }
+        : null;
+    })
+    .filter(Boolean);
+}
+
+export function showroomCityValue(options = [], enteredValue = "") {
+  const entered = String(enteredValue ?? "").trim();
+  const selected = (Array.isArray(options) ? options : []).find((option) => (
+    String(option?.value ?? "").trim() === entered
+    || String(option?.label ?? "").trim() === entered
+  ));
+
+  return selected ? String(selected.value) : entered;
+}
+
 /**
  * Registration-only entry point for showrooms. There is deliberately no login
  * form here — signing in happens from the landing page.
@@ -214,10 +238,7 @@ export function ShowroomRegisterPage() {
           .filter(([name, icon]) => name && icon)
       );
 
-      state.cities = (locationMaster?.data?.cities ?? locationMaster?.cities ?? [])
-        .filter((city) => (city?.status ?? "active") === "active")
-        .map((city) => String(city?.name ?? "").trim())
-        .filter(Boolean);
+      state.cities = showroomCityOptions(locationMaster?.data?.cities ?? locationMaster?.cities ?? []);
 
       await resumeExistingRegistration(state);
     },
@@ -527,6 +548,7 @@ function registerPanel(state, actions, context) {
     }
 
     const data = Object.fromEntries(new FormData(form));
+    data.city_name = showroomCityValue(state.cities, data.city_name);
     actions.updateDraft(data);
 
     const localError = validateDraft(data);
@@ -942,6 +964,23 @@ function field({ id, name, label, type = "text", placeholder = "", required = tr
  * datalist), jadi validasi backend dan frontend tidak berubah.
  */
 function selectField({ id, name, label, placeholder = "", options = [], required = true, value = "", error = "", iconFor = null }) {
+  const normalizedOptions = (Array.isArray(options) ? options : [])
+    .map((option) => {
+      if (option && typeof option === "object") {
+        const optionValue = String(option.value ?? "").trim();
+        const optionLabel = String(option.label ?? optionValue).trim() || optionValue;
+        return optionValue ? { value: optionValue, label: optionLabel } : null;
+      }
+
+      const optionValue = String(option ?? "").trim();
+      return optionValue ? { value: optionValue, label: optionValue } : null;
+    })
+    .filter(Boolean);
+  const currentValue = String(value ?? "").trim();
+  const selectedOption = normalizedOptions.find((option) => (
+    option.value === currentValue || option.label === currentValue
+  ));
+
   const wrap = document.createElement("div");
   wrap.className = "grid gap-1.5 text-xs font-semibold text-gray-700";
 
@@ -961,7 +1000,7 @@ function selectField({ id, name, label, placeholder = "", options = [], required
   input.required = required;
   input.autocomplete = "off";
   input.placeholder = placeholder ? `${placeholder} — ketik untuk mencari` : "Ketik untuk mencari";
-  input.value = value ?? "";
+  input.value = selectedOption?.label ?? currentValue;
   input.className = `${inputClassName(Boolean(error))} pr-10`;
   input.setAttribute("role", "combobox");
   input.setAttribute("aria-expanded", "false");
@@ -1001,12 +1040,16 @@ function selectField({ id, name, label, placeholder = "", options = [], required
   panel.className = "modal-scrollbar absolute inset-x-0 top-[calc(100%+0.4rem)] z-30 max-h-56 overflow-y-auto rounded-2xl border border-[var(--pb-card-border)] bg-white p-1.5 shadow-[0_20px_45px_rgba(15,23,42,0.16)]";
   panel.hidden = true;
 
-  let filtered = options.slice();
+  let filtered = normalizedOptions.slice();
   let highlighted = -1;
 
   function filterOptions(query) {
     const q = String(query ?? "").trim().toLowerCase();
-    return q ? options.filter((option) => option.toLowerCase().includes(q)) : options.slice();
+    return q
+      ? normalizedOptions.filter((option) => (
+        option.label.toLowerCase().includes(q) || option.value.toLowerCase().includes(q)
+      ))
+      : normalizedOptions.slice();
   }
 
   function renderOptions() {
@@ -1023,13 +1066,13 @@ function selectField({ id, name, label, placeholder = "", options = [], required
     filtered.forEach((option, index) => {
       const item = document.createElement("button");
       item.type = "button";
-      item.dataset.comboboxOption = option;
+      item.dataset.comboboxOption = option.value;
       item.setAttribute("role", "option");
       item.className = [
         "flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-xs font-semibold transition",
         index === highlighted ? "bg-[var(--pb-surface-muted)] text-[var(--pb-brand-secondary)]" : "text-gray-800 hover:bg-gray-50",
       ].join(" ");
-      const iconUrl = iconFor?.(option);
+      const iconUrl = iconFor?.(option.value);
       if (iconUrl) {
         const icon = document.createElement("span");
         icon.className = "grid h-6 w-6 shrink-0 place-items-center overflow-hidden rounded-lg border border-[var(--pb-border)] bg-white";
@@ -1040,7 +1083,7 @@ function selectField({ id, name, label, placeholder = "", options = [], required
         icon.append(image);
         item.append(icon);
       }
-      item.append(document.createTextNode(option));
+      item.append(document.createTextNode(option.label));
       // mousedown (bukan click) supaya terjadi sebelum blur input menutup panel.
       item.addEventListener("mousedown", (event) => {
         event.preventDefault();
@@ -1064,7 +1107,7 @@ function selectField({ id, name, label, placeholder = "", options = [], required
   }
 
   function selectOption(option) {
-    input.value = option;
+    input.value = option.label;
     syncLeadingIcon();
     // Menutup panel HARUS terakhir: listener "input" di bawah membuka lagi
     // panelnya (dipakai saat mengetik manual), jadi kalau closePanel() lebih

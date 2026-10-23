@@ -5,6 +5,7 @@ import { activeSubscriptionPlans, selectedSubscriptionPlan, registrationPackageU
 import { landingPricingCardsMarkup } from "../public/assets/js/modules/public/pages/carlynkLanding/markup.js";
 import { subscriptionBankIconsFromMaster } from "../public/assets/js/ui/composites/subscriptionMidtransPanel.js";
 import { copyTextToClipboard } from "../public/assets/js/utils/copyTextToClipboard.js";
+import { showroomCityOptions, showroomCityValue } from "../public/assets/js/modules/public/pages/showroomRegisterPage.js";
 import { bangunRute } from "../public/assets/js/modules/public/pages/carlynkLanding/content.js";
 
 const read = (path) => readFile(new URL(path, import.meta.url), "utf8");
@@ -144,4 +145,20 @@ test("transfer amount and account copy use the requested exact values with clipb
   });
   assert.equal(clipboardFallback, true);
   assert.equal(fallbackText, "88110120725");
+});
+
+test("showroom registration city choices show province while submitting only the city name", () => {
+  const options = showroomCityOptions([
+    { id: "city_surabaya", name: "Surabaya", province_name: "Jawa Timur", status: "active" },
+    { id: "city_no_province", name: "Kota Contoh", province_name: "", status: "active" },
+    { id: "city_inactive", name: "Kota Nonaktif", province_name: "Jawa Barat", status: "inactive" },
+  ]);
+
+  assert.deepEqual(options, [
+    { value: "Surabaya", label: "Surabaya, Jawa Timur" },
+    { value: "Kota Contoh", label: "Kota Contoh" },
+  ]);
+  assert.equal(options.find((option) => option.label === "Surabaya, Jawa Timur")?.value, "Surabaya");
+  assert.equal(showroomCityValue(options, "Surabaya, Jawa Timur"), "Surabaya");
+  assert.equal(showroomCityValue(options, "Kota yang belum ada di master"), "Kota yang belum ada di master");
 });
