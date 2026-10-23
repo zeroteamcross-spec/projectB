@@ -2,11 +2,13 @@ import { Button } from "../../../ui/primitives/button.js";
 import { paymentMethodOptionsForMode } from "../../transactions/paymentMethodSupport.js";
 import { tw } from "../../../theme/tailwindClasses.js";
 import { formatCurrency } from "../../../utils/formatCurrency.js";
+import { createIcon } from "../../../theme/iconRegistry.js";
 
 export function TransactionEntryForm({
   car,
   form = {},
   paymentMode = "both",
+  banks = [],
   isSubmitting = false,
   error = "",
   onChange = null,
@@ -35,7 +37,7 @@ export function TransactionEntryForm({
   // ada lagi pilihan tipe pembayaran maupun input nominal.
   node.append(
     bookingFeeBlock(car),
-    paymentMethodBlock(form.payment_method ?? defaultPaymentMethod(paymentMode), onChange, paymentMode)
+    paymentMethodBlock(form.payment_method ?? defaultPaymentMethod(paymentMode), onChange, paymentMode, banks)
   );
 
   if (error) {
@@ -101,7 +103,7 @@ function bookingFeeBlock(car) {
   return wrap;
 }
 
-function paymentMethodBlock(value, onChange, paymentMode) {
+function paymentMethodBlock(value, onChange, paymentMode, banks) {
   const wrap = document.createElement("label");
   wrap.className = "grid gap-3";
 
@@ -120,7 +122,8 @@ function paymentMethodBlock(value, onChange, paymentMode) {
   const grid = document.createElement("div");
   grid.className = "grid grid-cols-1 gap-2 sm:grid-cols-2";
   paymentMethodOptionsForMode(paymentMode).forEach((option) => {
-    const card = radioCard("payment_method", option.value, option.label, option.description, value, onChange);
+    const bank = option.value === "bca_va" ? findBcaBank(banks) : null;
+    const card = radioCard("payment_method", option.value, option.label, option.description, value, onChange, bank);
     grid.append(card);
   });
 
@@ -132,7 +135,7 @@ function defaultPaymentMethod(paymentMode) {
   return paymentMode === "midtrans" ? "bca_va" : "manual_transfer";
 }
 
-function radioCard(name, value, title, body, currentValue, onChange) {
+function radioCard(name, value, title, body, currentValue, onChange, bank = null) {
   const label = document.createElement("label");
   label.className = value === currentValue
     ? `grid cursor-pointer gap-1 ${tw.form.choiceActive}`
@@ -147,6 +150,38 @@ function radioCard(name, value, title, body, currentValue, onChange) {
   input.className = "sr-only";
   input.addEventListener("change", () => onChange?.({ [name]: value }));
 
+  const content = document.createElement("span");
+  content.className = "flex min-w-0 items-center gap-2.5";
+
+  if (bank) {
+    const icon = document.createElement("span");
+    icon.className = "grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-xl border border-[var(--pb-border)] bg-white";
+
+    if (bank.iconPath) {
+      const image = document.createElement("img");
+      image.src = bank.iconPath;
+      image.alt = `${bank.name} icon`;
+      image.className = "h-full w-full object-contain p-1";
+      image.addEventListener("error", () => {
+        icon.replaceChildren(createIcon("bank", {
+          className: "h-4 w-4 text-[var(--pb-brand-secondary)]",
+          title: `${bank.name} icon`,
+        }));
+      }, { once: true });
+      icon.append(image);
+    } else {
+      icon.append(createIcon("bank", {
+        className: "h-4 w-4 text-[var(--pb-brand-secondary)]",
+        title: `${bank.name} icon`,
+      }));
+    }
+
+    content.append(icon);
+  }
+
+  const copy = document.createElement("span");
+  copy.className = "grid min-w-0 gap-1";
+
   const strong = document.createElement("strong");
   strong.className = "text-sm text-gray-950";
   strong.textContent = title;
@@ -155,8 +190,28 @@ function radioCard(name, value, title, body, currentValue, onChange) {
   text.className = "text-[10px] text-gray-500";
   text.textContent = body;
 
-  label.append(input, strong, text);
+  copy.append(strong, text);
+  content.append(copy);
+  label.append(input, content);
   return label;
+}
+
+function findBcaBank(banks = []) {
+  const bank = banks.find((item) => {
+    if ((item?.status ?? "active") !== "active") {
+      return false;
+    }
+
+    const name = String(item?.bank_name ?? item?.name ?? "").trim().toLowerCase();
+    const slug = String(item?.slug ?? "").trim().toLowerCase();
+    const code = String(item?.bank_code ?? item?.code ?? "").trim();
+    return name === "bca" || slug === "bca" || code === "014";
+  });
+
+  return {
+    name: String(bank?.bank_name ?? bank?.name ?? "BCA").trim() || "BCA",
+    iconPath: String(bank?.icon_path ?? bank?.icon_url ?? "").trim(),
+  };
 }
 
 function carPriceHint(car) {

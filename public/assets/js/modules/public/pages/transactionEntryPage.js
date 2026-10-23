@@ -30,6 +30,7 @@ export function TransactionEntryPage() {
   let root = null;
   let unsubscribe = null;
   let backgroundVideoLayer = null;
+  let paymentBanks = [];
   const getBackgroundVideoLayer = () => {
     backgroundVideoLayer ??= createBackgroundVideoLayer({
       id: "public_transaction_background_video_layer",
@@ -45,10 +46,32 @@ export function TransactionEntryPage() {
       publicContextService.syncRouteContext(context);
       const affiliateSlug = publicContextService.routeAffiliateSlug(context);
       const showroomSlug = publicContextService.routeShowroomSlug(context);
+      const paymentModeTask = adminMasterService.getSubscriptionDestinationMaster()
+        .then((master) => {
+          const mode = adminMasterService.normalizeSubscriptionPaymentMode(master?.data?.payment_mode);
+          transactionEntryState.setPaymentMode(mode);
+          return mode;
+        })
+        .catch(() => {
+          transactionEntryState.setPaymentMode("both");
+          return "both";
+        });
       const bootstrapTasks = [
-        adminMasterService.getSubscriptionDestinationMaster()
-          .then((master) => transactionEntryState.setPaymentMode(master?.data?.payment_mode))
-          .catch(() => transactionEntryState.setPaymentMode("both")),
+        paymentModeTask,
+        paymentModeTask.then(async (mode) => {
+          paymentBanks = [];
+          if (mode === "manual") {
+            return;
+          }
+
+          try {
+            const master = await adminMasterService.getBankMaster();
+            paymentBanks = (master?.data?.banks ?? master?.banks ?? [])
+              .filter((bank) => (bank?.status ?? "active") === "active");
+          } catch {
+            paymentBanks = [];
+          }
+        }),
       ];
 
       if (affiliateSlug) {
@@ -179,6 +202,7 @@ function render(root, context, getBackgroundVideoLayer) {
       car,
       form: transactionEntryState.form(),
       paymentMode: transactionEntryState.paymentMode(),
+      banks: paymentBanks,
       isSubmitting: Boolean(entry.isSubmitting),
       error: entry.error ?? "",
       onChange: (values) => transactionEntryState.patchForm(values),
