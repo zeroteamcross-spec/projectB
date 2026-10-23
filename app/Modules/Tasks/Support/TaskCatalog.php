@@ -353,4 +353,10 @@ final class TaskCatalog
     public const PRIVACY_PAGE_REMOVE_DRAFT_INTRO_TASK_TITLE = 'Hapus keterangan draf dari bagian pembuka Kebijakan Privasi.';
 
     public const PRIVACY_PAGE_REMOVE_DRAFT_INTRO_TASK_DESCRIPTION = 'Pada halaman /kebijakan-privasi, hapus label "Draf untuk ditinjau — belum berlaku", ringkasan "Rancangan penjelasan mengenai data yang digunakan untuk menjalankan akun, katalog, transaksi, dan layanan Carlynk.", serta keterangan bahwa tanggal berlaku belum ditetapkan dan dokumen masih memerlukan tinjauan serta persetujuan.';
+
+    public const SHOWROOM_REGISTRATION_CITY_LABEL_REMOVE_KABUPATEN_TASK_KEY = 'request-059-showroom-registration-city-label-remove-kabupaten';
+
+    public const SHOWROOM_REGISTRATION_CITY_LABEL_REMOVE_KABUPATEN_TASK_TITLE = 'Hilangkan awalan Kabupaten dari pilihan kota saat daftar showroom.';
+
+    public const SHOWROOM_REGISTRATION_CITY_LABEL_REMOVE_KABUPATEN_TASK_DESCRIPTION = 'Pada halaman daftar-showroom, hapus awalan Kabupaten dari label opsi kota pada kolom Kota dan tetap tampilkan nama provinsi setelah koma. Pertahankan nilai kota Master Lokasi yang dikirim saat form didaftarkan agar tidak mengubah data maupun perilaku bisnis. Referensi: Tugas GitIgnore/daftar-showroom-location-remove-kabupaten-reference-2026-10-23.png.';
 }

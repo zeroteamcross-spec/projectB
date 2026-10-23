@@ -450,6 +450,14 @@ class TaskRepository
                 'work_status' => 'done',
                 'created_at' => '2026-10-23 00:00:00',
             ],
+            [
+                'task_key' => TaskCatalog::SHOWROOM_REGISTRATION_CITY_LABEL_REMOVE_KABUPATEN_TASK_KEY,
+                'title' => TaskCatalog::SHOWROOM_REGISTRATION_CITY_LABEL_REMOVE_KABUPATEN_TASK_TITLE,
+                'description' => TaskCatalog::SHOWROOM_REGISTRATION_CITY_LABEL_REMOVE_KABUPATEN_TASK_DESCRIPTION,
+                'status' => 'open',
+                'work_status' => 'done',
+                'created_at' => '2026-10-23 00:00:00',
+            ],
         ];
     }
 

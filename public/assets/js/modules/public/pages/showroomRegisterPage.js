@@ -23,9 +23,10 @@ export function showroomCityOptions(cities = []) {
     .map((city) => {
       const value = String(city?.name ?? city?.city_name ?? "").trim();
       const provinceName = String(city?.province_name ?? "").trim();
+      const displayName = value.replace(/^Kabupaten\s+/i, "");
 
       return value
-        ? { value, label: provinceName ? `${value}, ${provinceName}` : value }
+        ? { value, label: provinceName ? `${displayName}, ${provinceName}` : displayName }
         : null;
     })
     .filter(Boolean);
