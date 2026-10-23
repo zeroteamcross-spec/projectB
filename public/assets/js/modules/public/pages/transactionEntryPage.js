@@ -22,6 +22,7 @@ import { tw } from "../../../theme/tailwindClasses.js";
 import { applyDesignHook } from "../../../theme/designStudioHooks.js";
 import { getListingLockStatus } from "../../../utils/transactionStatus.js";
 import { googleLoginService } from "../../auth/services/googleLoginService.js";
+import { adminMasterService } from "../../admin/services/adminMasterService.js";
 
 const PUBLIC_TRANSACTION_FALLBACK = "bg-[radial-gradient(circle_at_top_left,color-mix(in_srgb,var(--pb-brand-accent)_18%,transparent),transparent_24%),linear-gradient(180deg,var(--pb-public-canvas-start)_0%,var(--pb-public-canvas-mid)_48%,var(--pb-public-canvas-end)_100%)]";
 
@@ -40,17 +41,25 @@ export function TransactionEntryPage() {
 
   return createPageLifecycle({
     async bootstrap(context) {
+      transactionEntryState.ensureForm();
       publicContextService.syncRouteContext(context);
       const affiliateSlug = publicContextService.routeAffiliateSlug(context);
       const showroomSlug = publicContextService.routeShowroomSlug(context);
+      const bootstrapTasks = [
+        adminMasterService.getSubscriptionDestinationMaster()
+          .then((master) => transactionEntryState.setPaymentMode(master?.data?.payment_mode))
+          .catch(() => transactionEntryState.setPaymentMode("both")),
+      ];
 
       if (affiliateSlug) {
-        await publicContextService.activateAffiliateBySlug(affiliateSlug).catch(() => null);
+        bootstrapTasks.push(publicContextService.activateAffiliateBySlug(affiliateSlug).catch(() => null));
       }
 
       if (showroomSlug) {
-        await publicContextService.activateShowroomBySlug(showroomSlug).catch(() => null);
+        bootstrapTasks.push(publicContextService.activateShowroomBySlug(showroomSlug).catch(() => null));
       }
+
+      await Promise.all(bootstrapTasks);
     },
     mount(context) {
       transactionEntryState.ensureForm();
@@ -169,6 +178,7 @@ function render(root, context, getBackgroundVideoLayer) {
     right.append(applyDesignHook(TransactionEntryForm({
       car,
       form: transactionEntryState.form(),
+      paymentMode: transactionEntryState.paymentMode(),
       isSubmitting: Boolean(entry.isSubmitting),
       error: entry.error ?? "",
       onChange: (values) => transactionEntryState.patchForm(values),

@@ -12,8 +12,10 @@ use App\Infrastructure\Payment\PaymentProviderInterface;
 use App\Infrastructure\Storage\StorageServiceInterface;
 use App\Modules\Affiliate\Services\AffiliateService;
 use App\Modules\Auth\Services\AuthService;
+use App\Modules\MasterData\Services\MasterDataService;
 use App\Modules\Notifications\Services\NotificationService;
 use App\Modules\Transactions\Mappers\TransactionMapper;
+use App\Modules\Transactions\Policies\TransactionPaymentModePolicy;
 use App\Modules\Transactions\Policies\TransactionPolicy;
 use App\Modules\Transactions\Repositories\TransactionRepository;
 use App\Modules\Transactions\Repositories\TransactionPaymentOperationRepository;
@@ -42,6 +44,8 @@ class TransactionService
 
     private ?AuthService $authService;
 
+    private ?MasterDataService $masterData;
+
     public function __construct(
         PDO $pdo,
         TransactionRepository $transactions,
@@ -50,7 +54,8 @@ class TransactionService
         AffiliateService $affiliateService,
         StorageServiceInterface $storage,
         ?NotificationService $notificationService = null,
-        ?AuthService $authService = null
+        ?AuthService $authService = null,
+        ?MasterDataService $masterData = null
     ) {
         $this->pdo = $pdo;
         $this->transactions = $transactions;
@@ -61,6 +66,7 @@ class TransactionService
         $this->storage = $storage;
         $this->notificationService = $notificationService;
         $this->authService = $authService;
+        $this->masterData = $masterData;
     }
 
     public function createOfflineBooking(array $user, array $data): array
@@ -1647,6 +1653,24 @@ class TransactionService
         return is_array($decoded) ? $decoded : [];
     }
 
+    private function assertPaymentMethodAllowedByMaster(string $paymentMethod): void
+    {
+        $mode = 'both';
+
+        if ($this->masterData !== null) {
+            try {
+                $master = $this->masterData->get('payments.subscription_destination');
+                $mode = TransactionPaymentModePolicy::normalizeMode($master['data']['payment_mode'] ?? 'both');
+            } catch (NotFoundException $exception) {
+                // Master yang belum tersimpan mempertahankan perilaku lama: kedua metode tersedia.
+            } catch (Throwable $exception) {
+                throw new HttpException('Pengaturan Master Pembayaran tidak dapat diverifikasi. Coba lagi.', 503);
+            }
+        }
+
+        TransactionPaymentModePolicy::assertAllowed($mode, $paymentMethod);
+    }
+
     public function create(array $user, array $data): array
     {
         $buyerUserId = (int) ($data['buyer_user_id'] ?? $user['id']);
@@ -1707,6 +1731,7 @@ class TransactionService
         $transactionCode = $this->generateTransactionCode();
         $now = date('Y-m-d H:i:s');
         $paymentMethod = trim((string) ($data['payment_method'] ?? 'bca_va'));
+        $this->assertPaymentMethodAllowedByMaster($paymentMethod);
         $isManualTransfer = $paymentMethod === 'manual_transfer';
 
         if ($isManualTransfer && $paymentType !== 'dp') {

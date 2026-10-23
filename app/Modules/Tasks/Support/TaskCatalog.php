@@ -317,4 +317,10 @@ final class TaskCatalog
     public const ADMIN_MASTER_BRAND_GLOBAL_CATALOG_TASK_TITLE = 'Lengkapi Master Brand dari Daftar Brand dan Model Mobil Global.';
 
     public const ADMIN_MASTER_BRAND_GLOBAL_CATALOG_TASK_DESCRIPTION = 'Pada halaman admin/master-brand, lengkapi brand dan model dari Tugas GitIgnore/Daftar_Brand_Model_Mobil_Global.json melalui UI Master Brand production. Gabungkan model yang belum ada tanpa menghapus atau menimpa data yang sudah ada, lalu verifikasi hasil dari halaman Master Brand dan Daftar Tugas.';
+
+    public const TRANSACTION_PAYMENT_METHOD_MASTER_SETTING_TASK_KEY = 'request-053-transaction-payment-method-master-setting';
+
+    public const TRANSACTION_PAYMENT_METHOD_MASTER_SETTING_TASK_TITLE = 'Ikuti pengaturan Master Pembayaran saat membuat transaksi mobil.';
+
+    public const TRANSACTION_PAYMENT_METHOD_MASTER_SETTING_TASK_DESCRIPTION = 'Pada halaman {slug-showroom}/transactions/new?car_id={id}, pilihan metode pembayaran mengikuti nilai payments.subscription_destination.payment_mode di admin/master-payment: manual hanya transfer manual, midtrans hanya metode otomatis yang didukung, dan both menyediakan keduanya. Backend menolak pilihan yang tidak sesuai. Perubahan berlaku untuk transaksi baru saja; transaksi yang sudah berjalan tidak berubah. Bukti browser: Tugas GitIgnore/transaction-entry-payment-master-setting-2026-10-23.png.';
 }

@@ -5,6 +5,20 @@ export const PAYMENT_METHOD_OPTIONS = [
   { value: "manual_transfer", label: "Transfer Manual", description: "Transfer ke rekening showroom, upload bukti" },
 ];
 
+export function paymentMethodOptionsForMode(mode = "both") {
+  const rawMode = String(mode ?? "both").trim().toLowerCase();
+  const normalizedMode = ["manual", "midtrans", "both"].includes(rawMode) ? rawMode : "both";
+
+  return PAYMENT_METHOD_OPTIONS.filter((option) => {
+    if (normalizedMode === "both") {
+      return true;
+    }
+
+    const isManual = option.value === "manual_transfer";
+    return normalizedMode === "manual" ? isManual : !isManual;
+  });
+}
+
 const GOPAY_AUTO_OPEN_PREFIX = "projectb:gopay:auto-open:";
 
 export function paymentMethodLabel(method) {

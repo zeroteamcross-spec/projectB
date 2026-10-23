@@ -46,6 +46,7 @@ $tests = [
     Tests\Unit\ShowroomInspectionMasterTest::class,
     Tests\Unit\OfflineBookingPaymentTest::class,
     Tests\Unit\TaskStatusSeparationTest::class,
+    Tests\Unit\TransactionPaymentModePolicyTest::class,
 ];
 
 $passed = 0;

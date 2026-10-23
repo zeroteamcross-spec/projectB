@@ -402,6 +402,13 @@ class TaskRepository
                 'status' => 'open',
                 'created_at' => '2026-10-23 00:00:00',
             ],
+            [
+                'task_key' => TaskCatalog::TRANSACTION_PAYMENT_METHOD_MASTER_SETTING_TASK_KEY,
+                'title' => TaskCatalog::TRANSACTION_PAYMENT_METHOD_MASTER_SETTING_TASK_TITLE,
+                'description' => TaskCatalog::TRANSACTION_PAYMENT_METHOD_MASTER_SETTING_TASK_DESCRIPTION,
+                'status' => 'open',
+                'created_at' => '2026-10-23 00:00:00',
+            ],
         ];
     }
 

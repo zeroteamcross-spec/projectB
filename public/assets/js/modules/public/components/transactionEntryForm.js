@@ -1,11 +1,12 @@
 import { Button } from "../../../ui/primitives/button.js";
-import { PAYMENT_METHOD_OPTIONS } from "../../transactions/paymentMethodSupport.js";
+import { paymentMethodOptionsForMode } from "../../transactions/paymentMethodSupport.js";
 import { tw } from "../../../theme/tailwindClasses.js";
 import { formatCurrency } from "../../../utils/formatCurrency.js";
 
 export function TransactionEntryForm({
   car,
   form = {},
+  paymentMode = "both",
   isSubmitting = false,
   error = "",
   onChange = null,
@@ -34,7 +35,7 @@ export function TransactionEntryForm({
   // ada lagi pilihan tipe pembayaran maupun input nominal.
   node.append(
     bookingFeeBlock(car),
-    paymentMethodBlock(form.payment_method ?? "manual_transfer", onChange)
+    paymentMethodBlock(form.payment_method ?? defaultPaymentMethod(paymentMode), onChange, paymentMode)
   );
 
   if (error) {
@@ -100,7 +101,7 @@ function bookingFeeBlock(car) {
   return wrap;
 }
 
-function paymentMethodBlock(value, onChange) {
+function paymentMethodBlock(value, onChange, paymentMode) {
   const wrap = document.createElement("label");
   wrap.className = "grid gap-3";
 
@@ -108,20 +109,27 @@ function paymentMethodBlock(value, onChange) {
   label.className = "text-xs font-bold text-gray-800";
   label.textContent = "Metode pembayaran";
 
+  const modeHint = document.createElement("span");
+  modeHint.className = "text-[10px] leading-5 text-gray-500";
+  modeHint.textContent = paymentMode === "manual"
+    ? "Transfer manual saja tersedia sesuai pengaturan Master Pembayaran."
+    : paymentMode === "midtrans"
+    ? "Pembayaran otomatis saja tersedia sesuai pengaturan Master Pembayaran."
+    : "Pilihan metode mengikuti pengaturan Master Pembayaran.";
+
   const grid = document.createElement("div");
-  grid.className = "grid grid-cols-1 gap-2";
-  // Gopay, QRIS, dan BCA Virtual Account (Midtrans) sengaja disembunyikan
-  // dari pilihan buyer atas permintaan -- provider-nya TETAP dipertahankan
-  // utuh di paymentMethodSupport.js (bukan dihapus) supaya bisa dipakai lagi
-  // begitu dibutuhkan, dan transaksi lama yang sudah memakai salah satunya
-  // tidak terpengaruh sama sekali.
-  PAYMENT_METHOD_OPTIONS.filter((option) => ! ["gopay", "qris", "bca_va"].includes(option.value)).forEach((option) => {
+  grid.className = "grid grid-cols-1 gap-2 sm:grid-cols-2";
+  paymentMethodOptionsForMode(paymentMode).forEach((option) => {
     const card = radioCard("payment_method", option.value, option.label, option.description, value, onChange);
     grid.append(card);
   });
 
-  wrap.append(label, grid);
+  wrap.append(label, modeHint, grid);
   return wrap;
+}
+
+function defaultPaymentMethod(paymentMode) {
+  return paymentMode === "midtrans" ? "bca_va" : "manual_transfer";
 }
 
 function radioCard(name, value, title, body, currentValue, onChange) {

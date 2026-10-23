@@ -866,8 +866,8 @@ function subscriptionPaymentModeCard({ destination, saving, onSave }) {
   const mode = adminMasterService.normalizeSubscriptionPaymentMode(destination?.payment_mode);
 
   section.append(
-    textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-[var(--pb-brand-secondary)]", "Metode pembayaran paket showroom"),
-    textNode("p", "text-xs leading-6 text-gray-600", "Pengaturan ini berlaku untuk pembayaran paket saat daftar-showroom dan perpanjangan langganan. Pembayaran transaksi mobil tidak terpengaruh."),
+    textNode("p", "text-[10px] font-black uppercase tracking-[0.14em] text-[var(--pb-brand-secondary)]", "Metode pembayaran"),
+    textNode("p", "text-xs leading-6 text-gray-600", "Pengaturan berlaku untuk pembayaran paket showroom (pendaftaran dan perpanjangan) serta Booking Fee pada transaksi mobil baru. Transaksi yang sudah berjalan tidak berubah."),
   );
 
   const form = document.createElement("form");
@@ -909,10 +909,10 @@ function subscriptionPaymentModeCard({ destination, saving, onSave }) {
   hint.id = "admstpm_payment_mode_hint";
   hint.className = "text-[11px] leading-5 text-gray-500";
   hint.textContent = mode === "manual"
-    ? "Showroom hanya melihat instruksi transfer manual dan upload bukti."
+    ? "Pembayaran manual saja tersedia untuk paket showroom dan Booking Fee transaksi baru."
     : mode === "midtrans"
-    ? "Showroom hanya melihat Virtual Account dan tidak dapat memilih transfer manual."
-    : "Showroom dapat memilih Virtual Account atau transfer manual.";
+    ? "Pembayaran otomatis saja tersedia; transfer manual tidak dapat dipilih."
+    : "Pembayaran manual dan otomatis tersedia sesuai alur pendaftaran atau transaksi.";
 
   section.append(form, hint);
   return section;
