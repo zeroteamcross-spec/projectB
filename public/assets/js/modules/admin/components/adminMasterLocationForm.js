@@ -11,7 +11,9 @@ export function AdminMasterLocationForm({
   onDelete = null,
   onCancel = null,
 } = {}) {
-  const draft = city ? { ...city } : adminMasterService.createEmptyCity();
+  const draft = city
+    ? { ...city, name: cityDisplayName(city.name) }
+    : adminMasterService.createEmptyCity();
   const form = document.createElement("form");
   form.id = "admstloc_location_form_section";
   form.className = "grid gap-5";
@@ -74,7 +76,9 @@ export function AdminMasterLocationForm({
     onSubmit?.({
       ...draft,
       name: cityNameValue,
-      slug: slugify(cityNameValue),
+      slug: mode === "edit" && cityNameValue === cityDisplayName(city?.name)
+        ? city.slug
+        : slugify(cityNameValue),
       province_name: provinceNameValue,
       province_slug: slugify(provinceNameValue),
       status: String(formData.get("status") ?? "active"),
@@ -119,6 +123,10 @@ function selectField(id, name, label, value, options) {
 
 function slugify(value) {
   return String(value ?? "").trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+}
+
+function cityDisplayName(value) {
+  return String(value ?? "").trim().replace(/^kabupaten\s+/i, "");
 }
 
 function textNode(tagName, className, text) {
