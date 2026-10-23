@@ -20,15 +20,16 @@ class TaskRepository
     {
         $stmt = $this->pdo->prepare(
             'INSERT INTO tasks
-                (task_key, title, description, status, requested_by_user_id, completed_by_user_id,
+                (task_key, title, description, status, work_status, requested_by_user_id, completed_by_user_id,
                  completed_at, created_at, updated_at, deleted_at)
              VALUES
-                (:task_key, :title, :description, :status, NULL, NULL, NULL, :created_at, NULL, NULL)
+                (:task_key, :title, :description, :status, :work_status, NULL, NULL, NULL, :created_at, NULL, NULL)
              ON DUPLICATE KEY UPDATE
                 title = VALUES(title),
                 description = VALUES(description)'
         );
         foreach ($this->taskCatalog() as $task) {
+            $task['work_status'] ??= 'pending';
             $stmt->execute($task);
         }
     }
@@ -385,6 +386,14 @@ class TaskRepository
                 'description' => TaskCatalog::ADMIN_WEB_CONFIGURATION_MENU_TASK_DESCRIPTION,
                 'status' => 'open',
                 'created_at' => '2026-10-21 00:00:00',
+            ],
+            [
+                'task_key' => TaskCatalog::SELLER_CARS_LATEST_LOCATION_MASTER_TASK_KEY,
+                'title' => TaskCatalog::SELLER_CARS_LATEST_LOCATION_MASTER_TASK_TITLE,
+                'description' => TaskCatalog::SELLER_CARS_LATEST_LOCATION_MASTER_TASK_DESCRIPTION,
+                'status' => 'open',
+                'work_status' => 'done',
+                'created_at' => '2026-10-23 00:00:00',
             ],
         ];
     }

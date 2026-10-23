@@ -305,4 +305,10 @@ final class TaskCatalog
     public const ADMIN_WEB_CONFIGURATION_MENU_TASK_TITLE = 'Tambahkan menu Konfigurasi WEB pada akun Admin.';
 
     public const ADMIN_WEB_CONFIGURATION_MENU_TASK_DESCRIPTION = 'Tambahkan menu bernama "Konfigurasi WEB" pada level akun Admin. Rincian pengaturan yang harus tersedia belum ditentukan; sebelum mengimplementasikan isi/fungsi menu, konfirmasi ruang lingkup kepada pengguna. Permintaan dicatat sebagai backlog saja dan menunggu instruksi "mulai kerjakan semua tugas". Tidak ada gambar referensi yang terlampir.';
+
+    public const SELLER_CARS_LATEST_LOCATION_MASTER_TASK_KEY = 'request-051-seller-cars-latest-location-master';
+
+    public const SELLER_CARS_LATEST_LOCATION_MASTER_TASK_TITLE = 'Gunakan data Master Lokasi terbaru pada form mobil showroom.';
+
+    public const SELLER_CARS_LATEST_LOCATION_MASTER_TASK_DESCRIPTION = 'Pada halaman seller/cars, field Lokasi harus memakai daftar kota aktif dari Master Lokasi terbaru, bukan snapshot/cache lama. Muat ulang Master Lokasi saat route dibuka agar pilihan kota pada form tambah/edit mobil mengikuti data admin terbaru. Referensi: Tugas GitIgnore/seller-cars-location-master-data-latest-2026-10-23/seller-cars-location-master-data-reference.png.';
 }

@@ -128,6 +128,10 @@ export const sellerRoutes = [
           key: "masterBrand",
           loader: ({ signal }) => adminMasterService.getBrandMaster({ signal }).catch(() => adminMasterService.normalizeMaster(null)),
         },
+        {
+          key: "masterLocation",
+          loader: ({ signal }) => adminMasterService.getLocationMaster({ signal }).catch(() => adminMasterService.normalizeLocationMaster(null)),
+        },
       ],
     },
   },
