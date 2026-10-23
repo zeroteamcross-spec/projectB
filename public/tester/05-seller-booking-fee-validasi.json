@@ -14,7 +14,7 @@
   "prasyarat_data": [
     "Server lokal berjalan di http://localhost:8000.",
     "Migrasi 20260809_booking_fee_and_return.sql sudah dijalankan.",
-    "Kredensial diambil dari tester/akun.json yang dimuat runner otomatis."
+    "Kredensial diambil dari endpoint tester yang dilindungi password dan dimuat runner otomatis."
   ],
   "variabel": {
     "email_seller": "{{seller_email}}",

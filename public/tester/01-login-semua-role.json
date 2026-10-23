@@ -14,7 +14,7 @@
     "Server lokal berjalan di http://localhost:8000.",
     "Belum ada sesi login aktif di browser. Kalau ada, logout dulu.",
     "Akun seed tersedia: frontend-buyer, metro-auto, frontend-admin, affiliate.",
-    "Kredensial diambil dari tester/akun.json yang dimuat runner otomatis."
+    "Kredensial diambil dari endpoint tester yang dilindungi password dan dimuat runner otomatis."
   ],
   "variabel": {
     "email_buyer": "{{buyer_email}}",

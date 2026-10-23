@@ -30,7 +30,7 @@
     poll_ms: 200,
     folder: "tester/",
     daftarUrl: "tester/index.json",
-    akunUrl: "tester/akun.json",
+    akunApi: "api/tester-credentials",
     endpoint_log_limit: 300,
     endpoint_response_limit: 1500,
     endpoint_gagalkan_langkah: true,
@@ -1090,25 +1090,40 @@
   /* =================== muat file =================== */
 
   /**
-   * Memuat akun bersama dari akun.json. Semua skenario otomatis mendapat
-   * variabel ini tanpa perlu mendeklarasikan ulang, sehingga kredensial hanya
-   * ditulis di satu tempat.
+   * Memuat akun bersama lewat endpoint yang dilindungi gerbang tester. Semua
+   * skenario otomatis mendapat variabel yang sama tanpa menyimpan password di
+   * file publik.
    */
   async function muatAkun() {
     try {
-      var r = await fetch(baseUrl() + CONFIG.akunUrl, { cache: "no-store" });
+      var password = window.prompt("Masukkan password untuk membuka akun tester:");
+      if (password === null) throw new Error("Akses akun tester dibatalkan.");
+
+      var unlock = await fetch(baseUrl() + CONFIG.akunApi + "/unlock", {
+        method: "POST",
+        cache: "no-store",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: password })
+      });
+      if (!unlock.ok) throw new Error("HTTP " + unlock.status + " saat membuka akses tester");
+
+      var r = await fetch(baseUrl() + CONFIG.akunApi + "/accounts", {
+        cache: "no-store",
+        credentials: "same-origin"
+      });
       if (!r.ok) throw new Error("HTTP " + r.status);
       var data = await r.json();
-      state.akun = (data && data.variabel) || {};
+      state.akun = (data && data.success && data.data && data.data.variabel) || {};
       // Tersedia langsung, bukan hanya saat run dimulai, supaya bisa diperiksa
       // lewat PBT.vars() sebelum menjalankan skenario apa pun.
       state.vars = Object.assign({}, state.akun, state.vars);
       var jml = Object.keys(state.akun).length;
-      log("Akun bersama dimuat: " + jml + " variabel dari akun.json");
+      log("Akun bersama dimuat: " + jml + " variabel dari endpoint tester yang dilindungi.");
       return jml;
     } catch (e) {
       state.akun = {};
-      log("akun.json tidak terbaca. Skenario harus mendeklarasikan kredensialnya sendiri. " + e.message, "warn");
+      log("Akun tester tidak tersedia. Skenario harus mendeklarasikan kredensialnya sendiri. " + e.message, "warn");
       return 0;
     }
   }

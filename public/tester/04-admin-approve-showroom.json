@@ -16,7 +16,7 @@
   "prasyarat_data": [
     "Skenario 02 sudah dijalankan pada sesi browser yang sama, sehingga {{email_showroom}} tersedia.",
     "Jangan tekan Reset Rantai di antara 02 dan 04.",
-    "Kredensial diambil dari tester/akun.json yang dimuat runner otomatis."
+    "Kredensial diambil dari endpoint tester yang dilindungi password dan dimuat runner otomatis."
   ],
   "variabel": {
     "email_admin": "{{admin_email}}",

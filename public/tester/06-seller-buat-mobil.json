@@ -16,7 +16,7 @@
   "prasyarat_data": [
     "Server lokal berjalan di http://localhost:8000.",
     "Master brand (locations.cities tidak relevan di sini, tapi master_brand) sudah ter-seed sehingga dropdown Merek/Model terisi.",
-    "Kredensial diambil dari tester/akun.json yang dimuat runner otomatis."
+    "Kredensial diambil dari endpoint tester yang dilindungi password dan dimuat runner otomatis."
   ],
   "variabel": {
     "email_seller": "{{seller_email}}",

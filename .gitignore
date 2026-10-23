@@ -5,6 +5,7 @@
 # Local runtime files
 /storage/logs/*
 /storage/cache/*
+/storage/tester/
 !/storage/logs/.gitkeep
 !/storage/cache/.gitkeep
 # Membuka satu rute di aplikasi membuat Design Studio menulis draft.json kosong

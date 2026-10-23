@@ -18,7 +18,7 @@
     "Jalankan lebih dulu: php scripts/seed_buyer_google_identity.php",
     "Showroom metro-auto-jakarta punya minimal satu mobil published yang sudah diisi Booking Fee.",
     "Kunci Midtrans sandbox terisi di .env.",
-    "Kredensial diambil dari tester/akun.json yang dimuat runner otomatis."
+    "Kredensial diambil dari endpoint tester yang dilindungi password dan dimuat runner otomatis."
   ],
   "variabel": {
     "email_buyer": "{{buyer_google_email}}",

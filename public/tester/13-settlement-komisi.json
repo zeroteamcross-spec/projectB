@@ -20,7 +20,7 @@
   "prasyarat_data": [
     "Server lokal berjalan di http://localhost:8000.",
     "Skenario 06, 11, dan 12 sudah dijalankan pada sesi browser yang sama.",
-    "Kredensial admin diambil dari tester/akun.json (admin_email/admin_password).",
+    "Kredensial admin diambil dari endpoint tester yang dilindungi password (admin_email/admin_password).",
     "PENTING - langkah manual di tengah skenario ini: begitu panel log menampilkan 'Variabel {{transaction_c_id}} = <angka>', jalankan di terminal server: php scripts/pay_transaction_for_tester.php <angka>."
   ],
   "variabel": {
