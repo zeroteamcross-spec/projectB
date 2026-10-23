@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { adminMasterService } from "../public/assets/js/modules/admin/services/adminMasterService.js";
+import { sellerCarLocationOptions } from "../public/assets/js/modules/seller/components/sellerCarForm.js";
 import { sellerRoutes } from "../public/assets/js/modules/seller/routes.js";
 
 test("seller cars route refreshes Master Lokasi for its create/edit form", async () => {
@@ -30,4 +31,19 @@ test("seller cars route refreshes Master Lokasi for its create/edit form", async
   } finally {
     adminMasterService.getLocationMaster = originalGetLocationMaster;
   }
+});
+
+test("seller car location labels include the province but retain the city value", () => {
+  const options = sellerCarLocationOptions([
+    { id: "city_surabaya", name: "Surabaya", province_name: "Jawa Timur", status: "active" },
+    { id: "city_unknown_province", name: "Kota Contoh", province_name: "", status: "active" },
+    { id: "city_inactive", name: "Kota Nonaktif", province_name: "Jawa Barat", status: "inactive" },
+  ], "Surabaya");
+
+  assert.deepEqual(options, [
+    { value: "", label: "Pilih kota" },
+    { value: "Surabaya", label: "Surabaya, Jawa Timur" },
+    { value: "Kota Contoh", label: "Kota Contoh" },
+  ]);
+  assert.equal(options.find((option) => option.label === "Surabaya, Jawa Timur")?.value, "Surabaya");
 });

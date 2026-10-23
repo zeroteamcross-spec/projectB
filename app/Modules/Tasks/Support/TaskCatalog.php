@@ -310,5 +310,5 @@ final class TaskCatalog
 
     public const SELLER_CARS_LATEST_LOCATION_MASTER_TASK_TITLE = 'Gunakan data Master Lokasi terbaru pada form mobil showroom.';
 
-    public const SELLER_CARS_LATEST_LOCATION_MASTER_TASK_DESCRIPTION = 'Pada halaman seller/cars, field Lokasi harus memakai daftar kota aktif dari Master Lokasi terbaru, bukan snapshot/cache lama. Muat ulang Master Lokasi saat route dibuka agar pilihan kota pada form tambah/edit mobil mengikuti data admin terbaru. Referensi: Tugas GitIgnore/seller-cars-location-master-data-latest-2026-10-23/seller-cars-location-master-data-reference.png.';
+    public const SELLER_CARS_LATEST_LOCATION_MASTER_TASK_DESCRIPTION = 'Pada halaman seller/cars, field Lokasi harus memakai daftar kota aktif dari Master Lokasi terbaru, bukan snapshot/cache lama. Muat ulang Master Lokasi saat route dibuka agar pilihan kota pada form tambah/edit mobil mengikuti data admin terbaru. Label opsi menampilkan nama kota dan provinsi dengan format "Kota, Provinsi" (misalnya "Surabaya, Jawa Timur"), sementara nilai yang disimpan tetap nama kota agar kompatibel dengan listing dan filter katalog. Referensi: Tugas GitIgnore/seller-cars-location-master-data-latest-2026-10-23/seller-cars-location-master-data-reference.png.';
 }

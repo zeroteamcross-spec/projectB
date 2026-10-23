@@ -138,7 +138,7 @@ export function SellerCarForm({
       name: "location_name",
       label: "Lokasi",
       value: values.location_name ?? "",
-      options: cityOptionsList(cityOptions, values.location_name),
+      options: sellerCarLocationOptions(cityOptions, values.location_name),
       helper: cityOptions.length ? "Ketik untuk mencari kota." : "Master Lokasi belum tersedia.",
       emptyLabel: "Kota tidak ditemukan",
       labelClass: "grid min-w-0 gap-1.5 text-xs font-bold text-gray-700",
@@ -588,17 +588,23 @@ function seatCountValue(value) {
  * Nilai lama yang sudah tersimpan tapi tidak ada di master tetap ditampilkan,
  * seperti pola yang sama dipakai createBrandSelect di atas.
  */
-function cityOptionsList(cities = [], selectedValue = "") {
+export function sellerCarLocationOptions(cities = [], selectedValue = "") {
   const active = (Array.isArray(cities) ? cities : [])
     .filter((city) => (city?.status ?? "active") === "active")
-    .map((city) => String(city?.name ?? "").trim())
-    .filter(Boolean);
+    .map((city) => ({
+      name: String(city?.name ?? "").trim(),
+      provinceName: String(city?.province_name ?? "").trim(),
+    }))
+    .filter((city) => city.name);
 
   const options = [{ value: "", label: active.length ? "Pilih kota" : "Master Lokasi belum tersedia" }];
-  active.forEach((name) => options.push({ value: name, label: name }));
+  active.forEach(({ name, provinceName }) => options.push({
+    value: name,
+    label: provinceName ? `${name}, ${provinceName}` : name,
+  }));
 
   const current = String(selectedValue ?? "").trim();
-  if (current && !active.includes(current)) {
+  if (current && !active.some((city) => city.name === current)) {
     options.push({ value: current, label: `${current} (data lama)` });
   }
 
