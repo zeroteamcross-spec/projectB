@@ -341,4 +341,16 @@ final class TaskCatalog
     public const PUBLIC_CATALOG_LOCATION_FILTER_KABUPATEN_TASK_TITLE = 'Hilangkan awalan Kabupaten dari pilihan lokasi katalog showroom.';
 
     public const PUBLIC_CATALOG_LOCATION_FILTER_KABUPATEN_TASK_DESCRIPTION = 'Pada katalog publik showroom, filter lokasi masih menampilkan awalan "Kabupaten" karena mengambil city.name mentah dari payload Master Lokasi. Tampilkan label kota tanpa awalan tersebut dan normalisasikan pilihan serta lokasi listing lama saat pencocokan agar filter tetap bekerja. Referensi: Tugas GitIgnore/catalog-showroom-filter-kabupaten-reference-2026-10-23.png.';
+
+    public const TERMS_PAGE_REMOVE_DRAFT_INTRO_TASK_KEY = 'request-057-terms-page-remove-draft-intro';
+
+    public const TERMS_PAGE_REMOVE_DRAFT_INTRO_TASK_TITLE = 'Hapus keterangan draf dari bagian pembuka Syarat & Ketentuan.';
+
+    public const TERMS_PAGE_REMOVE_DRAFT_INTRO_TASK_DESCRIPTION = 'Pada halaman /syarat-ketentuan, hapus label "Draf untuk ditinjau — belum berlaku", ringkasan "Rancangan aturan penggunaan Carlynk untuk showroom, buyer, dan partner marketing.", serta keterangan bahwa tanggal berlaku belum ditetapkan dan dokumen masih memerlukan tinjauan serta persetujuan. Perubahan hanya untuk halaman Syarat & Ketentuan.';
+
+    public const PRIVACY_PAGE_REMOVE_DRAFT_INTRO_TASK_KEY = 'request-058-privacy-page-remove-draft-intro';
+
+    public const PRIVACY_PAGE_REMOVE_DRAFT_INTRO_TASK_TITLE = 'Hapus keterangan draf dari bagian pembuka Kebijakan Privasi.';
+
+    public const PRIVACY_PAGE_REMOVE_DRAFT_INTRO_TASK_DESCRIPTION = 'Pada halaman /kebijakan-privasi, hapus label "Draf untuk ditinjau — belum berlaku", ringkasan "Rancangan penjelasan mengenai data yang digunakan untuk menjalankan akun, katalog, transaksi, dan layanan Carlynk.", serta keterangan bahwa tanggal berlaku belum ditetapkan dan dokumen masih memerlukan tinjauan serta persetujuan.';
 }

@@ -145,12 +145,9 @@ function render(document, type) {
 
   const panel = documentNode("article", "grid min-w-0 gap-5 rounded-[1.75rem] border border-slate-200 bg-white p-4 shadow-sm sm:gap-6 sm:p-7 lg:p-9");
   const intro = documentNode("header", "grid min-w-0 gap-3");
-  const draft = textNode("span", "Draf untuk ditinjau — belum berlaku", "w-fit max-w-full rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.12em] text-amber-800");
   const title = textNode("h1", document.title, "break-words text-2xl font-black leading-tight text-slate-950 sm:text-3xl");
   title.id = "legal_document_title";
-  const summary = textNode("p", document.summary, "max-w-3xl text-sm leading-7 text-slate-600 sm:text-base");
-  const status = textNode("p", "Tanggal berlaku belum ditetapkan. Naskah masih memerlukan tinjauan dan persetujuan sebelum digunakan sebagai ketentuan resmi.", "rounded-2xl border border-sky-100 bg-sky-50/70 p-3 text-xs leading-6 text-sky-900 sm:p-4 sm:text-sm");
-  intro.append(draft, title, summary, status);
+  intro.append(title);
 
   const body = documentNode("div", "grid min-w-0 gap-3 sm:gap-4");
   document.sections.forEach((section, index) => {
