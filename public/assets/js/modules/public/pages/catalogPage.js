@@ -995,7 +995,7 @@ function selectedLocations(filters) {
 }
 
 function locationFilterKey(value) {
-  return locationDisplayName(value).toLowerCase();
+  return locationDisplayName(value).replace(/^kota\s+/i, "").toLowerCase();
 }
 
 function marketableCars(cars = []) {
