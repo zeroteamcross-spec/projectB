@@ -215,7 +215,12 @@ function performanceText(affiliate) {
   const clicks = numberValue(affiliate?.click_count ?? affiliate?.total_clicks ?? affiliate?.clicks_count);
   const leads = numberValue(affiliate?.lead_count ?? affiliate?.total_leads ?? affiliate?.prospect_count ?? affiliate?.prospects_count);
   const transactions = numberValue(affiliate?.transaction_count ?? affiliate?.total_transactions ?? affiliate?.conversions_count);
-  return `${clicks.toLocaleString("id-ID")} klik | ${leads.toLocaleString("id-ID")} prospek | ${transactions.toLocaleString("id-ID")} transaksi`;
+  const metrics = [`${clicks.toLocaleString("id-ID")} klik`];
+  if (leads > 0) {
+    metrics.push(`${leads.toLocaleString("id-ID")} prospek`);
+  }
+  metrics.push(`${transactions.toLocaleString("id-ID")} transaksi`);
+  return metrics.join(" | ");
 }
 
 function commissionText(affiliate) {

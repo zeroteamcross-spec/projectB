@@ -410,6 +410,22 @@ class TaskRepository
                 'work_status' => 'done',
                 'created_at' => '2026-10-23 00:00:00',
             ],
+            [
+                'task_key' => TaskCatalog::ADMIN_MASTER_LOCATION_REMOVE_KABUPATEN_TASK_KEY,
+                'title' => TaskCatalog::ADMIN_MASTER_LOCATION_REMOVE_KABUPATEN_TASK_TITLE,
+                'description' => TaskCatalog::ADMIN_MASTER_LOCATION_REMOVE_KABUPATEN_TASK_DESCRIPTION,
+                'status' => 'open',
+                'work_status' => 'done',
+                'created_at' => '2026-10-23 00:00:00',
+            ],
+            [
+                'task_key' => TaskCatalog::SELLER_AFFILIATES_HIDE_ZERO_PROSPECT_TASK_KEY,
+                'title' => TaskCatalog::SELLER_AFFILIATES_HIDE_ZERO_PROSPECT_TASK_TITLE,
+                'description' => TaskCatalog::SELLER_AFFILIATES_HIDE_ZERO_PROSPECT_TASK_DESCRIPTION,
+                'status' => 'open',
+                'work_status' => 'done',
+                'created_at' => '2026-10-23 00:00:00',
+            ],
         ];
     }
 

@@ -323,4 +323,16 @@ final class TaskCatalog
     public const TRANSACTION_PAYMENT_METHOD_MASTER_SETTING_TASK_TITLE = 'Ikuti pengaturan Master Pembayaran saat membuat transaksi mobil.';
 
     public const TRANSACTION_PAYMENT_METHOD_MASTER_SETTING_TASK_DESCRIPTION = 'Pada halaman {slug-showroom}/transactions/new?car_id={id}, pilihan metode pembayaran mengikuti nilai payments.subscription_destination.payment_mode di admin/master-payment: manual hanya transfer manual, midtrans hanya metode otomatis yang didukung, dan both menyediakan keduanya. Backend menolak pilihan yang tidak sesuai. Perubahan berlaku untuk transaksi baru saja; transaksi yang sudah berjalan tidak berubah. Bukti browser: Tugas GitIgnore/transaction-entry-payment-master-setting-2026-10-23.png.';
+
+    public const ADMIN_MASTER_LOCATION_REMOVE_KABUPATEN_TASK_KEY = 'request-054-admin-master-location-remove-kabupaten';
+
+    public const ADMIN_MASTER_LOCATION_REMOVE_KABUPATEN_TASK_TITLE = 'Hilangkan awalan Kabupaten dari nama lokasi di Master Lokasi.';
+
+    public const ADMIN_MASTER_LOCATION_REMOVE_KABUPATEN_TASK_DESCRIPTION = 'Pada halaman admin/master-location, hilangkan awalan "Kabupaten" dari nama dan slug yang ditampilkan untuk seluruh lokasi yang sudah ada. Pertahankan ID, slug tersimpan, data provinsi, dan relasi lokasi. Pastikan tampilan desktop dan mobile serta pencarian tetap berfungsi. Bukti visual awal: Tugas GitIgnore/admin-master-location-kabupaten-before-2026-10-23.png.';
+
+    public const SELLER_AFFILIATES_HIDE_ZERO_PROSPECT_TASK_KEY = 'request-055-seller-affiliates-hide-zero-prospect';
+
+    public const SELLER_AFFILIATES_HIDE_ZERO_PROSPECT_TASK_TITLE = 'Sembunyikan metrik 0 prospek di halaman Marketing.';
+
+    public const SELLER_AFFILIATES_HIDE_ZERO_PROSPECT_TASK_DESCRIPTION = 'Pada halaman seller/affiliates, hilangkan potongan teks "0 prospek" dari ringkasan performa marketing ketika jumlahnya nol; pertahankan klik dan transaksi, dan tampilkan jumlah prospek saat nilainya lebih dari nol. Referensi: Tugas GitIgnore/seller-affiliates-remove-zero-prospek-2026-10-23.png.';
 }

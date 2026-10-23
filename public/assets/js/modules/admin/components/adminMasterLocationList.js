@@ -59,11 +59,11 @@ export function AdminMasterLocationList({
     mobileMode: "disclosure",
     emptyTitle: "Kota belum tersedia",
     emptyDescription: "Tambahkan kota pertama untuk referensi lokasi listing mobil.",
-    mobileCardTitle: (city) => city.name,
-    mobileCardSubtitle: (city) => `${city.province_name || "Provinsi belum diisi"} | ${city.slug}`,
+    mobileCardTitle: (city) => cityLabel(city.name),
+    mobileCardSubtitle: (city) => `${city.province_name || "Provinsi belum diisi"} | ${cityLabel(city.slug)}`,
     mobileCardBadges: (city) => [statusBadge(city.status)],
     mobilePrimaryFields: (city) => [
-      { label: "Slug", value: city.slug },
+      { label: "Slug", value: cityLabel(city.slug) },
       { label: "Provinsi", value: city.province_name || "-" },
       { label: "Status", value: city.status === "active" ? "Aktif" : "Nonaktif" },
     ],
@@ -90,8 +90,8 @@ function cityCell(city) {
   const copy = document.createElement("div");
   copy.className = "grid min-w-0 gap-1";
   copy.append(
-    textBlock("font-black text-gray-950", city.name),
-    textBlock("text-xs text-gray-500", city.slug || "-"),
+    textBlock("font-black text-gray-950", cityLabel(city.name)),
+    textBlock("text-xs text-gray-500", cityLabel(city.slug) || "-"),
   );
   wrap.append(icon, copy);
   return wrap;
@@ -133,4 +133,8 @@ function textBlock(className, text) {
   node.className = `${className} break-words`;
   node.textContent = text ?? "";
   return node;
+}
+
+function cityLabel(value) {
+  return String(value ?? "").trim().replace(/^kabupaten(?:\s+|-)+/i, "");
 }
