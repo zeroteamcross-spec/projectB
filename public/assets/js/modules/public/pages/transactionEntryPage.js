@@ -91,15 +91,15 @@ export function TransactionEntryPage() {
       // "Buat transaksi" di akhir form tidak ketutupan footer nav bawah yang
       // fixed. sm:pb-0 karena footer itu cuma tampil di layar sempit.
       root.className = "min-h-screen pb-24 sm:pb-0";
-      render(root, context, getBackgroundVideoLayer);
+      render(root, context, getBackgroundVideoLayer, paymentBanks);
       publicAffiliateTrackingService.trackCurrentPage();
       return root;
     },
     hydrate(context) {
-      render(root, context, getBackgroundVideoLayer);
+      render(root, context, getBackgroundVideoLayer, paymentBanks);
     },
     bindEvents(context) {
-      unsubscribe = appStore.subscribe(() => render(root, context, getBackgroundVideoLayer));
+      unsubscribe = appStore.subscribe(() => render(root, context, getBackgroundVideoLayer, paymentBanks));
       return () => unsubscribe?.();
     },
     unmount() {
@@ -114,7 +114,7 @@ export function TransactionEntryPage() {
   });
 }
 
-function render(root, context, getBackgroundVideoLayer) {
+function render(root, context, getBackgroundVideoLayer, paymentBanks = []) {
   if (!root) {
     return;
   }
