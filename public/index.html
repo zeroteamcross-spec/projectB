@@ -20,6 +20,11 @@
         var isMainCarlynkPage = (hostname === "carlynk.id" || hostname === "www.carlynk.id")
           && (pathname === "/" || pathname === "/daftar-showroom")
           && !legacyHashRoute;
+        var customDomainShowroomSlug = String(window.__PROJECTB_CUSTOM_DOMAIN_SHOWROOM_SLUG__ || "").trim();
+
+        if (customDomainShowroomSlug) {
+          return String(document.title || fallback || "").trim() || fallback;
+        }
 
         return isMainCarlynkPage ? "carlynk.id" : fallback;
       };
