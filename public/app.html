@@ -17,8 +17,13 @@
         var hostname = String(window.location.hostname || "").toLowerCase();
         var pathname = String(window.location.pathname || "/").replace(/\/+$/, "") || "/";
         var legacyHashRoute = /^#\/.+/.test(String(window.location.hash || ""));
-        var isMainCarlynkPage = (hostname === "carlynk.id" || hostname === "www.carlynk.id")
-          && (pathname === "/" || pathname === "/daftar-showroom")
+        var isMainCarlynkHost = hostname === "carlynk.id"
+          || hostname === "www.carlynk.id"
+          || hostname === "app.carlynk.id";
+        var isMainCarlynkPage = isMainCarlynkHost
+          && (pathname === "/"
+            || pathname === "/daftar-showroom"
+            || /^\/(?:buyer|notifications|profile)(?:\/|$)/.test(pathname))
           && !legacyHashRoute;
 
         return isMainCarlynkPage ? "carlynk.id" : fallback;
