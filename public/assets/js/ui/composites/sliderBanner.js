@@ -91,7 +91,9 @@ export function SliderBanner({
       ? "pb-slider-direction-prev"
       : direction === "next"
         ? "pb-slider-direction-next"
-        : "";
+        : direction === "initial"
+          ? "pb-slider-initial-static"
+          : "";
     section.dataset.template = activeTemplateKey;
     section.className = [
       "pb-slider-banner",
@@ -653,6 +655,7 @@ function injectSliderStyles() {
     .pb-slider-anim-slide .pb-slider-copy,.pb-slider-anim-slide .pb-slider-glass-card{animation:pbSliderSlide .48s ease both}
     .pb-slider-anim-zoom .pb-slider-image{animation:pbSliderZoom .62s ease both}
     .pb-slider-anim-rise .pb-slider-copy,.pb-slider-anim-rise .pb-slider-glass-card{animation:pbSliderRise .48s ease both}
+    .pb-slider-initial-static .pb-slider-copy,.pb-slider-initial-static .pb-slider-glass-card,.pb-slider-initial-static .pb-slider-image{animation:none!important}
     .pb-slider-floating-media{animation:pbSliderFloat 4.8s ease-in-out infinite}
     .pb-slider-direction-next .pb-slider-item-active .pb-slider-inner{animation:pbSliderCarouselNext .58s cubic-bezier(.2,.8,.2,1) both}
     .pb-slider-direction-prev .pb-slider-item-active .pb-slider-inner{animation:pbSliderCarouselPrev .58s cubic-bezier(.2,.8,.2,1) both}
