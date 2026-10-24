@@ -109,8 +109,8 @@ function serveSpaShell(string $basePath, string $publicPath, string $path): bool
 
 /**
  * Resolves the active showroom behind a custom domain without changing the
- * browser URL. The SPA uses this value to render the showroom catalog at the
- * custom-domain root while keeping the legacy /{slug} route available.
+ * browser URL. The SPA uses this value for the showroom catalog and buyer
+ * account routes so direct page loads retain the showroom's branding.
  */
 function customDomainShowroomSlug(string $basePath, string $path): string
 {
@@ -148,7 +148,9 @@ function isCustomDomainShowroomRequestPath(string $path): bool
 {
     return $path === '/'
         || (bool) preg_match('#^/cars/[^/]+$#', $path)
-        || $path === '/transactions/new';
+        || $path === '/transactions/new'
+        || (bool) preg_match('#^/(?:buyer|notifications|profile)(?:/|$)#', $path)
+        || $path === '/google-login/buyer';
 }
 
 /**

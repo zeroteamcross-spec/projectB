@@ -8,6 +8,7 @@ import { applyDesignHook } from "../theme/designStudioHooks.js";
 import { createIcon } from "../theme/iconRegistry.js";
 import { uiStore } from "../state/uiStore.js";
 import { renderImpersonationBanner as mountImpersonationBanner } from "./impersonationBanner.js";
+import { publicContextService } from "../modules/public/services/publicContextService.js";
 
 export class AppShell {
   constructor({ store } = {}) {
@@ -115,6 +116,9 @@ export class AppShell {
       ? appRole
       : this.store?.get("auth.user.role", "") || this.store?.get("working.profilePage.profile.data.role", "");
     const role = routeRole && routeRole !== "public" ? routeRole : activeRole;
+    if (role === "buyer") {
+      publicContextService.syncBuyerShowroomBranding(path);
+    }
     const isBuyerShell = role === "buyer" && this.isBuyerExperiencePath(path);
     const isAffiliateAccountShell = role === "affiliate_admin" && this.isAffiliateAccountExperiencePath(path);
     const isAccountShell = isBuyerShell || isAffiliateAccountShell;

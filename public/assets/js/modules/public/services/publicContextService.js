@@ -1,6 +1,7 @@
 import { brandConfig } from "../../../theme/brandConfig.js";
 import { affiliatesResource } from "../../../resources/affiliatesResource.js";
 import { showroomsResource } from "../../../resources/showroomsResource.js";
+import { authStore } from "../../../state/authStore.js";
 import { publicContextState } from "../state/publicContextState.js";
 import { persistLastViewedShowroom, persistLastViewedAffiliate } from "../../../utils/lastViewedPublicContext.js";
 import { publicReservedRoutePrefixes } from "../../../core/publicReservedRouteWords.js";
@@ -12,10 +13,16 @@ const RESERVED_ROOT_WORD_PATTERN = new RegExp(`^(?:${publicReservedRoutePrefixes
 let brandingOriginal = null;
 let brandingShowroomId = null;
 let mainRegistrationBrandingOriginal = null;
+let buyerShowroomBrandingSlug = "";
+let buyerShowroomBrandingContext = null;
+let buyerShowroomBrandingPromise = null;
+let buyerShowroomBrandingRequestSlug = "";
+let buyerShowroomBrandingAttemptedSlug = "";
 
 function applyShowroomBranding(showroom) {
   const iconUrl = String(showroom?.showroom?.icon_url ?? "").trim();
-  const tabTitle = String(showroom?.showroom?.tab_title ?? "").trim();
+  const tabTitle = String(showroom?.showroom?.tab_title ?? "").trim()
+    || String(showroom?.showroom?.name ?? showroom?.name ?? "").trim();
 
   if (!iconUrl && !tabTitle) {
     return;
@@ -260,6 +267,91 @@ export const publicContextService = {
   },
 
   /**
+   * Preserve the showroom's tab title and favicon across buyer account pages.
+   * The buyer's home_showroom_slug is the durable association; when the
+   * current public context already belongs to that showroom, reuse its data.
+   */
+  syncBuyerShowroomBranding(path = typeof window !== "undefined" ? window.location.pathname : "/") {
+    if (authStore.role() !== "buyer" || !isBuyerTabTitlePath(path)) {
+      return Promise.resolve(null);
+    }
+
+    const user = authStore.user();
+    const slug = String(user?.home_showroom_slug || this.customDomainShowroomSlug() || "")
+      .trim()
+      .toLowerCase();
+    if (!slug) {
+      return Promise.resolve(null);
+    }
+
+    const activeShowroom = this.activeShowroom();
+    if (activeShowroom?.slug?.toLowerCase?.() === slug) {
+      buyerShowroomBrandingSlug = slug;
+      buyerShowroomBrandingContext = activeShowroom;
+      applyShowroomBranding(activeShowroom);
+      return Promise.resolve(activeShowroom);
+    }
+
+    const activeAffiliate = this.activeAffiliate();
+    if (activeAffiliate?.showroom?.slug?.toLowerCase?.() === slug) {
+      const context = { id: activeAffiliate.showroom.id, showroom: activeAffiliate.showroom };
+      buyerShowroomBrandingSlug = slug;
+      buyerShowroomBrandingContext = context;
+      applyShowroomBranding(context);
+      return Promise.resolve(context);
+    }
+
+    if (buyerShowroomBrandingSlug === slug && buyerShowroomBrandingContext) {
+      applyShowroomBranding(buyerShowroomBrandingContext);
+      return Promise.resolve(buyerShowroomBrandingContext);
+    }
+    if (buyerShowroomBrandingRequestSlug === slug && buyerShowroomBrandingPromise) {
+      return buyerShowroomBrandingPromise;
+    }
+    if (buyerShowroomBrandingAttemptedSlug === slug) {
+      return Promise.resolve(null);
+    }
+
+    buyerShowroomBrandingSlug = slug;
+    buyerShowroomBrandingContext = null;
+    buyerShowroomBrandingAttemptedSlug = slug;
+    buyerShowroomBrandingRequestSlug = slug;
+    const request = showroomsResource.validateSlug(slug)
+      .then((result) => {
+        const currentUser = authStore.user();
+        const currentSlug = String(currentUser?.home_showroom_slug || this.customDomainShowroomSlug() || "")
+          .trim()
+          .toLowerCase();
+        if (authStore.role() !== "buyer" || currentSlug !== slug || !isBuyerTabTitlePath(window.location.pathname)) {
+          return null;
+        }
+        if (!result?.is_valid || !result?.seller_user_id || !result?.showroom) {
+          return null;
+        }
+
+        const context = {
+          id: Number(result.showroom.id ?? 0),
+          slug: result.slug ?? result.showroom.slug ?? slug,
+          sellerUserId: Number(result.seller_user_id),
+          showroom: result.showroom,
+          isActive: result.showroom.is_active !== false,
+        };
+        buyerShowroomBrandingContext = context;
+        applyShowroomBranding(context);
+        return context;
+      })
+      .catch(() => null)
+      .finally(() => {
+        if (buyerShowroomBrandingRequestSlug === slug) {
+          buyerShowroomBrandingPromise = null;
+          buyerShowroomBrandingRequestSlug = "";
+        }
+      });
+    buyerShowroomBrandingPromise = request;
+    return request;
+  },
+
+  /**
    * Safety net for showroom branding (tab title/favicon/header logo): the
    * pages that activate a showroom's branding (catalog/car-detail/
    * transaction-entry, and now affiliate/marketing catalog pages too) are
@@ -290,6 +382,19 @@ export const publicContextService = {
     }
 
     revertMainRegistrationBranding();
+    if (isBuyerTabTitlePath(normalizedPath) && authStore.role() === "buyer") {
+      const homeSlug = String(authStore.user()?.home_showroom_slug ?? "").trim().toLowerCase();
+      const activeShowroom = this.activeShowroom();
+      const activeAffiliate = this.activeAffiliate();
+      if (activeShowroom && (!homeSlug || activeShowroom.slug?.toLowerCase?.() === homeSlug)) {
+        applyShowroomBranding(activeShowroom);
+      } else if (activeAffiliate?.showroom && (!homeSlug || activeAffiliate.showroom.slug?.toLowerCase?.() === homeSlug)) {
+        applyShowroomBranding({ id: activeAffiliate.showroom.id, showroom: activeAffiliate.showroom });
+      } else {
+        this.syncBuyerShowroomBranding(normalizedPath);
+      }
+      return;
+    }
     if (this.isCustomDomainShowroomPath(value)) {
       return;
     }
@@ -497,6 +602,11 @@ export const publicContextService = {
     return `/transactions/new?car_id=${encodeURIComponent(carId)}`;
   },
 };
+
+function isBuyerTabTitlePath(path = "") {
+  const normalizedPath = String(path ?? "/").split(/[?#]/, 1)[0].replace(/\/+$/, "") || "/";
+  return /^\/(?:buyer(?:\/|$)|notifications(?:\/|$)|profile(?:\/|$))/.test(normalizedPath);
+}
 
 function applyMainRegistrationBranding() {
   if (mainRegistrationBrandingOriginal === null) {
