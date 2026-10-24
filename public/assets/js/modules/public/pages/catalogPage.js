@@ -126,6 +126,12 @@ function render(root, context, flags) {
     return;
   }
 
+  const renderSignature = publicCatalogRenderSignature(context, flags);
+  if (root.__catalogRenderSignature === renderSignature) {
+    return;
+  }
+  root.__catalogRenderSignature = renderSignature;
+
   const affiliate = publicContextService.activeAffiliate();
   const showroom = publicContextService.activeShowroom();
   const affiliateSlug = publicContextService.routeAffiliateSlug(context);
@@ -139,6 +145,7 @@ function render(root, context, flags) {
   if (isAffiliateRoute || isShowroomRoute) {
     const maintenance = publicContextService.inactiveShowroomContext();
     if (maintenance.isInactive) {
+      disposeSliderBanners(root);
       root.replaceChildren(MaintenancePage({ showroomName: maintenance.showroomName }));
       return;
     }
@@ -174,8 +181,16 @@ function render(root, context, flags) {
   const slidersBeforeRender = resolvePublicSliders();
 
   const isScopedRoute = isAffiliateRoute || isShowroomRoute;
+  const sliderNode = invalidAffiliateRoute || invalidShowroomRoute
+    ? null
+    : publicCatalogSliderNode(root, slidersBeforeRender, context, {
+        isAffiliateRoute,
+        isShowroomRoute,
+        affiliateSlug,
+        showroomSlug,
+        affiliate,
+      });
   if (isScopedRoute && !invalidAffiliateRoute && !invalidShowroomRoute && (!contextReady || (!workingHydratedAt && !cachedCatalog))) {
-    disposeSliderBanners(root);
     root.replaceChildren(loadingFrame(
       filters,
       catalogState.quickFilter,
@@ -183,6 +198,7 @@ function render(root, context, flags) {
       useBackgroundVideo ? flags.getBackgroundVideoLayer?.() : null,
       useBackgroundVideo,
       activeContext,
+      { root, context, sliderNode },
     ));
     return;
   }
@@ -209,25 +225,7 @@ function render(root, context, flags) {
   frame.className = hasBuyerMobileFooter
     ? "relative z-10 mx-auto grid w-full max-w-[1200px] gap-5 px-3 pb-28 pt-4 sm:gap-6 sm:px-6 sm:pb-32 sm:pt-6 md:pb-6 2xl:max-w-[1240px]"
     : "relative z-10 mx-auto grid w-full max-w-[1200px] gap-5 px-3 py-4 sm:gap-6 sm:px-6 sm:py-6 2xl:max-w-[1240px]";
-  const showDesktopTopNav = isAuthenticated && (role === "buyer" || role === "seller");
-  if (showDesktopTopNav) {
-    frame.append(BuyerDesktopTopNav({
-      activePath: context?.path ?? "/",
-      brandLabel: role === "seller" ? "Marketing" : buyerName(authStore.user()),
-      brandIcon: role === "seller" ? "showroom" : "car",
-      user: authStore.user(),
-      onNavigate: (path) => context.router?.navigate(path),
-    }));
-  }
-
-  if (isAuthenticated && (role === "buyer" || role === "seller")) {
-    frame.append(buyerProfileHeader({
-      user: authStore.user(),
-      actions: {
-        navigate: (path) => context.router?.navigate(path),
-      },
-    }));
-  }
+  appendCatalogAccountHeaders(frame, root, context);
 
   if (activeContext) {
     const banner = PublicAffiliateContextBanner({
@@ -258,16 +256,7 @@ function render(root, context, flags) {
       onQuickFilter: (value) => publicCatalogState.setQuickFilter(value),
       onOpenFilter: () => publicCatalogState.setFilterOpen(true),
     }));
-    frame.append(slidersBeforeRender.length
-      ? SliderBanner({
-          sliders: slidersBeforeRender,
-          idPrefix: "pubcat",
-          context: "public",
-          onNavigate: (path) => context.router?.navigate(path),
-          resolveCtaUrl: (url) => isAffiliateRoute ? affiliateSliderCtaUrl(url, affiliateSlug, affiliate?.showroom?.slug ?? "") : isShowroomRoute ? showroomSliderCtaUrl(url, showroomSlug) : url,
-          fallback: () => sliderSkeletonPlaceholder(),
-        })
-      : sliderSkeletonPlaceholder());
+    frame.append(sliderNode);
     frame.append(statsPanel({ count: allCars.length, meta, affiliate: activeContext }));
     frame.append(
         catalogToolbar(allCars.length, meta, activeContext),
@@ -620,16 +609,16 @@ function carGrid({ cars, router, isRefreshing, showFavorite = false }) {
   return grid;
 }
 
-function loadingFrame(filters = {}, quickFilter = "newest", options = {}, backgroundVideoLayer = null, useBackgroundVideo = false, affiliate = null) {
+function loadingFrame(filters = {}, quickFilter = "newest", options = {}, backgroundVideoLayer = null, useBackgroundVideo = false, affiliate = null, { root = null, context = null, sliderNode = null } = {}) {
   const shell = document.createElement("div");
   shell.className = useBackgroundVideo
     ? "relative isolate min-h-screen overflow-x-clip bg-transparent"
     : `relative isolate min-h-screen overflow-x-clip ${PUBLIC_CATALOG_FALLBACK}`;
   appendBackground(shell, backgroundVideoLayer, cosmicTexture());
-  const sliders = resolvePublicSliders();
 
   const frame = document.createElement("div");
   frame.className = "relative z-10 mx-auto grid w-full max-w-[1200px] gap-5 px-4 py-4 sm:px-6 sm:py-6 2xl:max-w-[1240px]";
+  appendCatalogAccountHeaders(frame, root, context);
   frame.append(
     PublicSearchFilterBar({
       filters,
@@ -637,19 +626,103 @@ function loadingFrame(filters = {}, quickFilter = "newest", options = {}, backgr
       options,
       activeFilterCount: activeFilterCount(filters),
     }),
-    sliders.length
-      ? SliderBanner({
-          sliders,
-          idPrefix: "pubcat",
-          context: "public",
-          fallback: () => sliderSkeletonPlaceholder(),
-        })
-      : sliderSkeletonPlaceholder(),
+    sliderNode ?? sliderSkeletonPlaceholder(),
     statsPanel({ count: 0, meta: {}, affiliate }),
     Skeleton({ lines: 8 }),
   );
   shell.append(frame);
   return shell;
+}
+
+function appendCatalogAccountHeaders(frame, root, context) {
+  const isAuthenticated = authStore.isAuthenticated();
+  const role = authStore.role();
+  if (!isAuthenticated || !["buyer", "seller"].includes(role)) {
+    return;
+  }
+
+  const activePath = context?.path ?? "/";
+  const user = authStore.user();
+  const headerSignature = JSON.stringify({
+    activePath,
+    role,
+    user: [user?.id, user?.name, user?.full_name, user?.username, user?.email, user?.avatar_url, user?.photo_url, user?.profile_photo_url],
+  });
+  const existingNavigation = root?.querySelector?.("#byrtx_desktop_top_nav");
+  const navigation = existingNavigation?.dataset.catalogHeaderSignature === headerSignature
+    ? existingNavigation
+    : BuyerDesktopTopNav({
+        activePath,
+        brandLabel: role === "seller" ? "Marketing" : buyerName(user),
+        brandIcon: role === "seller" ? "showroom" : "car",
+        user,
+        onNavigate: (path) => context?.router?.navigate(path),
+      });
+  navigation.dataset.catalogHeaderSignature = headerSignature;
+
+  const actions = { navigate: (path) => context?.router?.navigate(path) };
+  const existingProfileHeader = root?.querySelector?.("#byr_profile_header");
+  const profileHeader = existingProfileHeader?.dataset.catalogHeaderSignature === headerSignature
+    ? existingProfileHeader
+    : buyerProfileHeader({ user, actions });
+  profileHeader.dataset.catalogHeaderSignature = headerSignature;
+  frame.append(navigation, profileHeader);
+}
+
+function publicCatalogSliderNode(root, sliders, context, { isAffiliateRoute, isShowroomRoute, affiliateSlug, showroomSlug, affiliate } = {}) {
+  const signature = JSON.stringify(sliders);
+  const existing = root?.querySelector?.("#pubcat_slider_banner, #pubcat_slider_skeleton");
+  if (existing?.dataset.renderSignature === signature) {
+    return existing;
+  }
+
+  if (existing?.classList.contains("pb-slider-banner")) {
+    existing.dispose?.();
+  }
+  existing?.remove?.();
+
+  const node = sliders.length
+    ? SliderBanner({
+        sliders,
+        idPrefix: "pubcat",
+        context: "public",
+        onNavigate: (path) => context?.router?.navigate(path),
+        resolveCtaUrl: (url) => isAffiliateRoute
+          ? affiliateSliderCtaUrl(url, affiliateSlug, affiliate?.showroom?.slug ?? "")
+          : isShowroomRoute
+            ? showroomSliderCtaUrl(url, showroomSlug)
+            : url,
+        fallback: () => sliderSkeletonPlaceholder(),
+      })
+    : sliderSkeletonPlaceholder();
+  node.dataset.renderSignature = signature;
+  return node;
+}
+
+function publicCatalogRenderSignature(context, flags = {}) {
+  const state = appStore.getState();
+  const catalog = state.modules?.public?.catalog ?? {};
+  const publicContext = state.modules?.public?.context ?? {};
+  const authUser = state.auth?.user ?? null;
+
+  return JSON.stringify({
+    path: context?.path,
+    route: context?.name ?? context?.route?.name,
+    auth: [state.auth?.isAuthenticated, state.auth?.role, authUser],
+    publicContext: [publicContext.mode, publicContext.affiliate, publicContext.showroom, publicContext.invalidSlug],
+    filters: [catalog.filters, catalog.quickFilter, catalog.page, catalog.limit, catalog.isFilterOpen],
+    catalogData: [
+      state.working?.publicCatalog?.catalog?.data,
+      state.snapshot?.public?.catalog?.data,
+    ],
+    sliders: resolvePublicSliders(),
+    favorites: state.runtime?.favorites,
+    locations: [
+      state.working?.publicCatalog?.masterLocation?.data,
+      state.snapshot?.public?.masterLocation?.data,
+    ],
+    flags: [Boolean(flags.notFound), Boolean(flags.isLoadingMore), Boolean(flags.isRefreshing)],
+  });
 }
 
 function sliderSkeletonPlaceholder() {

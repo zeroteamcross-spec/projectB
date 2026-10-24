@@ -12,6 +12,7 @@ export function BuyerCarsPage() {
   let root = null;
   let unsubscribe = null;
   let currentContext = null;
+  let lastRelevantState = null;
 
   const actions = {
     navigate(path) {
@@ -32,7 +33,16 @@ export function BuyerCarsPage() {
     },
     bindEvents(context) {
       currentContext = context;
-      unsubscribe = appStore.subscribe(() => render(root, currentContext, actions));
+      unsubscribe = appStore.subscribe((state) => {
+        const nextRelevantState = buyerCarsStateSignature(state);
+        if (lastRelevantState === null) {
+          lastRelevantState = nextRelevantState;
+          return;
+        }
+        if (nextRelevantState === lastRelevantState) return;
+        lastRelevantState = nextRelevantState;
+        render(root, currentContext, actions);
+      });
       return () => unsubscribe?.();
     },
     dispose() {
@@ -46,18 +56,34 @@ function render(root, context, actions) {
   const workingCatalog = buyerState.working("buyerCars", "catalog", snapshotCatalog);
   const cars = marketableCars(workingCatalog?.cars ?? snapshotCatalog?.cars ?? []);
   const activePath = context?.path ?? "/buyer/cars";
+  const userSignature = JSON.stringify({
+    authUser: authStore.user(),
+    profile: appStore.get("working.profilePage.profile.data", null),
+    accountProfile: appStore.get("working.buyerAccount.profile.data", null),
+  });
+  const navigationSignature = JSON.stringify({ activePath, userSignature });
+  const existingNavigation = root.querySelector("#byrtx_desktop_top_nav");
+  const navigation = existingNavigation?.dataset.renderSignature === navigationSignature
+    ? existingNavigation
+    : BuyerDesktopTopNav({
+        activePath,
+        onNavigate: (path) => actions.navigate(path),
+        brandLabel: "Katalog Mobil",
+        brandIcon: "car",
+      });
+  navigation.dataset.renderSignature = navigationSignature;
+  const existingMobileHeader = root.querySelector("#byr_cars_mobile_header");
+  const mobileHeader = existingMobileHeader?.dataset.renderSignature === navigationSignature
+    ? existingMobileHeader
+    : buyerMobileHeader({ actions });
+  mobileHeader.dataset.renderSignature = navigationSignature;
   const page = document.createElement("section");
   page.id = "byr_cars_page";
   page.className = "mx-auto grid min-w-0 w-full max-w-[430px] gap-5 pb-28 text-[var(--pb-text)] md:max-w-[1180px] md:gap-6 md:pb-8";
 
   page.append(
-    BuyerDesktopTopNav({
-      activePath,
-      onNavigate: (path) => actions.navigate(path),
-      brandLabel: "Katalog Mobil",
-      brandIcon: "car",
-    }),
-    buyerMobileHeader({ actions }),
+    navigation,
+    mobileHeader,
     SectionHeader({
       title: "Katalog Mobil",
       description: "Daftar mobil sedang dimuat.",
@@ -72,6 +98,16 @@ function render(root, context, actions) {
 
   disposeChildren(root);
   root.replaceChildren(page);
+}
+
+function buyerCarsStateSignature(state = {}) {
+  return JSON.stringify({
+    catalog: state.working?.buyerCars?.catalog?.data
+      ?? state.snapshot?.buyer?.catalog?.data,
+    authUser: state.auth?.user,
+    profile: state.working?.profilePage?.profile?.data,
+    accountProfile: state.working?.buyerAccount?.profile?.data,
+  });
 }
 
 function buyerMobileHeader({ actions }) {

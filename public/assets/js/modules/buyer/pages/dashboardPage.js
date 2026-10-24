@@ -48,6 +48,7 @@ export function BuyerDashboardPage({ notFound = false } = {}) {
   let root = null;
   let unsubscribe = null;
   let currentContext = null;
+  let lastRelevantState = null;
   const uiState = {
     search: "",
     category: "all",
@@ -125,9 +126,13 @@ export function BuyerDashboardPage({ notFound = false } = {}) {
     bindEvents(context) {
       currentContext = context;
       unsubscribe = appStore.subscribe((state, action) => {
-        if (String(action ?? "").startsWith("ui:")) {
+        const nextRelevantState = buyerDashboardStateSignature(state);
+        if (lastRelevantState === null) {
+          lastRelevantState = nextRelevantState;
           return;
         }
+        if (nextRelevantState === lastRelevantState) return;
+        lastRelevantState = nextRelevantState;
         rerender();
       });
       return () => unsubscribe?.();
@@ -155,6 +160,34 @@ function render(root, context, actions, uiState, notFound) {
   const hasFavorites = cars.length > 0;
   const activePath = context?.path ?? appStore.get("app.currentRoute.path", "/buyer");
   const user = resolveBuyerUser();
+  const headerSignature = JSON.stringify({
+    activePath,
+    user: [user?.id, user?.name, user?.full_name, user?.username, user?.email, user?.avatar_url, user?.photo_url, user?.profile_photo_url],
+  });
+  const existingTopNavigation = root.querySelector("#byrtx_desktop_top_nav");
+  const topNavigation = existingTopNavigation?.dataset.renderSignature === headerSignature
+    ? existingTopNavigation
+    : buyerTopNavigation({ activePath, actions });
+  topNavigation.dataset.renderSignature = headerSignature;
+  const existingProfileHeader = root.querySelector("#byr_profile_header");
+  const profileHeader = existingProfileHeader?.dataset.renderSignature === headerSignature
+    ? existingProfileHeader
+    : buyerProfileHeader({ user, actions });
+  profileHeader.dataset.renderSignature = headerSignature;
+
+  const sliders = resolveBuyerSliders();
+  const sliderSignature = JSON.stringify(sliders);
+  const existingSlider = root.querySelector("#byr_slider_banner, #byr_hero_banner");
+  const slider = existingSlider?.dataset.renderSignature === sliderSignature
+    ? existingSlider
+    : SliderBanner({
+        sliders,
+        idPrefix: "byr",
+        context: "buyer",
+        onNavigate: actions.navigate,
+        fallback: () => buyerHero({ cars, notFound, actions }),
+      });
+  slider.dataset.renderSignature = sliderSignature;
 
   const page = document.createElement("section");
   page.id = "byr_page";
@@ -162,19 +195,10 @@ function render(root, context, actions, uiState, notFound) {
   page.dataset.ds = "buyer.dashboard.page";
 
   page.append(
-    buyerTopNavigation({ activePath, actions }),
-    buyerProfileHeader({
-      user,
-      actions,
-    }),
+    topNavigation,
+    profileHeader,
     ...(hasFavorites ? [buyerSearchBar({ cars, uiState, actions })] : []),
-    SliderBanner({
-      sliders: resolveBuyerSliders(),
-      idPrefix: "byr",
-      context: "buyer",
-      onNavigate: actions.navigate,
-      fallback: () => buyerHero({ cars, notFound, actions }),
-    }),
+    slider,
     buyerCategoryMenu({ activePath, actions }),
     latestTransactionsSection({ transactions, actions }),
     recommendationsSection({ cars: filteredCars, actions, hasFavorites }),
@@ -184,6 +208,26 @@ function render(root, context, actions, uiState, notFound) {
 
   disposeChildren(root);
   root.replaceChildren(page);
+}
+
+function buyerDashboardStateSignature(state = {}) {
+  return JSON.stringify({
+    auth: {
+      isAuthenticated: state.auth?.isAuthenticated,
+      role: state.auth?.role,
+      user: state.auth?.user,
+      profile: state.snapshot?.buyer?.profile?.data,
+    },
+    favorites: state.runtime?.favorites,
+    transactions: state.working?.buyerDashboard?.transactions?.data
+      ?? state.snapshot?.buyer?.transactions?.data,
+    sliders: [
+      state.working?.buyerDashboard?.sliders?.data,
+      state.snapshot?.buyer?.slidersLandingPage?.data,
+      state.snapshot?.buyer?.slidersPublicHome?.data,
+      state.snapshot?.buyer?.slidersLandingHero?.data,
+    ],
+  });
 }
 
 function disposeChildren(root) {
