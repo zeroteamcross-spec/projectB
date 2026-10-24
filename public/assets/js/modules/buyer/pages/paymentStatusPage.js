@@ -721,8 +721,10 @@ function bindVisibilityResume(context, flags, poller) {
 }
 
 function shouldAutoPollTransaction(transaction) {
-  return Boolean(transaction?.id) && isPendingPayment(transaction)
-    && (transaction.payment_method !== "manual_transfer" || Boolean(transaction.manual_transfer?.proof_path));
+  // Showroom can record a pending manual transfer offline, even before the
+  // buyer uploads proof. Keep checking the transaction detail so that the
+  // buyer page reflects that status change without requiring a reload.
+  return Boolean(transaction?.id) && isPendingPayment(transaction);
 }
 
 function openCompletionFlow() {
