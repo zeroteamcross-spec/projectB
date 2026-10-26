@@ -46,7 +46,7 @@ export function TasksPage({
         showToast(state.error, { type: "error" });
       } finally {
         state.loading = false;
-        render(root, state, actions);
+        render(root, state, actions, pageConfig);
       }
     },
 
@@ -216,7 +216,7 @@ function taskGroupCard(group, state, actions, root, readOnly) {
       } else {
         state.openGroups.add(group.key);
       }
-      render(root, state, actions);
+      render(root, state, actions, pageConfig);
     },
   });
   toggle.className = "flex min-h-14 w-full items-center justify-between gap-3 rounded-xl border border-transparent px-3 py-3 text-left hover:border-[var(--pb-border)] hover:bg-slate-50 sm:px-4";
