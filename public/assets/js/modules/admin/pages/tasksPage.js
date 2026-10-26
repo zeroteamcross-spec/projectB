@@ -3,6 +3,7 @@ import { Button } from "../../../ui/primitives/button.js";
 import { EmptyState } from "../../../ui/primitives/emptyState.js";
 import { showToast } from "../../../ui/primitives/toast.js";
 import { adminTasksService } from "../services/adminTasksService.js";
+import { groupTasks } from "../support/taskGrouping.js";
 
 const WORK_STATUS_LABEL = {
   pending: "Belum selesai",
@@ -17,12 +18,16 @@ export function TasksPage({ service = adminTasksService } = {}) {
     loading: true,
     savingId: null,
     error: "",
+    openGroups: new Set(),
+    groupsInitialized: false,
   };
 
   const actions = {
     async refresh() {
       state.loading = true;
       state.error = "";
+      state.groupsInitialized = false;
+      state.openGroups = new Set();
       render(root, state, actions);
 
       try {
@@ -96,11 +101,14 @@ function render(root, state, actions) {
   page.className = "grid gap-6";
   page.append(hero(state, actions));
 
+  const groups = state.loading ? [] : groupTasks(state.tasks);
+  initializeOpenGroups(state, groups);
+
   if (state.error) {
     page.append(errorBox(state.error));
   }
 
-  page.append(summary(state));
+  page.append(summary(state, groups));
 
   if (state.loading) {
     page.append(loadingPanel());
@@ -110,10 +118,7 @@ function render(root, state, actions) {
       description: "Permintaan baru akan muncul di halaman ini.",
     }));
   } else {
-    const list = document.createElement("div");
-    list.className = "grid gap-3";
-    list.append(...state.tasks.map((task) => taskCard(task, state, actions)));
-    page.append(list);
+    page.append(taskGroups(groups, state, actions, root));
   }
 
   root.replaceChildren(page);
@@ -133,7 +138,7 @@ function hero(state, actions) {
 
   const description = document.createElement("p");
   description.className = "max-w-3xl text-xs leading-6 text-[var(--pb-text-muted)]";
-  description.textContent = "Badge menunjukkan progres pekerjaan. Tombol Beres hanya untuk konfirmasi Anda setelah memeriksa hasilnya.";
+  description.textContent = "Tugas serupa dikelompokkan berdasarkan area fitur agar ringkas. Buka kelompok untuk melihat detail per tugas; data asli tetap tersimpan.";
 
   const refresh = Button({
     label: state.loading ? "Memuat..." : "Refresh",
@@ -147,17 +152,18 @@ function hero(state, actions) {
   return panel;
 }
 
-function summary(state) {
+function summary(state, groups) {
   const open = state.tasks.filter((task) => (task.work_status || "pending") === "pending").length;
   const done = state.tasks.filter((task) => task.work_status === "done").length;
   const sip = state.tasks.filter((task) => task.status === "sip").length;
 
   const grid = document.createElement("div");
-  grid.className = "grid gap-3 sm:grid-cols-3";
+  grid.className = "grid gap-3 sm:grid-cols-2 lg:grid-cols-4";
   grid.append(
     summaryCard("Belum selesai", open),
     summaryCard("Sudah Dikerjakan", done),
-    summaryCard("Sip", sip)
+    summaryCard("Sip", sip),
+    summaryCard("Kelompok", groups.length)
   );
   return grid;
 }
@@ -173,6 +179,97 @@ function summaryCard(label, value) {
   valueNode.textContent = String(value);
   card.append(labelNode, valueNode);
   return card;
+}
+
+function taskGroups(groups, state, actions, root) {
+  const list = document.createElement("div");
+  list.id = "admin_task_groups_list";
+  list.className = "grid gap-3";
+  list.append(...groups.map((group) => taskGroupCard(group, state, actions, root)));
+  return list;
+}
+
+function taskGroupCard(group, state, actions, root) {
+  const section = document.createElement("section");
+  section.id = `admin_task_group_${group.key}`;
+  section.className = "overflow-hidden rounded-2xl border border-[var(--pb-border)] bg-white shadow-sm";
+
+  const expanded = state.openGroups.has(group.key);
+  const header = document.createElement("div");
+  header.className = "p-2 sm:p-3";
+
+  const toggle = Button({
+    id: `admin_task_group_toggle_${group.key}`,
+    label: group.label,
+    variant: "secondary",
+    onClick: () => {
+      if (state.openGroups.has(group.key)) {
+        state.openGroups.delete(group.key);
+      } else {
+        state.openGroups.add(group.key);
+      }
+      render(root, state, actions);
+    },
+  });
+  toggle.className = "flex min-h-14 w-full items-center justify-between gap-3 rounded-xl border border-transparent px-3 py-3 text-left hover:border-[var(--pb-border)] hover:bg-slate-50 sm:px-4";
+  toggle.setAttribute("aria-expanded", String(expanded));
+  toggle.setAttribute("aria-controls", `admin_task_group_body_${group.key}`);
+  toggle.replaceChildren(
+    groupHeading(group),
+    groupMeta(group, expanded)
+  );
+  header.append(toggle);
+  section.append(header);
+
+  if (expanded) {
+    const body = document.createElement("div");
+    body.id = `admin_task_group_body_${group.key}`;
+    body.className = "grid gap-3 border-t border-[var(--pb-border)] bg-slate-50/50 p-3 sm:p-4";
+    body.append(...group.tasks.map((task) => taskCard(task, state, actions)));
+    section.append(body);
+  }
+
+  return section;
+}
+
+function groupHeading(group) {
+  const wrap = document.createElement("span");
+  wrap.className = "min-w-0";
+  const title = document.createElement("span");
+  title.className = "block break-words text-sm font-black text-gray-950";
+  title.textContent = group.label;
+  const subtitle = document.createElement("span");
+  subtitle.className = "mt-1 block text-[10px] font-semibold text-[var(--pb-text-muted)]";
+  subtitle.textContent = `${group.total} tugas`;
+  wrap.append(title, subtitle);
+  return wrap;
+}
+
+function groupMeta(group, expanded) {
+  const wrap = document.createElement("span");
+  wrap.className = "flex shrink-0 items-center gap-2 text-right";
+  const status = document.createElement("span");
+  status.className = "hidden text-[10px] font-semibold text-[var(--pb-text-muted)] sm:inline";
+  status.textContent = `${group.pending} belum selesai - ${group.sip} sip`;
+  const chevron = document.createElement("span");
+  chevron.className = "grid h-8 w-8 place-items-center rounded-full bg-slate-100 text-base font-black text-slate-600";
+  chevron.setAttribute("aria-hidden", "true");
+  chevron.textContent = expanded ? "-" : "+";
+  wrap.append(status, chevron);
+  return wrap;
+}
+
+function initializeOpenGroups(state, groups) {
+  if (state.groupsInitialized || !groups.length) {
+    return;
+  }
+
+  const pendingGroups = groups.filter((group) => group.pending > 0);
+  state.openGroups = new Set(pendingGroups.map((group) => group.key));
+  if (!state.openGroups.size) {
+    state.openGroups.add(groups[0].key);
+  }
+  state.groupsInitialized = true;
 }
 
 function taskCard(task, state, actions) {
