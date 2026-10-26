@@ -10,9 +10,17 @@ const WORK_STATUS_LABEL = {
   done: "Sudah Dikerjakan",
 };
 
-export function TasksPage({ service = adminTasksService } = {}) {
+export function TasksPage({
+  service = adminTasksService,
+  title = "Daftar Tugas",
+  description = "Tugas serupa dikelompokkan berdasarkan area fitur agar ringkas. Buka kelompok untuk melihat detail per tugas; data asli tetap tersimpan.",
+  readOnly = false,
+  emptyTitle = "Belum ada tugas",
+  emptyDescription = "Permintaan baru akan muncul di halaman ini.",
+} = {}) {
   let root = null;
   let currentContext = null;
+  const pageConfig = { title, description, readOnly, emptyTitle, emptyDescription };
   const state = {
     tasks: [],
     loading: true,
@@ -28,7 +36,7 @@ export function TasksPage({ service = adminTasksService } = {}) {
       state.error = "";
       state.groupsInitialized = false;
       state.openGroups = new Set();
-      render(root, state, actions);
+      render(root, state, actions, pageConfig);
 
       try {
         state.tasks = await service.list();
@@ -43,13 +51,13 @@ export function TasksPage({ service = adminTasksService } = {}) {
     },
 
     async complete(task) {
-      if (!task || task.status === "sip" || state.savingId !== null) {
+      if (readOnly || !task || task.status === "sip" || state.savingId !== null) {
         return;
       }
 
       state.savingId = task.id;
       state.error = "";
-      render(root, state, actions);
+      render(root, state, actions, pageConfig);
 
       try {
         const updated = await service.updateStatus(task.id, "sip");
@@ -60,7 +68,7 @@ export function TasksPage({ service = adminTasksService } = {}) {
         showToast(state.error, { type: "error" });
       } finally {
         state.savingId = null;
-        render(root, state, actions);
+        render(root, state, actions, pageConfig);
       }
     },
   };
@@ -72,13 +80,13 @@ export function TasksPage({ service = adminTasksService } = {}) {
     mount(context) {
       currentContext = context;
       root = document.createElement("div");
-      render(root, state, actions);
+      render(root, state, actions, pageConfig);
       actions.refresh();
       return root;
     },
     hydrate(context) {
       currentContext = context;
-      render(root, state, actions);
+      render(root, state, actions, pageConfig);
     },
     dispose() {
       currentContext = null;
@@ -91,7 +99,7 @@ export function AdminTasksPage() {
   return TasksPage();
 }
 
-function render(root, state, actions) {
+function render(root, state, actions, config) {
   if (!root) {
     return;
   }
@@ -99,7 +107,7 @@ function render(root, state, actions) {
   const page = document.createElement("section");
   page.id = "admintasks_page_section";
   page.className = "grid gap-6";
-  page.append(hero(state, actions));
+  page.append(hero(state, actions, config));
 
   const groups = state.loading ? [] : groupTasks(state.tasks);
   initializeOpenGroups(state, groups);
@@ -114,17 +122,17 @@ function render(root, state, actions) {
     page.append(loadingPanel());
   } else if (!state.tasks.length) {
     page.append(EmptyState({
-      title: "Belum ada tugas",
-      description: "Permintaan baru akan muncul di halaman ini.",
+      title: config.emptyTitle,
+      description: config.emptyDescription,
     }));
   } else {
-    page.append(taskGroups(groups, state, actions, root));
+    page.append(taskGroups(groups, state, actions, root, config.readOnly));
   }
 
   root.replaceChildren(page);
 }
 
-function hero(state, actions) {
+function hero(state, actions, config) {
   const panel = document.createElement("section");
   panel.className = "grid gap-2 rounded-2xl border border-[var(--pb-border)] bg-white p-5 shadow-sm sm:p-6";
 
@@ -134,11 +142,11 @@ function hero(state, actions) {
 
   const title = document.createElement("h1");
   title.className = "text-xl font-black tracking-normal text-gray-950";
-  title.textContent = "Daftar Tugas";
+  title.textContent = config.title;
 
   const description = document.createElement("p");
   description.className = "max-w-3xl text-xs leading-6 text-[var(--pb-text-muted)]";
-  description.textContent = "Tugas serupa dikelompokkan berdasarkan area fitur agar ringkas. Buka kelompok untuk melihat detail per tugas; data asli tetap tersimpan.";
+  description.textContent = config.description;
 
   const refresh = Button({
     label: state.loading ? "Memuat..." : "Refresh",
@@ -181,15 +189,15 @@ function summaryCard(label, value) {
   return card;
 }
 
-function taskGroups(groups, state, actions, root) {
+function taskGroups(groups, state, actions, root, readOnly) {
   const list = document.createElement("div");
   list.id = "admin_task_groups_list";
   list.className = "grid gap-3";
-  list.append(...groups.map((group) => taskGroupCard(group, state, actions, root)));
+  list.append(...groups.map((group) => taskGroupCard(group, state, actions, root, readOnly)));
   return list;
 }
 
-function taskGroupCard(group, state, actions, root) {
+function taskGroupCard(group, state, actions, root, readOnly) {
   const section = document.createElement("section");
   section.id = `admin_task_group_${group.key}`;
   section.className = "overflow-hidden rounded-2xl border border-[var(--pb-border)] bg-white shadow-sm";
@@ -225,7 +233,7 @@ function taskGroupCard(group, state, actions, root) {
     const body = document.createElement("div");
     body.id = `admin_task_group_body_${group.key}`;
     body.className = "grid gap-3 border-t border-[var(--pb-border)] bg-slate-50/50 p-3 sm:p-4";
-    body.append(...group.tasks.map((task) => taskCard(task, state, actions)));
+    body.append(...group.tasks.map((task) => taskCard(task, state, actions, readOnly)));
     section.append(body);
   }
 
@@ -272,7 +280,7 @@ function initializeOpenGroups(state, groups) {
   state.groupsInitialized = true;
 }
 
-function taskCard(task, state, actions) {
+function taskCard(task, state, actions, readOnly = false) {
   const card = document.createElement("article");
   card.id = `admin_task_card_${task.id}`;
   card.className = "grid gap-4 rounded-2xl border border-[var(--pb-border)] bg-white p-5 shadow-sm sm:p-6";
@@ -304,19 +312,28 @@ function taskCard(task, state, actions) {
   footer.className = "flex flex-col gap-3 border-t border-[var(--pb-border)] pt-4 sm:flex-row sm:items-center sm:justify-between";
   const meta = document.createElement("p");
   meta.className = "break-words text-[10px] leading-5 text-[var(--pb-text-muted)]";
-  meta.textContent = task.status === "sip" && task.completed_at
+  meta.textContent = readOnly && task.archived_at
+    ? `Diarsipkan ${task.archived_at}`
+    : task.status === "sip" && task.completed_at
     ? `Diselesaikan ${task.completed_at}${task.completed_by_name ? ` oleh ${task.completed_by_name}` : ""}`
     : `Dibuat ${task.created_at || "-"}`;
 
-  const button = Button({
-    id: `admin_task_beres_${task.id}`,
-    label: task.status === "sip" ? "Sip" : (state.savingId === task.id ? "Menyimpan..." : "Beres"),
-    variant: task.status === "sip" ? "secondary" : "ya",
-    disabled: task.status === "sip" || state.savingId !== null,
-    onClick: () => actions.complete(task),
-  });
-  button.classList.add("w-full", "sm:w-auto");
-  footer.append(meta, button);
+  if (readOnly) {
+    const archiveLabel = document.createElement("span");
+    archiveLabel.className = "inline-flex w-full items-center justify-center rounded-xl bg-slate-100 px-4 py-2 text-[10px] font-bold text-slate-600 sm:w-auto";
+    archiveLabel.textContent = "Backup read-only";
+    footer.append(meta, archiveLabel);
+  } else {
+    const button = Button({
+      id: `admin_task_beres_${task.id}`,
+      label: task.status === "sip" ? "Sip" : (state.savingId === task.id ? "Menyimpan..." : "Beres"),
+      variant: task.status === "sip" ? "secondary" : "ya",
+      disabled: task.status === "sip" || state.savingId !== null,
+      onClick: () => actions.complete(task),
+    });
+    button.classList.add("w-full", "sm:w-auto");
+    footer.append(meta, button);
+  }
   card.append(header, description, footer);
   return card;
 }

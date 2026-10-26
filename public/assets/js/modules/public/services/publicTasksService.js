@@ -11,3 +11,10 @@ export const publicTasksService = {
     return response.data?.task ?? null;
   },
 };
+
+export const publicTasksBackupService = {
+  async list(options = {}) {
+    const response = await apiClient.get("/tasks/backup", options);
+    return response.data?.tasks ?? [];
+  },
+};

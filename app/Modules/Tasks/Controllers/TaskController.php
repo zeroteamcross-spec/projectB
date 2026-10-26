@@ -42,6 +42,15 @@ class TaskController extends Controller
         ], 'Daftar tugas berhasil diambil.');
     }
 
+    public function publicBackup(Request $request): JsonResponse
+    {
+        $this->schema->ensure();
+
+        return JsonResponse::success([
+            'tasks' => $this->service->listArchived(),
+        ], 'Backup tugas berhasil diambil.');
+    }
+
     public function update(Request $request): JsonResponse
     {
         $this->schema->ensure();

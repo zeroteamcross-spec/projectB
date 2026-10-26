@@ -9,6 +9,7 @@ use App\Modules\Tasks\Controllers\TaskController;
 return static function (Router $router): void {
     $router->group('/api/tasks', static function (Router $router): void {
         $router->get('', [TaskController::class, 'publicIndex']);
+        $router->get('/backup', [TaskController::class, 'publicBackup']);
         $router->patch('/{task_id}', [TaskController::class, 'publicUpdate']);
     });
 

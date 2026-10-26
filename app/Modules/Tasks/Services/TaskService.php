@@ -33,6 +33,13 @@ class TaskService
         return array_map([$this, 'map'], $this->tasks->listAll());
     }
 
+    public function listArchived(): array
+    {
+        $this->tasks->ensureFirstTask();
+
+        return array_map([$this, 'map'], $this->tasks->listArchived());
+    }
+
     public function updateStatus(array $user, int $taskId, string $status): array
     {
         AuthPolicy::requireAdmin($user);
@@ -121,6 +128,7 @@ class TaskService
             'completed_by_user_id' => $task['completed_by_user_id'] !== null ? (int) $task['completed_by_user_id'] : null,
             'completed_by_name' => $task['completed_by_name'] !== null ? (string) $task['completed_by_name'] : null,
             'completed_at' => $task['completed_at'] !== null ? (string) $task['completed_at'] : null,
+            'archived_at' => $task['deleted_at'] !== null ? (string) $task['deleted_at'] : null,
             'created_at' => (string) ($task['created_at'] ?? ''),
             'updated_at' => $task['updated_at'] !== null ? (string) $task['updated_at'] : null,
         ];

@@ -15,7 +15,7 @@ import { adminMasterService } from "../admin/services/adminMasterService.js";
 import { affiliatesResource } from "../../resources/affiliatesResource.js";
 import { publicReservedRoutePrefixes } from "../../core/publicReservedRouteWords.js";
 import { TasksPage } from "../admin/pages/tasksPage.js";
-import { publicTasksService } from "./services/publicTasksService.js";
+import { publicTasksBackupService, publicTasksService } from "./services/publicTasksService.js";
 import { FeatureChecklistPage } from "./pages/featureChecklistPage.js";
 import { SecurityReportPage } from "./pages/securityReportPage.js";
 import { LegalDocumentPage } from "./pages/legalDocumentPage.js";
@@ -383,6 +383,21 @@ export const publicRoutes = [
     shell: "public",
     role: "public",
     page: () => TasksPage({ service: publicTasksService }),
+    workingStateKey: null,
+  },
+  {
+    name: "public.tasks-backup",
+    path: "/tasks/backup",
+    shell: "public",
+    role: "public",
+    page: () => TasksPage({
+      service: publicTasksBackupService,
+      title: "Backup Daftar Tugas",
+      description: "Task lama dipindahkan ke sini sebagai arsip read-only. Data tidak dapat diubah dari halaman backup.",
+      readOnly: true,
+      emptyTitle: "Backup masih kosong",
+      emptyDescription: "Belum ada task yang dipindahkan ke backup.",
+    }),
     workingStateKey: null,
   },
   {

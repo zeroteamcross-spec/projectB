@@ -463,15 +463,26 @@ class TaskRepository
 
     public function listAll(): array
     {
+        return $this->listByArchiveState(false);
+    }
+
+    public function listArchived(): array
+    {
+        return $this->listByArchiveState(true);
+    }
+
+    private function listByArchiveState(bool $archived): array
+    {
+        $archiveCondition = $archived ? 't.deleted_at IS NOT NULL' : 't.deleted_at IS NULL';
         $stmt = $this->pdo->query(
             'SELECT t.id, t.task_key, t.title, t.description, t.status, t.work_status,
                     t.requested_by_user_id, requested.name AS requested_by_name,
                     t.completed_by_user_id, completed.name AS completed_by_name,
-                    t.completed_at, t.created_at, t.updated_at
+                    t.completed_at, t.created_at, t.updated_at, t.deleted_at
              FROM tasks t
              LEFT JOIN users requested ON requested.id = t.requested_by_user_id
              LEFT JOIN users completed ON completed.id = t.completed_by_user_id
-             WHERE t.deleted_at IS NULL
+             WHERE ' . $archiveCondition . '
              ORDER BY CASE WHEN t.status = \'open\' THEN 0 ELSE 1 END,
                       t.created_at ASC, t.id ASC'
         );
@@ -485,7 +496,7 @@ class TaskRepository
             'SELECT t.id, t.task_key, t.title, t.description, t.status, t.work_status,
                     t.requested_by_user_id, requested.name AS requested_by_name,
                     t.completed_by_user_id, completed.name AS completed_by_name,
-                    t.completed_at, t.created_at, t.updated_at
+                    t.completed_at, t.created_at, t.updated_at, t.deleted_at
              FROM tasks t
              LEFT JOIN users requested ON requested.id = t.requested_by_user_id
              LEFT JOIN users completed ON completed.id = t.completed_by_user_id
