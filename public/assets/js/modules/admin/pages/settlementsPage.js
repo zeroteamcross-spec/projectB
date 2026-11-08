@@ -1,6 +1,7 @@
 import { createPageLifecycle } from "../../../core/lifecycle.js";
 import { appStore } from "../../../state/store.js";
 import { syncBusinessSettlement } from "../../../state/sync/businessStatusSync.js";
+import { Button } from "../../../ui/primitives/button.js";
 import { openModal } from "../../../ui/primitives/modal.js";
 import { showToast } from "../../../ui/primitives/toast.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
