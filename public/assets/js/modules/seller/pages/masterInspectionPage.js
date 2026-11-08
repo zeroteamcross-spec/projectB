@@ -498,7 +498,7 @@ function orderEditorSection(templates, runtime, actions) {
 function orderDraftCard(template, category, runtime, actions) {
   const card = document.createElement("article");
   card.dataset.inspectionTemplateId = String(template.id);
-  card.className = "grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-xl border border-[var(--pb-card-border)] bg-white p-3 transition-colors";
+  card.className = "relative grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-xl border border-[var(--pb-card-border)] bg-white p-3 transition-colors";
 
   const handle = document.createElement("button");
   handle.type = "button";
@@ -538,12 +538,43 @@ function bindOrderDrag(list, category, runtime, actions) {
   let activePointerId = null;
   let dropTarget = null;
   let highlightedCard = null;
+  let floatingCard = null;
+  let dragOffsetX = 0;
+  let dragOffsetY = 0;
+
+  const placeFloatingCard = (event) => {
+    if (!floatingCard) {
+      return;
+    }
+
+    floatingCard.style.transform = `translate3d(${event.clientX - dragOffsetX}px, ${event.clientY - dragOffsetY}px, 0) scale(1.025) rotate(0.35deg)`;
+  };
 
   const clearHighlight = () => {
     if (highlightedCard) {
-      highlightedCard.classList.remove("border-t-4", "border-t-[var(--pb-brand-secondary)]", "border-b-4", "border-b-[var(--pb-brand-secondary)]");
+      highlightedCard.querySelector("[data-drop-indicator]")?.remove();
       highlightedCard = null;
     }
+  };
+
+  const showDropIndicator = (card, before) => {
+    const indicator = document.createElement("span");
+    indicator.dataset.dropIndicator = "true";
+    indicator.setAttribute("aria-hidden", "true");
+    indicator.style.position = "absolute";
+    indicator.style.left = "0";
+    indicator.style.right = "0";
+    indicator.style.height = "5px";
+    indicator.style.borderRadius = "9999px";
+    indicator.style.backgroundColor = "var(--pb-brand-primary, #1e81b0)";
+    indicator.style.boxShadow = "0 0 0 1px rgba(255,255,255,.95), 0 2px 8px rgba(30,129,176,.42)";
+    indicator.style.zIndex = "20";
+    if (before) {
+      indicator.style.top = "-3px";
+    } else {
+      indicator.style.bottom = "-3px";
+    }
+    card.append(indicator);
   };
 
   const cardAtPoint = (event) => {
@@ -554,7 +585,13 @@ function bindOrderDrag(list, category, runtime, actions) {
 
   const resetDrag = () => {
     clearHighlight();
-    list.querySelectorAll("[data-inspection-template-id]").forEach((card) => card.classList.remove("opacity-50"));
+    list.querySelectorAll("[data-inspection-template-id]").forEach((card) => {
+      card.style.opacity = "";
+      card.style.borderStyle = "";
+      card.style.borderColor = "";
+    });
+    floatingCard?.remove();
+    floatingCard = null;
     draggedId = null;
     activePointerId = null;
     dropTarget = null;
@@ -569,7 +606,33 @@ function bindOrderDrag(list, category, runtime, actions) {
 
     draggedId = Number(card.dataset.inspectionTemplateId);
     activePointerId = event.pointerId;
-    card.classList.add("opacity-50");
+    const rect = card.getBoundingClientRect();
+    dragOffsetX = event.clientX - rect.left;
+    dragOffsetY = event.clientY - rect.top;
+    card.style.opacity = "0.3";
+    card.style.borderStyle = "dashed";
+    card.style.borderColor = "var(--pb-brand-primary, #1e81b0)";
+    floatingCard = card.cloneNode(true);
+    floatingCard.removeAttribute("data-inspection-template-id");
+    floatingCard.querySelector("[data-drop-indicator]")?.remove();
+    floatingCard.setAttribute("aria-hidden", "true");
+    Object.assign(floatingCard.style, {
+      position: "fixed",
+      left: "0",
+      top: "0",
+      width: `${rect.width}px`,
+      margin: "0",
+      pointerEvents: "none",
+      opacity: "0.98",
+      borderColor: "var(--pb-brand-primary, #1e81b0)",
+      boxShadow: "0 22px 48px rgba(15,23,42,.3), 0 5px 14px rgba(30,129,176,.2)",
+      zIndex: "10000",
+      willChange: "transform",
+      transition: "none",
+    });
+    floatingCard.style.cursor = "grabbing";
+    document.body.append(floatingCard);
+    placeFloatingCard(event);
     list.setPointerCapture?.(event.pointerId);
     event.preventDefault();
   });
@@ -579,6 +642,7 @@ function bindOrderDrag(list, category, runtime, actions) {
       return;
     }
 
+    placeFloatingCard(event);
     const target = cardAtPoint(event);
     clearHighlight();
     if (!target) {
@@ -588,9 +652,7 @@ function bindOrderDrag(list, category, runtime, actions) {
 
     const rect = target.getBoundingClientRect();
     const before = event.clientY < rect.top + rect.height / 2;
-    target.classList.add(...(before
-      ? ["border-t-4", "border-t-[var(--pb-brand-secondary)]"]
-      : ["border-b-4", "border-b-[var(--pb-brand-secondary)]"]));
+    showDropIndicator(target, before);
     highlightedCard = target;
     dropTarget = { id: Number(target.dataset.inspectionTemplateId), before };
   });
