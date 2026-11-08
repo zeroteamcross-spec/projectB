@@ -359,4 +359,10 @@ final class TaskCatalog
     public const SHOWROOM_REGISTRATION_CITY_LABEL_REMOVE_KABUPATEN_TASK_TITLE = 'Hilangkan awalan Kabupaten dari pilihan kota saat daftar showroom.';
 
     public const SHOWROOM_REGISTRATION_CITY_LABEL_REMOVE_KABUPATEN_TASK_DESCRIPTION = 'Pada halaman daftar-showroom, hapus awalan Kabupaten dari label opsi kota pada kolom Kota dan tetap tampilkan nama provinsi setelah koma. Pertahankan nilai kota Master Lokasi yang dikirim saat form didaftarkan agar tidak mengubah data maupun perilaku bisnis. Referensi: Tugas GitIgnore/daftar-showroom-location-remove-kabupaten-reference-2026-10-23.png.';
+
+    public const ADMIN_MASTER_BRAND_HIDE_INTERNAL_LABELS_TASK_KEY = 'request-060-admin-master-brand-hide-internal-labels';
+
+    public const ADMIN_MASTER_BRAND_HIDE_INTERNAL_LABELS_TASK_TITLE = 'Sembunyikan slug dan keterangan teknis pada daftar Master Brand.';
+
+    public const ADMIN_MASTER_BRAND_HIDE_INTERNAL_LABELS_TASK_DESCRIPTION = 'Pada halaman admin/master-brand, hilangkan teks slug yang tampil di bawah nama brand (contoh: "toyota") dari tabel desktop dan kartu mobile, serta teks "models[] disimpan di JSON brand" dari kolom Payload. Perubahan hanya pada tampilan daftar; pertahankan slug dan data model untuk pencarian, form, JSON payload, dan fungsi aplikasi lainnya. Referensi: Tugas GitIgnore/master-brand-hide-slug-json-reference-2026-11-08.png.';
 }

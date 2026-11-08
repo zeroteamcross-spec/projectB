@@ -61,10 +61,9 @@ export function AdminMasterBrandList({
     emptyTitle: "Brand belum tersedia",
     emptyDescription: "Tambahkan brand pertama agar katalog mobil punya referensi merek dan model.",
     mobileCardTitle: (brand) => brand.name,
-    mobileCardSubtitle: (brand) => `${brand.models?.length ?? 0} model | ${brand.slug}`,
+    mobileCardSubtitle: (brand) => `${brand.models?.length ?? 0} model`,
     mobileCardBadges: (brand) => [statusBadge(brand.status)],
     mobilePrimaryFields: (brand) => [
-      { label: "Slug", value: brand.slug },
       { label: "Model", value: `${brand.models?.length ?? 0} model` },
       { label: "Status", value: brand.status === "active" ? "Aktif" : "Nonaktif" },
     ],
@@ -92,10 +91,7 @@ function brandCell(brand) {
   icon.append(createIcon("car", { className: "h-4 w-4" }));
   const copy = document.createElement("div");
   copy.className = "grid min-w-0 gap-1";
-  copy.append(
-    textBlock("font-black text-gray-950", brand.name),
-    textBlock("text-xs text-gray-500", brand.slug || "-"),
-  );
+  copy.append(textBlock("font-black text-gray-950", brand.name));
   wrap.append(icon, copy);
   return wrap;
 }
@@ -103,10 +99,7 @@ function brandCell(brand) {
 function payloadCell(brand) {
   const wrap = document.createElement("div");
   wrap.className = "grid min-w-0 gap-1";
-  wrap.append(
-    textBlock("text-xs font-semibold text-gray-800", brand.description || "Tidak ada deskripsi"),
-    textBlock("text-[10px] text-gray-500", "models[] disimpan di JSON brand"),
-  );
+  wrap.append(textBlock("text-xs font-semibold text-gray-800", brand.description || "Tidak ada deskripsi"));
   return wrap;
 }
 
