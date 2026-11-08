@@ -24,10 +24,19 @@ class AdminUserService
     {
         AuthPolicy::requireAdmin($actor);
 
-        return array_map(
-            fn (array $user): array => $this->authService->serializeUser($user),
-            $this->users->listForAdmin($filters)
-        );
+        return array_map(function (array $user): array {
+            $serialized = $this->authService->serializeUser($user);
+            $showroom = $user['showroom'] ?? null;
+            $serialized['showroom'] = is_array($showroom)
+                ? [
+                    'id' => (int) $showroom['id'],
+                    'user_id' => (int) $showroom['user_id'],
+                    'name' => $showroom['name'],
+                ]
+                : null;
+
+            return $serialized;
+        }, $this->users->listForAdmin($filters));
     }
 
     /**

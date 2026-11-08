@@ -12,6 +12,7 @@ class CarMapper
             'id' => (int) $car['id'],
             'seller_user_id' => (int) $car['seller_user_id'],
             'showroom_id' => isset($car['showroom_id']) ? (int) $car['showroom_id'] : null,
+            'showroom_name' => $car['showroom_name'] ?? null,
             'listing_status' => $car['listing_status'],
             'stock' => (int) $car['stock'],
             'license_plate_number' => $car['license_plate_number'],

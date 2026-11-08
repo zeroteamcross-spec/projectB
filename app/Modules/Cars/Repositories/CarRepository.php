@@ -24,7 +24,14 @@ class CarRepository
             AND cover_image.deleted_at IS NULL
             ORDER BY cover_image.is_cover DESC, cover_image.sort_order ASC, cover_image.id ASC
             LIMIT 1
-        ) AS car_cover_image';
+        ) AS car_cover_image,
+        (
+            SELECT showroom.name
+            FROM showrooms AS showroom
+            WHERE showroom.id = cars.showroom_id
+            AND showroom.deleted_at IS NULL
+            LIMIT 1
+        ) AS showroom_name';
 
     private PDO $pdo;
 

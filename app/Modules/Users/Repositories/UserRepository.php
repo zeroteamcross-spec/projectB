@@ -188,7 +188,46 @@ class UserRepository
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
+        $users = $stmt->fetchAll() ?: [];
 
-        return $stmt->fetchAll() ?: [];
+        if ($users === []) {
+            return [];
+        }
+
+        $userPlaceholders = [];
+        $showroomParams = [];
+        foreach ($users as $index => $user) {
+            $placeholder = 'user_id_' . $index;
+            $userPlaceholders[] = ':' . $placeholder;
+            $showroomParams[$placeholder] = (int) $user['id'];
+        }
+
+        $showroomsStmt = $this->pdo->prepare(
+            'SELECT id, user_id, name
+             FROM showrooms
+             WHERE deleted_at IS NULL
+             AND user_id IN (' . implode(', ', $userPlaceholders) . ')
+             ORDER BY created_at ASC, id ASC'
+        );
+        $showroomsStmt->execute($showroomParams);
+        $showroomsByUserId = [];
+
+        foreach ($showroomsStmt->fetchAll() ?: [] as $showroom) {
+            $userId = (int) $showroom['user_id'];
+            if (! isset($showroomsByUserId[$userId])) {
+                $showroomsByUserId[$userId] = [
+                    'id' => (int) $showroom['id'],
+                    'user_id' => $userId,
+                    'name' => $showroom['name'],
+                ];
+            }
+        }
+
+        foreach ($users as &$user) {
+            $user['showroom'] = $showroomsByUserId[(int) $user['id']] ?? null;
+        }
+        unset($user);
+
+        return $users;
     }
 }

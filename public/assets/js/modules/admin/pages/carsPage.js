@@ -600,8 +600,11 @@ function adminSellerSelector(runtime) {
   sellers.forEach((seller) => {
     const option = document.createElement("option");
     option.value = String(seller.id);
-    const showroomId = seller.showroom?.id ?? seller.showroom_id ?? seller.id;
-    option.textContent = seller.showroom?.name || `Showroom #${showroomId}`;
+    const isSelectedListingOwner = isEdit && String(seller.id) === selectedSellerId;
+    const showroomName = isSelectedListingOwner
+      ? runtime.selectedCar?.showroom_name || seller.showroom?.name
+      : seller.showroom?.name;
+    option.textContent = showroomName || "Nama showroom tidak tersedia";
     option.selected = String(seller.id) === selectedSellerId;
     select.append(option);
   });
