@@ -377,4 +377,10 @@ final class TaskCatalog
     public const ADMIN_SETTLEMENTS_HIDE_COMMISSION_LEDGER_BUTTON_TASK_TITLE = 'Sembunyikan tombol Ledger Komisi pada halaman Admin Settlements.';
 
     public const ADMIN_SETTLEMENTS_HIDE_COMMISSION_LEDGER_BUTTON_TASK_DESCRIPTION = 'Pada halaman admin/settlements, sembunyikan tombol "Ledger komisi" yang terlihat di bagian atas halaman. Perubahan hanya menghilangkan tombol dari tampilan Admin Settlements; halaman dan fungsi Ledger Komisi tetap tersedia melalui navigasinya. Referensi: Tugas GitIgnore/admin-settlements-hide-commission-ledger-button-2026-11-08.png.';
+
+    public const SELLER_MASTER_INSPECTION_DRAG_DROP_ORDER_TASK_KEY = 'request-063-seller-master-inspection-drag-drop-order';
+
+    public const SELLER_MASTER_INSPECTION_DRAG_DROP_ORDER_TASK_TITLE = 'Atur urutan item Master Inspeksi dengan drag-and-drop.';
+
+    public const SELLER_MASTER_INSPECTION_DRAG_DROP_ORDER_TASK_DESCRIPTION = 'Pada halaman seller/master-inspection, ganti pengaturan urutan angka di dalam tiap section dengan drag-and-drop. Simpan urutan item pada master cabang untuk dipakai saat item inspeksi ditampilkan. Screenshot: Tugas GitIgnore/seller-master-inspection-drag-drop-order-reference-2026-11-08.png.';
 }

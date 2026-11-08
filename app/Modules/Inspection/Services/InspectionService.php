@@ -181,6 +181,72 @@ class InspectionService
         return InspectionMapper::template($this->repository->findTemplate($templateId) ?? $template);
     }
 
+    public function reorderShowroomTemplates(int $showroomId, array $user, array $sections): array
+    {
+        $showroom = $this->requireShowroom($showroomId);
+        $this->ensureShowroomOwner($showroom, $user);
+
+        try {
+            $this->pdo->beginTransaction();
+            $templates = $this->repository->listTemplates(false, $showroomId);
+            $existingByCategory = [];
+            foreach ($templates as $template) {
+                $existingByCategory[(string) $template['category_name']][] = (int) $template['id'];
+            }
+
+            if (count($sections) !== count($existingByCategory)) {
+                throw new ValidationException([
+                    'sections' => 'Daftar urutan harus mencakup semua section pada cabang ini.',
+                ]);
+            }
+
+            $ordersByCategory = [];
+            foreach ($sections as $section) {
+                $categoryName = (string) ($section['category_name'] ?? '');
+                $templateIds = array_map('intval', $section['template_ids'] ?? []);
+                $existingIds = $existingByCategory[$categoryName] ?? null;
+                if ($existingIds === null || isset($ordersByCategory[$categoryName])) {
+                    throw new ValidationException([
+                        'sections' => 'Section urutan tidak sesuai dengan master cabang ini.',
+                    ]);
+                }
+
+                $expectedIds = $existingIds;
+                $providedIds = $templateIds;
+                sort($expectedIds, SORT_NUMERIC);
+                sort($providedIds, SORT_NUMERIC);
+                if ($providedIds !== $expectedIds) {
+                    throw new ValidationException([
+                        'sections.' . $categoryName . '.template_ids' => 'Daftar item harus memuat semua item section tepat satu kali.',
+                    ]);
+                }
+
+                $ordersByCategory[$categoryName] = $templateIds;
+            }
+
+            foreach ($ordersByCategory as $categoryName => $templateIds) {
+                foreach ($templateIds as $index => $templateId) {
+                    $this->repository->updateShowroomTemplateSortOrder(
+                        $showroomId,
+                        $categoryName,
+                        $templateId,
+                        ($index + 1) * 10
+                    );
+                }
+            }
+
+            $this->pdo->commit();
+        } catch (Throwable $exception) {
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+
+            throw $exception;
+        }
+
+        return InspectionMapper::templates($this->repository->listTemplates(false, $showroomId));
+    }
+
     public function copyShowroomTemplates(int $targetShowroomId, array $user, int $sourceShowroomId): array
     {
         if ($sourceShowroomId <= 0 || $sourceShowroomId === $targetShowroomId) {

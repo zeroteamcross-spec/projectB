@@ -482,6 +482,14 @@ class TaskRepository
                 'work_status' => 'done',
                 'created_at' => '2026-11-08 00:00:00',
             ],
+            [
+                'task_key' => TaskCatalog::SELLER_MASTER_INSPECTION_DRAG_DROP_ORDER_TASK_KEY,
+                'title' => TaskCatalog::SELLER_MASTER_INSPECTION_DRAG_DROP_ORDER_TASK_TITLE,
+                'description' => TaskCatalog::SELLER_MASTER_INSPECTION_DRAG_DROP_ORDER_TASK_DESCRIPTION,
+                'status' => 'open',
+                'work_status' => 'done',
+                'created_at' => '2026-11-08 00:00:00',
+            ],
         ];
     }
 

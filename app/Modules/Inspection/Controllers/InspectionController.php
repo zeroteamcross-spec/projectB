@@ -10,6 +10,7 @@ use App\Core\Request;
 use App\Modules\Inspection\Requests\CopyInspectionTemplatesRequest;
 use App\Modules\Inspection\Requests\CreateInspectionItemRequest;
 use App\Modules\Inspection\Requests\CreateInspectionReportRequest;
+use App\Modules\Inspection\Requests\ReorderShowroomInspectionTemplatesRequest;
 use App\Modules\Inspection\Requests\UpdateInspectionItemRequest;
 use App\Modules\Inspection\Requests\UpdateInspectionReportRequest;
 use App\Modules\Inspection\Requests\UpdateInspectionTemplateRequest;
@@ -102,6 +103,19 @@ class InspectionController extends Controller
                 $payload
             ),
         ], 'Master item inspeksi cabang berhasil diperbarui.');
+    }
+
+    public function reorderShowroomTemplates(Request $request): JsonResponse
+    {
+        $payload = (new ReorderShowroomInspectionTemplatesRequest($request))->validate();
+
+        return JsonResponse::success([
+            'templates' => $this->service->reorderShowroomTemplates(
+                (int) $request->routeParam('showroom_id'),
+                $this->user($request),
+                $payload['sections']
+            ),
+        ], 'Urutan master inspeksi cabang berhasil diperbarui.');
     }
 
     public function copyShowroomTemplates(Request $request): JsonResponse

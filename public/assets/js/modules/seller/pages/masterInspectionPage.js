@@ -29,6 +29,9 @@ const SECTION_LABELS = Object.fromEntries(SECTION_OPTIONS);
 const DEFAULT_RUNTIME = {
   query: { keyword: "", section: "", status: "", page: 1, pageSize: 10 },
   saving: false,
+  ordering: false,
+  savingOrder: false,
+  orderDraft: null,
   copying: false,
   error: "",
 };
@@ -49,6 +52,58 @@ export function SellerMasterInspectionPage() {
     },
     changePageSize(pageSize) {
       setRuntime({ query: { ...runtimeState().query, page: 1, pageSize } });
+      render(root, context, actions);
+    },
+    startOrdering() {
+      setRuntime({ ordering: true, savingOrder: false, orderDraft: createOrderDraft(currentTemplates()), error: "" });
+      render(root, context, actions);
+    },
+    cancelOrdering() {
+      setRuntime({ ordering: false, savingOrder: false, orderDraft: null, error: "" });
+      render(root, context, actions);
+    },
+    moveOrder(categoryName, templateId, targetTemplateId, before = true) {
+      const currentDraft = runtimeState().orderDraft ?? createOrderDraft(currentTemplates());
+      const nextDraft = Object.fromEntries(
+        Object.entries(currentDraft).map(([category, ids]) => [category, [...ids]]),
+      );
+      const ids = nextDraft[categoryName];
+      if (!Array.isArray(ids) || templateId === targetTemplateId) {
+        return;
+      }
+
+      const sourceIndex = ids.indexOf(Number(templateId));
+      if (sourceIndex < 0) {
+        return;
+      }
+      ids.splice(sourceIndex, 1);
+      const targetIndex = ids.indexOf(Number(targetTemplateId));
+      if (targetIndex < 0) {
+        return;
+      }
+      ids.splice(targetIndex + (before ? 0 : 1), 0, Number(templateId));
+      setRuntime({ orderDraft: nextDraft });
+      render(root, context, actions);
+    },
+    async saveOrder() {
+      const showroom = currentShowroom();
+      if (!showroom?.id || runtimeState().savingOrder) {
+        return;
+      }
+
+      setRuntime({ savingOrder: true, error: "" });
+      render(root, context, actions);
+      try {
+        const sections = orderDraftPayload(runtimeState().orderDraft ?? createOrderDraft(currentTemplates()));
+        const templates = await inspectionsResource.reorderShowroomTemplates(showroom.id, sections);
+        patchTemplates(templates);
+        setRuntime({ ordering: false, savingOrder: false, orderDraft: null, error: "" });
+        showToast("Urutan item inspeksi berhasil disimpan.", { type: "success" });
+      } catch (error) {
+        const message = firstApiError(error) || "Urutan item inspeksi gagal disimpan.";
+        setRuntime({ savingOrder: false, error: message });
+        showToast(message, { type: "error" });
+      }
       render(root, context, actions);
     },
     selectBranch(showroomId) {
@@ -191,11 +246,15 @@ function render(root, context, actions) {
     return;
   }
 
-  layout.append(
-    copySection(showroom, branches, runtime, actions),
-    filterSection(templates, runtime.query, actions),
-    listSection(page, filtered.length, runtime, actions),
-  );
+  if (runtime.ordering) {
+    layout.append(orderEditorSection(templates, runtime, actions));
+  } else {
+    layout.append(
+      copySection(showroom, branches, runtime, actions),
+      filterSection(templates, runtime.query, actions),
+      listSection(page, filtered.length, runtime, actions),
+    );
+  }
   root.replaceChildren(layout);
 }
 
@@ -311,6 +370,18 @@ function listSection(page, total, runtime, actions) {
   const section = document.createElement("section");
   section.id = "slrminsp_list_section";
   section.className = "grid min-w-0 gap-3";
+  const orderAction = Button({
+    id: "slrminsp_order_items_button",
+    label: "Atur Urutan",
+    variant: "secondary",
+    onClick: actions.startOrdering,
+  });
+  orderAction.prepend(createIcon("sort", { className: "h-4 w-4" }));
+  const actionWrap = document.createElement("div");
+  actionWrap.className = "flex justify-end";
+  actionWrap.append(orderAction);
+  section.append(actionWrap);
+
   const groups = groupInspectionTemplates(page.items);
   if (!groups.length) {
     section.append(DataTable({
@@ -331,14 +402,13 @@ function listSection(page, total, runtime, actions) {
       columns: columns(actions),
       rows: items,
       mobileMode: "stack",
-      tableMinWidth: "min-w-[880px]",
+      tableMinWidth: "min-w-[760px]",
       getRowKey: (template) => template.id,
       mobileCardId: (template) => `slrminsp_item_${template.id}_section`,
       mobileCardTitle: (template) => template.item_name,
       mobileCardSubtitle: (template) => sectionLabel(template.category_name),
       mobileCardBadges: (template) => [statusBadge(template.is_active)],
       mobileCardFields: (template) => [
-        { label: "Urutan di section", value: String(template.sort_order ?? 0) },
         { label: "Keterangan", value: template.description || "Tanpa keterangan." },
       ],
       mobileCardActions: (template) => rowActions(template, actions),
@@ -371,11 +441,182 @@ function listSection(page, total, runtime, actions) {
   return section;
 }
 
+function orderEditorSection(templates, runtime, actions) {
+  const section = document.createElement("section");
+  section.id = "slrminsp_order_editor_section";
+  section.className = "grid min-w-0 gap-4 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white/88 p-4 shadow-[var(--pb-shadow-card)]";
+
+  const header = document.createElement("div");
+  header.className = "grid gap-1";
+  header.append(
+    textNode("h2", "text-base font-black text-gray-950", "Atur urutan inspeksi"),
+    textNode("p", "text-xs leading-6 text-gray-600", "Tarik item memakai handle untuk mengubah urutan di dalam section. Urutan master ini dipakai saat item inspeksi ditampilkan."),
+  );
+
+  const controls = document.createElement("div");
+  controls.className = "flex flex-wrap justify-end gap-2";
+  const cancel = Button({
+    id: "slrminsp_cancel_order_button",
+    label: "Batal",
+    variant: "secondary",
+    disabled: runtime.savingOrder,
+    onClick: actions.cancelOrdering,
+  });
+  const save = Button({
+    id: "slrminsp_save_order_button",
+    label: runtime.savingOrder ? "Menyimpan..." : "Simpan Urutan",
+    variant: "primary",
+    disabled: runtime.savingOrder,
+    onClick: actions.saveOrder,
+  });
+  controls.append(cancel, save);
+  section.append(header, controls);
+
+  groupInspectionTemplates(templates).forEach(([category, items]) => {
+    const byId = new Map(items.map((template) => [template.id, template]));
+    const orderedIds = runtime.orderDraft?.[category] ?? items.map((template) => template.id);
+    const orderedItems = orderedIds.map((id) => byId.get(Number(id))).filter(Boolean);
+    const group = document.createElement("section");
+    group.id = `slrminsp_order_${String(category).toLowerCase().replace(/[^a-z0-9]+/g, "-")}_section`;
+    group.className = "grid min-w-0 gap-3 rounded-[1.25rem] border border-[var(--pb-card-border)] bg-white/70 p-3 sm:p-4";
+    group.append(
+      textNode("h3", "text-sm font-black text-gray-950", sectionLabel(category)),
+      textNode("p", "text-[10px] leading-5 text-gray-500", `${orderedItems.length} item dalam section ini.`),
+    );
+
+    const list = document.createElement("div");
+    list.className = "grid min-w-0 gap-2";
+    orderedItems.forEach((template) => list.append(orderDraftCard(template, category, runtime, actions)));
+    bindOrderDrag(list, category, runtime, actions);
+    group.append(list);
+    section.append(group);
+  });
+
+  return section;
+}
+
+function orderDraftCard(template, category, runtime, actions) {
+  const card = document.createElement("article");
+  card.dataset.inspectionTemplateId = String(template.id);
+  card.className = "grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-xl border border-[var(--pb-card-border)] bg-white p-3 transition-colors";
+
+  const handle = document.createElement("button");
+  handle.type = "button";
+  handle.dataset.orderDragHandle = "true";
+  handle.className = "grid h-10 w-10 shrink-0 touch-none cursor-grab place-items-center rounded-lg border border-[var(--pb-card-border)] bg-gray-50 text-gray-600 active:cursor-grabbing";
+  handle.setAttribute("aria-label", `Geser ${template.item_name} untuk mengubah urutan`);
+  handle.setAttribute("aria-keyshortcuts", "ArrowUp ArrowDown");
+  handle.title = "Seret untuk mengubah urutan; tombol panah atas/bawah juga tersedia";
+  handle.append(createIcon("sort", { className: "h-4 w-4" }));
+  handle.addEventListener("keydown", (event) => {
+    if (event.key !== "ArrowUp" && event.key !== "ArrowDown") {
+      return;
+    }
+    const ids = (runtime.orderDraft?.[category] ?? []).map(Number);
+    const index = ids.indexOf(template.id);
+    const targetIndex = index + (event.key === "ArrowUp" ? -1 : 1);
+    if (index < 0 || targetIndex < 0 || targetIndex >= ids.length) {
+      return;
+    }
+    event.preventDefault();
+    actions.moveOrder(category, template.id, ids[targetIndex], event.key === "ArrowUp");
+  });
+
+  const content = document.createElement("div");
+  content.className = "grid min-w-0 gap-1";
+  content.append(
+    textNode("p", "break-words text-xs font-bold text-gray-900", template.item_name),
+    textNode("p", "break-words text-[10px] leading-5 text-gray-600", template.description || "Tanpa keterangan."),
+  );
+
+  card.append(handle, content, statusBadge(template.is_active));
+  return card;
+}
+
+function bindOrderDrag(list, category, runtime, actions) {
+  let draggedId = null;
+  let activePointerId = null;
+  let dropTarget = null;
+  let highlightedCard = null;
+
+  const clearHighlight = () => {
+    if (highlightedCard) {
+      highlightedCard.classList.remove("border-t-4", "border-t-[var(--pb-brand-secondary)]", "border-b-4", "border-b-[var(--pb-brand-secondary)]");
+      highlightedCard = null;
+    }
+  };
+
+  const cardAtPoint = (event) => {
+    const target = document.elementFromPoint(event.clientX, event.clientY);
+    const card = target instanceof Element ? target.closest("[data-inspection-template-id]") : null;
+    return card && list.contains(card) ? card : null;
+  };
+
+  const resetDrag = () => {
+    clearHighlight();
+    list.querySelectorAll("[data-inspection-template-id]").forEach((card) => card.classList.remove("opacity-50"));
+    draggedId = null;
+    activePointerId = null;
+    dropTarget = null;
+  };
+
+  list.addEventListener("pointerdown", (event) => {
+    const handle = event.target instanceof Element ? event.target.closest("[data-order-drag-handle]") : null;
+    const card = handle?.closest("[data-inspection-template-id]");
+    if (!card || runtime.savingOrder || (event.pointerType !== "touch" && event.button !== 0)) {
+      return;
+    }
+
+    draggedId = Number(card.dataset.inspectionTemplateId);
+    activePointerId = event.pointerId;
+    card.classList.add("opacity-50");
+    list.setPointerCapture?.(event.pointerId);
+    event.preventDefault();
+  });
+
+  list.addEventListener("pointermove", (event) => {
+    if (draggedId === null || event.pointerId !== activePointerId) {
+      return;
+    }
+
+    const target = cardAtPoint(event);
+    clearHighlight();
+    if (!target) {
+      dropTarget = null;
+      return;
+    }
+
+    const rect = target.getBoundingClientRect();
+    const before = event.clientY < rect.top + rect.height / 2;
+    target.classList.add(...(before
+      ? ["border-t-4", "border-t-[var(--pb-brand-secondary)]"]
+      : ["border-b-4", "border-b-[var(--pb-brand-secondary)]"]));
+    highlightedCard = target;
+    dropTarget = { id: Number(target.dataset.inspectionTemplateId), before };
+  });
+
+  list.addEventListener("pointerup", (event) => {
+    if (draggedId === null || event.pointerId !== activePointerId) {
+      return;
+    }
+    const target = cardAtPoint(event);
+    const result = target
+      ? { id: Number(target.dataset.inspectionTemplateId), before: event.clientY < target.getBoundingClientRect().top + target.getBoundingClientRect().height / 2 }
+      : dropTarget;
+    const sourceId = draggedId;
+    resetDrag();
+    if (result && result.id !== sourceId) {
+      actions.moveOrder(category, sourceId, result.id, result.before);
+    }
+  });
+
+  list.addEventListener("pointercancel", resetDrag);
+}
+
 function columns(actions) {
   return [
     { key: "item_name", label: "Item", render: (template) => template.item_name },
     { key: "description", label: "Keterangan", render: (template) => template.description || "-" },
-    { key: "sort_order", label: "Urutan di section", render: (template) => String(template.sort_order ?? 0) },
     { key: "is_active", label: "Status", render: (template) => statusBadge(template.is_active) },
     { key: "actions", label: "Aksi", render: (template) => rowActions(template, actions) },
   ];
@@ -409,12 +650,10 @@ function openEditor(template, actions) {
   description.placeholder = "Jelaskan keterangan item yang diperiksa";
   description.className = inputClass();
   const order = inputControl("slrminsp_editor_sort_order_input", String(template?.sort_order ?? nextInspectionItemOrder(currentTemplates(), section.value)), "Urutan dalam section");
-  order.type = "number";
-  order.min = "0";
-  order.step = "1";
+  order.type = "hidden";
   section.addEventListener("change", () => {
     order.value = section.value === template?.category_name
-      ? String(template.sort_order)
+      ? String(template?.sort_order ?? 0)
       : String(nextInspectionItemOrder(currentTemplates(), section.value));
   });
   const active = document.createElement("input");
@@ -426,7 +665,7 @@ function openEditor(template, actions) {
   const activeWrap = document.createElement("label");
   activeWrap.className = "flex items-center gap-2 rounded-xl border border-[var(--pb-card-border)] bg-gray-50 px-3 py-3 text-xs font-bold text-gray-700";
   activeWrap.append(active, document.createTextNode("Item aktif untuk flow inspeksi cabang"));
-  form.append(labelWrap("Section", section), labelWrap("Nama item", item), labelWrap("Keterangan *", description), labelWrap("Urutan dalam section", order), activeWrap);
+  form.append(labelWrap("Section", section), labelWrap("Nama item", item), labelWrap("Keterangan *", description), order, activeWrap);
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     actions.save(template, form);
@@ -458,7 +697,6 @@ function openDetail(template) {
     detailRow("Section", sectionLabel(template.category_name)),
     detailRow("Nama item", template.item_name),
     detailRow("Keterangan", template.description || "Tanpa keterangan."),
-    detailRow("Urutan dalam section", String(template.sort_order ?? 0)),
     detailRow("Status", template.is_active ? "Aktif" : "Nonaktif"),
     textNode("p", "rounded-xl border border-amber-200 bg-amber-50 px-3 py-3 text-xs leading-6 text-amber-900", "Catatan kompatibilitas: laporan lama menyimpan nama item, tetapi section dan urutannya masih mengikuti master saat ini. Perubahan master dapat mengubah pengelompokan atau urutan laporan lama."),
   );
@@ -505,6 +743,19 @@ function normalizeTemplates(templates) {
     is_active: template.is_active !== false,
   })).filter((template) => template.id > 0 && template.item_name);
   return sortInspectionTemplates(normalized, SECTION_OPTIONS.map(([key]) => key));
+}
+
+function createOrderDraft(templates) {
+  return Object.fromEntries(
+    groupInspectionTemplates(templates).map(([category, items]) => [category, items.map((template) => template.id)]),
+  );
+}
+
+function orderDraftPayload(orderDraft = {}) {
+  return Object.entries(orderDraft).map(([categoryName, templateIds]) => ({
+    category_name: categoryName,
+    template_ids: templateIds.map(Number),
+  }));
 }
 
 function sectionOptions(templates) {

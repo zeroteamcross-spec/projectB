@@ -32,6 +32,11 @@ export const inspectionsResource = {
     return response.data?.template ?? null;
   },
 
+  async reorderShowroomTemplates(showroomId, sections = [], options = {}) {
+    const response = await apiClient.patch(`/showrooms/${encodeURIComponent(showroomId)}/mine/inspection-templates/reorder`, { sections }, options);
+    return response.data?.templates ?? [];
+  },
+
   async copyShowroomTemplates(targetShowroomId, sourceShowroomId, options = {}) {
     const response = await apiClient.post(`/showrooms/${encodeURIComponent(targetShowroomId)}/mine/inspection-templates/copy`, {
       source_showroom_id: Number(sourceShowroomId),

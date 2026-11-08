@@ -36,6 +36,7 @@ return static function (Router $router): void {
         $router->get('', [InspectionController::class, 'showroomTemplates']);
         $router->post('', [InspectionController::class, 'createShowroomTemplate']);
         $router->post('/copy', [InspectionController::class, 'copyShowroomTemplates']);
+        $router->patch('/reorder', [InspectionController::class, 'reorderShowroomTemplates']);
         $router->patch('/{template_id}', [InspectionController::class, 'updateShowroomTemplate']);
     }, [AuthenticatedUserMiddleware::class]);
 

@@ -331,6 +331,25 @@ class InspectionRepository
         ]);
     }
 
+    public function updateShowroomTemplateSortOrder(int $showroomId, string $categoryName, int $templateId, int $sortOrder): void
+    {
+        $stmt = $this->pdo->prepare(
+            'UPDATE inspection_templates
+             SET sort_order = :sort_order,
+                 updated_at = :updated_at
+             WHERE id = :id
+             AND showroom_id = :showroom_id
+             AND category_name = :category_name'
+        );
+        $stmt->execute([
+            'id' => $templateId,
+            'showroom_id' => $showroomId,
+            'category_name' => $categoryName,
+            'sort_order' => $sortOrder,
+            'updated_at' => date('Y-m-d H:i:s'),
+        ]);
+    }
+
     public function deactivateTemplatesExcept(array $templateIds): int
     {
         $templateIds = array_values(array_unique(array_map('intval', $templateIds)));
