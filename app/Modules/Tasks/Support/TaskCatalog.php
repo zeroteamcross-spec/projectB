@@ -371,4 +371,10 @@ final class TaskCatalog
     public const ADMIN_CARS_SHOWROOM_LOCK_ON_EDIT_TASK_TITLE = 'Tampilkan nama showroom dan kunci pilihan showroom saat edit katalog mobil.';
 
     public const ADMIN_CARS_SHOWROOM_LOCK_ON_EDIT_TASK_DESCRIPTION = 'Pada halaman admin/cars, tampilkan nama showroom (bukan nama akun pemilik) pada pilihan Showroom. Saat mengedit listing, kunci pilihan Showroom dan pertahankan seller_user_id serta showroom_id dari listing yang dipilih. Saat menambah listing, pilihan showroom tetap dapat diubah. Referensi: Tugas GitIgnore/admin-cars-edit-showroom-owner-reference-2026-11-08.png.';
+
+    public const ADMIN_SETTLEMENTS_HIDE_COMMISSION_LEDGER_BUTTON_TASK_KEY = 'request-062-admin-settlements-hide-commission-ledger-button';
+
+    public const ADMIN_SETTLEMENTS_HIDE_COMMISSION_LEDGER_BUTTON_TASK_TITLE = 'Sembunyikan tombol Ledger Komisi pada halaman Admin Settlements.';
+
+    public const ADMIN_SETTLEMENTS_HIDE_COMMISSION_LEDGER_BUTTON_TASK_DESCRIPTION = 'Pada halaman admin/settlements, sembunyikan tombol "Ledger komisi" yang terlihat di bagian atas halaman. Perubahan hanya menghilangkan tombol dari tampilan Admin Settlements; halaman dan fungsi Ledger Komisi tetap tersedia melalui navigasinya. Referensi: Tugas GitIgnore/admin-settlements-hide-commission-ledger-button-2026-11-08.png.';
 }

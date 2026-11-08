@@ -1,7 +1,6 @@
 import { createPageLifecycle } from "../../../core/lifecycle.js";
 import { appStore } from "../../../state/store.js";
 import { syncBusinessSettlement } from "../../../state/sync/businessStatusSync.js";
-import { Button } from "../../../ui/primitives/button.js";
 import { openModal } from "../../../ui/primitives/modal.js";
 import { showToast } from "../../../ui/primitives/toast.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
@@ -143,17 +142,8 @@ function render(root, context, state, actions) {
   frame.id = "adst_page_section";
   frame.className = "mx-auto grid min-w-0 w-full max-w-[1240px] gap-6";
 
-  const dashboardButton = Button({
-    label: "Ledger komisi",
-    variant: "secondary",
-    onClick: () => context.router?.navigate("/admin/affiliate-commissions"),
-    designHook: "shared.button.secondary",
-  });
-  dashboardButton.id = "adst_dashboard_button";
-  dashboardButton.prepend(createIcon("dashboard", { className: "h-4 w-4" }));
-
   frame.append(
-    settlementsHero({ action: dashboardButton, summary }),
+    settlementsHero({ summary }),
     applyDesignHook(settlementsSummary(summary), "admin.settlements.summary"),
     applyDesignHook(settlementFilterBar(filters, summary, actions), "admin.settlements.filters"),
     eligibleDpPaidSection({
@@ -253,7 +243,7 @@ function eligibleDpPaidRow(ledger) {
   return row;
 }
 
-function settlementsHero({ action, summary = {} }) {
+function settlementsHero({ summary = {} }) {
   const section = document.createElement("section");
   section.id = "adst_hero_section";
   section.className = "relative overflow-hidden rounded-[2rem] border border-[var(--pb-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.95),rgba(250,244,237,0.86),rgba(234,244,249,0.74))] p-5 shadow-[0_24px_80px_rgba(15,23,42,0.10)] backdrop-blur-xl transition-shadow duration-150 sm:p-6 lg:p-7";
@@ -295,7 +285,7 @@ function settlementsHero({ action, summary = {} }) {
 
   const side = document.createElement("div");
   side.className = "grid gap-3";
-  side.append(stats, action);
+  side.append(stats);
 
   layout.append(copy, side);
   section.append(layout);
