@@ -365,4 +365,10 @@ final class TaskCatalog
     public const ADMIN_MASTER_BRAND_HIDE_INTERNAL_LABELS_TASK_TITLE = 'Sembunyikan slug dan keterangan teknis pada daftar Master Brand.';
 
     public const ADMIN_MASTER_BRAND_HIDE_INTERNAL_LABELS_TASK_DESCRIPTION = 'Pada halaman admin/master-brand, hilangkan teks slug yang tampil di bawah nama brand (contoh: "toyota") dari tabel desktop dan kartu mobile, serta teks "models[] disimpan di JSON brand" dari kolom Payload. Perubahan hanya pada tampilan daftar; pertahankan slug dan data model untuk pencarian, form, JSON payload, dan fungsi aplikasi lainnya. Referensi: Tugas GitIgnore/master-brand-hide-slug-json-reference-2026-11-08.png.';
+
+    public const ADMIN_CARS_SHOWROOM_LOCK_ON_EDIT_TASK_KEY = 'request-061-admin-cars-showroom-lock-on-edit';
+
+    public const ADMIN_CARS_SHOWROOM_LOCK_ON_EDIT_TASK_TITLE = 'Tampilkan nama showroom dan kunci pilihan showroom saat edit katalog mobil.';
+
+    public const ADMIN_CARS_SHOWROOM_LOCK_ON_EDIT_TASK_DESCRIPTION = 'Pada halaman admin/cars, tampilkan nama showroom (bukan nama akun pemilik) pada pilihan Showroom. Saat mengedit listing, kunci pilihan Showroom dan pertahankan seller_user_id serta showroom_id dari listing yang dipilih. Saat menambah listing, pilihan showroom tetap dapat diubah. Referensi: Tugas GitIgnore/admin-cars-edit-showroom-owner-reference-2026-11-08.png.';
 }

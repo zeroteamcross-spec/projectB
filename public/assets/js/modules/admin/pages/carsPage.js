@@ -450,7 +450,9 @@ function carsToolbar({ filters, isForm }) {
 async function saveCar(payload) {
   const runtime = runtimeState();
   const isEdit = runtime.mode === "edit" && runtime.selectedCar?.id;
-  const sellerUserId = Number(runtime.form?.seller_user_id ?? runtime.selectedCar?.seller_user_id ?? 0);
+  const sellerUserId = Number(isEdit
+    ? runtime.selectedCar.seller_user_id ?? 0
+    : runtime.form?.seller_user_id ?? 0);
   if (!sellerUserId) {
     setRuntime({ error: "Pilih showroom terlebih dahulu." });
     showToast("Pilih showroom terlebih dahulu.", { type: "error" });
@@ -462,7 +464,9 @@ async function saveCar(payload) {
     const adminPayload = {
       ...payload,
       seller_user_id: sellerUserId,
-      showroom_id: runtime.form?.showroom_id ?? runtime.selectedCar?.showroom_id ?? null,
+      showroom_id: isEdit
+        ? runtime.selectedCar.showroom_id ?? null
+        : runtime.form?.showroom_id ?? null,
     };
     const car = isEdit
       ? await carsResource.adminUpdate(runtime.selectedCar.id, adminPayload)
@@ -572,6 +576,7 @@ function adminSellerSelector(runtime) {
     ?? { users: [] };
   const sellers = normalizeUsers(usersPayload).filter((user) => user.role === "seller");
   const selectedSellerId = String(runtime.form?.seller_user_id ?? runtime.selectedCar?.seller_user_id ?? "");
+  const isEdit = runtime.mode === "edit" && Boolean(runtime.selectedCar?.id);
 
   const section = document.createElement("section");
   section.id = "adcars_seller_selector_section";
@@ -583,7 +588,8 @@ function adminSellerSelector(runtime) {
 
   const select = document.createElement("select");
   select.id = "adcars_seller_user_id_input";
-  select.className = "min-h-11 min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-2.5 text-xs font-semibold text-[var(--pb-text)] outline-none transition duration-150 focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  select.disabled = isEdit;
+  select.className = "min-h-11 min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-2.5 text-xs font-semibold text-[var(--pb-text)] outline-none transition duration-150 focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)] disabled:cursor-not-allowed disabled:opacity-70";
 
   const placeholder = document.createElement("option");
   placeholder.value = "";
@@ -594,7 +600,8 @@ function adminSellerSelector(runtime) {
   sellers.forEach((seller) => {
     const option = document.createElement("option");
     option.value = String(seller.id);
-    option.textContent = seller.name || seller.email || `Seller #${seller.id}`;
+    const showroomId = seller.showroom?.id ?? seller.showroom_id ?? seller.id;
+    option.textContent = seller.showroom?.name || `Showroom #${showroomId}`;
     option.selected = String(seller.id) === selectedSellerId;
     select.append(option);
   });
@@ -613,7 +620,9 @@ function adminSellerSelector(runtime) {
 
   const helper = document.createElement("p");
   helper.className = "text-[10px] font-semibold leading-5 text-[var(--pb-brand-secondary)]";
-  helper.textContent = "Wajib dipilih agar listing admin tercatat sebagai milik showroom yang benar.";
+  helper.textContent = isEdit
+    ? "Showroom pemilik listing dikunci dan tidak dapat diubah saat edit."
+    : "Wajib dipilih agar listing admin tercatat sebagai milik showroom yang benar.";
 
   label.append(select);
   section.append(label, helper);

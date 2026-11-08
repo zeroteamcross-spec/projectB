@@ -466,6 +466,14 @@ class TaskRepository
                 'work_status' => 'done',
                 'created_at' => '2026-11-08 00:00:00',
             ],
+            [
+                'task_key' => TaskCatalog::ADMIN_CARS_SHOWROOM_LOCK_ON_EDIT_TASK_KEY,
+                'title' => TaskCatalog::ADMIN_CARS_SHOWROOM_LOCK_ON_EDIT_TASK_TITLE,
+                'description' => TaskCatalog::ADMIN_CARS_SHOWROOM_LOCK_ON_EDIT_TASK_DESCRIPTION,
+                'status' => 'open',
+                'work_status' => 'done',
+                'created_at' => '2026-11-08 00:00:00',
+            ],
         ];
     }
 
