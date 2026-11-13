@@ -508,7 +508,7 @@ class ShowroomRepository
                  )
                  OR sh.subscription_payment_status = \'pending_verification\'
              )
-             ORDER BY sh.subscription_next_due_at ASC'
+             ORDER BY COALESCE(sh.updated_at, sh.created_at) DESC, sh.id DESC'
         );
         $stmt->execute();
 
