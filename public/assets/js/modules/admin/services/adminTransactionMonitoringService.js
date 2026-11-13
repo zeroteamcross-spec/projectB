@@ -6,6 +6,29 @@ export const adminTransactionMonitoringService = {
     return transactionsResource.list(filters, options);
   },
 
+  async listAll(filters = {}, options = {}) {
+    const limit = 100;
+    const transactions = [];
+    let total = Infinity;
+    let page = 1;
+
+    while (transactions.length < total) {
+      const response = await transactionsResource.list({ ...filters, page, limit }, options);
+      const batch = Array.isArray(response?.transactions) ? response.transactions : [];
+      transactions.push(...batch);
+      total = Number(response?.meta?.total ?? transactions.length);
+      if (!batch.length) {
+        break;
+      }
+      page += 1;
+    }
+
+    return {
+      transactions,
+      meta: { page: 1, limit, total: Number.isFinite(total) ? total : transactions.length },
+    };
+  },
+
   detail(transactionId, options = {}) {
     return transactionsResource.detail(transactionId, options);
   },
@@ -14,8 +37,13 @@ export const adminTransactionMonitoringService = {
     const keyword = String(filters.keyword ?? "").trim().toLowerCase();
     const status = String(filters.status ?? "").trim().toLowerCase();
     const paymentType = String(filters.paymentType ?? "").trim().toLowerCase();
+    const showroomId = String(filters.showroomId ?? "");
 
     return transactions.filter((transaction) => {
+      if (showroomId && String(transaction.showroom_id ?? transaction?.showroom?.id ?? "") !== showroomId) {
+        return false;
+      }
+
       if (status && String(transaction.transaction_status ?? "").toLowerCase() !== status) {
         return false;
       }

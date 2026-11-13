@@ -395,4 +395,16 @@ final class TaskCatalog
     public const ADMIN_SUBSCRIPTIONS_DUE_RECENT_ACTIVITY_ORDER_TASK_TITLE = 'Urutkan tagihan berulang berdasarkan aktivitas terbaru.';
 
     public const ADMIN_SUBSCRIPTIONS_DUE_RECENT_ACTIVITY_ORDER_TASK_DESCRIPTION = 'Pada halaman admin/subscriptions-due, urutkan tagihan berdasarkan waktu record terakhir dibuat atau diperbarui: gunakan updated_at jika tersedia, dan created_at sebagai fallback. Jika waktunya sama, tampilkan ID showroom yang lebih besar lebih dahulu.';
+
+    public const ADMIN_SHOWROOM_FILTERS_TASK_KEY = 'request-066-admin-showroom-filters';
+
+    public const ADMIN_SHOWROOM_FILTERS_TASK_TITLE = 'Tambahkan filter showroom pada katalog mobil, transaksi, dan settlement Admin.';
+
+    public const ADMIN_SHOWROOM_FILTERS_TASK_DESCRIPTION = 'Pada halaman admin/cars, admin/transactions, dan admin/settlements, tambahkan filter berdasarkan showroom. Di settlements, tampilkan batch penuh jika setidaknya satu ledger di dalam batch cocok dengan showroom terpilih; jangan mengubah nominal atau isi batch. Saring juga tabel ledger DP berdasarkan showroom.';
+
+    public const TASKS_SPAN_OPEN_BUG_TASK_KEY = 'request-067-tasks-span-open-bug';
+
+    public const TASKS_SPAN_OPEN_BUG_TASK_TITLE = 'Perbaiki BUG: span pada halaman daftar tugas tidak bisa dibuka.';
+
+    public const TASKS_SPAN_OPEN_BUG_TASK_DESCRIPTION = 'Pada halaman /tasks, perbaiki BUG yang dilaporkan sebagai "span tidak bisa dibuka". Kerjakan setelah request-066 dinyatakan selesai. Pastikan dahulu kontrol span mana yang dimaksud dan kondisi reproduksinya sebelum menentukan perbaikan. Tidak ada gambar referensi yang terlampir.';
 }

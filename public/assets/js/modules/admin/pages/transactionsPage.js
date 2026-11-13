@@ -4,6 +4,7 @@ import { Button } from "../../../ui/primitives/button.js";
 import { openModal, closeModal } from "../../../ui/primitives/modal.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 import { adminTransactionMonitoringService } from "../services/adminTransactionMonitoringService.js";
+import { adminShowroomFilterService } from "../services/adminShowroomFilterService.js";
 import { AdminTransactionsFilterBar } from "../components/adminTransactionsFilterBar.js";
 import { AdminTransactionsList } from "../components/adminTransactionsList.js";
 import { AdminTransactionDetailPanel } from "../components/adminTransactionDetailPanel.js";
@@ -15,6 +16,10 @@ export function AdminTransactionsPage() {
   let currentContext = null;
   const state = {
     error: "",
+    loading: false,
+    loadedShowroomId: null,
+    loadingShowroomId: null,
+    loadSequence: 0,
     query: createTransactionsQuery(),
   };
 
@@ -22,6 +27,7 @@ export function AdminTransactionsPage() {
 
   const actions = {
     applyFilters(nextFilters) {
+      const previousShowroomId = String(state.query.showroomId ?? "");
       state.error = "";
       state.query = {
         ...state.query,
@@ -30,6 +36,9 @@ export function AdminTransactionsPage() {
       };
       syncTransactionsUrl(state.query);
       rerender();
+      if (previousShowroomId !== String(state.query.showroomId ?? "")) {
+        loadTransactions(state.query.showroomId);
+      }
     },
     changePage(nextPage) {
       state.error = "";
@@ -70,22 +79,77 @@ export function AdminTransactionsPage() {
     },
   };
 
+  function ensureShowroomData(showroomId) {
+    const requestedId = String(showroomId ?? "");
+    if (!requestedId || state.loadedShowroomId === requestedId) {
+      return;
+    }
+    if (state.loading && state.loadingShowroomId === requestedId) {
+      return;
+    }
+    loadTransactions(requestedId);
+  }
+
+  async function loadTransactions(showroomId = "") {
+    const requestedId = String(showroomId ?? "");
+    const sequence = ++state.loadSequence;
+    state.loading = true;
+    state.loadingShowroomId = requestedId;
+    state.error = "";
+    appStore.patchState("working.adminTransactions.transactions", {
+      data: { transactions: [], meta: { total: 0 } },
+      hydratedAt: Date.now(),
+    }, "admin-transactions:showroom-filter-loading");
+    rerender();
+
+    try {
+      const payload = requestedId
+        ? await adminTransactionMonitoringService.listAll({ showroom_id: requestedId })
+        : await adminTransactionMonitoringService.list({ limit: 50 });
+      if (sequence !== state.loadSequence) {
+        return;
+      }
+      appStore.patchState("working.adminTransactions.transactions", {
+        data: payload,
+        hydratedAt: Date.now(),
+      }, "admin-transactions:showroom-filter");
+      state.loadedShowroomId = requestedId;
+    } catch (error) {
+      if (sequence === state.loadSequence) {
+        state.error = error?.message || "Gagal memuat transaksi untuk showroom ini.";
+      }
+    } finally {
+      if (sequence === state.loadSequence) {
+        state.loading = false;
+        state.loadingShowroomId = null;
+        rerender();
+      }
+    }
+  }
+
   return createPageLifecycle({
     bootstrap(context) {
       currentContext = context;
       state.error = "";
+      state.loadSequence += 1;
+      state.loadedShowroomId = null;
+      state.loadingShowroomId = null;
+      state.loading = false;
       state.query = createTransactionsQuery(context?.query);
     },
     mount(context) {
       currentContext = context;
       root = document.createElement("div");
       rerender();
+      ensureShowroomData(state.query.showroomId);
+      adminShowroomFilterService.ensure().then(rerender).catch(() => {});
       return root;
     },
     hydrate(context) {
       currentContext = context;
       state.query = createTransactionsQuery(context?.query);
       rerender();
+      ensureShowroomData(state.query.showroomId);
     },
     bindEvents(context) {
       currentContext = context;
@@ -154,6 +218,10 @@ function render(root, context, state, actions) {
     applyDesignHook(AdminTransactionsFilterBar({
       filters,
       counts,
+      showrooms: adminShowroomFilterService.options([
+        ...transactions,
+        ...(filters.showroomId ? [{ showroom_id: filters.showroomId }] : []),
+      ]),
       onSubmit: (nextFilters) => actions.applyFilters(nextFilters),
     }), "admin.transactions.filters"),
   );
@@ -166,7 +234,7 @@ function render(root, context, state, actions) {
   }
 
   main.append(applyDesignHook(AdminTransactionsList({
-    loading: !listHydratedAt && !hasTransactionsSource,
+    loading: state.loading || (!listHydratedAt && !hasTransactionsSource),
     transactions: pagedTransactions,
     page: safePage,
     perPage: currentPageSize,
@@ -250,7 +318,7 @@ function transactionsHero({ action, counts = {} }) {
   return section;
 }
 
-function buildTransactionsPath({ keyword = "", status = "", paymentType = "", transactionId = "", page = "", pageSize = "" } = {}) {
+function buildTransactionsPath({ keyword = "", status = "", paymentType = "", showroomId = "", transactionId = "", page = "", pageSize = "" } = {}) {
   const params = new URLSearchParams();
 
   if (keyword) {
@@ -263,6 +331,10 @@ function buildTransactionsPath({ keyword = "", status = "", paymentType = "", tr
 
   if (paymentType) {
     params.set("payment_type", paymentType);
+  }
+
+  if (showroomId) {
+    params.set("showroom_id", String(showroomId));
   }
 
   if (transactionId) {
@@ -286,6 +358,7 @@ function createTransactionsQuery(query = {}) {
     keyword: query.keyword ?? "",
     status: query.status ?? "",
     paymentType: query.payment_type ?? query.paymentType ?? "",
+    showroomId: query.showroom_id ?? query.showroomId ?? "",
     transactionId: query.transaction_id ?? query.transactionId ?? "",
     page: Math.max(1, Number(query.page || 1)),
     pageSize: Math.max(1, Number(query.page_size || query.pageSize || 10)),

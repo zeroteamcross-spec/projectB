@@ -269,13 +269,15 @@ export const adminRoutes = [
           key: "settlements",
           loader: ({ query, signal }) => adminSessionService.listSettlements({
             status: query.status ?? "",
+            showroom_id: query.showroom_id ?? "",
             limit: 50,
           }, { signal }).catch(() => ({ settlements: [], meta: {} })),
         },
         {
           key: "ledgers",
-          loader: ({ signal }) => adminSessionService.listAffiliateLedgers({
+          loader: ({ query, signal }) => adminSessionService.listAffiliateLedgers({
             ledger_status: "accrued",
+            showroom_id: query.showroom_id ?? "",
             limit: 100,
           }, { signal }).catch(() => ({ ledgers: [], meta: {} })),
         },
@@ -524,7 +526,7 @@ export const adminRoutes = [
       working: [
         {
           key: "transactions",
-          loader: ({ signal }) => transactionsResource.list({ limit: 50 }, { signal }).catch(() => ({ transactions: [], meta: {} })),
+          loader: ({ query, signal }) => transactionsResource.list({ showroom_id: query.showroom_id ?? "", limit: 50 }, { signal }).catch(() => ({ transactions: [], meta: {} })),
         },
         {
           key: "detail",

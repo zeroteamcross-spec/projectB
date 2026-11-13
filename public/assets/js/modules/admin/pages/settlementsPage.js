@@ -9,6 +9,7 @@ import { Badge } from "../../../ui/primitives/badge.js";
 import { AdminSettlementList } from "../components/adminSettlementList.js";
 import { adminAffiliateFinanceService } from "../services/adminAffiliateFinanceService.js";
 import { adminSessionService } from "../services/adminSessionService.js";
+import { adminShowroomFilterService } from "../services/adminShowroomFilterService.js";
 import { adminSettlementService } from "../services/adminSettlementService.js";
 import { applyDesignHook } from "../../../theme/designStudioHooks.js";
 import { getTransactionStatusMeta } from "../../../utils/transactionStatus.js";
@@ -19,6 +20,11 @@ export function AdminSettlementsPage() {
   let currentContext = null;
   const state = {
     isUpdatingId: null,
+    error: "",
+    loading: false,
+    loadedShowroomId: null,
+    loadingShowroomId: null,
+    loadSequence: 0,
     query: createSettlementsQuery(),
   };
 
@@ -26,6 +32,7 @@ export function AdminSettlementsPage() {
 
   const actions = {
     applyFilters(nextFilters = {}) {
+      const previousShowroomId = String(state.query.showroomId ?? "");
       state.query = {
         ...state.query,
         ...nextFilters,
@@ -33,6 +40,9 @@ export function AdminSettlementsPage() {
       };
       syncSettlementsUrl(state.query);
       rerender();
+      if (previousShowroomId !== String(state.query.showroomId ?? "")) {
+        loadSettlementData(state.query.showroomId);
+      }
     },
     changePage(nextPage) {
       state.query = {
@@ -80,21 +90,94 @@ export function AdminSettlementsPage() {
     },
   };
 
+  function ensureShowroomData(showroomId) {
+    const requestedId = String(showroomId ?? "");
+    if (!requestedId || state.loadedShowroomId === requestedId) {
+      return;
+    }
+    if (state.loading && state.loadingShowroomId === requestedId) {
+      return;
+    }
+    loadSettlementData(requestedId);
+  }
+
+  async function loadSettlementData(showroomId = "") {
+    const requestedId = String(showroomId ?? "");
+    const sequence = ++state.loadSequence;
+    state.loading = true;
+    state.loadingShowroomId = requestedId;
+    state.error = "";
+    appStore.patchState("working.adminSettlements.settlements", {
+      data: { settlements: [], meta: { total: 0 } },
+      hydratedAt: Date.now(),
+    }, "admin-settlements:showroom-filter-loading");
+    appStore.patchState("working.adminSettlements.ledgers", {
+      data: { ledgers: [], meta: { total: 0 } },
+      hydratedAt: Date.now(),
+    }, "admin-settlements:showroom-ledger-filter-loading");
+    rerender();
+
+    try {
+      const settlementFilters = requestedId ? { showroom_id: requestedId } : { status: state.query.status };
+      const ledgerFilters = requestedId
+        ? { ledger_status: "accrued", showroom_id: requestedId }
+        : { ledger_status: "accrued" };
+      const [settlementPayload, ledgerPayload] = await Promise.all([
+        requestedId
+          ? collectAllPages(adminSessionService.listSettlements, settlementFilters, "settlements")
+          : adminSessionService.listSettlements({ ...settlementFilters, limit: 50 }),
+        requestedId
+          ? collectAllPages(adminSessionService.listAffiliateLedgers, ledgerFilters, "ledgers")
+          : adminSessionService.listAffiliateLedgers({ ...ledgerFilters, limit: 100 }),
+      ]);
+      if (sequence !== state.loadSequence) {
+        return;
+      }
+      appStore.patchState("working.adminSettlements.settlements", {
+        data: settlementPayload,
+        hydratedAt: Date.now(),
+      }, "admin-settlements:showroom-filter");
+      appStore.patchState("working.adminSettlements.ledgers", {
+        data: ledgerPayload,
+        hydratedAt: Date.now(),
+      }, "admin-settlements:showroom-ledger-filter");
+      state.loadedShowroomId = requestedId;
+    } catch (error) {
+      if (sequence === state.loadSequence) {
+        state.error = error?.message || "Gagal memuat settlement untuk showroom ini.";
+      }
+    } finally {
+      if (sequence === state.loadSequence) {
+        state.loading = false;
+        state.loadingShowroomId = null;
+        rerender();
+      }
+    }
+  }
+
   return createPageLifecycle({
     bootstrap(context) {
       currentContext = context;
+      state.error = "";
+      state.loadSequence += 1;
+      state.loadedShowroomId = null;
+      state.loadingShowroomId = null;
+      state.loading = false;
       state.query = createSettlementsQuery(context?.query);
     },
     mount(context) {
       currentContext = context;
       root = document.createElement("div");
       rerender();
+      ensureShowroomData(state.query.showroomId);
+      adminShowroomFilterService.ensure().then(rerender).catch(() => {});
       return root;
     },
     hydrate(context) {
       currentContext = context;
       state.query = createSettlementsQuery(context?.query);
       rerender();
+      ensureShowroomData(state.query.showroomId);
     },
     bindEvents(context) {
       currentContext = context;
@@ -125,6 +208,9 @@ function render(root, context, state, actions) {
     .normalizedLedgers(eligiblePayload.ledgers ?? [])
     .filter((ledger) => ledger.ledger_status === "accrued"
       && ["dp_paid", "paid", "completed"].includes(ledger.transaction?.transaction_status));
+  const filteredEligibleLedgers = state.query.showroomId
+    ? eligibleLedgers.filter((ledger) => String(ledger.showroom_id ?? ledger?.showroom?.id ?? "") === String(state.query.showroomId))
+    : eligibleLedgers;
   const eligibleHydratedAt = appStore.get("working.adminSettlements.ledgers.hydratedAt", 0) ?? 0;
   const allSettlements = adminSettlementService.normalizedSettlements(payload.settlements ?? []);
   const settlements = adminSettlementService.filterSettlements(allSettlements, filters);
@@ -146,15 +232,22 @@ function render(root, context, state, actions) {
   frame.append(
     settlementsHero({ summary }),
     applyDesignHook(settlementsSummary(summary), "admin.settlements.summary"),
-    applyDesignHook(settlementFilterBar(filters, summary, actions), "admin.settlements.filters"),
+    applyDesignHook(settlementFilterBar(filters, summary, actions, adminShowroomFilterService.options([
+      ...filteredEligibleLedgers,
+      ...(filters.showroomId ? [{ showroom_id: filters.showroomId }] : []),
+    ])), "admin.settlements.filters"),
     eligibleDpPaidSection({
-      ledgers: eligibleLedgers,
-      loading: !eligibleHydratedAt && !workingEligiblePayload && !snapshotEligiblePayload,
+      ledgers: filteredEligibleLedgers,
+      loading: state.loading || (!eligibleHydratedAt && !workingEligiblePayload && !snapshotEligiblePayload),
     }),
   );
 
+  if (state.error) {
+    frame.append(textNode("p", "rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs font-semibold text-red-800", state.error));
+  }
+
   frame.append(applyDesignHook(AdminSettlementList({
-    loading: !hydratedAt && !hasSource,
+    loading: state.loading || (!hydratedAt && !hasSource),
     settlements: pagedSettlements,
     page: safePage,
     perPage: currentPageSize,
@@ -325,7 +418,7 @@ function summaryCardTone(index) {
   ][index % 4];
 }
 
-function settlementFilterBar(filters, summary, actions) {
+function settlementFilterBar(filters, summary, actions, showrooms = []) {
   const section = document.createElement("section");
   section.id = "adst_filter_section";
   section.className = "grid min-w-0 gap-4 rounded-[var(--pb-radius-2xl)] border border-[var(--pb-card-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.94),rgba(234,244,249,0.72),rgba(250,244,237,0.72))] p-3 shadow-[var(--pb-shadow-card)] backdrop-blur-xl transition-shadow duration-150 xl:p-4";
@@ -345,7 +438,7 @@ function settlementFilterBar(filters, summary, actions) {
 
   const form = document.createElement("form");
   form.id = "adst_filter_form_section";
-  form.className = "grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1.5fr)_220px_auto]";
+  form.className = "grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1.5fr)_220px_240px_auto]";
 
   const keyword = document.createElement("input");
   keyword.id = "adst_keyword_input";
@@ -371,6 +464,18 @@ function settlementFilterBar(filters, summary, actions) {
     status.append(option);
   });
 
+  const showroom = document.createElement("select");
+  showroom.id = "adst_showroom_input";
+  showroom.name = "showroom_id";
+  showroom.className = keyword.className;
+  [["", "Semua showroom"], ...showrooms.map((item) => [String(item.id), item.name])].forEach(([value, label]) => {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = label;
+    option.selected = String(value) === String(filters.showroomId ?? "");
+    showroom.append(option);
+  });
+
   const actionsWrap = document.createElement("div");
   actionsWrap.className = "grid gap-2 sm:grid-cols-2 lg:grid-cols-1";
   const submit = Button({ label: "Terapkan", variant: "primary" });
@@ -380,18 +485,19 @@ function settlementFilterBar(filters, summary, actions) {
   const reset = Button({
     label: "Reset",
     variant: "secondary",
-    onClick: () => actions.applyFilters({ keyword: "", status: "" }),
+    onClick: () => actions.applyFilters({ keyword: "", status: "", showroomId: "" }),
   });
   reset.id = "adst_reset_filter_button";
   reset.type = "button";
   actionsWrap.append(submit, reset);
 
-  form.append(labelWrap("Keyword", keyword), labelWrap("Status", status), actionsWrap);
+  form.append(labelWrap("Keyword", keyword), labelWrap("Status", status), labelWrap("Showroom", showroom), actionsWrap);
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     actions.applyFilters({
       keyword: keyword.value.trim(),
       status: status.value,
+      showroomId: showroom.value,
     });
   });
 
@@ -422,7 +528,7 @@ function labelWrap(label, control) {
   return node;
 }
 
-function buildSettlementsPath({ keyword = "", status = "", page = "", pageSize = "", settlementId = "" } = {}) {
+function buildSettlementsPath({ keyword = "", status = "", showroomId = "", page = "", pageSize = "", settlementId = "" } = {}) {
   const params = new URLSearchParams();
 
   if (keyword) {
@@ -431,6 +537,10 @@ function buildSettlementsPath({ keyword = "", status = "", page = "", pageSize =
 
   if (status) {
     params.set("status", status);
+  }
+
+  if (showroomId) {
+    params.set("showroom_id", String(showroomId));
   }
 
   if (page && Number(page) > 1) {
@@ -453,6 +563,7 @@ function createSettlementsQuery(query = {}) {
   return {
     keyword: query.keyword ?? "",
     status: query.status ?? "",
+    showroomId: query.showroom_id ?? query.showroomId ?? "",
     page: Math.max(1, Number(query.page || 1)),
     pageSize: Math.max(1, Number(query.page_size || query.pageSize || 10)),
     settlementId: query.settlement_id ?? query.settlementId ?? "",
@@ -576,6 +687,32 @@ function detailRow(label, value) {
     textNode("p", "break-words text-xs font-semibold text-gray-900", String(value ?? "-")),
   );
   return row;
+}
+
+async function collectAllPages(listPage, filters, collectionKey) {
+  const limit = 100;
+  const collection = [];
+  let total = Infinity;
+  let page = 1;
+  let meta = {};
+
+  while (collection.length < total) {
+    const response = await listPage({ ...filters, page, limit });
+    const batch = Array.isArray(response?.[collectionKey]) ? response[collectionKey] : [];
+    meta = response?.meta ?? meta;
+    collection.push(...batch);
+    const reportedTotal = Number(response?.meta?.total);
+    total = Number.isFinite(reportedTotal) ? reportedTotal : collection.length;
+    if (!batch.length) {
+      break;
+    }
+    page += 1;
+  }
+
+  return {
+    [collectionKey]: collection,
+    meta: { ...meta, page: 1, limit, total: Number.isFinite(total) ? total : collection.length },
+  };
 }
 
 function textNode(tagName, className, text) {

@@ -14,6 +14,7 @@ class TransactionMapper
             'buyer_user_id' => (int) $transaction['buyer_user_id'],
             'seller_user_id' => (int) $transaction['seller_user_id'],
             'car_id' => (int) $transaction['car_id'],
+            'showroom_id' => isset($transaction['showroom_id']) && $transaction['showroom_id'] !== null ? (int) $transaction['showroom_id'] : null,
             'car_price' => (int) $transaction['car_price'],
             'payment_type' => $transaction['payment_type'],
             'payment_method' => $transaction['payment_method'] ?? null,
@@ -44,6 +45,12 @@ class TransactionMapper
                     'id' => (int) $transaction['seller_user_id'],
                     'name' => $transaction['seller_name'],
                     'email' => $transaction['seller_email'],
+                ]
+                : null,
+            'showroom' => isset($transaction['showroom_id']) && $transaction['showroom_id'] !== null
+                ? [
+                    'id' => (int) $transaction['showroom_id'],
+                    'name' => $transaction['showroom_name'] ?? null,
                 ]
                 : null,
             'affiliate' => isset($transaction['affiliate_id']) && $transaction['affiliate_id'] !== null

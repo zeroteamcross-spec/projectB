@@ -2,7 +2,7 @@ import { Button } from "../../../ui/primitives/button.js";
 import { tw } from "../../../theme/tailwindClasses.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 
-export function AdminTransactionsFilterBar({ filters = {}, counts = {}, onSubmit = null } = {}) {
+export function AdminTransactionsFilterBar({ filters = {}, counts = {}, showrooms = [], onSubmit = null } = {}) {
   const card = document.createElement("section");
   card.id = "adtr_filter_section";
   card.className = `grid min-w-0 gap-4 ${tw.section.toolbar} border-[var(--pb-card-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.94),rgba(234,244,249,0.72),rgba(250,244,237,0.72))]`;
@@ -16,7 +16,7 @@ export function AdminTransactionsFilterBar({ filters = {}, counts = {}, onSubmit
   copy.className = "grid min-w-0 gap-1";
   copy.append(
     textBlock("text-[10px] font-black uppercase tracking-[0.16em] text-[color-mix(in_srgb,var(--pb-brand-primary)_84%,black)]", "Transaction filter"),
-    textBlock("text-xs leading-6 text-gray-600", "Saring status, payment type, dan keyword supaya review transaksi tetap cepat dibaca."),
+    textBlock("text-xs leading-6 text-gray-600", "Saring showroom, status, payment type, dan keyword supaya review transaksi tetap cepat dibaca."),
   );
   header.append(
     icon,
@@ -25,13 +25,14 @@ export function AdminTransactionsFilterBar({ filters = {}, counts = {}, onSubmit
 
   const form = document.createElement("form");
   form.id = "adtr_filter_form_section";
-  form.className = "grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1.6fr)_repeat(2,minmax(0,0.8fr))_auto]";
+  form.className = "grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1.6fr)_repeat(3,minmax(0,0.8fr))_auto]";
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     onSubmit?.({
       keyword: keywordInput.value.trim(),
       status: statusSelect.value,
       paymentType: paymentTypeSelect.value,
+      showroomId: showroomSelect.value,
       transactionId: filters.transactionId ?? "",
     });
   });
@@ -72,6 +73,17 @@ export function AdminTransactionsFilterBar({ filters = {}, counts = {}, onSubmit
   ]);
   paymentTypeLabel.append(paymentTypeSelect);
 
+  const showroomLabel = fieldLabel("Showroom");
+  const showroomSelect = document.createElement("select");
+  showroomSelect.id = "adtr_showroom_input";
+  showroomSelect.name = "showroom_id";
+  showroomSelect.className = `${tw.form.control} min-w-0 max-w-full`;
+  buildOptions(showroomSelect, String(filters.showroomId ?? ""), [
+    ["", "Semua showroom"],
+    ...showrooms.map((showroom) => [String(showroom.id), showroom.name]),
+  ]);
+  showroomLabel.append(showroomSelect);
+
   const actions = document.createElement("div");
   actions.className = "grid gap-2 sm:grid-cols-2 lg:grid-cols-1";
   const submit = Button({ label: "Terapkan", variant: "primary" });
@@ -81,13 +93,13 @@ export function AdminTransactionsFilterBar({ filters = {}, counts = {}, onSubmit
   const reset = Button({
     label: "Reset",
     variant: "secondary",
-    onClick: () => onSubmit?.({ keyword: "", status: "", paymentType: "", transactionId: filters.transactionId ?? "" }),
+    onClick: () => onSubmit?.({ keyword: "", status: "", paymentType: "", showroomId: "", transactionId: filters.transactionId ?? "" }),
   });
   reset.id = "adtr_reset_filter_button";
   reset.type = "button";
   actions.append(submit, reset);
 
-  form.append(keywordLabel, statusLabel, paymentTypeLabel, actions);
+  form.append(keywordLabel, statusLabel, paymentTypeLabel, showroomLabel, actions);
   card.append(header, form, countsRow(counts));
   return card;
 }

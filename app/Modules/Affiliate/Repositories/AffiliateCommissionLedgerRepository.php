@@ -383,6 +383,7 @@ class AffiliateCommissionLedgerRepository
 
         foreach ([
             'affiliate_id' => 'l.affiliate_id',
+            'showroom_id' => 'l.showroom_id',
             'ledger_status' => 'l.ledger_status',
             'transaction_id' => 'l.transaction_id',
             'settlement_id' => 'l.settlement_id',

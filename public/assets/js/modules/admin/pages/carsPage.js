@@ -9,6 +9,7 @@ import { showToast } from "../../../ui/primitives/toast.js";
 import { createIcon } from "../../../theme/iconRegistry.js";
 import { adminMasterService } from "../services/adminMasterService.js";
 import { adminCarsBackgroundLoader } from "../services/adminCarsBackgroundLoader.js";
+import { adminShowroomFilterService } from "../services/adminShowroomFilterService.js";
 import { SellerCarForm } from "../../seller/components/sellerCarForm.js";
 import { SellerCarsList } from "../../seller/components/sellerCarsList.js";
 
@@ -26,6 +27,7 @@ const DEFAULT_RUNTIME = {
   filters: {
     keyword: "",
     status: "",
+    showroomId: "",
   },
   pagination: {
     page: 1,
@@ -78,6 +80,7 @@ function render(root, router) {
     ?? adminMasterService.normalizeMaster(null);
   const brandMaster = adminMasterService.normalizeMaster(masterPayload);
   const brandOptions = brandMaster?.data?.brands ?? [];
+  const showroomOptions = adminShowroomFilterService.options(cars);
   const runtime = runtimeState();
   const isForm = runtime.mode === "create" || runtime.mode === "edit";
   const filteredCars = filterCars(cars, runtime.filters);
@@ -106,7 +109,7 @@ function render(root, router) {
   layout.dataset.ds = "admin.cars.page";
   layout.append(
     carsHero({ cars, filteredCars, isForm }),
-    carsToolbar({ filters: runtime.filters, isForm }),
+    carsToolbar({ filters: runtime.filters, isForm, showrooms: showroomOptions }),
     notice,
     error,
     body
@@ -385,10 +388,10 @@ function carsHero({ cars, filteredCars, isForm }) {
   return section;
 }
 
-function carsToolbar({ filters, isForm }) {
+function carsToolbar({ filters, isForm, showrooms = [] }) {
   const section = document.createElement("section");
   section.id = "adcars_toolbar_section";
-  section.className = "grid gap-3 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white/80 p-4 shadow-[0_18px_55px_rgba(15,23,42,0.07)] backdrop-blur-xl md:grid-cols-[minmax(0,1fr)_180px_auto] md:items-end";
+  section.className = "grid gap-3 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white/80 p-4 shadow-[0_18px_55px_rgba(15,23,42,0.07)] backdrop-blur-xl md:grid-cols-[minmax(0,1fr)_180px_220px_auto] md:items-end";
   section.dataset.ds = "admin.cars.toolbar";
 
   const searchWrap = document.createElement("label");
@@ -430,10 +433,20 @@ function carsToolbar({ filters, isForm }) {
   status.addEventListener("change", () => setRuntime({ filters: { ...runtimeState().filters, status: status.value }, pagination: { ...runtimeState().pagination, page: 1 } }));
   statusWrap.append(status);
 
+  const showroomWrap = document.createElement("label");
+  showroomWrap.className = "grid min-w-0 gap-1.5 text-xs font-bold text-gray-700";
+  showroomWrap.textContent = "Showroom";
+  const showroom = document.createElement("select");
+  showroom.id = "adcars_showroom_filter_input";
+  showroom.className = "min-h-11 min-w-0 rounded-[1rem] border border-[var(--pb-form-border)] bg-[var(--pb-form-input-bg)] px-4 py-2.5 text-xs font-semibold text-[var(--pb-text)] outline-none transition duration-150 focus:border-[var(--pb-form-focus)] focus:ring-2 focus:ring-[var(--pb-form-focus)]";
+  appendShowroomOptions(showroom, showrooms, filters.showroomId ?? "");
+  showroom.addEventListener("change", () => setRuntime({ filters: { ...runtimeState().filters, showroomId: showroom.value }, pagination: { ...runtimeState().pagination, page: 1 } }));
+  showroomWrap.append(showroom);
+
   const actions = document.createElement("section");
   actions.id = "adcars_toolbar_actions_section";
   actions.className = "grid gap-2 sm:flex sm:flex-wrap sm:justify-end";
-  const apply = Button({ label: "Terapkan", variant: "secondary", onClick: () => setRuntime({ filters: { ...runtimeState().filters, keyword: search.value.trim(), status: status.value }, pagination: { ...runtimeState().pagination, page: 1 } }) });
+  const apply = Button({ label: "Terapkan", variant: "secondary", onClick: () => setRuntime({ filters: { ...runtimeState().filters, keyword: search.value.trim(), status: status.value, showroomId: showroom.value }, pagination: { ...runtimeState().pagination, page: 1 } }) });
   apply.id = "adcars_apply_filter_button";
   apply.prepend(createIcon("filter", { className: "h-4 w-4" }));
   const main = isForm
@@ -443,7 +456,7 @@ function carsToolbar({ filters, isForm }) {
   main.prepend(createIcon(isForm ? "list" : "plus", { className: "h-4 w-4" }));
   actions.append(apply, main);
 
-  section.append(searchWrap, statusWrap, actions);
+  section.append(searchWrap, statusWrap, showroomWrap, actions);
   return section;
 }
 
@@ -675,8 +688,13 @@ function setFormState(form) {
 function filterCars(cars = [], filters = {}) {
   const keyword = String(filters.keyword ?? "").trim().toLowerCase();
   const status = String(filters.status ?? "").trim().toLowerCase();
+  const showroomId = String(filters.showroomId ?? "");
 
   return cars.filter((car) => {
+    if (showroomId && String(car.showroom_id ?? "") !== showroomId) {
+      return false;
+    }
+
     if (status && String(car.listing_status ?? "").toLowerCase() !== status) {
       return false;
     }
@@ -698,6 +716,17 @@ function filterCars(cars = [], filters = {}) {
       car.showroom_name,
       car.seller_name,
     ].filter(Boolean).join(" ").toLowerCase().includes(keyword);
+  });
+}
+
+function appendShowroomOptions(select, showrooms = [], selectedId = "") {
+  const options = [["", "Semua showroom"], ...showrooms.map((showroom) => [showroom.id, showroom.name])];
+  options.forEach(([value, label]) => {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = label;
+    option.selected = String(value) === String(selectedId);
+    select.append(option);
   });
 }
 

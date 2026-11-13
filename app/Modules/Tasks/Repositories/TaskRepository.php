@@ -506,6 +506,22 @@ class TaskRepository
                 'work_status' => 'done',
                 'created_at' => '2026-11-13 00:00:00',
             ],
+            [
+                'task_key' => TaskCatalog::ADMIN_SHOWROOM_FILTERS_TASK_KEY,
+                'title' => TaskCatalog::ADMIN_SHOWROOM_FILTERS_TASK_TITLE,
+                'description' => TaskCatalog::ADMIN_SHOWROOM_FILTERS_TASK_DESCRIPTION,
+                'status' => 'open',
+                'work_status' => 'done',
+                'created_at' => '2026-11-13 00:00:00',
+            ],
+            [
+                'task_key' => TaskCatalog::TASKS_SPAN_OPEN_BUG_TASK_KEY,
+                'title' => TaskCatalog::TASKS_SPAN_OPEN_BUG_TASK_TITLE,
+                'description' => TaskCatalog::TASKS_SPAN_OPEN_BUG_TASK_DESCRIPTION,
+                'status' => 'open',
+                'work_status' => 'pending',
+                'created_at' => '2026-11-13 00:00:00',
+            ],
         ];
     }
 

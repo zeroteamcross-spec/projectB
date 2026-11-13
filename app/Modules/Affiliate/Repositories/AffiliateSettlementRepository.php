@@ -142,6 +142,19 @@ class AffiliateSettlementRepository
             $params['status'] = $filters['status'];
         }
 
+        if (isset($filters['showroom_id']) && $filters['showroom_id'] !== '') {
+            $conditions[] = 'EXISTS (
+                SELECT 1
+                FROM affiliate_settlement_items AS filter_item
+                INNER JOIN affiliate_commission_ledgers AS filter_ledger
+                    ON filter_ledger.id = filter_item.ledger_id
+                WHERE filter_item.settlement_batch_id = b.id
+                  AND filter_ledger.showroom_id = :showroom_id
+                  AND filter_ledger.deleted_at IS NULL
+            )';
+            $params['showroom_id'] = $filters['showroom_id'];
+        }
+
         $sql = 'SELECT b.id, b.settlement_code, b.affiliate_id, b.affiliate_user_id, b.requested_amount, b.currency,
                        b.ledger_count, b.status, b.payment_method, b.payment_reference, b.payment_note, b.proof_file_url,
                        b.period_start, b.period_end, b.requested_by, b.approved_by, b.paid_by, b.cancelled_by, b.notes,
@@ -179,17 +192,30 @@ class AffiliateSettlementRepository
 
     public function countAll(array $filters = []): int
     {
-        $conditions = ['deleted_at IS NULL'];
+        $conditions = ['b.deleted_at IS NULL'];
         $params = [];
 
         if (isset($filters['status']) && $filters['status'] !== '') {
-            $conditions[] = 'status = :status';
+            $conditions[] = 'b.status = :status';
             $params['status'] = $filters['status'];
+        }
+
+        if (isset($filters['showroom_id']) && $filters['showroom_id'] !== '') {
+            $conditions[] = 'EXISTS (
+                SELECT 1
+                FROM affiliate_settlement_items AS filter_item
+                INNER JOIN affiliate_commission_ledgers AS filter_ledger
+                    ON filter_ledger.id = filter_item.ledger_id
+                WHERE filter_item.settlement_batch_id = b.id
+                  AND filter_ledger.showroom_id = :showroom_id
+                  AND filter_ledger.deleted_at IS NULL
+            )';
+            $params['showroom_id'] = $filters['showroom_id'];
         }
 
         $stmt = $this->pdo->prepare(
             'SELECT COUNT(*) AS total
-             FROM affiliate_settlement_batches
+             FROM affiliate_settlement_batches AS b
              WHERE ' . implode(' AND ', $conditions)
         );
         $stmt->execute($params);
