@@ -519,7 +519,7 @@ class TaskRepository
                 'title' => TaskCatalog::TASKS_SPAN_OPEN_BUG_TASK_TITLE,
                 'description' => TaskCatalog::TASKS_SPAN_OPEN_BUG_TASK_DESCRIPTION,
                 'status' => 'open',
-                'work_status' => 'pending',
+                'work_status' => 'done',
                 'created_at' => '2026-11-13 00:00:00',
             ],
         ];

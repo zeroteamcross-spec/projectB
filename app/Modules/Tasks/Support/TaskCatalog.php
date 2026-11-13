@@ -404,7 +404,7 @@ final class TaskCatalog
 
     public const TASKS_SPAN_OPEN_BUG_TASK_KEY = 'request-067-tasks-span-open-bug';
 
-    public const TASKS_SPAN_OPEN_BUG_TASK_TITLE = 'Perbaiki BUG: span pada halaman daftar tugas tidak bisa dibuka.';
+    public const TASKS_SPAN_OPEN_BUG_TASK_TITLE = 'Perbaiki kontrol buka kelompok pada halaman Daftar Tugas.';
 
-    public const TASKS_SPAN_OPEN_BUG_TASK_DESCRIPTION = 'Pada halaman /tasks, perbaiki BUG yang dilaporkan sebagai "span tidak bisa dibuka". Kerjakan setelah request-066 dinyatakan selesai. Pastikan dahulu kontrol span mana yang dimaksud dan kondisi reproduksinya sebelum menentukan perbaikan. Tidak ada gambar referensi yang terlampir.';
+    public const TASKS_SPAN_OPEN_BUG_TASK_DESCRIPTION = 'Pada halaman /tasks, kontrol untuk membuka/menutup kelompok tugas tidak berfungsi saat diklik karena renderer merujuk pageConfig di luar cakupan. Teruskan konfigurasi halaman ke kartu kelompok dan pertahankan mode writable/read-only. Direproduksi di produksi sebelum perbaikan; tidak ada gambar referensi yang terlampir.';
 }

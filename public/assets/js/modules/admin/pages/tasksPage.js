@@ -126,7 +126,7 @@ function render(root, state, actions, config) {
       description: config.emptyDescription,
     }));
   } else {
-    page.append(taskGroups(groups, state, actions, root, config.readOnly));
+    page.append(taskGroups(groups, state, actions, root, config));
   }
 
   root.replaceChildren(page);
@@ -189,15 +189,15 @@ function summaryCard(label, value) {
   return card;
 }
 
-function taskGroups(groups, state, actions, root, readOnly) {
+function taskGroups(groups, state, actions, root, config) {
   const list = document.createElement("div");
   list.id = "admin_task_groups_list";
   list.className = "grid gap-3";
-  list.append(...groups.map((group) => taskGroupCard(group, state, actions, root, readOnly)));
+  list.append(...groups.map((group) => taskGroupCard(group, state, actions, root, config)));
   return list;
 }
 
-function taskGroupCard(group, state, actions, root, readOnly) {
+function taskGroupCard(group, state, actions, root, config) {
   const section = document.createElement("section");
   section.id = `admin_task_group_${group.key}`;
   section.className = "overflow-hidden rounded-2xl border border-[var(--pb-border)] bg-white shadow-sm";
@@ -216,7 +216,7 @@ function taskGroupCard(group, state, actions, root, readOnly) {
       } else {
         state.openGroups.add(group.key);
       }
-      render(root, state, actions, pageConfig);
+      render(root, state, actions, config);
     },
   });
   toggle.className = "flex min-h-14 w-full items-center justify-between gap-3 rounded-xl border border-transparent px-3 py-3 text-left hover:border-[var(--pb-border)] hover:bg-slate-50 sm:px-4";
@@ -233,7 +233,7 @@ function taskGroupCard(group, state, actions, root, readOnly) {
     const body = document.createElement("div");
     body.id = `admin_task_group_body_${group.key}`;
     body.className = "grid gap-3 border-t border-[var(--pb-border)] bg-slate-50/50 p-3 sm:p-4";
-    body.append(...group.tasks.map((task) => taskCard(task, state, actions, readOnly)));
+    body.append(...group.tasks.map((task) => taskCard(task, state, actions, config.readOnly)));
     section.append(body);
   }
 
