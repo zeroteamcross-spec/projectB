@@ -733,6 +733,7 @@ function renderSidebarTab({ state, actions, items, loading }) {
 }
 
 function masterHero({ action, pageType, brands = [], sidebarItems = [], banks = [], cities = [], plans = [], master = {} }) {
+  const isBrand = pageType === "brand";
   const isSidebar = pageType === "sidebar";
   const isBank = pageType === "bank";
   const isLocation = pageType === "location";
@@ -810,7 +811,9 @@ function masterHero({ action, pageType, brands = [], sidebarItems = [], banks = 
   if (action) {
     side.append(action);
   }
-  side.append(textNode("p", "text-[10px] font-semibold text-gray-500", `master_key: ${master.master_key ?? "-"}`));
+  if (!isBrand) {
+    side.append(textNode("p", "text-[10px] font-semibold text-gray-500", `master_key: ${master.master_key ?? "-"}`));
+  }
   grid.append(copy, side);
   section.append(grid);
   return section;

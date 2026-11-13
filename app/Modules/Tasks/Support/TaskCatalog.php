@@ -407,4 +407,10 @@ final class TaskCatalog
     public const TASKS_SPAN_OPEN_BUG_TASK_TITLE = 'Perbaiki kontrol buka kelompok pada halaman Daftar Tugas.';
 
     public const TASKS_SPAN_OPEN_BUG_TASK_DESCRIPTION = 'Pada halaman /tasks, kontrol untuk membuka/menutup kelompok tugas tidak berfungsi saat diklik karena renderer merujuk pageConfig di luar cakupan. Teruskan konfigurasi halaman ke kartu kelompok dan pertahankan mode writable/read-only. Direproduksi di produksi sebelum perbaikan; tidak ada gambar referensi yang terlampir.';
+
+    public const ADMIN_MASTER_BRAND_ALPHABETICAL_ORDER_TASK_KEY = 'request-068-admin-master-brand-alphabetical-order';
+
+    public const ADMIN_MASTER_BRAND_ALPHABETICAL_ORDER_TASK_TITLE = 'Urutkan brand dan model berdasarkan abjad, lalu sembunyikan master_key pada Master Brand.';
+
+    public const ADMIN_MASTER_BRAND_ALPHABETICAL_ORDER_TASK_DESCRIPTION = 'Pada halaman admin/master-brand, urutkan daftar brand dan model dalam setiap brand secara alfabetis A-Z. Sembunyikan teks "master_key: cars.brands" dari tampilan halaman, tetapi pertahankan master key di data dan API.';
 }

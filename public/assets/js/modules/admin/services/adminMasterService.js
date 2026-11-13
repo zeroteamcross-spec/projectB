@@ -526,7 +526,8 @@ function normalizeBrands(brands = []) {
     description: String(brand.description ?? "").trim(),
     models: normalizeModels(brand.models ?? []),
     updated_at: brand.updated_at ?? null,
-  })).filter((brand) => brand.name);
+  })).filter((brand) => brand.name)
+    .sort((left, right) => compareNamesAlphabetically(left.name, right.name));
 }
 
 function normalizeModels(models = []) {
@@ -535,7 +536,12 @@ function normalizeModels(models = []) {
     name: String(model.name ?? "").trim(),
     slug: slugify(model.slug || model.name || `model-${index + 1}`),
     status: ["active", "inactive"].includes(model.status) ? model.status : "active",
-  })).filter((model) => model.name);
+  })).filter((model) => model.name)
+    .sort((left, right) => compareNamesAlphabetically(left.name, right.name));
+}
+
+function compareNamesAlphabetically(left, right) {
+  return String(left ?? "").localeCompare(String(right ?? ""), "id-ID", { sensitivity: "base" });
 }
 
 function normalizeBanks(banks = []) {
