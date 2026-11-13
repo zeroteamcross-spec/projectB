@@ -413,4 +413,10 @@ final class TaskCatalog
     public const ADMIN_MASTER_BRAND_ALPHABETICAL_ORDER_TASK_TITLE = 'Urutkan brand dan model berdasarkan abjad, lalu sembunyikan master_key pada Master Brand.';
 
     public const ADMIN_MASTER_BRAND_ALPHABETICAL_ORDER_TASK_DESCRIPTION = 'Pada halaman admin/master-brand, urutkan daftar brand dan model dalam setiap brand secara alfabetis A-Z. Sembunyikan teks "master_key: cars.brands" dari tampilan halaman, tetapi pertahankan master key di data dan API.';
+
+    public const ADMIN_CARS_BOOKING_FEE_EDIT_TASK_KEY = 'request-069-admin-cars-booking-fee-edit';
+
+    public const ADMIN_CARS_BOOKING_FEE_EDIT_TASK_TITLE = 'Pertahankan Nominal Booking Fee saat mengedit listing admin.';
+
+    public const ADMIN_CARS_BOOKING_FEE_EDIT_TASK_DESCRIPTION = 'Pada halaman admin/cars, isi kembali field Nominal Booking Fee dari nilai dp_amount listing yang sedang diedit. Pertahankan validasi dan perilaku penyimpanan yang sudah ada. Referensi: Tugas GitIgnore/admin-cars-booking-fee-edit-bug-2026-11-13.png.';
 }

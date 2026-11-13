@@ -971,6 +971,7 @@ function carToForm(car) {
     price_cash: car?.price_cash ?? null,
     price_discount: car?.price_discount ?? null,
     price_credit: car?.price_credit ?? null,
+    dp_amount: car?.dp_amount ?? null,
     youtube_url: car?.youtube_url ?? null,
     description: car?.description ?? null,
     listing_status: car?.listing_status ?? "draft",

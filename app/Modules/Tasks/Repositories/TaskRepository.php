@@ -530,6 +530,14 @@ class TaskRepository
                 'work_status' => 'done',
                 'created_at' => '2026-11-13 00:00:00',
             ],
+            [
+                'task_key' => TaskCatalog::ADMIN_CARS_BOOKING_FEE_EDIT_TASK_KEY,
+                'title' => TaskCatalog::ADMIN_CARS_BOOKING_FEE_EDIT_TASK_TITLE,
+                'description' => TaskCatalog::ADMIN_CARS_BOOKING_FEE_EDIT_TASK_DESCRIPTION,
+                'status' => 'open',
+                'work_status' => 'done',
+                'created_at' => '2026-11-13 00:00:00',
+            ],
         ];
     }
 
