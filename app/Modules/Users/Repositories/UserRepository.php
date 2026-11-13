@@ -203,7 +203,7 @@ class UserRepository
         }
 
         $showroomsStmt = $this->pdo->prepare(
-            'SELECT id, user_id, name
+            'SELECT id, user_id, name, city_name
              FROM showrooms
              WHERE deleted_at IS NULL
              AND user_id IN (' . implode(', ', $userPlaceholders) . ')
@@ -219,6 +219,7 @@ class UserRepository
                     'id' => (int) $showroom['id'],
                     'user_id' => $userId,
                     'name' => $showroom['name'],
+                    'city_name' => $showroom['city_name'] ?? null,
                 ];
             }
         }

@@ -383,4 +383,10 @@ final class TaskCatalog
     public const SELLER_MASTER_INSPECTION_DRAG_DROP_ORDER_TASK_TITLE = 'Atur urutan item Master Inspeksi dengan drag-and-drop.';
 
     public const SELLER_MASTER_INSPECTION_DRAG_DROP_ORDER_TASK_DESCRIPTION = 'Pada halaman seller/master-inspection, ganti pengaturan urutan angka di dalam tiap section dengan drag-and-drop. Simpan urutan item pada master cabang untuk dipakai saat item inspeksi ditampilkan. Screenshot: Tugas GitIgnore/seller-master-inspection-drag-drop-order-reference-2026-11-08.png.';
+
+    public const SHOWROOM_LISTING_LOCATION_DEFAULT_TASK_KEY = 'request-064-showroom-listing-location-default';
+
+    public const SHOWROOM_LISTING_LOCATION_DEFAULT_TASK_TITLE = 'Gunakan lokasi showroom sebagai default lokasi listing.';
+
+    public const SHOWROOM_LISTING_LOCATION_DEFAULT_TASK_DESCRIPTION = 'Gunakan Kota yang sudah diisi pada pendaftaran showroom sebagai nilai awal Lokasi saat membuat listing mobil. Untuk pembuatan listing oleh Admin, ikuti kota showroom yang dipilih. Field Lokasi tetap dapat diubah ke kota lain dari Master Lokasi; nilai pada listing yang sudah ada tetap dipertahankan.';
 }

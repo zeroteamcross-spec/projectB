@@ -121,6 +121,10 @@ export const sellerRoutes = [
     preload: {
       working: [
         {
+          key: "showroom",
+          loader: ({ signal }) => showroomsResource.mine({ signal }).catch(() => null),
+        },
+        {
           key: "cars",
           loader: ({ signal }) => carsResource.sellerList({ limit: 24 }, { signal }).catch(() => ({ cars: [] })),
         },

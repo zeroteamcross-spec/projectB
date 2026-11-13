@@ -616,6 +616,7 @@ function adminSellerSelector(runtime) {
         ...(runtimeState().form ?? emptyCarForm()),
         seller_user_id: select.value ? Number(select.value) : null,
         showroom_id: seller?.showroom?.id ?? seller?.showroom_id ?? null,
+        location_name: seller?.showroom?.city_name ?? null,
       },
       error: "",
     });

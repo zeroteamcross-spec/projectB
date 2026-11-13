@@ -76,6 +76,8 @@ function render(root, router) {
   const snapshotCars = sellerState.snapshot("cars", { cars: [] });
   const workingCars = sellerState.working("sellerCars", "cars", snapshotCars);
   const cars = workingCars?.cars ?? snapshotCars?.cars ?? [];
+  const showroom = sellerState.working("sellerCars", "showroom", sellerState.snapshot("showroom", null));
+  const defaultLocation = String(showroom?.city_name ?? "").trim() || null;
   const snapshotBrandMaster = sellerState.snapshot("masterBrand", adminMasterService.normalizeMaster(null));
   const workingBrandMaster = sellerState.working("sellerCars", "masterBrand", snapshotBrandMaster);
   const brandMaster = adminMasterService.normalizeMaster(workingBrandMaster ?? snapshotBrandMaster);
@@ -107,7 +109,7 @@ function render(root, router) {
 
   const body = SellerCarsList({
     cars: pagination.items,
-    onCreate: () => setRuntime({ mode: "create", selectedCar: null, form: emptyCarForm(), error: "", notice: "", formStep: 1 }),
+    onCreate: () => setRuntime({ mode: "create", selectedCar: null, form: emptyCarForm(defaultLocation), error: "", notice: "", formStep: 1 }),
     onEdit: (car) => setRuntime({ mode: "edit", selectedCar: car, form: carToForm(car), error: "", notice: "", formStep: 1 }),
     onArchive: (car) => archiveCar(car),
     onImages: (car) => router?.navigate(`/seller/cars/${car.id}/images`),
@@ -126,7 +128,7 @@ function render(root, router) {
   layout.dataset.ds = "seller.cars.page";
   layout.append(
     carsHero({ cars, filteredCars, isForm }),
-    carsToolbar({ filters: runtime.filters, isForm }),
+    carsToolbar({ filters: runtime.filters, isForm, defaultLocation }),
     notice,
     error,
     body
@@ -403,7 +405,7 @@ function carsHero({ cars, filteredCars, isForm }) {
   return section;
 }
 
-function carsToolbar({ filters, isForm }) {
+function carsToolbar({ filters, isForm, defaultLocation }) {
   const section = document.createElement("section");
   section.id = "slrc_toolbar_section";
   section.className = "grid gap-3 rounded-[1.5rem] border border-[var(--pb-card-border)] bg-white/80 p-4 shadow-[0_18px_55px_rgba(15,23,42,0.07)] backdrop-blur-xl md:grid-cols-[minmax(0,1fr)_180px_auto] md:items-end";
@@ -456,7 +458,7 @@ function carsToolbar({ filters, isForm }) {
   apply.prepend(createIcon("filter", { className: "h-4 w-4" }));
   const main = isForm
     ? Button({ label: "Lihat list", variant: "secondary", onClick: () => setRuntime({ mode: "list", selectedCar: null, form: null, error: "", formStep: 1 }) })
-    : Button({ label: "Tambah mobil", onClick: () => setRuntime({ mode: "create", selectedCar: null, form: emptyCarForm(), error: "", notice: "", formStep: 1 }) });
+    : Button({ label: "Tambah mobil", onClick: () => setRuntime({ mode: "create", selectedCar: null, form: emptyCarForm(defaultLocation), error: "", notice: "", formStep: 1 }) });
   main.id = isForm ? "slrc_back_to_list_button" : "slrc_add_car_button";
   main.prepend(createIcon(isForm ? "list" : "plus", { className: "h-4 w-4" }));
   actions.append(apply, main);
@@ -773,7 +775,7 @@ function clampPage(page, totalPages) {
   return Math.max(1, Math.min(Math.trunc(page), totalPages));
 }
 
-function emptyCarForm() {
+function emptyCarForm(defaultLocation = null) {
   return {
     brand_name: "",
     model_name: "",
@@ -784,7 +786,7 @@ function emptyCarForm() {
     color_variation: null,
     document_type: "new",
     transmission: null,
-    location_name: null,
+    location_name: defaultLocation,
     registration_date: null,
     engine_number: null,
     chassis_number: null,

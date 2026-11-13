@@ -32,6 +32,7 @@ class AdminUserService
                     'id' => (int) $showroom['id'],
                     'user_id' => (int) $showroom['user_id'],
                     'name' => $showroom['name'],
+                    'city_name' => $showroom['city_name'] ?? null,
                 ]
                 : null;
 
