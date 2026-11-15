@@ -21,7 +21,7 @@ import { SellerStaffPage } from "./pages/staffPage.js";
 import { SellerBillingPage } from "./pages/billingPage.js";
 import { SellerTransactionDetailPage } from "./pages/transactionDetailPage.js";
 import { SellerTransactionsPage } from "./pages/transactionsPage.js";
-import { loadSellerCarPreview } from "./services/sellerCarPreviewService.js";
+import { loadSellerCarPreview } from "../public/services/carPreviewService.js";
 
 export const sellerRoutes = [
   {

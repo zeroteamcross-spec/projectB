@@ -431,4 +431,10 @@ final class TaskCatalog
     public const ADMIN_SUBSCRIPTIONS_DUE_TABS_TASK_TITLE = 'Pisahkan tagihan berulang dan konfirmasi pembayaran dengan tab.';
 
     public const ADMIN_SUBSCRIPTIONS_DUE_TABS_TASK_DESCRIPTION = 'Pada halaman admin/subscriptions-due, pisahkan showroom dengan siklus tagihan yang jatuh tempo dari showroom dengan bukti pembayaran berstatus pending_verification ke dalam dua tab: "Tagihan berulang" dan "Butuh konfirmasi". Tampilkan jumlah item pada setiap tab dalam badge bulat berwarna merah dengan teks putih. Pertahankan aksi pembayaran dan aturan bisnis yang sudah ada.';
+
+    public const ADMIN_CARS_LIVE_PREVIEW_BUG_TASK_KEY = 'request-072-admin-cars-live-preview-bug';
+
+    public const ADMIN_CARS_LIVE_PREVIEW_BUG_TASK_TITLE = 'Perbaiki tombol Live Preview pada katalog mobil Admin.';
+
+    public const ADMIN_CARS_LIVE_PREVIEW_BUG_TASK_DESCRIPTION = 'Pada halaman admin/cars, pastikan tombol Live Preview membuka detail katalog untuk listing yang dipilih. Gunakan alur preview yang hanya dapat diakses Admin, sertakan data detail, gambar, dan laporan inspeksi sesuai status listing, dan pastikan retry serta tombol kembali menuju daftar mobil Admin.';
 }

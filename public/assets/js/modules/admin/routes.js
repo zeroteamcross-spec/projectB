@@ -19,6 +19,8 @@ import { AdminLandingPageConfigPage } from "./pages/landingPageConfigPage.js";
 import { AdminReleaseVersionManagerPage } from "./pages/releaseVersionManagerPage.js";
 import { SuperAdminAccountsPage } from "./pages/superAdminAccountsPage.js";
 import { SuperAdminDashboardPage } from "./pages/superAdminDashboardPage.js";
+import { PublicCarDetailPage } from "../public/pages/carDetailPage.js";
+import { loadAdminCarPreview } from "../public/services/carPreviewService.js";
 import { adminSessionService } from "./services/adminSessionService.js";
 import { transactionsResource } from "../../resources/transactionsResource.js";
 import { carsResource } from "../../resources/carsResource.js";
@@ -173,6 +175,26 @@ export const adminRoutes = [
         {
           key: "images",
           loader: ({ params, signal }) => imagesResource.listByCar(params.id, { signal }).catch(() => []),
+        },
+      ],
+    },
+  },
+  {
+    name: "admin.car-preview",
+    path: "/admin/cars/:id/preview",
+    shell: "public",
+    role: "admin",
+    page: () => PublicCarDetailPage({
+      preview: true,
+      previewStateKey: "adminCarPreview",
+      previewBasePath: "/admin/cars",
+    }),
+    workingStateKey: "adminCarPreview",
+    preload: {
+      working: [
+        {
+          key: "detail",
+          loader: ({ params, signal }) => loadAdminCarPreview(params.id, { signal }),
         },
       ],
     },

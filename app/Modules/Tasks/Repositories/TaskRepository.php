@@ -554,6 +554,14 @@ class TaskRepository
                 'work_status' => 'done',
                 'created_at' => '2026-11-15 00:00:00',
             ],
+            [
+                'task_key' => TaskCatalog::ADMIN_CARS_LIVE_PREVIEW_BUG_TASK_KEY,
+                'title' => TaskCatalog::ADMIN_CARS_LIVE_PREVIEW_BUG_TASK_TITLE,
+                'description' => TaskCatalog::ADMIN_CARS_LIVE_PREVIEW_BUG_TASK_DESCRIPTION,
+                'status' => 'open',
+                'work_status' => 'done',
+                'created_at' => '2026-11-15 00:00:00',
+            ],
         ];
     }
 

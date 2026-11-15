@@ -99,6 +99,7 @@ function render(root, router) {
     onArchive: (car) => archiveCar(car),
     onImages: (car) => router?.navigate(`/admin/cars/${car.id}/images`),
     onInspection: (car) => router?.navigate(`/admin/cars/${car.id}/inspection`),
+    onPreview: (car) => router?.navigate(`/admin/cars/${encodeURIComponent(car.id)}/preview`),
     onMarkSoldExternal: (car) => setRuntime({ markSoldExternal: { car, note: "", saving: false, error: "" } }),
     pagination: createCarsPagination(pagination),
   });

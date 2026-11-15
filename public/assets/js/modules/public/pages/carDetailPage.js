@@ -23,7 +23,11 @@ import { getListingLockStatus, getListingStatusMeta } from "../../../utils/trans
 
 const PUBLIC_DETAIL_FALLBACK = "bg-[radial-gradient(circle_at_top_left,color-mix(in_srgb,var(--pb-brand-accent)_18%,transparent),transparent_24%),linear-gradient(180deg,var(--pb-public-canvas-start)_0%,var(--pb-public-canvas-mid)_48%,var(--pb-public-canvas-end)_100%)]";
 
-export function PublicCarDetailPage({ preview = false } = {}) {
+export function PublicCarDetailPage({
+  preview = false,
+  previewStateKey = "sellerCarPreview",
+  previewBasePath = "/seller/cars",
+} = {}) {
   let root = null;
   let unsubscribe = null;
   let backgroundVideoLayer = null;
@@ -56,17 +60,17 @@ export function PublicCarDetailPage({ preview = false } = {}) {
     mount(context) {
       root = document.createElement("div");
       root.className = "min-h-screen pb-24 sm:pb-0";
-      render(root, context, getBackgroundVideoLayer, preview);
+      render(root, context, getBackgroundVideoLayer, { preview, previewStateKey, previewBasePath });
       if (!preview) {
         publicAffiliateTrackingService.trackCurrentPage();
       }
       return root;
     },
     hydrate(context) {
-      render(root, context, getBackgroundVideoLayer, preview);
+      render(root, context, getBackgroundVideoLayer, { preview, previewStateKey, previewBasePath });
     },
     bindEvents(context) {
-      unsubscribe = appStore.subscribe(() => render(root, context, getBackgroundVideoLayer, preview));
+      unsubscribe = appStore.subscribe(() => render(root, context, getBackgroundVideoLayer, { preview, previewStateKey, previewBasePath }));
       return () => unsubscribe?.();
     },
     unmount() {},
@@ -78,13 +82,15 @@ export function PublicCarDetailPage({ preview = false } = {}) {
   });
 }
 
-function render(root, context, getBackgroundVideoLayer, preview) {
+function render(root, context, getBackgroundVideoLayer, previewOptions) {
   if (!root) {
     return;
   }
 
+  const { preview, previewStateKey, previewBasePath } = previewOptions;
   const routeCarId = String(context.params?.id ?? "");
-  const detailNode = appStore.get(preview ? "working.sellerCarPreview.detail" : "working.publicCarDetail.detail", null);
+  const detailStatePath = preview ? `working.${previewStateKey}.detail` : "working.publicCarDetail.detail";
+  const detailNode = appStore.get(detailStatePath, null);
   const previewResult = preview ? detailNode?.data ?? null : null;
   const rawDetail = preview
     ? (previewResult?.status === "ready" ? previewResult.detail : null)
@@ -115,22 +121,22 @@ function render(root, context, getBackgroundVideoLayer, preview) {
   const backgroundVideoLayer = preview || isPublicCarDetailRoute(context) ? getBackgroundVideoLayer?.() : null;
 
   if (preview && previewResult?.status === "error") {
-    root.replaceChildren(backgroundShell(backgroundVideoLayer, previewLoadFailure(context, previewResult)));
+    root.replaceChildren(backgroundShell(backgroundVideoLayer, previewLoadFailure(context, previewResult, previewBasePath)));
     return;
   }
 
   if (preview && previewResult?.status === "not_found") {
-    root.replaceChildren(backgroundShell(backgroundVideoLayer, notFound(context, true)));
+    root.replaceChildren(backgroundShell(backgroundVideoLayer, notFound(context, true, previewBasePath)));
     return;
   }
 
   if (!car && !hasHydrated) {
-    root.replaceChildren(backgroundShell(backgroundVideoLayer, loadingDetail(context, preview)));
+    root.replaceChildren(backgroundShell(backgroundVideoLayer, loadingDetail(context, preview, previewBasePath)));
     return;
   }
 
   if (!car) {
-    root.replaceChildren(backgroundShell(backgroundVideoLayer, notFound(context, preview)));
+    root.replaceChildren(backgroundShell(backgroundVideoLayer, notFound(context, preview, previewBasePath)));
     return;
   }
 
@@ -150,8 +156,8 @@ function render(root, context, getBackgroundVideoLayer, preview) {
     })
     : null;
   mainColumn.append(
-    backButton(context, preview),
-    ...(preview ? [previewNotice(car)] : []),
+    backButton(context, preview, previewBasePath),
+    ...(preview ? [previewNotice(car, previewBasePath === "/admin/cars")] : []),
     ...(banner ? [banner] : []),
     applyDesignHook(PublicCarGallery({ car, images }), "public.car_detail.gallery"),
     applyDesignHook(PublicCarTitleBlock({ car }), "public.car_detail.title"),
@@ -195,13 +201,13 @@ function backgroundShell(backgroundVideoLayer, ...children) {
   return shell;
 }
 
-function loadingDetail(context, preview) {
+function loadingDetail(context, preview, previewBasePath) {
   const wrap = document.createElement("main");
   wrap.className = "mx-auto grid w-full max-w-[1200px] gap-6 px-4 py-5 sm:px-6 sm:py-8 lg:grid-cols-[minmax(0,1fr)_360px] 2xl:max-w-[1240px]";
 
   const left = document.createElement("div");
   left.className = "grid gap-4";
-  left.append(backButton(context, preview), Skeleton({ lines: 8 }), Skeleton({ lines: 6 }));
+  left.append(backButton(context, preview, previewBasePath), Skeleton({ lines: 8 }), Skeleton({ lines: 6 }));
 
   const right = document.createElement("div");
   right.className = "grid gap-4";
@@ -211,7 +217,7 @@ function loadingDetail(context, preview) {
   return wrap;
 }
 
-function notFound(context, preview) {
+function notFound(context, preview, previewBasePath) {
   const wrap = document.createElement("main");
   wrap.className = "mx-auto grid min-h-[70vh] w-full max-w-3xl place-items-center px-4 py-10";
   const content = document.createElement("div");
@@ -219,17 +225,17 @@ function notFound(context, preview) {
   content.append(EmptyState({
     title: preview ? "Pratinjau mobil tidak tersedia" : "Mobil tidak ditemukan",
     description: preview
-      ? "Mobil ini tidak ditemukan atau akun Anda tidak memiliki akses ke listing tersebut."
+      ? "Listing ini tidak ditemukan atau akun Anda tidak memiliki akses ke listing tersebut."
       : "Kembali ke katalog untuk melihat mobil publik yang masih tersedia.",
   }));
-  const button = backButton(context, preview);
+  const button = backButton(context, preview, previewBasePath);
   button.classList.add("justify-self-center");
   content.append(button);
   wrap.append(content);
   return wrap;
 }
 
-function previewLoadFailure(context, result) {
+function previewLoadFailure(context, result, previewBasePath) {
   const wrap = document.createElement("main");
   wrap.className = "mx-auto grid min-h-[70vh] w-full max-w-3xl place-items-center px-4 py-10";
 
@@ -243,38 +249,38 @@ function previewLoadFailure(context, result) {
   const actions = document.createElement("div");
   actions.className = "flex flex-wrap justify-center gap-3";
   const retry = Button({
-    id: "slrc_preview_retry_button",
+    id: previewBasePath === "/admin/cars" ? "adcars_preview_retry_button" : "slrc_preview_retry_button",
     label: "Coba lagi",
-    onClick: () => retrySellerCarPreview(context),
+    onClick: () => retryCarPreview(context, previewBasePath),
   });
   retry.prepend(createIcon("history", { className: "h-4 w-4" }));
-  actions.append(retry, backButton(context, true));
+  actions.append(retry, backButton(context, true, previewBasePath));
   content.append(actions);
   wrap.append(content);
   return wrap;
 }
 
-function retrySellerCarPreview(context) {
+function retryCarPreview(context, previewBasePath) {
   const query = new URLSearchParams();
   if (context.query?.status === "archived") {
     query.set("status", "archived");
   }
   query.set("retry", String(Date.now()));
-  context.router.navigate(`/seller/cars/${encodeURIComponent(context.params?.id ?? "")}/preview?${query.toString()}`);
+  context.router.navigate(`${previewBasePath}/${encodeURIComponent(context.params?.id ?? "")}/preview?${query.toString()}`);
 }
 
-function backButton(context, preview = false) {
+function backButton(context, preview = false, previewBasePath = "/seller/cars") {
   const button = Button({
     label: preview ? "Kembali ke daftar mobil" : "Kembali ke katalog",
     variant: "secondary",
-    onClick: () => context.router.navigate(preview ? "/seller/cars" : publicContextService.catalogPath()),
+    onClick: () => context.router.navigate(preview ? previewBasePath : publicContextService.catalogPath()),
   });
   button.classList.add("w-fit");
   button.prepend(createIcon("search", { className: "h-4 w-4" }));
   return button;
 }
 
-function previewNotice(car) {
+function previewNotice(car, adminPreview = false) {
   const notice = document.createElement("section");
   notice.className = "grid gap-1 rounded-[24px] border border-[var(--pb-border)] bg-white/95 px-5 py-4 shadow-card";
 
@@ -284,7 +290,7 @@ function previewNotice(car) {
 
   const description = document.createElement("p");
   description.className = "text-xs leading-6 text-gray-600";
-  description.textContent = `Pratinjau khusus akun showroom · Status listing: ${getListingStatusMeta(car?.listing_status).label}. Aksi pembelian dan konsultasi tidak tersedia di halaman ini.`;
+  description.textContent = `${adminPreview ? "Tampilan detail katalog" : "Pratinjau khusus akun showroom"} · Status listing: ${getListingStatusMeta(car?.listing_status).label}. Aksi pembelian dan konsultasi tidak tersedia di halaman ini.`;
 
   notice.append(title, description);
   return notice;

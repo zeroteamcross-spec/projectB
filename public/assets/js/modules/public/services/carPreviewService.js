@@ -14,14 +14,47 @@ export async function loadSellerCarPreview(carId, {
   images = imagesResource,
   inspections = inspectionsResource,
 } = {}) {
-  let car;
+  return loadCarPreview(carId, {
+    signal,
+    images,
+    loadCar: () => archived
+      ? findArchivedSellerCar(carId, signal, cars)
+      : cars.sellerDetail(carId, { signal }),
+    loadInspection: () => inspections.byCar(carId, { signal }),
+    notFoundOn404: !archived,
+    missingCarResult: archived ? "not_found" : "failure",
+  });
+}
 
+export async function loadAdminCarPreview(carId, {
+  signal,
+  cars = carsResource,
+  images = imagesResource,
+  inspections = inspectionsResource,
+} = {}) {
+  return loadCarPreview(carId, {
+    signal,
+    images,
+    loadCar: () => cars.adminDetail(carId, { signal }),
+    loadInspection: () => inspections.adminByCar(carId, { signal }),
+    notFoundOn404: true,
+    missingCarResult: "not_found",
+  });
+}
+
+async function loadCarPreview(carId, {
+  signal,
+  images,
+  loadCar,
+  loadInspection,
+  notFoundOn404 = false,
+  missingCarResult = "failure",
+}) {
+  let car;
   try {
-    car = archived
-      ? await findArchivedSellerCar(carId, signal, cars)
-      : await cars.sellerDetail(carId, { signal });
+    car = await loadCar();
   } catch (error) {
-    if (!archived && Number(error?.status) === 404) {
+    if (notFoundOn404 && Number(error?.status) === 404) {
       return notFoundResult();
     }
 
@@ -29,7 +62,7 @@ export async function loadSellerCarPreview(carId, {
   }
 
   if (!car) {
-    return archived
+    return missingCarResult === "not_found"
       ? notFoundResult()
       : failureResult({ code: "missing_car_payload" });
   }
@@ -47,7 +80,7 @@ export async function loadSellerCarPreview(carId, {
   let inspection = null;
   if (car.listing_status === "published" && hasInspectionSummary) {
     try {
-      inspection = await inspections.byCar(carId, { signal });
+      inspection = await loadInspection();
     } catch (error) {
       // A missing report is a genuine absence; connection and server failures
       // remain failures so the UI does not present them as an empty report.
