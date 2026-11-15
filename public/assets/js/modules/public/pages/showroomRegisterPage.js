@@ -384,8 +384,27 @@ function registerPanel(state, actions, context) {
 
   const slugField = slugInput.querySelector("input");
   slugField?.addEventListener("input", () => {
-    paintSlugPreview(slugField.value);
+    const slugValue = slugField.value;
+    actions.updateDraft({ showroom_slug: slugValue });
+    paintSlugPreview(slugValue);
     slugStatus.textContent = "";
+
+    const minimumLengthError = `Alamat halaman minimal ${SLUG_MIN_LENGTH} karakter.`;
+    if (
+      normalizeSlug(slugValue).length >= SLUG_MIN_LENGTH
+      && state.fieldErrors["showroom.slug"] === minimumLengthError
+    ) {
+      delete state.fieldErrors["showroom.slug"];
+      Array.from(slugInput.querySelectorAll("span"))
+        .find((node) => node.textContent === minimumLengthError)
+        ?.remove();
+      slugField.className = inputClassName(false);
+
+      if (!Object.keys(state.fieldErrors).length && state.error === "Periksa kembali isian yang ditandai.") {
+        state.error = "";
+        form.querySelector("#shr_register_error_message")?.remove();
+      }
+    }
   });
   checkSlug.addEventListener("click", async () => {
     const slug = normalizeSlug(slugField?.value);

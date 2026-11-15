@@ -419,4 +419,10 @@ final class TaskCatalog
     public const ADMIN_CARS_BOOKING_FEE_EDIT_TASK_TITLE = 'Pertahankan Nominal Booking Fee saat mengedit listing admin.';
 
     public const ADMIN_CARS_BOOKING_FEE_EDIT_TASK_DESCRIPTION = 'Pada halaman admin/cars, isi kembali field Nominal Booking Fee dari nilai dp_amount listing yang sedang diedit. Pertahankan validasi dan perilaku penyimpanan yang sudah ada. Referensi: Tugas GitIgnore/admin-cars-booking-fee-edit-bug-2026-11-13.png.';
+
+    public const SHOWROOM_REGISTER_SLUG_CLEAR_MIN_LENGTH_ERROR_TASK_KEY = 'request-070-showroom-slug-clear-min-length-error';
+
+    public const SHOWROOM_REGISTER_SLUG_CLEAR_MIN_LENGTH_ERROR_TASK_TITLE = 'Hilangkan pesan minimum alamat showroom setelah slug valid.';
+
+    public const SHOWROOM_REGISTER_SLUG_CLEAR_MIN_LENGTH_ERROR_TASK_DESCRIPTION = 'Pada halaman daftar-showroom, hapus pesan "Alamat halaman minimal 3 karakter." segera setelah alamat URL Showroom mencapai panjang minimum saat pengguna mengetik. Pertahankan aturan minimum/maksimum slug, validasi server, dan pesan validasi lain. Referensi: Tugas GitIgnore/daftar-showroom-hide-slug-min-length-error-2026-11-15.png.';
 }

@@ -538,6 +538,14 @@ class TaskRepository
                 'work_status' => 'done',
                 'created_at' => '2026-11-13 00:00:00',
             ],
+            [
+                'task_key' => TaskCatalog::SHOWROOM_REGISTER_SLUG_CLEAR_MIN_LENGTH_ERROR_TASK_KEY,
+                'title' => TaskCatalog::SHOWROOM_REGISTER_SLUG_CLEAR_MIN_LENGTH_ERROR_TASK_TITLE,
+                'description' => TaskCatalog::SHOWROOM_REGISTER_SLUG_CLEAR_MIN_LENGTH_ERROR_TASK_DESCRIPTION,
+                'status' => 'open',
+                'work_status' => 'done',
+                'created_at' => '2026-11-15 00:00:00',
+            ],
         ];
     }
 
