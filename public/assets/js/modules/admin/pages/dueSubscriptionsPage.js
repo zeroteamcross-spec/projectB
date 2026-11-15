@@ -40,6 +40,7 @@ export function AdminDueSubscriptionsPage() {
   const state = {
     processingShowroomId: null,
     error: "",
+    activeTab: "due",
     // Showroom id -> array riwayat (atau null selagi dimuat). Dipisah dari
     // daftar tagihan due utama -- kebanyakan admin tidak perlu buka riwayat
     // tiap showroom, jadi baru diambil begitu tombolnya diklik.
@@ -49,6 +50,10 @@ export function AdminDueSubscriptionsPage() {
   const rerender = () => render(root, currentContext, state, actions);
 
   const actions = {
+    selectTab(tab) {
+      state.activeTab = tab;
+      rerender();
+    },
     async confirm(showroom) {
       state.processingShowroomId = showroom.id;
       state.error = "";
@@ -153,6 +158,8 @@ function render(root, context, state, actions) {
 
   const showrooms = appStore.get("working.adminDueSubscriptions.list.data", null);
   const hydratedAt = appStore.get("working.adminDueSubscriptions.list.hydratedAt", 0) ?? 0;
+  const dueShowrooms = (showrooms ?? []).filter((item) => item.subscription_is_due && item.subscription_payment_status !== "pending_verification");
+  const pendingShowrooms = (showrooms ?? []).filter((item) => item.subscription_payment_status === "pending_verification");
 
   if (!hydratedAt && showrooms === null) {
     // First render: kick off the fetch, show a loading state meanwhile.
@@ -174,7 +181,7 @@ function render(root, context, state, actions) {
   layout.id = "admdue_page_section";
   layout.className = "grid gap-6";
 
-  layout.append(hero(showrooms ?? []));
+  layout.append(hero());
 
   if (state.error) {
     const error = document.createElement("div");
@@ -188,23 +195,14 @@ function render(root, context, state, actions) {
       title: "Memuat tagihan berulang",
       description: "Daftar showroom yang siklus tagihannya perlu ditinjau sedang dimuat.",
     }));
-  } else if (!showrooms.length) {
-    layout.append(EmptyState({
-      title: "Tidak ada tagihan yang perlu ditinjau",
-      description: "Semua showroom aktif sedang lunas untuk siklus tagihan saat ini.",
-    }));
   } else {
-    const list = document.createElement("div");
-    list.id = "admdue_list_section";
-    list.className = "grid gap-3";
-    list.append(...showrooms.map((showroom) => subscriptionCard(showroom, state, actions)));
-    layout.append(list);
+    layout.append(subscriptionTabs(dueShowrooms, pendingShowrooms, state, actions));
   }
 
   root.replaceChildren(layout);
 }
 
-function hero(showrooms) {
+function hero() {
   const section = document.createElement("section");
   section.id = "admdue_hero_section";
   section.className = "relative overflow-hidden rounded-[2rem] border border-[var(--pb-border)] bg-[linear-gradient(135deg,rgba(255,255,255,0.94),rgba(250,244,237,0.86),rgba(234,244,249,0.72))] p-5 shadow-[0_24px_80px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6 lg:p-7";
@@ -213,20 +211,75 @@ function hero(showrooms) {
   icon.className = "grid h-12 w-12 place-items-center rounded-2xl bg-[linear-gradient(135deg,var(--pb-brand-secondary),var(--pb-brand-accent))] text-white shadow-[0_16px_40px_rgba(30,129,176,0.24)]";
   icon.append(createIcon("creditCard", { className: "h-5 w-5" }));
 
-  const overdueCount = showrooms.filter((item) => item.subscription_is_due && item.subscription_payment_status !== "pending_verification").length;
-  const pendingCount = showrooms.filter((item) => item.subscription_payment_status === "pending_verification").length;
-
   const copy = document.createElement("div");
   copy.className = "grid min-w-0 gap-2";
   copy.append(
     icon,
     textNode("h1", "text-2xl font-black leading-tight tracking-normal text-gray-950 sm:text-3xl", "Tagihan Berulang"),
-    textNode("p", "max-w-xl text-xs leading-6 text-gray-600", "Showroom aktif yang siklus tagihan paketnya jatuh tempo atau sudah unggah bukti transfer perpanjangan."),
-    textNode("p", "text-xs font-semibold text-gray-700", `${overdueCount} jatuh tempo · ${pendingCount} menunggu verifikasi`),
+    textNode("p", "max-w-xl text-xs leading-6 text-gray-600", "Tinjau siklus tagihan showroom yang jatuh tempo atau bukti pembayaran yang menunggu konfirmasi."),
   );
 
   section.append(copy);
   return section;
+}
+
+function subscriptionTabs(dueShowrooms, pendingShowrooms, state, actions) {
+  const section = document.createElement("section");
+  section.className = "grid gap-4";
+
+  const tabList = document.createElement("div");
+  tabList.id = "admdue_tabs";
+  tabList.className = "flex flex-wrap gap-2";
+  tabList.setAttribute("role", "tablist");
+  tabList.setAttribute("aria-label", "Kategori tagihan showroom");
+  tabList.append(
+    subscriptionTab("due", "Tagihan berulang", dueShowrooms.length, state, actions),
+    subscriptionTab("pending", "Butuh konfirmasi", pendingShowrooms.length, state, actions),
+  );
+
+  const panel = document.createElement("div");
+  panel.id = "admdue_tab_panel";
+  panel.setAttribute("role", "tabpanel");
+  panel.setAttribute("aria-labelledby", state.activeTab === "pending" ? "admdue_tab_pending" : "admdue_tab_due");
+
+  const activeShowrooms = state.activeTab === "pending" ? pendingShowrooms : dueShowrooms;
+  if (!activeShowrooms.length) {
+    panel.append(EmptyState({
+      title: state.activeTab === "pending" ? "Tidak ada showroom yang butuh konfirmasi" : "Tidak ada tagihan berulang yang jatuh tempo",
+      description: state.activeTab === "pending"
+        ? "Belum ada bukti pembayaran paket yang menunggu verifikasi."
+        : "Semua showroom aktif sedang lunas untuk siklus tagihan saat ini.",
+    }));
+  } else {
+    const list = document.createElement("div");
+    list.id = "admdue_list_section";
+    list.className = "grid gap-3";
+    list.append(...activeShowrooms.map((showroom) => subscriptionCard(showroom, state, actions)));
+    panel.append(list);
+  }
+
+  section.append(tabList, panel);
+  return section;
+}
+
+function subscriptionTab(key, label, count, state, actions) {
+  const active = state.activeTab === key;
+  const button = document.createElement("button");
+  button.id = `admdue_tab_${key}`;
+  button.type = "button";
+  button.className = `inline-flex items-center gap-2 rounded-2xl border px-4 py-2 text-xs font-bold transition ${active ? "border-[var(--pb-brand-secondary)] bg-white text-gray-950 shadow-sm" : "border-[var(--pb-border)] bg-white/70 text-gray-600 hover:bg-white"}`;
+  button.setAttribute("role", "tab");
+  button.setAttribute("aria-selected", active ? "true" : "false");
+  button.tabIndex = active ? 0 : -1;
+  button.append(document.createTextNode(label));
+
+  const badge = document.createElement("span");
+  badge.className = "grid h-7 place-items-center rounded-full bg-[var(--pb-danger)] px-2 text-xs font-black leading-none text-white";
+  badge.style.minWidth = "1.75rem";
+  badge.textContent = String(count);
+  button.append(badge);
+  button.addEventListener("click", () => actions.selectTab(key));
+  return button;
 }
 
 function subscriptionCard(showroom, state, actions) {

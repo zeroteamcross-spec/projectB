@@ -546,6 +546,14 @@ class TaskRepository
                 'work_status' => 'done',
                 'created_at' => '2026-11-15 00:00:00',
             ],
+            [
+                'task_key' => TaskCatalog::ADMIN_SUBSCRIPTIONS_DUE_TABS_TASK_KEY,
+                'title' => TaskCatalog::ADMIN_SUBSCRIPTIONS_DUE_TABS_TASK_TITLE,
+                'description' => TaskCatalog::ADMIN_SUBSCRIPTIONS_DUE_TABS_TASK_DESCRIPTION,
+                'status' => 'open',
+                'work_status' => 'done',
+                'created_at' => '2026-11-15 00:00:00',
+            ],
         ];
     }
 

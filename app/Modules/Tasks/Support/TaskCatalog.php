@@ -425,4 +425,10 @@ final class TaskCatalog
     public const SHOWROOM_REGISTER_SLUG_CLEAR_MIN_LENGTH_ERROR_TASK_TITLE = 'Hilangkan pesan minimum alamat showroom setelah slug valid.';
 
     public const SHOWROOM_REGISTER_SLUG_CLEAR_MIN_LENGTH_ERROR_TASK_DESCRIPTION = 'Pada halaman daftar-showroom, hapus pesan "Alamat halaman minimal 3 karakter." segera setelah alamat URL Showroom mencapai panjang minimum saat pengguna mengetik. Pertahankan aturan minimum/maksimum slug, validasi server, dan pesan validasi lain. Referensi: Tugas GitIgnore/daftar-showroom-hide-slug-min-length-error-2026-11-15.png.';
+
+    public const ADMIN_SUBSCRIPTIONS_DUE_TABS_TASK_KEY = 'request-071-admin-subscriptions-due-tabs';
+
+    public const ADMIN_SUBSCRIPTIONS_DUE_TABS_TASK_TITLE = 'Pisahkan tagihan berulang dan konfirmasi pembayaran dengan tab.';
+
+    public const ADMIN_SUBSCRIPTIONS_DUE_TABS_TASK_DESCRIPTION = 'Pada halaman admin/subscriptions-due, pisahkan showroom dengan siklus tagihan yang jatuh tempo dari showroom dengan bukti pembayaran berstatus pending_verification ke dalam dua tab: "Tagihan berulang" dan "Butuh konfirmasi". Tampilkan jumlah item pada setiap tab dalam badge bulat berwarna merah dengan teks putih. Pertahankan aksi pembayaran dan aturan bisnis yang sudah ada.';
 }
