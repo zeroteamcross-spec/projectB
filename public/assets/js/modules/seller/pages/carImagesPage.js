@@ -232,6 +232,7 @@ function render(root, router, params, queueApi) {
           images,
           busyImageId: runtime.busyImageId,
           onPreview: (image) => openGalleryPreview(image),
+          onSetCover: (image) => setCover(carId, image),
           onDelete: (image) => deleteImage(carId, image),
           onMoveUp: (image) => reorderImage(carId, image, -1),
           onMoveDown: (image) => reorderImage(carId, image, 1),

@@ -562,6 +562,14 @@ class TaskRepository
                 'work_status' => 'done',
                 'created_at' => '2026-11-15 00:00:00',
             ],
+            [
+                'task_key' => TaskCatalog::CAR_IMAGES_COVER_BUTTON_TASK_KEY,
+                'title' => TaskCatalog::CAR_IMAGES_COVER_BUTTON_TASK_TITLE,
+                'description' => TaskCatalog::CAR_IMAGES_COVER_BUTTON_TASK_DESCRIPTION,
+                'status' => 'open',
+                'work_status' => 'done',
+                'created_at' => '2026-11-16 00:00:00',
+            ],
         ];
     }
 

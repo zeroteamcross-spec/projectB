@@ -437,4 +437,10 @@ final class TaskCatalog
     public const ADMIN_CARS_LIVE_PREVIEW_BUG_TASK_TITLE = 'Perbaiki tombol Live Preview pada katalog mobil Admin.';
 
     public const ADMIN_CARS_LIVE_PREVIEW_BUG_TASK_DESCRIPTION = 'Pada halaman admin/cars, pastikan tombol Live Preview membuka detail katalog untuk listing yang dipilih. Gunakan alur preview yang hanya dapat diakses Admin, sertakan data detail, gambar, dan laporan inspeksi sesuai status listing, dan pastikan retry serta tombol kembali menuju daftar mobil Admin.';
+
+    public const CAR_IMAGES_COVER_BUTTON_TASK_KEY = 'request-073-car-images-cover-button';
+
+    public const CAR_IMAGES_COVER_BUTTON_TASK_TITLE = 'Pulihkan tombol Pilih cover pada galeri gambar mobil.';
+
+    public const CAR_IMAGES_COVER_BUTTON_TASK_DESCRIPTION = 'Pada halaman admin/cars/{id}/images dan seller/cars/{id}/images, tampilkan tombol "Pilih cover" pada gambar yang belum menjadi cover listing. Saat dipilih, gunakan alur set cover yang sudah tersedia, perbarui penanda cover di galeri, dan pertahankan pembatasan akses Admin/seller yang berlaku. Referensi: Tugas GitIgnore/admin-seller-car-images-cover-button-2026-11-16.png.';
 }
