@@ -443,4 +443,10 @@ final class TaskCatalog
     public const CAR_IMAGES_COVER_BUTTON_TASK_TITLE = 'Pulihkan tombol Pilih cover pada galeri gambar mobil.';
 
     public const CAR_IMAGES_COVER_BUTTON_TASK_DESCRIPTION = 'Pada halaman admin/cars/{id}/images dan seller/cars/{id}/images, tampilkan tombol "Pilih cover" pada gambar yang belum menjadi cover listing. Saat dipilih, gunakan alur set cover yang sudah tersedia, perbarui penanda cover di galeri, dan pertahankan pembatasan akses Admin/seller yang berlaku. Referensi: Tugas GitIgnore/admin-seller-car-images-cover-button-2026-11-16.png.';
+
+    public const ADMIN_CARS_MARK_SOLD_EXTERNAL_COPY_TASK_KEY = 'request-074-admin-cars-mark-sold-external-copy';
+
+    public const ADMIN_CARS_MARK_SOLD_EXTERNAL_COPY_TASK_TITLE = 'Tinjau keterangan dan syarat tombol Tandai Terjual (Luar Sistem).';
+
+    public const ADMIN_CARS_MARK_SOLD_EXTERNAL_COPY_TASK_DESCRIPTION = 'Pada halaman admin/cars, rangkum dan buat ulasan, keterangan dan syarat tombol "Tandai Terjual (Luar Sistem)". Ruang lingkup tampilan/perilaku menunggu konfirmasi pengguna. Referensi: Tugas GitIgnore/admin-cars-mark-sold-external-2026-11-16.png.';
 }
