@@ -363,8 +363,9 @@ function validateStep(form, step) {
     return { valid: true, message: "" };
   }
   const field = form.elements.namedItem(missing);
-  const focusTarget = field?.dataset?.numericVisibleId
-    ? form.querySelector(`[id="${field.dataset.numericVisibleId}"]`)
+  const visibleControlId = field?.dataset?.numericVisibleId ?? field?.dataset?.searchableVisibleId;
+  const focusTarget = visibleControlId
+    ? form.querySelector(`[id="${visibleControlId}"]`)
     : field;
   const label = fieldLabel(focusTarget, missing);
   focusTarget?.focus?.();
@@ -441,21 +442,30 @@ function documentTypeButton(id, label, value) {
 function createBrandSelect({ brands = [], value = "" } = {}) {
   const selectedBrand = findBrandByValue(brands, value);
   const selectedValue = selectedBrand?.name ?? String(value ?? "").trim();
-  const select = createNativeSelect({
+  const field = SearchableSelect({
     id: "slrc_brand_name_input",
     name: "brand_name",
     label: "Merek Mobil",
-    helper: brands.length ? "Data diambil dari Master Brand." : "Master Brand belum tersedia.",
+    value: selectedValue,
+    options: [
+      { value: "", label: brands.length ? "Pilih merek" : "Brand belum tersedia" },
+      ...brands.map((brand) => ({ value: brand.name, label: brand.name })),
+      ...(selectedValue && !brands.some((brand) => brand.name === selectedValue)
+        ? [{ value: selectedValue, label: `${selectedValue} (data lama)` }]
+        : []),
+    ],
+    helper: brands.length ? "Data diambil dari Master Brand. Ketik untuk mencari merek." : "Master Brand belum tersedia.",
+    emptyLabel: "Merek tidak ditemukan",
+    labelClass: "grid min-w-0 gap-1.5 text-xs font-bold text-gray-700",
+    controlClass: fieldClass(),
   });
-  select.append(createOption("", brands.length ? "Pilih merek" : "Brand belum tersedia", !selectedValue));
-  brands.forEach((brand) => {
-    select.append(createOption(brand.name, brand.name, brand.name === selectedValue));
-  });
-  if (selectedValue && !brands.some((brand) => brand.name === selectedValue)) {
-    select.append(createOption(selectedValue, `${selectedValue} (data lama)`, true));
+  const select = field.querySelector('input[type="hidden"][name="brand_name"]');
+  const search = field.querySelector('input[role="combobox"]');
+  if (select && search) {
+    select.dataset.searchableVisibleId = search.id;
   }
   return {
-    field: select.closest("label"),
+    field,
     select,
     selectedBrand,
   };

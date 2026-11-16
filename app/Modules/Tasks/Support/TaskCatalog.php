@@ -455,4 +455,10 @@ final class TaskCatalog
     public const ADMIN_CARS_BULK_SHOWROOM_TRANSFER_TASK_TITLE = 'Tambahkan pemindahan mobil massal antar-showroom.';
 
     public const ADMIN_CARS_BULK_SHOWROOM_TRANSFER_TASK_DESCRIPTION = 'Pada halaman admin/cars, tambahkan checkbox pada setiap baris listing agar beberapa mobil dapat dipilih untuk dipindahkan sekaligus ke showroom lain. Tampilkan aksi massal setelah ada pilihan dan minta konfirmasi dengan ringkasan mobil, showroom asal, serta showroom tujuan; gunakan nama showroom, bukan ID. Sebelum implementasi, konfirmasi apakah satu batch boleh berisi mobil dari beberapa showroom asal dan apakah seluruh mobil dalam batch harus menuju showroom tujuan yang sama. Belum ada gambar referensi.';
+
+    public const SELLER_CARS_BRAND_SEARCH_TASK_KEY = 'request-076-seller-cars-brand-search';
+
+    public const SELLER_CARS_BRAND_SEARCH_TASK_TITLE = 'Tambahkan pencarian pada pilihan Merek Mobil di seller/cars.';
+
+    public const SELLER_CARS_BRAND_SEARCH_TASK_DESCRIPTION = 'Pada form tambah dan edit mobil di halaman seller/cars, ubah field Merek Mobil menjadi pilihan yang dapat dicari dengan mengetik nama. Pencarian hanya memfilter opsi dari Master Brand; nilai tetap harus dipilih dari opsi dan nilai merek lama yang sudah tersimpan tetap ditampilkan. Referensi: Tugas GitIgnore/seller-cars-brand-search-reference-2026-11-16.png. Implementasi sudah selesai.';
 }

@@ -584,6 +584,14 @@ class TaskRepository
                 'status' => 'open',
                 'created_at' => '2026-11-16 00:00:00',
             ],
+            [
+                'task_key' => TaskCatalog::SELLER_CARS_BRAND_SEARCH_TASK_KEY,
+                'title' => TaskCatalog::SELLER_CARS_BRAND_SEARCH_TASK_TITLE,
+                'description' => TaskCatalog::SELLER_CARS_BRAND_SEARCH_TASK_DESCRIPTION,
+                'status' => 'open',
+                'work_status' => 'done',
+                'created_at' => '2026-11-16 00:00:00',
+            ],
         ];
     }
 
