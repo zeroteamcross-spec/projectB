@@ -449,4 +449,10 @@ final class TaskCatalog
     public const ADMIN_CARS_MARK_SOLD_EXTERNAL_COPY_TASK_TITLE = 'Tinjau keterangan dan syarat tombol Tandai Terjual (Luar Sistem).';
 
     public const ADMIN_CARS_MARK_SOLD_EXTERNAL_COPY_TASK_DESCRIPTION = 'Pada halaman admin/cars, rangkum dan buat ulasan, keterangan dan syarat tombol "Tandai Terjual (Luar Sistem)". Ruang lingkup tampilan/perilaku menunggu konfirmasi pengguna. Referensi: Tugas GitIgnore/admin-cars-mark-sold-external-2026-11-16.png.';
+
+    public const ADMIN_CARS_BULK_SHOWROOM_TRANSFER_TASK_KEY = 'request-075-admin-cars-bulk-showroom-transfer';
+
+    public const ADMIN_CARS_BULK_SHOWROOM_TRANSFER_TASK_TITLE = 'Tambahkan pemindahan mobil massal antar-showroom.';
+
+    public const ADMIN_CARS_BULK_SHOWROOM_TRANSFER_TASK_DESCRIPTION = 'Pada halaman admin/cars, tambahkan checkbox pada setiap baris listing agar beberapa mobil dapat dipilih untuk dipindahkan sekaligus ke showroom lain. Tampilkan aksi massal setelah ada pilihan dan minta konfirmasi dengan ringkasan mobil, showroom asal, serta showroom tujuan; gunakan nama showroom, bukan ID. Sebelum implementasi, konfirmasi apakah satu batch boleh berisi mobil dari beberapa showroom asal dan apakah seluruh mobil dalam batch harus menuju showroom tujuan yang sama. Belum ada gambar referensi.';
 }
